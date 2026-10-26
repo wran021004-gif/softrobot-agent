@@ -1,0 +1,1449 @@
+{
+  "reference": {
+    "artifact_id": "1def36950da6336112258345698617c044079ec207d87aab3cbea394c9f4544a",
+    "media_type": "application/json"
+  },
+  "status": "prospective_predictions_frozen",
+  "implementation": "91763a3b2c98b0dd497f23a468bb544a7f1686b7",
+  "protocol": {
+    "date": "2026-10-26 Asia/Shanghai",
+    "source": "evidence/b3_r1_history_assisted_050/design_package.json",
+    "base_commit": "618fba9a11a1a1d0c9fca5228d25e873b7c8dddd",
+    "physics_step_cap": 20000,
+    "planned_steps": 13000,
+    "structure": {
+      "path": "segments.1.young_pa",
+      "unit": "Pa",
+      "base": 5400000.0,
+      "h": 10000.0
+    },
+    "control": {
+      "unit": "N",
+      "h": 0.001,
+      "knots_s": [
+        0.45,
+        0.49
+      ],
+      "window_s": [
+        0.45,
+        0.5
+      ],
+      "coefficient_index": 5,
+      "channel": "tendon_1"
+    },
+    "training_factors": [
+      -1.0,
+      1.0,
+      -0.5,
+      0.5
+    ],
+    "holdout_factor": 0.75,
+    "prediction": "baseline plus h/2 central per-sample derivative; maximize all 13 predicted rows for signed J, each metric and active sample",
+    "step_rationale": "Young reuses the A4 R1 native probe: 0.1852% of baseline and well inside the frozen 2-15 MPa domain. Control is a 1 mN perturbation of an unsaturated 4.4-5.1 N channel; the existing knot interpolation distributes it over the final 50 ms. Chosen before any new rollout or held-out result, without tuning to its outcome.",
+    "policy": {
+      "two_scale_relative_difference": 0.05,
+      "maximum_error_fraction_of_change": 0.25,
+      "material_normalized_change": 1e-08,
+      "decision_significance_fraction_of_baseline_speed_margin": 0.1
+    },
+    "policy_scope": "A4 empirical accuracy policy plus explicit decision significance relative to R1 boundary margin; neither is a rigorous bound or a new task threshold. Inspect all 13 rows even if aggregate J improves. Active switches keep A4 max-gradient status unresolved; row-wise predictions and predicted classification are assessed separately.",
+    "freeze_order": "commit protocol and driver; save training results and prospective predictions; commit predictions before calculating any holdout; then independent full MuJoCo playback and original evaluator",
+    "reoptimization": "not executed; reoptimized_capability_unresolved",
+    "prohibited_calls": [
+      "provider",
+      "LLM Agent",
+      "PPO",
+      "NMPC",
+      "new optimizer"
+    ]
+  },
+  "baseline": {
+    "metrics": {
+      "holding_max_error_m": {
+        "value": 0.00450472040935653,
+        "units": "m",
+        "time_s": 0.46000000000000035,
+        "margin": 0.00549527959064347
+      },
+      "holding_max_speed_m_s": {
+        "value": 0.019934319730102207,
+        "units": "m/s",
+        "time_s": 0.4900000000000004,
+        "margin": 6.56802698977936e-05
+      },
+      "terminal_error_m": {
+        "value": 0.004169056300314731,
+        "units": "m",
+        "time_s": 0.5000000000000003,
+        "margin": 0.005830943699685269
+      }
+    },
+    "signed_J": -0.00328401349488968,
+    "task_constraints_pass": true,
+    "active": {
+      "per_constraint": {
+        "holding_max_error_m": 46,
+        "holding_max_speed_m_s": 49,
+        "terminal_error_m": 50
+      },
+      "worst": [
+        "holding_max_speed_m_s",
+        49
+      ]
+    }
+  },
+  "directions": [
+    {
+      "direction_id": "structure@1.0h",
+      "coefficients": {
+        "structure": 1.0
+      },
+      "step": 10000.0,
+      "task_sensitivity": {
+        "fixed_control": {
+          "status": "local_estimate_unvalidated",
+          "reasons": [],
+          "coordinate_unit": "Pa",
+          "step": 10000.0,
+          "samples": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.004497352874747599,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5502647125252401
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.005749967638840546,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7125016180579727
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.00450472040935653,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.549527959064347
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.004348629306957262,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7825685346521369
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.004434841899843131,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.556515810015687
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.012459349597377918,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.3770325201311041
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.004321437766797422,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5678562233202579
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.016450706476368822,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.17746467618155892
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.004197051602353626,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5802948397646374
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.019934319730102207,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.00328401349488968
+            },
+            {
+              "constraint_id": "terminal_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.012458945114990723,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.37705274425046387
+            }
+          ],
+          "finite_difference_per_unit": [
+            -4.970718677208941e-07,
+            6.23206980366775e-07,
+            -4.832121186095772e-07,
+            -1.8255687936171994e-06,
+            -4.6130759063011674e-07,
+            -1.7566530138195007e-06,
+            -4.3394144243956714e-07,
+            -1.8123034688947646e-06,
+            -4.0341377881268346e-07,
+            -1.7504757083502098e-06,
+            -3.7994802675239136e-07,
+            -3.7994802675239136e-07,
+            -1.3762227036821007e-06
+          ],
+          "left_per_unit": [
+            -5.036009430762101e-07,
+            5.547160397518458e-07,
+            -4.890962554815692e-07,
+            -1.8586042670723834e-06,
+            -4.667117172393986e-07,
+            -1.7745551327643162e-06,
+            -4.3896628191306687e-07,
+            -1.824840707313341e-06,
+            -4.0815414627372035e-07,
+            -1.7585022650264474e-06,
+            -3.8436009013871344e-07,
+            -3.8436009013871344e-07,
+            -1.3868613641141837e-06
+          ],
+          "right_per_unit": [
+            -4.905427923655781e-07,
+            6.916979209817043e-07,
+            -4.773279817375853e-07,
+            -1.7925333201620153e-06,
+            -4.559034640208348e-07,
+            -1.7387508948746855e-06,
+            -4.2891660296606735e-07,
+            -1.799766230476188e-06,
+            -3.9867341135164657e-07,
+            -1.742449151673972e-06,
+            -3.7553596336606933e-07,
+            -3.7553596336606933e-07,
+            -1.3655840432500178e-06
+          ],
+          "legal_coordinate_span": null,
+          "dimensionless_sensitivity": null,
+          "active_samples": [
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            }
+          ],
+          "active_switches": [],
+          "validation": [],
+          "source_results": [
+            {
+              "artifact_id": "afaf1c7ec2e8ba65851ee38daf9de496777f42e13b58dcb1caf4cb0d5a1d57f7",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "547cb3fd9adea7f20395a7aec36a47372c35e5ca0e497b48c007b754cc02fc46",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "a0d409b33cf2783a913c88c8f99828a98a4d01ea09428439b88628eb3f7bde86",
+              "media_type": "application/json"
+            }
+          ],
+          "interpretation": "Sampled normalized constraint secants. No ordinary max gradient at active switches; no strict error bound.",
+          "scale_comparisons": [
+            {
+              "direction_id": "structure@0.5h",
+              "relative_difference": 0.000843329891520551,
+              "direction_agrees": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "direction_id": "structure@0.5h",
+      "coefficients": {
+        "structure": 1.0
+      },
+      "step": 5000.0,
+      "task_sensitivity": {
+        "fixed_control": {
+          "status": "local_estimate_unvalidated",
+          "reasons": [],
+          "coordinate_unit": "Pa",
+          "step": 5000.0,
+          "samples": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.004497352874747599,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5502647125252401
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.005749967638840546,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7125016180579727
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.00450472040935653,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.549527959064347
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.004348629306957262,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7825685346521369
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.004434841899843131,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.556515810015687
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.012459349597377918,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.3770325201311041
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.004321437766797422,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5678562233202579
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.016450706476368822,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.17746467618155892
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.004197051602353626,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5802948397646374
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.019934319730102207,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.00328401349488968
+            },
+            {
+              "constraint_id": "terminal_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.012458945114990723,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.37705274425046387
+            }
+          ],
+          "finite_difference_per_unit": [
+            -4.970928920170925e-07,
+            6.247478261150352e-07,
+            -4.832299903704929e-07,
+            -1.8270972768224424e-06,
+            -4.61323194062202e-07,
+            -1.7568369025254993e-06,
+            -4.339552238129318e-07,
+            -1.8123691985104552e-06,
+            -4.034260436711845e-07,
+            -1.75048090150327e-06,
+            -3.7995845653139293e-07,
+            -3.7995845653139293e-07,
+            -1.3762776102300755e-06
+          ],
+          "left_per_unit": [
+            -5.003574272133493e-07,
+            5.904895503413777e-07,
+            -4.861720510840106e-07,
+            -1.8435589189175206e-06,
+            -4.640252501406206e-07,
+            -1.7657858816563788e-06,
+            -4.364676397940803e-07,
+            -1.8186371316961435e-06,
+            -4.0579622938681223e-07,
+            -1.754494029310126e-06,
+            -3.8216449339476544e-07,
+            -3.8216449339476544e-07,
+            -1.381596389472195e-06
+          ],
+          "right_per_unit": [
+            -4.938283568208357e-07,
+            6.590061018886928e-07,
+            -4.802879296569751e-07,
+            -1.8106356347273645e-06,
+            -4.5862113798378346e-07,
+            -1.7478879233946199e-06,
+            -4.3144280783178336e-07,
+            -1.8061012653247666e-06,
+            -4.0105585795555674e-07,
+            -1.746467773696414e-06,
+            -3.777524196680204e-07,
+            -3.777524196680204e-07,
+            -1.3709588309879562e-06
+          ],
+          "legal_coordinate_span": null,
+          "dimensionless_sensitivity": null,
+          "active_samples": [
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            }
+          ],
+          "active_switches": [],
+          "validation": [],
+          "source_results": [
+            {
+              "artifact_id": "afaf1c7ec2e8ba65851ee38daf9de496777f42e13b58dcb1caf4cb0d5a1d57f7",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "88b6360d51363d14ad85bea47ce8192e22e92e8b1cf4a1779449e55aba2b27f1",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "641ebc11e501fe4c4c6933a2abf6a55b61ea6b367fca80bc4e4e802cc96206fd",
+              "media_type": "application/json"
+            }
+          ],
+          "interpretation": "Sampled normalized constraint secants. No ordinary max gradient at active switches; no strict error bound.",
+          "scale_comparisons": [
+            {
+              "direction_id": "structure@1.0h",
+              "relative_difference": 0.0008440359813596058,
+              "direction_agrees": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "direction_id": "control@1.0h",
+      "coefficients": {
+        "control": 1.0
+      },
+      "step": 0.001,
+      "task_sensitivity": {
+        "fixed_control": {
+          "status": "local_estimate_unvalidated",
+          "reasons": [],
+          "coordinate_unit": "N",
+          "step": 0.001,
+          "samples": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.004497352874747599,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5502647125252401
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.005749967638840546,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7125016180579727
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.00450472040935653,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.549527959064347
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.004348629306957262,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7825685346521369
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.004434841899843131,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.556515810015687
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.012459349597377918,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.3770325201311041
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.004321437766797422,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5678562233202579
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.016450706476368822,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.17746467618155892
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.004197051602353626,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5802948397646374
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.019934319730102207,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.00328401349488968
+            },
+            {
+              "constraint_id": "terminal_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.012458945114990723,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.37705274425046387
+            }
+          ],
+          "finite_difference_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.015841000668925798,
+            -1.8377315145441386,
+            0.055628311938060726,
+            -4.182200365445906,
+            0.11550656087411237,
+            -6.769976877306003,
+            0.18981711709087357,
+            0.18981711709087357,
+            -7.469607284419949
+          ],
+          "left_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.01584052640590805,
+            -1.8378052159726543,
+            0.055621046595955015,
+            -4.18254868950127,
+            0.115465483536914,
+            -6.770162381215805,
+            0.18967510520206954,
+            0.18967510520206954,
+            -7.49605379345325
+          ],
+          "right_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.015841474931943544,
+            -1.837657813115623,
+            0.05563557728016644,
+            -4.181852041390544,
+            0.11554763821131075,
+            -6.7697913733962,
+            0.1899591289796776,
+            0.1899591289796776,
+            -7.443160775386648
+          ],
+          "legal_coordinate_span": null,
+          "dimensionless_sensitivity": null,
+          "active_samples": [
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            }
+          ],
+          "active_switches": [],
+          "validation": [],
+          "source_results": [
+            {
+              "artifact_id": "afaf1c7ec2e8ba65851ee38daf9de496777f42e13b58dcb1caf4cb0d5a1d57f7",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "fc5610b8184961a822c9c2dfab41dec4db2112275c8dbf7d3fca260febdbda78",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "4de8095d22d5871faf45c8cbe087f1b4d3f3ef33619f64ec7b9c04188634969e",
+              "media_type": "application/json"
+            }
+          ],
+          "interpretation": "Sampled normalized constraint secants. No ordinary max gradient at active switches; no strict error bound.",
+          "scale_comparisons": [
+            {
+              "direction_id": "control@0.5h",
+              "relative_difference": 3.1999632416140265e-05,
+              "direction_agrees": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "direction_id": "control@0.5h",
+      "coefficients": {
+        "control": 1.0
+      },
+      "step": 0.0005,
+      "task_sensitivity": {
+        "fixed_control": {
+          "status": "local_estimate_unvalidated",
+          "reasons": [],
+          "coordinate_unit": "N",
+          "step": 0.0005,
+          "samples": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.004497352874747599,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5502647125252401
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 45,
+              "time_s": 0.45000000000000034,
+              "value": 0.005749967638840546,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7125016180579727
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.00450472040935653,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.549527959064347
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 46,
+              "time_s": 0.46000000000000035,
+              "value": 0.004348629306957262,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.7825685346521369
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.004434841899843131,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.556515810015687
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 47,
+              "time_s": 0.47000000000000036,
+              "value": 0.012459349597377918,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.3770325201311041
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.004321437766797422,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5678562233202579
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 48,
+              "time_s": 0.48000000000000037,
+              "value": 0.016450706476368822,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.17746467618155892
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.004197051602353626,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5802948397646374
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 49,
+              "time_s": 0.4900000000000004,
+              "value": 0.019934319730102207,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.00328401349488968
+            },
+            {
+              "constraint_id": "terminal_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.004169056300314731,
+              "units": "m",
+              "limit": 0.01,
+              "normalized_signed_excess": -0.5830943699685268
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 50,
+              "time_s": 0.5000000000000003,
+              "value": 0.012458945114990723,
+              "units": "m/s",
+              "limit": 0.02,
+              "normalized_signed_excess": -0.37705274425046387
+            }
+          ],
+          "finite_difference_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.015841000675420602,
+            -1.8377316820947787,
+            0.05562831263539181,
+            -4.182201751378761,
+            0.11550656905834344,
+            -6.769978067711415,
+            0.1898171638491375,
+            0.1898171638491375,
+            -7.46984631675629
+          ],
+          "left_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.01584076353022823,
+            -1.8377685325702275,
+            0.055624679953902856,
+            -4.182375909895009,
+            0.11548603036848348,
+            -6.770070815635687,
+            0.1897461579127846,
+            0.1897461579127846,
+            -7.48306834866741
+          ],
+          "right_per_unit": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.015841237820612974,
+            -1.8376948316193298,
+            0.05563194531688076,
+            -4.1820275928625135,
+            0.1155271077482034,
+            -6.769885319787145,
+            0.1898881697854904,
+            0.1898881697854904,
+            -7.45662428484517
+          ],
+          "legal_coordinate_span": null,
+          "dimensionless_sensitivity": null,
+          "active_samples": [
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            },
+            {
+              "per_constraint": {
+                "holding_max_error_m": 46,
+                "holding_max_speed_m_s": 49,
+                "terminal_error_m": 50
+              },
+              "worst": [
+                "holding_max_speed_m_s",
+                49
+              ]
+            }
+          ],
+          "active_switches": [],
+          "validation": [],
+          "source_results": [
+            {
+              "artifact_id": "afaf1c7ec2e8ba65851ee38daf9de496777f42e13b58dcb1caf4cb0d5a1d57f7",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "67b86775f1d22ad19b0fc7fd28d2f4bc51fa4ad42ad5c8dbf974766b772a638f",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "f7e0f332df3b98f5ee4d691fc6cf19dd275d18110574fe52063ac53f16e1b7c7",
+              "media_type": "application/json"
+            }
+          ],
+          "interpretation": "Sampled normalized constraint secants. No ordinary max gradient at active switches; no strict error bound.",
+          "scale_comparisons": [
+            {
+              "direction_id": "control@1.0h",
+              "relative_difference": 3.2000656425382954e-05,
+              "direction_agrees": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "predictions": {
+    "structure": {
+      "coordinate": 7500.0,
+      "samples": [
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 45,
+          "time_s": 0.45000000000000034,
+          "value": 0.004460070907846316,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5539929092153684,
+          "predicted_change": -3.728196690128194e-05,
+          "change_over_threshold": -0.0037281966901281938,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 45,
+          "time_s": 0.45000000000000034,
+          "value": 0.005843679812757801,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.70781600936211,
+          "predicted_change": 9.371217391725529e-05,
+          "change_over_threshold": 0.004685608695862764,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 46,
+          "time_s": 0.46000000000000035,
+          "value": 0.0044684781600787425,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5531521839921257,
+          "predicted_change": -3.6242249277786966e-05,
+          "change_over_threshold": -0.0036242249277786964,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 46,
+          "time_s": 0.46000000000000035,
+          "value": 0.004074564715433895,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.7962717642283053,
+          "predicted_change": -0.0002740645915233664,
+          "change_over_threshold": -0.013703229576168319,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 47,
+          "time_s": 0.47000000000000036,
+          "value": 0.004400242660288466,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5599757339711535,
+          "predicted_change": -3.459923955466515e-05,
+          "change_over_threshold": -0.003459923955466515,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 47,
+          "time_s": 0.47000000000000036,
+          "value": 0.012195824061999093,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.39020879690004534,
+          "predicted_change": -0.0002635255353788249,
+          "change_over_threshold": -0.013176276768941245,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 48,
+          "time_s": 0.48000000000000037,
+          "value": 0.004288891125011452,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5711108874988549,
+          "predicted_change": -3.254664178596989e-05,
+          "change_over_threshold": -0.003254664178596989,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 48,
+          "time_s": 0.48000000000000037,
+          "value": 0.016178851096592253,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.19105744517038734,
+          "predicted_change": -0.00027185537977656826,
+          "change_over_threshold": -0.013592768988828413,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 49,
+          "time_s": 0.4900000000000004,
+          "value": 0.004166794649078287,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5833205350921713,
+          "predicted_change": -3.025695327533884e-05,
+          "change_over_threshold": -0.003025695327533884,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 49,
+          "time_s": 0.4900000000000004,
+          "value": 0.019671747594876717,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.016412620256164204,
+          "predicted_change": -0.0002625721352254905,
+          "change_over_threshold": -0.013128606761274525,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "terminal_error_m",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.004140559416074877,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5859440583925123,
+          "predicted_change": -2.849688423985447e-05,
+          "change_over_threshold": -0.002849688423985447,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.004140559416074877,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5859440583925123,
+          "predicted_change": -2.849688423985447e-05,
+          "change_over_threshold": -0.002849688423985447,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.012252503473456211,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.38737482632718945,
+          "predicted_change": -0.00020644164153451133,
+          "change_over_threshold": -0.010322082076725567,
+          "direction": "decrease"
+        }
+      ],
+      "metrics": {
+        "holding_max_error_m": {
+          "value": 0.0044684781600787425,
+          "units": "m",
+          "time_s": 0.46000000000000035,
+          "margin": 0.005531521839921258
+        },
+        "holding_max_speed_m_s": {
+          "value": 0.019671747594876717,
+          "units": "m/s",
+          "time_s": 0.4900000000000004,
+          "margin": 0.00032825240512328324
+        },
+        "terminal_error_m": {
+          "value": 0.004140559416074877,
+          "units": "m",
+          "time_s": 0.5000000000000003,
+          "margin": 0.005859440583925123
+        }
+      },
+      "signed_J": -0.016412620256164204,
+      "task_constraints_pass": true,
+      "active": {
+        "per_constraint": {
+          "holding_max_error_m": 46,
+          "holding_max_speed_m_s": 49,
+          "terminal_error_m": 50
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          49
+        ]
+      }
+    },
+    "control": {
+      "coordinate": 0.00075,
+      "samples": [
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 45,
+          "time_s": 0.45000000000000034,
+          "value": 0.004497352874747599,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5502647125252401,
+          "predicted_change": 0.0,
+          "change_over_threshold": 0.0,
+          "direction": "unchanged"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 45,
+          "time_s": 0.45000000000000034,
+          "value": 0.005749967638840546,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.7125016180579727,
+          "predicted_change": 0.0,
+          "change_over_threshold": 0.0,
+          "direction": "unchanged"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 46,
+          "time_s": 0.46000000000000035,
+          "value": 0.00450472040935653,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.549527959064347,
+          "predicted_change": 0.0,
+          "change_over_threshold": 0.0,
+          "direction": "unchanged"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 46,
+          "time_s": 0.46000000000000035,
+          "value": 0.004348629306957262,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.7825685346521369,
+          "predicted_change": 0.0,
+          "change_over_threshold": 0.0,
+          "direction": "unchanged"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 47,
+          "time_s": 0.47000000000000036,
+          "value": 0.0044349607073481965,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5565039292651803,
+          "predicted_change": 1.1880750506565452e-07,
+          "change_over_threshold": 1.1880750506565452e-05,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 47,
+          "time_s": 0.47000000000000036,
+          "value": 0.012431783622146496,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.3784108188926752,
+          "predicted_change": -2.756597523142168e-05,
+          "change_over_threshold": -0.001378298761571084,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 48,
+          "time_s": 0.48000000000000037,
+          "value": 0.0043218549791421874,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5678145020857813,
+          "predicted_change": 4.172123447654386e-07,
+          "change_over_threshold": 4.1721234476543856e-05,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 48,
+          "time_s": 0.48000000000000037,
+          "value": 0.01638797345009814,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.180601327495093,
+          "predicted_change": -6.273302627068141e-05,
+          "change_over_threshold": -0.0031366513135340705,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 49,
+          "time_s": 0.4900000000000004,
+          "value": 0.004197917901621564,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.5802082098378436,
+          "predicted_change": 8.662992679375759e-07,
+          "change_over_threshold": 8.662992679375758e-05,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 49,
+          "time_s": 0.4900000000000004,
+          "value": 0.019832770059086534,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.008361497045673242,
+          "predicted_change": -0.00010154967101567124,
+          "change_over_threshold": -0.005077483550783562,
+          "direction": "decrease"
+        },
+        {
+          "constraint_id": "terminal_error_m",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.0041704799290436,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.58295200709564,
+          "predicted_change": 1.4236287288685313e-06,
+          "change_over_threshold": 0.00014236287288685312,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.0041704799290436,
+          "units": "m",
+          "limit": 0.01,
+          "normalized_signed_excess": -0.58295200709564,
+          "predicted_change": 1.4236287288685313e-06,
+          "change_over_threshold": 0.00014236287288685312,
+          "direction": "increase"
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 50,
+          "time_s": 0.5000000000000003,
+          "value": 0.012346897420239379,
+          "units": "m/s",
+          "limit": 0.02,
+          "normalized_signed_excess": -0.3826551289880311,
+          "predicted_change": -0.00011204769475134435,
+          "change_over_threshold": -0.0056023847375672176,
+          "direction": "decrease"
+        }
+      ],
+      "metrics": {
+        "holding_max_error_m": {
+          "value": 0.00450472040935653,
+          "units": "m",
+          "time_s": 0.46000000000000035,
+          "margin": 0.00549527959064347
+        },
+        "holding_max_speed_m_s": {
+          "value": 0.019832770059086534,
+          "units": "m/s",
+          "time_s": 0.4900000000000004,
+          "margin": 0.00016722994091346657
+        },
+        "terminal_error_m": {
+          "value": 0.0041704799290436,
+          "units": "m",
+          "time_s": 0.5000000000000003,
+          "margin": 0.0058295200709564
+        }
+      },
+      "signed_J": -0.008361497045673242,
+      "task_constraints_pass": true,
+      "active": {
+        "per_constraint": {
+          "holding_max_error_m": 46,
+          "holding_max_speed_m_s": 49,
+          "terminal_error_m": 50
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          49
+        ]
+      }
+    }
+  },
+  "physics_steps_before_holdout": 9000,
+  "holdout_results_used": false
+}
