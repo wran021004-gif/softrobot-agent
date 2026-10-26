@@ -1,7 +1,7 @@
 # B3 M2：有限真实自主科研试点
 
-2026-10-26（Asia/Shanghai）。状态：**准备完成，自动审批拒绝启动，B/C 均未运行**。
-本文件是准备与阻塞交接，不是已完成的 M2 科研报告。
+2026-10-26（Asia/Shanghai）。状态：**用户补充明确批准后，B 已启动；C 隔离等待**。
+本文件持续更新，尚不是已完成的 M2 科研报告。
 
 基线 `feat/b3-t2-guided-design@fcdc0a4f47dea98afe3a355f491b15b1f7a51a6d`。
 研究分支 `research/b3-m2-live-pilot`，复用原 M1 工作树与原 Store，保留 M1 分支和其他工作树。
@@ -42,8 +42,8 @@ NMPC **重规划/求解间隔 0.1 s**，horizon=10、substeps=1、max_iterations
 CVXPY 1.9.3、CLARABEL 0.11.1，三种数值线程均为 1；只做导入检查，没有重复科学预检。
 两项定向 unittest 通过（8.847 s）：原 request-feedback rotation、B/C 冻结公平配置与正式授权门禁。
 
-持续监督：已创建本聊天每 5 分钟检查的 heartbeat `b3-m2`，因下述自动审批阻塞暂为 PAUSED。
-明确授权满足审批要求后恢复；任务全部交付后停用。
+持续监督：本聊天每 5 分钟检查的 heartbeat `b3-m2` 已在明确授权后恢复 ACTIVE。
+任务全部交付后停用。
 原始请求、响应、决策、收据、worker 和结果继续由原 Store 保存，不建立第二套日志或账本。
 
 ## 进度与恢复交接
@@ -84,23 +84,47 @@ session_handoff=True、handoff_request_bytes=160000、pause_exploration_remainin
 `https://api.deepseek.com/chat/completions`。
 请求范围为冻结 B3 任务、必要结构与控制参数、三条显式声明的共同历史背景、工具定义和本 Study
 实际工具反馈；API key 仅供正常认证，不进入提示词、证据或日志；不检索其他工作区文件。
-若用户明确批准该具体出口与数据范围，再提交同一原运行操作；不换出口、不间接绕行。
-这是运行审批阻塞，不是模型网络故障、科学失败或平台已通过的证明。
+用户随后明确回复“批准”，已再次绑定原 scope：B 授权
+`96ef52443b36b18dc30327a4250d67cea40bbe86cc46ec8c359a92d4ab991ccf`，C 授权
+`adedc05beba95308bc65cb2b0b1f17b642d208ad6b383ad8968cabe339701369`。
+同一启动操作重新提交后获准，凭据可用、原出口 TCP 连通，B 进程 PID 515372 已启动。
+没有换出口、间接绕行或额外预检模型请求。之前的拦截不是网络故障或科学失败。
 
 ## 科研结果
 
+B 早期真实交付抽查：首请求 wire 为
+`63c6c4a21bfc049bc0bda4bc00116a3d5cab8ff08ac8adde1e50663a2165724a`，70,776 bytes。
+后续请求 #2–#4 仍完整包含三条 research_history 结论及原 Study、MODEL_WITNESS / PHYSICAL_OBSERVATION、
+task_match=false 与 L1 指针；0.35 s 旧 CONIC −0.2、回放速度 0.2741264353 m/s、
+旧 NMPC 速度 0.1817335826 m/s 均进入尾部 CURRENT_RESEARCH_PACKET。
+frozen_replan_period_s=0.1 可见，没有把旧结果赋予本轮验收身份。
+
+Agent 首先公开读取历史与必要配置，自主选择固定参考上的 NMPC 控制实测，未先调用 T1/T2。
+其可检验假设是：原控制配方在新 0.50 s 内满足位置和保持速度；若失败，再依据绑定指标选择剩余控制机会。
+三次 execute 请求的 decision.selected_candidate 缺失或为 null，被
+DECISION_CANDIDATE_MISMATCH 拒绝，没有科学启动；第四次自行修正后进入第一次 NMPC。
+原错误与公开操作 / Provider 成本均保留，没有监督者改写模型提交或重置预算。
+
+运行交接：B 主研究进程 PID 341580（Windows venv launcher PID 515372），
+execution owner `b3-t2-050-b-v2-draft-exec-773fd76849c64c3c`，原 worker_lifecycle PID 607404，
+实际控制子进程 PID 736960。原 backend execution `630458fcbd944389a602244dfdd5a42d`。
+首个在线求解在 t=0 返回 iteration_limit_feasible，plan_accepted=true、solver_failed=false、
+optimization_nonconverged=true，100.7528732 s；已保存 0–0.09 s 的 10 条控制更新，
+正在后续在线求解。这是实际数值状态，不是工程错误；未调整迭代或任务阈值。
+监督应先检查这些进程与原 pending，再读取新增 nmpc_updates / Store 事件，不重复启动。
+
 | 实际状态与费用 | B | C |
 |---|---:|---:|
-| 状态 | 未启动，审批阻塞 | 未启动，隔离等待 |
-| Provider（含 Reporter） | 0 / 32 | 0 / 32 |
-| 公开操作 | 0 / 80 | 0 / 80 |
+| 状态 | 已启动，待实际结果结算 | 未启动，隔离等待 |
+| Provider（含 Reporter） | 5 / 32 | 0 / 32 |
+| 公开操作 | 8 / 80 | 0 / 80 |
 | 数学总评价 / 模型 / CONIC / dual-face | 0 / 0 / 0 / 0 | 相同 |
-| 独立物理 / NMPC / 完整回放 | 0 / 0 / 0 | 相同 |
-| native 内部积分 / PPO | 0 / 0 | 相同 |
-| pending / 占用 / 未消费响应 | 无 | 无 |
+| 独立物理启动 / NMPC / 完整回放 | 1 / 1 / 0 | 0 / 0 / 0 |
+| native 内部积分 / PPO | 执行中，待原记录结算 / 0 | 0 / 0 |
+| pending / 占用 / 未消费响应 | 原 NMPC pending / 无 Provider 占用 / 无 | 无 |
 
-本轮模型**没有收到任何请求，因此没有科研决策**。T1/T2、分数平台、结构修改、
-GVS—MuJoCo 差异和最佳独立硬指标均未测量，不能把旧证据记成本轮结果。
+上表为第一次 NMPC 仍在执行的账本快照；后续由原账本结算并替换。
+T1/T2、分数平台、结构修改、GVS—MuJoCo 差异和最佳独立硬指标尚待本轮测量，不能把旧证据记成本轮结果。
 没有研究 Agent 的 SELECT/STOP，也未行政关闭这两份待运行 Store。
 后续须完成每组实际决策与 wire 审计、资源结算、独立物理硬验收、标准导出及完整研究结论。
 
