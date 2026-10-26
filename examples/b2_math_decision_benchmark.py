@@ -169,12 +169,15 @@ def diagnose():
         measure=task_measure(outputs,**options(cfg))
         return dict(reference='b2-control-'+str(native.cost['rollouts']),outputs=outputs,measure=measure,
             task_gap=dict(valid_complete=True,accepted=False,normalized_gap=measure['normalized_gap']),cost_s=0.)
-    result=search([start],evaluate,settings,evaluation_kind='native_short_rollout',
-        rank_key=lambda r:(r['measure']['signed_maximum_excess'],r['measure']['sum_normalized_excess']))
-    sensitivity=control_sensitivities(result,req)
-    save('a4_control_probes',dict(search=result,sensitivity=sensitivity,
-        new_cost={**native.cost,'wall_s':time.perf_counter()-started},
-        scope='Offset parameterization around original B1 best control; positive one-sided probes may clip at 0 N. No reoptimization claim.'))
+    if (OUT/'a4_control_probes.json').exists():
+        saved=read(OUT/'a4_control_probes.json');result=saved['search'];sensitivity=saved['sensitivity']
+    else:
+        result=search([start],evaluate,settings,evaluation_kind='native_short_rollout',
+            rank_key=lambda r:(r['measure']['signed_maximum_excess'],r['measure']['sum_normalized_excess']))
+        sensitivity=control_sensitivities(result,req)
+        save('a4_control_probes',dict(search=result,sensitivity=sensitivity,
+            new_cost={**native.cost,'wall_s':time.perf_counter()-started},
+            scope='Offset parameterization around original B1 best control; positive one-sided probes may clip at 0 N. No reoptimization claim.'))
     base_samples=sampled_constraints(result['candidates'][0]['outputs'],req)
     useful=[]
     for response in sensitivity['responses']:
@@ -182,39 +185,42 @@ def diagnose():
         predicted=np.array([r['normalized_signed_excess'] for r in base_samples])+.01*deriv
         useful.append((float(max(predicted)),response['coefficient_index'],deriv))
     _,coefficient,derivative=min(useful,key=lambda row:row[0])
-    save('a4_control_holdout_plan',dict(coefficient_index=coefficient,selection='min predicted whole-task J at +0.01 N using 0.02 N probes; held-out +0.015 N not read',
-        new_cost=dict(physics_steps=0,rollouts=0)))
+    if not (OUT/'a4_control_holdout_plan.json').exists():
+        save('a4_control_holdout_plan',dict(coefficient_index=coefficient,selection='min predicted whole-task J at +0.01 N using 0.02 N probes; held-out +0.015 N not read',
+            new_cost=dict(physics_steps=0,rollouts=0)))
     started=time.perf_counter();native=NativeModel(cfg);d=initial(native);room(2*1400)
     checks=[]
-    for delta in (.01,.015):
+    for delta in (() if (OUT/'a4_control_validation.json').exists() else (.01,.015)):
         x=np.zeros(24);x[coefficient]=delta
         u=corrected_tensions(source['trajectory']['tensions_n'],times[:-1],settings.knots_s,x,native.limits[:,1],settings.correction_window_s)
         outputs=native.rollout_sequence(d,times,u)
         checks.append(dict(delta_n=delta,outputs=outputs,samples=sampled_constraints(outputs,req)))
-    fine=(np.array([r['normalized_signed_excess'] for r in checks[0]['samples']])-
-        np.array([r['normalized_signed_excess'] for r in base_samples]))/.01
-    save('a4_control_validation',dict(coefficient_index=coefficient,checks=checks,
-        two_scale_relative_difference=float(np.linalg.norm(fine-derivative)/max(np.linalg.norm(fine),1e-30)),
-        validation=validate_prediction(base_samples,fine,.015,checks[1]['samples']),
-        new_cost={**native.cost,'wall_s':time.perf_counter()-started}))
+    if checks:
+        fine=(np.array([r['normalized_signed_excess'] for r in checks[0]['samples']])-
+            np.array([r['normalized_signed_excess'] for r in base_samples]))/.01
+        save('a4_control_validation',dict(coefficient_index=coefficient,checks=checks,
+            two_scale_relative_difference=float(np.linalg.norm(fine-derivative)/max(np.linalg.norm(fine),1e-30)),
+            validation=validate_prediction(base_samples,fine,.015,checks[1]['samples']),
+            new_cost={**native.cost,'wall_s':time.perf_counter()-started}))
     started=time.perf_counter();room(5*1400);rows=[];total={}
     # Baseline is the newly verified exact same control, reused without integration.
     rows.append(dict(value=.018,parameter_values={'coupled_radius_m':.018},reference='a4_control_probes/candidates/0',
-        task_samples=dict(fixed_control=base_samples)))
+        task_samples=dict(fixed_control=base_samples,reoptimized_control=[])))
     raw=[]
     for delta in (-.00001,.00001,-.000005,.000005,.0000075):
         variant=generated(s,radius=.018+delta);native=NativeModel(variant);d=initial(native)
         outputs=native.rollout_sequence(d,times,source['trajectory']['tensions_n'])
         row=dict(value=.018+delta,parameter_values={'coupled_radius_m':.018+delta},
-            reference='a4_radius/'+str(delta),task_samples=dict(fixed_control=sampled_constraints(outputs,req)))
+            reference='a4_radius/'+str(delta),task_samples=dict(fixed_control=sampled_constraints(outputs,req),reoptimized_control=[]))
         rows.append(row);raw.append(dict(delta_m=delta,configuration=variant,outputs=outputs))
         for k,v in native.cost.items():total[k]=total.get(k,0)+v
+    save('a4_radius_raw',dict(rows=rows,raw=raw,new_cost={**total,'wall_s':time.perf_counter()-started}))
     contexts=[dict(rows=[rows[0],rows[lo],rows[hi]],validation_rows=[rows[5]],
         parameter=dict(units='m'),coefficients={'coupled_radius_m':1.},
         parameters={'coupled_radius_m':dict(bounds=[.014,.023])}) for lo,hi in [(1,2),(3,4)]]
     sensitivities=[task_sensitivities(context) for context in contexts]
-    save('a4_radius',dict(raw=raw,sensitivities=sensitivities,
-        new_cost={**total,'wall_s':time.perf_counter()-started},
+    save('a4_radius',dict(raw_source='a4_radius_raw.json',sensitivities=sensitivities,
+        new_cost=dict(physics_steps=0,rollouts=0),
         scope='Actual six-tendon two-segment B1, same full sequence and zero state. Coupled legal span radius perturbation only.'))
     fine=sensitivities[1]['fixed_control'];control=read(OUT/'a4_control_validation.json')
     base=np.array([r['normalized_signed_excess'] for r in base_samples])
@@ -248,10 +254,33 @@ def validate_history():
         limitation='Identical action gets identical sealed outcome, not three independently sampled trials. Suffix is a cost counterfactual; cold rerun acquisition actually paid the prefix again.'))
 
 
+def validate_control_probe():
+    """Secondary information check; does not revise the frozen strategy decision."""
+    from extensions.tendon_family.backends import playback_tensions
+    check=read(OUT/'a4_control_validation.json');s=read(OUT/'decision_input.json')
+    save('a4_secondary_validation_plan',dict(action='Independently execute +0.015 N at the selected control coefficient.',
+        coefficient_index=check['coefficient_index'],comparison_status='Secondary validation after A/B/C actions and historical check; not a new prospective policy.',
+        expected='Native held-out execution satisfied metrics; test original full-backend acceptance.',
+        budget=dict(rollouts=1,physics_steps=1400),new_cost=dict(physics_steps=0,rollouts=0)))
+    cfg=s['configuration'];schedule=deepcopy(s['targets']['up_z']['schedule']);settings=s['control_settings']
+    x=np.zeros(24);x[check['coefficient_index']]=.015
+    tr=schedule['trajectory']
+    tr['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],settings['knots_s'],x,[8.]*6,settings['correction_window_s']).tolist()
+    room(1400);started=time.perf_counter();inp,physics,scene=binding(cfg,tr)
+    raw=playback_tensions(inp,physics,scene,tr['tensions_n'],ROOT/'runs/b2_math_decision_benchmark/replay_control_holdout')
+    ref=ARCHIVE.put_context_checkpoint(raw);evaluation,profile=evaluate_playback(cfg,raw,ref,'b2-a4-secondary-control')
+    acceptance=assemble_acceptance(cfg,evaluation,profile,motion=raw['samples'])
+    save('a4_control_independent',dict(schedule=schedule,raw=raw,evaluation=plain(evaluation),profile=profile,acceptance=acceptance,
+        new_cost=dict(model_builds=1,physics_steps=raw['physics_steps'],rollouts=1,wall_s=time.perf_counter()-started)))
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('command',choices=['freeze','diagnose','validate_history'])
+    p.add_argument('command',choices=['freeze','diagnose','validate_history','validate_control_probe'])
     args=p.parse_args()
+    marker={'freeze':'decision_input','diagnose':'decision_C','validate_history':'paired_historical_validation',
+        'validate_control_probe':'a4_secondary_validation_plan'}[args.command]
+    if (OUT/(marker+'.json')).exists():raise FileExistsError(marker)
     globals()[args.command]()
 
 

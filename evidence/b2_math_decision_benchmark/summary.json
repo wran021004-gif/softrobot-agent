@@ -1,0 +1,866 @@
+{
+  "environment": {
+    "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "mujoco": "3.13.0",
+    "environment_path": "D:/softrobot-agent/.f3-prestudy-env",
+    "thread_environment": "inherited, no forced thread-count claim"
+  },
+  "audit": {
+    "passed": true,
+    "physics_integration_performed": 0,
+    "b1_baseline_maximum_difference": 0.0,
+    "checks": [
+      "budget sum without duplicate summaries",
+      "B1 original sequence reproduces original stored outputs",
+      "paired exact input prefix",
+      "same frozen task across structures",
+      "cold source and zero states",
+      "six channels and physical input bounds",
+      "nonlinear geometry",
+      "original acceptance and Native/full-backend trajectory alignment",
+      "secondary control independent pass",
+      "held-out coefficient selection"
+    ]
+  },
+  "cost_ledger": [
+    {
+      "file": "a4_control_holdout_plan.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "a4_control_independent.json",
+      "model_builds": 1,
+      "physics_steps": 1400,
+      "rollouts": 1,
+      "wall_s": 0.5749375999985205
+    },
+    {
+      "file": "a4_control_probes.json",
+      "model_builds": 1,
+      "forward_evaluations": 3526,
+      "physics_steps": 35000,
+      "rollouts": 25,
+      "mechanics_evaluations": 0,
+      "wall_s": 3.191300099999353
+    },
+    {
+      "file": "a4_control_validation.json",
+      "model_builds": 1,
+      "forward_evaluations": 283,
+      "physics_steps": 2800,
+      "rollouts": 2,
+      "mechanics_evaluations": 0,
+      "wall_s": 0.2970279000001028
+    },
+    {
+      "file": "a4_radius.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "a4_radius_raw.json",
+      "model_builds": 5,
+      "forward_evaluations": 710,
+      "physics_steps": 7000,
+      "rollouts": 5,
+      "mechanics_evaluations": 0,
+      "wall_s": 0.7849728999972285
+    },
+    {
+      "file": "a4_secondary_validation_plan.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "benchmark_frozen.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "benchmark_geometry.json",
+      "physics_steps": 0,
+      "rollouts": 0,
+      "wall_s": 1.1675480000012612
+    },
+    {
+      "file": "benchmark_length_exchange.json",
+      "model_builds": 1,
+      "forward_evaluations": 8947,
+      "physics_steps": 88200,
+      "rollouts": 126,
+      "mechanics_evaluations": 0,
+      "preparation_s": 0.17450950000056764,
+      "solver_s": 0.11756890000469866,
+      "solver_calls": 5,
+      "solver_iterations": 179,
+      "wall_s": 8.404042399997707
+    },
+    {
+      "file": "benchmark_length_exchange_independent.json",
+      "model_builds": 1,
+      "physics_steps": 700,
+      "rollouts": 1,
+      "wall_s": 0.2912058000001707
+    },
+    {
+      "file": "benchmark_neutral.json",
+      "model_builds": 1,
+      "forward_evaluations": 8947,
+      "physics_steps": 88200,
+      "rollouts": 126,
+      "mechanics_evaluations": 0,
+      "preparation_s": 0.1869403999990027,
+      "solver_s": 0.11440269999729935,
+      "solver_calls": 5,
+      "solver_iterations": 173,
+      "wall_s": 7.939253499996994
+    },
+    {
+      "file": "benchmark_neutral_independent.json",
+      "model_builds": 1,
+      "physics_steps": 700,
+      "rollouts": 1,
+      "wall_s": 0.29085099999792874
+    },
+    {
+      "file": "benchmark_soft.json",
+      "model_builds": 1,
+      "forward_evaluations": 49,
+      "physics_steps": 479,
+      "rollouts": 1,
+      "mechanics_evaluations": 0,
+      "preparation_s": 0.17823210000278777,
+      "solver_s": 0,
+      "solver_calls": 0,
+      "solver_iterations": 0,
+      "wall_s": 0.2173164000014367
+    },
+    {
+      "file": "benchmark_soft_independent.json",
+      "model_builds": 1,
+      "physics_steps": 479,
+      "rollouts": 1,
+      "failed_step_calls": 1
+    },
+    {
+      "file": "benchmark_stiff.json",
+      "model_builds": 1,
+      "forward_evaluations": 7243,
+      "physics_steps": 71400,
+      "rollouts": 102,
+      "mechanics_evaluations": 0,
+      "preparation_s": 0.16754349999973783,
+      "solver_s": 0.06923939999978757,
+      "solver_calls": 4,
+      "solver_iterations": 97,
+      "wall_s": 6.348971899999015
+    },
+    {
+      "file": "benchmark_stiff_independent.json",
+      "model_builds": 1,
+      "physics_steps": 700,
+      "rollouts": 1,
+      "wall_s": 0.2928213000013784
+    },
+    {
+      "file": "decision_A.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "decision_B.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "decision_C.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "decision_input.json",
+      "physics_steps": 0,
+      "rollouts": 0,
+      "wall_s": 0.1364916999991692
+    },
+    {
+      "file": "engineering_failure_01.json",
+      "physics_steps": 7000,
+      "rollouts": 5,
+      "model_builds": 5
+    },
+    {
+      "file": "engineering_failure_02.json",
+      "physics_steps": 700,
+      "rollouts": 1,
+      "model_builds": 1
+    },
+    {
+      "file": "numerical_accounting_supplement.json",
+      "physics_steps": 0,
+      "rollouts": 0,
+      "solver_calls": 1
+    },
+    {
+      "file": "paired_historical_validation.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "protocol.json",
+      "physics_steps": 0,
+      "rollouts": 0
+    },
+    {
+      "file": "recovery_preparation_cost.json",
+      "model_builds": 2,
+      "forward_evaluations": 2,
+      "physics_steps": 0,
+      "rollouts": 0
+    }
+  ],
+  "conservative_new_cost": {
+    "physics_steps": 304758,
+    "rollouts": 398,
+    "model_builds": 24,
+    "forward_evaluations": 29707,
+    "solver_calls": 15,
+    "solver_iterations": 449,
+    "solver_s": 0.3012110000017856,
+    "wall_s": 29.936740499990265
+  },
+  "step_accounting": {
+    "persisted_confirmed_steps": 297058,
+    "completed_radius_steps_reconstructed_from_control_flow": 7000,
+    "original_unlogged_soft_attempt_step_range": [
+      0,
+      700
+    ],
+    "known_or_reconstructed_steps": 304058,
+    "conservative_upper_steps": 304758,
+    "failed_backend_step_calls": 1,
+    "failed_call_internal_progress": "unknown; one extra failed mj_step call, not silently counted as zero",
+    "interpretation": "Conservative ledger charges 700 for the unlogged partial soft attempt. Repeated runs are additionally charged."
+  },
+  "shared_history": {
+    "search": {
+      "model_builds": 3,
+      "forward_evaluations": 42726,
+      "physics_steps": 424200,
+      "rollouts": 303,
+      "mechanics_evaluations": 0,
+      "kernel_wall_s": 29.482139499999903
+    },
+    "independent": {
+      "rollouts": 3,
+      "physics_steps": 4200,
+      "wall_s": 1.2821277000002738
+    }
+  },
+  "paired_historical_validation": {
+    "acquisition": {
+      "model_builds": 1,
+      "forward_evaluations": 17767,
+      "physics_steps": 176400,
+      "rollouts": 126,
+      "mechanics_evaluations": 0,
+      "kernel_wall_s": 12.048944399999527
+    },
+    "suffix": {
+      "rollouts": 25,
+      "physics_steps": 35000
+    },
+    "independent": {
+      "rollouts": 1,
+      "physics_steps": 1400,
+      "wall_s": 0.4388230000004114
+    },
+    "before": {
+      "normalized_gap": 0.048487491307075636,
+      "sum_normalized_excess": 0.048487491307075636,
+      "terminal_position_error_m": 0.00966102845634428,
+      "holding_max_position_error_m": 0.00966102845634428,
+      "holding_max_speed_m_s": 0.020969749826141512,
+      "signed_maximum_excess": 0.048487491307075636,
+      "returned_array_gap_interval": [
+        0.04848749130707474,
+        0.04848749130707631
+      ]
+    },
+    "after": {
+      "normalized_gap": 0.0,
+      "sum_normalized_excess": 0.0,
+      "terminal_position_error_m": 0.009499532219445108,
+      "holding_max_position_error_m": 0.009499532219445108,
+      "holding_max_speed_m_s": 0.019003221727083068,
+      "signed_maximum_excess": -0.04983891364584658,
+      "returned_array_gap_interval": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "a4": {
+    "diagnostic_steps": 51800,
+    "secondary_validation_steps": 1400,
+    "control_coefficient": 14,
+    "control_two_scale_difference": 0.029805198166345782,
+    "control_holdout": {
+      "coordinate": 0.015,
+      "status": "unresolved",
+      "direction_correct": true,
+      "practical_checks": {
+        "error_fraction_of_actual_change": 0.25,
+        "material_normalized_change": 1e-08,
+        "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+      },
+      "maximum_error_over_threshold": 0.0018771006609107216,
+      "maximum_error_over_actual_change": 0.6362774212399254,
+      "predicted_J": -0.011763376198604007,
+      "actual_J": -0.010817825792589983,
+      "J_error": -0.0009455504060140243,
+      "active_prediction": {
+        "per_constraint": {
+          "holding_max_error_m": 70,
+          "holding_max_speed_m_s": 65,
+          "terminal_error_m": 70
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          65
+        ]
+      },
+      "active_actual": {
+        "per_constraint": {
+          "holding_max_error_m": 70,
+          "holding_max_speed_m_s": 65,
+          "terminal_error_m": 70
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          65
+        ]
+      },
+      "samples": [
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 65,
+          "time_s": 0.6499999999999838,
+          "units": "m",
+          "predicted_change": 0.0003024326105444754,
+          "actual_change": 0.00030340752027275403,
+          "error": -9.749097282786557e-07,
+          "error_over_threshold": -9.749097282786556e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 65,
+          "time_s": 0.6499999999999838,
+          "units": "m/s",
+          "predicted_change": 0.0008374676275200599,
+          "actual_change": 0.0008563786356403404,
+          "error": -1.891100812028049e-05,
+          "error_over_threshold": -0.0009455504060140243,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 66,
+          "time_s": 0.6599999999999827,
+          "units": "m",
+          "predicted_change": 0.00028479905360139987,
+          "actual_change": 0.00028571538633269736,
+          "error": -9.163327312974867e-07,
+          "error_over_threshold": -9.163327312974867e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 66,
+          "time_s": 0.6599999999999827,
+          "units": "m/s",
+          "predicted_change": 2.0429372371424393e-05,
+          "actual_change": 5.61674571896742e-05,
+          "error": -3.5738084818249804e-05,
+          "error_over_threshold": -0.0017869042409124902,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 67,
+          "time_s": 0.6699999999999816,
+          "units": "m",
+          "predicted_change": 0.00026709641253811617,
+          "actual_change": 0.0002679153227726632,
+          "error": -8.189102345470406e-07,
+          "error_over_threshold": -8.189102345470406e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 67,
+          "time_s": 0.6699999999999816,
+          "units": "m/s",
+          "predicted_change": -0.0008580466638655523,
+          "actual_change": -0.0008205046506473378,
+          "error": -3.754201321821443e-05,
+          "error_over_threshold": -0.0018771006609107216,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 68,
+          "time_s": 0.6799999999999805,
+          "units": "m",
+          "predicted_change": 0.0002489841895940303,
+          "actual_change": 0.0002496842432503313,
+          "error": -7.000536563010057e-07,
+          "error_over_threshold": -7.000536563010057e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 68,
+          "time_s": 0.6799999999999805,
+          "units": "m/s",
+          "predicted_change": -0.0016988041259046096,
+          "actual_change": -0.0016682449039370634,
+          "error": -3.055922196754629e-05,
+          "error_over_threshold": -0.0015279610983773145,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 69,
+          "time_s": 0.6899999999999794,
+          "units": "m",
+          "predicted_change": 0.00022996252637767257,
+          "actual_change": 0.00023053834087348457,
+          "error": -5.758144958119965e-07,
+          "error_over_threshold": -5.758144958119965e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 69,
+          "time_s": 0.6899999999999794,
+          "units": "m/s",
+          "predicted_change": -0.002521731899359218,
+          "actual_change": -0.002509622018840186,
+          "error": -1.2109880519032279e-05,
+          "error_over_threshold": -0.0006054940259516139,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "terminal_error_m",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m",
+          "predicted_change": 0.0002094642207564239,
+          "actual_change": 0.00020992288233337604,
+          "error": -4.58661576952131e-07,
+          "error_over_threshold": -4.58661576952131e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m",
+          "predicted_change": 0.0002094642207564239,
+          "actual_change": 0.00020992288233337604,
+          "error": -4.58661576952131e-07,
+          "error_over_threshold": -4.58661576952131e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m/s",
+          "predicted_change": -0.0027225705413682372,
+          "actual_change": -0.0027097727937361628,
+          "error": -1.279774763207453e-05,
+          "error_over_threshold": -0.0006398873816037265,
+          "direction_correct": true
+        }
+      ]
+    },
+    "radius_two_scale_difference": 2.5445939161828213e-05,
+    "radius_holdout": {
+      "coordinate": 7.500000000000562e-06,
+      "status": "validated_local_prediction",
+      "direction_correct": true,
+      "practical_checks": {
+        "error_fraction_of_actual_change": 0.25,
+        "material_normalized_change": 1e-08,
+        "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+      },
+      "maximum_error_over_threshold": 4.263651117981937e-05,
+      "maximum_error_over_actual_change": 0.013899623993268998,
+      "predicted_J": 0.04384947133462676,
+      "actual_J": 0.043880409173243685,
+      "J_error": -3.0937838616927615e-05,
+      "active_prediction": {
+        "per_constraint": {
+          "holding_max_error_m": 70,
+          "holding_max_speed_m_s": 70,
+          "terminal_error_m": 70
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          70
+        ]
+      },
+      "active_actual": {
+        "per_constraint": {
+          "holding_max_error_m": 70,
+          "holding_max_speed_m_s": 70,
+          "terminal_error_m": 70
+        },
+        "worst": [
+          "holding_max_speed_m_s",
+          70
+        ]
+      },
+      "samples": [
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 65,
+          "time_s": 0.6499999999999838,
+          "units": "m",
+          "predicted_change": -5.493622722237385e-05,
+          "actual_change": -5.479156495715412e-05,
+          "error": -1.446622652197249e-07,
+          "error_over_threshold": -1.4466226521972492e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 65,
+          "time_s": 0.6499999999999838,
+          "units": "m/s",
+          "predicted_change": 6.27270200754279e-05,
+          "actual_change": 6.356261988027523e-05,
+          "error": -8.355998048473201e-07,
+          "error_over_threshold": -4.1779990242366005e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 66,
+          "time_s": 0.6599999999999827,
+          "units": "m",
+          "predicted_change": -5.5691275480932864e-05,
+          "actual_change": -5.553679651367105e-05,
+          "error": -1.5447896726181188e-07,
+          "error_over_threshold": -1.5447896726181187e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 66,
+          "time_s": 0.6599999999999827,
+          "units": "m/s",
+          "predicted_change": -6.220188787054631e-05,
+          "actual_change": -6.134915764694992e-05,
+          "error": -8.527302235963874e-07,
+          "error_over_threshold": -4.263651117981937e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 67,
+          "time_s": 0.6699999999999816,
+          "units": "m",
+          "predicted_change": -5.686168256301638e-05,
+          "actual_change": -5.6701232391700716e-05,
+          "error": -1.6045017131566252e-07,
+          "error_over_threshold": -1.6045017131566253e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 67,
+          "time_s": 0.6699999999999816,
+          "units": "m/s",
+          "predicted_change": -0.0001309285122980372,
+          "actual_change": -0.0001304822686808288,
+          "error": -4.462436172084083e-07,
+          "error_over_threshold": -2.2312180860420416e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 68,
+          "time_s": 0.6799999999999805,
+          "units": "m",
+          "predicted_change": -5.835478147247219e-05,
+          "actual_change": -5.819111902083229e-05,
+          "error": -1.6366245163990101e-07,
+          "error_over_threshold": -1.63662451639901e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 68,
+          "time_s": 0.6799999999999805,
+          "units": "m/s",
+          "predicted_change": -0.00016131793459155024,
+          "actual_change": -0.0001610997683673364,
+          "error": -2.1816622421386157e-07,
+          "error_over_threshold": -1.0908311210693078e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 69,
+          "time_s": 0.6899999999999794,
+          "units": "m",
+          "predicted_change": -6.0058510762782336e-05,
+          "actual_change": -5.9893132332029114e-05,
+          "error": -1.6537843075321855e-07,
+          "error_over_threshold": -1.6537843075321856e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 69,
+          "time_s": 0.6899999999999794,
+          "units": "m/s",
+          "predicted_change": -0.00015763524706717715,
+          "actual_change": -0.00015738402813509494,
+          "error": -2.512189320821867e-07,
+          "error_over_threshold": -1.2560946604109335e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "terminal_error_m",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m",
+          "predicted_change": -6.184841007437221e-05,
+          "actual_change": -6.168150670564365e-05,
+          "error": -1.669033687285576e-07,
+          "error_over_threshold": -1.669033687285576e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m",
+          "predicted_change": -6.184841007437221e-05,
+          "actual_change": -6.168150670564365e-05,
+          "error": -1.669033687285576e-07,
+          "error_over_threshold": -1.669033687285576e-05,
+          "direction_correct": true
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "sample_index": 70,
+          "time_s": 0.6999999999999783,
+          "units": "m/s",
+          "predicted_change": -9.276039944897661e-05,
+          "actual_change": -9.214164267663805e-05,
+          "error": -6.187567723385523e-07,
+          "error_over_threshold": -3.0937838616927615e-05,
+          "direction_correct": true
+        }
+      ],
+      "reference": "a4_radius/7.5e-06"
+    },
+    "independent_control_metrics": {
+      "terminal_error_m": 0.009870951338677656,
+      "holding_max_error_m": 0.009870951338677656,
+      "holding_max_speed_m_s": 0.0197836434841482
+    }
+  },
+  "benchmarks": [
+    {
+      "name": "neutral",
+      "accepted": true,
+      "best": {
+        "normalized_gap": 0.0,
+        "sum_normalized_excess": 0.0,
+        "terminal_position_error_m": 0.009499974451294826,
+        "holding_max_position_error_m": 0.009499974451294826,
+        "holding_max_speed_m_s": 0.019000781501899787,
+        "signed_maximum_excess": -0.049960924905010695,
+        "returned_array_gap_interval": [
+          0.0,
+          0.0
+        ]
+      },
+      "first_native_nonpositive_callback": 101,
+      "prefix_best_J": {
+        "51": 1.8593557540461099,
+        "76": 0.06909323442679693,
+        "101": -0.047226900299637276,
+        "102": -0.047226900299637276,
+        "126": -0.049960924905010695
+      },
+      "stop": "iteration_limit",
+      "cost": {
+        "model_builds": 1,
+        "forward_evaluations": 8947,
+        "physics_steps": 88200,
+        "rollouts": 126,
+        "mechanics_evaluations": 0,
+        "preparation_s": 0.1869403999990027,
+        "solver_s": 0.11440269999729935,
+        "solver_calls": 5,
+        "solver_iterations": 173,
+        "wall_s": 7.939253499996994
+      },
+      "independent_cost": {
+        "model_builds": 1,
+        "physics_steps": 700,
+        "rollouts": 1,
+        "wall_s": 0.29085099999792874
+      }
+    },
+    {
+      "name": "soft",
+      "accepted": null,
+      "best": null,
+      "first_native_nonpositive_callback": null,
+      "prefix_best_J": {},
+      "stop": "native_contact_free_domain_exit",
+      "cost": {
+        "model_builds": 1,
+        "forward_evaluations": 49,
+        "physics_steps": 479,
+        "rollouts": 1,
+        "mechanics_evaluations": 0,
+        "preparation_s": 0.17823210000278777,
+        "solver_s": 0,
+        "solver_calls": 0,
+        "solver_iterations": 0,
+        "wall_s": 0.2173164000014367
+      },
+      "independent_cost": {
+        "model_builds": 1,
+        "physics_steps": 479,
+        "rollouts": 1,
+        "failed_step_calls": 1
+      }
+    },
+    {
+      "name": "stiff",
+      "accepted": true,
+      "best": {
+        "normalized_gap": 0.0,
+        "sum_normalized_excess": 0.0,
+        "terminal_position_error_m": 0.009396334747028215,
+        "holding_max_position_error_m": 0.009498956211776691,
+        "holding_max_speed_m_s": 0.01895569203706216,
+        "signed_maximum_excess": -0.050104378822330875,
+        "returned_array_gap_interval": [
+          0.0,
+          0.0
+        ]
+      },
+      "first_native_nonpositive_callback": 76,
+      "prefix_best_J": {
+        "51": 1.7468251941671826,
+        "76": -0.04672431974497793,
+        "101": -0.049998580647451885,
+        "102": -0.050104378822330875
+      },
+      "stop": "local_target_reached",
+      "cost": {
+        "model_builds": 1,
+        "forward_evaluations": 7243,
+        "physics_steps": 71400,
+        "rollouts": 102,
+        "mechanics_evaluations": 0,
+        "preparation_s": 0.16754349999973783,
+        "solver_s": 0.06923939999978757,
+        "solver_calls": 4,
+        "solver_iterations": 97,
+        "wall_s": 6.348971899999015
+      },
+      "independent_cost": {
+        "model_builds": 1,
+        "physics_steps": 700,
+        "rollouts": 1,
+        "wall_s": 0.2928213000013784
+      }
+    },
+    {
+      "name": "length_exchange",
+      "accepted": true,
+      "best": {
+        "normalized_gap": 0.0,
+        "sum_normalized_excess": 0.0,
+        "terminal_position_error_m": 0.00949905798545103,
+        "holding_max_position_error_m": 0.00949905798545103,
+        "holding_max_speed_m_s": 0.019012690863046203,
+        "signed_maximum_excess": -0.04936545684768989,
+        "returned_array_gap_interval": [
+          0.0,
+          0.0
+        ]
+      },
+      "first_native_nonpositive_callback": 101,
+      "prefix_best_J": {
+        "51": 2.6672645219725233,
+        "76": 0.47733175219029333,
+        "101": -0.016659192662828337,
+        "102": -0.016659192662828337,
+        "126": -0.04936545684768989
+      },
+      "stop": "iteration_limit",
+      "cost": {
+        "model_builds": 1,
+        "forward_evaluations": 8947,
+        "physics_steps": 88200,
+        "rollouts": 126,
+        "mechanics_evaluations": 0,
+        "preparation_s": 0.17450950000056764,
+        "solver_s": 0.11756890000469866,
+        "solver_calls": 5,
+        "solver_iterations": 179,
+        "wall_s": 8.404042399997707
+      },
+      "independent_cost": {
+        "model_builds": 1,
+        "physics_steps": 700,
+        "rollouts": 1,
+        "wall_s": 0.2912058000001707
+      }
+    }
+  ],
+  "decisions": {
+    "prediction_accuracy": "Radius locally validated; control direction useful but strict all-sample relative-error check unresolved.",
+    "experiment_selection": "A/B/C same continuation; secondary math probe provides a concrete control correction.",
+    "total_net_benefit": "Not demonstrated. Added math did not replace the frozen continuation or save subsequent experiments.",
+    "benchmark_structure_discrimination": "Weak: all three fully optimized valid candidates pass; soft baseline is unsupported/numerically invalid, not an infeasibility example."
+  },
+  "recommendation": {
+    "priority": "B3 six-tendon 0.35 s v1 as an executable conditional follow-up, not an established structure-essential benchmark.",
+    "task": "tasks/b2_b3_six_tendon_035_v1.json",
+    "independent_witnesses": [
+      "neutral",
+      "stiff",
+      "length_exchange"
+    ],
+    "formal_structure_benchmark_ready": false,
+    "next": "Verify equal optimization opportunities and control parameterization quality before any structural claim; if neutral remains readily feasible, retire this condition from structure-necessity evaluation. Do not tighten targets post hoc."
+  },
+  "tests": {
+    "existing_native_task_sensitivity": "6 tests passed, exit 0; no integration",
+    "full_repository_suite": false
+  },
+  "limitations": [
+    "No blinded prospective trial or statistical causality.",
+    "Historical and fresh wall times are separate measurements.",
+    "Kernel times exclude process launch, export and some failed/recovery preparation; no end-to-end speedup ratio.",
+    "No global optimum, structural impossibility, hardware or GVS fast-trajectory validity claim."
+  ]
+}

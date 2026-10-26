@@ -1,0 +1,275 @@
+{
+  "decisions": {
+    "A": {
+      "maximum_violation": "up_z holding speed",
+      "constraints": {
+        "normalized_gap": 0.048487491307075636,
+        "sum_normalized_excess": 0.048487491307075636,
+        "terminal_position_error_m": 0.00966102845634428,
+        "holding_max_position_error_m": 0.00966102845634428,
+        "holding_max_speed_m_s": 0.020969749826141512,
+        "signed_maximum_excess": 0.048487491307075636,
+        "returned_array_gap_interval": [
+          0.04848749130707474,
+          0.04848749130707631
+        ]
+      },
+      "sufficient_control_optimization": false,
+      "sufficiency_reason": "101 callbacks / four iterations is a resource limit, not convergence.",
+      "distinguishing_experiment": "Same structure and original cold-start algorithm with one additional iteration on failed target only.",
+      "expected_maximum_acquisition_cost": {
+        "extra_suffix_rollouts": 25,
+        "extra_suffix_physics_steps": 35000,
+        "full_cold_restart_rollouts": 126,
+        "full_cold_restart_physics_steps": 176400
+      },
+      "alternative_result": "If still failed or stagnated, inspect control parameterization and model domain before claiming structural limitation.",
+      "action": "Replay sealed 126/5 cold run for up_z only, verify 101-prefix identity, retain already passing targets.",
+      "rationale": "Small performance residual and improving last proposal meet predeclared allocation rule; no new mathematical evidence.",
+      "new_cost": {
+        "physics_steps": 0,
+        "rollouts": 0
+      }
+    },
+    "B": {
+      "maximum_violation": "up_z holding speed",
+      "constraints": {
+        "normalized_gap": 0.048487491307075636,
+        "sum_normalized_excess": 0.048487491307075636,
+        "terminal_position_error_m": 0.00966102845634428,
+        "holding_max_position_error_m": 0.00966102845634428,
+        "holding_max_speed_m_s": 0.020969749826141512,
+        "signed_maximum_excess": 0.048487491307075636,
+        "returned_array_gap_interval": [
+          0.04848749130707474,
+          0.04848749130707631
+        ]
+      },
+      "sufficient_control_optimization": false,
+      "sufficiency_reason": "101 callbacks / four iterations is a resource limit, not convergence.",
+      "distinguishing_experiment": "Same structure and original cold-start algorithm with one additional iteration on failed target only.",
+      "expected_maximum_acquisition_cost": {
+        "extra_suffix_rollouts": 25,
+        "extra_suffix_physics_steps": 35000,
+        "full_cold_restart_rollouts": 126,
+        "full_cold_restart_physics_steps": 176400
+      },
+      "alternative_result": "If still failed or stagnated, inspect control parameterization and model domain before claiming structural limitation.",
+      "action": "Same paired continuation as A.",
+      "maximum_tension_n": 2.208578675288871,
+      "upper_limit_n": 8.0,
+      "lower_bound_active": true,
+      "response_conditions": [
+        9104522429.640905,
+        4993205328.579537,
+        4878792814.803454,
+        7318194942.817731
+      ],
+      "rationale": "Upper tension far from saturation; response ill-conditioned and stopping budget-limited. Continue control, do not infer globally adequate actuation or convergence.",
+      "new_cost": {
+        "physics_steps": 0,
+        "rollouts": 0
+      }
+    },
+    "C": {
+      "action": "Same paired continuation as A/B.",
+      "largest_violation": {
+        "normalized_gap": 0.048487491307075636,
+        "sum_normalized_excess": 0.048487491307075636,
+        "terminal_position_error_m": 0.00966102845634428,
+        "holding_max_position_error_m": 0.00966102845634428,
+        "holding_max_speed_m_s": 0.020969749826141512,
+        "signed_maximum_excess": 0.048487491307075636,
+        "returned_array_gap_interval": [
+          0.04848749130707474,
+          0.04848749130707631
+        ]
+      },
+      "radius_can_remove_residual_locally": false,
+      "radius_prediction_status": "validated_local_prediction",
+      "control_prediction_status": "unresolved",
+      "rationale": "Compare full original sampled constraints, not moment-arm change. Local radius effect cannot establish 2 mm reoptimized gain. Continuation tests optimization sufficiency.",
+      "expected_validation": "Read only sealed failed-target fifth iteration, verify prefix identity and original independent acceptance.",
+      "alternative_result": "If continuation failed, examine parameterization and constraints; no structural infeasibility inference.",
+      "new_cost": {
+        "physics_steps": 0,
+        "rollouts": 0
+      }
+    }
+  },
+  "prefix_identical": true,
+  "prefix_length": 101,
+  "source": {
+    "commit": "305abc2509995ea796c7ef57eb3f4ff19f158b54",
+    "search": "evidence/b1_math_guided_benchmark_discovery/neutral126_up_z.json",
+    "independent": "evidence/b1_math_guided_benchmark_discovery/neutral126_independent.json"
+  },
+  "before": {
+    "normalized_gap": 0.048487491307075636,
+    "sum_normalized_excess": 0.048487491307075636,
+    "terminal_position_error_m": 0.00966102845634428,
+    "holding_max_position_error_m": 0.00966102845634428,
+    "holding_max_speed_m_s": 0.020969749826141512,
+    "signed_maximum_excess": 0.048487491307075636,
+    "returned_array_gap_interval": [
+      0.04848749130707474,
+      0.04848749130707631
+    ]
+  },
+  "after": {
+    "normalized_gap": 0.0,
+    "sum_normalized_excess": 0.0,
+    "terminal_position_error_m": 0.009499532219445108,
+    "holding_max_position_error_m": 0.009499532219445108,
+    "holding_max_speed_m_s": 0.019003221727083068,
+    "signed_maximum_excess": -0.04983891364584658,
+    "returned_array_gap_interval": [
+      0.0,
+      0.0
+    ]
+  },
+  "independent_acceptance": {
+    "contract": "research.task_acceptance",
+    "version": "1.0.0",
+    "protocol_id": "offline_reach_hold_v1",
+    "task_family": "task.reach",
+    "task_identity": "adda9151605ff1ea652aa14c72a15e91d4582af49aab7437287f63372daae91e",
+    "status": "accepted",
+    "accepted": true,
+    "components": {
+      "evaluation_validity": {
+        "value": "valid",
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "execution_complete": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "task_evaluator": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "evaluator:task_bound": {
+        "value": 0.009499532219445108,
+        "passed": true,
+        "unit": "m",
+        "limit": 0.01,
+        "reason": null
+      },
+      "solver_errors": {
+        "value": 0,
+        "passed": true,
+        "unit": "count",
+        "limit": 0,
+        "reason": null
+      },
+      "force_bounds": {
+        "value": 0.0,
+        "passed": true,
+        "unit": "N",
+        "limit": 1e-08,
+        "reason": null
+      },
+      "holding_coverage": {
+        "value": true,
+        "passed": true,
+        "unit": "inclusive uniform samples",
+        "limit": 6,
+        "reason": null
+      },
+      "holding_position": {
+        "value": 0.009499532219445108,
+        "passed": true,
+        "unit": "m",
+        "limit": 0.01,
+        "reason": null
+      },
+      "holding_speed": {
+        "value": 0.019003221727083068,
+        "passed": true,
+        "unit": "m/s",
+        "limit": 0.02,
+        "reason": null
+      }
+    },
+    "metrics": {
+      "terminal_error_m": 0.009499532219445108,
+      "holding_max_error_m": 0.009499532219445108,
+      "holding_max_speed_m_s": 0.019003221727083068
+    },
+    "missing": [],
+    "issues": [],
+    "execution_id": null,
+    "sources": {
+      "evaluation": null,
+      "profile": null
+    },
+    "evidence_binding": {
+      "evaluation": null,
+      "profile": null,
+      "simulation": {
+        "artifact_id": "f18b4ea158996e687be387f1c7376b362863dd75623de784e5dfe250a214cdad",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "source": {
+          "artifact_id": "f18b4ea158996e687be387f1c7376b362863dd75623de784e5dfe250a214cdad",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null,
+        "original_execution_id": null
+      },
+      "profile_binding": {}
+    },
+    "evaluator_tension_channels": null,
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.7,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "real_time_required": false,
+      "real_time_demonstrated": null,
+      "deadline_misses": null,
+      "mean_update_s": null,
+      "simulation_wall_s": null
+    },
+    "continuous_time_guarantee": false
+  },
+  "group_with_retained_original_targets": true,
+  "historical_acquisition_cost": {
+    "model_builds": 1,
+    "forward_evaluations": 17767,
+    "physics_steps": 176400,
+    "rollouts": 126,
+    "mechanics_evaluations": 0,
+    "kernel_wall_s": 12.048944399999527
+  },
+  "historical_separable_suffix_cost": {
+    "rollouts": 25,
+    "physics_steps": 35000
+  },
+  "historical_independent_cost": {
+    "rollouts": 1,
+    "physics_steps": 1400,
+    "wall_s": 0.4388230000004114
+  },
+  "first_suffix_nonpositive_callback": 121,
+  "new_cost": {
+    "physics_steps": 0,
+    "rollouts": 0
+  },
+  "limitation": "Identical action gets identical sealed outcome, not three independently sampled trials. Suffix is a cost counterfactual; cold rerun acquisition actually paid the prefix again."
+}
