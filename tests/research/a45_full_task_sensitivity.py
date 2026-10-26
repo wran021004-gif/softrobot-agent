@@ -65,7 +65,8 @@ def persist(host, label, result):
     ref = save(host, result, 'a45_' + label)
     s = state(host)
     update(host, research_mathematics=[*s.get('research_mathematics', []), ref],
-        numerical_s=s['numerical_s'] + result.get('cost', {}).get('kernel_wall_s', 0))
+        numerical_s=s['numerical_s'] + (0 if result.get('cost_scope') == 'aggregate'
+            else result.get('cost', {}).get('kernel_wall_s', 0)))
     atomic_json(OUT / (label + '.json'), dict(reference=ref, **result))
     return ref
 
@@ -282,10 +283,72 @@ def validate(host):
     print('A45_COMPLETE', total, flush=True)
 
 
+def review(host):
+    """Audit already-saved evidence and interpretation; zero physics calls."""
+    if (OUT / 'decision_review.json').exists():return
+    started = time.perf_counter()
+    summary = read(OUT / 'summary.json'); predictions = read(OUT / 'predictions.json')
+    base = read(OUT / 'baseline.json')['task_samples']
+    assert used_steps(host) == summary['cost']['physics_steps'] == 17000
+    assert predictions['holdout_results_used'] is False
+    assert read(OUT / 'boundary_predictions.json')['holdout_results_used'] is False
+    reviews = {}
+    margin = predictions['baseline']['metrics']['holding_max_speed_m_s']['margin']
+    for kind in ('structure', 'control'):
+        pairs = [summary['checks'][key] for key in (kind, kind+'_negative')]
+        assert all(c['validation']['status'] == 'validated_local_prediction' for c in pairs)
+        assert all(c['validation']['direction_correct'] for c in pairs)
+        assert all(c['predicted']['task_constraints_pass'] == c['acceptance']['accepted'] for c in pairs)
+        assert all(not c['baseline_to_holdout_active_switch'] for c in pairs)
+        errors = [r for c in pairs for r in c['validation']['samples']]
+        positive = pairs[0]['validation']['samples']
+        peak_change = next(r['actual_change'] for r in positive
+            if r['constraint_id'] == 'holding_max_speed_m_s' and abs(r['time_s']-.49) < 1e-12)
+        assert abs(peak_change) > .1*margin
+        fine = next(d for d in predictions['directions'] if d['direction_id'] == kind+'@0.5h')['task_sensitivity']['fixed_control']
+        reviews[kind] = dict(status='validated_fixed_control_prediction',
+            peak_speed_change_over_baseline_margin=abs(peak_change)/margin,
+            normalized_two_scale_difference=fine['scale_comparisons'][0]['relative_difference'],
+            max_position_error_m=max(abs(r['error']) for r in errors if r['units'] == 'm'),
+            max_speed_error_m_s=max(abs(r['error']) for r in errors if r['units'] == 'm/s'),
+            max_error_over_actual_change=max(c['validation']['maximum_error_over_actual_change'] for c in pairs),
+            predicted_classification=[c['predicted']['task_constraints_pass'] for c in pairs],
+            independently_evaluated_classification=[c['acceptance']['accepted'] for c in pairs],
+            samples=[dict(sample, normalized_derivative_per_unit=derivative,
+                physical_derivative_per_unit=derivative*sample['limit'])
+                for sample, derivative in zip(base, fine['finite_difference_per_unit'])],
+            validated_holdout_deltas=[PROTOCOL[kind]['h']*v for v in (.75, -.75)],
+            stencil_range=[-PROTOCOL[kind]['h'], PROTOCOL[kind]['h']],
+            continuous_interval_error_bound=False,
+            small_effect_or_unresolved='No full direction is classified small; control rows at .45/.46 are exactly unchanged, and later sub-micrometre position changes are secondary to speed margin.',
+            reoptimized_capability='reoptimized_capability_unresolved')
+    # The initial completion writer added aggregate kernel time a second time.
+    # Preserve the original result and record this bookkeeping correction openly.
+    s = state(host); before = s['numerical_s']
+    expected = s['construction_numerical_s'] + summary['cost']['kernel_wall_s']
+    assert abs(before-expected-summary['cost']['kernel_wall_s']) < 1e-8
+    update(host, numerical_s=expected)
+    query = dict(reference=predictions['reference'], view='full', pointer='/predictions/structure/samples')
+    assert core.read_evidence(host, query, record_read=False) == predictions['predictions']['structure']['samples']
+    result = dict(status='reviewed_without_new_integration', directions=reviews,
+        exact_query=query, physics_steps=used_steps(host),
+        accounting=dict(native_and_backend_cost=summary['cost'],
+            construction_numerical_s=s['construction_numerical_s'],
+            preparation_wall_s=s['compatibility_preparation_s'],
+            numerical_s_before_aggregate_correction=before, numerical_s_after=expected,
+            correction='Remove duplicated aggregate kernel wall time; all raw costs and 17000 physical steps unchanged.',
+            public_operation_ledger=host.store.remaining(),
+            scope='Direct user-authorized engineering kernel/backend calls; no research_analysis worker/public operation was dispatched. The public-operation ledger is not the physics cost.'),
+        postflight_wall_s=time.perf_counter()-started)
+    persist(host, 'decision_review', result)
+    print('A45_SAVED_REVIEW', used_steps(host), 'steps; no new integration', flush=True)
+
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(); parser.add_argument('phase', choices=['prepare', 'train', 'boundary', 'validate'])
+    parser = argparse.ArgumentParser(); parser.add_argument('phase', choices=['prepare', 'train', 'boundary', 'validate', 'review'])
     args = parser.parse_args(); host = prepare()
     if args.phase == 'train':train(host)
     elif args.phase == 'boundary':freeze_boundary_predictions(host)
     elif args.phase == 'validate':validate(host)
+    elif args.phase == 'review':review(host)
     else:print('Prepared; no physics integration', flush=True)

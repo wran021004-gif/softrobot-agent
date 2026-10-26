@@ -1,0 +1,1757 @@
+{
+  "reference": {
+    "artifact_id": "bfbdecb2237818f8baf473593c180128c2f689c1246b25d3f751bf0fff23bdf2",
+    "media_type": "application/json"
+  },
+  "status": "stopped",
+  "protocol": {
+    "date": "2026-10-26 Asia/Shanghai",
+    "source": "evidence/b3_r1_history_assisted_050/design_package.json",
+    "base_commit": "618fba9a11a1a1d0c9fca5228d25e873b7c8dddd",
+    "physics_step_cap": 20000,
+    "planned_steps": 13000,
+    "structure": {
+      "path": "segments.1.young_pa",
+      "unit": "Pa",
+      "base": 5400000.0,
+      "h": 10000.0
+    },
+    "control": {
+      "unit": "N",
+      "h": 0.001,
+      "knots_s": [
+        0.45,
+        0.49
+      ],
+      "window_s": [
+        0.45,
+        0.5
+      ],
+      "coefficient_index": 5,
+      "channel": "tendon_1"
+    },
+    "training_factors": [
+      -1.0,
+      1.0,
+      -0.5,
+      0.5
+    ],
+    "holdout_factor": 0.75,
+    "prediction": "baseline plus h/2 central per-sample derivative; maximize all 13 predicted rows for signed J, each metric and active sample",
+    "step_rationale": "Young reuses the A4 R1 native probe: 0.1852% of baseline and well inside the frozen 2-15 MPa domain. Control is a 1 mN perturbation of an unsaturated 4.4-5.1 N channel; the existing knot interpolation distributes it over the final 50 ms. Chosen before any new rollout or held-out result, without tuning to its outcome.",
+    "policy": {
+      "two_scale_relative_difference": 0.05,
+      "maximum_error_fraction_of_change": 0.25,
+      "material_normalized_change": 1e-08,
+      "decision_significance_fraction_of_baseline_speed_margin": 0.1
+    },
+    "policy_scope": "A4 empirical accuracy policy plus explicit decision significance relative to R1 boundary margin; neither is a rigorous bound or a new task threshold. Inspect all 13 rows even if aggregate J improves. Active switches keep A4 max-gradient status unresolved; row-wise predictions and predicted classification are assessed separately.",
+    "freeze_order": "commit protocol and driver; save training results and prospective predictions; commit predictions before calculating any holdout; then independent full MuJoCo playback and original evaluator",
+    "reoptimization": "not executed; reoptimized_capability_unresolved",
+    "prohibited_calls": [
+      "provider",
+      "LLM Agent",
+      "PPO",
+      "NMPC",
+      "new optimizer"
+    ]
+  },
+  "cost": {
+    "physics_steps": 17000,
+    "rollouts": 17,
+    "model_builds": 17,
+    "forward_evaluations": 1730,
+    "mechanics_evaluations": 0,
+    "kernel_wall_s": 2.8731989999942016
+  },
+  "cost_scope": "aggregate",
+  "budget": 20000,
+  "unused_physics_steps": 3000,
+  "checks": {
+    "structure": {
+      "validation": {
+        "coordinate": 7500.0,
+        "status": "validated_local_prediction",
+        "direction_correct": true,
+        "practical_checks": {
+          "error_fraction_of_actual_change": 0.25,
+          "material_normalized_change": 1e-08,
+          "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+        },
+        "maximum_error_over_threshold": 0.0003805247604805606,
+        "maximum_error_over_actual_change": 0.07511147579503737,
+        "predicted_J": -0.016412620256164204,
+        "actual_J": -0.01636745563848973,
+        "J_error": -4.516461767447438e-05,
+        "active_prediction": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "active_actual": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "samples": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m",
+            "predicted_change": -3.7281966901282494e-05,
+            "actual_change": -3.691404951876032e-05,
+            "error": -3.6791738252217597e-07,
+            "error_over_threshold": -3.67917382522176e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m/s",
+            "predicted_change": 9.371217391725529e-05,
+            "actual_change": 0.0001013226691268665,
+            "error": -7.610495209611212e-06,
+            "error_over_threshold": -0.0003805247604805606,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m",
+            "predicted_change": -3.6242249277786966e-05,
+            "actual_change": -3.591070855759493e-05,
+            "error": -3.3154072019203617e-07,
+            "error_over_threshold": -3.315407201920362e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m/s",
+            "predicted_change": -0.0002740645915233664,
+            "actual_change": -0.0002702601343761368,
+            "error": -3.8044571472295453e-06,
+            "error_over_threshold": -0.00019022285736147726,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m",
+            "predicted_change": -3.459923955466571e-05,
+            "actual_change": -3.429477027128258e-05,
+            "error": -3.044692833831242e-07,
+            "error_over_threshold": -3.0446928338312418e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m/s",
+            "predicted_change": -0.00026352553537882463,
+            "actual_change": -0.0002615003286720996,
+            "error": -2.0252067067250137e-06,
+            "error_over_threshold": -0.00010126033533625067,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m",
+            "predicted_change": -3.254664178596989e-05,
+            "actual_change": -3.226356411893505e-05,
+            "error": -2.8307766703483674e-07,
+            "error_over_threshold": -2.8307766703483672e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m/s",
+            "predicted_change": -0.00027185537977656826,
+            "actual_change": -0.00027044092288442567,
+            "error": -1.4144568921425905e-06,
+            "error_over_threshold": -7.072284460712952e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m",
+            "predicted_change": -3.0256953275339393e-05,
+            "actual_change": -2.998992417529878e-05,
+            "error": -2.6702910004061665e-07,
+            "error_over_threshold": -2.6702910004061664e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m/s",
+            "predicted_change": -0.00026257213522549045,
+            "actual_change": -0.000261668842872001,
+            "error": -9.032923534894876e-07,
+            "error_over_threshold": -4.516461767447438e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "terminal_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": -2.8496884239854748e-05,
+            "actual_change": -2.8248379384826493e-05,
+            "error": -2.4850485502825317e-07,
+            "error_over_threshold": -2.4850485502825315e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": -2.8496884239854748e-05,
+            "actual_change": -2.8248379384826493e-05,
+            "error": -2.4850485502825317e-07,
+            "error_over_threshold": -2.4850485502825315e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m/s",
+            "predicted_change": -0.00020644164153451163,
+            "actual_change": -0.00020524143324201604,
+            "error": -1.2002082924955638e-06,
+            "error_over_threshold": -6.0010414624778186e-05,
+            "direction_correct": true
+          }
+        ]
+      },
+      "predicted": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.0044684781600787425,
+            "units": "m",
+            "time_s": 0.46000000000000035,
+            "margin": 0.005531521839921258
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.019671747594876717,
+            "units": "m/s",
+            "time_s": 0.4900000000000004,
+            "margin": 0.00032825240512328324
+          },
+          "terminal_error_m": {
+            "value": 0.004140559416074877,
+            "units": "m",
+            "time_s": 0.5000000000000003,
+            "margin": 0.005859440583925123
+          }
+        },
+        "signed_J": -0.016412620256164204,
+        "task_constraints_pass": true,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "actual": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.004468809700798935,
+            "units": "m",
+            "time_s": 0.46,
+            "margin": 0.005531190299201065
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.019672650887230206,
+            "units": "m/s",
+            "time_s": 0.49,
+            "margin": 0.0003273491127697946
+          },
+          "terminal_error_m": {
+            "value": 0.004140807920929906,
+            "units": "m",
+            "time_s": 0.5,
+            "margin": 0.005859192079070094
+          }
+        },
+        "signed_J": -0.01636745563848973,
+        "task_constraints_pass": true,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.004140807920929906,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.004468809700798935,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.019672650887230206,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.004140807920929906,
+          "holding_max_error_m": 0.004468809700798935,
+          "holding_max_speed_m_s": 0.019672650887230206
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": null,
+        "sources": {
+          "evaluation": {
+            "artifact_id": "cd99dd5b0160c135c9cc4d573a51a43a5f64d2427a4e32350ac010f9deb40ab4",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "7c78daa7f4de26951bc859518c3d1407b9bc599d39285187ef6f27296a9ec16a",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "cd99dd5b0160c135c9cc4d573a51a43a5f64d2427a4e32350ac010f9deb40ab4",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "7c78daa7f4de26951bc859518c3d1407b9bc599d39285187ef6f27296a9ec16a",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "67ecdb82b17fc06621002a2c39df117ae3286b7939dd45fb7893efc88a578b9d",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "67ecdb82b17fc06621002a2c39df117ae3286b7939dd45fb7893efc88a578b9d",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {}
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.5,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "two_scale": [
+        {
+          "direction_id": "structure@1.0h",
+          "relative_difference": 0.0008440359813596058,
+          "direction_agrees": true
+        }
+      ],
+      "training_active_switches": [],
+      "baseline_to_holdout_active_switch": false,
+      "reoptimization_status": "reoptimized_capability_unresolved"
+    },
+    "control": {
+      "validation": {
+        "coordinate": 0.00075,
+        "status": "validated_local_prediction",
+        "direction_correct": true,
+        "practical_checks": {
+          "error_fraction_of_actual_change": 0.25,
+          "material_normalized_change": 1e-08,
+          "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+        },
+        "maximum_error_over_threshold": 1.4950053975282263e-05,
+        "maximum_error_over_actual_change": 0.002675656150251658,
+        "predicted_J": -0.008361497045673242,
+        "actual_J": -0.008361392330380121,
+        "J_error": -1.0471529312064409e-07,
+        "active_prediction": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "active_actual": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "samples": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m/s",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m/s",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m",
+            "predicted_change": 1.1880750506620963e-07,
+            "actual_change": 1.1881017282999729e-07,
+            "error": -2.667763787655986e-12,
+            "error_over_threshold": -2.6677637876559857e-10,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m/s",
+            "predicted_change": -2.756597523142168e-05,
+            "actual_change": -2.7565145046369864e-05,
+            "error": -8.301850518144249e-10,
+            "error_over_threshold": -4.1509252590721246e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m",
+            "predicted_change": 4.172123447654386e-07,
+            "actual_change": 4.172532100776838e-07,
+            "error": -4.086531224523071e-11,
+            "error_over_threshold": -4.086531224523071e-09,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m/s",
+            "predicted_change": -6.273302627068156e-05,
+            "actual_change": -6.272909900918056e-05,
+            "error": -3.9272615010022e-09,
+            "error_over_threshold": -1.9636307505010997e-07,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m",
+            "predicted_change": 8.662992679375759e-07,
+            "actual_change": 8.66530302325863e-07,
+            "error": -2.3103438828719902e-10,
+            "error_over_threshold": -2.3103438828719902e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m/s",
+            "predicted_change": -0.00010154967101567124,
+            "actual_change": -0.00010154757670980882,
+            "error": -2.094305862412882e-09,
+            "error_over_threshold": -1.0471529312064409e-07,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "terminal_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": 1.4236287288682537e-06,
+            "actual_change": 1.4244273996033562e-06,
+            "error": -7.986707351026468e-10,
+            "error_over_threshold": -7.986707351026467e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": 1.4236287288682537e-06,
+            "actual_change": 1.4244273996033562e-06,
+            "error": -7.986707351026468e-10,
+            "error_over_threshold": -7.986707351026467e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m/s",
+            "predicted_change": -0.00011204769475134491,
+            "actual_change": -0.00011174869367183926,
+            "error": -2.990010795056453e-07,
+            "error_over_threshold": -1.4950053975282263e-05,
+            "direction_correct": true
+          }
+        ]
+      },
+      "predicted": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.00450472040935653,
+            "units": "m",
+            "time_s": 0.46000000000000035,
+            "margin": 0.00549527959064347
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.019832770059086534,
+            "units": "m/s",
+            "time_s": 0.4900000000000004,
+            "margin": 0.00016722994091346657
+          },
+          "terminal_error_m": {
+            "value": 0.0041704799290436,
+            "units": "m",
+            "time_s": 0.5000000000000003,
+            "margin": 0.0058295200709564
+          }
+        },
+        "signed_J": -0.008361497045673242,
+        "task_constraints_pass": true,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "actual": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.00450472040935653,
+            "units": "m",
+            "time_s": 0.46,
+            "margin": 0.00549527959064347
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.019832772153392398,
+            "units": "m/s",
+            "time_s": 0.49,
+            "margin": 0.00016722784660760243
+          },
+          "terminal_error_m": {
+            "value": 0.004170480727714336,
+            "units": "m",
+            "time_s": 0.5,
+            "margin": 0.0058295192722856645
+          }
+        },
+        "signed_J": -0.008361392330380121,
+        "task_constraints_pass": true,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.0041704807277143366,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.00450472040935653,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.019832772153392398,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.0041704807277143366,
+          "holding_max_error_m": 0.00450472040935653,
+          "holding_max_speed_m_s": 0.019832772153392398
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": null,
+        "sources": {
+          "evaluation": {
+            "artifact_id": "533e86f9aaab5e1b66f2b5a0428dde92f844684e1e042d509783a7df9856e8d3",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "4f9ef5307c871af79b45183ac19d9e72d7167520f022496da65d325ed7b54ab7",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "533e86f9aaab5e1b66f2b5a0428dde92f844684e1e042d509783a7df9856e8d3",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "4f9ef5307c871af79b45183ac19d9e72d7167520f022496da65d325ed7b54ab7",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "20c3fbfc76637dd97cf0dd3c217caaaf1685d1da9eb62f482a7b4c789762531b",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "20c3fbfc76637dd97cf0dd3c217caaaf1685d1da9eb62f482a7b4c789762531b",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {}
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.5,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "two_scale": [
+        {
+          "direction_id": "control@1.0h",
+          "relative_difference": 3.2000656425382954e-05,
+          "direction_agrees": true
+        }
+      ],
+      "training_active_switches": [],
+      "baseline_to_holdout_active_switch": false,
+      "reoptimization_status": "reoptimized_capability_unresolved"
+    },
+    "structure_negative": {
+      "validation": {
+        "coordinate": -7500.0,
+        "status": "validated_local_prediction",
+        "direction_correct": true,
+        "practical_checks": {
+          "error_fraction_of_actual_change": 0.25,
+          "material_normalized_change": 1e-08,
+          "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+        },
+        "maximum_error_over_threshold": 0.00039016656823220863,
+        "maximum_error_over_actual_change": 0.09083269117338374,
+        "predicted_J": 0.009844593266384845,
+        "actual_J": 0.009889725435492137,
+        "J_error": -4.5132169107292217e-05,
+        "active_prediction": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "active_actual": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "samples": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m",
+            "predicted_change": 3.7281966901282494e-05,
+            "actual_change": 3.7648570171030516e-05,
+            "error": -3.666032697480226e-07,
+            "error_over_threshold": -3.666032697480226e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m/s",
+            "predicted_change": -9.371217391725529e-05,
+            "actual_change": -8.590884255261111e-05,
+            "error": -7.803331364644172e-06,
+            "error_over_threshold": -0.00039016656823220863,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m",
+            "predicted_change": 3.6242249277786966e-05,
+            "actual_change": 3.657267294293054e-05,
+            "error": -3.3042366514357544e-07,
+            "error_over_threshold": -3.3042366514357546e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m/s",
+            "predicted_change": 0.0002740645915233664,
+            "actual_change": 0.000277678376538395,
+            "error": -3.6137850150286255e-06,
+            "error_over_threshold": -0.00018068925075143127,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m",
+            "predicted_change": 3.459923955466571e-05,
+            "actual_change": 3.4902733566538614e-05,
+            "error": -3.034940118729068e-07,
+            "error_over_threshold": -3.034940118729068e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m/s",
+            "predicted_change": 0.00026352553537882463,
+            "actual_change": 0.0002655277593373284,
+            "error": -2.0022239585038016e-06,
+            "error_over_threshold": -0.00010011119792519008,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m",
+            "predicted_change": 3.254664178596989e-05,
+            "actual_change": 3.2828858067083246e-05,
+            "error": -2.822162811133566e-07,
+            "error_over_threshold": -2.822162811133566e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m/s",
+            "predicted_change": 0.00027185537977656826,
+            "actual_change": 0.0002732616214404621,
+            "error": -1.4062416638938036e-06,
+            "error_over_threshold": -7.031208319469018e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m",
+            "predicted_change": 3.0256953275339393e-05,
+            "actual_change": 3.052321577556749e-05,
+            "error": -2.6626250022809826e-07,
+            "error_over_threshold": -2.6626250022809828e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m/s",
+            "predicted_change": 0.0002625721352254905,
+            "actual_change": 0.00026347477860763635,
+            "error": -9.026433821458443e-07,
+            "error_over_threshold": -4.5132169107292217e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "terminal_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": 2.8496884239854748e-05,
+            "actual_change": 2.87447371944205e-05,
+            "error": -2.4785295456575264e-07,
+            "error_over_threshold": -2.4785295456575263e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": 2.8496884239854748e-05,
+            "actual_change": 2.87447371944205e-05,
+            "error": -2.4785295456575264e-07,
+            "error_over_threshold": -2.4785295456575263e-05,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m/s",
+            "predicted_change": 0.00020644164153451163,
+            "actual_change": 0.0002076349872046235,
+            "error": -1.1933456701118672e-06,
+            "error_over_threshold": -5.966728350559336e-05,
+            "direction_correct": true
+          }
+        ]
+      },
+      "predicted": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.004540962658634317,
+            "units": "m",
+            "time_s": 0.46000000000000035,
+            "margin": 0.005459037341365683
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.020196891865327696,
+            "units": "m/s",
+            "time_s": 0.4900000000000004,
+            "margin": -0.00019689186532769604
+          },
+          "terminal_error_m": {
+            "value": 0.004197553184554586,
+            "units": "m",
+            "time_s": 0.5000000000000003,
+            "margin": 0.0058024468154454145
+          }
+        },
+        "signed_J": 0.009844593266384843,
+        "task_constraints_pass": false,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "actual": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.00454129308229946,
+            "units": "m",
+            "time_s": 0.46,
+            "margin": 0.00545870691770054
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.020197794508709843,
+            "units": "m/s",
+            "time_s": 0.49,
+            "margin": -0.00019779450870984275
+          },
+          "terminal_error_m": {
+            "value": 0.004197801037509152,
+            "units": "m",
+            "time_s": 0.5,
+            "margin": 0.005802198962490848
+          }
+        },
+        "signed_J": 0.009889725435492137,
+        "task_constraints_pass": false,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+        "status": "valid_failure",
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.004197801037509152,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.00454129308229946,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.020197794508709843,
+            "passed": false,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.004197801037509152,
+          "holding_max_error_m": 0.00454129308229946,
+          "holding_max_speed_m_s": 0.020197794508709843
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": null,
+        "sources": {
+          "evaluation": {
+            "artifact_id": "1fc42ebc28bf7253fd76d8a2bfe895cac17198ff386a2d89e86f8ac7eb7444be",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "ab6e24196237187581630df8130783d7e382bd41bb3004cfbdfd9e130696026f",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "1fc42ebc28bf7253fd76d8a2bfe895cac17198ff386a2d89e86f8ac7eb7444be",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "ab6e24196237187581630df8130783d7e382bd41bb3004cfbdfd9e130696026f",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "e78c93f3f7cc7b07725909437317c509ea4c60f163b43fe9b3517315d5e71b8b",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "e78c93f3f7cc7b07725909437317c509ea4c60f163b43fe9b3517315d5e71b8b",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {}
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.5,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "two_scale": [
+        {
+          "direction_id": "structure@1.0h",
+          "relative_difference": 0.0008440359813596058,
+          "direction_agrees": true
+        }
+      ],
+      "training_active_switches": [],
+      "baseline_to_holdout_active_switch": false,
+      "reoptimization_status": "reoptimized_capability_unresolved"
+    },
+    "control_negative": {
+      "validation": {
+        "coordinate": -0.00075,
+        "status": "validated_local_prediction",
+        "direction_correct": true,
+        "practical_checks": {
+          "error_fraction_of_actual_change": 0.25,
+          "material_normalized_change": 1e-08,
+          "interpretation": "Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances."
+        },
+        "maximum_error_over_threshold": 1.4800664010827802e-05,
+        "maximum_error_over_actual_change": 0.0026348897094743843,
+        "predicted_J": 0.0017934700558938817,
+        "actual_J": 0.0017935740271883896,
+        "J_error": -1.039712945079263e-07,
+        "active_prediction": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "active_actual": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        },
+        "samples": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 45,
+            "time_s": 0.45000000000000034,
+            "units": "m/s",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 46,
+            "time_s": 0.46000000000000035,
+            "units": "m/s",
+            "predicted_change": 0.0,
+            "actual_change": 0.0,
+            "error": 0.0,
+            "error_over_threshold": 0.0,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m",
+            "predicted_change": -1.1880750506620963e-07,
+            "actual_change": -1.1880483727244595e-07,
+            "error": -2.6677937636776508e-12,
+            "error_over_threshold": -2.6677937636776505e-10,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 47,
+            "time_s": 0.47000000000000036,
+            "units": "m/s",
+            "predicted_change": 2.756597523142168e-05,
+            "actual_change": 2.7566803322153223e-05,
+            "error": -8.280907315416641e-10,
+            "error_over_threshold": -4.1404536577083206e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m",
+            "predicted_change": -4.172123447654386e-07,
+            "actual_change": -4.171714750400568e-07,
+            "error": -4.08697253817536e-11,
+            "error_over_threshold": -4.08697253817536e-09,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 48,
+            "time_s": 0.48000000000000037,
+            "units": "m/s",
+            "predicted_change": 6.273302627068156e-05,
+            "actual_change": 6.273693620836518e-05,
+            "error": -3.909937683621578e-09,
+            "error_over_threshold": -1.954968841810789e-07,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m",
+            "predicted_change": -8.662992679375759e-07,
+            "actual_change": -8.66068182346913e-07,
+            "error": -2.310855906628717e-10,
+            "error_over_threshold": -2.310855906628717e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 49,
+            "time_s": 0.4900000000000004,
+            "units": "m/s",
+            "predicted_change": 0.00010154967101567124,
+            "actual_change": 0.0001015517504415614,
+            "error": -2.079425890158526e-09,
+            "error_over_threshold": -1.039712945079263e-07,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "terminal_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": -1.4236287288682537e-06,
+            "actual_change": -1.4228297657159496e-06,
+            "error": -7.989631523042107e-10,
+            "error_over_threshold": -7.989631523042107e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m",
+            "predicted_change": -1.4236287288682537e-06,
+            "actual_change": -1.4228297657159496e-06,
+            "error": -7.989631523042107e-10,
+            "error_over_threshold": -7.989631523042107e-08,
+            "direction_correct": true
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "sample_index": 50,
+            "time_s": 0.5000000000000003,
+            "units": "m/s",
+            "predicted_change": 0.00011204769475134491,
+            "actual_change": 0.00011234370803156146,
+            "error": -2.9601328021655604e-07,
+            "error_over_threshold": -1.4800664010827802e-05,
+            "direction_correct": true
+          }
+        ]
+      },
+      "predicted": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.00450472040935653,
+            "units": "m",
+            "time_s": 0.46000000000000035,
+            "margin": 0.00549527959064347
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.02003586940111788,
+            "units": "m/s",
+            "time_s": 0.4900000000000004,
+            "margin": -3.586940111787937e-05
+          },
+          "terminal_error_m": {
+            "value": 0.0041676326715858625,
+            "units": "m",
+            "time_s": 0.5000000000000003,
+            "margin": 0.005832367328414138
+          }
+        },
+        "signed_J": 0.0017934700558938817,
+        "task_constraints_pass": false,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "actual": {
+        "metrics": {
+          "holding_max_error_m": {
+            "value": 0.00450472040935653,
+            "units": "m",
+            "time_s": 0.46,
+            "margin": 0.00549527959064347
+          },
+          "holding_max_speed_m_s": {
+            "value": 0.020035871480543768,
+            "units": "m/s",
+            "time_s": 0.49,
+            "margin": -3.587148054376779e-05
+          },
+          "terminal_error_m": {
+            "value": 0.004167633470549016,
+            "units": "m",
+            "time_s": 0.5,
+            "margin": 0.005832366529450984
+          }
+        },
+        "signed_J": 0.0017935740271883896,
+        "task_constraints_pass": false,
+        "active": {
+          "per_constraint": {
+            "holding_max_error_m": 46,
+            "holding_max_speed_m_s": 49,
+            "terminal_error_m": 50
+          },
+          "worst": [
+            "holding_max_speed_m_s",
+            49
+          ]
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+        "status": "valid_failure",
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.004167633470549016,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.00450472040935653,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.020035871480543768,
+            "passed": false,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.004167633470549016,
+          "holding_max_error_m": 0.00450472040935653,
+          "holding_max_speed_m_s": 0.020035871480543768
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": null,
+        "sources": {
+          "evaluation": {
+            "artifact_id": "ceaf35d9d8f64c059e12105355b302114f1ef014e970d230120f418a8f7f2d46",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "a250b1c28ecb0bbda68cbc041620cf7b4cc979103c7d8201d74a7af124933744",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "ceaf35d9d8f64c059e12105355b302114f1ef014e970d230120f418a8f7f2d46",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "a250b1c28ecb0bbda68cbc041620cf7b4cc979103c7d8201d74a7af124933744",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "076e8ccea9da62c51b69cf600dd306971888569588673cb4d393303731f9b1e7",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "076e8ccea9da62c51b69cf600dd306971888569588673cb4d393303731f9b1e7",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {}
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.5,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "two_scale": [
+        {
+          "direction_id": "control@1.0h",
+          "relative_difference": 3.2000656425382954e-05,
+          "direction_agrees": true
+        }
+      ],
+      "training_active_switches": [],
+      "baseline_to_holdout_active_switch": false,
+      "reoptimization_status": "reoptimized_capability_unresolved"
+    }
+  },
+  "provider_calls": 0,
+  "agent_calls": 0,
+  "nmpc_calls": 0,
+  "ppo_calls": 0,
+  "optimization_calls": 0,
+  "baseline_reproduction": "all three original metrics within 1e-10; 51 world-frame samples, 48 named hinges, four tendon channels",
+  "store": "D:\\softrobot-agent\\.worktrees\\a45-full-task-sensitivity-validation\\runs\\a45-full-task-sensitivity-validation\\store",
+  "research_mathematics": [
+    {
+      "artifact_id": "afaf1c7ec2e8ba65851ee38daf9de496777f42e13b58dcb1caf4cb0d5a1d57f7",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "547cb3fd9adea7f20395a7aec36a47372c35e5ca0e497b48c007b754cc02fc46",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a0d409b33cf2783a913c88c8f99828a98a4d01ea09428439b88628eb3f7bde86",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "88b6360d51363d14ad85bea47ce8192e22e92e8b1cf4a1779449e55aba2b27f1",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "641ebc11e501fe4c4c6933a2abf6a55b61ea6b367fca80bc4e4e802cc96206fd",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "fc5610b8184961a822c9c2dfab41dec4db2112275c8dbf7d3fca260febdbda78",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "4de8095d22d5871faf45c8cbe087f1b4d3f3ef33619f64ec7b9c04188634969e",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "67b86775f1d22ad19b0fc7fd28d2f4bc51fa4ad42ad5c8dbf974766b772a638f",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "f7e0f332df3b98f5ee4d691fc6cf19dd275d18110574fe52063ac53f16e1b7c7",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1def36950da6336112258345698617c044079ec207d87aab3cbea394c9f4544a",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "088215a6cde8ef851e252c8920791bd527dee2292359bff3d041961c66956157",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "dfd59ab1a11fd7f98a2da81fefa4c532782ce543a1d94893ee19dd38d861cb2a",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1d4aacf71439f0e46c4ee290c78d5eb668e265b19985d637350e4b886d7a2006",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "dd1d2bafccab0dd8d04eb106ff7790137c2b20bb09b327b325114b2968b975ea",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "81fb2ee1c0ff371a57521804e4b86688a15dc43216199cebdf82dec4c870d816",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a98e346245dbcf530fe444ddee77bcb593c78d6e6225d4ff69c765f5ba55e26f",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "f6fecf0b1626f4899ca9db7c2c024108623f83bc1d637cef9b60f110e9e7d831",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "88dc30c6c30bc8c40183697117576eac52ac5850d58775f40012348add61df2b",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "f8bee3f29eb4ff8cd7b8fbde6cd54aa660253446a0323a19f8ab20cce1354fed",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "40638f39436b81803ec5a674825ac13ef7bfeb2de9665debc93cf02d6a7ce991",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "6d43871c716ea616634dd1cbdf8e373aea37bf8ec86a23c108e60a2e5f839107",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a97c02dd271ad6105e6b79211b27d4cff2db699a045733ad4cecfda42b0f88f0",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "06eda655b98242206f46861aec8ba4ff0aeb3672adf26685f6b6ad00a47f3df0",
+      "media_type": "application/json"
+    }
+  ]
+}
