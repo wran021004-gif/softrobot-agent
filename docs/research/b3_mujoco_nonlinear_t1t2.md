@@ -251,9 +251,10 @@ native_analysis/native_control 的薄适配、capability/task_constraints 的摘
 
 Git 只保留源码、小配置、定向测试、本报告、阶段关键数值和证据索引。
 完整轨迹、回调、矩阵和 Worker 原始收据保留于忽略的 runs/Store，没有重复 tar 或新 SHA manifest。
-初始接口和实验冻结提交为 `cb25654e2`；最终数值、报告和离线边界收紧另行提交。
+初始接口和实验冻结提交为 `cb25654e2`；完整数值、报告和离线边界收紧提交为 `4353972e9`。
 交付分支为 `research/b3-mujoco-nonlinear-t1t2`，推送目的地为用户指定的
-`wran021004-gif/softrobot-agent`；最终提交、普通 push 回执和清洁状态在交付时复核。
+`wran021004-gif/softrobot-agent`。上述两提交已普通 push 成功，远端跟踪分支与本地均为
+`4353972e96afae2527905bc2b3efbff3c5bf93ce` 时复核工作树清洁；本段交付回执以纯文档提交追加，继续普通推送。
 未强推、合并 main 或清理其他工作树。
 
 ## 9. 可开放的信息与不可越过的限制
