@@ -17,7 +17,10 @@ def supervised_dispatch(host, value, request_id, **kwargs):
     action = value.get('action')
     if action in ('execute', 'physical_replay'):
         s = state(host)
-        ref = value['candidate'] if action == 'execute' else value['physical_replay']['candidate']
+        payload = value if action == 'execute' else (value.get('physical_replay') or {})
+        ref = payload.get('candidate')
+        if ref is None:
+            return original_dispatch(host, value, request_id, **kwargs)
         candidate = verify_candidate(host, ref)
         recipe = candidate['configuration']['policy']['controller']['parameters']['data']['recipe']
         expected = dict(replan_period_s=.1, horizon=10, substeps=1, tolerance=1e-6)

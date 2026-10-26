@@ -1,6 +1,6 @@
 # B3 M2：有限真实自主科研试点
 
-2026-10-26（Asia/Shanghai）。状态：**B 首次完整 NMPC 为有效失败，Agent 正在继续研究；C 隔离等待**。
+2026-10-26（Asia/Shanghai）。状态：**B 已合法 STOP，无可行解；C 已隔离启动第一次 NMPC**。
 本文件持续更新，尚不是已完成的 M2 科研报告。
 
 基线 `feat/b3-t2-guided-design@fcdc0a4f47dea98afe3a355f491b15b1f7a51a6d`。
@@ -108,13 +108,13 @@ Agent 首先公开读取历史与必要配置，自主选择固定参考上的 N
 DECISION_CANDIDATE_MISMATCH 拒绝，没有科学启动；第四次自行修正后进入第一次 NMPC。
 原错误与公开操作 / Provider 成本均保留，没有监督者改写模型提交或重置预算。
 
-运行交接：B 主研究进程 PID 341580（Windows venv launcher PID 515372），
+首次运行原始进程记录（现均已退出、结果已结算）：B 主研究进程 PID 341580（Windows venv launcher PID 515372），
 execution owner `b3-t2-050-b-v2-draft-exec-773fd76849c64c3c`，原 worker_lifecycle PID 607404，
 实际控制子进程 PID 736960。原 backend execution `630458fcbd944389a602244dfdd5a42d`。
 首个在线求解在 t=0 返回 iteration_limit_feasible，plan_accepted=true、solver_failed=false、
 optimization_nonconverged=true，100.7528732 s；已保存 0–0.09 s 的 10 条控制更新，
 正在后续在线求解。这是实际数值状态，不是工程错误；未调整迭代或任务阈值。
-监督应先检查这些进程与原 pending，再读取新增 nmpc_updates / Store 事件，不重复启动。
+这些 PID 仅用于原执行溯源；B 已 STOP，不得再次恢复。当前监督对象为下文 C。
 
 ### B：首项独立物理结果与反馈
 
@@ -161,19 +161,67 @@ diagnose 与 CONTROL_SEARCH intent 不匹配；native 保存状态字段缺失�
 随后 evaluation_requests=300 超过 8、iterations=8 超过 2，均由原门禁在计算前拒绝。
 这保留为调用与预算理解错误，不把被拒的 300 回调记为已执行，也不放宽冻结上限。
 
+### B：完整研究结束审计
+
+最终合法 STOP 原 Plan 为 `d41a059183f6cb4ab6fb15086d5d742919aa433471e531e3ed6b1f4a3012ea51`。
+模型在事件 485、518 公开读取 `/all_fresh_results`，完整索引只有上述一个独立物理失败；
+事件 545 的 STOP 只引用该登记结果，事件 548 接受，最终 research_status=stopped，无 SELECT。
+此前一次 STOP 引用未注册材料、一次加入不支持字段，均被原规则拒绝，随后自行改正。
+没有行政替代 STOP、追加实验或第二轮 Study。
+
+模型收到的核心内容是新 0.50 s 任务、参考结构、原 0.35 s 三条具名历史和真实新物理反馈。
+实际路线为参考 NMPC → 发现停稳失败 → 尝试瞬时制动/原生末段控制修正 → 绑定控制来源未完成 → 收尾 STOP。
+研究方向确实因新速度失败改变；但没有产生合法数学或第二次控制实测，不能称控制已充分优化。
+未使用 T1/T2；B 本身未授予结构 T2，数学能力没有得到本组的新增实际检验。
+Agent 对“没有探索预算”判断对应的是 Provider 保护/耗尽；数学 22、NMPC 1 和物理 3 仍未使用，
+不能写成这些科学计数已经耗尽。
+
+Provider 为 **31 主 Agent + 1 Reporter = 32**，32 个唯一请求均确认 HTTP 200，无未知发送或自动重试。
+prompt=954,950，completion=191,321，total=1,146,271 tokens；cache hit=331,008 / miss=623,942；
+reasoning=168,070（包含在 completion），金额未返回，unknown。
+public operations=50，13 个原工具参数/引用错误；另有 SDK offload 读取错误。
+10 次原 request-feedback Handoff，最新结果与原决策轨迹在切换后仍可见。
+只有第一次 NMPC 物理启动；native 修正尝试全部在计算前拒绝，所以数学、native 内部修正积分、回放均为 0。
+原 NMPC 完整物理网格为 0.50 / 0.0005 = 1,000 步，50 段已保存实际控制；无额外 native 前缀重建。
+
+主要限制同时包括：控制 NLP 五次达迭代上限、真实停稳未通过；Agent 原生工具/引用使用和 Provider 分配低效；
+长单行 JSON 与 SDK offload/切换引用造成读取阻力。不能仅据一次失败把瓶颈归因于结构，
+也不能把参数修复和大量读取包装成已执行的控制优化。
+
+已通过原 core.export 保存[完整原证据](../../evidence/b3_t2_pilot_050_b/immutable_artifacts.tar.gz)、
+[账本](../../evidence/b3_t2_pilot_050_b/ledger.json)、
+[原停止与结果目录](../../evidence/b3_t2_pilot_050_b/disposition.json)及 design_package。
+原 archived 对归档整体和结果/STOP member 校验通过；没有覆盖之前的导出。
+
+### C：启动隔离与早期决策
+
+B 全部进程和请求结束后才启动 C（Windows launcher PID 540692）；复用原独立 C Store、共同候选和三条背景。
+C 主进程 PID 354640，首次 execution owner `b3-t2-050-c-v2-draft-exec-04c61298c33a4331`，原 launch_intent=true。
+首真实请求 wire `842f3e8ab65a02acef2020f443216fd16ad33a75b1896dcf81e4bc81a0406036`，71,628 bytes；
+实际序列化正文不存在本次 B 结果 `137dd4b2…`，历史仍仅来自 c3-b-100ms-20261025，求解间隔 0.1 s。
+标准 B 导出没有 summary.json，不会新增原 experiment_preflight 所扫描的全局历史摘要。
+Agent 自主先测同一参考结构 NMPC，没有先做 T2 或预先改结构。
+
+早期三次请求缺少顶层 candidate 或 decision.selected_candidate，未启动科学计算。
+其中前两次被本轮操作脚本过早读取缺字段转成 KeyError；这是监督接口的工程缺口，
+已局部修正为缺字段直接交还原 dispatch/Plan 验证，原科学准入不放宽、原错误与费用保留。
+C 在修正前已自行补齐参数进入首次 NMPC，未中断其控制执行或更改正在运行的模型程序。
+脚本修改只影响后续进程恢复时的无效输入错误交付；生产源码和冻结配置均不变。
+Agent 所述“旧目标/阈值不同、速度成本是新元素”尚不符合冻结背景：新信息主要是 0.35→0.50 s 时域，
+旧目标与硬阈值不能仅从 task_match=false 推断已改变。保留原自然语言误判，不改写其科研方案。
+
 | 实际状态与费用 | B | C |
 |---|---:|---:|
-| 状态 | 首项有效失败，继续研究 | 未启动，隔离等待 |
-| Provider（含 Reporter） | 17 / 32（含 1 Reporter） | 0 / 32 |
-| 公开操作 | 28 / 80 | 0 / 80 |
+| 状态 | 已合法 STOP，无可行解 | 第一次 NMPC 执行中 |
+| Provider（含 Reporter） | 32 / 32（31 + 1） | 4 / 32 |
+| 公开操作 | 50 / 80 | 5 / 80 |
 | 数学总评价 / 模型 / CONIC / dual-face | 0 / 0 / 0 / 0 | 相同 |
-| 独立物理启动 / NMPC / 完整回放 | 1 / 1 / 0 | 0 / 0 / 0 |
-| native 内部积分 / PPO | 执行中，待原记录结算 / 0 | 0 / 0 |
-| pending / 占用 / 未消费响应 | 无物理 pending；后续 Provider 执行中 | 无 |
+| 独立物理启动 / NMPC / 完整回放 | 1 / 1 / 0 | 1 / 1 / 0 |
+| 独立物理积分 / 额外 native 搜索积分 / PPO | 1,000 / 0 / 0 | 执行中 / 0 / 0 |
+| pending / 占用 / 未消费响应 | 均无 | 原 NMPC pending |
 
-上表为首次物理结束后继续研究时的账本快照；后续由原账本结算并替换。
-T1/T2、分数平台、结构修改、GVS—MuJoCo 差异和最佳独立硬指标尚待本轮测量，不能把旧证据记成本轮结果。
-没有研究 Agent 的 SELECT/STOP，也未行政关闭这两份待运行 Store。
-后续须完成每组实际决策与 wire 审计、资源结算、独立物理硬验收、标准导出及完整研究结论。
+上表 B 为最终账本，C 为首次 NMPC 执行中快照；后续由原账本结算并替换。
+C 的 T1/T2、分数平台、结构修改及两组结构收益仍待其自主研究结果，不能把旧证据记成本轮结果。
+后续须完成 C 真实决策、硬验收和标准导出，以及 B/C 公平机会比较、完整科研解释与最终版本核对。
 
 生产源码修改为零；新增本准备报告和一个操作脚本。没有扩大测试、修改冻结科学配置或扩展预算。
