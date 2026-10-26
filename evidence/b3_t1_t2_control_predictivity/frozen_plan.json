@@ -1,0 +1,203 @@
+{
+  "version": "b3_t1_t2_predictivity_v1",
+  "baseline": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+  "date": "2026-10-26 Asia/Shanghai",
+  "scope": "Independent mathematical/simulation engineering validation; no formal Study or SELECT",
+  "source": {
+    "folder": "evidence/b3_t2_pilot_050_c",
+    "candidate": {
+      "artifact_id": "123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33",
+      "media_type": "application/json"
+    },
+    "schedule": {
+      "artifact_id": "30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea",
+      "media_type": "application/json"
+    },
+    "replay": {
+      "artifact_id": "0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca",
+      "media_type": "application/json"
+    },
+    "raw": {
+      "artifact_id": "66f733b4ba4c59b0ce892cb88e00b846b6ba9f950bc24159feba0fbf861bf705",
+      "media_type": "application/json"
+    },
+    "inherited_acceptance": false
+  },
+  "task": {
+    "identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+    "target_m": [
+      0.29,
+      -0.035,
+      0.19
+    ],
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.5,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "limits": {
+      "terminal_error_m": 0.01,
+      "holding_max_error_m": 0.01,
+      "holding_max_speed_m_s": 0.02
+    },
+    "holding_start_s": 0.45
+  },
+  "moduli_pa": {
+    "d_minus": 4860000.0,
+    "d_zero": 5400000.0,
+    "d_plus": 5940000.0
+  },
+  "parameter": {
+    "path": "segments.1.young_pa",
+    "units": "Pa",
+    "bounds": [
+      2000000.0,
+      15000000.0
+    ],
+    "source": "current frozen FamilySpace continuous domain",
+    "affected_tendon_indices": null,
+    "bounds_source": {
+      "family_space_identity": "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+      "path": "segment_domains.1.young_pa"
+    }
+  },
+  "protocol": {
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "authority_threshold": null,
+    "baseline_lengths_m": {
+      "segment_0": 0.16,
+      "segment_1": 0.11,
+      "segment_2": 0.14,
+      "segment_3": 0.14,
+      "segment_4": 0.14,
+      "segment_5": 0.14,
+      "segment_6": 0.14,
+      "segment_7": 0.14,
+      "segment_8": 0.14
+    },
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "construction_max_iterations": 20,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "duration_s": 0.5,
+    "endpoint_check_atol": 1e-08,
+    "endpoint_max_iterations": 100,
+    "equilibrium_normalized_residual": 1e-05,
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "horizon_alignment_atol_s": 1e-12,
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "period_s": 0.01,
+    "pole_margin_s_inv": 1e-07,
+    "protocol_id": "task-local-v2",
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "samples_s": [
+      0.0,
+      0.1,
+      0.3,
+      0.45,
+      0.49
+    ],
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ]
+  },
+  "settings": {
+    "version": "local_control_search_v2",
+    "correction_window_s": [
+      0.0,
+      0.5
+    ],
+    "safety_margin_fraction": 0.05,
+    "method": "response",
+    "knots_s": [
+      0.0,
+      0.38,
+      0.45,
+      0.5
+    ],
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.01,
+    "initial_radius_n": 0.1,
+    "minimum_radius_n": 0.0001,
+    "evaluation_requests": 12,
+    "iterations": 2,
+    "active_coefficients": [
+      9,
+      10,
+      13,
+      14
+    ]
+  },
+  "control_initialization": "M2 C independently replayed schedule; identical absolute U0; legal per-design rebinding",
+  "active_rule": "Same four knot-major coefficients 9,10,13,14 as saved M2 C search; declared before new results",
+  "math_rule": "Three initial-point models; T1 values from the original single-scale T2 internal CONIC solves; no duplicate T1 or h/2",
+  "physical_rule": "One fixed backend replay, one native search and one independent best-control backend replay per structure",
+  "metric": "Original evaluator metrics: max(terminal/limit, holding_position/limit, holding_speed/limit)-1",
+  "judgment": {
+    "model_resolution": "Original recorded primal/support estimates and T2 direction_status",
+    "physical_resolution": "Observed deterministic differences separated from unknown nonlinear optimization error",
+    "ranking": "No structure optimum ranking without bounded search/model error; no invented confidence interval",
+    "nmpc": "Not allocated in this minimal single-scale experiment; no closed-loop verification"
+  },
+  "caps": {
+    "provider": 0,
+    "mathematical_evaluations": 22,
+    "structures": 3,
+    "callbacks_per_structure": 12,
+    "updates_per_structure": 2,
+    "fixed_replays_per_structure": 1,
+    "best_replays_per_structure": 1,
+    "physics_steps": 50000,
+    "nmpc": 0,
+    "ppo": 0,
+    "matlab": 0,
+    "formal_study": 0
+  },
+  "worst_case_physics_steps": 42000,
+  "math_accounting": "Engineering equivalent of original counters: 3 model/Gramian preparations + 3 CONIC + 2 dual-face + 3 native analyses = 11; no formal Store ledger created",
+  "runtime": {
+    "python": "3.11.16",
+    "versions": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "casadi": "3.7.2",
+      "mujoco": "3.13.0",
+      "cvxpy": "1.9.3",
+      "clarabel": "0.11.1"
+    }
+  },
+  "r1_before": {
+    "run_id": "b3-r1-history-assisted-050",
+    "size": 49934336,
+    "mtime_ns": 1792987100895194400,
+    "research_status": "ready",
+    "pending": null,
+    "freeze": "7283d07d652d2a382e16e2ba33e9b99533572414",
+    "mathematical_evaluations": 0,
+    "results": 2,
+    "analysis_results": 0,
+    "calls": 113,
+    "events": 758
+  },
+  "raw_directory": "D:\\softrobot-agent\\.worktrees\\b3-t1t2-control-predictivity\\runs\\b3-t1t2-control-predictivity"
+}

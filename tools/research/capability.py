@@ -12,6 +12,58 @@ SCORE_QUANTITY_SEMANTICS = dict(score='Computed signed minimax value within the 
     control_reoptimization_improvement='fixed-old-control score - reoptimized score on the same candidate')
 
 
+def task_control_capability_comparison(candidates, *, t2):
+    """Pure L1 composition of original numerical and acceptance evidence.
+
+    Observed finite-search differences never imply optimized structural order.
+    Caller supplies frozen comparison conditions and original result pointers.
+    No task threshold, acceptance decision or new scientific computation here.
+    """
+    from itertools import combinations
+    from tools.research_tasks import compare_acceptance
+    pairs=[]
+    for (left,a),(right,b) in combinations(candidates.items(),2):
+        pair=dict(left=left,right=right,ranking='unresolved',preferred_candidate=None)
+        if not a.get('conditions') or a['conditions']!=b.get('conditions'):
+            pair.update(status='not_comparable',reason='Frozen task/model/control conditions differ or are missing')
+            pairs.append(pair);continue
+        tasks=[row.get(role,{}).get('acceptance',{}) for row in (a,b) for role in ('fixed','reoptimized')]
+        identity=a['conditions']['task']['identity']
+        if any(r.get('task_identity')!=identity or r.get('status') not in ('accepted','valid_failure') for r in tasks):
+            pair.update(status='not_comparable',reason='Valid independent acceptance for the same task required')
+            pairs.append(pair);continue
+        resolution=recorded_score_resolution(a['mathematics'],b['mathematics'])
+        separated=resolution['status']=='separated_numerical_estimates'
+        direction=t2.get('direction_status')=='numerically_stable_local_direction'
+        physical={}
+        for role in ('fixed','reoptimized'):
+            ar,br=a[role],b[role]
+            physical[role]=dict(J_left=ar['J'],J_right=br['J'],delta_J=br['J']-ar['J'],
+                comparison=compare_acceptance(br['acceptance'],ar['acceptance']),
+                left_metrics=ar['acceptance']['metrics'],right_metrics=br['acceptance']['metrics'],
+                sources=[ar['reference'],br['reference']])
+        observed=physical['reoptimized']['delta_J']!=0
+        pair.update(status='physically_observed_difference' if observed else 'indistinguishable',
+            mathematics=resolution,model_direction_supported=bool(separated and direction),
+            direction_relation='unresolved',physical=physical,
+            search_opportunities={name:dict(cost=row['native']['cost'],stop_reason=row['native']['stop_reason'])
+                for name,row in ((left,a),(right,b))},
+            reason='Finite search error is unbounded; deterministic replay agreement is not an optimization error bound')
+        if observed and separated and direction:
+            model_delta=b['mathematics']['trajectory']['replayed_violation']-a['mathematics']['trajectory']['replayed_violation']
+            pair['direction_relation']='direction_consistent' if model_delta*physical['reoptimized']['delta_J']>0 else 'direction_conflicting'
+        elif observed and resolution['status']=='indistinguishable_at_recorded_numerical_precision':
+            pair['direction_relation']='model_indistinguishable_physical_difference_observed'
+        pairs.append(pair)
+    return dict(version='task_control_capability_comparison_v1',pairs=pairs,
+        t2={k:t2.get(k) for k in ('direction_status','preferred_parameter_direction','parameter_identity','regularity')},
+        ranking='unresolved',preferred_candidate=None,feedback_closed_loop='not_executed',
+        supported=['Read original component metrics and numerical resolution',
+            'Compare fixed-input response with finite-budget control reoptimization'],
+        unsupported=['Globally optimized structure order','NMPC closed-loop order','Hardware performance'],
+        integration='Independent L1 view only; no Agent L0 or frozen Study changes')
+
+
 class CapabilityComparison(Contract):
     baseline_result: EvidenceRef
     variable: str
