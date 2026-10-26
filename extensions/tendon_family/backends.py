@@ -56,6 +56,25 @@ def _mujoco_state_failed(data, previous_time):
         or not all(np.isfinite(v).all() for v in (data.qpos,data.qvel,data.qacc)))
 
 
+def _bind_mujoco_forces(model, scene):
+    """Resolve the validated TimedForce schema to named engine bodies and ticks."""
+    dt=model.opt.timestep
+    return tuple((model.body(f['entity']).id,round(f['start_s']/dt),round(f['end_s']/dt),
+        np.asarray(f['force_n'],dtype=float)) for f in scene['forces'])
+
+
+def _apply_mujoco_forces(model, data, forces):
+    """World N at body COM, [start,end), held through one actual engine step.
+
+    Integer ticks avoid accumulated engine-time rounding at grid boundaries.
+    xfrc_applied[:3] is force; [3:] is a zero COM couple, not a tip load.
+    """
+    tick=round(data.time/model.opt.timestep)
+    data.xfrc_applied[:]=0
+    for bid,start,end,force in forces:
+        if start<=tick<end:data.xfrc_applied[bid,:3]+=force
+
+
 class MujocoFailureSnapshot:
     """One reusable pre-call buffer; serialize only on a catchable engine failure."""
     def __init__(self,model,identity,folder=None):
@@ -265,6 +284,7 @@ class MujocoBackend(SerialBackend):
         compile_xml(p,s,self.config,path); model=mujoco.MjModel.from_xml_path(str(path))
         data=mujoco.MjData(model); pose=mujoco.MjData(model)
         safety=MujocoFailureSnapshot(model,p['identity'],self.folder)
+        forces=_bind_mujoco_forces(model,s)
         bids=[model.body(b['entity']).id for b in p['parts']]
         # Tree serialization can reorder siblings; never assume array order.
         jids=[model.joint(j).id for j in p['dofs']]; qi=model.jnt_qposadr[jids]; vi=model.jnt_dofadr[jids]
@@ -328,12 +348,11 @@ class MujocoBackend(SerialBackend):
                         complete=False;reason='NMPC_SUSTAINED_UNUSABLE_REPLANNING';break
             else:
                 command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
-            data.ctrl[aids]=command; data.xfrc_applied[:]=0; external=np.zeros(model.nv)
-            for f in s['forces']:
-                if f['start_s']<=t<f['end_s']:
-                    bid=bids[f['body']]; data.xfrc_applied[bid,:3]+=f['force_n']
+            data.ctrl[aids]=command; _apply_mujoco_forces(model,data,forces); external=np.zeros(model.nv)
+            for bid in {f[0] for f in forces}:
+                if np.any(data.xfrc_applied[bid,:3]):
                     J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacBodyCom(model,data,J,Jr,bid)
-                    external+=J.T@f['force_n']
+                    external+=J.T@data.xfrc_applied[bid,:3]
             safety.call(data,mujoco.mj_forward,'backend.apply')
             actual_tension=-data.actuator_force[aids]
             before=dict(solver_tendon_length_m=data.ten_length[tids].tolist(),tension_n=actual_tension.tolist(),
@@ -358,6 +377,7 @@ class MujocoBackend(SerialBackend):
                         update_wall_s=self.controller.last['update_wall_s'],
                         deadline_missed=self.controller.last['deadline_missed'])
             for _ in range(substeps):
+                _apply_mujoco_forces(model,data,forces)
                 previous_time=data.time
                 safety.call(data,mujoco.mj_step,'backend.step'); steps+=1
                 if _mujoco_state_failed(data,previous_time):
