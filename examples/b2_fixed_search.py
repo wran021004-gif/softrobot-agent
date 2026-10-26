@@ -44,10 +44,11 @@ def plan():
     return value
 
 
-def configurations(value, radius):
+def configurations(value, radius=None, *, generation=None):
     spec = resolve(ROOT / 'configs/research/study_family_space_dev.json')
-    request = dict(family_space_identity=spec['family_space_identity'], segment_count=2,
-        tendon_count=4, spans=[dict(last_segment=1, count=4, radius_m=radius)])
+    request = (dict(family_space_identity=spec['family_space_identity'], **generation) if generation is not None else
+        dict(family_space_identity=spec['family_space_identity'], segment_count=2,
+            tendon_count=4, spans=[dict(last_segment=1, count=4, radius_m=radius)]))
     build = parse_build(dict(space=spec['family_space'], request=request))
     robot, mesh, physics = generate_family(build)
     cfg = deepcopy(spec['configuration'])

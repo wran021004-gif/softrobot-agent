@@ -1,0 +1,118 @@
+{
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08,
+    "baseline_lengths_m": {
+      "segment_0": 0.16,
+      "segment_1": 0.11
+    },
+    "duration_s": 0.35,
+    "period_s": 0.01
+  },
+  "search": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.35
+    ],
+    "knots_s": [
+      0.0,
+      0.05,
+      0.17,
+      0.3
+    ],
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "coefficient_limit_n": 8.0,
+    "difference_step_n": 0.01,
+    "initial_radius_n": 0.5,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.01
+  },
+  "version": "bf1_multidirectional_screen_v1",
+  "tasks": {
+    "zero": "tasks/bf1_multidirectional_hold_v1_zero.json",
+    "positive": "tasks/bf1_multidirectional_hold_v1_positive.json",
+    "negative": "tasks/bf1_multidirectional_hold_v1_negative.json"
+  },
+  "candidate_manifest_identity": "a2023c67df69f3fa4897cc696f6f1df7a2c7d39946650811d3f32386d2009b50",
+  "initial_tensions_n": [
+    0.2
+  ],
+  "initialization": {
+    "method": "short_input_response_v1 and constrained_response_step",
+    "calls": 3,
+    "radius_n": 0.5,
+    "horizon_s": 0.05
+  },
+  "stages": [
+    {
+      "id": 1,
+      "search": {
+        "evaluation_requests": 151,
+        "iterations": 8
+      }
+    },
+    {
+      "id": 2,
+      "search": {
+        "evaluation_requests": 301,
+        "iterations": 12
+      }
+    }
+  ],
+  "physics_step_attempt_cap": 3500000,
+  "authorization": "User 2026-10-26: both BF0 and BF1/F2 must complete; no approval requests; define ample finite budgets to find feasibility; all integration budgets authorized",
+  "stop": "Stop each accepted case immediately; at most two bounded stages for unresolved cases; no task modification; stop screening after these three structures",
+  "provider_requests": 0,
+  "scientific_math_workers": 0,
+  "task_identities": {
+    "zero": "be39bee95aa69b2bbc997d6a797ec7d751f12725991ba553f20dd846e0f3215f",
+    "positive": "173f1a1e1a5c1d51b771121a811e3b45fd55704333823a5941f6ee97005b7849",
+    "negative": "eb71df58b820192bc9bfcd42e02ce600a6328167914e14f02621badca60d31e0"
+  },
+  "frozen_sources": {
+    "configs/research/family_space_v1.json": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70",
+    "configs/research/control.json": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f",
+    "configs/research/family_study_defaults.json": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+  }
+}
