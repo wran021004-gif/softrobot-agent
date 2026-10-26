@@ -239,7 +239,8 @@ def admit_decision(host,plan):
         'diagnose':'DIAGNOSE','search':'MATHEMATICAL_ANALYSIS','mechanics':'MATHEMATICAL_ANALYSIS',
         'replay':'MATHEMATICAL_ANALYSIS','refine':'MATHEMATICAL_ANALYSIS','cross_replay':'MATHEMATICAL_ANALYSIS',
         'matched_state':'DIAGNOSE','nmpc_prediction_diagnostic':'DIAGNOSE','confirm':'PHYSICAL_VALIDATION'}
-    if d.research_intent!=intents[plan.action]:raise ValueError('RESEARCH_INTENT_ACTION_MISMATCH')
+    if d.research_intent!=intents[plan.action]:
+        raise ValueError(f'RESEARCH_INTENT_ACTION_MISMATCH: action={plan.action} requires decision.research_intent={intents[plan.action]}; received={d.research_intent}')
     actual=plan.candidate
     if plan.control_seed:actual=plan.control_seed.candidate
     if plan.control_search:actual=plan.control_search.candidate

@@ -90,6 +90,13 @@ Reporter 的 `_source_catalog` 丢弃 `working_set`/`mathematical_capabilities` 
 [template_delivery_repair.json](../../evidence/b3_r1_history_assisted_050/template_delivery_repair.json)。
 本次补充提交后仍通过原显式 bind/restore-only 迁移；科学实现及 96/192 总上限不再改变。
 
+累计 58 次请求、107 次公开操作后，原迁移门禁再次在反馈结算后暂停。Agent 已实际使用
+精确模板查询，但多次为 diagnose 填写 MATHEMATICAL_ANALYSIS/CONTROL_SEARCH，原
+RESEARCH_INTENT_ACTION_MISMATCH 仅返回同名错误码。现由原 admit_decision 的唯一
+动作映射直接给出 action、所需 decision.research_intent 和收到值，error_feedback 标明
+字段；接受条件不变，没有另建映射或替 Agent 填值。定向原 Schema/错误反馈测试通过
+（1.066 s）；新增 fixture 初次多留了 execute 的 candidate payload，修正后通过，零科学。
+
 ### 初始预检及当时的审批状态（历史快照）
 
 R0 源码提交 **`78ca687fd893bfc805cfcaf1370ea62dd14dbf65`** 已普通推送，

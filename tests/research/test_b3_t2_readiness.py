@@ -121,6 +121,15 @@ class B3T2Tests(unittest.TestCase):
             self.assertEqual(feedback['field'],'candidate');self.assertIn('non-null candidate',feedback['expected'])
             mismatch=error_feedback(h,dict(name='research_plan',input=value),ValueError('DECISION_CANDIDATE_MISMATCH'),state(h))
             self.assertEqual(mismatch['field'],'decision.selected_candidate')
+            from tools.research.evidence_policy import admit_decision
+            invalid_intent=deepcopy(value);invalid_intent['action']='diagnose'
+            invalid_intent.pop('candidate')
+            invalid_intent['decision']['research_intent']='MATHEMATICAL_ANALYSIS'
+            try:admit_decision(h,Plan.model_validate(invalid_intent))
+            except ValueError as exc:feedback=error_feedback(h,dict(name='research_plan',input=invalid_intent),exc,state(h))
+            self.assertEqual(feedback['error_code'],'RESEARCH_INTENT_ACTION_MISMATCH')
+            self.assertEqual(feedback['field'],'decision.research_intent')
+            self.assertIn('requires decision.research_intent=DIAGNOSE',feedback['expected'])
             unrelated=error_feedback(h,dict(name='research_plan',input=value),KeyError('candidate'),state(h))
             self.assertNotEqual(unrelated['error_code'],'INVALID_EVIDENCE_POINTER')
             pointer=error_feedback(h,dict(name='evidence_read',input=dict(reference=ref,pointer='/absent')),KeyError('absent'),state(h))

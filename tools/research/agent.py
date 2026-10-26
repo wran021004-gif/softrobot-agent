@@ -377,6 +377,7 @@ def error_feedback(host, use, exc, before):
                 elif isinstance(value,list):expected='List at '+(parent or '/')+' has '+str(len(value))+' items; use view=range or an index from 0 through '+str(len(value)-1)
                 if use['input'].get('view')=='fields':field='fields'
             except (ValueError,KeyError,IndexError,TypeError):pass
+    if code=='RESEARCH_INTENT_ACTION_MISMATCH':field='decision.research_intent'
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
     if 'PROTECTED_EVIDENCE_READ_REQUIRES' in message:
