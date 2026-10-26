@@ -307,4 +307,60 @@ class ScientificFeedbackTests(unittest.TestCase):
         h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
 
 
+class NonlinearIntegrationTests(unittest.TestCase):
+    def setUp(self):
+        from tests.research.c3_readiness_audit import FrozenDecisionBoundary
+        from tools.research.config import ROOT
+        self.after=FrozenDecisionBoundary(ROOT,'C')
+        self.addCleanup(self.after.archive.close)
+
+    def test_t1_l0_preserves_failure_scope_study_and_cost(self):
+        from unittest.mock import patch
+        from tools.research.contracts import LocalControlSearchSettings
+        from tools.research.nonlinear_capability import t1_summary, T1_OPERATION
+        from tools.research.research_context import compact_scientific_delivery
+        b=self.after;h=b.host;r=b.saved_state['analysis_results'][0]
+        synthetic=deepcopy(b.artifact(r));synthetic['operation']=T1_OPERATION
+        settings=LocalControlSearchSettings.model_validate(synthetic['requested_operation']['control_optimization']['settings'])
+        synthetic['nonlinear_capability']=t1_summary(synthetic,settings)
+        original=h.store.artifact.side_effect
+        with patch.object(h.store,'artifact',side_effect=lambda reference,**kw:deepcopy(synthetic) if plain(reference)==r else original(reference,**kw)):
+            card=plain(result_card(h,r));view=mathematical_decision_view(card)
+            compact=compact_scientific_delivery(dict(additional_mathematical_evidence=[dict(reference=r,mathematics=view)]),decision_only=True)
+            delivered=compact['additional_mathematical_evidence'][0]['mathematics']
+            self.assertEqual(delivered['owning_study'],synthetic['owning_study'])
+            self.assertEqual(delivered['unresolved'],view['unresolved'])
+            self.assertIn('neither proves structural infeasibility',' '.join(delivered['unresolved']['evidence_limits']))
+            self.assertEqual(delivered['cost_scope'],view['cost_scope'])
+            self.assertNotEqual(card['evidence_summary']['claim_kind'],'MODEL_EXCLUSION')
+            self.assertEqual(read_evidence(h,view['nonlinear_capability']['detail_query'],record_read=False),synthetic['nonlinear_capability'])
+            resources=[c for c in card['resources'] if c['source'] and c['source']['pointer']=='/native_dynamics/cost/physics_steps']
+            self.assertEqual(len(resources),1)
+        h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
+
+    def test_t2_zero_cost_and_failed_native_lower_bound_keep_current_scope(self):
+        from unittest.mock import patch
+        from tools.research.budget import decision_budget
+        b=self.after;h=b.host;current=deepcopy(b.saved_state)
+        values=[dict(status='computed',requested_operation=dict(model_source='mujoco'),
+            nonlinear_response=dict(cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0))),
+            dict(status='execution_incomplete',requested_operation=dict(model_source='mujoco'),
+                native_progress=dict(cost=dict(model_builds=1,rollouts=1,physics_steps=17)))]
+        original=h.store.artifact.side_effect;synthetic={ref(v)['artifact_id']:v for v in values}
+        current['analysis_results'].append(ref(values[0]))
+        with patch.object(h.store,'session',return_value=dict(state=current)),patch.object(h.store,'artifact',side_effect=
+                lambda reference,**kw:synthetic[plain(reference)['artifact_id']] if plain(reference)['artifact_id'] in synthetic else original(reference,**kw)):
+            costs=decision_budget(h)['science_budget']['native']
+            self.assertEqual(costs['recorded_physics_steps'],8000)
+            self.assertTrue(costs['cost_record_complete'])
+            self.assertEqual(costs['latest_cost_query']['pointer'],'/nonlinear_response/cost')
+            current['analysis_results'].append(ref(values[1]))
+            costs=decision_budget(h)['science_budget']['native']
+            self.assertEqual(costs['recorded_physics_steps'],8017)
+            self.assertFalse(costs['cost_record_complete'])
+            self.assertEqual(costs['latest_cost_query']['pointer'],'/native_progress/cost')
+        self.assertEqual(h.store.session()['state'],b.saved_state)
+        h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
+
+
 if __name__=='__main__':unittest.main()

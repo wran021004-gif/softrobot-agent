@@ -111,6 +111,10 @@ class FamilySensitivityTests(unittest.TestCase):
         self.assertEqual(result['candidate'],ref)
         self.assertEqual(grant['bounds_source']['path'],'segment_domains.0.length_m')
         self.assertIsInstance(params['segments']['0']['young_pa'],float)
+        legacy_spec=deepcopy(state(self.h)['spec']);legacy_spec.pop('family_sensitivity_variables')
+        rows={r['parameter_id']:r for r in opt.family_analysis_parameters(legacy_spec,c)}
+        self.assertIn('fixed_input_structure_v1',rows['segments.0.young_pa']['applicable_mathematical_methods'])
+        self.assertNotIn('mujoco-reoptimized-structure-response-v1',rows['segments.0.young_pa']['applicable_mathematical_methods'])
         changed=deepcopy(c);changed['configuration']['robot']['structure']['data']['components'][0]['length_m']+=.001
         with self.assertRaisesRegex(ValueError,'GENERATED_CONFIGURATION'):opt.family_parameters(state(self.h)['spec'],changed,'segments.0.length_m')
 

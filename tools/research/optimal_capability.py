@@ -55,8 +55,11 @@ def family_analysis_parameters(spec,candidate):
     rows=parameter_capabilities(spec['family_space'],candidate['parameters'])
     for row in rows:
         path=row['parameter_id'];row['study_authorized']=family_variable_authorized(spec,path) and '*' not in path
+        legacy_fixed=path.startswith('segments.') and (path.endswith('.young_pa') or '.sections.' in path)
         row['applicable_mathematical_methods']=[m for m in row['supported_methods'] if m!='generate' and
-            row['study_authorized'] and 'analysis' in spec.get('capabilities',[]) and (m=='fixed_input_structure_v1' or spec.get('mathematical_methods',{}).get(m))]
+            'analysis' in spec.get('capabilities',[]) and
+            ((m=='fixed_input_structure_v1' and (legacy_fixed or row['study_authorized'])) or
+             (m!='fixed_input_structure_v1' and row['study_authorized'] and spec.get('mathematical_methods',{}).get(m)))]
         if (row['continuous_perturbation'] and row['study_authorized'] and 'analysis' in spec.get('capabilities',[])
                 and spec.get('mathematical_methods',{}).get(CONIC) and spec.get('mathematical_methods',{}).get(SENSITIVITY)):
             row['applicable_mathematical_methods'].append(SENSITIVITY)

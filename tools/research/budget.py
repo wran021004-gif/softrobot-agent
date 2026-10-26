@@ -57,7 +57,14 @@ def decision_budget(host):
     reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host))
     public_total=remaining['tool_calls'];public_reserve=b.get('protected_public_operations',0)
     native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r)).get('requested_operation',{}).get('model_source')=='mujoco']
-    native_costs=[(r,v['native_dynamics']['cost']) for r,v in native if v.get('native_dynamics',{}).get('cost')]
+    native_costs=[]
+    for r,v in native:
+        for key in ('native_dynamics','nonlinear_response','native_progress','native_diagnostic'):
+            cost=(v.get(key) or {}).get('cost')
+            if cost:
+                native_costs.append((r,cost,'/'+key+'/cost',
+                    key in ('native_dynamics','nonlinear_response') and v.get('status') in ('computed','not_comparable')))
+                break
     return dict(public_operation_budget=dict(remaining_total=public_total,reserved_for_closeout=public_reserve,
             available_for_exploration=max(0,public_total-public_reserve),
             scope='Shared ledger includes public requests and charged child operations; a scientific action may cost multiple operations.'),
@@ -77,11 +84,11 @@ def decision_budget(host):
             remaining_full_replays=max(0,(s['spec'].get('physical_replay_limit') if s['spec'].get('physical_replay_limit') is not None else b['physical_launches'])-s.get('physical_replay_launches',0)),
             native=dict(per_request_control_limits=s['spec'].get('native_control_limits'),
                 accounting_scope='Current Study registered analysis_results only; imported historical results and proposed actions are excluded.',
-                recorded_rollouts=sum(v['rollouts'] for _,v in native_costs if v.get('rollouts') is not None),
-                recorded_physics_steps=sum(v['physics_steps'] for _,v in native_costs if v.get('physics_steps') is not None),
-                latest_cost_query=dict(reference=native_costs[-1][0],view='full',pointer='/native_dynamics/cost') if native_costs else None,
+                recorded_rollouts=sum(v['rollouts'] for _,v,_,_ in native_costs if v.get('rollouts') is not None),
+                recorded_physics_steps=sum(v['physics_steps'] for _,v,_,_ in native_costs if v.get('physics_steps') is not None),
+                latest_cost_query=dict(reference=native_costs[-1][0],view='full',pointer=native_costs[-1][2]) if native_costs else None,
                 attempts_without_cost_record=len(native)-len(native_costs),
-                cost_record_complete=all(all(v.get(k) is not None for k in ('rollouts','physics_steps')) for _,v in native_costs) and len(native)==len(native_costs),
+                cost_record_complete=all(complete and all(v.get(k) is not None for k in ('rollouts','physics_steps')) for _,v,_,complete in native_costs) and len(native)==len(native_costs),
                 integration_scope='Recorded physics_steps already includes prefix reconstruction and suffix rollouts. Callback counts describe these rollouts, not additional integrations. Independent full replay is separate; zero independent physical evaluations does not imply zero native integration.',
                 allowance_scope='Recorded totals are known subtotals; incomplete records leave actual total unknown. Native analysis shares remaining_mathematical; per-request limits are not a separate cumulative allowance. Missing costs are unknown, not zero.'),
             any_scientific_route_fits=science_fits(host) and not (active or total-1<=reserve)),

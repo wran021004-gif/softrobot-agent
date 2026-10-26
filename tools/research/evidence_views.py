@@ -311,7 +311,7 @@ def _resources(value, reference):
             resources.append(ResourceUse(name=key, amount=data[key], unit=unit,
                 time_basis=time_basis, source=_location(reference, prefix+'/'+_token(key))))
 
-    for key,unit in (('physical_launches','evaluations'), ('physics_steps','steps'),
+    for key,unit in (('physical_launches','evaluations'), ('physics_steps','steps'), ('physics_steps_lower_bound','steps'),
             ('charged_analysis_evaluations','analyses'), ('mathematical_reintegrations','reintegrations'),
             ('nmpc_updates','updates'), ('rl_actions','actions'), ('finite_difference_evaluations','evaluations')):
         add(value,key,unit)
@@ -326,9 +326,14 @@ def _resources(value, reference):
     native=value.get('native_dynamics')
     if native is not None:
         cost=native.get('cost') or {}
-        for key,unit in (('rollouts','rollouts'),('physics_steps','steps'),('optimization_evaluations','evaluations')):
+        for key,unit in (('model_builds','models'),('rollouts','rollouts'),('physics_steps','steps'),('optimization_evaluations','evaluations')):
             resources.append(ResourceUse(name='native_'+key,amount=cost.get(key),unit=unit,
                 source=_location(reference,'/native_dynamics/cost/'+key) if key in cost else None))
+    if value.get('nonlinear_response'):
+        costs=value['nonlinear_response']['cost']
+        for field,unit in [('model_builds','models'),('rollouts','rollouts'),('physics_steps','steps'),('optimization_evaluations','evaluations')]:
+            add(costs,field,unit,'/nonlinear_response/cost')
+    add(value,'admission_preparation_numerical_s','s',time_basis='parent_action_wall')
     # No cost computation: each entry is a recorded quantity, never additive by default.
     resources.extend([ResourceUse(name='provider_cost',unit='USD'),
         ResourceUse(name='parent_action_elapsed',unit='s',time_basis='parent_action_wall'),
@@ -386,7 +391,7 @@ def result_card(host, reference):
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
         if value.get('native_analysis'):
             from schemas.research_reporting import MathematicalQuantity
-            if value['operation']=='mujoco_direct_control_v1':
+            if value['operation'] in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
                 fields=dict(terminal_position=('terminal_error_m','terminal_position_error_m'),
                     holding_position=('holding_max_error_m','holding_max_position_error_m'),
                     holding_speed=('holding_max_speed_m_s','holding_max_speed_m_s'))
@@ -400,7 +405,7 @@ def result_card(host, reference):
             mathematics=mathematics.model_copy(update=dict(
                 problem_definition=_location(reference,'/native_analysis/basis'),
                 quantities=[MathematicalQuantity(name=q['name'],value=q['value'],unit=q['unit'],
-                    status='unverified_estimate',control_reoptimization='required' if value['operation']=='mujoco_direct_control_v1' else 'fixed_control',
+                    status='unverified_estimate',control_reoptimization='required' if value['operation'] in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') else 'fixed_control',
                     source=_location(reference,q['source_pointer'])) for q in summary['native_analysis']['quantities']]))
             details.append(_location(reference,'/native_dynamics'))
             if value.get('control_schedule_reference'):details.append(_location(value['control_schedule_reference']))
@@ -409,6 +414,18 @@ def result_card(host, reference):
             mathematics=populate_mathematics(mathematics,value['trajectory'],reference)
             if value['trajectory'].get('structural_comparison'):
                 details.append(_location(value['trajectory']['structural_comparison']['baseline_result']))
+        if value.get('nonlinear_response'):
+            from schemas.research_reporting import MathematicalQuantity
+            t=value['nonlinear_response'];quantities=[]
+            for i,d in enumerate(t.get('directions',[t])):
+                prefix='/nonlinear_response'+('/directions/'+str(i) if 'directions' in t else '')
+                for key in ('fixed_control','reoptimized'):
+                    if d.get(key):quantities.append(MathematicalQuantity(name=d.get('direction_id','parameter')+'/'+key+'/central',
+                        value=d[key]['central'],unit=d.get('secant_unit'),status='unverified_estimate',
+                        control_reoptimization='required' if key=='reoptimized' else 'fixed_control',
+                        source=_location(reference,prefix+'/'+key+'/central')))
+            mathematics=mathematics.model_copy(update=dict(problem_definition=_location(reference,'/nonlinear_response'),quantities=quantities))
+            details.extend([_location(reference,'/nonlinear_response'),_location(reference,'/nonlinear_response/referenced_t1_costs')])
         if value.get('optimal_sensitivity'):
             from tools.research.capability import populate_sensitivity
             mathematics=populate_sensitivity(mathematics,value['optimal_sensitivity'],reference)

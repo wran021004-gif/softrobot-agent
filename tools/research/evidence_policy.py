@@ -102,7 +102,7 @@ def summarize_evidence(value,reference=None,*,refinement=None):
             kind='MODEL_EXCLUSION';supported=['model_input_box_exclusion']
         unresolved+=['Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.']
         best=value.get('native_dynamics',{}).get('optimization',{}).get('best') or {}
-        if (value.get('operation')=='mujoco_direct_control_v1' and value.get('status')=='computed'
+        if (value.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') and value.get('status')=='computed'
                 and best.get('measure',{}).get('normalized_gap',0)>0):
             unresolved.append('Finite native search found no passing control under the recorded initialization, parameterization and budget; this neither proves structural infeasibility nor excludes control weights, parameterization or solver limitations.')
         trajectory=value.get('trajectory',{})
@@ -116,6 +116,10 @@ def summarize_evidence(value,reference=None,*,refinement=None):
             supported.append('controlled_reoptimized_finite_difference')
             unresolved.extend(['Strict structural gradient and regional descent unavailable.',
                 'Numerically flat modulus does not imply physical irrelevance; position improvement does not guarantee holding-speed improvement.'])
+    if value.get('nonlinear_capability') or value.get('nonlinear_response'):
+        if value.get('status')=='computed':supported.append('finite_budget_native_observation')
+        unresolved.extend(['Global optimal task capability and a strict structural improvement direction are not established.',
+            'Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.'])
     if 'acceptance' in value:
         gap=task_gap(value);pointer='/acceptance'
         acceptance=value.get('acceptance') or {}
