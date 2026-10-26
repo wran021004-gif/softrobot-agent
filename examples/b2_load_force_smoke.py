@@ -8,6 +8,7 @@ from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -57,7 +58,7 @@ def compare(left,right):
     return result
 
 
-def run(folder):
+def run(folder, recover_zero_playback=None):
     if folder.exists():raise ValueError('REFUSE_TO_OVERWRITE_PRIOR_COSTS_OR_EVIDENCE')
     folder.mkdir(parents=True)
     cfg=configuration();loaded=deepcopy(cfg);loaded['task']['environment']['data']['external_forces']=[FORCE]
@@ -71,7 +72,14 @@ def run(folder):
     legacy=ModuleType('extensions.tendon_family._b1_baseline');legacy.__package__='extensions.tendon_family'
     exec(compile(source,BASE+':mujoco_analysis.py','exec'),legacy.__dict__)
     old_native=legacy.NativeModel(cfg)
-    ledger=dict(cap=CAP,physics_step_attempts=0,physics_steps=0,phases={})
+    prior=read(recover_zero_playback/'cost.json') if recover_zero_playback else None
+    ledger=dict(cap=CAP,physics_step_attempts=prior['physics_step_attempts'] if prior else 0,
+        physics_steps=prior['physics_steps'] if prior else 0,phases={})
+    if prior:
+        assert read(recover_zero_playback/'summary.json')['status']=='failed'
+        assert prior['physics_step_attempts']==2100 and prior['physics_steps']==2100
+        ledger['prior_attempt']=dict(path=str(recover_zero_playback),cost=prior,
+            missing='Original and new zero Native position/velocity arrays were not saved before evaluation error; repeat only 0.02 s.')
     traces={};label=None;original=MujocoFailureSnapshot.call
 
     def audited(safety,data,operation,location):
@@ -94,12 +102,18 @@ def run(folder):
                 wall_s=time.perf_counter()-started,**(dict(native_cost=deepcopy(cost)) if cost is not None else {}))
             atomic_json(folder/'cost.json',ledger);atomic_json(folder/'force_steps.json',traces)
 
-    def replay(configuration,n,name):
+    def replay(configuration,n,name,raw=None):
         inp=SessionInput.model_validate(configuration)
-        raw=playback_tensions(inp,n.physics,n.scene,commands,folder/name)
-        evaluation,profile=evaluate_playback(configuration,raw,{},digest(configuration))
-        acceptance=assemble_acceptance(configuration,evaluation,profile,evaluation_reference=None,
-            profile_reference=None,motion=[dict(time_s=s['time_s']) for s in raw['samples']])
+        if raw is None:raw=playback_tensions(inp,n.physics,n.scene,commands,folder/name)
+        (folder/name).mkdir(exist_ok=True)
+        atomic_json(folder/name/'raw.json',raw)
+        raw_ref=dict(artifact_id=digest(raw),media_type='application/json')
+        evaluation,profile=evaluate_playback(configuration,raw,raw_ref,digest(configuration))
+        evaluation_ref=dict(artifact_id=digest(evaluation.model_dump(mode='json')),media_type='application/json')
+        profile.update(simulation=raw_ref,evaluation=evaluation_ref)
+        profile_ref=dict(artifact_id=digest(profile),media_type='application/json')
+        acceptance=assemble_acceptance(configuration,evaluation,profile,evaluation_reference=evaluation_ref,
+            profile_reference=profile_ref,motion=[dict(time_s=s['time_s']) for s in raw['samples']])
         atomic_json(folder/(name+'.json'),dict(raw=raw,evaluation=evaluation.model_dump(mode='json'),profile=profile,acceptance=acceptance))
         assert profile['complete'] and raw['physics_steps']==700,profile
         return dict(times_s=[s['time_s'] for s in raw['samples']],tip_positions_m=[s['tip_m'] for s in raw['samples']],
@@ -108,12 +122,26 @@ def run(folder):
     summary=dict(status='running',implementation=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
     try:
         with patch.object(MujocoFailureSnapshot,'call',audited):
-            zero_old=phase('zero_original_native',lambda:old_native.rollout_sequence(initial(old_native),times,commands),old_native.cost)
-            zero=phase('zero_native',lambda:native.rollout_sequence(initial(native),times,commands),native.cost)
-            zero_replay,zero_accept=phase('zero_playback',lambda:replay(cfg,native,'zero_playback'))
+            if prior:
+                xml=recover_zero_playback/'zero_playback/robot.xml'
+                recovered=dict(status='completed',failure=None,samples=read(recover_zero_playback/'zero_playback/samples.json'),
+                    physics_steps=700,physics_step_attempts=700,command_intervals=35,tendon_order=native.tendons,
+                    model_identity=native.physics['identity'],scene_identity=native.scene['identity'],
+                    xml_sha256=hashlib.sha256(xml.read_bytes()).hexdigest(),physics_timestep_s=float(native.model.opt.timestep),
+                    integrator=int(native.model.opt.integrator),physical_backend='backend.family_mujoco',tension_execution_mode='ideal_tension',
+                    recovery='Raw envelope reconstructed from saved samples, XML, input and 700 audited completed step calls; no new playback integration.')
+                zero_replay,zero_accept=phase('zero_playback_recovered_evaluation',lambda:replay(cfg,native,'zero_playback',recovered))
+            zero_times=times[:3] if prior else times
+            zero_commands=commands[:len(zero_times)-1]
+            zero_old=phase('zero_original_native',lambda:old_native.rollout_sequence(initial(old_native),zero_times,zero_commands),old_native.cost)
+            atomic_json(folder/'zero_original_native.json',zero_old)
+            zero=phase('zero_native',lambda:native.rollout_sequence(initial(native),zero_times,zero_commands),native.cost)
+            atomic_json(folder/'zero_native.json',zero)
+            if not prior:zero_replay,zero_accept=phase('zero_playback',lambda:replay(cfg,native,'zero_playback'))
             force=phase('force_native',lambda:load_native.rollout_sequence(initial(load_native),times,commands),load_native.cost)
+            atomic_json(folder/'force_native.json',force)
             force_replay,force_accept=phase('force_playback',lambda:replay(loaded,load_native,'force_playback'))
-            summary['matches']=dict(zero_original_native=compare(zero,zero_old),zero_playback=compare(zero,zero_replay),
+            summary['matches']=dict(zero_original_native=compare(zero,zero_old),zero_playback=compare(zero,{k:v[:len(zero_times)] for k,v in zero_replay.items()}),
                 nonzero_playback=compare(force,force_replay))
             # Reconstruct to the force-on boundary using fresh engine history.
             rows=read(folder/'force_playback.json')['raw']['samples'][1:11]
@@ -141,8 +169,8 @@ def run(folder):
                 assert row['force_n']==expected and row['couple_nm']==[0.,0.,0.],(name,row)
         summary.update(status='passed',force_window_verified_every_step=True,
             full_run_active_steps={name:sum(any(row['force_n']) for row in traces[name]) for name in ('zero_native','force_native','force_playback')},
-            nonzero_effect=dict(max_position_change_m=float(max(np.linalg.norm(np.asarray(force['tip_positions_m'])-zero['tip_positions_m'],axis=1))),
-                max_velocity_change_m_s=float(max(np.linalg.norm(np.asarray(force['tip_velocities_m_s'])-zero['tip_velocities_m_s'],axis=1)))),
+            nonzero_effect=dict(max_position_change_m=float(max(np.linalg.norm(np.asarray(force['tip_positions_m'])-zero_replay['tip_positions_m'],axis=1))),
+                max_velocity_change_m_s=float(max(np.linalg.norm(np.asarray(force['tip_velocities_m_s'])-zero_replay['tip_velocities_m_s'],axis=1)))),
             original_acceptance=dict(zero=zero_accept,force=force_accept),cost=ledger,
             native_costs=dict(original=old_native.cost,zero=native.cost,force=load_native.cost),
             limitations='Matching execution semantics only; no B2 feasibility or structural advantage; task draft remains unfrozen.')
@@ -158,4 +186,6 @@ def run(folder):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,default=ROOT/'evidence/b2_external_force_runtime')
-    run(parser.parse_args().output.resolve())
+    parser.add_argument('--recover-zero-playback',type=Path,help='Explicit recovery of this smoke\'s first evaluation-only error; carries all 2100 prior steps.')
+    args=parser.parse_args()
+    run(args.output.resolve(),args.recover_zero_playback.resolve() if args.recover_zero_playback else None)
