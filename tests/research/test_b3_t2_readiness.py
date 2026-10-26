@@ -29,6 +29,103 @@ def fixture_host(arm):
 
 
 class B3T2Tests(unittest.TestCase):
+    def test_r0_archived_m2_complete_wire_and_handoff(self):
+        import httpx
+        from openai import AsyncOpenAI
+        from tools.research.agent import live_model_class, plan_schema
+        from tools.research.session_handoff import initial_messages, feedback_delivery
+        from tools.research.task_constraints import mathematical_catalog
+        rows=[]
+        for arm in 'bc':
+            archive=C3Archive(ROOT/f'evidence/b3_t2_pilot_050_{arm}/immutable_artifacts.tar.gz')
+            self.addCleanup(archive.archive.close)
+            requests=archive.requests()
+            positions=[0,next(i for i,r in enumerate(requests) if r[3]['research'].get('latest_reports')),len(requests)-1]
+            for position in positions:
+                event,meta,wire,packet,events=requests[position]
+                h,s=archive.host(events)
+                budget=packet['research']['budget']
+                s['count_closeout']=budget['closeout']['active']
+                ledger=h.store.remaining.return_value
+                ledger['remaining']['model_calls']=budget['provider_budget']['remaining_total']
+                ledger['remaining']['backend_solves']=budget['science_budget']['remaining_physical']
+                candidate=packet['research']['mathematical_capabilities']['candidate']
+                view=mathematical_method_view(h,candidate)
+                brief=agent_decision_brief(h)
+                native=brief['mathematical_capabilities']['methods']['mujoco_direct_control_v1']
+                self.assertEqual(native['execution_limits'],s['spec']['native_control_limits'])
+                self.assertNotIn('execution_limits',packet['research']['mathematical_capabilities']['methods']['mujoco_direct_control_v1'])
+                if s['results'] and not budget['closeout']['active']:
+                    query=native['control_initialization_query']
+                    seed=core.read_evidence(h,query,record_read=False)['control_seed']
+                    self.assertEqual(seed['candidate'],candidate);self.assertEqual(seed['parent'],candidate)
+                t2=brief['mathematical_capabilities']['methods'].get(opt.SENSITIVITY)
+                if arm=='c':
+                    self.assertTrue(t2['authorized']);self.assertFalse(t2['executable'])
+                    preparation=(core.read_evidence(h,t2['preparation_query'],record_read=False) if not budget['closeout']['active'] else view['methods'][opt.SENSITIVITY]['readiness'])
+                    self.assertTrue(preparation['variables']);self.assertTrue(preparation['model_preparation'])
+                    self.assertIn('missing_validated_model_stencil',preparation['reasons'])
+                packet=deepcopy(packet);packet['research']=brief
+                boundary=SimpleNamespace(host=h,research_packet=packet)
+                model=live_model_class(boundary)(model_id=wire['model'],stream=False,
+                    client=AsyncOpenAI(api_key='offline-fixture',base_url='https://offline.invalid',max_retries=0))
+                tail=model.format_request([],[],None)['messages'][-1]
+                tools=deepcopy(wire['tools'])
+                for tool in tools:
+                    if tool['function']['name']=='research_plan':
+                        tool['function']['parameters']=plan_schema(brief['actions'],decision_required=True,family_version='serial_family_space_v2')
+                sizes={}
+                for handoff in (False,True):
+                    after={**wire,'tools':tools,'messages':([wire['messages'][0],*model.format_request_messages(initial_messages(h.run_id))] if handoff else wire['messages'][:-1])+[tail]}
+                    encoded=httpx.Request('POST','https://offline.invalid',json=after).content
+                    sizes['handoff' if handoff else 'same_session']=len(encoded)
+                    delivered=json.loads(json.loads(encoded)['messages'][-1]['content'].split('\n',1)[1])['research']
+                    self.assertEqual(delivered['mathematical_capabilities']['methods']['mujoco_direct_control_v1']['execution_limits'],s['spec']['native_control_limits'])
+                    if not handoff:self.assertEqual(after['messages'][:-1],wire['messages'][:-1])
+                last=[e for e in events if e['kind']=='model_original_tool_feedback'][-1:]
+                if last and not budget['closeout']['active']:
+                    key=archive.artifact(last[0]['outputs'][0])['tool_use']['toolUseId']
+                    delivery=feedback_delivery(h,[key])['items'][0]
+                    self.assertEqual(core.read_evidence(h,delivery['original_result_query'],record_read=False),archive.artifact(last[0]['outputs'][0])['result'])
+                rows.append(dict(arm=arm,boundary=position+1,original_request=meta['request'],original_bytes=meta['input_bytes'],projected_bytes=sizes,limits=native['execution_limits'],handoff_limits_visible=True,
+                    control_initialization_query=native.get('control_initialization_query'),t2_preparation_query=(t2 or {}).get('preparation_query')))
+            self.assertEqual(archive.snapshot['session']['state']['research_status'],'stopped')
+        type(self).r0_wire_rows=rows
+
+    def test_r0_real_schema_and_precise_rejections(self):
+        from jsonschema import Draft202012Validator
+        from tools.research.agent import plan_schema,error_feedback
+        from pydantic import ValidationError
+        ref=self.generate();h=self.h
+        value=dict(action='execute',candidate=ref,hypothesis='Offline schema check',expected_observation='No science',
+            weakening_observation='Invalid binding',fixed_conditions='Frozen B3',stopping_condition='No dispatch',interpretation='Fixture',
+            decision=dict(hypothesis_id='offline',research_intent='NMPC_EXECUTION',selected_method='execute',selected_candidate=ref))
+        schema=plan_schema(['execute','initialize_control','physical_replay','diagnose','stop'],decision_required=True)
+        validator=Draft202012Validator(schema);validator.validate(value)
+        invalid=deepcopy(value);invalid['decision'].pop('selected_candidate')
+        self.assertTrue(list(validator.iter_errors(invalid)))
+        invalid=deepcopy(value);invalid.pop('candidate')
+        self.assertTrue(list(validator.iter_errors(invalid)))
+        with patch('tools.research.agent.record',return_value=ref):
+            try:Plan.model_validate(invalid)
+            except ValidationError as exc:feedback=error_feedback(h,dict(name='research_plan',input=invalid),exc,state(h))
+            self.assertEqual(feedback['field'],'candidate');self.assertIn('non-null candidate',feedback['expected'])
+            mismatch=error_feedback(h,dict(name='research_plan',input=value),ValueError('DECISION_CANDIDATE_MISMATCH'),state(h))
+            self.assertEqual(mismatch['field'],'decision.selected_candidate')
+            unrelated=error_feedback(h,dict(name='research_plan',input=value),KeyError('candidate'),state(h))
+            self.assertNotEqual(unrelated['error_code'],'INVALID_EVIDENCE_POINTER')
+            pointer=error_feedback(h,dict(name='evidence_read',input=dict(reference=ref,pointer='/absent')),KeyError('absent'),state(h))
+            self.assertEqual(pointer['error_code'],'INVALID_EVIDENCE_POINTER');self.assertIn('Available children',pointer['expected'])
+            query=dict(candidate=ref,operation='instantaneous_braking_v1',model_source='mujoco',operating_point='saved_state',execution=ref,update_id=0,protocol=state(h)['spec']['analysis_protocol'])
+            try:AnalysisRequest.model_validate(query)
+            except ValidationError as exc:feedback=error_feedback(h,dict(name='research_analysis',input=query),exc,state(h))
+            self.assertEqual(feedback['field'],'operation/model_source');self.assertIn('Unsupported method-model',feedback['expected'])
+            query.update(operation='linearization',model_source='gvs',operating_point='controller_start_input',execution=None,update_id=None,scoring_window_s=.05)
+            query['protocol']={**query['protocol'],'holding_period_s':.05}
+            try:AnalysisRequest.model_validate(query)
+            except ValidationError as exc:feedback=error_feedback(h,dict(name='research_analysis',input=query),exc,state(h))
+            self.assertEqual(feedback['field'],'protocol');self.assertIn('complete frozen',feedback['expected'])
+
     @classmethod
     def setUpClass(cls):
         cls.archive=C3Archive(ROOT/'evidence/c3_f1_f2/math/immutable_artifacts.tar.gz')

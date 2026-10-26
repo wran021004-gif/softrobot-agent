@@ -19,7 +19,7 @@ def window_applicability(requirements, query, assessed, point, reasons):
         window=q.settings.correction_window_s
         if (point.get('actual_time_s') is None or abs(window[0]-point['actual_time_s'])>1e-12
                 or abs(window[1]-requirements.duration_s)>1e-12):
-            reasons.append('Native optimization window must start at checkpoint and end at task duration.')
+            reasons.append(f'Native optimization window must start at selected state time {point.get("actual_time_s")} s and end at task duration {requirements.duration_s} s; received {window}. Frozen initialization starts at 0 s; a later window requires a matching saved state.')
     if (abs(query.protocol.duration_s-requirements.duration_s)>1e-12 or
             abs(query.protocol.period_s-requirements.physical_inputs['control_period_s'])>1e-12):
         reasons.append('Frozen duration and input period must match protocol.')

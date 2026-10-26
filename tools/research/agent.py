@@ -307,6 +307,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
                 'else':{'properties':{field:{'type':'null'}}}})
     schema['allOf'].append({'if':{'properties':{'action':{'not':{'enum':['select','confirm']}}}},
         'then':{'properties':{'revise_selection':{'const':False}}}})
+    if decision_required:
+        bound=[a for a in actions if a in ('execute','initialize_control','control_search','physical_replay')]
+        schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
+            'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -341,6 +345,8 @@ def error_feedback(host, use, exc, before):
         'explicit evidence_read of this completed evaluation required':('selected_execution','Publicly evidence_read the exact selected_execution with view=full and pointer="" before SELECT; /acceptance alone does not satisfy the whole-result read required here.'),
         'ORDERED_V2_CORRECTION_WINDOW_REQUIRED':('control_search.settings.correction_window_s','0 <= window[0] <= knots[0] < knots[-1] <= window[1] <= task duration'),
         'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Match the exact action candidate (for physical_replay, physical_replay.candidate); source is a control/result reference and must not replace the candidate.'),
+        'MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE':('operation/model_source','Unsupported method-model combination: instantaneous_braking_v1 is not a MuJoCo native method. Choose a registered operation and its supported model_source from mathematical_capabilities; native options cannot make an unsupported combination executable.'),
+        'CONTROL_SOURCE_REQUIRES_EXACT_PARENT':('control_seed.parent','When control_seed.source is supplied, supply its exact parent candidate too. For complete measured NMPC input, parent must equal control_seed.candidate; source is the execution result, not the candidate.'),
         'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH':('source','Use a candidate-bound source; initialize_control explicitly rebinds inherited controls'),
         'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.'),
         'REGISTERED_CURRENT_ANALYSIS_REQUIRED':('control_seed.response_evidence','Request input_sensitivity for the selected candidate, then use its registered result reference'),
@@ -350,9 +356,13 @@ def error_feedback(host, use, exc, before):
     for marker,(f,hint) in hints.items():
         if marker in message:code=marker;field=f;expected=hint
     if 'ACTION_REQUIRES_ONLY_' in message:
-        field='action';expected=message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
+        from tools.research.contracts import PLAN_PAYLOADS
+        field=PLAN_PAYLOADS.get(use['input'].get('action'),'action')
+        expected='Action '+str(use['input'].get('action'))+' requires non-null '+field+' and no other action payload. '+message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
         if use['input'].get('action')=='physical_replay':expected+='; put candidate/source inside physical_replay and match decision.selected_candidate to physical_replay.candidate; omit top-level candidate.'
-    if isinstance(exc,(KeyError,IndexError)):
+    if hasattr(exc,'errors') and any(e['loc'] and e['loc'][0]=='protocol' and e['type']=='extra_forbidden' for e in errors):
+        field='protocol';expected='Use the complete frozen analysis_protocol from the method request_template/protocol in mathematical_capabilities. Do not add protocol fields; holding duration belongs to the frozen task.'
+    if isinstance(exc,(KeyError,IndexError)) and use.get('name')=='evidence_read':
         code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
         if use['input'].get('reference'):
             refs=[use['input']['reference']]

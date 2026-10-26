@@ -211,7 +211,7 @@ class NativeAnalysisOptions(Contract):
 
 
 class AnalysisRequest(Contract):
-    candidate: EvidenceRef
+    candidate: EvidenceRef = Field(description='Exact current-Study owned candidate; operation and model_source must match a registered mathematical_capabilities method.')
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1']
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
@@ -225,7 +225,7 @@ class AnalysisRequest(Contract):
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,strict=True)
-    protocol: TaskAnalysisProtocol
+    protocol: TaskAnalysisProtocol = Field(description='Complete frozen analysis_protocol from the method request_template. No additional fields or changed task conditions.')
     scoring_window_s: FiniteFloat | None = Field(default=None,gt=0)
 
     @model_validator(mode='after')
@@ -318,8 +318,8 @@ class CrossReplayRequest(Contract):
 
 
 class PhysicalReplayRequest(Contract):
-    candidate: EvidenceRef
-    source: EvidenceRef
+    candidate: EvidenceRef = Field(description='Replay candidate; decision.selected_candidate must equal this reference. Both candidate and source belong inside physical_replay.')
+    source: EvidenceRef = Field(description='Exact candidate-bound complete control schedule; a control/result reference, not the candidate.')
 
 
 class ControlCorrectionSettings(Contract):
@@ -401,9 +401,9 @@ class ControlSearchRequest(ControlSearchStart):
 
 
 class ControlSeedRequest(Contract):
-    candidate: EvidenceRef
+    candidate: EvidenceRef = Field(description='Target candidate; decision.selected_candidate must equal control_seed.candidate.')
     source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
-    parent: EvidenceRef | None = None
+    parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
     method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = 'baseline'
@@ -446,7 +446,7 @@ class ResearchDecision(Contract):
     research_intent: Literal['DIAGNOSE','MATHEMATICAL_ANALYSIS','CONTROL_SEARCH','DESIGN_MODIFICATION','NMPC_EXECUTION','RL_TRAINING','PHYSICAL_VALIDATION','SELECT','STOP']
     selected_method: str = Field(min_length=1)
     selected_variables: list[str] = Field(default_factory=list)
-    selected_candidate: EvidenceRef | None = None
+    selected_candidate: EvidenceRef | None = Field(default=None,description='Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source.')
     requested_budget: int = Field(default=0,ge=0,strict=True,description='Physical request cap for control search; otherwise declared operation units')
 
 
@@ -475,7 +475,7 @@ class Plan(Contract):
     parameters: Parameters | TopologyParameters | None = None
     generation: GenerationRequest | GenerationRequestV2 | None = None
     search: Search | FamilyMixedSearch | None = None
-    candidate: EvidenceRef | None = None
+    candidate: EvidenceRef | None = Field(default=None,description='Required top-level candidate for action=execute only. For initialize_control or physical_replay use the nested action payload candidate instead.')
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable publicly read passing NMPC, fixed-tension physical_replay or independent RL evaluation; freezes the complete solution')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
@@ -528,9 +528,9 @@ class ExperienceQuery(Contract):
 
 class EvidenceQuery(Contract):
     reference: EvidenceRef
-    pointer: str = ''
+    pointer: str = Field(default='',description='Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.')
     view: Literal['full','summary','fields','range','capabilities','mathematical_capabilities','working_set'] = 'full'
-    fields: list[str] = Field(default_factory=list, max_length=32)
+    fields: list[str] = Field(default_factory=list, max_length=32,description='For view=fields, immediate child keys at pointer, not dotted paths. Read candidate /parameters or working_set /control_result_links and /research_history_index instead of full long JSON.')
     start: int = Field(default=0, ge=0, strict=True)
     count: int = Field(default=20, ge=1, le=100, strict=True)
 

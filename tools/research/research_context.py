@@ -1009,7 +1009,8 @@ def compact_scientific_delivery(brief,*,decision_only=False):
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
                 if key not in ('planning_status','execution_status','missing','estimated_evaluations',
-                        'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable'):
+                        'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable',
+                        'execution_limits','control_initialization_query','preparation_query','preparation_hint'):
                     row.pop(key)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']['method']

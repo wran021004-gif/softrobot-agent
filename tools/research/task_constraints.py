@@ -145,6 +145,7 @@ def mathematical_method_view(host, reference):
 
 def mathematical_catalog(view):
     """Small per-method facts; full instructions and native schemas stay reachable."""
+    from tools.research.optimal_capability import SENSITIVITY
     rows={}
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
     for row in view['methods'].values():
@@ -152,6 +153,11 @@ def mathematical_catalog(view):
             'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits',
             'registered','authorized','applicable','executable') if k in row}
         item['detail_pointer']='/methods/'+row['method']
+        if row.get('measured_control_initialization'):
+            item['control_initialization_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/measured_control_initialization'}
+        if row['method']==SENSITIVITY and row.get('authorized') and 'missing_validated_model_stencil' in row['missing']:
+            item['preparation_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/readiness'}
+            item['preparation_hint']='Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply.'
         item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
         item['missing']=list(dict.fromkeys(item['missing']))
         if item.get('cost_scope')==shared_cost:item.pop('cost_scope')
