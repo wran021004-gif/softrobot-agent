@@ -677,6 +677,29 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             trusted_history(host,agent,allow_incomplete=not reporter_saved or intra_reporter)
         await complete_reports(host,boundary.inner,recover_only=True)
         if unmatched(agent.messages):await recover_feedback(host,agent)
+        continuation=state(host).get('pending_authorized_continuation')
+        if continuation:
+            approval=host.store.artifact(continuation)
+            prior=host.store.artifact(approval['previous_state'])
+            if (not approval.get('user_approval') or prior['research_status']!='stopped'
+                    or prior.get('success_gate') or approval['previous_final_disposition']!=prior['final_disposition']):
+                raise ValueError('EXPLICIT_NONPASS_STOP_CONTINUATION_REQUIRED')
+            guard(host)
+            preparation=state(host)['pilot'].get('handoff')
+            source=(host.store.artifact(host.store.artifact(preparation)['source_state']) if preparation else {})
+            if source.get('pending_authorized_continuation')!=continuation:
+                current=decision_packet(host)['research']
+                native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
+                    decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'))}}
+                # Restore the authorized tools removed by the previous closeout.
+                for tool in native:
+                    if tool is not native[1]:agent.tool_registry.registry[tool.tool_name]=tool
+                from tools.research.session_handoff import handoff
+                preparation,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions')
+            update(host,pending_authorized_continuation=None)
+            record(host,'authorized_continuation_activated',dict(authorization=continuation,
+                previous_stop=approval['previous_final_disposition'],handoff=preparation,
+                session_id=agent._session_manager.session_id,tools=sorted(agent.tool_registry.registry),next_request_sent=False))
     except BaseException:
         await boundary.aclose()
         raise

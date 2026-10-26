@@ -8,7 +8,7 @@ from unittest.mock import patch
 import httpx
 from tools.research.agent import converse
 from tools.research.session_handoff import request_feedback_boundary,handoff
-from tools.research.state import state,update
+from tools.research.state import state,update,save
 from tests.research.test_s125_contract import cold_host
 
 
@@ -90,6 +90,49 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIAL_OR_SEND')):
             with self.assertRaisesRegex(ValueError,'REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED'):
                 asyncio.run(converse(h,handoff_before_next_request=True))
+
+    def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
+        h=self.provision();sent=[];update(h,count_closeout=True)
+        transport=httpx.MockTransport(self.responder(h,sent))
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=transport):
+            asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+        self.assertEqual(len(sent),2)
+        self.assertNotIn('research_analysis',[t['function']['name'] for t in sent[-1]['tools']])
+        stop=save(h,dict(fixture='explicit synthetic nonpass STOP, no science'),'synthetic_fixture')
+        update(h,research_status='stopped',final_disposition=stop)
+        prior=save(h,state(h),'synthetic_sealed_state')
+        approval=save(h,dict(user_approval=True,previous_state=prior,previous_final_disposition=stop),
+            'synthetic_continuation_authorization')
+        update(h,research_status='ready',count_closeout=False,final_disposition=None,
+            research_continuations=[approval],pending_authorized_continuation=approval)
+        ledger=h.store.remaining();old_session=state(h)['pilot']['framework_session_id']
+        def forbidden(request):raise AssertionError('Restore must not send')
+        def interrupted_update(host,**values):
+            if 'pending_authorized_continuation' in values:raise RuntimeError('fixture after committed continuation handoff')
+            return update(host,**values)
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('tools.research.agent.update',side_effect=interrupted_update),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
+            with self.assertRaisesRegex(RuntimeError,'after committed continuation'):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+        for _ in range(2):
+            with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                    patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                    patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+        self.assertEqual(h.store.remaining(),ledger)
+        self.assertNotEqual(state(h)['pilot']['framework_session_id'],old_session)
+        self.assertEqual(h.store.artifact(prior)['final_disposition'],stop)
+        activated=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+            if e['kind']=='authorized_continuation_activated']
+        self.assertEqual(len(activated),1)
+        self.assertEqual(len([e for e in h.store.events(h.run_id) if e['kind']=='session_handoff' and e['status']=='committed']),2)
+        self.assertIn('research_analysis',activated[0]['tools'])
+        self.assertFalse(activated[0]['next_request_sent'])
+        self.assertIsNone(state(h)['pending_authorized_continuation'])
 
     def test_budget_review_pauses_at_verified_feedback_before_second_send(self):
         h=self.provision();sent=[];original=state(h)['pilot']['framework_session_id']

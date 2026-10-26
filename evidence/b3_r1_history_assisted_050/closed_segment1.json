@@ -1,0 +1,118 @@
+{
+  "study": "b3-r1-history-assisted-050",
+  "segment": 1,
+  "status": "stopped",
+  "origin": "model",
+  "accepted": false,
+  "selected": null,
+  "closed_time": "2026-10-26T14:06:48.780270+08:00",
+  "frozen_implementation": "4e4a7e25d3f207ed96bb49e317cea66d8b381d20",
+  "resolved_identity": "6f2b9ec2753364f63da994ae538d2cca2f3136480f670f94615d05f7566470ce",
+  "sealed_state_identity": "3ec99043dd08a2f5c198e92b53c3fef308c0159bf6413896aa93ca8cf48faf21",
+  "stop": {
+    "artifact_id": "90e356dcc684c02f4e557065afc9f982d235dd8b14e777b62bc8d6e35ae0221a",
+    "media_type": "application/json"
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 144,
+      "tool_calls": 192,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 190,
+      "model_calls": 99,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 5678.730999999936
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 45,
+      "tool_calls": 2,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "all_fresh_results": [
+    {
+      "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f",
+      "media_type": "application/json"
+    }
+  ],
+  "science": {
+    "mathematical_evaluations": 0,
+    "nmpc_launches": 2,
+    "independent_physical_launches": 2,
+    "physical_replays": 0,
+    "native_rollouts": 0,
+    "native_physics_steps": 0,
+    "nmpc_internal_nlp_solves": 10,
+    "independent_physics_steps": 2000,
+    "t1": 0,
+    "t2": 0,
+    "model_preparation": 0,
+    "conic": 0,
+    "dual_face": 0,
+    "ppo": 0
+  },
+  "best_result": {
+    "artifact_id": "629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f",
+    "media_type": "application/json"
+  },
+  "best_holding_speed_m_s": 0.043009681835387996,
+  "threshold_m_s": 0.02,
+  "corrections": [
+    {
+      "source": {
+        "reference": {
+          "artifact_id": "90e356dcc684c02f4e557065afc9f982d235dd8b14e777b62bc8d6e35ae0221a",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan/interpretation",
+        "view": "full"
+      },
+      "issue": "Replay allowance described as spent",
+      "recorded_fact": "0 of 2 full replays used; 2 remained. Public-operation protection, not replay exhaustion, blocked further science."
+    },
+    {
+      "source": {
+        "reference": {
+          "artifact_id": "90e356dcc684c02f4e557065afc9f982d235dd8b14e777b62bc8d6e35ae0221a",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan/interpretation",
+        "view": "full"
+      },
+      "issue": "Candidate acceptance described uniformly as unmeasured",
+      "recorded_fact": "Both independent physical results are measured complete failures; initialized control sources remain unmeasured until independently replayed."
+    },
+    {
+      "source": {
+        "reference": {
+          "artifact_id": "90e356dcc684c02f4e557065afc9f982d235dd8b14e777b62bc8d6e35ae0221a",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan/interpretation",
+        "view": "full"
+      },
+      "issue": "No admissible native schedule can be misread as an optimizer outcome",
+      "recorded_fact": "Both research_analysis requests were rejected before scientific computation. Native optimizer runs, rollouts and physics steps were zero; no numerical infeasibility conclusion follows."
+    }
+  ],
+  "archive_scope": "One cumulative final Store export will include this sealed STOP, original receipts, an immutable pre-continuation state, and all additional-segment evidence. Local first-segment export retained unchanged.",
+  "continuation_authorization": {
+    "source": "Trusted user reply request_user_input_async/call_9d088123c6a144288abfbfa2c2b80a5e",
+    "public_operations_total": 288,
+    "provider_requests_total": 144,
+    "scientific_limits_unchanged": true,
+    "original_stop_and_all_costs_retained": true
+  }
+}

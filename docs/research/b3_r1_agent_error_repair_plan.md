@@ -5,31 +5,35 @@
 
 ## 取证快照
 
-快照截至事件序号 **1511**（序号仅便于定位，内容身份见 JSON 原引用）。
-累计 Provider **82/96**、公开操作 **151/192**；数学 **0/26**、NMPC **2/2**、
+快照截至首段 STOP，事件序号 **1843**（序号仅便于定位，内容身份见 JSON 原引用）。
+累计 Provider **99/144**、公开操作 **190/192**；数学 **0/26**、NMPC **2/2**、
 独立物理 **2/4**、完整回放 **0/2**、native 优化和积分均 **0**。
-用户已再次明确批准 Provider +48，迁移后总上限为 **144**，公开操作仍 **192**。
-因此仅增加 Provider 不能消除公开操作先进入保护的风险。
+公开操作先触发保护并合法 STOP，Provider 仍余 45，回放仍余 2。用户随后明确批准
+公开操作 +96 至 **288**，Provider 保持 144，并授权保留首段 STOP 的同 Study 追加研究段。
+初步计划 `4e4a7e25d` 的历史快照为 82 次 Provider、151 次公开操作；本节现补齐首段全量。
 
-原始错误记录 **32** 条，其中 **1** 条是监督者为授权增额设置的迁移门禁，
-不能归责 Agent；其余 **31** 条是 Agent 请求被拒记录。它们也不能全部归因于模型，
+原始 tool_request_error **36** 条，其中 **1** 条是监督者为授权增额设置的迁移门禁，
+不能归责 Agent；其余 **35** 条是 Agent 请求被拒记录。另有 **3** 条 SDK/工具钩子失败：
+临时检索引用失效 2 条、缺动作而遭收尾钩子拒绝 1 条；合计 **39** 个失败工具反馈。
+它们也不能全部归因于模型，
 其中既有参数错误，也有视图/引用交付易混淆。详见
 [agent_error_inventory.json](../../evidence/b3_r1_history_assisted_050/agent_error_inventory.json)。
 
 | 请求被拒的原错误码 | 次数 | 可观察行为 |
 |---|---:|---|
-| INVALID_EVIDENCE_POINTER | 20 | 派生路径配 raw/full 引用；将 wrapper 的 `/result/...` 路径配到原始诊断对象；fields 猜测不存在键 |
+| INVALID_EVIDENCE_POINTER | 22 | 派生路径配 raw/full 引用；将 wrapper 的 `/result/...` 路径配到原始诊断对象；fields 猜测不存在键 |
 | RESEARCH_INTENT_ACTION_MISMATCH | 3 | diagnose 配 CONTROL_SEARCH 或 MATHEMATICAL_ANALYSIS |
-| EVIDENCE_RANGE_REQUIRES_LIST_POINTER | 2 | 对对象节点按列表读取 |
+| EVIDENCE_RANGE_REQUIRES_LIST_POINTER | 3 | 对对象节点按列表读取 |
 | missing | 2 | Plan 动作必填字段缺失，包括漏填 action |
 | extra_forbidden | 1 | 向冻结 protocol 添加未声明字段 |
 | NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION | 1 | native 请求遗漏明确初态选择；实际精确模板含该字段 |
 | UNREGISTERED_RESEARCH_EVIDENCE | 1 | 可读来源被当成已注册科研证据 |
 | EVIDENCE_MISSING_OR_CHANGED | 1 | 使用不可定位的来源身份 |
+| PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY | 1 | 收尾保护后读取不在允许范围内的来源 |
 
-原工具调用中 evidence_read **120** 次、retrieve_context **9** 次、research_plan **13** 次、
-research_analysis **2** 次、research_investigate **1** 次。120 次 evidence_read 有 **40** 次
-完全相同请求载荷的重复；动态视图可能已改变，不能直接把这 40 次都判为无效。
+原工具调用中 evidence_read **156** 次、retrieve_context **10** 次、research_plan **15** 次、
+research_analysis **2** 次、research_investigate **1** 次。156 次 evidence_read 有 **64** 次
+完全相同请求载荷的重复；动态视图可能已改变，不能直接把这 64 次都判为无效。
 此快照没有 DECISION_CANDIDATE_MISMATCH；候选约束修复有具体收益，整体科研效率仍低。
 
 ## 已实施的交付修复
@@ -45,6 +49,9 @@ research_analysis **2** 次、research_investigate **1** 次。120 次 evidence_
 这些修复后仍有重复读取和错误路径。已通过的 diagnose 只做只读诊断，
 不是执行 selected_method 文本中的 native 优化；其 numerical_evidence 为空。
 不能把这项计划的成功收据报告成一次完成的优化。
+首段 STOP 原文又把 replay allowance 写成已用尽、把候选接受状态统称 unmeasured；
+原账本实际回放 0/2，两次独立物理评价均为已测失败。STOP 原文保留，审计更正见
+[首段封存摘要](../../evidence/b3_r1_history_assisted_050/closed_segment1.json)。
 
 ## 待修复项目与验收
 
@@ -55,6 +62,7 @@ research_analysis **2** 次、research_investigate **1** 次。120 次 evidence_
 | P0 | `core.py` read_evidence、原 evidence 导航投影 | 明确 raw 对象和 retrieval wrapper 的引用边界；提供可直接使用的 reference+view+pointer 查询。对 raw/full 使用派生路径、对对象使用 range、对 fields 缺键，返回精确的父节点与合法查询 | 使用本 Study 的 `/control_result_links`、4ea52762… 原诊断及 b29073a3… wrapper 做零计算回放；每条建议查询在其声明视图上真实可读，不能混搭引用/路径 |
 | P1 | `diagnostic.py`、`agent.py` 的原工具描述与反馈 | 只读 diagnose 明确报告未发起所选数学方法、实际新增计算数为 0，并链接原数学模板；计划、诊断、analysis 执行分别陈述结果 | 成功 diagnose 后明确 numerical_evidence=[]、无 native cost、数学计费不变；不凭 selected_method 字符串隐式派发实验 |
 | P1 | `research_context.py` 的原 read_coverage 投影 | 使用已有 delivery_identity/source_state_identity 显示“相同内容已交付”及精确小查询；把当前已知来源 metadata 放到原短包所需位置 | 完全相同请求且同状态/内容时可识别；动态视图变化、公开完整读取、重复性验证均正常，不封锁合法读取、不绕过读信用 |
+| P1 | 原 STOP/报告事实投影 | 将剩余额度和物理 measured_failure/控制源 unmeasured 分别引用其权威字段；区分请求拒绝与优化器已运行但未找到解 | 首段 replay=0/2 不再被描述为用尽；两次物理失败不写成未测；原 Agent 文本和失败保持可读 |
 | P2 | 原 budget/监督报告 | 同时显示下一阶段 Provider 与 public-operation 可用额、保护额、有效计算和只读调用数，帮助识别公开操作先成为瓶颈 | 本次第二增额后显示 Provider 144、public 192，累计消耗不变；不自动扩额，不新增计费账本 |
 
 P0 的来源显示与导航先做，再评估是否仍需调整 SDK offload/Handoff 大小策略。

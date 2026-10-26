@@ -1,54 +1,55 @@
 {
   "study": "b3-r1-history-assisted-050",
-  "freeze": "a29f3713450088cc5ba42a864630ccb6988cd9a9",
-  "status": "ready",
-  "snapshot_event": 1511,
+  "freeze": "4e4a7e25d3f207ed96bb49e317cea66d8b381d20",
+  "status": "stopped",
+  "snapshot_event": 1843,
   "ledger": {
     "limit": {
       "backend_solves": 4,
-      "model_calls": 96,
+      "model_calls": 144,
       "tool_calls": 192,
       "wall_s": null,
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 151,
-      "model_calls": 82,
+      "tool_calls": 190,
+      "model_calls": 99,
       "backend_solves": 2,
       "worker_calls": 0,
-      "wall_s": 5032.528999999937
+      "wall_s": 5678.730999999936
     },
     "remaining": {
       "backend_solves": 2,
-      "model_calls": 14,
-      "tool_calls": 41,
+      "model_calls": 45,
+      "tool_calls": 2,
       "wall_s": null,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "raw_error_records": 32,
-  "agent_request_rejections": 31,
+  "raw_error_records": 36,
+  "agent_request_rejections": 35,
   "supervisor_gate_rejections": 1,
   "by_code": {
-    "INVALID_EVIDENCE_POINTER": 20,
+    "INVALID_EVIDENCE_POINTER": 22,
     "extra_forbidden": 1,
     "EVIDENCE_MISSING_OR_CHANGED": 1,
     "missing": 2,
     "RESEARCH_INTENT_ACTION_MISMATCH": 3,
-    "EVIDENCE_RANGE_REQUIRES_LIST_POINTER": 2,
+    "EVIDENCE_RANGE_REQUIRES_LIST_POINTER": 3,
     "NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION": 1,
-    "UNREGISTERED_RESEARCH_EVIDENCE": 1
+    "UNREGISTERED_RESEARCH_EVIDENCE": 1,
+    "PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY": 1
   },
   "tool_counts": {
-    "evidence_read": 120,
-    "retrieve_context": 9,
-    "research_plan": 13,
+    "evidence_read": 156,
+    "retrieve_context": 10,
+    "research_plan": 15,
     "research_analysis": 2,
     "research_investigate": 1
   },
-  "evidence_reads": 120,
-  "exact_read_payload_repetitions": 40,
+  "evidence_reads": 156,
+  "exact_read_payload_repetitions": 64,
   "frequent_read_payloads": [
     {
       "count": 14,
@@ -62,7 +63,18 @@
       }
     },
     {
-      "count": 7,
+      "count": 9,
+      "input": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      }
+    },
+    {
+      "count": 8,
       "input": {
         "pointer": "/methods/mujoco_direct_control_v1/request_template",
         "reference": {
@@ -73,40 +85,7 @@
       }
     },
     {
-      "count": 6,
-      "input": {
-        "pointer": "/control_result_links",
-        "reference": {
-          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
-          "media_type": "application/json"
-        },
-        "view": "working_set"
-      }
-    },
-    {
-      "count": 3,
-      "input": {
-        "pointer": "/methods/mujoco_direct_control_v1",
-        "reference": {
-          "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
-          "media_type": "application/json"
-        },
-        "view": "mathematical_capabilities"
-      }
-    },
-    {
-      "count": 3,
-      "input": {
-        "pointer": "/method_requirements",
-        "reference": {
-          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
-          "media_type": "application/json"
-        },
-        "view": "working_set"
-      }
-    },
-    {
-      "count": 3,
+      "count": 7,
       "input": {
         "count": 20,
         "pointer": "/control_result_links",
@@ -116,8 +95,70 @@
         },
         "view": "working_set"
       }
+    },
+    {
+      "count": 5,
+      "input": {
+        "pointer": "",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "count": 4,
+      "input": {
+        "pointer": "/method_requirements",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      }
     }
   ],
+  "sdk_or_hook_failures": 3,
+  "sdk_or_hook_errors": [
+    {
+      "event": 547,
+      "reference": {
+        "artifact_id": "032fe6e1dbde26018ff9997aa59539ef5af4573d07d1b81526a17ecc5d837261",
+        "media_type": "application/json"
+      },
+      "tool": "retrieve_context",
+      "tool_id": "call_00_Rn982I5qUFpPJQy6pBXS0652",
+      "action": null,
+      "message": "Error: reference not found: call_00_RnRqS0uEvXDKPakyNuo80622_0",
+      "classification": "sdk_temporary_reference_missing"
+    },
+    {
+      "event": 775,
+      "reference": {
+        "artifact_id": "780950f56485b83da4d506b17163ffbb029cc0c0205c2ac4fc00241b2e62125c",
+        "media_type": "application/json"
+      },
+      "tool": "retrieve_context",
+      "tool_id": "call_00_ytVXSbCSCNQmQ9GtFZAw0856",
+      "action": null,
+      "message": "Error: reference not found: call_00_wTpIgyZLxHn0fawkHztO3506_0",
+      "classification": "sdk_temporary_reference_missing"
+    },
+    {
+      "event": 1827,
+      "reference": {
+        "artifact_id": "1f88437252ecd35852e8920791012fc181653bab357c709d80fb14fe250fd168",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_ZpulmKLVSFxBRaDGOlb84354",
+      "action": null,
+      "message": "PROTECTED_CLOSEOUT_REQUIRES_EVIDENCE_SELECTION_OR_STOP",
+      "classification": "protected_tool_hook_rejection"
+    }
+  ],
+  "failed_original_feedback": 39,
   "errors": [
     {
       "event": 35,
@@ -1158,6 +1199,157 @@
       "expected": "AUTHORIZED_EXTENSION_REQUIRES_COMMITTED_EXPLICIT_MIGRATION",
       "scientific_execution_started": false,
       "classification": "supervisor_migration_gate"
+    },
+    {
+      "event": 1590,
+      "reference": {
+        "artifact_id": "b863935922037c52f3ecf55c0013af2a7246573b1cda02167f0767af7152116d",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_uKPGUkWUq0dhFgPmDqQ04408",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "b863935922037c52f3ecf55c0013af2a7246573b1cda02167f0767af7152116d",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1643,
+      "reference": {
+        "artifact_id": "7d329f0a26d3afb2a6d230bd92fc7edc38a93f45ad2a642834583b8398ffb348",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_JIsmneylfLMBsGm6jmlh4994",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "version",
+          "operation",
+          "model_source",
+          "candidate",
+          "source",
+          "settings",
+          "best",
+          "search",
+          "iterations",
+          "control_optimization",
+          "result",
+          "diagnostics",
+          "native_steps_total",
+          "evaluation_requests_used"
+        ],
+        "pointer": "",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "7d329f0a26d3afb2a6d230bd92fc7edc38a93f45ad2a642834583b8398ffb348",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'version'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1726,
+      "reference": {
+        "artifact_id": "46f7b34293d8ae353aae9b2f3c15c0534c401e413cc125456515936dff0234f4",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_t44M8IKeRdBhe0cPSwIm3697",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "time_s",
+          "tip_position_m",
+          "tip_velocity_m_s",
+          "tip_speed_m_s",
+          "actual_tension_n"
+        ],
+        "pointer": "/38",
+        "reference": {
+          "artifact_id": "81321dd4c49760371f51b589d08ababff1a09f99e3b0d90d1c23a2e93835d5df",
+          "media_type": "application/json"
+        },
+        "view": "range"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "46f7b34293d8ae353aae9b2f3c15c0534c401e413cc125456515936dff0234f4",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "code": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "field": "pointer",
+      "expected": "Read the current reference root with view=summary, then use an advertised list read_pointer with view=range",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1806,
+      "reference": {
+        "artifact_id": "0db4add549d0bbbfae09be9827979cb106ee516c7f5c45e39af4f0da2f5276f9",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_QU8JoT7gqxFToNnhpJef0776",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "0db4add549d0bbbfae09be9827979cb106ee516c7f5c45e39af4f0da2f5276f9",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY",
+      "code": "PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY",
+      "field": "reference",
+      "expected": "Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
     }
   ],
   "science": {

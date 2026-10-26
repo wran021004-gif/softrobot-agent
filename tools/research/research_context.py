@@ -917,6 +917,10 @@ def agent_decision_brief(host):
     if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
     brief['mathematics_authorization']=mathematics_authorization(host,s)
+    if s.get('research_continuations'):
+        ref=s['research_continuations'][-1];continuation=host.store.artifact(ref)
+        brief['authorized_continuation']=dict(reference=ref,previous_stop=continuation['previous_final_disposition'],
+            scope='Explicit user-authorized additional segment in the same Study. Previous STOP is historical; all evidence and cumulative costs retained. No additional scientific allowance.')
     if s['spec'].get('family_search'):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])
