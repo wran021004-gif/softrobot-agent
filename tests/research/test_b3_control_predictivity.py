@@ -13,6 +13,8 @@ class PredictivityTests(unittest.TestCase):
         acceptance=archived('evidence/b3_t2_pilot_050_c',dict(
             artifact_id='0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca',
             media_type='application/json'))['acceptance']
+        acceptance['sources']['profile']=dict(artifact_id='synthetic-profile-fixture')
+        acceptance['evidence_binding']['profile']=acceptance['sources']['profile']
         role=dict(acceptance=acceptance,J=1.,reference=dict(fixture=True))
         row=dict(conditions=dict(task=dict(identity=acceptance['task_identity'])),
             mathematics=dict(trajectory=dict(replayed_violation=-.2,
@@ -31,10 +33,11 @@ class PredictivityTests(unittest.TestCase):
         self.assertEqual(result['feedback_closed_loop'],'not_executed')
 
     def test_mismatched_task_or_control_conditions_are_not_comparable(self):
-        for changed in ('conditions','acceptance'):
+        for changed in ('conditions','acceptance','source'):
             rows=self.fixtures()
             if changed=='conditions':rows['b']['conditions']['settings']='different budget'
-            else:rows['b']['fixed']['acceptance']['task_identity']='other task'
+            elif changed=='acceptance':rows['b']['fixed']['acceptance']['task_identity']='other task'
+            else:rows['b']['reoptimized']['acceptance']['sources']['evaluation']=None
             self.assertEqual(task_control_capability_comparison(rows,t2={})['pairs'][0]['status'],'not_comparable')
 
     def test_saved_original_evaluator_and_accounting_alignment(self):
@@ -44,7 +47,7 @@ class PredictivityTests(unittest.TestCase):
         for label,row in summary['candidates'].items():
             item=read(RUN/'inputs.json')[label]
             for role in ('fixed','reoptimized'):
-                saved=read(RUN/label/role/'evaluation.json')['acceptance']
+                saved=read(RUN/label/role/'settled_evaluation.json')['acceptance']
                 self.assertEqual(saved,row[role]['acceptance'])
                 self.assertEqual(saved['task_identity'],plan['task']['identity'])
                 J=max(saved['metrics'][k]/v for k,v in plan['task']['limits'].items())-1
@@ -54,6 +57,10 @@ class PredictivityTests(unittest.TestCase):
             self.assertLessEqual(cost['optimization_iterations'],2)
             self.assertLessEqual(max(row['reoptimized']['native_replay_difference'].values()),1e-10)
             self.assertEqual(item['parameters']['segments']['1']['young_pa'],plan['moduli_pa'][label])
+            self.assertTrue(row['mathematical_admission']['full_task_supported'])
+            self.assertEqual(sum(len(c['analyzed_indices']) for c in row['mathematical_admission']['constraint_coverage']),13)
         self.assertEqual(total,summary['resources']['physics_steps'])
         self.assertLessEqual(total,50000)
+        self.assertEqual(summary['accounting']['engineering_equivalent_math'],11)
+        self.assertTrue(all(p['status']!='not_comparable' for p in summary['comparison']['pairs']))
         self.assertEqual(plan['r1_before'],summary['resources']['r1_after'])

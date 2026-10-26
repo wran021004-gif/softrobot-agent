@@ -42,6 +42,9 @@ def task_control_capability_comparison(candidates, *, t2):
                 comparison=compare_acceptance(br['acceptance'],ar['acceptance']),
                 left_metrics=ar['acceptance']['metrics'],right_metrics=br['acceptance']['metrics'],
                 sources=[ar['reference'],br['reference']])
+        if any(v['comparison']['relation']=='unavailable' for v in physical.values()):
+            pair.update(status='not_comparable',reason='Original acceptance comparison prerequisites unresolved',physical=physical)
+            pairs.append(pair);continue
         observed=physical['reoptimized']['delta_J']!=0
         pair.update(status='physically_observed_difference' if observed else 'indistinguishable',
             mathematics=resolution,model_direction_supported=bool(separated and direction),

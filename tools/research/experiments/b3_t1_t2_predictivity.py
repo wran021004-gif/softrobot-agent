@@ -15,7 +15,7 @@ import time
 import numpy as np
 
 from schemas.platform import SessionInput
-from schemas.platform_analysis import EndpointLinearizedModel, TaskAnalysisProtocol
+from schemas.platform_analysis import EndpointLinearizedModel, TaskAnalysisProtocol, TaskAnalysisRequirement
 from tools.platform_store import plain
 from tools.state_io import atomic_json, digest, read
 from tools.research import analysis
@@ -133,7 +133,11 @@ def playback(label, item, schedule, role):
     atomic_json(folder/'raw.json',raw)
     ref=dict(artifact_id=digest(raw),media_type='application/json')
     evaluation,profile=evaluate_playback(cfg,raw,ref,digest(cfg))
-    acceptance=assemble_acceptance(cfg,evaluation,profile,motion=[dict(time_s=r['time_s']) for r in raw['samples']])
+    evref=dict(artifact_id=digest(plain(evaluation)),media_type='application/json')
+    profile.update(execution_id=cfg['run_id']+'-'+role,simulation=ref,evaluation=evref)
+    profref=dict(artifact_id=digest(profile),media_type='application/json')
+    acceptance=assemble_acceptance(cfg,evaluation,profile,evaluation_reference=evref,profile_reference=profref,
+        motion=[dict(time_s=r['time_s']) for r in raw['samples']])
     atomic_json(folder/'evaluation.json',dict(evaluation=plain(evaluation),profile=profile,acceptance=acceptance))
     assert acceptance['status'] in ('accepted','valid_failure')
     limits=task_adapter(cfg).ranking_limits()
@@ -148,9 +152,21 @@ def playback(label, item, schedule, role):
         outputs=task_outputs(raw))
 
 
+def task_fit(item, value, query):
+    """Apply the original task-capability gate to the saved local model."""
+    from tools.research.task_constraints import check_analysis_applicability, model_assessment
+    inp=SessionInput.model_validate(item['configuration'])
+    req=TaskAnalysisRequirement.model_validate(value['task_analysis'])
+    model=EndpointLinearizedModel.model_validate(value['model'])
+    fit=check_analysis_applicability(req,query,model_assessment(inp,req,query.operation,model=model),model=model)
+    if fit['status']=='not_applicable' or not fit['full_task_supported']:
+        raise ValueError('FULL_TASK_MODEL_ADMISSION_FAILED: '+str(fit))
+    return fit
+
+
 def run():
     from tools.research.optimal_capability import calculate_sensitivity
-    from tools.research.capability import capability_summary, task_control_capability_comparison
+    from tools.research.capability import capability_summary
     from extensions.tendon_family.mujoco_analysis import NativeModel
     frozen=read(EVIDENCE/'frozen_plan.json');items=read(RUN/'inputs.json')
     assert frozen['moduli_pa']==MODULI and frozen['settings']==plain(LocalControlSearchSettings(**SETTINGS))
@@ -194,6 +210,8 @@ def run():
                     construction_rule='controller_start_input')))
         q=AnalysisRequest(candidate=items['d_zero']['binding']['configuration'],operation='task_capability',
             operating_point='controller_start_input',protocol=p,capability_method='sampled-affine-conic-minimax-v1')
+        for label,item in items.items():
+            models[label]['analysis_applicability']=task_fit(item,models[label],q)
         t2=calculate_sensitivity(dict(points=points,parameter=frozen['parameter'],baseline=models['d_zero']),q,checkpoint)
         atomic_json(RUN/'t2.json',t2)
         for point,sol in zip(points,t2['optimal_sensitivity'].get('numerical_optimality',[])):
@@ -257,17 +275,91 @@ def run():
         ledger.update(status='failed',error=repr(exc));raise
     finally:
         record();atomic_json(RUN/'partial_summary.json',rows)
-    comparison=task_control_capability_comparison(rows,t2=t2['optimal_sensitivity'])
-    # Full trajectories/matrices stay in ignored runs; the committed view is derived.
-    summary=deepcopy(rows)
-    for row in summary.values():
-        row.pop('mathematics');row.pop('local')
+    export()
+
+
+def export():
+    """Read saved arrays only: bind evaluation evidence and derive the L1 view.
+
+    Also supports settling an already completed run; never launches science.
+    Original model, T2, callback and raw/evaluation files remain untouched.
+    """
+    from tools.research.capability import task_control_capability_comparison
+    from extensions.math_analysis.kernels import spectrum
+    from extensions.math_analysis.capability_sensitivity import _prepare, _fixed_replay
+    frozen=read(EVIDENCE/'frozen_plan.json');items=read(RUN/'inputs.json')
+    ledger=read(RUN/'execution.json');rows=read(RUN/'partial_summary.json');t2=read(RUN/'t2.json')
+    if ledger['status']!='completed':raise ValueError('COMPLETE_SAVED_RUN_REQUIRED')
+    p=TaskAnalysisProtocol.model_validate(frozen['protocol'])
+    q=AnalysisRequest(candidate=items['d_zero']['binding']['configuration'],operation='task_capability',
+        operating_point='controller_start_input',protocol=p,capability_method='sampled-affine-conic-minimax-v1')
+    fits={label:task_fit(item,read(RUN/label/'model.json'),q) for label,item in items.items()}
+    scoped=analysis.scoped_result(deepcopy(t2),TaskAnalysisRequirement.model_validate(t2['task_analysis']),fits['d_zero'],q)
+    atomic_json(RUN/'t2_task_scope.json',scoped)
+    for label,item in items.items():
+        cfg=item['configuration'];row=rows[label];model=EndpointLinearizedModel.model_validate(read(RUN/label/'model.json')['model'])
+        req=TaskAnalysisRequirement.model_validate(read(RUN/label/'model.json')['task_analysis'])
+        point=dict(model=model,requirements=req,initial_delta=None)
+        maps=_prepare(point,p)
+        row['mathematical_admission']=fits[label]
+        row['same_input_model_checks']={}
+        for role in ('fixed','reoptimized'):
+            folder=RUN/label/role;raw=read(folder/'raw.json');saved=read(folder/'evaluation.json')
+            evref=dict(artifact_id=digest(saved['evaluation']),media_type='application/json')
+            profile=deepcopy(saved['profile'])
+            profile.update(execution_id=cfg['run_id']+'-'+role,simulation=row[role]['raw_reference'],evaluation=evref)
+            profref=dict(artifact_id=digest(profile),media_type='application/json')
+            acceptance=assemble_acceptance(cfg,saved['evaluation'],profile,evaluation_reference=evref,profile_reference=profref,
+                motion=[dict(time_s=r['time_s']) for r in raw['samples']])
+            assert acceptance['metrics']==row[role]['acceptance']['metrics']
+            row[role]['acceptance']=acceptance
+            atomic_json(folder/'settled_evaluation.json',dict(evaluation=saved['evaluation'],profile=profile,acceptance=acceptance))
+            native=read(RUN/label/'native.json')['native_dynamics']
+            schedule=item['schedule'] if role=='fixed' else native['optimized_schedule']
+            check=_fixed_replay(point,maps,np.asarray(schedule['trajectory']['tensions_n']).ravel(),p)
+            atomic_json(folder/'affine_same_input.json',check)
+            row['same_input_model_checks'][role]=dict(score=check['score'],input_legal=check['input_legal'],
+                replay_valid=check['replay_valid'],physical_J=row[role]['J'],
+                source=dict(file=str((folder/'affine_same_input.json').relative_to(ROOT)),pointer=''))
+        metrics=read(RUN/label/'model.json')['metrics']
+        velocity=next(v for v in model.endpoint_outputs if v.name=='tip_velocity')
+        Cv=np.asarray(velocity.C)*np.asarray(model.state_scales)[None,:]/np.asarray(velocity.scales)[:,None]
+        row['local']={k:v for k,v in row['local'].items() if k!='working_point'}
+        row['local']['working_point']={k:model.operating_point[k] for k in ('name','actual_time_s','phase','remaining_task_s')}
+        row['local']['velocity_windows']=[dict(window_s=w['window_s'],
+            held=spectrum(Cv@np.asarray(metrics['raw']['held_gramians'][i])@Cv.T,p),
+            continuous=spectrum(Cv@np.asarray(metrics['raw']['continuous_gramians'][i])@Cv.T,p))
+            for i,w in enumerate(metrics['windows'])]
+        for w in row['local']['position_windows']:
+            for kind in ('held','continuous'):w[kind]={k:w[kind][k] for k in ('output','minimum_energy','energy_definition')}
+        row['t1_constraints']=[{k:r[k] for k in ('constraint_id','sample_index','absolute_time_s','value',
+            'radius','normalization_scale','signed_violation','passed')} for r in row['mathematics']['trajectory']['replay']['records']]
+        row['sources']['admitted_t2']=dict(file=str((RUN/'t2_task_scope.json').relative_to(ROOT)),pointer='')
+    comparison=task_control_capability_comparison(rows,t2=scoped['optimal_sensitivity'])
+    for row in rows.values():
+        row.pop('mathematics')
         for role in ('fixed','reoptimized'):row[role].pop('outputs')
-    atomic_json(EVIDENCE/'summary.json',dict(candidates=summary,comparison=comparison,resources=ledger,
-        mathematical_cost=t2['optimal_sensitivity'].get('computation_cost'),raw_directory=str(RUN)))
-    print(json.dumps(dict(resources=ledger,comparison=comparison),ensure_ascii=False))
+        # Retain physical values and evidence pointers, not repeated spectrum vectors.
+        for w in row['local']['position_windows']:
+            for kind in ('held','continuous'):
+                w[kind]['output'].pop('weak_directions',None)
+        for w in row['local']['velocity_windows']:
+            for kind in ('held','continuous'):w[kind].pop('weak_directions',None)
+        row['mathematical_admission']={k:row['mathematical_admission'][k] for k in ('status','reasons','full_task_supported','constraint_coverage','horizon')}
+    sens=scoped['optimal_sensitivity'];fd=deepcopy(sens.get('reoptimized_finite_difference',[]))
+    for d in fd:
+        d.pop('constraint_contributions',None);d.pop('duplicate_aggregates',None)
+    summary=dict(candidates=rows,comparison=comparison,resources=ledger,
+        mathematical_cost=sens.get('computation_cost'),t2_differences=fd,
+        t2_fixed_control=[dict(parameter_value=v['value'],score=r['score'],input_legal=r['input_legal'],replay_valid=r['replay_valid'])
+            for v,r in zip(sens['numerical_optimality'],sens['fixed_control_sensitivity']['points'])],
+        accounting=dict(engineering_equivalent_math=ledger['model_preparations']+ledger['conic_attempts']+ledger['dual_face_attempts']+ledger['native_analyses'],
+            formal_store_charges=0,postprocess='Saved-model arithmetic, task admission and evaluator evidence composition only; no extra solve or integration'),
+        raw_directory=str(RUN))
+    atomic_json(EVIDENCE/'summary.json',summary)
+    print(json.dumps(dict(resources=ledger,status=comparison['ranking'],J={k:v['reoptimized']['J'] for k,v in rows.items()}),ensure_ascii=False))
 
 
 if __name__=='__main__':
     import sys
-    {'prepare':prepare,'run':run}[sys.argv[1]]()
+    {'prepare':prepare,'run':run,'export':export}[sys.argv[1]]()
