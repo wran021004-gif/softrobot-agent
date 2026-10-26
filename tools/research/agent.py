@@ -15,6 +15,7 @@ from tools.research.state import (state, update, save, guard, enabled, protected
 from tools.research.budget import engineering_closeout
 CALLER='research-provider'
 PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_replay/diagnose. '
+    'control_search uses physical replay callbacks; Native mathematical sequence optimization uses research_analysis, not a selected_method label. '
     'Diagnose reads existing evidence; selected_method does not execute a mathematical/native worker '
     '(use research_analysis with its registered template). Only an explicit diagnostic payload requests local solves. '
     'Control sources and optional NMPC handoff are described in control_initialization_methods. '
@@ -372,6 +373,16 @@ def error_feedback(host, use, exc, before):
         if use['input'].get('action')=='physical_replay':expected+='; put candidate/source inside physical_replay and match decision.selected_candidate to physical_replay.candidate; omit top-level candidate.'
     if hasattr(exc,'errors') and any(e['loc'] and e['loc'][0]=='protocol' and e['type']=='extra_forbidden' for e in errors):
         field='protocol';expected='Use the complete frozen analysis_protocol from the method request_template/protocol in mathematical_capabilities. Do not add protocol fields; holding duration belongs to the frozen task.'
+    if hasattr(exc,'errors'):
+        setting_error=next((e for e in errors if e['type']=='extra_forbidden' and
+            tuple(e['loc'][-2:])==('settings','regularization')),None)
+        if setting_error:
+            from tools.research.contracts import LocalControlSearchSettings
+            field='.'.join(map(str,setting_error['loc']))
+            expected=('regularization is not supported. Use only LocalControlSearchSettings fields: '
+                +', '.join(LocalControlSearchSettings.model_fields)+'. Plan control_search uses physical replay callbacks; '
+                'Native optimization requires research_analysis and the registered request_template. '
+                'Do not rename fields or assume zero integration; normal authorization and cost admission still apply.')
     if isinstance(exc,(KeyError,IndexError)) and use.get('name')=='evidence_read':
         code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
         if use['input'].get('reference') and not getattr(exc,'evidence_navigation',None):

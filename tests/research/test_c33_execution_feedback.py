@@ -1,0 +1,56 @@
+"""C3.2 error reproductions only; no Provider, Store writes or scientific workers."""
+from copy import deepcopy
+import unittest
+from unittest.mock import patch
+
+from tools.research.agent import error_feedback,plan_schema
+from tools.research.contracts import Plan,LocalControlSearchSettings,NativeControlOptimization
+from tests.research.test_research_reporting import offline_host
+
+
+class ExecutionFeedbackTests(unittest.TestCase):
+    def test_schema_exposes_intent_only_routing_and_nonzero_native_cost(self):
+        schema=plan_schema(['diagnose','control_search'],decision_required=True)
+        fields=schema['$defs']['ResearchDecision']['properties']
+        self.assertIn('Intent label only',fields['selected_method']['description'])
+        self.assertIn('research_analysis',fields['selected_method']['description'])
+        self.assertIn('not actual cost or authorization',fields['requested_budget']['description'])
+        self.assertIn('unknown costs remain unresolved',fields['requested_budget']['description'])
+        self.assertIn('physical replay',schema['$defs']['LocalControlSearchSettings']['properties']['evaluation_requests']['description'])
+
+    def test_rejected_regularization_has_precise_shared_settings_correction(self):
+        reference=dict(artifact_id='a'*64,media_type='application/json')
+        value=dict(action='control_search',hypothesis='Fixture only',expected_observation='Fixture',
+            weakening_observation='Fixture',fixed_conditions='Fixture',stopping_condition='Fixture',
+            interpretation='Fixture',control_search=dict(candidate=reference,source=reference,
+                settings=dict(regularization=1.)))
+        native=dict(source=reference,settings=dict(version='local_control_search_v2',
+            correction_window_s=[0.,.35],regularization=1.))
+        for contract,payload,tool,path in ((Plan,value,'research_plan','control_search.settings.regularization'),
+                (NativeControlOptimization,native,'research_analysis','settings.regularization')):
+            host,current=offline_host({});before=deepcopy(current)
+            with self.assertRaises(ValueError) as caught:contract.model_validate(payload)
+            with patch('tools.research.agent.record',return_value=reference):
+                feedback=error_feedback(host,dict(name=tool,input=payload),caught.exception,before)
+            self.assertEqual(feedback['field'],path)
+            self.assertEqual(feedback['status'],'rejected')
+            self.assertFalse(feedback['scientific_execution_started'])
+            self.assertIn('regularization is not supported',feedback['expected'])
+            fields=feedback['expected'].split('fields: ',1)[1].split('. Plan ',1)[0].split(', ')
+            self.assertEqual(set(fields),set(LocalControlSearchSettings.model_fields))
+            self.assertNotIn('regularization',fields)
+            self.assertIn('normal authorization and cost admission',feedback['expected'])
+            self.assertEqual(current,before)
+            host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
+
+    def test_unrelated_unknown_parameter_keeps_its_original_error(self):
+        host,current=offline_host({});reference=dict(artifact_id='b'*64,media_type='application/json')
+        with self.assertRaises(ValueError) as caught:LocalControlSearchSettings.model_validate(dict(other_field=1))
+        with patch('tools.research.agent.record',return_value=reference):
+            feedback=error_feedback(host,dict(name='research_plan',input={}),caught.exception,current)
+        self.assertEqual(feedback['field'],'other_field')
+        self.assertNotIn('regularization',feedback['expected'])
+        self.assertFalse(feedback['scientific_execution_started'])
+
+
+if __name__=='__main__':unittest.main()

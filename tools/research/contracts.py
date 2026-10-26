@@ -154,7 +154,7 @@ class LocalControlSearchSettings(Contract):
     difference_step_n: FiniteFloat = Field(default=.01,gt=0)
     initial_radius_n: FiniteFloat = Field(default=.1,gt=0)
     minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
-    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
+    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True,description='Search callback cap, not mathematical charges or integration steps. Plan control_search callbacks request physical replay; Native research_analysis callbacks integrate cloned native trajectories. Actual costs and independent validation are recorded separately.')
     iterations: int = Field(default=16,ge=1,le=100,strict=True)
     active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.')
 
@@ -518,10 +518,10 @@ class ResearchDecision(Contract):
     hypothesis_id: str = Field(min_length=1)
     claimed_inference: str = Field(default='empirical_search',min_length=1,description='Use empirical_search for a proposed falsifiable experiment, including testing a mathematical prediction in physics. This is not a proven inference. Any stronger claim must match supported_inferences of registered supporting_evidence with the required identity and scope.')
     research_intent: Literal['DIAGNOSE','MATHEMATICAL_ANALYSIS','CONTROL_SEARCH','DESIGN_MODIFICATION','NMPC_EXECUTION','RL_TRAINING','PHYSICAL_VALIDATION','SELECT','STOP']
-    selected_method: str = Field(min_length=1)
+    selected_method: str = Field(min_length=1,description='Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.')
     selected_variables: list[str] = Field(default_factory=list)
     selected_candidate: EvidenceRef | None = Field(default=None,description='Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source.')
-    requested_budget: int = Field(default=0,ge=0,strict=True,description='Physical request cap for control search; otherwise declared operation units')
+    requested_budget: int = Field(default=0,ge=0,strict=True,description='Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.')
 
 
 # Payload ownership belongs to Plan; the provider schema projects this contract.
