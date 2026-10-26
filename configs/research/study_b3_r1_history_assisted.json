@@ -1,0 +1,232 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "b3-r1-history-assisted-050",
+  "base_commit": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: require the registered R1 formal scope bound to this identity; user 2026-10-26 R0/R1 attachment explicitly authorizes this finite Study and specified DeepSeek egress.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_c3_ab.json",
+  "evidence_destination": "evidence/b3_r1_history_assisted_050",
+  "nmpc_replan_period_s": 0.1,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay",
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "execute",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 48,
+    "protected_provider_requests": 4,
+    "public_operations": 96,
+    "protected_public_operations": 6,
+    "physical_launches": 4,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 26,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 2,
+  "reserve_rl_evaluation": false,
+  "native_control_limits": {
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [
+      {
+        "folder": "evidence/b3_t2_pilot_050_c",
+        "candidate": {
+          "artifact_id": "123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "background": [
+      {
+        "folder": "evidence/b3_t2_pilot_050_b",
+        "reference": {
+          "artifact_id": "137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+          "media_type": "application/json"
+        },
+        "dependencies": [
+          {
+            "artifact_id": "c884086ce2fc5a2ddfe61a19bf67fab01dcc440e0329be0a7ae317855809d2a7",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      {
+        "folder": "evidence/b3_t2_pilot_050_c",
+        "reference": {
+          "artifact_id": "0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca",
+          "media_type": "application/json"
+        },
+        "dependencies": [
+          {
+            "artifact_id": "123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "66f733b4ba4c59b0ce892cb88e00b846b6ba9f950bc24159feba0fbf861bf705",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7cee4f6b079fbb8fd921b48a18c3f8567aaaddbdd9638ecf86c78664f9cf4f12",
+            "media_type": "application/json"
+          }
+        ]
+      }
+    ],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "Explicitly authorized by the 2026-10-26 user R0/R1 task within this Study total; registered formal scope and method preconditions still required.",
+    "controlled-capability-sensitivity-v1": "Explicitly authorized by the 2026-10-26 user R0/R1 task within this Study total; registered formal scope and method preconditions still required."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "execution_instructions": "Independent finite history-assisted R1 Study. Select the most informative next research action yourself: fixed-structure control, T1/T2, legal FamilySpace modifications with fresh controls, aligned GVS/MuJoCo diagnostics, or another registered task-relevant method. No mandatory method order, T2 use or structural edit. Supervision checks legality, identities, frozen limits and costs only. Historical M2 reference NMPC: terminal 0.003148372648914904 m, holding position 0.006038027478928508 m, peak speed 0.11137394399884916 m/s; five solves hit iteration limits. M2 same-structure native search: 8 callbacks / 2 started iterations / 1 completed response step, 8000 native steps; exact optimized schedule independently replayed at terminal 0.004515550349894086 m, holding position 0.006675937086453473 m, peak speed 0.08788779126447174 m/s. This is finite local control improvement, not convergence or structural infeasibility. No T1/T2 was run at 0.50 s. These history records retain their original Study identity and count for no new execution, solve, success or SELECT. The original legal control_seeds import provides the full M2 C optimized actual replay input as an unmeasured current-candidate open-loop starting schedule, with exact parent/task/time/channel/bounds validation and provenance. No previous physical acceptance is inherited. Read current working_set /control_result_links for sources; candidate /parameters via fields avoids full long JSON.\nFrozen task: tasks/reach_hold_b3_050.json, target [0.29,-0.035,0.19] m, zero initial state, 0.50 s, final [0.45,0.50] s hold, position <=0.010 m, speed <=0.020 m/s, tension [0,8] N, control/sample 0.01 s, physics 0.0005 s. Do not relax task or acceptance. Final evaluation requires 12 cells per segment and 8 N channel bounds. NMPC horizon=10, substeps=1, replan_period_s=0.1, max_iterations<=120 per solve, tolerance=1e-6. At most two independently physically evaluated structures including the reference, each at most one NMPC, one native control optimization analysis and one full independent replay. At most two native optimizations Study-wide, each <=24 evaluation_requests, <=3 iterations, <=4 knots. All native integration, including required prefix reconstruction and other native diagnostics, totals <=60000 steps from raw costs. Extra T2 stencil candidates used only for mathematics do not consume independent physical structure opportunities. Actual unequal control expenditure must be reported; do not attribute it solely to structure.\nUse original Plan to record hypothesis, supporting evidence, expected and weakening observations, fixed conditions, actual budget and stop condition before each scientific action. T2 is optional: read mathematical_capabilities, choose an authorized bounded variable and h, optionally h/2; use generate and current-Study GVS models and validated model groups. Read readiness for original costs (two scales from zero: 14 with linearization preparation or 19 with T1 preparation, plus 2 for a new candidate T1). Preserve stable/flat/unresolved and active constraints; T1/T2 are local GVS diagnostics, not MuJoCo gradients or physical gains. New structures require legal control initialization and their own optimization. Compare model error only for same candidate, state, actual input, signal and sampling time. Small internal residuals do not establish physical model fidelity.\nProvider 48 including Reporter, reserve 4; public operations 96, reserve 6; math total 26; independent physical launches 4; NMPC 2; full replays 2; PPO 0. These are caps, not spending targets. Do not repeat a used same-structure native optimization merely to spend remaining budget. Before repeats read research_history_index and state new information. If improved control is found, independently replay its exact legal source. At the first fresh complete final-fidelity independent task pass, publicly read the full new evaluation and immediately SELECT the exact candidate/control/result with zero extra confirmations, then stop. Otherwise publicly read all_fresh_results and cite all new results in a legal STOP. Unused scientific budgets are not exhausted budgets; failed/nonconverged control and unresolved T2 do not prove infeasibility. Use original settled request-feedback handoff/recovery. No resets, expansions, second Study, new B/C benchmark or B1/B2 work.",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ]
+  },
+  "initial_structure_strategy": "agent_choice",
+  "scoring_window_s": 0.5,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.3,
+      0.45,
+      0.49
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "record_update_ids": [
+    0,
+    44,
+    45,
+    49
+  ],
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "spans.0.radius_m"
+    ]
+  }
+}
+
