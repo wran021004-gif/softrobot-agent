@@ -1,0 +1,131 @@
+{
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08,
+    "baseline_lengths_m": {
+      "segment_0": 0.16,
+      "segment_1": 0.11
+    },
+    "duration_s": 0.35,
+    "period_s": 0.01
+  },
+  "search": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.35
+    ],
+    "knots_s": [
+      0.0,
+      0.05,
+      0.17,
+      0.3
+    ],
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "coefficient_limit_n": 8.0,
+    "difference_step_n": 0.01,
+    "initial_radius_n": 0.5,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.01
+  },
+  "version": "bf2_multidirectional_validation_v1",
+  "tasks": {
+    "zero": "tasks/bf2_multidirectional_hold_frozen_v1_zero.json",
+    "positive": "tasks/bf2_multidirectional_hold_frozen_v1_positive.json",
+    "negative": "tasks/bf2_multidirectional_hold_frozen_v1_negative.json"
+  },
+  "candidate_manifest_identity": "5bf0d1e873def0db44a83dae27db815c61caa9350be2226f7f5e000d18d99892",
+  "initial_tensions_n": [
+    0.2,
+    0.4
+  ],
+  "initialization": {
+    "method": "short_input_response_v1 and constrained_response_step",
+    "calls": 3,
+    "radius_n": 0.5,
+    "horizon_s": 0.05
+  },
+  "stages": [
+    {
+      "id": 1,
+      "search": {
+        "evaluation_requests": 151,
+        "iterations": 8
+      }
+    },
+    {
+      "id": 2,
+      "search": {
+        "evaluation_requests": 301,
+        "iterations": 12
+      }
+    },
+    {
+      "id": 3,
+      "search": {
+        "evaluation_requests": 501,
+        "iterations": 20
+      }
+    }
+  ],
+  "physics_step_attempt_cap": 12000000,
+  "authorization": "User 2026-10-26: both BF0 and BF1/F2 must complete; no approval requests; define ample finite budgets to find feasibility; all integration budgets authorized",
+  "stop": "Fresh starts; stop every independently accepted case immediately; three predeclared bounded stages otherwise; two structures times three conditions times two starts; no task or candidate changes",
+  "provider_requests": 0,
+  "scientific_math_workers": 0,
+  "task_identities": {
+    "zero": "8d440c312a1adcd0958c78a411b52c50b3a503944c1124c573efbf7ee718e99c",
+    "positive": "e874696c22cdfc167581d35ce72d2c23f1d880b7befb3ba947e28d65fa80bccb",
+    "negative": "de65172f6bf615332dc87f254439763cfc092c1638d68ad3a37b771e0bcf3328"
+  },
+  "frozen_sources": {
+    "configs/research/family_space_v1.json": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70",
+    "configs/research/control.json": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f",
+    "configs/research/family_study_defaults.json": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81",
+    "configs/research/study_family_space_dev.json": "cff04d52b2f23cc30a733f8da29915772dcef196f299ba5c1ee7d838b7beb435",
+    "configs/research/runtime.json": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a",
+    "tasks/reach_hold.json": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+  },
+  "development_plan_identity": "b817bcf336d4f5216bf02dc634bdc67584606ac3245fcafb963b8ebfdd37036f",
+  "prephysical_decision_identity": "cd9cde449f4b7f2c029dd3582272f90b8d1391cb2b696cf21aad7b7578a2ab07"
+}

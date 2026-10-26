@@ -1,0 +1,73 @@
+{
+  "contract": "benchmark.same_structure_multi_condition",
+  "version": "1.0.0",
+  "benchmark_id": "bf2-multidirectional-reach-hold-v1",
+  "status": "frozen_candidate_before_independent_validation",
+  "hash_encoding": "sha256_utf8_text_with_universal_newlines",
+  "conditions": [
+    {
+      "condition_id": "zero",
+      "path": "tasks/bf2_multidirectional_hold_frozen_v1_zero.json",
+      "task_id": "bf2-multidirectional-hold-frozen-v1-zero",
+      "task_version": "1.0.0",
+      "sha256": "872c54325655abd46f7074bcf56102ec24dac3f153e8e75c13a7a290abcdbb36"
+    },
+    {
+      "condition_id": "positive",
+      "path": "tasks/bf2_multidirectional_hold_frozen_v1_positive.json",
+      "task_id": "bf2-multidirectional-hold-frozen-v1-positive",
+      "task_version": "1.0.0",
+      "sha256": "8fd0c5f53092ff646b949135d6e4361b9bd69400ce0f070d729eab2f795112c9"
+    },
+    {
+      "condition_id": "negative",
+      "path": "tasks/bf2_multidirectional_hold_frozen_v1_negative.json",
+      "task_id": "bf2-multidirectional-hold-frozen-v1-negative",
+      "task_version": "1.0.0",
+      "sha256": "3152e523e9f5ce65a1aa5f7f5718874efe292afb92a353da90fea0e7250f3581"
+    }
+  ],
+  "structure_binding": {
+    "comparison": "tools.research.config.same_robot_structure",
+    "required_equal": [
+      "robot.family",
+      "robot.structure",
+      "policy.discretization"
+    ],
+    "controls": "independent legal sequences for each condition; no acceptance transfer"
+  },
+  "acceptance": {
+    "per_condition": "playback_tensions -> evaluate_playback -> assemble_acceptance",
+    "protocol_id": "offline_reach_hold_v1",
+    "joint_rule": "all declared conditions independently accepted on the same structure and frozen physical discretization",
+    "missing_invalid_or_incomplete": "unresolved; never accepted",
+    "valid_failure": "joint not accepted; retain every failed component",
+    "execution_api_status": "public Study is single-task; physical_replay receipts lack generic aggregation compatibility"
+  },
+  "family_space": "configs/research/family_space_v1.json",
+  "engineering_defaults": [
+    "configs/research/control.json",
+    "configs/research/family_study_defaults.json"
+  ],
+  "initialization": "constant pretension, registered response-based initialization, or other authorized legal control initialization; charge all probes",
+  "cost": "new Study needs independent authorization and cumulative attempted-integration ledger including initialization, mathematical internal rollouts, failures and independent replay",
+  "cold_start": {
+    "include": [
+      "this manifest",
+      "referenced frozen task files",
+      "legal FamilySpace and executable domain",
+      "registered tool contracts and necessary engineering model/defaults",
+      "own Study evidence"
+    ],
+    "exclude": [
+      "historical B2 research reports and scalar results",
+      "historical research conversations",
+      "private witnesses and drivers",
+      "successful structure mappings and controls",
+      "historical Stores and Provider traces",
+      "BF1/BF2 historical reports, rankings and scalar results",
+      "BF1/BF2 validation plans and private candidate manifests"
+    ],
+    "deployment": "separate checkout with history/files excluded, new Store, new context; no access-control implementation implied"
+  }
+}
