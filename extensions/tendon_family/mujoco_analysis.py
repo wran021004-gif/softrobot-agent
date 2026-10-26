@@ -142,6 +142,11 @@ class NativeModel:
         balance=mass@d.qacc-d.qfrc_smooth-d.qfrc_constraint
         acceleration=jac@d.qacc+jdot@d.qvel;drive=jac@response.T;v=np.asarray(motion['tip_velocity_m_s'])
         speed=float(np.linalg.norm(v))
+        speed_map=v@drive/speed if speed>0 else None
+        speed_rate=float(v@acceleration/speed) if speed>0 else None
+        braking_input=np.where(speed_map>=0,self.limits[:,0],self.limits[:,1]) if speed>0 else None
+        speed_range=None if speed==0 else [float(speed_rate+np.sum(np.minimum(speed_map*(self.limits[:,0]-u),speed_map*(self.limits[:,1]-u)))),
+            float(speed_rate+np.sum(np.maximum(speed_map*(self.limits[:,0]-u),speed_map*(self.limits[:,1]-u))))]
         return dict(**motion,mass_matrix_kg_m2=mass[np.ix_(self.vi,self.vi)].tolist(),qacc_rad_s2=d.qacc[self.vi].tolist(),
             qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist(),
             coordinates=dict(dof_order=self.order,tendon_order=self.tendons,tip_frame='world',
@@ -163,8 +168,10 @@ class NativeModel:
             tip_acceleration_input_map_m_s2_n=drive.tolist(),
             passive_tip_acceleration_contribution_m_s2=(jac@passive[0]).tolist(),
             function_metrics=dict(drive_singular_values_m_s2_n=np.linalg.svd(drive,compute_uv=False).tolist(),
-                speed_derivative_m_s2=float(v@acceleration/speed) if speed>0 else None,
-                speed_derivative_input_map_m_s2_n=(v@drive/speed).tolist() if speed>0 else None),
+                speed_derivative_m_s2=speed_rate,
+                speed_derivative_input_map_m_s2_n=speed_map.tolist() if speed>0 else None,
+                instantaneous_speed_derivative_range_m_s2=speed_range,
+                minimum_speed_derivative_tensions_n=braking_input.tolist() if speed>0 else None),
             mass_balance_residual_inf_nm=float(np.max(abs(balance))),
             actuator_map_residual_inf_nm=float(np.max(abs(mapping@u-d.qfrc_actuator))),
             mass_condition_number=float(np.linalg.cond(mass)),actual_tensions_n=(-d.actuator_force[self.aids]).tolist(),
@@ -185,7 +192,7 @@ class NativeModel:
         self.forward(d);motion,_=self.motion(d)
         return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
 
-    def rollout_sequence(self, start, times, tensions):
+    def rollout_sequence(self, start, times, tensions, *, capture_speed_after_s=None):
         """Clone one integration state; sample its origin and every interval end."""
         times=np.asarray(times,dtype=float);tensions=np.asarray(tensions,dtype=float)
         steps=np.rint(np.diff(times)/self.model.opt.timestep).astype(int)
@@ -195,6 +202,13 @@ class NativeModel:
             raise ValueError('NATIVE_ALIGNED_SEQUENCE_REQUIRED')
         d=mujoco.MjData(self.model);mujoco.mj_copyData(d,self.model,start)
         self.forward(d);samples=[self.motion(d)[0]];actual=[]
+        peak=None;peak_speed=-1.
+        def retain_peak():
+            nonlocal peak,peak_speed
+            if capture_speed_after_s is not None and d.time>=capture_speed_after_s-1e-12:
+                speed=float(np.linalg.norm(samples[-1]['tip_velocity_m_s']))
+                if speed>peak_speed:peak=self.checkpoint(d);peak_speed=speed
+        retain_peak()
         self.cost['rollouts']+=1
         for count,u in zip(steps,tensions):
             actual.append(self.apply(d,u).tolist())
@@ -203,9 +217,12 @@ class NativeModel:
                 self.check_supported(d,previous)
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SEQUENCE_NUMERICAL_FAILURE')
             self.forward(d);samples.append(self.motion(d)[0])
-        return dict(times_s=[s['time_s'] for s in samples],
+            retain_peak()
+        result=dict(times_s=[s['time_s'] for s in samples],
             tip_positions_m=[s['tip_position_m'] for s in samples],
             tip_velocities_m_s=[s['tip_velocity_m_s'] for s in samples],actual_tensions_n=actual)
+        if peak is not None:result['peak_speed_state']=peak
+        return result
 
 
 def input_response(native, start, u, options):

@@ -218,18 +218,32 @@ class NonlinearResponseDirection(Contract):
     coordinates: list[FiniteFloat] = Field(default_factory=list)
     comparison_variables: list[str] = Field(default_factory=list)
     t1_results: list[EvidenceRef] = Field(min_length=2,max_length=8)
+    validation_coordinates: list[FiniteFloat] = Field(default_factory=list,max_length=4,
+        description='Held-out legal path coordinates, excluded from the symmetric fitted stencil.')
+    validation_t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=4)
 
     @model_validator(mode='after')
     def direction(self):
+        if (len(self.validation_coordinates)!=len(self.validation_t1_results) or
+                any(c in self.coordinates for c in self.validation_coordinates) or
+                any(r in self.t1_results for r in self.validation_t1_results)):
+            raise ValueError('INDEPENDENT_HELD_OUT_COORDINATES_AND_RESULTS_REQUIRED')
         if self.mode=='continuous':
             if (not self.variables or any(v==0 for v in self.variables.values()) or not self.coordinate_unit
                     or self.comparison_variables or len(self.t1_results)!=3 or len(self.coordinates)!=3
                     or self.coordinates[0]!=0 or not self.coordinates[1]<0<self.coordinates[2]
                     or self.coordinates[1]!=-self.coordinates[2]):
                 raise ValueError('EXPLICIT_SYMMETRIC_ONE_DIMENSIONAL_DIRECTION_REQUIRED')
-        elif self.variables or self.coordinates or self.coordinate_unit or not self.comparison_variables:
+        elif self.variables or self.coordinates or self.coordinate_unit or not self.comparison_variables or self.validation_t1_results:
             raise ValueError('FINITE_COMPARISON_HAS_VARIABLES_AND_NO_DERIVATIVE_COORDINATE')
         return self
+
+    @model_serializer(mode='wrap')
+    def unchanged_without_validation(self,handler):
+        value=handler(self)
+        if not self.validation_t1_results:
+            value.pop('validation_coordinates',None);value.pop('validation_t1_results',None)
+        return value
 
 
 class NonlinearStructureResponse(Contract):

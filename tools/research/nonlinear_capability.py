@@ -103,10 +103,17 @@ def saved_context(host, query):
         row=dict(reference=reference,candidate=raw['candidate'],candidate_record=c,configuration=cfg,
             original_charges={k:raw.get(k) for k in ('charged_analysis_evaluations','charged_numerical_s','operation_key')},
             t1=raw['nonlinear_capability'],protocol=raw['protocol'],input=tr,initial_state=point,cost=native['cost'])
+        if native.get('optimization',{}).get('candidates'):
+            from tools.research.task_constraints import describe_analysis_requirements
+            requirements=describe_analysis_requirements(cfg,{})
+            search=native['optimization']
+            row['task_samples']={scope:sampled_constraints(source['outputs'],requirements) for scope,source in
+                [('fixed_control',search['candidates'][0]),('reoptimized_control',search['best'])]}
         cache[key]=row
         return row
     def admit(direction):
-        rows=[dict(load(ref)) for ref in direction.t1_results]
+        validation_refs=getattr(direction,'validation_t1_results',[])
+        rows=[dict(load(ref)) for ref in [*direction.t1_results,*validation_refs]]
         if rows[0]['candidate']!=plain(query.candidate):raise ValueError('BASELINE_T1_CANDIDATE_REQUIRED')
         paths=direction.variables if direction.mode=='continuous' else direction.comparison_variables
         parameters={}
@@ -122,7 +129,7 @@ def saved_context(host, query):
                 row['parameters']=params
             row['parameter_values']=values
         base=rows[0];a=base['configuration']
-        coordinates=direction.coordinates
+        coordinates=None if direction.coordinates is None else [*direction.coordinates,*getattr(direction,'validation_coordinates',[])]
         if direction.mode=='continuous' and legacy:
             path=next(iter(paths));coordinates=[r['parameter_values'][path]-base['parameter_values'][path] for r in rows]
             if request.unit!=parameters[path]['units']:raise ValueError('PARAMETER_UNIT_MISMATCH')
@@ -180,7 +187,7 @@ def saved_context(host, query):
         independent=len(paths)==1 and next(iter(direction.variables.values()))==1. and direction.coordinate_unit==next(iter(parameters.values()))['units']
         if legacy:
             for row in rows:row['value']=next(iter(row['parameter_values'].values()))
-        return dict(rows=rows,parameter=next(iter(parameters.values())) if legacy else dict(units=direction.coordinate_unit),
+        return dict(rows=rows[:3],validation_rows=rows[3:],parameter=next(iter(parameters.values())) if legacy else dict(units=direction.coordinate_unit),
             parameters=parameters,direction_id=direction.direction_id,mode='continuous',
             derivative_scope='independent_parameter_secant' if independent else 'coupled_path_secant' if len(paths)>1 else 'scaled_path_secant',
             coefficients=dict(direction.variables),coordinate_unit=direction.coordinate_unit)
@@ -293,7 +300,136 @@ def comparison_summary(result):
             evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',change_significance='unresolved_without_error_bound',
             followup_hypothesis='Recheck the observed lower J with an independent control initialization' if lower else 'Check another legal step or initialization',
             detail_pointer='/nonlinear_response/directions/'+str(i) if 'directions' in result else '/nonlinear_response'))
+        if d.get('task_sensitivity'):
+            rows[-1]['task_sensitivity']={k:dict(status=v['status'],reasons=v.get('reasons',[]),
+                maximum_validation_error_over_threshold=max((r['maximum_error_over_threshold'] for r in v.get('validation',[])),default=None),
+                active_switches=v.get('active_switches',[])) for k,v in d['task_sensitivity'].items()}
     return rows
+
+
+def sampled_constraints(outputs, requirements):
+    """Original adapter constraints at every original sample, normalized by its limit."""
+    from tools.research.native_analysis import task_proxy
+    limits={c.constraint_id:c.radius for c in requirements.constraints}
+    rows=[]
+    for t,p,v in zip(outputs['times_s'],outputs['tip_positions_m'],outputs['tip_velocities_m_s']):
+        for row in task_proxy(requirements,dict(time_s=t,tip_position_m=p,tip_velocity_m_s=v)):
+            limit=limits[row['constraint_id']]
+            rows.append({k:row[k] for k in ('constraint_id','sample_index','time_s','value','units')} |
+                dict(limit=limit,normalized_signed_excess=-min(row['margins'])/limit))
+    return rows
+
+
+def active_samples(samples):
+    active={}
+    for row in samples:
+        key=row['constraint_id']
+        if key not in active or row['normalized_signed_excess']>active[key]['normalized_signed_excess']:
+            active[key]=row
+    worst=max(samples,key=lambda r:r['normalized_signed_excess'])
+    return dict(per_constraint={k:r['sample_index'] for k,r in active.items()},
+        worst=[worst['constraint_id'],worst['sample_index']])
+
+
+def validate_prediction(base, derivative, coordinate, actual):
+    """Empirical held-out error, never a bound; retain physical units per sample."""
+    zero=np.array([r['normalized_signed_excess'] for r in base]);truth=np.array([r['normalized_signed_excess'] for r in actual])
+    predicted=zero+coordinate*np.asarray(derivative);change=truth-zero;expected=predicted-zero;error=predicted-truth
+    material=np.maximum(abs(change),abs(expected))>1e-8
+    correct=(change*expected>0) | ~material
+    comparable=abs(error)<np.maximum(abs(change),1e-8)
+    status='validated_local_prediction' if np.all(correct & comparable) and np.any(material) else 'unresolved'
+    return dict(coordinate=coordinate,status=status,direction_correct=bool(np.all(correct)),
+        maximum_error_over_threshold=float(max(abs(error))),
+        maximum_error_over_actual_change=float(max(abs(error)/np.maximum(abs(change),1e-8))),
+        predicted_J=float(max(predicted)),actual_J=float(max(truth)),J_error=float(max(predicted)-max(truth)),
+        active_prediction=active_samples([dict(r,normalized_signed_excess=float(y)) for r,y in zip(base,predicted)]),
+        active_actual=active_samples(actual),
+        samples=[dict(constraint_id=r['constraint_id'],sample_index=r['sample_index'],time_s=r['time_s'],units=r['units'],
+            predicted_change=float(dp*r['limit']),actual_change=float(da*r['limit']),
+            error=float(e*r['limit']),error_over_threshold=float(e),direction_correct=bool(ok))
+            for r,dp,da,e,ok in zip(base,expected,change,error,correct)])
+
+
+def task_sensitivities(context):
+    rows=context['rows'];h=rows[2]['value']-rows[0]['value'];result={}
+    if any(not r.get('task_samples') for r in rows):return {}
+    # A coupled path is normalized by its feasible coordinate interval, not mixed units.
+    lower=[];upper=[]
+    for path,coefficient in context.get('coefficients',{}).items():
+        p=context['parameters'][path];origin=rows[0]['parameter_values'][path]
+        if p.get('minimum') is not None and p.get('maximum') is not None:
+            ends=sorted([(p['minimum']-origin)/coefficient,(p['maximum']-origin)/coefficient])
+            lower.append(ends[0]);upper.append(ends[1])
+    span=min(upper)-max(lower) if upper else None
+    for scope in ('fixed_control','reoptimized_control'):
+        samples=[r['task_samples'][scope] for r in rows]
+        keys=lambda ss:[(r['constraint_id'],r['sample_index']) for r in ss]
+        if not samples[0] or any(keys(s)!=keys(samples[0]) for s in samples[1:]):continue
+        y=np.array([[r['normalized_signed_excess'] for r in s] for s in samples])
+        left=(y[0]-y[1])/h;right=(y[2]-y[0])/h;central=(y[2]-y[1])/(2*h)
+        active=[active_samples(s) for s in samples]
+        switches=[k for k in active[0]['per_constraint'] if len({a['per_constraint'][k] for a in active})>1]
+        if any(a['worst']!=active[0]['worst'] for a in active[1:]):switches.append('signed_J')
+        reasons=['ACTIVE_CONSTRAINT_OR_TIME_SWITCH'] if switches else []
+        if np.any(left*right<0):reasons.append('OPPOSING_ONE_SIDED_RESPONSES')
+        validation=[]
+        for row in context.get('validation_rows',[]):
+            actual=row.get('task_samples',{}).get(scope)
+            if actual and keys(actual)==keys(samples[0]):
+                check=validate_prediction(samples[0],central,row['value']-rows[0]['value'],actual)
+                check['reference']=row['reference'];validation.append(check)
+                if check['status']=='unresolved':reasons.append('HELD_OUT_PREDICTION_FAILED_OR_TOO_SMALL')
+                if check['active_actual']!=active[0]:reasons.append('HELD_OUT_ACTIVE_CONSTRAINT_OR_TIME_SWITCH')
+        if scope=='reoptimized_control':
+            reasons.append('FINITE_BUDGET_CONTROL_OPTIMALITY_UNRESOLVED')
+        result[scope]=dict(status='unresolved' if reasons else 'validated_local_prediction' if validation else 'local_estimate_unvalidated',
+            reasons=sorted(set(reasons)),coordinate_unit=context['parameter']['units'],step=h,
+            samples=samples[0],finite_difference_per_unit=central.tolist(),
+            left_per_unit=left.tolist(),right_per_unit=right.tolist(),legal_coordinate_span=span,
+            dimensionless_sensitivity=None if span is None else (central*span).tolist(),
+            active_samples=active,active_switches=switches,validation=validation,
+            source_results=[r['reference'] for r in rows],
+            interpretation='Sampled normalized constraint secants. No ordinary max gradient at active switches; no strict error bound.')
+    return result
+
+
+def control_sensitivities(search, requirements):
+    """Reuse the actual local_control_search probes without extra integration."""
+    indexed={r['reference']:r for r in search['candidates']};responses=[]
+    for probe in search['candidates']:
+        if probe['label']!='finite_difference':continue
+        base=indexed[probe['prediction_base']]
+        delta=np.asarray(probe['coefficients_n'])-base['coefficients_n'];selected=np.flatnonzero(delta)
+        if len(selected)!=1:continue
+        j=int(selected[0]);a=sampled_constraints(base['outputs'],requirements);b=sampled_constraints(probe['outputs'],requirements)
+        derivative=[(v['normalized_signed_excess']-u['normalized_signed_excess'])/delta[j] for u,v in zip(a,b)]
+        responses.append(dict(coefficient_index=j,delta_n=float(delta[j]),samples=a,finite_difference_per_n=derivative,
+            scheme=probe.get('derivative_scope','one-sided control response'),projected=probe.get('projected_response'),
+            baseline_rollout=base['reference'],probe_rollout=probe['reference'],
+            active_baseline=active_samples(a),active_probe=active_samples(b),status='local_estimate_unvalidated'))
+    return dict(parameterization='original local_control_search knot-major absolute-tension offsets',responses=responses,
+        new_physics_steps=0,scope='Full frozen control intervals; no single-physics-step Jacobian substitution.')
+
+
+def compare_scales(results):
+    for i,direction in enumerate(results):
+        peers=[other for j,other in enumerate(results) if i!=j and direction.get('coefficients') and
+            direction.get('coefficients')==other.get('coefficients') and direction.get('step')!=other.get('step')]
+        for scope,value in direction.get('task_sensitivity',{}).items():
+            comparisons=[]
+            for peer in peers:
+                other=peer.get('task_sensitivity',{}).get(scope)
+                if not other or value['samples']!=other['samples']:continue
+                a=np.asarray(value['finite_difference_per_unit']);b=np.asarray(other['finite_difference_per_unit'])
+                relative=float(np.max(abs(a-b))/max(float(np.max(abs(b))),1e-15))
+                agrees=not bool(np.any((a*b<0)&(np.maximum(abs(a),abs(b))*min(value['step'],other['step'])>1e-8)))
+                comparisons.append(dict(direction_id=peer['direction_id'],relative_difference=relative,direction_agrees=agrees))
+                if relative>.05 or not agrees:
+                    value['status']='unresolved';value['reasons'].append('TWO_SCALE_DISAGREEMENT')
+            value['scale_comparisons']=comparisons
+            if not comparisons and value['status']=='validated_local_prediction':
+                value['status']='unresolved';value['reasons'].append('SECOND_SCALE_NOT_AVAILABLE')
 
 
 def response(context):
@@ -301,8 +437,9 @@ def response(context):
     started=time.perf_counter()
     if context.get('directions') is not None:
         results=[response(c) for c in context['directions']]
+        compare_scales(results)
         costs={r['reference']['artifact_id']:dict(reference=r['reference'],cost=r.get('cost',{}))
-            for c in context['directions'] for r in c.get('rows',[])}
+            for c in context['directions'] for r in [*c.get('rows',[]),*c.get('validation_rows',[])]}
         out=dict(method=T2,version='nonlinear_response_v2',status='computed_diagnostic' if any(r['status']=='computed_diagnostic' for r in results) else 'not_comparable',
             direction_status='unresolved',baseline=context['baseline'],directions=results,task_acceptance='unmeasured',limitations=LIMITATIONS,
             cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,reused_t1_results=len(costs),kernel_wall_s=time.perf_counter()-started),
@@ -326,6 +463,7 @@ def response(context):
     if context.get('not_comparable'):out['reasons']=[context['not_comparable']]
     else:
         rows=context['rows'];base,minus,plus=rows;h=base['value']-minus['value']
+        out['task_sensitivity']=task_sensitivities(context)
         summaries=[r['t1'] for r in rows];reasons=[]
         numeric=all(math.isfinite(t[k]) for t in summaries for k in ('J','initial_J'))
         searched=all(t['callbacks']>1 and t['iterations_started']>0 for t in summaries)
@@ -369,9 +507,10 @@ def response(context):
     for key in ('direction_id','parameters','derivative_scope','coefficients','coordinate_unit'):
         if key in context:out[key]=context[key]
     out['cost']=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,
-        reused_t1_results=0 if context.get('not_comparable') else 3,kernel_wall_s=time.perf_counter()-started)
+        reused_t1_results=0 if context.get('not_comparable') else 3+len(context.get('validation_rows',[])),kernel_wall_s=time.perf_counter()-started)
     out['referenced_t1_costs']=[dict(reference=r['reference'],cost=r.get('cost',{}),
-        accounting='Previously charged T1 computation; referenced, not charged again by T2') for r in context.get('rows',[])]
+        accounting='Previously charged T1 computation; referenced, not charged again by T2') for r in
+        [*context.get('rows',[]),*context.get('validation_rows',[])]]
     out['comparison_summary']=comparison_summary(out)
     return out
 

@@ -178,6 +178,7 @@ def mathematical_method_view(host, reference):
             item['execution_status']='conditional_on_admission' if item['executable'] else 'blocked'
             item['estimated_evaluations']=1
             item['required_parameters']=['nonlinear_response v1: {variable,unit,t1_results} OR v2: {version,directions}; read analysis_request_schema']
+            item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,

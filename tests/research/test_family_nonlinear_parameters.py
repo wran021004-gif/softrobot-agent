@@ -311,7 +311,7 @@ class FamilyNonlinearTests(unittest.TestCase):
             limits=np.tile([0.,8.],(3,1))
             def __init__(self,cfg):self.cost=dict(model_builds=1,rollouts=0,physics_steps=0)
             def reconstruct(self,point):return point,object()
-            def rollout_sequence(self,*args):
+            def rollout_sequence(self,*args,**kwargs):
                 self.cost.update(rollouts=1,physics_steps=17)
                 raise ValueError('EXPLICIT_SYNTHETIC_PARTIAL_CALLBACK_FAILURE')
         settings=LocalControlSearchSettings(version='local_control_search_v2',knots_s=[0.,.34],correction_window_s=[0.,.35],

@@ -287,6 +287,11 @@ def nonlinear_summary(value,reference=None):
             'stop_reason','callbacks','physics_steps','response_steps_completed')}
         result['nonlinear_capability'].update(worst_constraint=t.get('best_metrics',{}).get('worst_constraint'),
             evidence_level='finite_budget_observation',detail_query=query('/nonlinear_capability'))
+        controls=value.get('native_dynamics',{}).get('control_task_sensitivity')
+        if controls:
+            result['nonlinear_capability']['control_sensitivity']=dict(
+                coefficients=[r['coefficient_index'] for r in controls['responses']],status='local_estimate_unvalidated',
+                detail_query=query('/native_dynamics/control_task_sensitivity'),new_physics_steps=0)
     if value.get('nonlinear_response'):
         t=value['nonlinear_response'];matrix=t.get('comparison_summary',[])
         baseline=next((d.get('observations',[None])[0] for d in t.get('directions',[t]) if d.get('observations')),None)

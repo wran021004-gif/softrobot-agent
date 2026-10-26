@@ -48,3 +48,14 @@ A3 已有 mj_fullM、mj_solveM、mj_jacSite、mj_jacDot、bias/passive/actuator�
 逆对角、张力边界与逐通道饱和、驱动力映射一致性残差，以及逐物理步接触限制诊断。
 原矩阵留在 `/native_dynamics/mechanics`；简要解释通过原 native_analysis 交付。
 内部一致性不证明硬件准确性或未来轨迹预测正确。
+
+## A4.2 实现
+
+原 T1 保留基线保持速度峰值的完整 native checkpoint，未为此增加积分。
+原控制搜索的已有 FD callbacks 产生逐采样约束对控制系数的响应，不新增搜索器。
+T2 继续仅聚合已拥有的 T1，增加逐采样约束割线、合法区间无量纲化、活跃时刻切换、
+两尺度对照和独立留出预测。V2 direction 的可选 validation_coordinates /
+validation_t1_results 是唯一请求扩展；未使用时原请求序列化不变。
+所有固定控制与重优化结果分别报告；有限优化上限不建立 V_tau(d) 或最优梯度。
+fixed_input_structure_v1 额外保留广义力、qacc、末端与腱 Jacobian 的原单位差分数组。
+原生瞬时速度导数张力盒范围只描述当前工作点，不替代完整任务响应。

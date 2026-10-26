@@ -196,9 +196,14 @@ def calculate(configuration, binding, query, point, requirements, comparisons, *
         for i,row in enumerate(raw['structure_responses']):
             row['task_proxy']=task_proxy(requirements,row['terminal']);changes={}
             for key in ('mass_matrix_kg_m2','tip_acceleration_input_map_m_s2_n','passive_tip_acceleration_contribution_m_s2',
-                    'tip_acceleration_m_s2','tendon_lengths_m','input_force_map_nm_n'):
+                    'tip_acceleration_m_s2','tendon_lengths_m','input_force_map_nm_n','qacc_rad_s2',
+                    'tip_jacobian_m_rad','tendon_jacobian_m_rad'):
                 a=np.asarray(row['mechanics'][key]);b=np.asarray(base['mechanics'][key])
-                changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)))
+                changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)),
+                    finite_difference_per_parameter=((a-b)/row['delta']).tolist())
+            changes['generalized_forces_nm']={key:dict(delta=(np.asarray(force)-base['mechanics']['generalized_forces_nm'][key]).tolist(),
+                finite_difference_per_parameter=((np.asarray(force)-base['mechanics']['generalized_forces_nm'][key])/row['delta']).tolist())
+                for key,force in row['mechanics']['generalized_forces_nm'].items()}
             for key in base['mechanics']['components']:
                 a=np.asarray(row['mechanics']['components'][key]);b=np.asarray(base['mechanics']['components'][key])
                 changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)))
