@@ -64,11 +64,20 @@ R0 实际 Provider、真实数学、MuJoCo 步进、NMPC、PPO 全为 **0**。
 详细错误记录及优先级见 [Agent 错误修复计划](b3_r1_agent_error_repair_plan.md)：
 36 条原错误中 1 条是监督暂停门禁，35 条是 Agent 请求被拒，另有 3 条 SDK/钩子失败；
 不把全部问题归责模型。
-新增计划尚未实施，已完成的三个交付修复另有提交和实际 wire 证明。
+后续计划已区分已实施与待修项，前三个交付修复另有提交和实际 wire 证明。
 追加段沿原 completed-invocation Handoff 保留旧 SDK/Store，恢复关闭阶段移除的合法工具；
 两个定向测试通过（5.566 s），新增中断恢复单项通过（3.336 s），均显式 mock HTTP。
 重开需要具体人工授权，不放宽普通 STOP 的封存规则。新原始授权与状态快照会写入原 Store，
 不建立新 Study、不重置累计账本，科学 profile 保持原版。
+追加段实际恢复到 `3b5d68bd8`、resolved_identity
+`023ff511358affa9f4cbcdf118b742a01f5e60ecea7c4916108e97ab0cd9df52`，
+原 STOP 状态已作为 `3ec99043dd08a2f5c198e92b53c3fef308c0159bf6413896aa93ca8cf48faf21`
+保存在原 Store；追加授权为 `450679a6abd1bb18bda17d1a9209b5e30cef730d70cf582e5c0e602f71b3588d`。
+在累计 Provider 103、公开操作 200 时再次暂停下一次发送，修复真实重现的派生视图 fields
+组合缺口。现在同一 EvidenceQuery 保持 working_set / mathematical_capabilities 后可选
+对象字段；错用 raw fields 时返回视图错误和实际可读查询，不存在字段明确列出。
+真实 `/control_result_links/3` 绑定查询投影为 459 bytes，零新增 Provider/数学/物理费用，
+见 [derived_fields_repair.json](../../evidence/b3_r1_history_assisted_050/derived_fields_repair.json)。
 
 以下初始预检快照保留原时间语义。用户随后在聊天明确批准 DeepSeek 地址/载荷及公开 GitHub
 分支披露；`7922de156` 已推送，唯一 R1 已真实运行。中断前累计 Provider 39/48、公开操作

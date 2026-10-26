@@ -530,7 +530,7 @@ class EvidenceQuery(Contract):
     reference: EvidenceRef
     pointer: str = Field(default='',description='Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.')
     view: Literal['full','summary','fields','range','capabilities','mathematical_capabilities','working_set'] = 'full'
-    fields: list[str] = Field(default_factory=list, max_length=32,description='For view=fields, immediate child keys at pointer, not dotted paths. Read candidate /parameters or working_set /control_result_links and /research_history_index instead of full long JSON.')
+    fields: list[str] = Field(default_factory=list, max_length=32,description='Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.')
     start: int = Field(default=0, ge=0, strict=True)
     count: int = Field(default=20, ge=1, le=100, strict=True)
 

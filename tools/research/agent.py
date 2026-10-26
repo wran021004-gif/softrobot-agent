@@ -375,8 +375,12 @@ def error_feedback(host, use, exc, before):
                     value=value[int(key)] if isinstance(value,list) else value[key];parent+='/'+part
                 if isinstance(value,dict):expected='Available children at '+(parent or '/')+': '+', '.join(value)
                 elif isinstance(value,list):expected='List at '+(parent or '/')+' has '+str(len(value))+' items; use view=range or an index from 0 through '+str(len(value)-1)
-                if use['input'].get('view')=='fields':field='fields'
+                if use['input'].get('fields'):field='fields'
             except (ValueError,KeyError,IndexError,TypeError):pass
+        derived=getattr(exc,'evidence_navigation',{}).get('derived_view_query')
+        if derived:
+            code='EVIDENCE_VIEW_MISMATCH';field='view'
+            expected='Use this exact derived-view query: '+json.dumps(derived,separators=(',',':'))
     if code=='RESEARCH_INTENT_ACTION_MISMATCH':field='decision.research_intent'
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'

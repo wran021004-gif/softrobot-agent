@@ -1,7 +1,7 @@
 # R1 Agent 错误记录与后续修复计划
 
 2026-10-26，唯一 Study `b3-r1-history-assisted-050`。本计划基于原 Store 事件，
-不把失败请求、只读诊断或历史阅读算成新科学计算。后续项目尚未实施。
+不把失败请求、只读诊断或历史阅读算成新科学计算。下文分别标注已实施与待修部分。
 
 ## 取证快照
 
@@ -45,6 +45,11 @@ research_analysis **2** 次、research_investigate **1** 次。156 次 evidence_
    原 8 KB 以上方法反馈现能保留 2,849 bytes 的执行字段；Agent 已实际读取精确路径。
 3. `a29f37134`：原唯一意图映射直接返回动作所需字段/值；定向回归通过。
    之后出现成功的 DIAGNOSE Plan，说明该拒绝关口确已通过。
+4. 追加段的派生查询修复：原 EvidenceQuery.fields 现在可与 working_set / mathematical_capabilities
+   同用，保留其视图再选对象字段。raw 派生路径误用返回 EVIDENCE_VIEW_MISMATCH 和经原
+   read_evidence 验证的完整查询；不存在的字段单独列出。真实原请求的合法结果仅 **459 bytes**。
+   三项定向回归通过（16.493 s）；补充验证提示查询缺键的单项通过（22.671 s）。原 raw
+   读取/读取信用规则不变。证据见 [derived_fields_repair.json](../../evidence/b3_r1_history_assisted_050/derived_fields_repair.json)。
 
 这些修复后仍有重复读取和错误路径。已通过的 diagnose 只做只读诊断，
 不是执行 selected_method 文本中的 native 优化；其 numerical_evidence 为空。
@@ -59,7 +64,7 @@ research_analysis **2** 次、research_investigate **1** 次。156 次 evidence_
 |---|---|---|---|
 | P0 | `evidence_policy.py`、`agent.py` 的现有 Plan Schema | 将 action→research_intent 的唯一映射提取为现有模块常量，Schema 依动作收窄允许意图，错误反馈继续引用同一映射 | 对 execute/initialize_control/diagnose/replay/select/stop 的真实 Schema 验证；错误组合在提交前可见，原运行时校验仍拒绝 |
 | P0 | `research_context.py`、`task_constraints.py` 的原方法投影 | 从当前 control_initializations 显示当前候选已有的可用绑定源、来源状态与精确小查询；显示已初始化状态，避免只给“可初始化”入口。来源列表由原 Store 派生，保留未测状态 | 在同会话和 Handoff 完整 wire 中识别 e76d3b34… 与候选 e85fc8e3…；无需读 44,522 bytes 的整个 control_result_links；不复制张力数组、不自动选源 |
-| P0 | `core.py` read_evidence、原 evidence 导航投影 | 明确 raw 对象和 retrieval wrapper 的引用边界；提供可直接使用的 reference+view+pointer 查询。对 raw/full 使用派生路径、对对象使用 range、对 fields 缺键，返回精确的父节点与合法查询 | 使用本 Study 的 `/control_result_links`、4ea52762… 原诊断及 b29073a3… wrapper 做零计算回放；每条建议查询在其声明视图上真实可读，不能混搭引用/路径 |
+| P0 | `core.py` read_evidence、原 evidence 导航投影 | **派生字段与视图纠错部分已实施**。仍需强化 raw 对象和 retrieval wrapper 的引用边界、对象 range 导航；保留 reference+view+pointer 的完整查询 | 使用本 Study 的 `/control_result_links`、4ea52762… 原诊断及 b29073a3… wrapper 做零计算回放；每条建议查询在其声明视图上真实可读，不能混搭引用/路径 |
 | P1 | `diagnostic.py`、`agent.py` 的原工具描述与反馈 | 只读 diagnose 明确报告未发起所选数学方法、实际新增计算数为 0，并链接原数学模板；计划、诊断、analysis 执行分别陈述结果 | 成功 diagnose 后明确 numerical_evidence=[]、无 native cost、数学计费不变；不凭 selected_method 字符串隐式派发实验 |
 | P1 | `research_context.py` 的原 read_coverage 投影 | 使用已有 delivery_identity/source_state_identity 显示“相同内容已交付”及精确小查询；把当前已知来源 metadata 放到原短包所需位置 | 完全相同请求且同状态/内容时可识别；动态视图变化、公开完整读取、重复性验证均正常，不封锁合法读取、不绕过读信用 |
 | P1 | 原 STOP/报告事实投影 | 将剩余额度和物理 measured_failure/控制源 unmeasured 分别引用其权威字段；区分请求拒绝与优化器已运行但未找到解 | 首段 replay=0/2 不再被描述为用尽；两次物理失败不写成未测；原 Agent 文本和失败保持可读 |

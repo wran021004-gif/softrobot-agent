@@ -29,6 +29,33 @@ def fixture_host(arm):
 
 
 class B3T2Tests(unittest.TestCase):
+    def test_derived_field_queries_and_view_mismatch_use_real_archived_nodes(self):
+        from tools.research.agent import error_feedback
+        archive=C3Archive(ROOT/'evidence/b3_t2_pilot_050_c/immutable_artifacts.tar.gz')
+        self.addCleanup(archive.archive.close)
+        host,current=archive.host();current['research_status']='ready';current['count_closeout']=False
+        host.store.remaining.return_value['remaining'].update(model_calls=50,tool_calls=50)
+        anchor=current['family_space_reference']
+        rows=core.read_evidence(host,dict(reference=anchor,view='working_set',pointer='/control_result_links'),record_read=False)
+        index=next(i for i,row in enumerate(rows) if row.get('source'))
+        fields=[k for k in ('candidate','source','source_kind','grid') if k in rows[index]]
+        wrong=dict(reference=anchor,view='fields',pointer='/control_result_links/'+str(index),fields=[*fields,'not_a_field'])
+        with patch('tools.research.agent.record',return_value=anchor):
+            try:core.read_evidence(host,wrong,record_read=False)
+            except KeyError as exc:
+                feedback=error_feedback(host,dict(name='evidence_read',input=wrong),exc,current)
+        self.assertEqual(feedback['error_code'],'EVIDENCE_VIEW_MISMATCH')
+        self.assertEqual(feedback['field'],'view')
+        corrected=feedback['evidence_navigation']['derived_view_query']
+        self.assertEqual(corrected,{**wrong,'view':'working_set','fields':fields})
+        self.assertEqual(feedback['evidence_navigation']['unavailable_fields'],['not_a_field'])
+        self.assertEqual(core.read_evidence(host,corrected,record_read=False),{k:rows[index][k] for k in fields})
+        candidate=rows[index]['candidate']
+        query=dict(reference=candidate,view='mathematical_capabilities',pointer='/methods/mujoco_direct_control_v1')
+        original=core.read_evidence(host,query,record_read=False)
+        projected=core.read_evidence(host,{**query,'fields':['request_template','execution_limits']},record_read=False)
+        self.assertEqual(projected,{k:original[k] for k in ('request_template','execution_limits')})
+
     def test_r0_archived_m2_complete_wire_and_handoff(self):
         import httpx
         from openai import AsyncOpenAI

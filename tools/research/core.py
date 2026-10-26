@@ -81,8 +81,20 @@ def read_evidence(host, query, *, record_read=True):
             list_length=len(node) if isinstance(node,list) else None,
             parent_query=dict(reference=plain(q.reference),view=q.view if q.view in ('working_set','mathematical_capabilities') else 'summary',pointer=path),
             data_access=data_access(host,plain(q.reference),root_value))
-        if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility'):
-            details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
+        if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','method_requirements','all_fresh_results','research_history_index','action_trace'):
+            proposed=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
+            try:
+                projected=read_evidence(host,proposed,record_read=False)
+            except (KeyError,IndexError) as issue:
+                proposed=issue.evidence_navigation['parent_query'];projected=None
+            except ValueError:
+                proposed=None;projected=None
+            if proposed:
+                if q.view=='fields' and q.fields and isinstance(projected,dict):
+                    proposed['fields']=[key for key in q.fields if key in projected]
+                    details['unavailable_fields']=[key for key in q.fields if key not in projected]
+                    details['derived_available_fields']=list(projected)
+                details['derived_view_query']=proposed
         if q.view=='fields' and not q.pointer:
             derived=next((k for k in q.fields if k in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','eligible_methods','read_coverage')),None)
             if derived:details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer='/'+derived)
@@ -110,7 +122,7 @@ def read_evidence(host, query, *, record_read=True):
         value=compact_evidence(value,plain(q.reference),q.pointer)
         from tools.research.evidence_views import data_access
         value['data_access']=data_access(host,plain(q.reference),root_value)
-    elif q.view=='fields':
+    elif q.view=='fields' or (q.view in ('working_set','mathematical_capabilities') and q.fields):
         if not isinstance(value,dict):raise ValueError('EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER')
         missing=[key for key in q.fields if key not in value]
         if missing:raise navigation(KeyError(missing[0]),value,q.pointer)
