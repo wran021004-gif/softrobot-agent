@@ -252,9 +252,13 @@ class NonlinearStructureResponse(Contract):
     unit: str | None = None
     t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3)
     directions: list[NonlinearResponseDirection] = Field(default_factory=list,max_length=32)
+    control_validation_t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3,
+        description='Optional v2 T1 triplet: coarse FD, finer FD, independent held-out control probe on the same candidate.')
 
     @model_validator(mode='after')
     def selected_form(self):
+        if self.control_validation_t1_results and (self.version!='nonlinear_response_v2' or len(self.control_validation_t1_results)!=3):
+            raise ValueError('V2_CONTROL_VALIDATION_REQUIRES_THREE_T1_RESULTS')
         if self.version=='nonlinear_response_v1':
             if not self.variable or not self.unit or len(self.t1_results)!=3 or self.directions:
                 raise ValueError('BASELINE_MINUS_PLUS_T1_REQUIRED')
@@ -267,6 +271,7 @@ class NonlinearStructureResponse(Contract):
     @model_serializer(mode='wrap')
     def legacy(self,handler):
         value=handler(self)
+        if not self.control_validation_t1_results:value.pop('control_validation_t1_results',None)
         if self.version=='nonlinear_response_v1':
             value.pop('version',None);value.pop('directions',None)
         else:

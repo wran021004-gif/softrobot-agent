@@ -103,6 +103,7 @@ def saved_context(host, query):
         row=dict(reference=reference,candidate=raw['candidate'],candidate_record=c,configuration=cfg,
             original_charges={k:raw.get(k) for k in ('charged_analysis_evaluations','charged_numerical_s','operation_key')},
             t1=raw['nonlinear_capability'],protocol=raw['protocol'],input=tr,initial_state=point,cost=native['cost'])
+        row['control_response']=native.get('control_task_sensitivity',{})
         if native.get('optimization',{}).get('candidates'):
             from tools.research.task_constraints import describe_analysis_requirements
             requirements=describe_analysis_requirements(cfg,{})
@@ -196,7 +197,16 @@ def saved_context(host, query):
         try:contexts.append(admit(d))
         except (ValueError,KeyError,IndexError) as exc:contexts.append(dict(not_comparable=str(exc),direction_id=d.direction_id))
     if legacy:return contexts[0]
-    return dict(directions=contexts,unique_t1_results=len(cache),baseline=plain(directions[0].t1_results[0]))
+    controls=[load(ref) for ref in request.control_validation_t1_results]
+    if controls:
+        base=controls[0]
+        for row in controls:
+            left,right=deepcopy(base['t1']['settings']),deepcopy(row['t1']['settings'])
+            left.pop('difference_step_n');right.pop('difference_step_n')
+            if (row['candidate']!=plain(query.candidate) or row['candidate']!=base['candidate'] or
+                    row['input']!=base['input'] or row['initial_state']!=base['initial_state'] or left!=right):
+                raise ValueError('MATCHED_CONTROL_VALIDATION_CANDIDATE_STATE_SCHEDULE_AND_SETTINGS_REQUIRED')
+    return dict(directions=contexts,unique_t1_results=len(cache),baseline=plain(directions[0].t1_results[0]),control_rows=controls)
 
 
 def candidate_responses(host, reference):
@@ -432,6 +442,28 @@ def compare_scales(results):
                 value['status']='unresolved';value['reasons'].append('SECOND_SCALE_NOT_AVAILABLE')
 
 
+def control_prediction_validation(rows):
+    probes=[r['control_response'].get('responses',[]) for r in rows]
+    if any(not p for p in probes):return dict(status='unresolved',reason='MISSING_EXISTING_CONTROL_PROBES')
+    a,b,held=[p[0] for p in probes]
+    if len({p['coefficient_index'] for p in (a,b,held)})!=1 or any(p['samples']!=a['samples'] for p in (b,held)):
+        return dict(status='unresolved',reason='CONTROL_PROBE_COORDINATES_OR_BASELINES_DIFFER')
+    if abs(b['delta_n'])>=abs(a['delta_n']) or held['delta_n'] in (0.,a['delta_n'],b['delta_n']):
+        return dict(status='unresolved',reason='DISTINCT_COARSE_FINE_AND_HELD_OUT_CONTROL_PROBES_REQUIRED')
+    actual=[dict(s,normalized_signed_excess=s['normalized_signed_excess']+held['delta_n']*dy)
+        for s,dy in zip(held['samples'],held['finite_difference_per_n'])]
+    check=validate_prediction(b['samples'],b['finite_difference_per_n'],held['delta_n'],actual)
+    relative=float(np.max(abs(np.asarray(a['finite_difference_per_n'])-b['finite_difference_per_n']))/
+        max(float(np.max(abs(np.asarray(b['finite_difference_per_n'])))),1e-15))
+    reasons=[]
+    if relative>.05:reasons.append('TWO_SCALE_DISAGREEMENT')
+    if any(p['projected'] for p in (a,b,held)):reasons.append('CLIPPED_CONTROL_PROBE')
+    if any(p['active_baseline']!=p['active_probe'] for p in (a,b,held)):reasons.append('ACTIVE_CONSTRAINT_OR_TIME_SWITCH')
+    return dict(status='unresolved' if reasons else check['status'],reasons=reasons,coefficient_index=b['coefficient_index'],
+        steps_n=[p['delta_n'] for p in (a,b,held)],two_scale_relative_difference=relative,validation=check,
+        source_results=[r['reference'] for r in rows],scope='Fixed structure and original coefficient parameterization only; not reoptimized structural capability.')
+
+
 def response(context):
     """Descriptive secants plus a conservative decision, never an optimal gradient."""
     started=time.perf_counter()
@@ -440,11 +472,13 @@ def response(context):
         compare_scales(results)
         costs={r['reference']['artifact_id']:dict(reference=r['reference'],cost=r.get('cost',{}))
             for c in context['directions'] for r in [*c.get('rows',[]),*c.get('validation_rows',[])]}
+        costs.update({r['reference']['artifact_id']:dict(reference=r['reference'],cost=r['cost']) for r in context.get('control_rows',[])})
         out=dict(method=T2,version='nonlinear_response_v2',status='computed_diagnostic' if any(r['status']=='computed_diagnostic' for r in results) else 'not_comparable',
             direction_status='unresolved',baseline=context['baseline'],directions=results,task_acceptance='unmeasured',limitations=LIMITATIONS,
             cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,reused_t1_results=len(costs),kernel_wall_s=time.perf_counter()-started),
             referenced_t1_costs=list(costs.values()),cost_semantics='Referenced T1 costs were already charged; aggregation never charges them again.')
         out['comparison_summary']=comparison_summary(out)
+        if context.get('control_rows'):out['control_prediction_validation']=control_prediction_validation(context['control_rows'])
         return out
     if context.get('mode')=='finite_comparison':
         rows=context['rows'];base=rows[0]

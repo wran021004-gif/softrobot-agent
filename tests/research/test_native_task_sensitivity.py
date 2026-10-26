@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import unittest
 import numpy as np
 from copy import deepcopy
-from tools.research.nonlinear_capability import task_sensitivities,compare_scales,validate_prediction
+from tools.research.nonlinear_capability import task_sensitivities,compare_scales,validate_prediction,control_prediction_validation
 from tools.research.contracts import NonlinearResponseDirection
 from tools.platform_store import plain
 
@@ -56,6 +56,21 @@ class NativeTaskSensitivityTests(unittest.TestCase):
         for coordinate,reference in [(1.,refs[3]),(.75,refs[0])]:
             with self.assertRaises(ValueError):
                 NonlinearResponseDirection(**value,validation_coordinates=[coordinate],validation_t1_results=[reference])
+
+    def test_control_holdout_is_independent_and_clipped_probe_is_unresolved(self):
+        samples=self.response_fixture()['rows'][0]['task_samples']['fixed_control']
+        def row(h):
+            return dict(reference=dict(artifact_id=str(h)),control_response=dict(responses=[dict(
+                coefficient_index=0,delta_n=h,samples=samples,finite_difference_per_n=[3+.1*h],
+                projected=False,active_baseline={'worst':['speed',2]},active_probe={'worst':['speed',2]})]))
+        rows=[row(.01),row(.005),row(.0075)]
+        result=control_prediction_validation(rows)
+        self.assertEqual(result['status'],'validated_local_prediction')
+        self.assertAlmostEqual(result['validation']['maximum_error_over_threshold'],.000001875)
+        rows[-1]['control_response']['responses'][0]['projected']=True
+        self.assertEqual(control_prediction_validation(rows)['status'],'unresolved')
+        rows[-1]=row(.005)
+        self.assertEqual(control_prediction_validation(rows)['status'],'unresolved')
 
     def test_contact_failure_retains_geometry_time_and_actual_cost(self):
         native=object.__new__(NativeModel)

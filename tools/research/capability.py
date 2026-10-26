@@ -301,4 +301,9 @@ def nonlinear_summary(value,reference=None):
             worst_constraint=baseline.get('worst_constraint') if baseline else None,cost=t['cost'],
             detail_query=query('/nonlinear_response'),comparison_query=query('/nonlinear_response/comparison_summary'),
             task_acceptance='unmeasured')
+        control=t.get('control_prediction_validation')
+        if control:
+            result['nonlinear_response']['control_prediction_validation']={k:control.get(k) for k in
+                ('status','reasons','coefficient_index','steps_n','two_scale_relative_difference')}
+            result['nonlinear_response']['control_prediction_validation']['detail_query']=query('/nonlinear_response/control_prediction_validation')
     return result
