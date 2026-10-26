@@ -1,0 +1,55 @@
+{
+  "version": "c4_decision_protocol_v1",
+  "study_id": "c4-decision-pairs-20261026",
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "control_commit": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+  "cases": {
+    "A": {
+      "folder": "b3_r1_history_assisted_050",
+      "sequence": 383,
+      "source_state": "1a9bcfaa13935293f03114cfe04bd35b63308c9ff68b5ab77a9db3ba6c7bd911",
+      "focus_offline_only": "Position passes and holding speed fails; two finite NMPC observations, no current mathematics. Consider the value and cost of additional control versus diagnosis without prescribing either."
+    },
+    "B": {
+      "folder": "b3_t2_pilot_050_c",
+      "sequence": 354,
+      "source_state": "08b3c48a228f554b3aa6965252b26386ff940b3b0df80e772651f1ac465b2763",
+      "focus_offline_only": "Finite native search has returned a candidate-bound prediction and control source; its later physical replay is inaccessible. Distinguish model evidence from independent acceptance."
+    },
+    "C": {
+      "folder": "c3_math_search_ab_100ms_20261025",
+      "sequence": 473,
+      "source_state": "6d5aaa4090ed8f74a908f9c07a308fcba0300b68649d6cf1f71d7688f3b3b160",
+      "focus_offline_only": "Six model-scored structures, an unsuccessful replay and unsuccessful NMPC create competing control, realization and structure explanations. Do not promote cross-candidate scores to causal structural benefit."
+    }
+  },
+  "design": {
+    "turns_per_arm": 2,
+    "first_batch_requests": 6,
+    "maximum_requests": 12,
+    "followup": "Only if actual first-round feedback is needed to assess correction or judgment update; reverse the first batch order. No resampling, retries or prompt changes.",
+    "tools": ["evidence_read", "research_plan", "research_analysis"],
+    "science": "Zero dispatch, including local_diagnostic. Schema and existing candidate/evidence admission only; full worker admission remains untested until C4-3.",
+    "provider": "configs/research/runtime_c4.json provider; deepseek-flash, high reasoning, thinking enabled, max_tokens=32768, same endpoint/configuration in both arms.",
+    "authorization": "PENDING_EXPLICIT_C4_EGRESS_APPROVAL; no earlier grant is reused.",
+    "intervention": "C3.3 routing, cost and schema fixes held constant in both arms. Only C4's read-state explanation changes production behavior; record code commits and wire identities before sending.",
+    "visibility": "Only the projected historical packet, production schemas and common scope are sent. This protocol's rubric, focus text, future evidence and successful controls are excluded. Raw wires, reasoning and Store stay in ignored runs."
+  },
+  "rubric_offline_only": {
+    "ratings": ["accurate", "partial", "error", "unassessable"],
+    "context": "Report actual requests, input/output/total tokens, every attempted tool/read, invalid queries/JSON, new information reads, relevant verification rereads, identical-content unnecessary repeats and no-information reads separately. A changed query/state hash alone does not prove new scientific information or waste.",
+    "execution": "Require an exact legal action/operation/payload, candidate/control/task binding, actual registered route, applicable authorization and explicitly conditional costs. Diagnose is read-only. Plan control_search uses physical replay callbacks. Native uses research_analysis. Proposed budget is neither permission nor actual spending. Record untested full admission as unknown.",
+    "judgment": "A credible proposal identifies the active task violation, at least two evidence-grounded explanations, a distinguishing experiment, outcome branches that change the next action, and relevant resource costs. Continuing control without expensive mathematics can be reasonable. Finite search failure, fixed-control sensitivity and model witnesses retain their actual scientific scope.",
+    "credible_first_proposal": "All three axes survive factual review, with no material evidence-scope, permission or cost error. Schema acceptance alone is insufficient. Report cumulative cost through the proposal, or null when none exists.",
+    "gate": "At least two distinct scenarios produce credible legal discriminating actions; no severe scope, permission or cost mistake; no evident additional useless interaction burden. This is a small behavioral gate, not a statistical causal proof.",
+    "if_failed": "Separate information delivery, schema/entry and model judgment. At most one targeted repair; any revalidation uses new frozen states and the remaining original grant. Do not tune original samples to pass. No automatic budget increase.",
+    "review": "Review original outputs against frozen facts and this rubric; no second LLM grader, weighted total or automatic reward for a particular method. Preserve negative outputs."
+  },
+  "limitations": [
+    "None is a C3.2 N/K/M frozen source state; all include a different temporal boundary and visible evidence. Related task and archive lineages prevent a claim of statistically independent populations or fully blind evidence.",
+    "A's second candidate observation improves speed relative to the first candidate, but the structure also changed; it is not a controlled demonstration of same-structure control-search improvement.",
+    "Historical formal mathematics scopes and remaining allowances are preserved, including missing prerequisites; no approval is manufactured for paired proposals.",
+    "Two Provider turns per arm cannot establish long-run research efficiency. Actual C4-3 feedback and C4-4 completion remain separate gates."
+  ]
+}

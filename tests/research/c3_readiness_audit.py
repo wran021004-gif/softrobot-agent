@@ -146,12 +146,12 @@ def compare_exports(paths):
 
 class FrozenDecisionBoundary(C3Archive):
     """C3 only: use a saved Handoff source state, never the final snapshot host."""
-    def __init__(self, root, case):
+    def __init__(self, root, case, *, source=None):
         import gzip, io
         from unittest.mock import Mock
         from types import SimpleNamespace
         self.root=Path(root)
-        folder,sequence={
+        folder,sequence=source or {
             'A':('b3_r1_history_assisted_050',425),
             'B':('b3_r1_history_assisted_050',2110),
             'C':('b3_t2_pilot_050_c',425),
@@ -218,13 +218,13 @@ class FrozenDecisionBoundary(C3Archive):
         return packet,tools
 
 
-def c3_frozen_audit(root,case,output,tool_input=None):
+def c3_frozen_audit(root,case,output,tool_input=None,*,source=None):
     """Run in either frozen checkout; no Provider or dispatch is reachable here."""
     from tools.research.core import read_evidence
     from tools.research.agent import error_feedback
     from unittest.mock import patch
     from tools.state_io import atomic_json
-    boundary=FrozenDecisionBoundary(root,case);host=boundary.host
+    boundary=FrozenDecisionBoundary(root,case,source=source);host=boundary.host
     try:
         packet,tools=boundary.projection()
         if tool_input is not None:
@@ -317,6 +317,21 @@ def c3_frozen_audit(root,case,output,tool_input=None):
             state_unchanged=host.store.session()['state']==boundary.saved_state,
             methods=list(packet['research']['mathematical_capabilities'].get('methods',{})),
             allowed_artifact_count=len(boundary.allowed),provider_requests=0,scientific_workers=0)
+        result['source_facts']={k:deepcopy(boundary.saved_state.get(k)) for k in
+            ('mathematical_evaluations','physical_calls','nmpc_calls','research_status')}
+        result['source_facts']['counts']={k:len(boundary.saved_state.get(k,[])) for k in
+            ('candidates','results','physical_replays','analysis_results','control_initializations')}
+        sequence=next(e['sequence'] for e in boundary.snapshot['events'] if boundary.preparation_reference in e['outputs'])
+        future={r['artifact_id'] for e in boundary.snapshot['events'] if e['sequence']>=sequence
+            for r in e['outputs']}-boundary.allowed
+        result['future_only_outputs']=len(future)
+        denied=0
+        for key in future:
+            try:host.store.artifact(dict(artifact_id=key,media_type='application/json'))
+            except ValueError as exc:
+                if str(exc)!='C3_FUTURE_OR_UNPUBLISHED_REFERENCE':raise
+                denied+=1
+        result['future_only_outputs_denied']=denied
         # Final R1 success artifacts must be inaccessible even if present in archive.
         audit=json.loads((Path(root)/'evidence/b3_r1_history_assisted_050/final_audit.json').read_text())
         result['final_r1_refs_absent']=all(r['artifact_id'] not in boundary.allowed and r['artifact_id'] not in serialized(handoff).decode()
@@ -332,6 +347,9 @@ if __name__=='__main__':
     parser.add_argument('--evidence-root',type=Path)
     parser.add_argument('--output',type=Path)
     parser.add_argument('--tool-input',type=Path)
+    parser.add_argument('--source-archive')
+    parser.add_argument('--source-sequence',type=int)
     args=parser.parse_args()
-    if args.decision_efficiency:c3_frozen_audit(args.evidence_root,args.decision_efficiency,args.output,args.tool_input)
+    if args.decision_efficiency:c3_frozen_audit(args.evidence_root,args.decision_efficiency,args.output,args.tool_input,
+        source=(args.source_archive,args.source_sequence) if args.source_archive else None)
     else:print(json.dumps(compare_exports(args.compare_exports) if args.compare_exports else dict(context=context_audit(),search=search_audit()),indent=2))

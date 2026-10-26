@@ -172,6 +172,35 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(second['provider_ledger']['remaining']['model_calls'],0)
         self.assertEqual(second['provider_ledger']['used']['worker_calls'],0)
 
+    def test_c4_unseen_boundary_denies_later_physics_without_state_writes(self):
+        from copy import deepcopy
+        from tests.research.c3_readiness_audit import FrozenDecisionBoundary
+        protocol=read(probe.ROOT/'tests/research/fixtures/c4_decision_protocol.json')
+        definition=protocol['cases']['B']
+        boundary=FrozenDecisionBoundary(probe.ROOT,'B',source=(definition['folder'],definition['sequence']))
+        self.addCleanup(boundary.archive.close)
+        before=deepcopy(boundary.saved_state)
+        packet,tools=boundary.projection()
+        self.assertEqual(len(before['analysis_results']),1)
+        self.assertEqual(before['physical_replays'],[])
+        future=dict(artifact_id='0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca',media_type='application/json')
+        with self.assertRaisesRegex(ValueError,'FUTURE_OR_UNPUBLISHED_REFERENCE'):
+            boundary.host.store.artifact(future)
+        self.assertNotIn(future['artifact_id'],json.dumps(packet))
+        self.assertEqual(boundary.host.store.session()['state'],before)
+        boundary.host.store.transaction.assert_not_called()
+        boundary.host.store.reserve.assert_not_called()
+
+    def test_c4_missing_approval_stops_before_transport_or_account_creation(self):
+        from tools.state_io import atomic_json
+        self.out.mkdir(parents=True)
+        atomic_json(self.out/'frozen.json',dict(offline_passed=True,protocol={},
+            scope=probe.C3_SCOPE.replace('C3 is','C4 is')))
+        with patch.object(probe,'LiveBoundary') as transport,patch.object(probe,'Store') as store:
+            with self.assertRaisesRegex(ValueError,'C4_EXPLICIT_EGRESS_APPROVAL_REQUIRED'):
+                asyncio.run(probe.c3_live(self.out))
+            transport.assert_not_called();store.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

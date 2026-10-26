@@ -19,7 +19,7 @@ from tools.research.agent import LiveBoundary, load_credential, plan_schema, rec
 from tools.research.contracts import Plan
 from tools.research.state import update
 from tools.research.task_constraints import METHOD_MEANINGS
-from tools.state_io import atomic_json, read
+from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[2]
 CASES = Path(__file__).with_name('agent_math_decision_cases.json')
@@ -175,7 +175,7 @@ C3_SCOPE=(
 )
 
 
-def c3_boundary(case,arm,output,tool_input=None):
+def c3_boundary(case,arm,output,tool_input=None,*,source=None,roots=None):
     """The same small archive audit runs against either frozen production checkout."""
     import subprocess,sys
     script=Path(__file__).with_name('c3_readiness_audit.py')
@@ -183,7 +183,47 @@ def c3_boundary(case,arm,output,tool_input=None):
         'import runpy,sys;sys.path.insert(0,".");p=sys.argv.pop(1);runpy.run_path(p,run_name="__main__")',
         str(script),'--decision-efficiency',case,'--evidence-root',str(ROOT),'--output',str(output)]
     if tool_input:command+=['--tool-input',str(tool_input)]
-    subprocess.run(command,cwd=C3_ROOTS[arm],check=True)
+    if source:command+=['--source-archive',source[0],'--source-sequence',str(source[1])]
+    subprocess.run(command,cwd=(roots or C3_ROOTS)[arm],check=True)
+
+
+def c4_freeze(out):
+    """New historical boundaries, same production projection and accounted transport."""
+    import subprocess
+    protocol=read(Path(__file__).with_name('fixtures')/'c4_decision_protocol.json')
+    roots=dict(control=ROOT.parent/'research-next',treatment=ROOT)
+    commits={arm:subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        for arm,root in roots.items()}
+    if commits['control']!=protocol['control_commit']:raise ValueError('C4_CONTROL_COMMIT_CHANGED')
+    for root in roots.values():
+        subprocess.run(['git','diff','--quiet','HEAD','--','tools','schemas','extensions','configs','tasks'],cwd=root,check=True)
+    if out.exists():raise ValueError('C4_EXISTING_FREEZE_NO_OVERWRITE')
+    out.mkdir(parents=True)
+    rows=[]
+    for case,definition in protocol['cases'].items():
+        pair=[]
+        for arm in C3_ARMS:
+            path=out/f'{case}-{arm}.json'
+            c3_boundary(case,arm,path,source=(definition['folder'],definition['sequence']),roots=roots)
+            row=read(path);pair.append(row)
+            if row['source_state']['artifact_id']!=definition['source_state']:raise ValueError('C4_SOURCE_STATE_MISMATCH')
+            if not (row['state_unchanged'] and row['final_r1_refs_absent'] and
+                    row['future_only_outputs']==row['future_only_outputs_denied']):raise ValueError('C4_TEMPORAL_GATE_FAILED')
+            if any(q['status']=='failed' and not q['historical_read_query'] for q in row['query_checks']):
+                raise ValueError('C4_CURRENT_QUERY_FAILED: '+str(path))
+            rows.append(dict(case=case,arm=arm,**{k:row[k] for k in ('source_state','preparation','source_archive',
+                'event_boundary','sizes','source_facts','methods','state_unchanged','final_r1_refs_absent',
+                'future_only_outputs','future_only_outputs_denied')},packet_identity=digest(row['handoff_wire'])))
+        if pair[0]['source_state']!=pair[1]['source_state'] or pair[0]['methods']!=pair[1]['methods']:
+            raise ValueError('C4_PAIR_EVIDENCE_OR_METHOD_MISMATCH')
+    provider=read(ROOT/'configs/research/runtime_c4.json')['provider']
+    frozen=dict(study_id=protocol['study_id'],provider=provider,scope=C3_SCOPE.replace('C3 is','C4 is'),
+        commits=commits,roots={k:str(v) for k,v in roots.items()},protocol=protocol,
+        authorization='PENDING_EXPLICIT_C4_EGRESS_APPROVAL',request_ceiling=12,offline_passed=True,offline=rows,
+        order=[(c,a) for i,c in enumerate(protocol['cases']) for a in (C3_ARMS if i%2==0 else C3_ARMS[::-1])])
+    frozen['frozen_identity']=digest(frozen)
+    atomic_json(out/'frozen.json',frozen)
+    return frozen
 
 
 def c3_freeze(out):
@@ -219,10 +259,28 @@ def c3_freeze(out):
     return rows
 
 
-async def c3_live(out,followup=False):
+async def c3_live(out,followup=False,*,c4_approval=None):
     """Reuse the original probe's transport/ledger; two bounded rounds, no dispatch."""
     frozen=read(out/'frozen.json')
-    if not frozen['offline_passed'] or frozen['scope']!=C3_SCOPE:raise ValueError('C3_OFFLINE_GATE_REQUIRED')
+    is_c4='protocol' in frozen
+    scope=C3_SCOPE.replace('C3 is','C4 is') if is_c4 else C3_SCOPE
+    if not frozen['offline_passed'] or frozen['scope']!=scope:raise ValueError('C3_OFFLINE_GATE_REQUIRED')
+    if is_c4:
+        import subprocess
+        if c4_approval is None:raise ValueError('C4_EXPLICIT_EGRESS_APPROVAL_REQUIRED')
+        for key,value in dict(study_id=frozen['study_id'],frozen_identity=frozen['frozen_identity'],
+                endpoint=frozen['provider']['base_url'].rstrip('/')+'/chat/completions',request_ceiling=12).items():
+            if c4_approval.get(key)!=value:raise ValueError('C4_APPROVAL_BINDING_MISMATCH: '+key)
+        if not c4_approval.get('user_approval'):raise ValueError('C4_EXPLICIT_EGRESS_APPROVAL_REQUIRED')
+        for arm,root in frozen['roots'].items():
+            paths=['tools','schemas','extensions','configs','tasks']
+            if arm=='treatment':paths+=['tests/research/agent_math_decision_probe.py',
+                'tests/research/c3_readiness_audit.py','tests/research/fixtures/c4_decision_protocol.json']
+            subprocess.run(['git','diff','--quiet',frozen['commits'][arm],'--',*paths],cwd=root,check=True)
+        for row in frozen['offline']:
+            if digest(read(out/f"{row['case']}-{row['arm']}.json")['handoff_wire'])!=row['packet_identity']:
+                raise ValueError('C4_FROZEN_PACKET_CHANGED')
+        frozen['authorization']=c4_approval['user_approval']
     summary_path=out/'summary.json'
     if summary_path.exists() and not followup:raise ValueError('C3_NO_AUTOMATIC_RESEND')
     if followup:
@@ -230,10 +288,10 @@ async def c3_live(out,followup=False):
         if (summary['status']!='first_six_complete' or summary['actual_requests']!=6 or
                 summary['confirmed_responses']!=6 or any(r['turn']==2 or r.get('error') for r in summary['results'])):
             raise ValueError('C3_FOLLOWUP_REQUIRES_EXACT_COMPLETED_FIRST_SIX')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id='c3-agent-decision-efficiency')
+        host=SimpleNamespace(store=Store(out/'provider'),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
     else:
         if (out/'provider/platform.sqlite').exists():raise ValueError('C3_EXISTING_LEDGER_NO_RESEND')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id='c3-agent-decision-efficiency')
+        host=SimpleNamespace(store=Store(out/'provider'),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
         project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id+'-12',authorization_source=frozen['authorization'],
             budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1})
         host.store.create(project)
@@ -246,7 +304,7 @@ async def c3_live(out,followup=False):
         for case,arm in (reversed(frozen['order']) if followup else frozen['order']):
             base=read(out/f'{case}-{arm}.json');wire=deepcopy(base['handoff_wire'])
             wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
-            wire['messages'][0]['content']+='\n\n'+C3_SCOPE
+            wire['messages'][0]['content']+='\n\n'+scope
             if followup:
                 prior=read(out/f'{case}-{arm}-1-request.json');body=read(out/f'{case}-{arm}-1-response.json')
                 feedback=read(out/f'{case}-{arm}-1-feedback.json')
@@ -266,7 +324,11 @@ async def c3_live(out,followup=False):
                 result.update(request_id=boundary.last_request,usage=body.get('usage'),finish_reason=body['choices'][0].get('finish_reason'),tool_calls=len(calls),
                     evidence_reads=sum(c['function']['name']=='evidence_read' for c in calls))
                 atomic_json(out/f'{label}-tools.json',calls)
-                c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json')
+                definition=frozen.get('protocol',{}).get('cases',{}).get(case)
+                if definition:
+                    c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json',
+                        source=(definition['folder'],definition['sequence']),roots=frozen['roots'])
+                else:c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json')
                 result['feedback']=read(out/f'{label}-feedback.json')
                 result['message']=body['choices'][0]['message']
                 boundary.consumed()
@@ -366,7 +428,7 @@ async def live(out=OUT, *, test_transport=None, host=None):
 def main():
     global SUMMARY
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live'))
+    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live','c4-freeze','c4-live'))
     parser.add_argument('--results',type=Path,help='Read-only review of saved original probe results')
     parser.add_argument('--cases',type=Path,default=CASES)
     parser.add_argument('--out',type=Path)
@@ -375,7 +437,18 @@ def main():
     args = parser.parse_args()
     out=args.out or OUT
     if args.out:SUMMARY=out/'summary.json'
-    if args.mode.startswith('c3-') and args.mode!='c3-template':
+    if args.mode.startswith('c4-'):
+        if args.out is None:parser.error('C4 requires an independent --out directory')
+        if args.mode=='c4-freeze':
+            result=c4_freeze(out.resolve())
+            print(json.dumps(dict(status='frozen_pending_approval',frozen_identity=result['frozen_identity'],inputs=len(result['offline']),provider_requests=0,science=0)))
+        else:
+            if args.approval_file is None:parser.error('C4 live requires --approval-file bound to frozen_identity')
+            approval=read(args.approval_file)
+            load_credential(Path('~/.codex/.env').expanduser())
+            result=asyncio.run(c3_live(out.resolve(),args.c3_followup,c4_approval=approval))
+            print(json.dumps({k:result[k] for k in ('status','actual_requests','usage')},ensure_ascii=False))
+    elif args.mode.startswith('c3-') and args.mode!='c3-template':
         if args.out is None:parser.error('C3 requires an independent --out directory')
         if args.mode=='c3-freeze':
             rows=c3_freeze(out.resolve());print('C3-A passed: '+str(len(rows))+' frozen inputs; Provider=0; science=0')

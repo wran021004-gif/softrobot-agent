@@ -1,0 +1,195 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "c4-coldstart-reach-hold-20261026",
+  "base_commit": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: C4 request authorizes engineering and preparation only. New finite Provider egress and scientific scope must be explicitly approved and bound to this resolved identity. No historical grant applies.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_c4.json",
+  "evidence_destination": "evidence/c4_coldstart_reach_hold_20261026",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay",
+    "nmpc",
+    "rl",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "execute",
+    "diagnose",
+    "select",
+    "confirm",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 128,
+    "protected_provider_requests": 12,
+    "public_operations": 240,
+    "protected_public_operations": 16,
+    "physical_launches": 16,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 36,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "rl_limits": {
+    "training_stages": 2,
+    "actions_per_trial": 16384,
+    "seconds_per_trial": null,
+    "training_actions": 32768,
+    "training_active_seconds": null,
+    "evaluation_episodes": 2,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 12,
+  "reserve_rl_evaluation": true,
+  "native_control_limits": {
+    "evaluation_requests": 120,
+    "iterations": 4,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "C4 proposed finite registered mathematics scope; explicit new identity-bound authorization required before execution.",
+    "controlled-capability-sensitivity-v1": "C4 proposed finite registered mathematics scope; explicit new identity-bound authorization required before execution.",
+    "mujoco-nonlinear-task-capability-v1": "C4 proposed finite registered mathematics scope; explicit new identity-bound authorization required before execution.",
+    "mujoco-reoptimized-structure-response-v1": "C4 proposed finite registered mathematics scope; explicit new identity-bound authorization required before execution."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_proposals": 16,
+    "max_evaluations": 12
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "segments.2.length_m",
+      "segments.2.young_pa",
+      "segments.3.length_m",
+      "segments.3.young_pa",
+      "segments.4.length_m",
+      "segments.4.young_pa",
+      "segments.5.length_m",
+      "segments.5.young_pa",
+      "segments.6.length_m",
+      "segments.6.young_pa",
+      "segments.7.length_m",
+      "segments.7.young_pa",
+      "segments.8.length_m",
+      "segments.8.young_pa"
+    ]
+  },
+  "execution_instructions": "Own this Reach/Hold Study from an empty scientific candidate pool: no reference robot, history, mathematical results or control seed. Choose every first candidate and control yourself from the frozen FamilySpace. Engineering prototypes and defaults are grammar, not tested designs. No segment/tendon count, material, routing, controller weight, mathematical method or research sequence is prescribed. Use the original task, input bounds, zero initial condition, full horizon and complete final-fidelity acceptance without alteration. Select research questions and methods autonomously. State competing explanations, discriminating observations, outcome branches, relevant costs and unresolved assumptions. Read for specific missing facts or relevant verification; use exact current request templates and candidate-bound sources. diagnose is read-only; selected_method is intent. Native optimization uses research_analysis; Plan control_search can launch physical replays. Requested budgets are neither actual spending nor permission. Internal native baselines, finite differences, proposals, prefixes and failures consume computation even when independent replay count is zero. Finite search failure is not structural infeasibility; fixed-control sensitivity is not reoptimized capability; mathematical feasibility is not physical success. All registered applicable GVS/native analysis, NMPC, direct PPO and compatible residual PPO remain optional under the frozen shared allowances. Residual PPO needs a complete compatible current-candidate reference; direct PPO does not need NMPC. Read actual training summaries and independently evaluate exact published policies. The first complete fresh independent final-fidelity pass immediately ends exploration: publicly read the exact result, then SELECT its exact candidate/control execution under the original rules. Zero extra confirmations. Otherwise publicly read/cite all fresh numerical results and training summaries, then STOP with remaining scientific uncertainty. Use actual remaining resources, including Provider/Reporter overhead and protected closeout. No self-extension, reset, transfer, changed Study identity or blind retry of unknown outcomes. Keep explanations compact; original evidence remains available. No global optimality, hardware, robustness, repeatability or cross-task claim follows from one task pass.",
+  "initial_structure_strategy": "heuristic_generate",
+  "nmpc_replan_period_s": 0.1,
+  "scoring_window_s": 0.5,
+  "record_update_ids": [
+    0,
+    44,
+    49
+  ],
+  "reference_parameters": {},
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.3,
+      0.45,
+      0.49
+    ]
+  }
+}

@@ -753,10 +753,10 @@ def decision_brief(current):
         read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
             classification=r['classification'],content_identity=r['delivery_identity'],
             source_state_identity=r['source_state_identity'],
-            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'changed; reread to compare content')
+            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'state changed; queried content change unverified')
                 if r['source_state_identity'] else 'immutable source or unrecorded state') for r in ws['read_coverage'][-3:]],
         full_list_query=dict(reference=anchor,view='working_set',pointer='/read_coverage'),
-        rule='Exact repeats refer to previously delivered unchanged content. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
+        rule='Exact repeats refer to previously delivered unchanged content. A changed whole-session identity alone does not require rereading: Provider counters, read markers and handoff metadata also change it. Read for a specific missing fact or to verify a relevant change. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
     definitions={};actions=[]
     for row in feedback['actions']:
         method=row['action']+('/'+row['method'] if row.get('method') else '')

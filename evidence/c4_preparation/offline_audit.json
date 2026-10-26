@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-26",
+  "provider_requests": 0,
+  "new_scientific_steps": 0,
+  "r1_reads": {
+    "recorded_successful_reads": 147,
+    "confirmed_delivered": 62,
+    "classifications": {
+      "new_query": 27,
+      "covered_subnode": 1,
+      "exact_repeat": 34
+    },
+    "interpretation": "Delivery/classification only. Exact repeats include potentially necessary verification; no automatic waste label."
+  },
+  "reproduced_context_issue": {
+    "archive": "b3_r1_history_assisted_050",
+    "boundaries": [
+      445,
+      465
+    ],
+    "changed_state_keys": [
+      "pilot"
+    ],
+    "changed_pilot_keys": [
+      "framework_session_id",
+      "handoff",
+      "handoff_verification",
+      "live_model_requests"
+    ],
+    "all_non_pilot_state_unchanged": true,
+    "fix": "Remove the inference that a changed whole-session identity requires rereading; retain actual content hashes, read history and all evidence."
+  },
+  "baseline": {
+    "requested": "d20cf4ee047d1b5d16befacdee52ed5a3d3905e3",
+    "audited": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+    "difference": "Documentation only; no duplicate C3.1/C3.3 fixes."
+  },
+  "task_feasibility_precheck": {
+    "canonical_task_identity": "062de8ca2fd2acaebdbf856ba8fc3420d88c8d3943cfa789c5c9e6f06e486c6b",
+    "canonical_task_equal": true,
+    "historical_complete_independent_pass": true,
+    "historical_acceptance_status": "accepted",
+    "original_limits_equal": true,
+    "holding_start_equal": true,
+    "timing_equal": true,
+    "backend_equal": true,
+    "limits": {
+      "terminal_error_m": 0.01,
+      "holding_max_error_m": 0.01,
+      "holding_max_speed_m_s": 0.02
+    },
+    "holding_window_s": [
+      0.45,
+      0.5
+    ],
+    "source": "Sealed R1 selected independent replay; read-only supervisor check. No successful design/control imported or sent."
+  },
+  "new_boundaries": [
+    {
+      "case": "A",
+      "source_archive": "b3_r1_history_assisted_050",
+      "source_state": {
+        "artifact_id": "1a9bcfaa13935293f03114cfe04bd35b63308c9ff68b5ab77a9db3ba6c7bd911",
+        "media_type": "application/json"
+      },
+      "event_boundary": 382,
+      "source_facts": {
+        "mathematical_evaluations": 0,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 2,
+          "results": 2,
+          "physical_replays": 0,
+          "analysis_results": 0,
+          "control_initializations": 2
+        }
+      },
+      "future_only_outputs": 1231,
+      "future_only_outputs_denied": 1231,
+      "final_r1_refs_absent": true,
+      "state_unchanged": true
+    },
+    {
+      "case": "B",
+      "source_archive": "b3_t2_pilot_050_c",
+      "source_state": {
+        "artifact_id": "08b3c48a228f554b3aa6965252b26386ff940b3b0df80e772651f1ac465b2763",
+        "media_type": "application/json"
+      },
+      "event_boundary": 353,
+      "source_facts": {
+        "mathematical_evaluations": 1,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 1,
+          "results": 1,
+          "physical_replays": 0,
+          "analysis_results": 1,
+          "control_initializations": 2
+        }
+      },
+      "future_only_outputs": 99,
+      "future_only_outputs_denied": 99,
+      "final_r1_refs_absent": true,
+      "state_unchanged": true
+    },
+    {
+      "case": "C",
+      "source_archive": "c3_math_search_ab_100ms_20261025",
+      "source_state": {
+        "artifact_id": "6d5aaa4090ed8f74a908f9c07a308fcba0300b68649d6cf1f71d7688f3b3b160",
+        "media_type": "application/json"
+      },
+      "event_boundary": 472,
+      "source_facts": {
+        "mathematical_evaluations": 12,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 6,
+          "results": 1,
+          "physical_replays": 1,
+          "analysis_results": 6,
+          "control_initializations": 1
+        }
+      },
+      "future_only_outputs": 467,
+      "future_only_outputs_denied": 467,
+      "final_r1_refs_absent": true,
+      "state_unchanged": true
+    }
+  ]
+}
