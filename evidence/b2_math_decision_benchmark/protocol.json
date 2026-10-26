@@ -1,0 +1,81 @@
+{
+  "kind": "Historical decision replay; investigator has read B1 report; no prospective blinding claim.",
+  "cap_new_mujoco_steps": 500000,
+  "A": {
+    "visible": [
+      "metrics",
+      "best proposal improvement",
+      "budget exit"
+    ],
+    "rule": "If max J <= 0.1 and last proposal improved, add exactly one response iteration to failed target; otherwise test radius 20 mm cold.",
+    "action": "Replay sealed 126/5 cold run for up_z only, verify 101-prefix identity, retain already passing targets."
+  },
+  "B": {
+    "visible": "A plus saved trajectories, saturation, response condition and optimizer status; no new integration.",
+    "rule": "If upper tension headroom and a budget exit coexist with small residual, same extra iteration; ill-conditioning prevents sufficiency claims.",
+    "action": "Same paired continuation as A."
+  },
+  "C": {
+    "diagnostic": "Actual B1 up_z best control: 24 +0.02 N control probes; strongest useful coefficient at +0.01 and held-out +0.015 N. Coupled radius ±10/±5 micrometers and held-out +7.5 micrometers. Original constraints at every holding sample.",
+    "rule": "Prefer unchanged-structure continuation unless held-out local radius evidence removes the full residual inside ±10 micrometers while preserving every position constraint. No extrapolation to 2 mm or optimal capability.",
+    "applicability": "No initial affine GVS-T1/T2 or dense single-step transition Jacobian: whole-trajectory sampled constraints are the question. No transplantation of A4 engineering sensitivities."
+  },
+  "paired_validation": "Only after A/B/C actions saved: read sealed neutral126 up_z; exact prefix audit; charge historical acquisition and separable suffix, never new wall time.",
+  "benchmark": {
+    "priority": "B3 six-tendon reach/hold 0.35 s; preserve existing world target [0.29,-0.035,0.19] and thresholds.",
+    "reason": "Mature independent evaluation and native control; dynamic braking tradeoff without changing goals to favor a structure.",
+    "other_candidates": "B1 v2 multi-target costs more per fair control opportunity; load hold blocked by Native external-force support, defer both.",
+    "candidates": [
+      {
+        "name": "neutral",
+        "young_scale": 1.0,
+        "lengths_m": [
+          0.16,
+          0.11
+        ]
+      },
+      {
+        "name": "soft",
+        "young_scale": 0.8,
+        "lengths_m": [
+          0.16,
+          0.11
+        ]
+      },
+      {
+        "name": "stiff",
+        "young_scale": 1.2,
+        "lengths_m": [
+          0.16,
+          0.11
+        ]
+      },
+      {
+        "name": "length_exchange",
+        "young_scale": 1.0,
+        "lengths_m": [
+          0.14,
+          0.13
+        ]
+      }
+    ],
+    "settings": {
+      "evaluation_requests": 126,
+      "iterations": 5,
+      "knots_s": [
+        0.0,
+        0.1,
+        0.25,
+        0.34
+      ],
+      "initialization": "constant 0.2 N for every candidate; no B1 success controls",
+      "other_settings": "same original local_control_search response settings"
+    },
+    "stopping": "Execute four declared candidates once; stop before cap. No target or score changes. Independent replay each best. No global or statistical structural superiority claim.",
+    "criteria": "Prefer benchmark only if reoptimized structural differences remain and neutral is not trivially solved. Pass witness alone does not establish discrimination."
+  },
+  "new_cost": {
+    "physics_steps": 0,
+    "rollouts": 0
+  }
+}

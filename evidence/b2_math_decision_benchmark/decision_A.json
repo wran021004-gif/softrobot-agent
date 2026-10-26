@@ -1,0 +1,31 @@
+{
+  "maximum_violation": "up_z holding speed",
+  "constraints": {
+    "normalized_gap": 0.048487491307075636,
+    "sum_normalized_excess": 0.048487491307075636,
+    "terminal_position_error_m": 0.00966102845634428,
+    "holding_max_position_error_m": 0.00966102845634428,
+    "holding_max_speed_m_s": 0.020969749826141512,
+    "signed_maximum_excess": 0.048487491307075636,
+    "returned_array_gap_interval": [
+      0.04848749130707474,
+      0.04848749130707631
+    ]
+  },
+  "sufficient_control_optimization": false,
+  "sufficiency_reason": "101 callbacks / four iterations is a resource limit, not convergence.",
+  "distinguishing_experiment": "Same structure and original cold-start algorithm with one additional iteration on failed target only.",
+  "expected_maximum_acquisition_cost": {
+    "extra_suffix_rollouts": 25,
+    "extra_suffix_physics_steps": 35000,
+    "full_cold_restart_rollouts": 126,
+    "full_cold_restart_physics_steps": 176400
+  },
+  "alternative_result": "If still failed or stagnated, inspect control parameterization and model domain before claiming structural limitation.",
+  "action": "Replay sealed 126/5 cold run for up_z only, verify 101-prefix identity, retain already passing targets.",
+  "rationale": "Small performance residual and improving last proposal meet predeclared allocation rule; no new mathematical evidence.",
+  "new_cost": {
+    "physics_steps": 0,
+    "rollouts": 0
+  }
+}

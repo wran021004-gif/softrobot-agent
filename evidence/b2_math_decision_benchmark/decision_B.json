@@ -1,0 +1,40 @@
+{
+  "maximum_violation": "up_z holding speed",
+  "constraints": {
+    "normalized_gap": 0.048487491307075636,
+    "sum_normalized_excess": 0.048487491307075636,
+    "terminal_position_error_m": 0.00966102845634428,
+    "holding_max_position_error_m": 0.00966102845634428,
+    "holding_max_speed_m_s": 0.020969749826141512,
+    "signed_maximum_excess": 0.048487491307075636,
+    "returned_array_gap_interval": [
+      0.04848749130707474,
+      0.04848749130707631
+    ]
+  },
+  "sufficient_control_optimization": false,
+  "sufficiency_reason": "101 callbacks / four iterations is a resource limit, not convergence.",
+  "distinguishing_experiment": "Same structure and original cold-start algorithm with one additional iteration on failed target only.",
+  "expected_maximum_acquisition_cost": {
+    "extra_suffix_rollouts": 25,
+    "extra_suffix_physics_steps": 35000,
+    "full_cold_restart_rollouts": 126,
+    "full_cold_restart_physics_steps": 176400
+  },
+  "alternative_result": "If still failed or stagnated, inspect control parameterization and model domain before claiming structural limitation.",
+  "action": "Same paired continuation as A.",
+  "maximum_tension_n": 2.208578675288871,
+  "upper_limit_n": 8.0,
+  "lower_bound_active": true,
+  "response_conditions": [
+    9104522429.640905,
+    4993205328.579537,
+    4878792814.803454,
+    7318194942.817731
+  ],
+  "rationale": "Upper tension far from saturation; response ill-conditioned and stopping budget-limited. Continue control, do not infer globally adequate actuation or convergence.",
+  "new_cost": {
+    "physics_steps": 0,
+    "rollouts": 0
+  }
+}
