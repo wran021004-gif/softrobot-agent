@@ -50,6 +50,9 @@ class NonlinearCapabilityTests(unittest.TestCase):
         self.assertEqual(response(c)['direction_status'],'not_comparable')
         c=context();c['rows'][1]['t1']['callbacks']=8
         self.assertIn('UNEQUAL_ACTUAL_SEARCH_OPPORTUNITIES',response(c)['reasons'])
+        c=context();c['rows'][1]['t1'].update(local_responses=[],response_steps_completed=0)
+        self.assertEqual(response(c)['direction_status'],'unresolved')
+        self.assertEqual(response(c)['cost']['physics_steps'],0)
 
     def test_saved_t1_single_parameter_task_and_search_binding(self):
         refs=[dict(artifact_id=str(i)*64,media_type='application/json') for i in (1,2,3)]

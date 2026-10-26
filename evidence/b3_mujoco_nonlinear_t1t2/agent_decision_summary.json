@@ -1,0 +1,171 @@
+{
+  "version": "b3-nonlinear-decision-summary-v1",
+  "classification": "C_evidence_insufficient_for_trusted_structure_edit",
+  "scientific_implementation": "cb25654e2fe3095c4ceafbe10fecea129d3745dc",
+  "structures": {
+    "variable": "segments.1.young_pa",
+    "unit": "Pa",
+    "values": {
+      "d_minus": 4860000.0,
+      "d0": 5400000.0,
+      "d_plus": 5940000.0
+    }
+  },
+  "conditions": {
+    "task": "tasks/reach_hold_b3_050.json",
+    "target_m": [
+      0.29,
+      -0.035,
+      0.19
+    ],
+    "duration_s": 0.5,
+    "holding_window_s": [
+      0.45,
+      0.5
+    ],
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "tension_range_n": [
+      0.0,
+      8.0
+    ],
+    "control_period_s": 0.01,
+    "physics_step_s": 0.0005,
+    "initialization": "Each generated candidate own legal frozen zero state; common M2 C U0; no acceptance transfer.",
+    "settings": {
+      "version": "local_control_search_v2",
+      "correction_window_s": [
+        0.0,
+        0.5
+      ],
+      "safety_margin_fraction": 0.0,
+      "method": "response",
+      "knots_s": [
+        0.0,
+        0.38,
+        0.45,
+        0.5
+      ],
+      "coefficient_limit_n": 2.0,
+      "difference_step_n": 0.01,
+      "initial_radius_n": 0.1,
+      "minimum_radius_n": 0.0001,
+      "evaluation_requests": 24,
+      "iterations": 3,
+      "active_coefficients": [
+        9,
+        10,
+        13,
+        14
+      ]
+    }
+  },
+  "model_prediction": {
+    "gvs_signed_J": {
+      "d_minus": -0.19999999999984042,
+      "d0": -0.1999999999901171,
+      "d_plus": -0.19999999999997867
+    },
+    "direction": "unresolved",
+    "common_affine_score_platform": true
+  },
+  "mujoco_finite_budget": {
+    "d_minus": {
+      "initial_J": 4.554934585687774,
+      "best_found_J": 2.0857141424384675,
+      "best_metrics": {
+        "holding_max_position_error_m": 0.012741179465874584,
+        "holding_max_speed_m_s": 0.06171428284876935,
+        "normalized_gap": 2.0857141424384675,
+        "returned_array_gap_interval": [
+          2.0857141424384653,
+          2.0857141424384693
+        ],
+        "signed_maximum_excess": 2.0857141424384675,
+        "sum_normalized_excess": 2.5893154912718925,
+        "terminal_position_error_m": 0.012294834022459667,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": 2.0857141424384675,
+          "time_s": 0.5000000000000003
+        }
+      },
+      "callbacks": 16,
+      "stop_reason": "iteration_limit",
+      "independent_acceptance": "valid_failure"
+    },
+    "d0": {
+      "initial_J": 3.394389563223587,
+      "best_found_J": 1.7468672625906523,
+      "best_metrics": {
+        "holding_max_position_error_m": 0.008068170854003237,
+        "holding_max_speed_m_s": 0.05493734525181305,
+        "normalized_gap": 1.7468672625906523,
+        "returned_array_gap_interval": [
+          1.7468672625906503,
+          1.7468672625906538
+        ],
+        "signed_maximum_excess": 1.7468672625906523,
+        "sum_normalized_excess": 1.7468672625906523,
+        "terminal_position_error_m": 0.0074401918597937515,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": 1.7468672625906523,
+          "time_s": 0.5000000000000003
+        }
+      },
+      "callbacks": 16,
+      "stop_reason": "iteration_limit",
+      "independent_acceptance": "valid_failure"
+    },
+    "d_plus": {
+      "initial_J": 2.467174028968762,
+      "best_found_J": 1.4174875824815398,
+      "best_metrics": {
+        "holding_max_position_error_m": 0.004842188681213695,
+        "holding_max_speed_m_s": 0.0483497516496308,
+        "normalized_gap": 1.4174875824815398,
+        "returned_array_gap_interval": [
+          1.4174875824815374,
+          1.4174875824815418
+        ],
+        "signed_maximum_excess": 1.4174875824815398,
+        "sum_normalized_excess": 1.4174875824815398,
+        "terminal_position_error_m": 0.0038424944304132533,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": 1.4174875824815398,
+          "time_s": 0.48000000000000037
+        }
+      },
+      "callbacks": 16,
+      "stop_reason": "iteration_limit",
+      "independent_acceptance": "valid_failure"
+    }
+  },
+  "observed_order": "d_plus < d0 < d_minus in signed J for this exact finite search and U0",
+  "structure_direction_trustworthy": false,
+  "direction_status": "unresolved",
+  "pre_replay_recommendations": {
+    "gvs": "d0",
+    "mujoco": "d0",
+    "baseline": "d0"
+  },
+  "decision": "Retain d0 and request targeted diagnostics; no automatic structural edit.",
+  "unresolved": [
+    "All three control searches hit their update cap; no convergence or optimization-error bound.",
+    "No controller-independent structure ordering; one common initialization and one four-coefficient subspace.",
+    "Every independent replay still violates holding speed; no feasible solution found.",
+    "No demonstrated physical-evaluation savings or improved solution-finding efficiency over retaining d0."
+  ],
+  "most_valuable_next_experiment": "Only under a new authorization: matched-budget d0/d_plus search from an independent legal control initialization, then full replay; test whether the observed advantage survives initialization. Not executed.",
+  "evidence": "evidence/b3_mujoco_nonlinear_t1t2/evidence_index.json",
+  "unsupported_conclusions": [
+    "Global MuJoCo optimum or strict structural gradient.",
+    "Physical/hardware validity, robustness, repeatability or statistical generalization.",
+    "Cross-model prediction accuracy from same-MuJoCo replay.",
+    "Other-controller ranking or guaranteed research-efficiency improvement."
+  ],
+  "agent_injection": false,
+  "scope": "Read on demand as limited-budget diagnostics only; current R1 authorization unchanged."
+}

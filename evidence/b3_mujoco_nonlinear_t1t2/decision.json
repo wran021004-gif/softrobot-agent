@@ -1,0 +1,181 @@
+{
+  "reference": {
+    "artifact_id": "3165bb843ffae904a0b00b2cfe9cd114ea4bbb77f0543861d38f60948030b55e",
+    "media_type": "application/json"
+  },
+  "rule": {
+    "version": "fixed-direction-rule-v1",
+    "gvs": "Choose the corresponding endpoint only with resolved single-scale T2 direction, discriminating T1 values and no unresolved model validity; otherwise retain d0 and diagnose.",
+    "mujoco": "Choose endpoint only with comparable T1 and conditional/resolved monotone T2 direction, sufficient search quality and equal opportunities; otherwise retain d0 and diagnose.",
+    "baseline": "Always retain d0.",
+    "no_new_score": "Use signed J and original hard metrics; no weighted ranking.",
+    "reveal": "Save recommendations after T2 and before any best-control independent replay."
+  },
+  "choices": {
+    "gvs": {
+      "candidate": "d0",
+      "action": "retain_and_diagnose",
+      "reasons": [
+        "Single-scale local GVS model has no verified nonlinear task-error bound."
+      ],
+      "observed_direction": "directional_comparisons_only",
+      "evidence": {
+        "artifact_id": "39c8fedb67f63c2640637c65e2691e62d40cbc92e948045dce4520ad3b8b4d6e",
+        "media_type": "application/json"
+      }
+    },
+    "mujoco": {
+      "candidate": "d0",
+      "action": "retain_and_diagnose",
+      "reasons": [
+        "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+      ],
+      "evidence": {
+        "artifact_id": "07cebecc5ab86fde1c2015d2aa19c96aea9bc556da2ae31467add37e656f6bb4",
+        "media_type": "application/json"
+      }
+    },
+    "baseline": {
+      "candidate": "d0",
+      "action": "retain",
+      "reasons": [
+        "Frozen no-structure-edit reference."
+      ]
+    }
+  },
+  "native_T2": {
+    "artifact_id": "07cebecc5ab86fde1c2015d2aa19c96aea9bc556da2ae31467add37e656f6bb4",
+    "media_type": "application/json"
+  },
+  "native_response": {
+    "actual_search_opportunities": [
+      [
+        16,
+        3
+      ],
+      [
+        16,
+        3
+      ],
+      [
+        16,
+        3
+      ]
+    ],
+    "cost": {
+      "kernel_wall_s": 2.7199999976801337e-05,
+      "model_builds": 0,
+      "optimization_evaluations": 0,
+      "physics_steps": 0,
+      "reused_t1_results": 3,
+      "rollouts": 0
+    },
+    "direction_status": "unresolved",
+    "fixed_control": {
+      "central": -1.9331116265916777e-06,
+      "left": -2.1491574490077535e-06,
+      "right": -1.717065804175602e-06
+    },
+    "limitations": [
+      "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+      "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+      "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+    ],
+    "method": "mujoco-reoptimized-structure-response-v1",
+    "monotone_observed": true,
+    "nonmonotonic": false,
+    "parameter": {
+      "affected_tendon_indices": null,
+      "bounds": [
+        2000000.0,
+        15000000.0
+      ],
+      "bounds_source": {
+        "family_space_identity": "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+        "path": "segment_domains.1.young_pa"
+      },
+      "path": "segments.1.young_pa",
+      "source": "current frozen FamilySpace continuous domain",
+      "units": "Pa"
+    },
+    "practical_J_tolerance": 0.00020857141424384675,
+    "reasons": [
+      "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+    ],
+    "recommendation": "retain_baseline_and_diagnose",
+    "reoptimized": {
+      "central": -6.187282962564145e-07,
+      "left": -6.274942219403987e-07,
+      "right": -6.099623705724304e-07
+    },
+    "results": [
+      {
+        "J": 1.7468672625906523,
+        "candidate": {
+          "artifact_id": "8f1041d42015db00c91e55ba0e5305814e30b173ce95313b663e95d6112d6ed9",
+          "media_type": "application/json"
+        },
+        "initial_J": 3.394389563223587,
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "reference": {
+          "artifact_id": "03d1a9c73948dd87bb0001ee089306c2a86dcb8178aa4bac9310524760ac741a",
+          "media_type": "application/json"
+        },
+        "stop_reason": "iteration_limit",
+        "value": 5400000.0
+      },
+      {
+        "J": 2.0857141424384675,
+        "candidate": {
+          "artifact_id": "6d25eb98d8e591cb5d810c41d2304a5dccb80b3e3559304698ff0a29278bf34a",
+          "media_type": "application/json"
+        },
+        "initial_J": 4.554934585687774,
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "reference": {
+          "artifact_id": "61d246d5238004a7cafab6b1de61d736098831688397ab4e70960e00f758f90b",
+          "media_type": "application/json"
+        },
+        "stop_reason": "iteration_limit",
+        "value": 4860000.0
+      },
+      {
+        "J": 1.4174875824815398,
+        "candidate": {
+          "artifact_id": "998c06aaff70f7455367da752bed988fb244f1280e68bcc0fd37cd80d5f7a0fd",
+          "media_type": "application/json"
+        },
+        "initial_J": 2.467174028968762,
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "reference": {
+          "artifact_id": "f934905e750976f6f3209e566ecf3fdd3eb3cf51ec8fbb72026f0a3a7e86f613",
+          "media_type": "application/json"
+        },
+        "stop_reason": "iteration_limit",
+        "value": 5940000.0
+      }
+    ],
+    "secant_unit": "signed J / Pa",
+    "status": "computed_diagnostic",
+    "step": 540000.0,
+    "task_acceptance": "unmeasured",
+    "uncertainty": "No numerical or optimization error bound; a conditional direction concerns this local search only."
+  },
+  "replay_results_revealed": false,
+  "prior_best_control_replays": 0
+}

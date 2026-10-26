@@ -157,8 +157,11 @@ def mathematical_method_view(host, reference):
         if method==T2:
             item['missing']=[m for m in item['missing'] if not m.startswith('control_optimization')]
             item['missing'].append('three comparable completed T1 results')
-            item.pop('handoff',None)
-            item.pop('measured_control_initialization',None)
+            for name in ('handoff','measured_control_initialization','control_sources','execution_limits'):
+                item.pop(name,None)
+            item['coverage']=[]
+            item['applicability']=dict(status='requires_parameters',
+                parameter_requirements=['nonlinear_response'],execution_support='saved_evidence_only')
         methods[method]=item
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())

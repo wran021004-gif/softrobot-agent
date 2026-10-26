@@ -329,7 +329,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
     from tools.research.nonlinear_capability import METHODS, saved_context
-    if q.operation in METHODS and not state(host)['spec'].get('mathematical_methods',{}).get(METHODS[q.operation]):
+    if q.operation in METHODS and ('analysis' not in state(host)['spec']['capabilities'] or
+            not state(host)['spec'].get('mathematical_methods',{}).get(METHODS[q.operation])):
         return dict(status='not_applicable',reason='EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED',task_acceptance='unmeasured')
     if q.control_optimization:
         settings=q.control_optimization.settings

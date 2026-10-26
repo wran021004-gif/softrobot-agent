@@ -1,0 +1,687 @@
+{
+  "reference": {
+    "artifact_id": "424b191b560343f989904dfde63cdaeaa87e62c9ab0cbbd7d00e5dd8bdcebcb6",
+    "media_type": "application/json"
+  },
+  "results": {
+    "d_minus": {
+      "reference": {
+        "artifact_id": "61d246d5238004a7cafab6b1de61d736098831688397ab4e70960e00f758f90b",
+        "media_type": "application/json"
+      },
+      "control": {
+        "artifact_id": "df4ac415c0ca03043d8bd42e2b48aa15fd80f4b6a8ed60f77f24b77b47e8061a",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "J": 2.0857141424384675,
+        "best_control": {
+          "coefficients_n": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.40014944176256023,
+            -0.015087190709286519,
+            0.0,
+            0.0,
+            0.18975083796762027,
+            -0.02473758509186344,
+            0.0
+          ],
+          "label": "local_response_proposal",
+          "rollout": "native-rollout-15",
+          "schedule_pointer": "/native_dynamics/optimized_schedule",
+          "source": {
+            "candidate": {
+              "artifact_id": "6d25eb98d8e591cb5d810c41d2304a5dccb80b3e3559304698ff0a29278bf34a",
+              "media_type": "application/json"
+            },
+            "inherited_acceptance": false,
+            "method": "mujoco_nonlinear_task_capability_v1",
+            "settings": {
+              "active_coefficients": [
+                9,
+                10,
+                13,
+                14
+              ],
+              "coefficient_limit_n": 2.0,
+              "correction_window_s": [
+                0.0,
+                0.5
+              ],
+              "difference_step_n": 0.01,
+              "evaluation_requests": 24,
+              "initial_radius_n": 0.1,
+              "iterations": 3,
+              "knots_s": [
+                0.0,
+                0.38,
+                0.45,
+                0.5
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.0,
+              "version": "local_control_search_v2"
+            },
+            "source": {
+              "artifact_id": "3a59f1be3d3d5a59ec3c43fc2e8cb2281faea5d8264d6a9642aca05d04b8f77c",
+              "media_type": "application/json"
+            },
+            "state_provenance": {
+              "inherited_acceptance": false,
+              "initialization": "frozen_task_initializer_and_candidate_pretension"
+            }
+          }
+        },
+        "best_metrics": {
+          "holding_max_position_error_m": 0.012741179465874584,
+          "holding_max_speed_m_s": 0.06171428284876935,
+          "normalized_gap": 2.0857141424384675,
+          "returned_array_gap_interval": [
+            2.0857141424384653,
+            2.0857141424384693
+          ],
+          "signed_maximum_excess": 2.0857141424384675,
+          "sum_normalized_excess": 2.5893154912718925,
+          "terminal_position_error_m": 0.012294834022459667,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 2.0857141424384675,
+            "time_s": 0.5000000000000003
+          }
+        },
+        "callbacks": 16,
+        "coefficient_boundary": false,
+        "detail_pointer": "/native_dynamics",
+        "improvement": 2.4692204432493066,
+        "initial_J": 4.554934585687774,
+        "initial_metrics": {
+          "holding_max_position_error_m": 0.010880792884357223,
+          "holding_max_speed_m_s": 0.11109869171375548,
+          "normalized_gap": 4.554934585687774,
+          "returned_array_gap_interval": [
+            4.55493458568777,
+            4.5549345856877785
+          ],
+          "signed_maximum_excess": 4.554934585687774,
+          "sum_normalized_excess": 4.643013874123496,
+          "terminal_position_error_m": 0.007625441972488307,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 4.554934585687774,
+            "time_s": 0.48000000000000037
+          }
+        },
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "iterations_started": 3,
+        "limitations": [
+          "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+          "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+          "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+        ],
+        "local_responses": [
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 0,
+            "resolved_subspace_condition": 3.3590384426203634,
+            "response_rank": 4,
+            "singular_values": [
+              21.757147933133034,
+              19.756370483881728,
+              8.757018866616919,
+              6.477195276205421
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 1,
+            "resolved_subspace_condition": 3.361931919473452,
+            "response_rank": 4,
+            "singular_values": [
+              21.789857334987264,
+              19.7495647032003,
+              8.814497900403275,
+              6.481349966896417
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 2,
+            "resolved_subspace_condition": 3.368658476753611,
+            "response_rank": 4,
+            "singular_values": [
+              21.83235525483059,
+              19.732749495912188,
+              8.88900280185547,
+              6.4810236494708455
+            ],
+            "start": "native"
+          }
+        ],
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "physics_steps": 16000,
+        "response_steps_completed": 3,
+        "rollouts": 16,
+        "settings": {
+          "active_coefficients": [
+            9,
+            10,
+            13,
+            14
+          ],
+          "coefficient_limit_n": 2.0,
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "difference_step_n": 0.01,
+          "evaluation_requests": 24,
+          "initial_radius_n": 0.1,
+          "iterations": 3,
+          "knots_s": [
+            0.0,
+            0.38,
+            0.45,
+            0.5
+          ],
+          "method": "response",
+          "minimum_radius_n": 0.0001,
+          "safety_margin_fraction": 0.0,
+          "version": "local_control_search_v2"
+        },
+        "status": "finite_budget_diagnostic",
+        "stop_reason": "iteration_limit",
+        "task_acceptance": "unmeasured"
+      }
+    },
+    "d0": {
+      "reference": {
+        "artifact_id": "03d1a9c73948dd87bb0001ee089306c2a86dcb8178aa4bac9310524760ac741a",
+        "media_type": "application/json"
+      },
+      "control": {
+        "artifact_id": "ed90f640e25ed4101b0da336a7a2e9844db66204af25524a9f29246a972bd651",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "J": 1.7468672625906523,
+        "best_control": {
+          "coefficients_n": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3474117319786877,
+            -0.01880819830681125,
+            0.0,
+            0.0,
+            0.07049373453587603,
+            -0.060213301090148524,
+            0.0
+          ],
+          "label": "local_response_proposal",
+          "rollout": "native-rollout-15",
+          "schedule_pointer": "/native_dynamics/optimized_schedule",
+          "source": {
+            "candidate": {
+              "artifact_id": "8f1041d42015db00c91e55ba0e5305814e30b173ce95313b663e95d6112d6ed9",
+              "media_type": "application/json"
+            },
+            "inherited_acceptance": false,
+            "method": "mujoco_nonlinear_task_capability_v1",
+            "settings": {
+              "active_coefficients": [
+                9,
+                10,
+                13,
+                14
+              ],
+              "coefficient_limit_n": 2.0,
+              "correction_window_s": [
+                0.0,
+                0.5
+              ],
+              "difference_step_n": 0.01,
+              "evaluation_requests": 24,
+              "initial_radius_n": 0.1,
+              "iterations": 3,
+              "knots_s": [
+                0.0,
+                0.38,
+                0.45,
+                0.5
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.0,
+              "version": "local_control_search_v2"
+            },
+            "source": {
+              "artifact_id": "ee0317678f9cfda61b7cb238cfd606a3207c07f006e89e8389071c1ca4248562",
+              "media_type": "application/json"
+            },
+            "state_provenance": {
+              "inherited_acceptance": false,
+              "initialization": "frozen_task_initializer_and_candidate_pretension"
+            }
+          }
+        },
+        "best_metrics": {
+          "holding_max_position_error_m": 0.008068170854003237,
+          "holding_max_speed_m_s": 0.05493734525181305,
+          "normalized_gap": 1.7468672625906523,
+          "returned_array_gap_interval": [
+            1.7468672625906503,
+            1.7468672625906538
+          ],
+          "signed_maximum_excess": 1.7468672625906523,
+          "sum_normalized_excess": 1.7468672625906523,
+          "terminal_position_error_m": 0.0074401918597937515,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 1.7468672625906523,
+            "time_s": 0.5000000000000003
+          }
+        },
+        "callbacks": 16,
+        "coefficient_boundary": false,
+        "detail_pointer": "/native_dynamics",
+        "improvement": 1.647522300632935,
+        "initial_J": 3.394389563223587,
+        "initial_metrics": {
+          "holding_max_position_error_m": 0.006675937086453473,
+          "holding_max_speed_m_s": 0.08788779126447174,
+          "normalized_gap": 3.394389563223587,
+          "returned_array_gap_interval": [
+            3.394389563223583,
+            3.394389563223591
+          ],
+          "signed_maximum_excess": 3.394389563223587,
+          "sum_normalized_excess": 3.394389563223587,
+          "terminal_position_error_m": 0.004515550349894086,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 3.394389563223587,
+            "time_s": 0.48000000000000037
+          }
+        },
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "iterations_started": 3,
+        "limitations": [
+          "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+          "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+          "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+        ],
+        "local_responses": [
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 0,
+            "resolved_subspace_condition": 3.2888205271547615,
+            "response_rank": 4,
+            "singular_values": [
+              20.75268008795554,
+              19.151850119302473,
+              8.229601310109913,
+              6.310067672166102
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 1,
+            "resolved_subspace_condition": 3.2908829856173667,
+            "response_rank": 4,
+            "singular_values": [
+              20.774062729588145,
+              19.14694893043937,
+              8.276212702070849,
+              6.312610573022532
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 2,
+            "resolved_subspace_condition": 3.303561444901795,
+            "response_rank": 4,
+            "singular_values": [
+              20.845648337952692,
+              19.15199626964507,
+              8.328497246281161,
+              6.310053160997697
+            ],
+            "start": "native"
+          }
+        ],
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "physics_steps": 16000,
+        "response_steps_completed": 3,
+        "rollouts": 16,
+        "settings": {
+          "active_coefficients": [
+            9,
+            10,
+            13,
+            14
+          ],
+          "coefficient_limit_n": 2.0,
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "difference_step_n": 0.01,
+          "evaluation_requests": 24,
+          "initial_radius_n": 0.1,
+          "iterations": 3,
+          "knots_s": [
+            0.0,
+            0.38,
+            0.45,
+            0.5
+          ],
+          "method": "response",
+          "minimum_radius_n": 0.0001,
+          "safety_margin_fraction": 0.0,
+          "version": "local_control_search_v2"
+        },
+        "status": "finite_budget_diagnostic",
+        "stop_reason": "iteration_limit",
+        "task_acceptance": "unmeasured"
+      }
+    },
+    "d_plus": {
+      "reference": {
+        "artifact_id": "f934905e750976f6f3209e566ecf3fdd3eb3cf51ec8fbb72026f0a3a7e86f613",
+        "media_type": "application/json"
+      },
+      "control": {
+        "artifact_id": "643715d03fbcb0349c33a2dda1aafe5e5cb0430c602730e350420c90a2f3b255",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "J": 1.4174875824815398,
+        "best_control": {
+          "coefficients_n": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3066778107311652,
+            -0.01612429059521611,
+            0.0,
+            0.0,
+            -0.03318312286954651,
+            -0.09555773142870048,
+            0.0
+          ],
+          "label": "local_response_proposal",
+          "rollout": "native-rollout-15",
+          "schedule_pointer": "/native_dynamics/optimized_schedule",
+          "source": {
+            "candidate": {
+              "artifact_id": "998c06aaff70f7455367da752bed988fb244f1280e68bcc0fd37cd80d5f7a0fd",
+              "media_type": "application/json"
+            },
+            "inherited_acceptance": false,
+            "method": "mujoco_nonlinear_task_capability_v1",
+            "settings": {
+              "active_coefficients": [
+                9,
+                10,
+                13,
+                14
+              ],
+              "coefficient_limit_n": 2.0,
+              "correction_window_s": [
+                0.0,
+                0.5
+              ],
+              "difference_step_n": 0.01,
+              "evaluation_requests": 24,
+              "initial_radius_n": 0.1,
+              "iterations": 3,
+              "knots_s": [
+                0.0,
+                0.38,
+                0.45,
+                0.5
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.0,
+              "version": "local_control_search_v2"
+            },
+            "source": {
+              "artifact_id": "ca068abe0f9dac6db0c2ada45eb96c58c3be82b12f8033570e404c4ea8843508",
+              "media_type": "application/json"
+            },
+            "state_provenance": {
+              "inherited_acceptance": false,
+              "initialization": "frozen_task_initializer_and_candidate_pretension"
+            }
+          }
+        },
+        "best_metrics": {
+          "holding_max_position_error_m": 0.004842188681213695,
+          "holding_max_speed_m_s": 0.0483497516496308,
+          "normalized_gap": 1.4174875824815398,
+          "returned_array_gap_interval": [
+            1.4174875824815374,
+            1.4174875824815418
+          ],
+          "signed_maximum_excess": 1.4174875824815398,
+          "sum_normalized_excess": 1.4174875824815398,
+          "terminal_position_error_m": 0.0038424944304132533,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 1.4174875824815398,
+            "time_s": 0.48000000000000037
+          }
+        },
+        "callbacks": 16,
+        "coefficient_boundary": false,
+        "detail_pointer": "/native_dynamics",
+        "improvement": 1.0496864464872222,
+        "initial_J": 2.467174028968762,
+        "initial_metrics": {
+          "holding_max_position_error_m": 0.00406130880362835,
+          "holding_max_speed_m_s": 0.06934348057937524,
+          "normalized_gap": 2.467174028968762,
+          "returned_array_gap_interval": [
+            2.467174028968759,
+            2.467174028968765
+          ],
+          "signed_maximum_excess": 2.467174028968762,
+          "sum_normalized_excess": 2.467174028968762,
+          "terminal_position_error_m": 0.0031176446578404906,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 2.467174028968762,
+            "time_s": 0.48000000000000037
+          }
+        },
+        "input_saturation": {
+          "lower": true,
+          "maximum_n": 7.9999451984617505,
+          "minimum_n": 0.0,
+          "upper": false
+        },
+        "iterations_started": 3,
+        "limitations": [
+          "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+          "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+          "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+        ],
+        "local_responses": [
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 0,
+            "resolved_subspace_condition": 3.2493143005579403,
+            "response_rank": 4,
+            "singular_values": [
+              19.967127732838424,
+              18.632289764493006,
+              7.7777244573618125,
+              6.145028115442654
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 1,
+            "resolved_subspace_condition": 3.2524083451915593,
+            "response_rank": 4,
+            "singular_values": [
+              19.98581147272114,
+              18.62880927655373,
+              7.8138927352853615,
+              6.144926882342021
+            ],
+            "start": "native"
+          },
+          {
+            "diagnostic": "resolved_local_response",
+            "effective_coefficients": [
+              9,
+              10,
+              13,
+              14
+            ],
+            "input_direction_rank": 4,
+            "iteration": 2,
+            "resolved_subspace_condition": 3.265941977685718,
+            "response_rank": 4,
+            "singular_values": [
+              20.06258564312502,
+              18.647666420031214,
+              7.85001188361209,
+              6.142970628443799
+            ],
+            "start": "native"
+          }
+        ],
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "physics_steps": 16000,
+        "response_steps_completed": 3,
+        "rollouts": 16,
+        "settings": {
+          "active_coefficients": [
+            9,
+            10,
+            13,
+            14
+          ],
+          "coefficient_limit_n": 2.0,
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "difference_step_n": 0.01,
+          "evaluation_requests": 24,
+          "initial_radius_n": 0.1,
+          "iterations": 3,
+          "knots_s": [
+            0.0,
+            0.38,
+            0.45,
+            0.5
+          ],
+          "method": "response",
+          "minimum_radius_n": 0.0001,
+          "safety_margin_fraction": 0.0,
+          "version": "local_control_search_v2"
+        },
+        "status": "finite_budget_diagnostic",
+        "stop_reason": "iteration_limit",
+        "task_acceptance": "unmeasured"
+      }
+    }
+  },
+  "physics_steps": 51000
+}

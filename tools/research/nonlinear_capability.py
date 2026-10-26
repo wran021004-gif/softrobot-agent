@@ -99,15 +99,18 @@ def response(context):
     """Descriptive secants plus a conservative decision, never an optimal gradient."""
     started=time.perf_counter()
     out=dict(method=T2,status='not_comparable',direction_status='not_comparable',
-        task_acceptance='unmeasured',limitations=LIMITATIONS)
+        task_acceptance='unmeasured',limitations=LIMITATIONS,
+        cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,
+            reused_t1_results=0 if context.get('not_comparable') else 3,kernel_wall_s=0.))
     if context.get('not_comparable'):out['reasons']=[context['not_comparable']]
     else:
         rows=context['rows'];base,minus,plus=rows;h=base['value']-minus['value']
         summaries=[r['t1'] for r in rows];reasons=[]
         numeric=all(math.isfinite(t[k]) for t in summaries for k in ('J','initial_J'))
-        searched=all(t['callbacks']>1 and t['iterations_started']>0 and t['local_responses'] for t in summaries)
+        searched=all(t['callbacks']>1 and t['iterations_started']>0 for t in summaries)
         if not numeric or not searched:
             out['reasons']=['VALID_NUMERICS_AND_ACTUAL_CONTROL_REOPTIMIZATION_REQUIRED']
+            out['cost']['kernel_wall_s']=time.perf_counter()-started
             return out
         def secants(key):
             zero,low,high=[t[key] for t in summaries]
@@ -127,6 +130,8 @@ def response(context):
             reasons.append('TARGET_STOP_DOES_NOT_ESTABLISH_COMPARABLE_OPTIMAL_MARGIN')
         if any(r['diagnostic']!='resolved_local_response' for t in summaries for r in t['local_responses']):
             reasons.append('RANK_DEFICIENT_CONTROL_RESPONSE')
+        if any(t['response_steps_completed']==0 for t in summaries):
+            reasons.append('NO_COMPLETED_RESPONSE_UPDATE')
         if any(t['coefficient_boundary'] for t in summaries):reasons.append('COEFFICIENT_DOMAIN_LIMITS_BEST_FOUND_CONTROL')
         direction='unresolved' if reasons else 'conditional_increase' if left<0 else 'conditional_decrease'
         out.update(status='computed_diagnostic',direction_status=direction,reasons=reasons,
@@ -151,6 +156,7 @@ def calculate(configuration, binding, query, requirements, context):
     result=response(context)
     value=dict(status='computed' if result['status']=='computed_diagnostic' else 'not_comparable',
         operation=query.operation,binding=binding,protocol=plain(query.protocol),
+        model_identity=binding['effective_configuration_identity'],
         nonlinear_response=result,task_acceptance='unmeasured',proxy_values={},
         internal_calculations=[dict(purpose=T2,**result.get('cost',{}))],limitations=LIMITATIONS)
     fit=applicability(requirements,query,assessment(SessionInput.model_validate(configuration),requirements),None)
