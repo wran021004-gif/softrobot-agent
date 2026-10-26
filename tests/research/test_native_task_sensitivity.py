@@ -51,6 +51,14 @@ class NativeTaskSensitivityTests(unittest.TestCase):
         actual=[dict(base[0],normalized_signed_excess=1.1)]
         self.assertEqual(validate_prediction(base,[.3],.5,actual)['status'],'unresolved')
 
+    def test_fixed_schedule_evidence_does_not_invent_reoptimization(self):
+        context=self.response_fixture()
+        for row in context['rows']+context['validation_rows']:
+            row['task_samples'].pop('reoptimized_control')
+        result=task_sensitivities(context)
+        self.assertEqual(set(result),{'fixed_control'})
+        self.assertIn('validation',result['fixed_control'])
+
     def test_validation_requires_distinct_results_and_preserves_old_v2_request(self):
         refs=[dict(artifact_id=c*64,media_type='application/json') for c in 'abcd']
         value=dict(direction_id='E',variables={'E':1.},coordinates=[0.,-1.,1.],coordinate_unit='Pa',t1_results=refs[:3])

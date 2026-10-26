@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-26 Asia/Shanghai",
+  "source": "evidence/b3_r1_history_assisted_050/design_package.json",
+  "base_commit": "618fba9a11a1a1d0c9fca5228d25e873b7c8dddd",
+  "physics_step_cap": 20000,
+  "planned_steps": 13000,
+  "structure": {"path": "segments.1.young_pa", "unit": "Pa", "base": 5400000.0, "h": 10000.0},
+  "control": {"unit": "N", "h": 0.001, "knots_s": [0.45, 0.49], "window_s": [0.45, 0.50], "coefficient_index": 5, "channel": "tendon_1"},
+  "training_factors": [-1.0, 1.0, -0.5, 0.5],
+  "holdout_factor": 0.75,
+  "prediction": "baseline plus h/2 central per-sample derivative; maximize all 13 predicted rows for signed J, each metric and active sample",
+  "step_rationale": "Young reuses the A4 R1 native probe: 0.1852% of baseline and well inside the frozen 2-15 MPa domain. Control is a 1 mN perturbation of an unsaturated 4.4-5.1 N channel; the existing knot interpolation distributes it over the final 50 ms. Chosen before any new rollout or held-out result, without tuning to its outcome.",
+  "policy": {"two_scale_relative_difference": 0.05, "maximum_error_fraction_of_change": 0.25, "material_normalized_change": 1e-8, "decision_significance_fraction_of_baseline_speed_margin": 0.1},
+  "policy_scope": "A4 empirical accuracy policy plus explicit decision significance relative to R1 boundary margin; neither is a rigorous bound or a new task threshold. Inspect all 13 rows even if aggregate J improves. Active switches keep A4 max-gradient status unresolved; row-wise predictions and predicted classification are assessed separately.",
+  "freeze_order": "commit protocol and driver; save training results and prospective predictions; commit predictions before calculating any holdout; then independent full MuJoCo playback and original evaluator",
+  "reoptimization": "not executed; reoptimized_capability_unresolved",
+  "prohibited_calls": ["provider", "LLM Agent", "PPO", "NMPC", "new optimizer"]
+}

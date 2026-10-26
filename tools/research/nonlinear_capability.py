@@ -376,6 +376,7 @@ def task_sensitivities(context):
             lower.append(ends[0]);upper.append(ends[1])
     span=min(upper)-max(lower) if upper else None
     for scope in ('fixed_control','reoptimized_control'):
+        if any(scope not in r['task_samples'] for r in rows):continue
         samples=[r['task_samples'][scope] for r in rows]
         keys=lambda ss:[(r['constraint_id'],r['sample_index']) for r in ss]
         if not samples[0] or any(keys(s)!=keys(samples[0]) for s in samples[1:]):continue
