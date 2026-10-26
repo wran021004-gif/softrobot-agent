@@ -1,0 +1,171 @@
+{
+  "first_full_solution": "radius020_101",
+  "main_feasibility_search_stopped": true,
+  "group_results": {
+    "neutral101": {
+      "radius_m": 0.018,
+      "J": 0.048487491307075636,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 42726,
+        "physics_steps": 424200,
+        "rollouts": 303,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 29.482139499999903
+      },
+      "independent_accepted": false
+    },
+    "radius016_101": {
+      "radius_m": 0.016,
+      "J": 18.833944109169096,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 32065,
+        "physics_steps": 318340,
+        "rollouts": 228,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 21.954472100000203
+      },
+      "independent_accepted": null
+    },
+    "radius020_101": {
+      "radius_m": 0.02,
+      "J": -0.045936748705046604,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 41316,
+        "physics_steps": 410200,
+        "rollouts": 293,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 28.466400400000566
+      },
+      "independent_accepted": true
+    },
+    "unguided014_101": {
+      "radius_m": 0.014,
+      "J": 18.86048309751578,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 10749,
+        "physics_steps": 106680,
+        "rollouts": 78,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 7.439316999998482
+      },
+      "independent_accepted": null
+    },
+    "unguided022_101": {
+      "radius_m": 0.022,
+      "J": -0.033316020674680424,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 35958,
+        "physics_steps": 357000,
+        "rollouts": 255,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 24.72073839999939
+      },
+      "independent_accepted": true
+    },
+    "neutral126": {
+      "radius_m": 0.018,
+      "J": -0.04983891364584658,
+      "cost": {
+        "model_builds": 3,
+        "forward_evaluations": 47943,
+        "physics_steps": 476000,
+        "rollouts": 340,
+        "mechanics_evaluations": 0,
+        "kernel_wall_s": 32.72939829999814
+      },
+      "independent_accepted": true
+    }
+  },
+  "first_solution_metrics": {
+    "plus_y": {
+      "terminal_error_m": 0.004994944478771761,
+      "holding_max_error_m": 0.004994944478771761,
+      "holding_max_speed_m_s": 0.018987945684735115
+    },
+    "minus_y": {
+      "terminal_error_m": 0.005193975874307155,
+      "holding_max_error_m": 0.005193975874307156,
+      "holding_max_speed_m_s": 0.019000505264635287
+    },
+    "up_z": {
+      "terminal_error_m": 0.009540632512949534,
+      "holding_max_error_m": 0.009540632512949534,
+      "holding_max_speed_m_s": 0.018931079093159574
+    }
+  },
+  "matched_policy_comparison": {
+    "common": "neutral101 and its independent failure; same frozen task, cold controls, native optimizer, per-target cap 101/4",
+    "unguided": {
+      "rollouts": 642,
+      "physics_steps": 896280,
+      "measured_kernel_and_validation_wall_s": 64.20074530000056
+    },
+    "guided_core": {
+      "rollouts": 830,
+      "physics_steps": 1161140,
+      "measured_kernel_and_validation_wall_s": 89.28086430000076
+    },
+    "guided_including_reconstructed_exception_cost": {
+      "rollouts": 858,
+      "physics_steps": 1199480,
+      "measured_wall_s_lower_bound": 89.28086430000076,
+      "additional_wall_s": null
+    },
+    "B_minus_A_core": {
+      "rollouts": 188,
+      "physics_steps": 264860,
+      "measured_kernel_and_validation_wall_s": 25.080119000000195
+    },
+    "inference": "No total computation saving. B initial screening order was predeclared; no causal claim that T2 selected the successful structure.",
+    "wall_scope": "Measured numerical kernels and validation only; excludes unmeasured early abort/generation and process startup/export time. Not an exact end-to-end speedup."
+  },
+  "cold_restart_prefix_check": {
+    "plus_y": {
+      "identical_first_101_sequences": true,
+      "first_feasible_callback_126": 101
+    },
+    "minus_y": {
+      "identical_first_101_sequences": true,
+      "first_feasible_callback_126": 101
+    },
+    "up_z": {
+      "identical_first_101_sequences": true,
+      "first_feasible_callback_126": 121
+    }
+  },
+  "total_research": {
+    "rollouts": 1539,
+    "physics_steps": 2149389,
+    "failed_step_calls": 1,
+    "measured_wall_s_lower_bound": 158.64950429999953
+  },
+  "benchmark_classification": "feasible control baseline; structural necessity unestablished; counterexample for cost of initial-affine guidance",
+  "validation": {
+    "tests": 19,
+    "separate_process_exit_codes": [
+      0,
+      0
+    ],
+    "actual_final_independent_groups": 3
+  },
+  "environment": {
+    "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "mujoco": "3.13.0",
+    "casadi": "3.7.2",
+    "platform": "Windows-10-10.0.19044-SP0",
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": null,
+      "OMP_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null
+    },
+    "note": "Direct numerical recipe inherited shell threading; runtime defaults specifying one thread were not enforced. All compared runs used the same shell environment."
+  },
+  "future_agent_isolation": "Do not include this evidence directory, report, branch or optimized inputs in future cold-start Agent context. Supply only frozen task/family and generic kernels."
+}

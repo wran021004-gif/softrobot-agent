@@ -1,0 +1,28 @@
+{
+  "version": "b1_workspace_coverage_v1",
+  "purpose": "Task-only projection for a future isolated cold-start study; contains no optimized design, control, trial ordering, or results",
+  "task_template": "reach_hold.json",
+  "frame": "world",
+  "targets_m": {
+    "plus_y": [0.276, 0.075, 0.15],
+    "minus_y": [0.276, -0.075, 0.15],
+    "up_z": [0.276, 0.0, 0.225]
+  },
+  "duration_s": 0.7,
+  "sampling_window_s": [0.0, 0.7],
+  "initializer": "All candidate named qpos and qvel zero; independently reset for each target",
+  "acceptance": "Original offline_reach_hold_v1 for every target, AND identical actual robot structure across all targets; never average failures",
+  "structure_space": {
+    "family_space": "../configs/research/family_space_v1.json",
+    "segment_lengths_m": [0.16, 0.11],
+    "young_pa": [7200000.0, 5400000.0],
+    "other_segment_and_assembly_values": "FamilySpace defaults",
+    "tendon_count": 6,
+    "spans": [
+      {"first_segment": 0, "last_segment": 0, "count": 3, "phase_rad": 0.0},
+      {"first_segment": 0, "last_segment": 1, "count": 3, "phase_rad": 1.0471975511965976}
+    ],
+    "shared_span_radius_m": [0.014, 0.023],
+    "other_tendon_and_control_limits": "FamilySpace defaults; physical tensions 0 to 8 N"
+  }
+}

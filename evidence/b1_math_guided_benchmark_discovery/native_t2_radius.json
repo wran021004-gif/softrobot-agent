@@ -1,0 +1,517 @@
+{
+  "results": {
+    "plus_y": {
+      "method": "mujoco-reoptimized-structure-response-v1",
+      "status": "computed_diagnostic",
+      "direction_status": "unresolved",
+      "task_acceptance": "unmeasured",
+      "limitations": [
+        "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+        "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+        "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+      ],
+      "cost": {
+        "model_builds": 0,
+        "rollouts": 0,
+        "physics_steps": 0,
+        "optimization_evaluations": 0,
+        "reused_t1_results": 3,
+        "kernel_wall_s": 7.089999962772708e-05
+      },
+      "reasons": [
+        "FLAT_OR_OPPOSING_LEFT_RIGHT_RESPONSE",
+        "UNEQUAL_ACTUAL_SEARCH_OPPORTUNITIES",
+        "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE",
+        "TARGET_STOP_DOES_NOT_ESTABLISH_COMPARABLE_OPTIMAL_MARGIN"
+      ],
+      "parameter": {
+        "units": "m",
+        "name": "both span radii"
+      },
+      "step": 0.0019999999999999983,
+      "secant_unit": "signed J / m",
+      "fixed_control": {
+        "left": -0.0026698271327063616,
+        "right": -0.0029931411358319364,
+        "central": -0.002831484134269149
+      },
+      "reoptimized": {
+        "left": -1.097318962525685,
+        "right": 0.7817481199786098,
+        "central": -0.1577854212735376
+      },
+      "nonmonotonic": true,
+      "practical_J_tolerance": 0.0001,
+      "monotone_observed": false,
+      "actual_search_opportunities": [
+        [
+          101,
+          4
+        ],
+        [
+          101,
+          4
+        ],
+        [
+          91,
+          3
+        ]
+      ],
+      "results": [
+        {
+          "candidate": {
+            "artifact_id": "b963cd2bd21ccda5c9a0486c3535013644445d278ba5451579d2bf6ee9be8ad7",
+            "media_type": "application/json"
+          },
+          "value": 0.018,
+          "reference": {
+            "artifact_id": "1b7ad84492bb73d54880152446d82cd0786f1e0c46cb1283a825e3b301c857d5",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.06202521788383,
+          "J": -0.052166212003201484,
+          "stop_reason": "local_target_reached",
+          "input_saturation": {
+            "minimum_n": 0.0,
+            "maximum_n": 1.9530255904197529,
+            "lower": true,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "d3b95148c46a5fd91e151319057222573ad809c2763da4124fbf035a02fc792a",
+            "media_type": "application/json"
+          },
+          "value": 0.016,
+          "reference": {
+            "artifact_id": "2a93d544e9c49b84004538f4d3141d824619d12e410b0cef5c041a994882c5e5",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062030557538094,
+          "J": -0.049971574078150116,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 5.964382931236689e-05,
+            "maximum_n": 2.5085551195699556,
+            "lower": false,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "21f17ce65f86c7a7dd54f3e7ba701faad8c98fa7fcb6ec6f77822cfc36ab79b1",
+            "media_type": "application/json"
+          },
+          "value": 0.02,
+          "reference": {
+            "artifact_id": "6b13c5fe38ae91aeaa3cb83dbe967b915069f284827771f7239eabbe517bea27",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062019231601557,
+          "J": -0.050602715763244266,
+          "stop_reason": "local_target_reached",
+          "input_saturation": {
+            "minimum_n": 0.0,
+            "maximum_n": 2.068850118782741,
+            "lower": true,
+            "upper": false
+          }
+        }
+      ],
+      "recommendation": "retain_baseline_and_diagnose",
+      "uncertainty": "No numerical or optimization error bound; a conditional direction concerns this local search only.",
+      "derivative_scope": "coupled path r_near=r_full, other generated choices fixed",
+      "referenced_t1_costs": [
+        {
+          "reference": {
+            "artifact_id": "1b7ad84492bb73d54880152446d82cd0786f1e0c46cb1283a825e3b301c857d5",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.933078099998966
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "2a93d544e9c49b84004538f4d3141d824619d12e410b0cef5c041a994882c5e5",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.558052600001247
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "6b13c5fe38ae91aeaa3cb83dbe967b915069f284827771f7239eabbe517bea27",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 12832,
+            "physics_steps": 127400,
+            "rollouts": 91,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 8.770375199999762
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        }
+      ]
+    },
+    "minus_y": {
+      "method": "mujoco-reoptimized-structure-response-v1",
+      "status": "computed_diagnostic",
+      "direction_status": "unresolved",
+      "task_acceptance": "unmeasured",
+      "limitations": [
+        "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+        "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+        "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+      ],
+      "cost": {
+        "model_builds": 0,
+        "rollouts": 0,
+        "physics_steps": 0,
+        "optimization_evaluations": 0,
+        "reused_t1_results": 3,
+        "kernel_wall_s": 3.529999958118424e-05
+      },
+      "reasons": [
+        "FLAT_OR_OPPOSING_LEFT_RIGHT_RESPONSE",
+        "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+      ],
+      "parameter": {
+        "units": "m",
+        "name": "both span radii"
+      },
+      "step": 0.0019999999999999983,
+      "secant_unit": "signed J / m",
+      "fixed_control": {
+        "left": -0.0026698271327063616,
+        "right": -0.0029931411358319364,
+        "central": -0.002831484134269149
+      },
+      "reoptimized": {
+        "left": 1.7811177748090505,
+        "right": -2.545197158271675,
+        "central": -0.38203969173131214
+      },
+      "nonmonotonic": true,
+      "practical_J_tolerance": 0.0001,
+      "monotone_observed": false,
+      "actual_search_opportunities": [
+        [
+          101,
+          4
+        ],
+        [
+          101,
+          4
+        ],
+        [
+          101,
+          4
+        ]
+      ],
+      "results": [
+        {
+          "candidate": {
+            "artifact_id": "a2c958571a03125c27c7c7541ab1039da0472fa6d0f52bcbb3503509253c3049",
+            "media_type": "application/json"
+          },
+          "value": 0.018,
+          "reference": {
+            "artifact_id": "70265f8faaa4264bd69ddcb28fe7e7fc0b7beed9d597b5831ed54c0464c62961",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.06202521788383,
+          "J": -0.04488434245169237,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 0.016309436394823185,
+            "maximum_n": 2.7455214582839624,
+            "lower": false,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "f37c7b7b7ca9c977e76b245a8c37346f74864d8e7113cd817a34f295b4a2fa21",
+            "media_type": "application/json"
+          },
+          "value": 0.016,
+          "reference": {
+            "artifact_id": "9ebfb2d1b22dcc8a14023d3a757030ef6ae22bd36b0b937e1ba717769e03d17e",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062030557538094,
+          "J": -0.04844657800131047,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 0.013330060345652012,
+            "maximum_n": 2.5752828548192115,
+            "lower": false,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "9d94e742096e641892410ea0064426fcdd3f12ceeab04fe0ec0ad89f296cc209",
+            "media_type": "application/json"
+          },
+          "value": 0.02,
+          "reference": {
+            "artifact_id": "de226856c85df8bbac3f8c305079cac843ac466f8e83b8ac8c2f60a29d198fe0",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062019231601557,
+          "J": -0.04997473676823572,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 0.0,
+            "maximum_n": 2.215589825391513,
+            "lower": true,
+            "upper": false
+          }
+        }
+      ],
+      "recommendation": "retain_baseline_and_diagnose",
+      "uncertainty": "No numerical or optimization error bound; a conditional direction concerns this local search only.",
+      "derivative_scope": "coupled path r_near=r_full, other generated choices fixed",
+      "referenced_t1_costs": [
+        {
+          "reference": {
+            "artifact_id": "70265f8faaa4264bd69ddcb28fe7e7fc0b7beed9d597b5831ed54c0464c62961",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.734017900000254
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "9ebfb2d1b22dcc8a14023d3a757030ef6ae22bd36b0b937e1ba717769e03d17e",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.814287100000001
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "de226856c85df8bbac3f8c305079cac843ac466f8e83b8ac8c2f60a29d198fe0",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.707539800001541
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        }
+      ]
+    },
+    "up_z": {
+      "method": "mujoco-reoptimized-structure-response-v1",
+      "status": "computed_diagnostic",
+      "direction_status": "unresolved",
+      "task_acceptance": "unmeasured",
+      "limitations": [
+        "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+        "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+        "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+      ],
+      "cost": {
+        "model_builds": 0,
+        "rollouts": 0,
+        "physics_steps": 0,
+        "optimization_evaluations": 0,
+        "reused_t1_results": 3,
+        "kernel_wall_s": 3.1099998523131944e-05
+      },
+      "reasons": [
+        "UNEQUAL_ACTUAL_SEARCH_OPPORTUNITIES",
+        "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE",
+        "NO_COMPLETED_RESPONSE_UPDATE"
+      ],
+      "parameter": {
+        "units": "m",
+        "name": "both span radii"
+      },
+      "step": 0.0019999999999999983,
+      "secant_unit": "signed J / m",
+      "fixed_control": {
+        "left": -0.0026698271327063616,
+        "right": -0.0029931411358319364,
+        "central": -0.002831484134269149
+      },
+      "reoptimized": {
+        "left": -9392.728308931019,
+        "right": -47.21212000606116,
+        "central": -4719.97021446854
+      },
+      "nonmonotonic": false,
+      "practical_J_tolerance": 0.0018833944109169097,
+      "monotone_observed": true,
+      "actual_search_opportunities": [
+        [
+          101,
+          4
+        ],
+        [
+          25,
+          0
+        ],
+        [
+          101,
+          4
+        ]
+      ],
+      "results": [
+        {
+          "candidate": {
+            "artifact_id": "9f1d70aa84fd26364b83dafcf0536e46b9a3f8aaa37ca68909abc29d6d54659a",
+            "media_type": "application/json"
+          },
+          "value": 0.018,
+          "reference": {
+            "artifact_id": "361e093ef5252dab7e32beb91cff0c75fd1db277969753e3608675e297ffbb93",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.06202521788383,
+          "J": 0.048487491307075636,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 0.0,
+            "maximum_n": 2.208578675288871,
+            "lower": true,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "db29b610913b7dce99164f4cdd546436d3d43836cfb4d8b86353718ce7ea6774",
+            "media_type": "application/json"
+          },
+          "value": 0.016,
+          "reference": {
+            "artifact_id": "b91224e412ec35a197cc2dc20dd306c7fe5ee57fcd24e0d543aa51ebd71e0368",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062030557538094,
+          "J": 18.833944109169096,
+          "stop_reason": "native_contact_free_domain_exit",
+          "input_saturation": {
+            "minimum_n": 0.2,
+            "maximum_n": 0.22,
+            "lower": false,
+            "upper": false
+          }
+        },
+        {
+          "candidate": {
+            "artifact_id": "b245ccd6bce11e3ad76a66811c31a32f3e6da9be4bfb9b97ac19f9a33a6dccde",
+            "media_type": "application/json"
+          },
+          "value": 0.02,
+          "reference": {
+            "artifact_id": "b7a0867ec74073a1248b2bdb724f017efe90714c4335c8f6e133cdf382388a5c",
+            "media_type": "application/json"
+          },
+          "initial_J": 19.062019231601557,
+          "J": -0.045936748705046604,
+          "stop_reason": "iteration_limit",
+          "input_saturation": {
+            "minimum_n": 0.0,
+            "maximum_n": 2.0568430500660306,
+            "lower": true,
+            "upper": false
+          }
+        }
+      ],
+      "recommendation": "retain_baseline_and_diagnose",
+      "uncertainty": "No numerical or optimization error bound; a conditional direction concerns this local search only.",
+      "derivative_scope": "coupled path r_near=r_full, other generated choices fixed",
+      "referenced_t1_costs": [
+        {
+          "reference": {
+            "artifact_id": "361e093ef5252dab7e32beb91cff0c75fd1db277969753e3608675e297ffbb93",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.815043500000684
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "b91224e412ec35a197cc2dc20dd306c7fe5ee57fcd24e0d543aa51ebd71e0368",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 3581,
+            "physics_steps": 35540,
+            "rollouts": 26,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 2.5821323999989545
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        },
+        {
+          "reference": {
+            "artifact_id": "b7a0867ec74073a1248b2bdb724f017efe90714c4335c8f6e133cdf382388a5c",
+            "media_type": "application/json"
+          },
+          "cost": {
+            "model_builds": 1,
+            "forward_evaluations": 14242,
+            "physics_steps": 141400,
+            "rollouts": 101,
+            "mechanics_evaluations": 0,
+            "kernel_wall_s": 9.988485399999263
+          },
+          "accounting": "Previously charged T1 computation; referenced, not charged again by T2"
+        }
+      ]
+    }
+  },
+  "cost": {
+    "wall_s": 0.2672287999994296,
+    "rollouts": 0,
+    "physics_steps": 0
+  },
+  "interpretation": "Direct existing T2 kernel on explicit saved T1 inputs; referenced T1 costs already charged"
+}
