@@ -154,9 +154,86 @@ def optimize(output, name):
         assert abs(validated['acceptance']['metrics'][official]-predicted[proxy]) < 1e-12
 
 
+def audit(output):
+    """Read-only numerical provenance and cost checks; no new rollout or search."""
+    import numpy as np
+    from tools.research.control_correction import corrected_tensions
+    from tools.research.physical_replay import binding
+    cfg = read(output/'configuration.json')
+    failed = read(output/'failed_nmpc_schedule.json')
+    saved = read(output/'search_01/schedule.json')
+    request = read(output/'search_01/request.json')
+    numerical = read(output/'search_01/optimization.json')
+    result = numerical['native_dynamics']['optimization']
+    settings = request['query']['control_optimization']['settings']
+    accepted = read(output/'search_01/independent_replay/result.json')
+    repeat = read(output/'nominal_repeat/result.json')
+    archived = read(output/'archived_schedule.json')
+    limits = [t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']]
+    reconstructed = corrected_tensions(failed['trajectory']['tensions_n'],
+        failed['trajectory']['times_s'][:-1], settings['knots_s'], result['best']['coefficients_n'],
+        limits, settings['correction_window_s'])
+    actual = np.asarray(saved['trajectory']['tensions_n'])
+    assert np.array_equal(reconstructed, actual)
+    assert numerical['native_dynamics']['original_schedule'] == failed
+    assert request['source_identity'] == digest(failed)
+    assert request['initial_coefficients_n'] == [0.]*16
+    assert result['candidates'][0]['coefficients_n'] == [0.]*16
+    assert accepted['acceptance']['accepted'] is True and repeat['acceptance']['accepted'] is True
+    assert accepted['raw_reference'] == repeat['raw_reference']
+    assert digest(saved['trajectory']) != digest(archived['trajectory'])
+    binding(cfg, saved['trajectory'])
+    raw = read(output/'search_01/independent_replay/raw.json')
+    expected = result['best']['outputs']
+    p = np.array([r['tip_m'] for r in raw['samples']])
+    v = np.array([r['tip_velocity_m_s'] for r in raw['samples']])
+    dp = float(np.max(abs(p-np.asarray(expected['tip_positions_m']))))
+    dv = float(np.max(abs(v-np.asarray(expected['tip_velocities_m_s']))))
+    assert dp < 1e-12 and dv < 1e-12
+    kernel = numerical['native_dynamics']['cost']
+    preparation_replays = [read(output/name/'result.json')['cost']
+        for name in ('archived_solution_replay', 'failed_nmpc_replay')]
+    through_first_rollouts = kernel['rollouts']+accepted['cost']['full_rollouts']
+    through_first_steps = kernel['physics_steps']+accepted['cost']['physics_steps']
+    total_rollouts = through_first_rollouts+sum(r['full_rollouts'] for r in preparation_replays)
+    total_steps = through_first_steps+sum(r['physics_steps'] for r in preparation_replays)
+    summary = dict(runtime=runtime(), accepted=True, configuration_identity=digest(cfg),
+        task_identity=digest(cfg['task']), trajectory_identity=digest(saved['trajectory']),
+        provenance_checks=dict(zero_offset_restart=True, failed_nmpc_source_matches=True,
+            fresh_coefficients_reconstruct_full_sequence=True, different_from_archived_passing_sequence=True,
+            same_structure=True, complete_original_task=True),
+        metrics=accepted['acceptance']['metrics'],
+        speed_margin_m_s=cfg['policy']['controller']['parameters']['data']['settling']['speed_limit_m_s']-
+            accepted['acceptance']['metrics']['holding_max_speed_m_s'],
+        max_absolute_correction_n=float(np.max(abs(actual-np.asarray(failed['trajectory']['tensions_n'])))),
+        max_difference_from_archived_control_n=float(np.max(abs(actual-np.asarray(archived['trajectory']['tensions_n'])))),
+        channel_min_n=actual.min(axis=0).tolist(), channel_max_n=actual.max(axis=0).tolist(), limits_n=limits,
+        native_vs_independent_replay=dict(max_position_difference_m=dp, max_velocity_difference_m_s=dv),
+        nominal_repeat=dict(accepted=True, identical_full_sample_content=True, new_process=True),
+        cost=dict(native=kernel, local_slsqp_iterations=result['best']['local_solver']['iterations'],
+            finite_difference_rollouts=result['finite_difference_evaluations'],
+            search_and_first_acceptance=dict(native_rollouts=kernel['rollouts'], independent_full_replays=accepted['cost']['full_rollouts'],
+                total_mujoco_rollouts=through_first_rollouts, physics_steps=through_first_steps,
+                original_physical_evaluations=accepted['cost']['physical_evaluations'],
+                calculate_wall_s=numerical['experiment_wall_s'], replay_wall_s=accepted['cost']['wall_s']),
+            including_preparation_to_first_acceptance=dict(total_mujoco_rollouts=total_rollouts,
+                physics_steps=total_steps, original_physical_evaluations=sum(r['physical_evaluations'] for r in preparation_replays)+accepted['cost']['physical_evaluations'],
+                measured_phase_wall_s=read(output/'preparation.json')['preparation_wall_s']+
+                    numerical['experiment_wall_s']+accepted['cost']['wall_s']),
+            including_nominal_repeat=dict(total_mujoco_rollouts=total_rollouts+repeat['cost']['full_rollouts'],
+                physics_steps=total_steps+repeat['cost']['physics_steps'],
+                original_physical_evaluations=sum(r['physical_evaluations'] for r in preparation_replays)+accepted['cost']['physical_evaluations']+repeat['cost']['physical_evaluations'],
+                repeat_wall_s=repeat['cost']['wall_s']),
+            fresh_nmpc_solves=0, ppo_training_steps=0, research_llm_calls=0),
+        limitations=['Nominal sampled open-loop simulation only; very small speed margin.',
+            'No disturbance robustness, continuous-time, hardware, global optimality, or structural-benefit proof.'])
+    atomic_json(output/'summary.json', summary)
+    print('audit passed', summary['metrics'], flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage', choices=['prepare', 'optimize', 'replay'])
+    parser.add_argument('stage', choices=['prepare', 'optimize', 'replay', 'audit'])
     parser.add_argument('--output', type=Path, default=ROOT/'evidence/b3_math_tool_feasibility')
     parser.add_argument('--name', default='search_01')
     args = parser.parse_args()
@@ -164,6 +241,8 @@ def main():
         prepare(args.output)
     elif args.stage == 'optimize':
         optimize(args.output, args.name)
+    elif args.stage == 'audit':
+        audit(args.output)
     else:
         replay(read(args.output/'configuration.json'), read(args.output/'search_01/schedule.json'),
             args.output/args.name, args.name)
