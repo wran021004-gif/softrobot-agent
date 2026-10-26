@@ -48,7 +48,15 @@ run = sys.argv[1]
 assert run in ('b3-t2-050-b-v2-draft', 'b3-t2-050-c-v2-draft')
 host = Host(ROOT/'runs/research'/run, run, actor='unified-research')
 guard(host)
+reviewed = '--reviewed' in sys.argv[2:]
+if reviewed:
+    pauses = [e for e in host.store.events(run) if e['kind'] == 'supervisor_pause']
+    if not pauses:
+        raise ValueError('M2_REVIEW_REQUIRES_ORIGINAL_SETTLED_SUPERVISOR_PAUSE')
+    record(host, 'supervisor_budget_review', dict(pause=pauses[-1]['outputs'][0],
+        budget=host.store.remaining(), additional_budget=0, protected_provider_requests=4,
+        decision='Continue the same Agent and frozen scope within the original remaining counts; no scientific direction supplied'))
 record(host, 'supervisor_run', dict(pid=os.getpid(), runner='runs/m2_run.py',
     scope='Only frozen computation and physical opportunity checks; original dispatch, ledger and tools unchanged'))
 asyncio.run(converse(host, session_handoff=True, handoff_request_bytes=160000,
-    pause_exploration_remaining=4))
+    pause_exploration_remaining=None if reviewed else 4))

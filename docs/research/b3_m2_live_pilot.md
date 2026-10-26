@@ -68,6 +68,9 @@ C 每结构独立物理机会；核对结果直接保存到原 Store event。没
 正常运行使用原 s135 Python 执行 `runs/m2_run.py <study_id>`；其内部调用原 converse，
 session_handoff=True、handoff_request_bytes=160000、pause_exploration_remaining=4。
 恢复前检查进程、原账本和未知发送；优先原 recover/restore-only，不重复 launch。
+到达原 supervisor_pause 后，监督者核对剩余额度、配对反馈和原快照；
+若仍能在原额度内继续，可用同一操作脚本加 `--reviewed`，仅取消已经完成的监督复核暂停。
+它要求存在原暂停记录、向原 Store 记下复核和 additional_budget=0；原 4 次 Provider 保护及所有科学门禁保持。
 
 ## 自动审批阻塞
 
@@ -144,6 +147,19 @@ MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE 拒绝，数学启动和
 因此保留这一数据获取限制，不把它直接归为数值故障或静默修改上下文机制。
 当前已交付新物理失败；未发现网络或未结算 worker 故障，不因 Agent 读取低效就改变提示或替其提交新控制。
 这是后续审计需评估的资源效率与信息获取行为，尚未宣称其找到第二项有效科研方案。
+
+### B：原预算复核后继续
+
+Provider=23 / 32 时到达原 request-feedback 监督暂停（事件 422；
+`178368b6cab2ca98c0595af4af5abf7c2f8042dc12bb5829ecfa7ab129e4f6fd`）。
+无 pending、无未知发送、无未消费响应或运行中 worker；原 restore-only 在新进程验证通过，未发送请求。
+剩 Provider=9，包含原收尾保护 4；公开操作剩 41，数学剩 22、NMPC 剩 1、物理剩 3。
+监督者完成原预算复核后继续同一 Study，没有追加任何额度、指令、科学控制种子或研究方向。
+
+Agent 此时已自主提出 native 末段张力修正，尚未执行成功：
+diagnose 与 CONTROL_SEARCH intent 不匹配；native 保存状态字段缺失；
+随后 evaluation_requests=300 超过 8、iterations=8 超过 2，均由原门禁在计算前拒绝。
+这保留为调用与预算理解错误，不把被拒的 300 回调记为已执行，也不放宽冻结上限。
 
 | 实际状态与费用 | B | C |
 |---|---:|---:|
