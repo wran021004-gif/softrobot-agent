@@ -1,6 +1,6 @@
 # B3 M2：有限真实自主科研试点
 
-2026-10-26（Asia/Shanghai）。状态：**B 已合法 STOP，无可行解；C 已隔离启动第一次 NMPC**。
+2026-10-26（Asia/Shanghai）。状态：**B 已合法 STOP、深入审计完成；C 继续隔离研究**。
 本文件持续更新，尚不是已完成的 M2 科研报告。
 
 基线 `feat/b3-t2-guided-design@fcdc0a4f47dea98afe3a355f491b15b1f7a51a6d`。
@@ -136,8 +136,9 @@ optimization_nonconverged=true，100.7528732 s；已保存 0–0.09 s 的 10 条
 `918586272d39efa02276f55c4cc9a0bc2e53f913807f3b669fc2a8fc65c42b9b`（133,979 bytes），
 已包含新独立结果身份、holding_speed 主违反量 0.11137394399884916 / 0.02、原 action_trace 和非权威解释。
 随后 Agent 选择瞬时制动诊断：model_source=mujoco、saved_state、当前 execution、update_id=44。
-但把方法名放在 operation 且缺少正式 native 方法字段，原 Schema 以
-MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE 拒绝，数学启动和计费均为 0。
+本次深入审计纠正早期摘要：operation 字段本身合法，也不是缺少某个 native 方法字段；
+`instantaneous_braking_v1` 未注册为 MuJoCo native operation，属于不支持的模型—方法组合。
+原 Schema 以 MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE 拒绝，数学启动和计费均为 0。
 原错误不改写为科学结果，也不免费补造一次正确调用。
 
 后续真实行为是多次读取当前候选、控制观测、历史和原 Plan，并通过 SDK retrieve_context 搜索生成参数。
@@ -157,7 +158,7 @@ Provider=23 / 32 时到达原 request-feedback 监督暂停（事件 422；
 监督者完成原预算复核后继续同一 Study，没有追加任何额度、指令、科学控制种子或研究方向。
 
 Agent 此时已自主提出 native 末段张力修正，尚未执行成功：
-diagnose 与 CONTROL_SEARCH intent 不匹配；native 保存状态字段缺失；
+diagnose 与 CONTROL_SEARCH intent 不匹配；native 保存状态准入条件不满足；
 随后 evaluation_requests=300 超过 8、iterations=8 超过 2，均由原门禁在计算前拒绝。
 这保留为调用与预算理解错误，不把被拒的 300 回调记为已执行，也不放宽冻结上限。
 
@@ -193,6 +194,65 @@ public operations=50，13 个原工具参数/引用错误；另有 SDK offload �
 [原停止与结果目录](../../evidence/b3_t2_pilot_050_b/disposition.json)及 design_package。
 原 archived 对归档整体和结果/STOP member 校验通过；没有覆盖之前的导出。
 
+### B：用户追加的深入审计
+
+**结论：独立物理失败可信、账本与 STOP 合规；后续自主优化没有实际执行。
+不能把本组描述为充分控制优化后仍失败，也不能把所有后续调用失败都归为 Agent 忽视已知规则。**
+此次只读核对原 Store、32 份真实请求、原反馈、冻结源码与原保存轨迹，不恢复 B、不请求新模型、不启动新求解。
+
+第一，重算原保存观测的范数，与独立验收一致：终点误差 3.148372649 mm；
+保持位置峰值 6.038027479 mm（t=0.45 s）；保持速度峰值 0.111373943999 m/s（t=0.48 s）。
+原 50 个 post-step 样本覆盖 0.01–0.50 s，六个保持点齐全，engine_time 与 sample_time 最大差 3.89e-16 s。
+五次求解 raw_status 全为 Maximum_Iterations_Exceeded，采用原允许的 feasible_suboptimal_update；
+独立 solver_errors=0 表示无执行错误，不表示五个 NLP 收敛。
+全轨迹张力峰值 **7.999945198 N**，已接近 8 N 上限；只有最后保持窗峰值为 4.387190886 N。
+Agent 从末段有张力余量推断“不是 actuation-limit deficiency”缺少识别性依据，
+余量既不是可用制动力证明，也不能排除更早的输入约束、求解质量或预测模型限制。
+
+第二，**原生方法限制在工具结果中存在，但未完整交付到真实后续请求**。
+原方法反馈 `f5422168ad12f74cff6dcfc8b88243db163fc87110c70324d7627d77056af880`
+（事件 324）有 7,893 字符，execution_limits 在约第 6,520 字符，
+measured_control_initialization 模板在约第 6,592 字符。
+真实请求 #18 已切换 Session：pending_feedback_delivery 将该结果标成 summary_only，
+facts 仅有 candidate/operation；execution_limits 与完整绑定模板均未进入 wire。
+后续 #19–#22 亦没有这两个字段；8 次回调和 2 次更新的具体上限分别到 #23、#24 才随拒绝反馈出现。
+因此，evaluation_requests=300、iterations=8 两次拒绝保护了预算，
+但不能认定模型此前已经完整看见 8/2/4 后仍故意越界。
+这是交付层的实质缺口，不是数学证据错误；原 L1 数据仍可通过稳定 Store 指针读取。
+
+第三，**可明确归于 Agent 的调用与研究管理错误仍然存在**。
+请求 #3、#4、#5 中均已包含 decision.selected_candidate 的明确修正反馈，模型仍反复漏填或设 null；
+累计四次 DECISION_CANDIDATE_MISMATCH（含后期初始化）。
+L0 始终明确说明 measured_nmpc 的 source+parent 绑定步骤，模型却在来源未绑定时提交原生控制修正，
+直到 #25 才尝试 initialize_control，且再次漏填选定候选。
+此外有不支持的 MuJoCo 瞬时制动组合、保存状态选择不合法、字段选择使用点路径、
+STOP 引用未注册证据和添加不存在字段等错误。
+这些区别于合理但最终失败的物理假设，确实消耗了有限 Provider 机会。
+
+第四，**长对象读取与切换增加了额外阻力**。
+候选 full 为长单行 JSON，SDK 按行正则命中仍返回整行；随后再被 offload，难以只取需要的结构参数。
+切换后两次旧 SDK reference 失效（真实 #10、#17 返回 reference not found），
+但原 Store 查询仍合法；这是临时检索引用寿命问题，不是结果丢失。
+31 次主 Agent 请求中，18 次只做读取/检索（包括必要的初始历史读取和收尾，不把全部视为浪费），
+5 次数学提交全部被拒，实际仅 1 次 NMPC 科研执行。
+47 个模型原始工具请求与原账本 50 次公开操作口径不同，后者还含原执行内部操作；两者不混记。
+32 次 Provider 全部 HTTP 200，无网络故障；失败主因不是网络中断。
+
+第五，**科研解释的边界**。
+模型确实收到新速度失败并改变问题方向，后续原生修正方向有可检验性；
+但没有得到任何修正后物理数据或 T1/T2 数值，因此不能证明固定结构不可行、T2 无价值或结构修改更好。
+32 次 Provider 用尽时仍剩数学 22、NMPC 1、回放 2、共享物理 3；主要执行瓶颈是模型调用预算和接口使用，
+物理层面则仍未区分求解不足、预测失配、控制时序和结构能力。
+Provider 实际接收计时合计 1,104.792 s，独立 NMPC 物理执行计时 476.266 s；
+这两种计时与 shared ledger wall 不另行重复累加成“总科学计算”。
+
+修复建议按实际证据排序：把当前方法的少量 execution_limits 与明确控制来源缺项保留到 L0/切换摘要；
+让长对象的按需读取维持结构化小范围，切换时不把旧 SDK 引用作为唯一入口；
+使行动相关的必填字段和不支持的模型—方法组合更早给出精确提示。
+这些均应复用原方法视图、Handoff 和 evidence_read，不新增记忆、优化器或 Agent。
+本次审计未改变正在运行的 C 的冻结提示/交付条件，也未向 C 注入本审计或 B 结果；
+本轮结束后再根据完整 B/C 证据决定最小修复，不能为改善 B 结果恢复其已封存 Study。
+
 ### C：启动隔离与早期决策
 
 B 全部进程和请求结束后才启动 C（Windows launcher PID 540692）；复用原独立 C Store、共同候选和三条背景。
@@ -209,6 +269,13 @@ C 在修正前已自行补齐参数进入首次 NMPC，未中断其控制执行�
 脚本修改只影响后续进程恢复时的无效输入错误交付；生产源码和冻结配置均不变。
 Agent 所述“旧目标/阈值不同、速度成本是新元素”尚不符合冻结背景：新信息主要是 0.35→0.50 s 时域，
 旧目标与硬阈值不能仅从 task_match=false 推断已改变。保留原自然语言误判，不改写其科研方案。
+
+用户请求 B 深入审计期间，C 到达原 Provider=23/32 的 request-feedback 暂停（事件 407，
+`6c4a0459cb5278421604ec22518c0edbb1263c1d1fe279864b89f626e908158c`）。
+已完成首次独立 NMPC、1 项数学分析及 1 次独立回放；详细结果留待 C 结束统一核对。
+监督者确认原进程退出、无 pending/占用/未消费响应，完成原 restore-only 验证，
+使用同一 C Store `--reviewed` 继续原剩余 9 次 Provider（含保护 4），additional_budget=0。
+Windows launcher PID 745260；没有将 B 新审计内容传入 C，未改变其冻结提示、科学实现或任务。
 
 | 实际状态与费用 | B | C |
 |---|---:|---:|
