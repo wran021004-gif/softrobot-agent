@@ -19,10 +19,16 @@ def freeze_family_variables(space, grant):
     import re
     from extensions.tendon_family.family_space import parameter_capabilities
     if (not isinstance(grant,dict) or set(grant)!={'version','variables'} or
-            grant['version']!='family_sensitivity_v1' or not isinstance(grant['variables'],list)
+            grant['version'] not in ('family_sensitivity_v1','family_sensitivity_v2') or not isinstance(grant['variables'],list)
             or not grant['variables'] or any(not isinstance(v,str) for v in grant['variables'])
             or len(set(grant['variables']))!=len(grant['variables'])):
         raise ValueError('EXPLICIT_VERSIONED_FAMILY_SENSITIVITY_GRANT_REQUIRED')
+    if grant['version']=='family_sensitivity_v2':
+        # Authorization is a path selector, never a second physical domain. Resolve
+        # existence, type and effectiveness against each actual candidate later.
+        if any(not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*(?:\.(?:[A-Za-z_][A-Za-z_0-9]*|0|[1-9][0-9]*|\*))*',v) for v in grant['variables']):
+            raise ValueError('FAMILY_PARAMETER_PATH_SELECTOR_REQUIRED')
+        return deepcopy(grant)
     request=dict(family_space_identity=digest(space),segment_count=max(space['executable_segment_counts']),
         tendon_count=space['executable_tendon_count_bounds'][0])
     if space['version']=='serial_family_space_v2':request['version']='serial_family_generation_v2'
@@ -36,41 +42,66 @@ def freeze_family_variables(space, grant):
     return deepcopy(grant)
 
 
-def family_parameters(spec, candidate, path):
-    """Resolve sparse defaults, then verify the actual generator output, without solving."""
-    from extensions.tendon_family.family_space import parse_build, parameter_capabilities
-    from extensions.tendon_family.generated_serial import generate_family
+def family_variable_authorized(spec,path):
     grant=spec.get('family_sensitivity_variables',{})
-    if grant.get('version')!='family_sensitivity_v1' or path not in grant.get('variables',[]):
-        raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
+    if grant.get('version')=='family_sensitivity_v1':return path in grant.get('variables',[])
+    if grant.get('version')!='family_sensitivity_v2':return False
+    return any(len(p.split('.'))==len(path.split('.')) and all(a=='*' or a==b for a,b in zip(p.split('.'),path.split('.')))
+        for p in grant.get('variables',[]))
+
+
+def family_analysis_parameters(spec,candidate):
+    from extensions.tendon_family.family_space import parameter_capabilities
+    rows=parameter_capabilities(spec['family_space'],candidate['parameters'])
+    for row in rows:
+        path=row['parameter_id'];row['study_authorized']=family_variable_authorized(spec,path) and '*' not in path
+        row['applicable_mathematical_methods']=[m for m in row['supported_methods'] if m!='generate' and
+            row['study_authorized'] and 'analysis' in spec.get('capabilities',[]) and (m=='fixed_input_structure_v1' or spec.get('mathematical_methods',{}).get(m))]
+        if (row['continuous_perturbation'] and row['study_authorized'] and 'analysis' in spec.get('capabilities',[])
+                and spec.get('mathematical_methods',{}).get(CONIC) and spec.get('mathematical_methods',{}).get(SENSITIVITY)):
+            row['applicable_mathematical_methods'].append(SENSITIVITY)
+        if not row['study_authorized']:row['authorization_reason']='Not selected by frozen family_sensitivity_variables'
+    return rows
+
+
+def family_parameters(spec, candidate, path, *, continuous=True):
+    """Resolve one authorized actual path and verify the existing generated model."""
+    from extensions.tendon_family.family_space import parse_build, resolved_request
+    from extensions.tendon_family.generated_serial import generate_family
+    if not family_variable_authorized(spec,path):raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
     if candidate.get('generation_version') not in ('serial_family_generation_v1','serial_family_generation_v2'):
         raise ValueError('CURRENT_GENERATED_FAMILY_CANDIDATE_REQUIRED')
     build=parse_build(dict(space=spec['family_space'],request=candidate['parameters']))
-    params=plain(build.request)
-    domains={r['parameter_id']:r for r in parameter_capabilities(spec['family_space'],params)}
+    params=resolved_request(spec['family_space'],candidate['parameters'])
+    if spec['family_sensitivity_variables']['version']=='family_sensitivity_v1':
+        # Preserve the original sparse normalization of the sealed v1 contract.
+        params=plain(build.request)
+        from extensions.tendon_family.family_space import parameter_capabilities, Span
+        old_domains={r['parameter_id']:r for r in parameter_capabilities(spec['family_space'],params)}
+        if path.startswith('spans.'):
+            params['spans']=params['spans'] or [plain(Span(last_segment=params['segment_count']-1,count=params['tendon_count']))]
+            for span in params['spans']:
+                if span['radius_m'] is None:span['radius_m']=spec['family_space']['routing_domains']['radius_m']['default']
+        for i in range(params['segment_count']):
+            choice=params['segments'].setdefault(str(i),{})
+            for key in ('length_m','young_pa'):
+                if choice.get(key) is None:choice[key]=old_domains[f'segments.{i}.{key}']['default']
+        params=plain(parse_build(dict(space=spec['family_space'],request=params)).request)
+    domains={r['parameter_id']:r for r in family_analysis_parameters(spec,candidate) if '*' not in r['parameter_id']}
     if path not in domains:raise ValueError('PARAMETER_NOT_IN_CURRENT_CANDIDATE_TOPOLOGY')
-    if not domains[path]['effective_in_current_execution']:raise ValueError('PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING')
-    if path.startswith('spans.'):
-        from extensions.tendon_family.family_space import Span
-        params['spans']=params['spans'] or [plain(Span(last_segment=params['segment_count']-1,count=params['tendon_count']))]
-        for span in params['spans']:
-            if span['radius_m'] is None:span['radius_m']=spec['family_space']['routing_domains']['radius_m']['default']
-    for i in range(params['segment_count']):
-        choice=params['segments'].setdefault(str(i),{})
-        for key in ('length_m','young_pa'):
-            if choice.get(key) is None:choice[key]=domains[f'segments.{i}.{key}']['default']
-        # Parse omitted and explicit segments identically, including optional fields.
-    params=plain(parse_build(dict(space=spec['family_space'],request=params)).request)
-    robot,mesh,_=generate_family(build)
-    cfg=candidate['configuration']
+    domain=domains[path]
+    if not domain['effective_in_current_execution']:raise ValueError('PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING: '+domain['analysis_reason'])
+    if continuous and not domain['continuous_perturbation']:raise ValueError('PARAMETER_NOT_CONTINUOUS_STRUCTURAL_DIRECTION: '+domain['analysis_reason'])
+    robot,mesh,_=generate_family(build);cfg=candidate['configuration']
     if (robot!=cfg['robot']['structure']['data'] or mesh!=cfg['policy']['discretization']['data']
             or cfg['policy']['candidate_builder']['parameters']['data']!=plain(build)):
         raise ValueError('GENERATED_CONFIGURATION_DOES_NOT_MATCH_FROZEN_REQUEST')
-    domain=domains[path];index=path.split('.')[1]
-    source='routing_domains' if path.startswith('spans.') else ('segment_domains.'+index if index in spec['family_space']['segment_domains'] else 'segment_domain')
-    return params,dict(path=path,units=domain['unit'],bounds=[domain['minimum'],domain['maximum']],
-        source='current frozen FamilySpace continuous domain',affected_tendon_indices=domain.get('affected_tendon_indices'),bounds_source=dict(
-            family_space_identity=spec['family_space_identity'],path=source+'.'+path.split('.')[-1]))
+    return params,dict(path=path,units=domain['unit'],bounds=[domain.get('minimum'),domain.get('maximum')],
+        current_value=domain['current_value'],category=domain['category'],data_type=domain['data_type'],choices=domain['choices'],
+        continuous_perturbation=domain['continuous_perturbation'],physical_component=domain['physical_component'],
+        comparison_path=domain.get('comparison_path',path),input_set_changes=domain.get('input_set_changes',False),
+        source='current frozen FamilySpace continuous domain',affected_tendon_indices=domain.get('affected_tendon_indices'),
+        bounds_source=dict(family_space_identity=spec['family_space_identity'],path=domain['domain_source']))
 
 
 def dependencies():
@@ -151,6 +182,8 @@ def candidate_methods(host, reference):
     methods=spec.get('mathematical_methods',{});remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
     variables=(spec.get('family_sensitivity_variables',{}).get('variables',[]) if spec.get('start_mode')=='family_space'
         else [p for p in spec['allowed_parameters'] if p.endswith(('.length_m','.young_pa'))])
+    if spec.get('family_sensitivity_variables',{}).get('version')=='family_sensitivity_v2':
+        variables=[r['parameter_id'] for r in family_analysis_parameters(spec,candidate) if r['study_authorized'] and r['continuous_perturbation']]
     rows=[]
     for variable in variables:
         row=dict(variable=variable,status='missing_models',ready_stencils=[],incomplete_stencils=[],rejections=[])
@@ -232,8 +265,7 @@ def sensitivity_context(host, query):
         raise ValueError('EXPLICIT_STENCIL_REQUIRES_H_AND_HALF_H')
     family=s['spec'].get('start_mode')=='family_space'
     continuous=(path.startswith('segments.') and path.split('.')[-1] in ('length_m','young_pa')) or (family and path.startswith('spans.') and path.endswith('.radius_m'))
-    if (len(path.split('.')) != 3 or not continuous
-            or (not family and path not in s['spec']['allowed_parameters'])):
+    if (not family and (len(path.split('.')) != 3 or not continuous or path not in s['spec']['allowed_parameters'])):
         raise ValueError('AUTHORIZED_CONTINUOUS_PARAMETER_REQUIRED')
     points=[]; base_candidate=None; base_result=None
     bounds=None if family else s['spec']['allowed_parameters'][path]

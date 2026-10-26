@@ -143,6 +143,48 @@ def mathematical_method_view(host, reference):
                 'repeat_hint','experimental_equivalence','source')} for r in history_index(host,reference,request)
                 if r['method']==key]
             methods[key]['repeat_guidance']='Read the original result and state what new information a repeat adds. Reproducibility, numerical checks and changed conditions are legitimate; this hint never vetoes execution. Configuration/request matching alone does not prove identical models, working points or controls.'
+    from copy import deepcopy
+    from tools.research.nonlinear_capability import METHODS, T1, T2, LIMITATIONS, candidate_responses
+    for operation,method in METHODS.items():
+        # Frozen old studies retain their existing catalog and authorization.
+        if not spec.get('mathematical_methods',{}).get(method):continue
+        item=deepcopy(methods['mujoco_direct_control_v1'])
+        item.update(operation=operation,method=method,method_version=method,
+            scientific_purpose='Finite-budget nonlinear task capability' if method==T1 else 'Reoptimized structural response',
+            description='Limited-budget mathematical diagnostic; automatic physical ranking has not been validated.',
+            limitations=LIMITATIONS,required_parameters=['control_optimization={source,settings}'] if method==T1 else
+                ['nonlinear_response={variable,unit,t1_results=[baseline,minus,plus]}'],
+            cost_scope=item['cost_scope'] if method==T1 else 'One aggregation evaluation for admitted saved T1 results, zero new native models, optimizations or physics steps. Prior T1 charges remain referenced; actual preparation/worker wall time is additional.',
+            request_template=dict(candidate=reference,operation=operation,model_source='mujoco',
+                operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
+            detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+method))
+        if method==T2:
+            item['missing']=[m for m in item['missing'] if not m.startswith('control_optimization')]
+            item['missing'].append('three comparable completed T1 results')
+            for name in ('handoff','measured_control_initialization','control_sources','execution_limits'):
+                item.pop(name,None)
+            item['coverage']=[]
+            item['applicability']=dict(status='requires_parameters',
+                parameter_requirements=['nonlinear_response'],execution_support='saved_evidence_only')
+            if binding_error is None and c.get('generation_version'):
+                prepared=candidate_responses(host,reference)
+                item.update(prepared)
+                if prepared['batch_request']:
+                    item['request_template']=prepared['batch_request']
+                    item['missing']=[m for m in item['missing'] if m!='three comparable completed T1 results']
+            item.update(registered=True,authorized=item['formal_execution_authorized'],
+                applicable=bool(item.get('ready_requests')),executable=bool(item.get('ready_requests') and
+                    item['formal_execution_authorized'] and remaining>=1 and not closed))
+            item['planning_status']=('unauthorized' if not item['authorized'] else 'blocked' if closed else
+                'insufficient_budget' if remaining<1 else 'ready' if item['executable'] else 'requires_comparable_t1_results')
+            if item.get('ready_requests'):
+                item['applicability'].update(status='applicable',parameter_requirements=[])
+            item['execution_status']='conditional_on_admission' if item['executable'] else 'blocked'
+            item['estimated_evaluations']=1
+            item['required_parameters']=['nonlinear_response v1: {variable,unit,t1_results} OR v2: {version,directions}; read analysis_request_schema']
+            item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
+
+        methods[method]=item
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
 
@@ -189,6 +231,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     p=TaskAnalysisProtocol.model_validate(protocol)
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
+        if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):continue
         native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')

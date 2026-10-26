@@ -17,10 +17,17 @@ def decision_summary(value):
     summary['question']={
         'native_dynamics_v1':'Which native forces and drive directions determine acceleration at this state?',
         'short_input_response_v1':'How do legal tensions affect the short endpoint, and does one local correction improve its constraints?',
+        'mujoco_nonlinear_task_capability_v1':'What is the best found full-task signed J under this finite native search?',
         'mujoco_direct_control_v1':'Can bounded native sequence optimization improve every holding sample before independent full replay?',
         'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
     if value['operation']=='native_dynamics_v1':
         mechanics=raw['mechanics'];names={q['name'] for q in summary['quantities']}
+        if mechanics.get('validity'):
+            summary['mechanics_evidence']=dict(state=mechanics['validity'],coordinates=mechanics['coordinates'],
+                input_saturation=mechanics['input_saturation'],
+                force_relation='M qacc = qfrc_passive + qfrc_actuator + qfrc_applied - qfrc_bias + qfrc_constraint',
+                raw_pointer='/native_dynamics/mechanics',
+                interpretation='Internal engine consistency only; no hardware accuracy or future trajectory guarantee.')
         for name,data,unit,path in (
                 ('tip_acceleration',mechanics.get('tip_acceleration_m_s2'),'m/s^2','mechanics/tip_acceleration_m_s2'),
                 ('local_drive_singular_values',mechanics.get('function_metrics',{}).get('drive_singular_values_m_s2_n'),'m/(s^2*N)','mechanics/function_metrics/drive_singular_values_m_s2_n'),
@@ -50,16 +57,25 @@ def decision_summary(value):
     return summary
 
 
-def structure_context(base, candidates, request):
+def structure_context(base, candidates, request, *, spec=None):
     """Existing verified source-relative candidates; exactly one continuous edit."""
     variable=request.variable
-    if not (variable.startswith('segments.') and (variable.endswith('.young_pa') or '.sections.' in variable)):
+    generated=bool(base.get('generation_version'))
+    legacy=variable.startswith('segments.') and (variable.endswith('.young_pa') or '.sections.' in variable)
+    from tools.research.optimal_capability import family_parameters, family_variable_authorized
+    # The original fixed-input modulus/section method did not require a T2 grant.
+    expanded=generated and (not legacy or family_variable_authorized(spec or {},variable))
+    if expanded:
+        base_parameters,parameter=family_parameters(spec,base,variable)
+    else:base_parameters=base['parameters']
+    if not generated and not legacy:
         raise ValueError('NATIVE_V1_SUPPORTS_MODULUS_OR_SECTION_PARAMETER_ONLY')
-    value=parameter_value(base['parameters'],variable);rows=[]
+    value=parameter_value(base_parameters,variable);rows=[]
     for reference,c in candidates:
-        other=parameter_value(c['parameters'],variable)
-        expected=deepcopy(base['parameters']);set_parameter(expected,variable,other)
-        if c['parameters']!=expected or other==value:raise ValueError('SINGLE_CHANGED_CONTINUOUS_PARAMETER_REQUIRED')
+        parameters=family_parameters(spec,c,variable)[0] if expanded else c['parameters']
+        other=parameter_value(parameters,variable)
+        expected=deepcopy(base_parameters);set_parameter(expected,variable,other)
+        if parameters!=expected or other==value:raise ValueError('SINGLE_CHANGED_CONTINUOUS_PARAMETER_REQUIRED')
         a,b=base['configuration'],c['configuration']
         if (a['task']!=b['task'] or a['seed']!=b['seed'] or any(a['policy'][k]!=b['policy'][k]
                 for k in ('controller','backend','dynamics_model','discretization'))):
@@ -88,10 +104,14 @@ def applicability(requirements, query, assessed, point):
     point=point or {};start=point.get('actual_time_s')
     initial=query.operating_point=='standardized_initial_pretension'
     if initial:point=point or dict(actual_time_s=0.);start=0.
+    if query.operation=='mujoco_reoptimized_structure_response_v1':
+        return dict(status='not_applicable' if reasons else 'applicable',reasons=reasons,
+            constraint_coverage=[],full_task_supported=False,execution_support='saved_evidence_only',model_assessment=assessed,
+            horizon=dict(task_duration_s=requirements.duration_s,interpretation='Aggregate existing complete T1 evidence; no new integration.'))
     horizon=0. if query.operation=='native_dynamics_v1' else query.native.horizon_s
     if not initial and (query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay'))):
         reasons.append('Exact native integration checkpoint required; a GVS state cannot substitute.')
-    if query.operation=='mujoco_direct_control_v1':
+    if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
         from tools.research.native_control import window_applicability
         return window_applicability(requirements,query,assessed,point,reasons)
     p=query.protocol
@@ -131,7 +151,7 @@ def calculate(configuration, binding, query, point, requirements, comparisons, *
     from extensions.tendon_family.mujoco_analysis import calculate as kernel
     from tools.research.control_correction import constrained_response_step
     from tools.research.analysis import scoped_result
-    if query.operation=='mujoco_direct_control_v1':
+    if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
         from tools.research.native_control import calculate as optimize
         return optimize(configuration,binding,query,point,requirements,comparisons,checkpoint)
     started=time.perf_counter()
@@ -179,9 +199,14 @@ def calculate(configuration, binding, query, point, requirements, comparisons, *
         for i,row in enumerate(raw['structure_responses']):
             row['task_proxy']=task_proxy(requirements,row['terminal']);changes={}
             for key in ('mass_matrix_kg_m2','tip_acceleration_input_map_m_s2_n','passive_tip_acceleration_contribution_m_s2',
-                    'tip_acceleration_m_s2','tendon_lengths_m','input_force_map_nm_n'):
+                    'tip_acceleration_m_s2','tendon_lengths_m','input_force_map_nm_n','qacc_rad_s2',
+                    'tip_jacobian_m_rad','tendon_jacobian_m_rad'):
                 a=np.asarray(row['mechanics'][key]);b=np.asarray(base['mechanics'][key])
-                changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)))
+                changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)),
+                    finite_difference_per_parameter=((a-b)/row['delta']).tolist())
+            changes['generalized_forces_nm']={key:dict(delta=(np.asarray(force)-base['mechanics']['generalized_forces_nm'][key]).tolist(),
+                finite_difference_per_parameter=((np.asarray(force)-base['mechanics']['generalized_forces_nm'][key])/row['delta']).tolist())
+                for key,force in row['mechanics']['generalized_forces_nm'].items()}
             for key in base['mechanics']['components']:
                 a=np.asarray(row['mechanics']['components'][key]);b=np.asarray(base['mechanics']['components'][key])
                 changes[key]=dict(delta_norm=float(np.linalg.norm(a-b)),relative_change=float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-15)))

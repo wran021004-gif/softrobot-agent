@@ -210,11 +210,81 @@ class NativeAnalysisOptions(Contract):
     correction_radius_n: FiniteFloat = Field(default=0.,ge=0,le=.5)
 
 
+class NonlinearResponseDirection(Contract):
+    direction_id: str = Field(min_length=1,max_length=120)
+    mode: Literal['continuous','finite_comparison'] = 'continuous'
+    variables: dict[str,FiniteFloat] = Field(default_factory=dict,description='dp/ds coefficients of an explicit legal one-dimensional path; units are parameter units / coordinate_unit.')
+    coordinate_unit: str | None = None
+    coordinates: list[FiniteFloat] = Field(default_factory=list)
+    comparison_variables: list[str] = Field(default_factory=list)
+    t1_results: list[EvidenceRef] = Field(min_length=2,max_length=8)
+    validation_coordinates: list[FiniteFloat] = Field(default_factory=list,max_length=4,
+        description='Held-out legal path coordinates, excluded from the symmetric fitted stencil.')
+    validation_t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=4)
+
+    @model_validator(mode='after')
+    def direction(self):
+        if (len(self.validation_coordinates)!=len(self.validation_t1_results) or
+                any(c in self.coordinates for c in self.validation_coordinates) or
+                any(r in self.t1_results for r in self.validation_t1_results)):
+            raise ValueError('INDEPENDENT_HELD_OUT_COORDINATES_AND_RESULTS_REQUIRED')
+        if self.mode=='continuous':
+            if (not self.variables or any(v==0 for v in self.variables.values()) or not self.coordinate_unit
+                    or self.comparison_variables or len(self.t1_results)!=3 or len(self.coordinates)!=3
+                    or self.coordinates[0]!=0 or not self.coordinates[1]<0<self.coordinates[2]
+                    or self.coordinates[1]!=-self.coordinates[2]):
+                raise ValueError('EXPLICIT_SYMMETRIC_ONE_DIMENSIONAL_DIRECTION_REQUIRED')
+        elif self.variables or self.coordinates or self.coordinate_unit or not self.comparison_variables or self.validation_t1_results:
+            raise ValueError('FINITE_COMPARISON_HAS_VARIABLES_AND_NO_DERIVATIVE_COORDINATE')
+        return self
+
+    @model_serializer(mode='wrap')
+    def unchanged_without_validation(self,handler):
+        value=handler(self)
+        if not self.validation_t1_results:
+            value.pop('validation_coordinates',None);value.pop('validation_t1_results',None)
+        return value
+
+
+class NonlinearStructureResponse(Contract):
+    version: Literal['nonlinear_response_v1','nonlinear_response_v2'] = 'nonlinear_response_v1'
+    variable: str | None = None
+    unit: str | None = None
+    t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3)
+    directions: list[NonlinearResponseDirection] = Field(default_factory=list,max_length=32)
+    control_validation_t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3,
+        description='Optional v2 T1 triplet: coarse FD, finer FD, independent held-out control probe on the same candidate.')
+
+    @model_validator(mode='after')
+    def selected_form(self):
+        if self.control_validation_t1_results and (self.version!='nonlinear_response_v2' or len(self.control_validation_t1_results)!=3):
+            raise ValueError('V2_CONTROL_VALIDATION_REQUIRES_THREE_T1_RESULTS')
+        if self.version=='nonlinear_response_v1':
+            if not self.variable or not self.unit or len(self.t1_results)!=3 or self.directions:
+                raise ValueError('BASELINE_MINUS_PLUS_T1_REQUIRED')
+        elif self.variable or self.unit or self.t1_results or not self.directions or len({d.direction_id for d in self.directions})!=len(self.directions):
+            raise ValueError('UNIQUE_V2_DIRECTIONS_WITHOUT_LEGACY_FIELDS_REQUIRED')
+        if self.directions and any(d.t1_results[0]!=self.directions[0].t1_results[0] for d in self.directions):
+            raise ValueError('COMMON_BASELINE_T1_REQUIRED')
+        return self
+
+    @model_serializer(mode='wrap')
+    def legacy(self,handler):
+        value=handler(self)
+        if not self.control_validation_t1_results:value.pop('control_validation_t1_results',None)
+        if self.version=='nonlinear_response_v1':
+            value.pop('version',None);value.pop('directions',None)
+        else:
+            for k in ('variable','unit','t1_results'):value.pop(k,None)
+        return value
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned candidate; operation and model_source must match a registered mathematical_capabilities method.')
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
+    nonlinear_response: NonlinearStructureResponse | None = None
     structure_response: NativeStructureResponse | None = None
     control_optimization: NativeControlOptimization | None = None
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
@@ -230,11 +300,15 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
-        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
+        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
         if (self.model_source=='mujoco')!=native_operation:
             raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
-        if (self.operation=='mujoco_direct_control_v1')!=(self.control_optimization is not None):
+        if (self.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'))!=(self.control_optimization is not None):
             raise ValueError('NATIVE_CONTROL_OPTIMIZATION_REQUIRES_SOURCE_AND_SETTINGS')
+        if (self.operation=='mujoco_reoptimized_structure_response_v1')!=(self.nonlinear_response is not None):
+            raise ValueError('NONLINEAR_RESPONSE_REQUIRES_THREE_SAVED_T1_RESULTS')
+        if self.operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1') and self.operating_point!='standardized_initial_pretension':
+            raise ValueError('NONLINEAR_CAPABILITY_REQUIRES_OWN_FROZEN_INITIALIZATION')
         if self.control_optimization and self.native!=NativeAnalysisOptions():
             raise ValueError('NATIVE_CONTROL_USES_SEQUENCE_AND_SEARCH_SETTINGS')
         if native_operation and self.operating_point not in ('saved_state','standardized_initial_pretension'):
@@ -277,7 +351,7 @@ class AnalysisRequest(Contract):
             if getattr(self,key) is None:value.pop(key,None)
         if self.model_source=='controller':value.pop('model_source',None)
         if self.model_source!='mujoco':value.pop('native',None)
-        for key in ('structure_response','control_optimization'):
+        for key in ('structure_response','control_optimization','nonlinear_response'):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 

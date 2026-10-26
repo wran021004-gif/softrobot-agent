@@ -58,6 +58,9 @@ class NativeAnalysisTests(unittest.TestCase):
         request=SimpleNamespace(variable='segments.distal1.young_pa')
         row=structure_context(base,[(self.t.ref,other)],request)[0]
         self.assertEqual(row['delta'],-1e5)
+        # Original generated-candidate modulus analysis needs no new T2 grant.
+        base['generation_version']=other['generation_version']='serial_family_generation_v2'
+        self.assertEqual(structure_context(base,[(self.t.ref,other)],request,spec={})[0]['delta'],-1e5)
         other['configuration']['task']['seed_fixture']=1
         with self.assertRaisesRegex(ValueError,'FIXED_TASK'):structure_context(base,[(self.t.ref,other)],request)
 

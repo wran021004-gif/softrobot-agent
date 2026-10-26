@@ -275,3 +275,51 @@ def populate_sensitivity(mathematics, value, reference):
         for i,r in enumerate(value.get('reoptimized_finite_difference',[]))]
     return mathematics.model_copy(update=dict(quantities=quantities,
         problem_definition=EvidenceLocation(reference=reference,pointer='/optimal_sensitivity/parameter_identity')))
+
+
+def compact_nonlinear_directions(result):
+    """Show physical paths in L0; two FD scales do not hide another parameter."""
+    matrix=result.get('comparison_summary',[]);groups={}
+    for i,row in enumerate(matrix):
+        direction=result.get('directions',[result])[i]
+        key=(tuple(sorted(direction['coefficients'].items())),direction.get('coordinate_unit')) if direction.get('coefficients') else i
+        if key not in groups:groups[key]=dict(row)
+        elif direction.get('step',float('inf'))<groups[key].get('_step',float('inf')):
+            ids=groups[key]['source_direction_ids'];groups[key]=dict(row,source_direction_ids=ids)
+        groups[key].setdefault('source_direction_ids',[]).append(row.get('direction_id'))
+        groups[key]['_step']=min(direction.get('step',float('inf')),groups[key].get('_step',float('inf')))
+    for row in groups.values():row.pop('_step',None)
+    return list(groups.values())
+
+
+def nonlinear_summary(value,reference=None):
+    """Bounded decision facts; multi-parameter matrices and sequences stay in Store."""
+    result={}
+    query=lambda pointer:dict(reference=reference,view='full',pointer=pointer)
+    if value.get('nonlinear_capability'):
+        t=value['nonlinear_capability']
+        result['nonlinear_capability']={k:t[k] for k in ('method','status','J','initial_J','improvement',
+            'stop_reason','callbacks','physics_steps','response_steps_completed')}
+        result['nonlinear_capability'].update(worst_constraint=t.get('best_metrics',{}).get('worst_constraint'),
+            evidence_level='finite_budget_observation',detail_query=query('/nonlinear_capability'))
+        controls=value.get('native_dynamics',{}).get('control_task_sensitivity')
+        if controls:
+            result['nonlinear_capability']['control_sensitivity']=dict(
+                coefficients=[r['coefficient_index'] for r in controls['responses']],status='local_estimate_unvalidated',
+                detail_query=query('/native_dynamics/control_task_sensitivity'),new_physics_steps=0)
+    if value.get('nonlinear_response'):
+        t=value['nonlinear_response'];matrix=compact_nonlinear_directions(t)
+        baseline=next((d.get('observations',[None])[0] for d in t.get('directions',[t]) if d.get('observations')),None)
+        result['nonlinear_response']=dict(method=t['method'],status=t['status'],direction_status=t['direction_status'],
+            directions=matrix[:4],direction_count=len(matrix),omitted_directions=max(0,len(matrix)-4),
+            stencil_count=len(t.get('comparison_summary',[])),
+            evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',
+            worst_constraint=baseline.get('worst_constraint') if baseline else None,cost=t['cost'],
+            detail_query=query('/nonlinear_response'),comparison_query=query('/nonlinear_response/comparison_summary'),
+            task_acceptance='unmeasured')
+        control=t.get('control_prediction_validation')
+        if control:
+            result['nonlinear_response']['control_prediction_validation']={k:control.get(k) for k in
+                ('status','reasons','coefficient_index','steps_n','two_scale_relative_difference')}
+            result['nonlinear_response']['control_prediction_validation']['detail_query']=query('/nonlinear_response/control_prediction_validation')
+    return result

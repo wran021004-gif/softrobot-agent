@@ -133,7 +133,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     methods=study.pop('mathematical_methods',None)
     if methods is not None:
         if (not isinstance(methods,dict) or not methods or
-                set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1'} or
+                set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1','mujoco-nonlinear-task-capability-v1','mujoco-reoptimized-structure-response-v1'} or
                 any(not isinstance(v,str) or not v.strip() for v in methods.values())):
             raise ValueError('EXPLICIT_VERSIONED_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     decisions=study.pop('research_decisions',None)

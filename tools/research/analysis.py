@@ -60,6 +60,9 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
     import numpy as np
     q=AnalysisRequest.model_validate(query)
+    if q.nonlinear_response is not None:
+        from tools.research.nonlinear_capability import calculate as aggregate
+        return aggregate(configuration,binding,q,describe_analysis_requirements(configuration,binding),design_context)
     if q.optimal_sensitivity is not None:
         from tools.research.optimal_capability import calculate_sensitivity
         if not design_context or design_context.get('kind')!='controlled-capability-sensitivity-v1':
@@ -245,8 +248,11 @@ def scoped_result(result, requirements, applicability, query):
         if result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
-            if query.operation=='mujoco_direct_control_v1':
+            if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
                 interpretation='Bounded native sequence search with nonlinear sampled checks; full physical replay and frozen task acceptance remain independent.'
+        elif result.get('nonlinear_response'):
+            conclusion,verification,pointer='diagnostic',result['nonlinear_response']['direction_status'],'/nonlinear_response'
+            interpretation='Evidence-only finite-budget structural secants; direction is conditional or unresolved.'
         elif result.get('optimal_sensitivity'):
             conclusion,verification,pointer='diagnostic',result['optimal_sensitivity']['direction_status'],'/optimal_sensitivity'
             interpretation='Controlled reoptimized finite differences of sampled local models; no strict structural gradient, regional descent or physical improvement guarantee.'
@@ -322,6 +328,10 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
+    from tools.research.nonlinear_capability import METHODS, saved_context
+    if q.operation in METHODS and ('analysis' not in state(host)['spec']['capabilities'] or
+            not state(host)['spec'].get('mathematical_methods',{}).get(METHODS[q.operation])):
+        return dict(status='not_applicable',reason='EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED',task_acceptance='unmeasured')
     if q.control_optimization:
         settings=q.control_optimization.settings
         for name,limit in state(host)['spec'].get('native_control_limits',{}).items():
@@ -342,10 +352,19 @@ def dispatch(host,query,key,*,guard,origin='model'):
     except (ValueError,KeyError) as exc:
         if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
         raise
-    sensitivity_context=None
+    sensitivity_context=None;preparation_s=0.
+    if q.nonlinear_response:
+        if admission(host)['admitted']<1:raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
+        started_preparation=time.perf_counter()
+        try:sensitivity_context=saved_context(host,q)
+        finally:
+            preparation_s=time.perf_counter()-started_preparation;current=state(host)
+            update(host,numerical_s=current['numerical_s']+preparation_s,
+                analysis_preparation_s=current.get('analysis_preparation_s',0.)+preparation_s)
+
     if q.structure_response:
         from tools.research.native_analysis import structure_context
-        sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response)
+        sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response,spec=state(host)['spec'])
     if q.design_sensitivity:
         from extensions.tendon_family.sorosim_analysis import design_context
         sensitivity_context=design_context(c,verify_candidate(host,q.design_sensitivity.minus_candidate),
@@ -392,7 +411,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if c.get('generation_version'):
         binding.update(canonical_task_identity=c['task_identity'],initialization_provenance=c['initialization_provenance'])
     point=None
-    if q.model_source=='mujoco':
+    if q.nonlinear_response:
+        binding['coordinate_order']=[]
+    elif q.model_source=='mujoco':
         from tools.research.numerics import native_point
         point=native_point(host,q,cfg)
         binding['coordinate_order']=point['dof_order']
@@ -466,10 +487,12 @@ def dispatch(host,query,key,*,guard,origin='model'):
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
         task_analysis=plain(requirements),analysis_applicability=applicability)
     if sensitivity_context:request['design_context']=sensitivity_context
+    if preparation_s:request['admission_preparation_numerical_s']=preparation_s
     if method_fit:request['method_admission']=method_fit
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time(),analysis_evaluations=count)
+    if preparation_s:pending['preparation_numerical_s']=preparation_s
     if method_fit:pending['method_admission']=method_fit
     update(host,pending=pending)
     from tools.service_execution import _run_contained
@@ -504,9 +527,11 @@ def recover(host):
         if 'task_analysis' in request:
             value=scoped_result(value,TaskAnalysisRequirement.model_validate(request['task_analysis']),
                 request['analysis_applicability'],AnalysisRequest.model_validate(request['query']))
+    value.setdefault('operation',p['request']['operation'])
     value.update(candidate=p['request']['candidate'],requested_operation=p['request'],operation_key=p['worker_request_id'],
-        owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed,
+        owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed+p.get('preparation_numerical_s',0.),
         charged_analysis_evaluations=p.get('analysis_evaluations',1),boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
+    if p.get('preparation_numerical_s'):value['admission_preparation_numerical_s']=p['preparation_numerical_s']
     if p.get('method_admission'):
         value['method_admission']=p['method_admission']
         value['numerical_call_events']=[read(path) for path in sorted(folder.glob('numerical_optimal_*.json'))]
@@ -522,15 +547,22 @@ def recover(host):
         value['recorded_return_boundaries']={kind:sum(e['kind']==kind and e['stage']=='returned' for e in value['numerical_call_events'])
             for kind in ('model_build','capability','dual_face')}
         value['attempt_boundary_semantics']='Durable pre-call boundaries; interruption between checkpoint and call cannot establish that the solver entered. Reserved evaluations never reset.'
-    if value['status'] not in ('computed','unavailable','not_applicable'):
+    if value['status'] not in ('computed','unavailable','not_applicable','not_comparable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
-    if value.get('operation')=='mujoco_direct_control_v1' and value['status']=='computed':
+    if value.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') and value['status']=='computed':
         from tools.research.physical_replay import binding as schedule_binding
         schedule=value['native_dynamics']['optimized_schedule']
         schedule_binding(verify_candidate(host,value['candidate'])['configuration'],schedule['trajectory'])
         value['control_schedule_reference']=save(host,schedule,'bound_applied_control_schedule')
     progress=sorted(folder.glob('numerical_native_progress_*.json'))
-    if progress:value['native_progress']=read(progress[-1])
+    if progress:
+        value['native_progress']=read(progress[-1])
+        if value['status']!='computed' and value['native_progress'].get('cost'):
+            observed_cost=value['native_progress']['cost']
+            value['internal_calculations']=[dict(purpose=p['request']['operation'],**observed_cost,
+                status='partial_callback_observations',accounting='Recorded native operations before failure; no successful search or acceptance inferred')]
+            value['physics_steps_lower_bound']=max(value.get('physics_steps_lower_bound',0),observed_cost['physics_steps'])
+
     ref=save(host,value,'candidate_analysis_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:
@@ -543,7 +575,7 @@ def recover(host):
         current.setdefault('analysis_results',[]).append(ref)
         if value.get('control_schedule_reference'):
             current.setdefault('control_initializations',[]).append(dict(candidate=value['candidate'],source=value['control_schedule_reference']))
-        current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed,
+        current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed+p.get('preparation_numerical_s',0.),
             mathematical_evaluations=p.get('analysis_evaluations',1),internal_calculations=value.get('internal_calculations',[])))
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
@@ -606,6 +638,8 @@ def compact_result(value, reference):
         from tools.research.capability import sensitivity_summary
         summary.pop('task_capability',None)
         summary['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
+    from tools.research.capability import nonlinear_summary
+    summary.update(nonlinear_summary(value,reference))
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
@@ -676,6 +710,8 @@ def decision_result(value, reference):
         from tools.research.capability import sensitivity_summary
         result.pop('task_capability',None)
         result['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
+    from tools.research.capability import nonlinear_summary
+    result.update(nonlinear_summary(value,reference))
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
