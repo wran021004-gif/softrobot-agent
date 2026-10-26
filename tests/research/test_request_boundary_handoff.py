@@ -91,6 +91,39 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED'):
                 asyncio.run(converse(h,handoff_before_next_request=True))
 
+    def test_unsent_initial_invocation_recovers_and_changed_text_is_rejected(self):
+        h=self.provision();sent=[]
+        async def pause_after_commit(*args,**kwargs):
+            result=await handoff(*args,**kwargs)
+            update(h,validation_extension_pending_binding=True)
+            return result
+        def migration_guard(host,*args,**kwargs):
+            if state(host).get('validation_extension_pending_binding'):raise ValueError('fixture migration pause')
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard',side_effect=migration_guard),patch('tools.research.agent.guard'),\
+                patch('tools.research.session_handoff.handoff',side_effect=pause_after_commit),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            with self.assertRaisesRegex(ValueError,'fixture migration pause'):
+                asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1))
+        self.assertEqual(len(sent),1);ledger=h.store.remaining()
+        update(h,validation_extension_pending_binding=False)
+        root=h.store.root/'framework_sessions/session'/state(h)['pilot']['framework_session_id']
+        path=next(root.rglob('snapshot_latest.json'));original=path.read_bytes()
+        snapshot=json.loads(original);snapshot['data']['messages'][-1]['content'][0]['text']='untrusted changed prompt'
+        path.write_text(json.dumps(snapshot),encoding='utf8')
+        def forbidden(request):raise AssertionError('No new request')
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
+            with self.assertRaisesRegex(ValueError,'SDK_INITIAL_CONTEXT_MISMATCH'):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            path.write_bytes(original)
+            asyncio.run(converse(h,session_handoff=True,restore_only=True))
+        self.assertEqual(h.store.remaining(),ledger)
+        events=h.store.events(h.run_id)
+        self.assertTrue(any(e['kind']=='sdk_unsent_invocation_verified' for e in events))
+        self.assertFalse(any(e['kind']=='model_original_turn' for e in events))
+
     def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
         h=self.provision();sent=[];update(h,count_closeout=True)
         transport=httpx.MockTransport(self.responder(h,sent))

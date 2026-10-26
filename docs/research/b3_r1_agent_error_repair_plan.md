@@ -50,6 +50,12 @@ research_analysis **2** 次、research_investigate **1** 次。156 次 evidence_
    read_evidence 验证的完整查询；不存在的字段单独列出。真实原请求的合法结果仅 **459 bytes**。
    三项定向回归通过（16.493 s）；补充验证提示查询缺键的单项通过（22.671 s）。原 raw
    读取/读取信用规则不变。证据见 [derived_fields_repair.json](../../evidence/b3_r1_history_assisted_050/derived_fields_repair.json)。
+5. 追加段迁移暴露 SDK 初始恢复边界：新 Handoff 已提交、固定 invocation 提示已写入 SDK，
+   before_model 门禁尚未允许首次发送时，原校验报 SDK_INITIAL_CONTEXT_MISMATCH。
+   现在仅当固定初始消息/固定启动提示逐字匹配（只忽略 SDK tracking_id）、原 Handoff
+   已验证且提交后没有任何 r3_request 时，登记未发送调用的恢复证明；不伪造完成记录。
+   三项定向测试通过（6.557 s），包括任意改写提示拒绝、旧响应改写拒绝、追加段中断恢复。
+   这是工程恢复缺口，单独计数，不能归入 Agent 参数错误或科学失败。
 
 这些修复后仍有重复读取和错误路径。已通过的 diagnose 只做只读诊断，
 不是执行 selected_method 文本中的 native 优化；其 numerical_evidence 为空。

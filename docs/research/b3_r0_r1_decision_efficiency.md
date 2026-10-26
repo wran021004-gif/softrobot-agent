@@ -78,6 +78,11 @@ R0 实际 Provider、真实数学、MuJoCo 步进、NMPC、PPO 全为 **0**。
 对象字段；错用 raw fields 时返回视图错误和实际可读查询，不存在字段明确列出。
 真实 `/control_result_links/3` 绑定查询投影为 459 bytes，零新增 Provider/数学/物理费用，
 见 [derived_fields_repair.json](../../evidence/b3_r1_history_assisted_050/derived_fields_repair.json)。
+迁移至 `58e84d45c` 后零请求恢复发现 SDK_INITIAL_CONTEXT_MISMATCH：实际新 Session
+`rh-aac8b869be6f496d091dde3a` 只有原初始消息和固定启动提示（带 SDK tracking_id），
+Handoff 提交后没有任何真实 Provider 发送。现对这一明确的未发送边界登记原 Store
+恢复证明，任意改写提示或提交后已有请求均不适用；不改旧响应，不声明 invocation 完成。
+三项定向 mock-HTTP 回归通过（6.557 s），本次修复仍无新增 Provider/数学/物理费用。
 
 以下初始预检快照保留原时间语义。用户随后在聊天明确批准 DeepSeek 地址/载荷及公开 GitHub
 分支披露；`7922de156` 已推送，唯一 R1 已真实运行。中断前累计 Provider 39/48、公开操作

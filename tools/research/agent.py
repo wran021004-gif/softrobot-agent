@@ -661,7 +661,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             for name,spec in definitions.items():registry[name].tool_spec=deepcopy(spec)
         return restored
     agent=build_session()
-    from tools.research.session_handoff import unmatched, recover_feedback, trusted_history
+    from tools.research.session_handoff import unmatched, recover_feedback, trusted_history, INVOCATION_PROMPT
     try:
         saved=state(host)['pilot'].get('unconsumed_response')
         reporter_saved=bool(saved and (received(host,saved) or {}).get('purpose')=='reporter')
@@ -842,7 +842,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
             try:
-                result=await agent.invoke_async('Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.')
+                result=await agent.invoke_async(INVOCATION_PROMPT)
             except Exception as exc:
                 cause=exc;seen=set()
                 while cause is not None and id(cause) not in seen and not isinstance(cause,RequestBoundaryHandoff):

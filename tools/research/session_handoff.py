@@ -7,6 +7,7 @@ from tools.platform_store import plain
 from tools.state_io import digest
 from tools.research.state import state
 
+INVOCATION_PROMPT='Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.'
 
 def state_identity(value):
     value=deepcopy(value);value['pilot'].pop('handoff_preparation',None)
@@ -223,8 +224,25 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
         if unmatched(agent.messages):raise ValueError('SDK_COMPLETED_HISTORY_HAS_UNPAIRED_TOOLS')
         return 'request_feedback' if anchor.get('version')=='request_feedback_boundary_v1' else 'completed'
     if initial_messages is not None:
-        if agent.messages!=initial_messages:raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
         verification=host.store.artifact(s['pilot']['handoff_verification'])
+        if agent.messages!=initial_messages:
+            # The SDK snapshots a deterministic invocation prompt before the
+            # first before_model hook. A migration pause there has sent nothing.
+            normalized=[{k:v for k,v in m.items() if k!='tracking_id'} for m in agent.messages]
+            suffix=normalized[len(initial_messages):]
+            events=host.store.events(host.run_id)
+            committed=[e for e in events if e['kind']=='session_handoff' and e['status']=='committed'
+                and e['outputs'][0]==preparation]
+            unsent=bool(committed and not any(e['kind']=='r3_request' and e['sequence']>committed[-1]['sequence'] for e in events))
+            if (normalized[:len(initial_messages)]!=initial_messages or not suffix
+                    or any(m!=dict(role='user',content=[dict(text=INVOCATION_PROMPT)]) for m in suffix)
+                    or not unsent or verification.get('preparation')!=preparation or not verification.get('independently_restored')):
+                raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
+            from tools.research.agent import record
+            record(host,'sdk_unsent_invocation_verified',dict(preparation=preparation,session_id=session_id,
+                sdk_message_identity=digest(agent.messages),messages=agent.messages,snapshot_files=files,
+                next_request_sent=False,invocation_completed=False))
+            return 'initial_unsent_invocation'
         if (verification.get('preparation')!=preparation or not verification.get('independently_restored')
                 or files!=verification['snapshot_files']):raise ValueError('SDK_COMMITTED_SNAPSHOT_FILES_MISMATCH')
         return 'initial'
