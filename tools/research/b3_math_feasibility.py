@@ -12,8 +12,6 @@ import subprocess
 import sys
 import time
 
-import numpy as np
-
 from tools.platform_store import plain
 from tools.state_io import atomic_json, digest, read
 
@@ -67,7 +65,9 @@ def replay(configuration, schedule, folder, label):
 def prepare(output):
     from tools.research.numerics import archived
     from tools.research.physical_replay import binding
-    output.mkdir(parents=True, exist_ok=False)
+    output.mkdir(parents=True, exist_ok=True)
+    if (output/'preparation.json').exists():
+        raise ValueError('Use a new output directory to preserve completed experiments.')
     started = time.perf_counter()
     candidate = archived(HISTORY, ref(CANDIDATE))
     failed = archived(HISTORY, ref(FAILED))
@@ -75,12 +75,17 @@ def prepare(output):
     configuration = candidate['configuration']
     package = read(ROOT/HISTORY/'design_package.json')
     assert configuration == package['configuration']
-    assert configuration['task'] == package['canonical_task']
+    initial = configuration['task']['initializer']['parameters']['data']
+    assert initial == candidate['initialization_provenance']['effective']
+    assert all(v == 0. for key in ('qpos_rad', 'qvel_rad_s') for v in initial[key].values())
+    canonical = deepcopy(configuration['task'])
+    canonical['initializer']['parameters']['data'] = dict(rule=candidate['initialization_provenance']['rule'])
+    assert canonical == package['canonical_task']
     binding(configuration, failed['trajectory'])
     frozen = read(ROOT/HISTORY/'configuration.json')
     atomic_json(output/'configuration.json', configuration)
     atomic_json(output/'design_parameters.json', candidate['parameters'])
-    atomic_json(output/'canonical_task.json', configuration['task'])
+    atomic_json(output/'canonical_task.json', canonical)
     atomic_json(output/'analysis_protocol.json', frozen['analysis_protocol'])
     atomic_json(output/'failed_nmpc_schedule.json', failed)
     atomic_json(output/'archived_schedule.json', passing)
@@ -92,7 +97,8 @@ def prepare(output):
         assert abs(positive['acceptance']['metrics'][key]-value) < 1e-12
     result = dict(runtime=runtime(), base_sha='c153e1731ae0925e756467f75a783b28abce2873',
         candidate=ref(CANDIDATE), failed_source=ref(FAILED), archived_positive_source=ref(ARCHIVED_PASS),
-        task_identity=digest(configuration['task']), configuration_identity=digest(configuration),
+        task_identity=digest(configuration['task']), canonical_task_identity=digest(canonical),
+        configuration_identity=digest(configuration),
         archived_solution_replay=positive['acceptance']['metrics'], failed_start=baseline['acceptance']['metrics'],
         preparation_wall_s=time.perf_counter()-started,
         tools=dict(mujoco='executed full replay', native_control='available; next experiment',
