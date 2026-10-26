@@ -144,8 +144,194 @@ def compare_exports(paths):
         scope='Original recorded acceptance and costs, not new evidence or an independent scientific ranking. Missing internal costs remain unknown; do not add ledger wall time to kernel wall time.')
 
 
+class FrozenDecisionBoundary(C3Archive):
+    """C3 only: use a saved Handoff source state, never the final snapshot host."""
+    def __init__(self, root, case):
+        import gzip, io
+        from unittest.mock import Mock
+        from types import SimpleNamespace
+        self.root=Path(root)
+        folder,sequence={
+            'A':('b3_r1_history_assisted_050',425),
+            'B':('b3_r1_history_assisted_050',2110),
+            'C':('b3_t2_pilot_050_c',425),
+        }[case]
+        self.folder=folder
+        self.archive=tarfile.open(fileobj=io.BytesIO(gzip.decompress(
+            (self.root/'evidence'/folder/'immutable_artifacts.tar.gz').read_bytes())))
+        self.snapshot=json.load(self.archive.extractfile(next(m for m in self.archive.getmembers() if m.name.startswith('snapshot/'))))
+        event=next(e for e in self.snapshot['events'] if e['sequence']==sequence)
+        self.preparation_reference=event['outputs'][0]
+        self.preparation=self.artifact(self.preparation_reference)
+        self.saved_state=self.artifact(self.preparation['source_state'])
+        self.events=[e for e in self.snapshot['events'] if e['sequence']<sequence]
+        self.next_request=next(r for r in self.requests() if r[0]['sequence']>sequence)
+        # The archive's final state is used only by requests() to locate original
+        # wire artifacts. No state fields or final ledger feed this host.
+        current=deepcopy(self.saved_state)
+        store=Mock();store.session.return_value=dict(state=current)
+        store.events.return_value=self.events
+        store.remaining.return_value=deepcopy(self.preparation['budget'])
+        store.transaction.side_effect=AssertionError('C3_ARCHIVE_NO_WRITES')
+        store.reserve.side_effect=AssertionError('C3_NO_SCIENTIFIC_EXECUTION')
+        store.connect.side_effect=ValueError('C3_ARCHIVE_NO_LIVE_SQLITE')
+        store.lookup.return_value=None
+        self.host=SimpleNamespace(store=store,run_id=self.preparation['study_id'],actor='c3-read-only')
+        # Follow references already saved at this boundary, including execution
+        # receipts. The final archive can contain later artifacts: deny those.
+        self.allowed=set();queue=[self.saved_state,*self.events]
+        def refs(value):
+            if isinstance(value,dict):
+                if isinstance(value.get('artifact_id'),str) and isinstance(value.get('media_type'),str):yield value
+                for v in value.values():yield from refs(v)
+            elif isinstance(value,list):
+                for v in value:yield from refs(v)
+        while queue:
+            for ref in refs(queue.pop()):
+                key=ref['artifact_id']
+                if key in self.allowed:continue
+                self.allowed.add(key)
+                if ref.get('media_type','application/json')=='application/json':
+                    try:queue.append(self.artifact(ref))
+                    except KeyError:pass  # Some saved metadata names absent optional artifacts.
+        def bounded(ref,raw=False):
+            ref=plain(ref)
+            if ref['artifact_id'] not in self.allowed:raise ValueError('C3_FUTURE_OR_UNPUBLISHED_REFERENCE')
+            return self.artifact(ref,raw=raw)
+        store.artifact.side_effect=bounded
+
+    def projection(self):
+        from tools.research.research_context import agent_decision_brief
+        from tools.research import agent
+        from tools.research.contracts import EvidenceQuery, AnalysisRequest
+        packet=deepcopy(self.next_request[3])
+        packet['research']=agent_decision_brief(self.host)
+        tools=deepcopy(self.next_request[2]['tools'])
+        # Keep the existing production definitions; refresh only the interventions.
+        for tool in tools:
+            f=tool['function'];name=f['name']
+            if name=='research_plan':
+                f.update(description=getattr(agent,'PLAN_TOOL_DESCRIPTION',f['description']),parameters=plan_schema(packet['research']['actions'],
+                    decision_required=True,family_version=self.saved_state['spec']['family_space']['version']))
+            elif name=='evidence_read':f['parameters']=EvidenceQuery.model_json_schema()
+            elif name=='research_analysis':f['parameters']=AnalysisRequest.model_json_schema()
+        return packet,tools
+
+
+def c3_frozen_audit(root,case,output,tool_input=None):
+    """Run in either frozen checkout; no Provider or dispatch is reachable here."""
+    from tools.research.core import read_evidence
+    from tools.research.agent import error_feedback
+    from unittest.mock import patch
+    from tools.state_io import atomic_json
+    boundary=FrozenDecisionBoundary(root,case);host=boundary.host
+    try:
+        packet,tools=boundary.projection()
+        if tool_input is not None:
+            uses=json.loads(Path(tool_input).read_text(encoding='utf8'));results=[]
+            from tools.research.contracts import Plan,AnalysisRequest
+            from tools.research.evidence_policy import admit_decision
+            from tools.research.design import verify_candidate
+            from jsonschema import Draft202012Validator
+            definitions={t['function']['name']:t['function']['parameters'] for t in tools}
+            for use in uses:
+                name=use['function']['name'];value=None;args={}
+                try:
+                    args=json.loads(use['function']['arguments'])
+                    Draft202012Validator(definitions[name]).validate(args)
+                    if name=='evidence_read':value=read_evidence(host,{'view':'summary',**args},record_read=False)
+                    elif name=='research_plan':
+                        plan=Plan.model_validate(args);admission=admit_decision(host,plan)
+                        value=dict(status='proposal_recorded',action=plan.action,decision_admission=admission,
+                            scientific_execution='not_dispatched_by_C3',new_scientific_computations=0,
+                            observation=None,proposed_budget=plain(plan.decision).get('requested_budget'),
+                            limitation='Plan contract and evidence admission checked. Execution-specific admission was not run. An explicit local_diagnostic would compute in production; C3 does not execute it.')
+                    elif name=='research_analysis':
+                        q=AnalysisRequest.model_validate(args);verify_candidate(host,q.candidate)
+                        value=dict(status='proposal_recorded',operation=q.operation,
+                            scientific_execution='not_dispatched_by_C3',observation=None,
+                            limitation='Schema and candidate identity checked; worker admission, numerical applicability and results are untested.')
+                    else:raise ValueError('C3_TOOL_NOT_EXPOSED')
+                    results.append(dict(tool_call_id=use['id'],name=name,status='success',result=value))
+                except (ValueError,KeyError,IndexError,TypeError) as exc:
+                    with patch('tools.research.agent.record',return_value=boundary.preparation['source_state']):
+                        feedback=error_feedback(host,dict(name=name,input=args),exc,boundary.saved_state)
+                    feedback.pop('full_error_reference',None)
+                    results.append(dict(tool_call_id=use['id'],name=name,status='error',result=feedback))
+                except Exception as exc:
+                    # jsonschema's ValidationError is not a ValueError.
+                    from jsonschema.exceptions import ValidationError
+                    if not isinstance(exc,ValidationError):raise
+                    results.append(dict(tool_call_id=use['id'],name=name,status='error',result=dict(
+                        code='SCHEMA_VALIDATION_ERROR',message=exc.message,scientific_execution='not_dispatched_by_C3')))
+            atomic_json(Path(output),results);return
+        from tools.research.provider_context import official_tokenizer
+        tokenizer=official_tokenizer()
+        def measure(value):
+            body=serialized(value)
+            return dict(bytes=len(body),offline_serialized_tokens=len(tokenizer.encode(body.decode(),add_special_tokens=False).ids))
+        wire=deepcopy(boundary.next_request[2]);wire['tools']=tools
+        tail=dict(role='user',content='CURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':')))
+        wire['messages'][-1]=tail
+        handoff={**wire,'messages':[wire['messages'][0],*DeepSeekModel.format_request_messages(initial_messages(host.run_id)),tail]}
+        checks=[]
+        def queries(value,path=''):
+            if isinstance(value,dict):
+                if isinstance(value.get('reference'),dict) and 'view' in value and set(value)<= {'reference','view','pointer','fields','start','count'}:
+                    yield value,path
+                else:
+                    for k,v in value.items():yield from queries(v,path+'/'+k)
+            elif isinstance(value,list):
+                for i,v in enumerate(value):yield from queries(v,path+'/'+str(i))
+        for q,path in queries(packet['research']):
+            metadata=dict(query=q,path=path,historical_read_query='/read_state/recent/' in path)
+            try:
+                answer=read_evidence(host,q,record_read=False)
+                checks.append(dict(**metadata,status='readable',bytes=len(serialized(answer))))
+            except (ValueError,KeyError,IndexError,TypeError) as exc:checks.append(dict(**metadata,status='failed',error=str(exc)))
+        # Replay actual errors only when their tool inputs existed at this boundary.
+        errors=[]
+        for event in boundary.events:
+            if event['kind']!='tool_request_error':continue
+            original=boundary.artifact(event['outputs'][0]);use=original.get('tool_use',{})
+            if use.get('name')!='evidence_read':continue
+            q=use['input']
+            if not (q.get('pointer','').startswith(('/result/','/control_result_links')) or q.get('view')=='range'):continue
+            try:read_evidence(host,q,record_read=False)
+            except (ValueError,KeyError,IndexError) as exc:
+                with patch('tools.research.agent.record',return_value=event['outputs'][0]):
+                    feedback=error_feedback(host,use,exc,boundary.saved_state)
+                correction=(feedback.get('evidence_navigation') or {}).get('corrected_query')
+                readable=False
+                if correction:
+                    try:read_evidence(host,correction,record_read=False);readable=True
+                    except (ValueError,KeyError,IndexError):pass
+                errors.append(dict(event=event['sequence'],query=q,code=feedback.get('error_code'),corrected_query=correction,correction_readable=readable))
+        result=dict(case=case,source_archive=boundary.folder,preparation=boundary.preparation_reference,
+            source_state=boundary.preparation['source_state'],event_boundary=boundary.events[-1]['sequence'],
+            original_next_request=boundary.next_request[1]['request'],
+            sizes=dict(brief=measure(packet['research']),same_session=measure(wire),handoff=measure(handoff),
+                schema=measure(tools),fixed_system=measure(wire['messages'][0]),
+                history=measure(wire['messages'][1:-1]),dynamic=measure(tail)),
+            packet=packet,tools=tools,handoff_wire=handoff,query_checks=checks,error_replay=errors,
+            state_unchanged=host.store.session()['state']==boundary.saved_state,
+            methods=list(packet['research']['mathematical_capabilities'].get('methods',{})),
+            allowed_artifact_count=len(boundary.allowed),provider_requests=0,scientific_workers=0)
+        # Final R1 success artifacts must be inaccessible even if present in archive.
+        audit=json.loads((Path(root)/'evidence/b3_r1_history_assisted_050/final_audit.json').read_text())
+        result['final_r1_refs_absent']=all(r['artifact_id'] not in boundary.allowed and r['artifact_id'] not in serialized(handoff).decode()
+            for r in (audit['selected'],audit['selected_solution'],audit['final_disposition']))
+        atomic_json(Path(output),result)
+    finally:boundary.archive.close()
+
+
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--compare-exports',nargs=2,type=Path)
+    parser.add_argument('--decision-efficiency',choices=('A','B','C'))
+    parser.add_argument('--evidence-root',type=Path)
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--tool-input',type=Path)
     args=parser.parse_args()
-    print(json.dumps(compare_exports(args.compare_exports) if args.compare_exports else dict(context=context_audit(),search=search_audit()),indent=2))
+    if args.decision_efficiency:c3_frozen_audit(args.evidence_root,args.decision_efficiency,args.output,args.tool_input)
+    else:print(json.dumps(compare_exports(args.compare_exports) if args.compare_exports else dict(context=context_audit(),search=search_audit()),indent=2))

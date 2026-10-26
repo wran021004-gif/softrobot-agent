@@ -1,0 +1,803 @@
+{
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "verdict": "partial_pass",
+  "decision": "Keep C1/C2 engineering changes; no demonstrated overall live efficiency gain. Do not start a full autonomous Study on this evidence.",
+  "commits": {
+    "control": "c153e1731ae0925e756467f75a783b28abce2873",
+    "treatment": "5d73965e1ed52afed689a182976064a2af80ffac"
+  },
+  "authorization": "User C3 attachment 80d34de2-8762-4fad-aca6-6d5ebbacf361, sections 2/5/10: at most 12 real Provider requests, independent ledger, original DeepSeek configuration; only necessary frozen scientific task/evidence/tools, no unrelated private data. Zero formal Study, Reporter, scientific worker, training or physical evaluation. Commit/push authorized; no use of R1 remaining budget. No retries or alternate models. Explicit in-chat follow-up on 2026-10-26: user confirms sending these six frozen historical inputs (task conditions, candidate/control origins, necessary research evidence and tool schemas) to https://api.deepseek.com/chat/completions using deepseek-flash; total independent ceiling 12, no retries, science zero, R1 untouched.",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "actual_requests": 12,
+  "confirmed_responses": 12,
+  "usage": {
+    "prompt_tokens": 436557,
+    "completion_tokens": 106754,
+    "total_tokens": 543311,
+    "prompt_cache_hit_tokens": 265088,
+    "prompt_cache_miss_tokens": 171469,
+    "reasoning_tokens": 87267
+  },
+  "money": null,
+  "money_scope": "Provider receipts do not supply monetary charge; no inferred price",
+  "provider_ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 12,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 12,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 635.1729999999989
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_pending": [],
+  "unconsumed_response": null,
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "formal_studies": 0,
+  "reporter_requests": 0,
+  "r1_budget_used": 0,
+  "public_tool_count_scope": "Counted model tool requests and feedback, not original Study ledger charges; isolated Provider ledger tool_calls remains zero",
+  "offline": [
+    {
+      "case": "A",
+      "arm": "control",
+      "source_archive": "b3_r1_history_assisted_050",
+      "source_state": {
+        "artifact_id": "8a96cdd0c29c211346a2e5c33694908335ef8812109998c8088772e02c7de835",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "d2d4a0dcebf5a4114abba4826b67cc473e09164cb2f1a0cc0ed202b06830f8ff",
+        "media_type": "application/json"
+      },
+      "event_boundary": 424,
+      "original_next_request": {
+        "artifact_id": "19fbb8ab91dd821ef7dfd7dff3a10f943ed96ff0c1970bc1855aa25e5e13f3dd",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 48333,
+          "offline_serialized_tokens": 14294
+        },
+        "same_session": {
+          "bytes": 106737,
+          "offline_serialized_tokens": 31145
+        },
+        "handoff": {
+          "bytes": 106574,
+          "offline_serialized_tokens": 31109
+        },
+        "schema": {
+          "bytes": 30475,
+          "offline_serialized_tokens": 7717
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 71207,
+          "offline_serialized_tokens": 22299
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 32,
+        "readable": 32
+      },
+      "historical_query_failures": [],
+      "navigation_error_replay": {
+        "total": 2,
+        "structured_corrections_readable": 0
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    },
+    {
+      "case": "A",
+      "arm": "treatment",
+      "source_archive": "b3_r1_history_assisted_050",
+      "source_state": {
+        "artifact_id": "8a96cdd0c29c211346a2e5c33694908335ef8812109998c8088772e02c7de835",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "d2d4a0dcebf5a4114abba4826b67cc473e09164cb2f1a0cc0ed202b06830f8ff",
+        "media_type": "application/json"
+      },
+      "event_boundary": 424,
+      "original_next_request": {
+        "artifact_id": "19fbb8ab91dd821ef7dfd7dff3a10f943ed96ff0c1970bc1855aa25e5e13f3dd",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 48166,
+          "offline_serialized_tokens": 14081
+        },
+        "same_session": {
+          "bytes": 107755,
+          "offline_serialized_tokens": 31165
+        },
+        "handoff": {
+          "bytes": 107592,
+          "offline_serialized_tokens": 31129
+        },
+        "schema": {
+          "bytes": 31744,
+          "offline_serialized_tokens": 8002
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 70956,
+          "offline_serialized_tokens": 22034
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 22,
+        "readable": 22
+      },
+      "historical_query_failures": [],
+      "navigation_error_replay": {
+        "total": 2,
+        "structured_corrections_readable": 2
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    },
+    {
+      "case": "B",
+      "arm": "control",
+      "source_archive": "b3_r1_history_assisted_050",
+      "source_state": {
+        "artifact_id": "466c816fa6de7b0b4b76eb7314881ae5010ae4ff6af98560bb7e3dc69f7bc269",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "56cc297bab5c5b267a8151234b1780706b0935aa90b2b0ac7fdccd19e643a3a2",
+        "media_type": "application/json"
+      },
+      "event_boundary": 2109,
+      "original_next_request": {
+        "artifact_id": "08b5555d18a36056fd27f0b026a07c57ec60f1ef0cb4fba5e6da30e1ed5d7679",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 50043,
+          "offline_serialized_tokens": 14671
+        },
+        "same_session": {
+          "bytes": 109234,
+          "offline_serialized_tokens": 31778
+        },
+        "handoff": {
+          "bytes": 109071,
+          "offline_serialized_tokens": 31742
+        },
+        "schema": {
+          "bytes": 30606,
+          "offline_serialized_tokens": 7752
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 73573,
+          "offline_serialized_tokens": 22897
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 33,
+        "readable": 33
+      },
+      "historical_query_failures": [],
+      "navigation_error_replay": {
+        "total": 18,
+        "structured_corrections_readable": 0
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    },
+    {
+      "case": "B",
+      "arm": "treatment",
+      "source_archive": "b3_r1_history_assisted_050",
+      "source_state": {
+        "artifact_id": "466c816fa6de7b0b4b76eb7314881ae5010ae4ff6af98560bb7e3dc69f7bc269",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "56cc297bab5c5b267a8151234b1780706b0935aa90b2b0ac7fdccd19e643a3a2",
+        "media_type": "application/json"
+      },
+      "event_boundary": 2109,
+      "original_next_request": {
+        "artifact_id": "08b5555d18a36056fd27f0b026a07c57ec60f1ef0cb4fba5e6da30e1ed5d7679",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 49868,
+          "offline_serialized_tokens": 14423
+        },
+        "same_session": {
+          "bytes": 110240,
+          "offline_serialized_tokens": 31761
+        },
+        "handoff": {
+          "bytes": 110077,
+          "offline_serialized_tokens": 31725
+        },
+        "schema": {
+          "bytes": 31875,
+          "offline_serialized_tokens": 8037
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 73310,
+          "offline_serialized_tokens": 22595
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 23,
+        "readable": 23
+      },
+      "historical_query_failures": [
+        {
+          "query": {
+            "reference": {
+              "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+              "media_type": "application/json"
+            },
+            "pointer": "/methods/mujoco_direct_control_v1/measured_control_initialization",
+            "view": "mathematical_capabilities",
+            "fields": [],
+            "start": 0,
+            "count": 20
+          },
+          "path": "/evidence_working_set/read_state/recent/1/query",
+          "historical_read_query": true,
+          "status": "failed",
+          "error": "'measured_control_initialization'"
+        }
+      ],
+      "navigation_error_replay": {
+        "total": 18,
+        "structured_corrections_readable": 18
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    },
+    {
+      "case": "C",
+      "arm": "control",
+      "source_archive": "b3_t2_pilot_050_c",
+      "source_state": {
+        "artifact_id": "cecf5a70d67231c0361ddc953c4b79cbbcde6f46f03205bb91978756899f2509",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "f5f11175f24a0eeac8b51ef1c15391a68fd1b8598ddbd3d73eaff0ea76052562",
+        "media_type": "application/json"
+      },
+      "event_boundary": 424,
+      "original_next_request": {
+        "artifact_id": "edf4066ac6eb4070baff29e363bfed76e0f57de07ab3fded94de5ef7a8a2037a",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 50331,
+          "offline_serialized_tokens": 14854
+        },
+        "same_session": {
+          "bytes": 106745,
+          "offline_serialized_tokens": 31215
+        },
+        "handoff": {
+          "bytes": 106582,
+          "offline_serialized_tokens": 31179
+        },
+        "schema": {
+          "bytes": 30104,
+          "offline_serialized_tokens": 7646
+        },
+        "fixed_system": {
+          "bytes": 3066,
+          "offline_serialized_tokens": 649
+        },
+        "history": {
+          "bytes": 521,
+          "offline_serialized_tokens": 115
+        },
+        "dynamic": {
+          "bytes": 72915,
+          "offline_serialized_tokens": 22767
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 32,
+        "readable": 32
+      },
+      "historical_query_failures": [],
+      "navigation_error_replay": {
+        "total": 0,
+        "structured_corrections_readable": 0
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    },
+    {
+      "case": "C",
+      "arm": "treatment",
+      "source_archive": "b3_t2_pilot_050_c",
+      "source_state": {
+        "artifact_id": "cecf5a70d67231c0361ddc953c4b79cbbcde6f46f03205bb91978756899f2509",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "f5f11175f24a0eeac8b51ef1c15391a68fd1b8598ddbd3d73eaff0ea76052562",
+        "media_type": "application/json"
+      },
+      "event_boundary": 424,
+      "original_next_request": {
+        "artifact_id": "edf4066ac6eb4070baff29e363bfed76e0f57de07ab3fded94de5ef7a8a2037a",
+        "media_type": "application/json"
+      },
+      "sizes": {
+        "brief": {
+          "bytes": 52269,
+          "offline_serialized_tokens": 15436
+        },
+        "same_session": {
+          "bytes": 110084,
+          "offline_serialized_tokens": 32159
+        },
+        "handoff": {
+          "bytes": 109921,
+          "offline_serialized_tokens": 32123
+        },
+        "schema": {
+          "bytes": 31373,
+          "offline_serialized_tokens": 7931
+        },
+        "fixed_system": {
+          "bytes": 3066,
+          "offline_serialized_tokens": 649
+        },
+        "history": {
+          "bytes": 521,
+          "offline_serialized_tokens": 115
+        },
+        "dynamic": {
+          "bytes": 74985,
+          "offline_serialized_tokens": 23426
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "recommended_queries": {
+        "total": 23,
+        "readable": 23
+      },
+      "historical_query_failures": [],
+      "navigation_error_replay": {
+        "total": 0,
+        "structured_corrections_readable": 0
+      },
+      "state_unchanged": true,
+      "final_r1_refs_absent": true
+    }
+  ],
+  "totals": {
+    "control": {
+      "provider_requests": 6,
+      "input_tokens": 216886,
+      "output_tokens": 53875,
+      "total_tokens": 270761,
+      "reasoning_tokens": 44656,
+      "public_tool_calls": 8,
+      "evidence_reads": 5,
+      "errors": [
+        {
+          "case": "C",
+          "turn": 2,
+          "kind": "RESEARCH_INTENT_ACTION_MISMATCH"
+        },
+        {
+          "case": "A",
+          "turn": 2,
+          "kind": "RESEARCH_INTENT_ACTION_MISMATCH"
+        }
+      ],
+      "empty_evidence_deliveries": 0,
+      "identical_read_deliveries": 0,
+      "avoidable_repeated_reads_confirmed": 0,
+      "dynamic_reread_assessment": "not measured: C3 uses frozen state and does not rebuild read coverage for new reads"
+    },
+    "treatment": {
+      "provider_requests": 6,
+      "input_tokens": 219671,
+      "output_tokens": 52879,
+      "total_tokens": 272550,
+      "reasoning_tokens": 42611,
+      "public_tool_calls": 12,
+      "evidence_reads": 9,
+      "errors": [
+        {
+          "case": "C",
+          "turn": 1,
+          "kind": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER"
+        },
+        {
+          "case": "A",
+          "turn": 2,
+          "kind": "INVALID_TOOL_JSON"
+        }
+      ],
+      "empty_evidence_deliveries": 1,
+      "identical_read_deliveries": 0,
+      "avoidable_repeated_reads_confirmed": 0,
+      "dynamic_reread_assessment": "not measured: C3 uses frozen state and does not rebuild read coverage for new reads"
+    }
+  },
+  "paired": [
+    {
+      "case": "A",
+      "control": {
+        "provider_requests": 2,
+        "total_tokens": 87207,
+        "input_tokens": 73348,
+        "output_tokens": 13859,
+        "public_tool_calls": 3,
+        "evidence_reads": 2,
+        "errors": [
+          {
+            "case": "A",
+            "turn": 2,
+            "kind": "RESEARCH_INTENT_ACTION_MISMATCH"
+          }
+        ],
+        "first_contract_admitted_proposal": null
+      },
+      "treatment": {
+        "provider_requests": 2,
+        "total_tokens": 104861,
+        "input_tokens": 80600,
+        "output_tokens": 24261,
+        "public_tool_calls": 4,
+        "evidence_reads": 3,
+        "errors": [
+          {
+            "case": "A",
+            "turn": 2,
+            "kind": "INVALID_TOOL_JSON"
+          }
+        ],
+        "first_contract_admitted_proposal": null
+      }
+    },
+    {
+      "case": "B",
+      "control": {
+        "provider_requests": 2,
+        "total_tokens": 92886,
+        "input_tokens": 74581,
+        "output_tokens": 18305,
+        "public_tool_calls": 1,
+        "evidence_reads": 0,
+        "errors": [],
+        "first_contract_admitted_proposal": {
+          "provider_requests": 1,
+          "tool_calls": 1,
+          "scope": "contract-admitted proposal only; scientific quality reviewed separately"
+        }
+      },
+      "treatment": {
+        "provider_requests": 2,
+        "total_tokens": 83556,
+        "input_tokens": 69181,
+        "output_tokens": 14375,
+        "public_tool_calls": 5,
+        "evidence_reads": 4,
+        "errors": [],
+        "first_contract_admitted_proposal": {
+          "provider_requests": 2,
+          "tool_calls": 5,
+          "scope": "contract-admitted proposal only; scientific quality reviewed separately"
+        }
+      }
+    },
+    {
+      "case": "C",
+      "control": {
+        "provider_requests": 2,
+        "total_tokens": 90668,
+        "input_tokens": 68957,
+        "output_tokens": 21711,
+        "public_tool_calls": 4,
+        "evidence_reads": 3,
+        "errors": [
+          {
+            "case": "C",
+            "turn": 2,
+            "kind": "RESEARCH_INTENT_ACTION_MISMATCH"
+          }
+        ],
+        "first_contract_admitted_proposal": null
+      },
+      "treatment": {
+        "provider_requests": 2,
+        "total_tokens": 84133,
+        "input_tokens": 69890,
+        "output_tokens": 14243,
+        "public_tool_calls": 3,
+        "evidence_reads": 2,
+        "errors": [
+          {
+            "case": "C",
+            "turn": 1,
+            "kind": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER"
+          }
+        ],
+        "first_contract_admitted_proposal": {
+          "provider_requests": 2,
+          "tool_calls": 3,
+          "scope": "contract-admitted proposal only; scientific quality reviewed separately"
+        }
+      }
+    }
+  ],
+  "manual_review": {
+    "A-control": {
+      "facts": "partial: source origins remain uncertain despite list delivery; redundant initialization proposed",
+      "legality": "failed: diagnose/CONTROL_SEARCH mismatch at turn 2",
+      "discrimination": "plausible timing vs compliance hypothesis; finite negative search cannot identify mechanism",
+      "cost": "partial: recognizes math unused, physical replay reserved",
+      "autonomy": "several mechanisms, but treats native as sole route"
+    },
+    "A-treatment": {
+      "facts": "partial: identifies measured source; unsupported other-structure origin asserted for e76 plan",
+      "legality": "failed: malformed JSON; extra analysis/decision keys also present but not repaired",
+      "discrimination": "timing constant estimated from two observations; targeted response proposal, still an untested approximation",
+      "cost": "states callbacks/steps but requested_budget 12 versus 19/24 callbacks is ambiguous",
+      "autonomy": "new falsifiable timing explanation; no usable typed proposal"
+    },
+    "B-control": {
+      "facts": "failed: imports historical M2 8000 native steps into current R1 cost",
+      "legality": "turn 1 Plan/evidence admitted; no new typed submission at turn 2",
+      "discrimination": "native correction has task value, but sole-route claim and source uncertainty remain",
+      "cost": "incorrect cumulative native cost; correctly separates unexecuted proposal and acceptance",
+      "autonomy": "keeps competing explanations but does not resolve source uncertainty"
+    },
+    "B-treatment": {
+      "facts": "partial: measured source vs unmeasured plan correctly resolved; tendon ordering still unknown",
+      "legality": "turn 2 Plan/evidence admitted; execution-specific admission not run",
+      "discrimination": "failed negative inference: limited local failure claimed to rule out model mismatch/weight tuning and identify structural authority",
+      "cost": "partial: calls and physical opportunity budget explicit; suffix-only estimate does not establish repeated prefix cost or state/window admission",
+      "autonomy": "targeted active set and falsifier, but overly decisive mechanism conclusion"
+    },
+    "C-control": {
+      "facts": "partial: correct metric, but equal prediction/replay generalized to model trust and capped repeat asserted unable to improve",
+      "legality": "failed: diagnose/MATHEMATICAL_ANALYSIS mismatch; proposed task_capability/braking with MuJoCo is not established as a supported combination",
+      "discrimination": "asks a valuable control-vs-structure question, but overstates what the proposed math can resolve",
+      "cost": "unverified 1-2 math units and near-zero native cost for proposed method",
+      "autonomy": "switches away from native optimization, yet does not verify method applicability"
+    },
+    "C-treatment": {
+      "facts": "mostly sound: identifies unknown samples, finite budget/search scope and same-number reuse ambiguity",
+      "legality": "one range error then contract-admitted diagnose proposal; execution admission untested",
+      "discrimination": "useful bounded control/parameterization vs structural-authority comparison; explicitly retains search-budget alternative and no global infeasibility",
+      "cost": "partial: states 8 callbacks/8000 physics steps but also calls the diagnostic zero physical cost; no complete protocol/state/window admission",
+      "autonomy": "acknowledges missing evidence; considers T2/design alternatives without executing them"
+    }
+  },
+  "historical_intent_check": {
+    "control": {
+      "status": "rejected",
+      "error_code": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "field": "decision.research_intent",
+      "evidence_navigation": null,
+      "expected": "RESEARCH_INTENT_ACTION_MISMATCH: action=diagnose requires decision.research_intent=DIAGNOSE; received=MATHEMATICAL_ANALYSIS",
+      "scientific_execution_started": false,
+      "relevant_references": []
+    },
+    "treatment": {
+      "code": "SCHEMA_VALIDATION_ERROR",
+      "message": "'DIAGNOSE' was expected",
+      "scientific_execution": "not_dispatched_by_C3"
+    }
+  },
+  "limitations": [
+    "One pair per case, at most two Provider turns, no repeat or prompt tuning",
+    "Same reported model alias, no immutable weight revision returned",
+    "Only three production tool schemas exposed; no full SDK offload or Reporter cycle",
+    "Frozen read coverage is not updated by new probe reads, so changed_content feedback loops are not tested",
+    "Plan admission is not execution-specific scientific admission",
+    "Structured navigation correction gains are offline; no live wrapper/view error occurred to demonstrate avoided recovery turns",
+    "Archive host has no original execution SQLite; already-initialized complete schedules are read, but NMPC schedule extraction/file resolution and execution admission are not replayed"
+  ],
+  "tests": {
+    "passed_unique": 9,
+    "production_science_changes": 0
+  },
+  "raw_trace": "provider_trace.tar.gz",
+  "decisions": "decisions.json"
+}

@@ -132,6 +132,46 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(result['provider_ledger']['occupied']['provider_request'], 1)
         self.assertIsNone(result['usage']['total_tokens'])
 
+    def test_c3_rounds_share_twelve_request_cap_and_never_dispatch(self):
+        from types import SimpleNamespace
+        from tools.platform_store import Store
+        from tools.state_io import atomic_json
+        provider=read(probe.ROOT/'configs/research/runtime_c3_ab.json')['provider']
+        self.out.mkdir(parents=True)
+        order=[(c,a) for c in ('A','B','C') for a in probe.C3_ARMS]
+        atomic_json(self.out/'frozen.json',dict(offline_passed=True,scope=probe.C3_SCOPE,
+            authorization='EXPLICIT OFFLINE MOCK ONLY',provider=provider,order=order))
+        for case,arm in order:
+            atomic_json(self.out/f'{case}-{arm}.json',dict(handoff_wire=dict(model=provider['model'],
+                tools=[],messages=[dict(role='system',content='Explicit mock fixture'),dict(role='user',content='No scientific facts')])) )
+        sends=[]
+        def respond(request):
+            sends.append(request)
+            return httpx.Response(200,json=dict(choices=[dict(finish_reason='stop',message=dict(
+                role='assistant',content='Mock decision only'))],usage=dict(prompt_tokens=1,completion_tokens=1,total_tokens=2)))
+        def feedback(case,arm,output,tool_input):atomic_json(output,[])
+        project_config=probe.ProjectConfig
+        def isolated_grant(**values):
+            return project_config(**{**values,'grant_id':'explicit-mock-c3-'+self.out.name})
+        transport=httpx.MockTransport(respond)
+        with patch.dict(os.environ,DEEPSEEK_API_KEY='offline-fixture'),\
+                patch('httpx.AsyncHTTPTransport',return_value=transport),\
+                patch.object(probe,'ProjectConfig',side_effect=isolated_grant),\
+                patch.object(probe,'c3_boundary',side_effect=feedback),\
+                patch('tools.research.core.dispatch',side_effect=AssertionError('NO_SCIENCE')) as dispatch:
+            first=asyncio.run(probe.c3_live(self.out));self.assertEqual(first['actual_requests'],6)
+            second=asyncio.run(probe.c3_live(self.out,True));self.assertEqual(second['actual_requests'],12)
+            with self.assertRaisesRegex(ValueError,'NO_AUTOMATIC_RESEND'):asyncio.run(probe.c3_live(self.out))
+            with self.assertRaisesRegex(ValueError,'FOLLOWUP_REQUIRES'):asyncio.run(probe.c3_live(self.out,True))
+            host=SimpleNamespace(store=Store(self.out/'provider'),run_id='c3-agent-decision-efficiency')
+            boundary=probe.LiveBoundary(host,transport)
+            wire=json.loads(sends[-1].content)
+            with self.assertRaisesRegex(ValueError,'PROVIDER_COUNT_EXHAUSTED'):
+                asyncio.run(boundary.handle_async_request(httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire)))
+            self.assertEqual(len(sends),12);dispatch.assert_not_called()
+        self.assertEqual(second['provider_ledger']['remaining']['model_calls'],0)
+        self.assertEqual(second['provider_ledger']['used']['worker_calls'],0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,684 @@
+[
+  {
+    "case": "A",
+    "arm": "control",
+    "turn": 1,
+    "request_id": "r3-request-96e1e6bf1b3f40bab9b69ed4fe5d4998",
+    "provider_response": {
+      "id": "6aeb0c4f-12cf-41b5-98fb-5e06320f7793",
+      "created": 1793006367,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 28980,
+      "completion_tokens": 7619,
+      "total_tokens": 36599,
+      "prompt_tokens_details": {
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 7356
+      },
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 28212
+    },
+    "input_bytes": 103505,
+    "content": "",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_sXLsAhNOhgl2n0kWmf079070",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/control_result_links\", \"count\": 5}"
+        }
+      },
+      {
+        "index": 1,
+        "id": "call_01_3Lx6wZnS5mzObxukeDfR2593",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/candidate_index\", \"count\": 2}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_sXLsAhNOhgl2n0kWmf079070",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_01_3Lx6wZnS5mzObxukeDfR2593",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/A-control-1-request.json and A-control-1-response.json"
+  },
+  {
+    "case": "A",
+    "arm": "treatment",
+    "turn": 1,
+    "request_id": "r3-request-0b24ca45107640fc83291410bcd274b3",
+    "provider_response": {
+      "id": "b8e9210d-b10d-4bb9-a523-8f8fc450373c",
+      "created": 1793006419,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 29122,
+      "completion_tokens": 20174,
+      "total_tokens": 49296,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 19831
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 27970
+    },
+    "input_bytes": 104523,
+    "content": "",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_zuZO0MZu8v4jPfHEk5WS9615",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, \"view\": \"mathematical_capabilities\", \"pointer\": \"/methods/mujoco_direct_control_v1/request_template\"}"
+        }
+      },
+      {
+        "index": 1,
+        "id": "call_01_xJHH3W22S07Nzq3iVv9O8531",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/method_requirements\"}"
+        }
+      },
+      {
+        "index": 2,
+        "id": "call_02_UC9T4RE7jnRyAaTxQe7d7601",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48\", \"media_type\": \"application/json\"}, \"view\": \"summary\"}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_zuZO0MZu8v4jPfHEk5WS9615",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_01_xJHH3W22S07Nzq3iVv9O8531",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_02_UC9T4RE7jnRyAaTxQe7d7601",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/A-treatment-1-request.json and A-treatment-1-response.json"
+  },
+  {
+    "case": "B",
+    "arm": "treatment",
+    "turn": 1,
+    "request_id": "r3-request-a2594f2b7f1446af95b56c98c498c396",
+    "provider_response": {
+      "id": "798ee9d6-e65a-4c9d-9d2b-38b97846aee2",
+      "created": 1793006545,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 29586,
+      "completion_tokens": 8731,
+      "total_tokens": 38317,
+      "prompt_tokens_details": {
+        "cached_tokens": 10752
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 8080
+      },
+      "prompt_cache_hit_tokens": 10752,
+      "prompt_cache_miss_tokens": 18834
+    },
+    "input_bytes": 106877,
+    "content": "我先做只读核查（不执行任何科学动作），确认两个 control source 的精确身份、`mujoco_direct_control_v1` 的合法请求模板与本候选的配置维度，然后给出下一动作提案。",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_mx5iCSrzqu5OU2ld6LxC5552",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, \"pointer\": \"/control_result_links/2\", \"view\": \"working_set\", \"fields\": [\"source\", \"source_kind\", \"origin_kind\", \"origin_status\", \"origin_reference\", \"initialized\", \"full_control_sequence\", \"task_acceptance\", \"execution_references\", \"trajectory_query\"]}"
+        }
+      },
+      {
+        "index": 1,
+        "id": "call_01_xfsFR7h4U7jiIY8visX10876",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, \"pointer\": \"/control_result_links/3\", \"view\": \"working_set\", \"fields\": [\"source\", \"source_kind\", \"origin_kind\", \"origin_status\", \"origin_reference\", \"initialized\", \"full_control_sequence\", \"task_acceptance\", \"execution_references\", \"trajectory_query\"]}"
+        }
+      },
+      {
+        "index": 2,
+        "id": "call_02_xzwTcqnj473FMlyy73yk3148",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, \"pointer\": \"/methods/mujoco_direct_control_v1/request_template\", \"view\": \"mathematical_capabilities\"}"
+        }
+      },
+      {
+        "index": 3,
+        "id": "call_03_IrY4oy1NvY0jfD5N1rsc8102",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, \"pointer\": \"\", \"view\": \"fields\"}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_mx5iCSrzqu5OU2ld6LxC5552",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_01_xfsFR7h4U7jiIY8visX10876",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_02_xzwTcqnj473FMlyy73yk3148",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_03_IrY4oy1NvY0jfD5N1rsc8102",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/B-treatment-1-request.json and B-treatment-1-response.json"
+  },
+  {
+    "case": "B",
+    "arm": "control",
+    "turn": 1,
+    "request_id": "r3-request-0200a01a400e4bc2bd5d7f863937703c",
+    "provider_response": {
+      "id": "611217f4-8607-43e2-b584-f9ae45a0e601",
+      "created": 1793006605,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 29479,
+      "completion_tokens": 15205,
+      "total_tokens": 44684,
+      "prompt_tokens_details": {
+        "cached_tokens": 10496
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 13174
+      },
+      "prompt_cache_hit_tokens": 10496,
+      "prompt_cache_miss_tokens": 18983
+    },
+    "input_bytes": 105871,
+    "content": "",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_dSiQL2xpInHXvObAOMEH5265",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"在冻结候选 e85fc8（结构不变、现行速度感知 recipe 不变）下，唯一违反项 holding_speed=0.043009681835387996 m/s（0.49 s，竖直分量主导 -0.0396046 m/s，0.50 s 已降到 0.03553 m/s）主要由末段指令制动不足/时序造成，而非 8 N 通道内不可耗散。因此在与评估同保真度的 native MuJoCo 上，只对 [0.45,0.50] s 的张力轨迹做 ≤4 节局部修正（≤24 evaluation_requests、≤3 iterations），即可把终窗合速压到 0.020 m/s 以内，同时保持位置误差 ≤0.010 m。\", \"expected_observation\": \"返回一个 e85fc8 绑定的完整开环 schedule（task_acceptance=unmeasured，不继承任何物理接受），其终窗合速相对源 schedule 明显下降（目标包络 <0.020 m/s，竖直分量先降），位置误差维持在 0.004 m 量级；随后用剩余物理额度做恰好一次独立重放，若通过则公开读取完整评估并零额外确认 SELECT。\", \"weakening_observation\": \"若 ≤24 evals / ≤3 iterations 内目标仍 >0.020 m/s、或触到迭代上限仍无改进、或所得 schedule 的独立重放终窗速度仍 >0.020 m/s，或源绑定/校验被拒（源非 e85fc8 实测 ZOH 完整 schedule、区间数或 tendon 顺序不符、张力越界或为负、为 stitched 未执行预测、带 channel_map、继承了物理接受），则\\\"末段指令制动不足\\\"这一解释被削弱，而\\\"物理实现层面的耗散/端点权威受限\\\"相对上升（仍不构成不可行性结论）。\", \"fixed_conditions\": \"冻结 tasks/reach_hold_b3_050.json：目标 [0.29,-0.035,0.19] m，0.50 s，hold [0.45,0.50] s，位置 ≤0.010 m、速度 ≤0.020 m/s、张力 [0,8] N、控制 0.01 s、物理 0.0005 s、12 cells/segment、8 N 通道界，不放松。候选 e85fc8 的结构、材料、截面、路由与 recipe 全部不变（不做 FamilySpace 修改，不新建结构；两个物理结构额度 cb6db6 与 e85fc8 均已用尽）。control_optimization.source 必须是 e85fc8 精确绑定的实测 ZOH 完整开环 schedule（首选 e3a06aa1），无 channel_map；若不满足则先走合法 measured 初始化（candidate=e85fc8、parent=e85fc8、source=629f68）再请求。只修改 [0.45,0.50] s 的 ≤4 节张力偏移，前缀按源 schedule 精确重建；settings 用 local_control_search_v2，显式 correction_window_s=[0.45,0.50]、knots_s=[0.45,0.4667,0.4833,0.50]、method=response、evaluation_requests=24、iterations=3、safety_margin_fraction=0.1、coefficient_limit_n=1.5、difference_step_n=0.05、initial_radius_n=1.0、minimum_radius_n=1e-3。不使用 NMPC（0 剩余）、不重复 offline NLP、不跑 PPO。\", \"stopping_condition\": \"若产出改进 schedule，则只做恰好一次完整独立物理重放；在首次完整通过的最终保真独立任务评估被公开读取后立即以零额外确认 SELECT 该精确 candidate/control/result 并停止。若优化未改进、触到迭代/评估上限，或重放未通过，则不重复同一结构的 native 优化，公开读取 all_fresh_results 并据实给出 STOP，逐条引用全部新结果。\", \"interpretation\": \"竞争解释有三：(H1) 控制/时序——末段制动指令不足或过晚（recipe 的 holding_tip_speed_weight=terminal_tip_speed_weight=1.0 已到控制域名上限，brake_lead=0.06 s）；(H2) 模型-物理差——GVS 降阶模型对终窗速度不敏感，NMPC 因此不再下压（历史五次求解触迭代上限说明其数值本身即紧）；(H3) 结构端点权威/耗散受限。三者对\\\"下一步是否有价值\\\"含义不同：若为 H1，本次 native（与评估同物理、同 0.0005 s 步长）局部修正就有直接产出；若为 H2，说明任何降阶模型驱动的调参都不可信，应改为在 native 上直接闭环修正；若为 H3，则末期输入修正也压不下来，此时应停止而不是继续花额度。选 native MuJoCo-direct 而非 T2/GVS 诊断，是因为它同时覆盖 H1 与 H2 两种可行动情形，且是当前唯一仍合法、能直接产出可物理评估 schedule 的路线（NMPC 与 offline NLP 已为 0，物理结构额度 2 个已用尽）。代价与不确定性：本次占 1 次数学评估（余 26），native 积分 ≤24×(900+101)≈24000 步，叠加历史 8000 步仍在 60000 上限内（实测按 raw costs 报账）；若改进成立还要占 remaining_physical 2 中的 1 次重放。关键未知：(a) e3a06aa1 与 e76d3b34 究竟哪个是 629f68 实测 ZOH schedule、哪个是历史 M2-C 导入开环起点（需读 /control_result_links 一次确认）；(b) 本 Study 是否已消耗过一次 native 优化（method_remaining 的 offline_nlp=0 是否即该计数），决定这是否是两次上限中的最后一次；(c) remaining_physical=2 是否覆盖\\\"新控制 + e85fc8 重放\\\"这一语义；(d) C3 快照中 629f68 的 actual_tension 为 unavailable，故同输入同采样的模型误差比较无法仅凭快照建立，只能做计划层比较。本次不重复同一结构的既有 native 优化：新增信息是 C3 首次给出 e85fc8 实测终窗速度 0.0430 m/s 及其竖直主导的临界样本，与历史 M2 的 0.0879/0.1114 及未执行预测均不同。最后，若未来两份 schedule 的控制支出（张力水平/节律/总消耗）不同，必须如实报告该不等支出，不得单独归因于结构。\", \"decision\": {\"hypothesis_id\": \"h-native-holdwindow-brake-v1\", \"research_intent\": \"DIAGNOSE\", \"selected_method\": \"mujoco_direct_control_v1 (native MuJoCo local control correction, local_control_search_v2, hold-window only)\", \"selected_variables\": [\"[0.45,0.50] s 4 节 × 4 根 tendon 的张力偏移系数（16 维，系数限幅 1.5 N）\", \"holding_max_speed_m_s\", \"holding_max_error_m\", \"terminal_error_m\", \"实际张力支出（张力水平/节律/总量）\"], \"requested_budget\": 1, \"claimed_inference\": \"empirical_search\", \"selected_candidate\": null}, \"supporting_evidence\": [{\"artifact_id\": \"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48\", \"media_type\": \"application/json\"}], \"next_step\": \"diagnose\"}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_dSiQL2xpInHXvObAOMEH5265",
+        "name": "research_plan",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/B-control-1-request.json and B-control-1-response.json"
+  },
+  {
+    "case": "C",
+    "arm": "control",
+    "turn": 1,
+    "request_id": "r3-request-b132fe4dcc7146cdabe24b2b70c104bf",
+    "provider_response": {
+      "id": "150d2212-2d80-48df-bd74-cf8b0e66e27c",
+      "created": 1793006703,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 29078,
+      "completion_tokens": 4834,
+      "total_tokens": 33912,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 4422
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 28566
+    },
+    "input_bytes": 103884,
+    "content": "我先做一次低成本的证据读取，用来消除两个会直接影响方法选择的未知：(1) 五条 control_result_links 各自的身份与冻结状态，尤其第二个可回放源 `b5cebafd` 到底是开环抑或 NMPC 派生调度；(2) 各方法当前的生产合同要求。这些是纯读取，不执行任何科学。",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_TCj3VGcvUA4RLYCGvTCi1743",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"db55b0733c50e7f624db606b8b0076df07abf367e5086dc20306f45835d7c93f\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/control_result_links\"}"
+        }
+      },
+      {
+        "index": 1,
+        "id": "call_01_APHlsh7wHCpQVwWaK8Nz6141",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"b5cebafd770e90a339f96c6f9928d24e5688fe23f0803d1fd41547170573abfb\", \"media_type\": \"application/json\"}, \"view\": \"summary\"}"
+        }
+      },
+      {
+        "index": 2,
+        "id": "call_02_DXQyixDDrZpqVV2Ey4EK4601",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"db55b0733c50e7f624db606b8b0076df07abf367e5086dc20306f45835d7c93f\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/method_requirements\"}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_TCj3VGcvUA4RLYCGvTCi1743",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_01_APHlsh7wHCpQVwWaK8Nz6141",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_02_DXQyixDDrZpqVV2Ey4EK4601",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/C-control-1-request.json and C-control-1-response.json"
+  },
+  {
+    "case": "C",
+    "arm": "treatment",
+    "turn": 1,
+    "request_id": "r3-request-298c1f60f0184299ba1d1b0ec57e9a35",
+    "provider_response": {
+      "id": "3865d2a5-4e56-41aa-b935-c233fd3d52e3",
+      "created": 1793006737,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 30015,
+      "completion_tokens": 8758,
+      "total_tokens": 38773,
+      "prompt_tokens_details": {
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 8376
+      },
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 29247
+    },
+    "input_bytes": 107223,
+    "content": "I'll first read two decision-critical pieces of evidence (both read-only), then submit a typed proposal.",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_FswwKtyeg9T3KfEbHe891808",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"db55b0733c50e7f624db606b8b0076df07abf367e5086dc20306f45835d7c93f\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/control_result_links/0\", \"fields\": [\"source\", \"source_kind\", \"origin_kind\", \"origin_status\", \"origin_reference\", \"initialized\", \"full_control_sequence\", \"task_acceptance\", \"trajectory_query\", \"execution_references\"]}"
+        }
+      },
+      {
+        "index": 1,
+        "id": "call_01_PUXTJNpnPlY2tcY4Ib4e0650",
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "arguments": "{\"reference\": {\"artifact_id\": \"66f733b4ba4c59b0ce892cb88e00b846b6ba9f950bc24159feba0fbf861bf705\", \"media_type\": \"application/json\"}, \"view\": \"range\", \"fields\": [\"time_s\", \"tip_error_m\", \"tip_speed_m_s\", \"tip_velocity_m_s\", \"actual_tension_n\"], \"start\": 43, \"count\": 8}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_FswwKtyeg9T3KfEbHe891808",
+        "name": "evidence_read",
+        "status": "success",
+        "error_code": null
+      },
+      {
+        "tool_call_id": "call_01_PUXTJNpnPlY2tcY4Ib4e0650",
+        "name": "evidence_read",
+        "status": "error",
+        "error_code": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER"
+      }
+    ],
+    "source": "provider_trace.tar.gz/C-treatment-1-request.json and C-treatment-1-response.json"
+  },
+  {
+    "case": "C",
+    "arm": "treatment",
+    "turn": 2,
+    "request_id": "r3-request-9e4820d4bbe1468e83ad629bb721bec7",
+    "provider_response": {
+      "id": "fe786775-badf-4f0e-950a-c0752d7cb660",
+      "created": 1793006866,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 39875,
+      "completion_tokens": 5485,
+      "total_tokens": 45360,
+      "prompt_tokens_details": {
+        "cached_tokens": 38656
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2955
+      },
+      "prompt_cache_hit_tokens": 38656,
+      "prompt_cache_miss_tokens": 1219
+    },
+    "input_bytes": 147849,
+    "content": "本轮唯一的只读反馈：`/control_result_links/0`（来源 b5cebafd，origin=measured_nmpc_execution_v1）**`execution_references: []`** —— 该\"由实测 NMPC 输入固化成的开环调度\"从未经过独立物理执行，其 `task_acceptance` 仍为 unmeasured；而 `/samples` 的区间读取被拒（我误把非列表指针 `\"\"` 用于 range，`EVIDENCE_RANGE_REQUIRES_LIST_POINTER`，正确指针应为 `/samples`），故 0.45–0.50 s 内速度轨迹的逐点走势仍是未知。据此提交决策：先做零物理成本的判别，而不是立刻花掉最后一次物理复跑或最后一次 NMPC。",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_gOAHI4XG06NA31WhXewb3325",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"唯一越界项是 holding_speed = 0.0878878 m/s（限 0.02，归一化超出 3.394，4.39×），位置类指标以约 33% 余量通过（holding_max_error 0.0066759 m、terminal 0.0045156 m）；且 0.48 s 与 0.50 s 实测张力为 [0, 4.063, 1.198, 0] 与 [0, 4.489, 1.386, ~0] N，远未触及 8 N 上限、且四通道中只有两通道在工作。因此首要竞争解释是\\\"开环调度在最后 50 ms 内没有充分制动\\\"（控制/参数化原因：原生有界搜索在第 8 个回调、2 次迭代即因评价预算耗尽停止，predicted gap 3.464，基线 0.1114 -> 0.0879 仅两步），而非\\\"该结构在 50 ms 内物理上无法减速到 0.02 m/s\\\"。本决策为只读判断：不执行任何科学，不产生新物理/数学结果。\", \"expected_observation\": \"若 E1（控制/参数化）成立：对同一结构、同一调度做一次仅数学的原生制动窗口重搜（correction_window 约 [0.30, 0.50] s、knots 覆盖制动与终窗、coefficient_limit ≤ 8 N，仍受 8 次评价 / 2 次迭代 / ≤4 knots 的固定单请求上限约束）后，应看到 predicted holding_max_speed 从 0.0879 明显下降到接近或低于 0.02，同时 predicted holding_max_error 仍 ≤ 0.01 m，且最优候选的终段张力显著升高（逼近但不超过 8 N）。此结果才支持花掉剩余 1 次完整物理复跑去做独立验收。\", \"weakening_observation\": \"若 predicted holding_max_speed 在约 0.05–0.09 m/s 平台化、最优候选把某通道顶到 8 N 饱和、且 predicted holding_max_error 向 0.01 m 逼近或越界（即提速必须以牺牲已通过的位置为代价），则削弱 E1，指向该结构在该窗口的制动权限/结构限制（E2），此时不应消耗最后一次物理复跑与最后一次 NMPC。另两种削弱情形：(a) 原生预测不再与实测逐位吻合（模型保真前提失效，需先查模型-物理一致性）；(b) 复跑后 holding_speed 下降但位置越界，说明是权衡迁移而非真实改进。\", \"fixed_conditions\": \"候选 123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33（结构身份 676cfa6149fd3f07deea5dca853fcb2ff990def0df7fcd46d79f8ed0a486ec04）；任务 target [0.29,-0.035,0.19] m、0–0.50 s、控制周期 0.01 s、物理步长 0.0005 s、终窗 [0.45,0.50] s、position ≤ 0.010 m、speed ≤ 0.020 m/s、每通道张力 [0,8] N；原生单请求上限 8 次评价 / 2 次迭代 / ≤4 knots 不得放大；NMPC 冻结 horizon=10、substeps=1、replan_period=0.1 s、max_iterations≤120、tolerance=1e-6；软权重不替代验收阈值。\", \"stopping_condition\": \"出现任一完整、独立、同时满足 position ≤0.010 m、speed ≤0.020 m/s、张力 ∈[0,8] N 的评估时，立即公开读取并 SELECT 该精确结果，零额外确认；否则在剩余数学额度（21 次总量，单请求上限不变）、剩余物理额度（剩余 2 次评估 / 仅 1 次完整复跑，本结构上限）与剩余 1 次 NMPC 中任一耗尽或 Provider 探索额度（4）用尽时，先公开读取并引用 all_fresh_results 再 STOP；不重置、不扩额、不接受任何超出协议上限的放大。\", \"interpretation\": \"只读综合（无执行）：四条竞争解释及其证据取舍——E1 控制/参数化（支持度最高）：越界仅速度、位置有余量、张力远离 8 N 且仅两通道激活、原生搜索因评价预算而非数值失败停止（stop_reason=evaluation_request_budget，solver 报 Optimization terminated successfully）；E2 结构/制动权限（尚未被排除，但未被证实）：50 ms 窗口内 4.5 N 级张力是否足以把 ~0.03–0.09 m/s 降到 0.02 以下未知，需看饱和行为；E3 模型-代理保真：原生 best 的 holding_max_speed 0.08788779 与实测 holding_speed 0.08788779、holding_max_position_error 0.00667594 与实测 0.0066759 逐位吻合，可能是\\\"代理保真度高\\\"，也可能是同源记账/复用伪影——本轮第二次读取被拒，未能用 /samples 原始样本交叉核对，故列为未决，不得据此断言模型-物理一致；E4 窗口/权重语义：recipe 默认 holding_tip_speed_weight=0.1、tip_speed_scale=0.02、holding_brake_lead_s=0、holding_speed_cost_mode=time_integral_v1，终窗速度在软代价中占比很小，属\\\"软权重不替代验收\\\"的典型风险。方法选择与代价：首选仅数学的同结构制动窗口重搜（8 次原生回调、≤8000 物理步，计入剩余数学 21 次；零新增物理机会），因为它是区分 E1/E2 的最便宜判别，且不消耗本结构仅剩 1 次完整物理复跑与 1 次 NMPC。明确不选的两条：其一，物理复跑 b5cebafd —— 该来源确为实测 NMPC 输入固化，但把反馈律的实测输入以开环 ZOH 回放并不检验该反馈律本身，且 execution_references 为空、质量未知，属高成本低信息；其二，立即 execute NMPC —— 只剩 1 次，recipe 关键阻尼/制动旋钮无法在本 Plan 结构中表达，且若 E2 成立则纯属浪费。设计修改与 T2：当前 direction_status 未知，controlled-capability-sensitivity-v1 仍为 blocked（缺失 validated_model_stencil）、input_sensitivity/design_sensitivity 仅 SoRoSim 实现（本模型不可用），故不强行把未知方向化为结构修改；若后续 E1 被削弱而 E2 增强，再考虑受权的 T2 两尺度对比（≤9 次数学）或结构修改，并须重跑新候选 T1 与全新控制适配，旧控制/旧分数不授予任何改进或验收。未决与残余风险：0.45–0.50 s 内的速度是否单调衰减（需以 /samples 列表指针 range 读取，本轮读取被拒而未得）尚未确认，此点决定 E1 的\\\"晚期收敛\\\"与 E4 的\\\"窗口语义\\\"能否区分；原生单请求上限（2 次迭代）可能本身不足以把 4.39× 的缺口压到 1，因而\\\"数学上仍越界\\\"既可能是 E2，也可能只是搜索预算不足，须以张力饱和与位置代价两项事实共同判读，不得反推全局可行性/不可行性。\", \"decision\": {\"hypothesis_id\": \"holding_speed_openloop_braking_vs_structural_authority\", \"research_intent\": \"DIAGNOSE\", \"selected_method\": \"read-only 决策提案：先以仅数学的同结构制动窗口原生重搜（mujoco_direct_control_v1，source=现有调度，correction_window 约 [0.30,0.50] s、≤4 knots、8 callbacks/2 iters 固定上限）判别 E1 与 E2；仅当其 predicted holding_max_speed 降至 0.02 附近或更低且 predicted 位置 ≤0.01 m 时，才申请本结构最后 1 次完整物理复跑做独立验收。本包内不执行任何数学/物理/NMPC，不请求 local_diagnostic。\", \"selected_candidate\": null, \"selected_variables\": [\"correction_window_s\", \"knots_s\", \"coefficient_limit_n\", \"holding_max_speed_m_s\", \"holding_max_error_m\", \"terminal_error_m\", \"actual_tension_n\"], \"requested_budget\": 1, \"claimed_inference\": \"empirical_search\"}, \"next_step\": \"diagnose\", \"supporting_evidence\": [{\"artifact_id\": \"0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"7cee4f6b079fbb8fd921b48a18c3f8567aaaddbdd9638ecf86c78664f9cf4f12\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"b5cebafd770e90a339f96c6f9928d24e5688fe23f0803d1fd41547170573abfb\", \"media_type\": \"application/json\"}]}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_gOAHI4XG06NA31WhXewb3325",
+        "name": "research_plan",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/C-treatment-2-request.json and C-treatment-2-response.json"
+  },
+  {
+    "case": "C",
+    "arm": "control",
+    "turn": 2,
+    "request_id": "r3-request-de1ebdcf8f6e42a6af33cbe6137fd268",
+    "provider_response": {
+      "id": "9aa164f5-c45f-42b8-a116-d0d4a28acef5",
+      "created": 1793006904,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 39879,
+      "completion_tokens": 16877,
+      "total_tokens": 56756,
+      "prompt_tokens_details": {
+        "cached_tokens": 33280
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 14337
+      },
+      "prompt_cache_hit_tokens": 33280,
+      "prompt_cache_miss_tokens": 6599
+    },
+    "input_bytes": 142339,
+    "content": "## 一、重读之后被确定的只读事实（非因果，仅陈述）\n\n五条 `control_result_links` 与来源身份现在清楚了，这改变了先前\"再回放一次\"的直觉：\n\n- **`30994c15`（原生优化开环调度）** 已有一次真实执行 `0f87cf`：`holding_speed=0.08788779`、`terminal=0.00452`、`holding_pos=0.00668`，仅 `holding_speed` 违规（0.0879 ≫ 0.02，约 4.4×）。它同时是当前 `best_valid`。\n- **数学预测 `7cee4f6b`（mujoco_direct_control_v1）** 的 `best holding_max_speed = 0.08788779126447174`，与物理回放 `0f87cf` **逐位相同**。也就是说：在本任务上，原生模型的这条指标与\"物理\"几乎不可区分——模型可信度很高，预测没有误导。\n- **原生优化器受冻结上限约束**：`evaluation_requests=8, iterations=2, knots_s=4`，`stop_reason=\"evaluation_request_budget\"`，`predicted_gap≈3.46` 未收敛。协议禁止放大这些上限，故\"同一参数化再跑一次\"预期仍停在 ~0.088。\n- **`b5cebafd` 不是新方法**：其 `provenance.source_kind = measured_nmpc_execution_v1`、`command_origin=measured_applied_interval_inputs`、`semantics=open_loop_zero_order_hold`、`execution_references: []`（从未物理回放）、`task_acceptance=unmeasured`。它只是把已跑过的 NMPC 实测输入转成开环 ZOH。\n- **NMPC 闭环实际执行**（`nmpc_actual_execution`，execution `6b28a10f`）`holding_speed = 0.11137`，**比开环 0.0879 更差**（terminal/holding_pos 反而更好）。\n\n## 二、竞争解释（当前无法区分）\n\n1. **控制搜索/参数化/预算受限**：原生优化只 2 次迭代就把速度从 0.111→0.088（−21%），但精度/自由度被 caps 限制；NMPC 用冻结 recipe 反而更差。\n2. **结构性/时序能力上限**：0.5 s 内既要到点（位置已达标）又要末端准静止 <0.02 m/s，可能本身超出该结构的可容许张力（0–8 N）能力。\n3. **NMPC 反馈优于开环**已被现有证据削弱（0.111 > 0.088）。\n4. 采样/离散伪影：0.088 约为限值 4.4×，非边界噪声，基本排除。\n\n## 三、决策：不花物理预算，先用一次廉价数学\"可行性/制动能力\"诊断\n\n理由（成本–判别力）：\n- 回放 `b5cebafd` 大概率复现 ~0.111（更差），**低信息**；重跑 NMPC 用同一冻结 recipe 同属低信息，且 `control_search` 不可用、不得放大 NMPC 计算上限。\n- `mujoco_direct` 再跑一次仍在 8/2/4 上限内，预期 ~0.088，**不能越过 0.02**。\n- 真正能**改变整体策略**的未知是：**在已与物理逐位吻合的原生模型上，可容许张力能否把末端速度压到 <0.02 m/s？** 结论可行 → 继续控制搜索（更聚焦末段的校正窗/节点有权重意义）；结论不可行 → 转向结构修改或 STOP，避免继续消耗物理预算。这一问只需 **1–2 次数学评估**（21 次余额内），且无需物理预算。\n\n因此提交 `diagnose / MATHEMATICAL_ANALYSIS` 提案：在 `model_source=mujoco`、`protocol=task-local-v2`、持位附近工作点上调用 `task_capability`（含 `braking` 子检查）给出可容许张力下的末端减速能力界限。**本次为只读 C3，该提案不会被执行、也不会返回新结果——以下是待授权的提案与判定标准，而非已执行实验。**\n\n## 四、未知量（须在授权时确认）\n- `task_capability/braking` 的 model_source/operating_point 具体准入（`reference_is_equilibrium=false`，目标点非平衡，需选固定输入或持位工作点）。\n- 4 节点/校正窗参数化能否表达足够强的末端制动（本次未验证更优参数化）。\n- `continuous_time_guarantee=false`；结果仅为采样可行性，不证明连续时间合规。\n- 是否 <0.02 m/s 在该时序内根本可达——正由本诊断回答，当前**不可下全局可行/不可行结论**。\n\n下面提交该判定：",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_hDXqbcfk1WhHi0Uw8KOr5236",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"在冻结候选 123ba9d4 与可容许张力 0–8 N 下，该结构有可能在 t=0.5 s 前同时保持位置误差<0.01 m 并把末端世界速度降到 <0.02 m/s；因此当前 0.0879 m/s 的失败主要来自控制搜索参数化/预算受限，而非结构性能力上限。可用已与物理逐位吻合的原生模型（7cee4f6b 的 best speed 与 0f87cf 完全相同）做一次廉价数学能力/制动分析来判定。\", \"expected_observation\": \"若 task_capability/braking 在原生模型上表明存在可容许张力轨迹能在窗口内把末端速度降到 <0.02 m/s（位置亦在界内），则支持 H：结论为\\\"控制/预算问题\\\"，后续应以更聚焦末段的校正窗/节点再做控制搜索，而非改结构或消耗物理预算做等价重放。\", \"weakening_observation\": \"若该分析（在同一已与物理吻合的原生模型上）表明即使最优可容许输入也无法在 0.5 s 内把末端速度降到 <0.02 m/s，或所需张力/位置越界，则削弱 H，指向结构性/时序能力上限：下一步应转向设计修改或 STOP，而不是继续在冻结 caps 内做同类控制重放。\", \"fixed_conditions\": \"目标 [0.29,-0.035,0.19] m、零初速、时长 0.50 s、末窗 0.45–0.50 s 保持、位置≤0.010 m、速度≤0.020 m/s、张力每通道 [0,8] N、控制 0.01 s、物理 0.0005 s；冻结候选 123ba9d4；协议 task-local-v2；NMPC 计算上限 horizon=10/substeps=1/replan=0.1 s/迭代≤120/tol=1e-6 不得放大；mujoco_direct 上限 8/2/4 不得放大。\", \"stopping_condition\": \"完成这一次数学可行性/制动分析即停止本决策：若证明不可行则明确记录并建议转向设计修改或 STOP；若证明可行，则把\\\"更聚焦末段的原生控制搜索\\\"列为需新授权、消耗控制/物理预算的下一次尝试。本次只读 C3 不执行、不产生新结果。\", \"interpretation\": \"读后结论：唯一违规是 holding_speed（0.0879 vs 0.02，约 4.4×），位置与终点均达标；原生开环最优 0.0879 与物理逐位一致，说明模型可信但优化器受 8/2/4 上限、predicted_gap≈3.46 未收敛；NMPC 闭环实测 0.1114 更差；b5cebafd 只是该 NMPC 输入的开环 ZOH、从未回放且 acceptance 未测，回放预期≈0.111，低信息。据此不花稀缺物理预算，而以 1–2 次数学 task_capability/braking 分析判别\\\"结构性能力上限 vs 控制/预算受限\\\"这一能改变整体策略的未知。所选方法为 research_analysis（model_source=mujoco，protocol=task-local-v2，持位附近固定输入工作点）。不据此声明全局可行/不可行或物理通过。\", \"decision\": {\"version\": \"research_decision_v1\", \"hypothesis_id\": \"c3-b3-t2-050-c-holdspeed-feasibility-v1\", \"research_intent\": \"MATHEMATICAL_ANALYSIS\", \"selected_method\": \"research_analysis 能力/制动可行性诊断：operation=task_capability（含 braking 子检查），model_source=mujoco（已与物理逐位吻合），protocol=task-local-v2，operating_point=固定输入持位工作点，约 1–2 次数学评估\", \"selected_variables\": [\"holding_max_speed_m_s\", \"terminal_tip_world_speed\", \"admissible_tension_[0,8]_N\", \"tip_position_error_m\"], \"selected_candidate\": {\"artifact_id\": \"123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33\", \"media_type\": \"application/json\"}, \"requested_budget\": 2}, \"next_step\": \"diagnose\", \"control_seed\": null, \"generation\": null, \"candidate\": null, \"physical_replay\": null, \"diagnostic\": null, \"selected_execution\": null, \"revise_selection\": false, \"supporting_evidence\": [{\"artifact_id\": \"0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"7cee4f6b079fbb8fd921b48a18c3f8567aaaddbdd9638ecf86c78664f9cf4f12\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"b5cebafd770e90a339f96c6f9928d24e5688fe23f0803d1fd41547170573abfb\", \"media_type\": \"application/json\"}]}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_hDXqbcfk1WhHi0Uw8KOr5236",
+        "name": "research_plan",
+        "status": "error",
+        "error_code": "RESEARCH_INTENT_ACTION_MISMATCH"
+      }
+    ],
+    "source": "provider_trace.tar.gz/C-control-2-request.json and C-control-2-response.json"
+  },
+  {
+    "case": "B",
+    "arm": "control",
+    "turn": 2,
+    "request_id": "r3-request-7467f45ea95b47d28f37d6e8e847ca9e",
+    "provider_response": {
+      "id": "a1e5d6dc-05df-4de4-9f56-86576a6e5ebf",
+      "created": 1793007004,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 45102,
+      "completion_tokens": 3100,
+      "total_tokens": 48202,
+      "prompt_tokens_details": {
+        "cached_tokens": 44672
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1532
+      },
+      "prompt_cache_hit_tokens": 44672,
+      "prompt_cache_miss_tokens": 430
+    },
+    "input_bytes": 170502,
+    "content": "## C3 最终决定（只读复核后）\n\n### 一、对实际只读反馈的复核：发生了什么，没发生什么\n\n返回结果是 `proposal_recorded`：\n\n- `decision_admission` 通过（`prospective_guarantee=false`，`resolved_evidence` 4 条全部解析成功）→ 说明**类型化决策 + 证据引用**在合同层面是可接受的；\n- `scientific_execution=\"not_dispatched_by_C3\"`，`new_scientific_computations=0`，`observation=null`，`proposed_budget=1` 未被消耗；\n- `limitation` 明确：\"执行层准入未运行\"；只有显式 `local_diagnostic` 才在生产中真正计算，而 C3 不执行。\n\n因此这次反馈**既没有证实也没有驳回** my 推荐：它只证明计划与证据身份合法，**不构成** native 修正的可执行性/合法性结论。这一点与历史上那两次 `mujoco_direct_control_v1` 被拒（`RESEARCH_INTENT_ACTION_MISMATCH`，方法层检查根本没被触达）性质不同——那两次是执行准入被挡，且原因是 `research_intent=CONTROL_SEARCH` 与 `action=diagnose` 的配对错误，不是源/设置不可采纳。\n\n### 二、维持的科学决定（未因无新结果而改变）\n\n在**冻结结构 e85fc8 上做 native MuJoCo 保持窗局部修正**，而不是新结构、NMPC、T2 或重放复读：\n\n- 候选/结构/材料/截面/路由/recipe 全部不动（不做 FamilySpace 修改）；\n- source 必须是 e85fc8 精确绑定的**实测 ZOH 完整开环 schedule**（首选 `e3a06aa1`），无 channel_map、不继承任何物理接受；若绑定不成立，先走合法 measured 初始化（candidate=`e85fc8`, parent=`e85fc8`, source=`629f68`）；\n- 只改 `[0.45,0.50] s` 的 ≤4 节张力偏移，前缀按源 schedule 精确重建；\n- `local_control_search_v2`，显式 `correction_window_s=[0.45,0.50]`、`knots_s=[0.45,0.4667,0.4833,0.50]`、`method=response`、`evaluation_requests=24`、`iterations=3`、`safety_margin_fraction=0.1`、`coefficient_limit_n=1.5`；\n- 成功后**恰好一次**独立物理重放；首次完整通过的最终保真评估被公开读取后，零额外确认 SELECT 并停止。\n\n**为什么在无新信息下它仍是最优**：两个物理结构额度（`cb6db6`、`e85fc8`）已用尽，任何新结构都无法再取得物理接受且需全新控制优化；`nmpc=0`、`offline_nlp=0`，两个源的 `control_search` 均 `unavailable`，闭环调参路线关闭；T2 便宜但只给降阶模型局部敏感性，无法产出可评估 schedule，且若 H2 成立其结论对物理不可迁移。native MuJoCo 与评估同物理、同步长（0.0005 s），是唯一仍合法、同保真度、同时覆盖 H1（末段制动指令不足）与 H2（降阶模型对终窗速度不敏感）两条**仍可行动**解释的路线。代价：1 次数学评估（余 26），native 积分 ≤24×(900+101)≈24000 步（叠加历史 8000 步仍 <60000），成功后占 `remaining_physical=2` 中的 1 次；0 次 NMPC/offline NLP/PPO/新结构。\n\n### 三、执行前必须按序完成的前置读取（这是最后的可发言窗口，特此登记）\n\n1. 读 `/control_result_links`（5 条）：确认 `e3a06aa1` 与 `e76d3b34` 谁是 `629f68` 的实测 ZOH schedule、谁是历史 M2-C 导入开环起点，以及是否**已被物理重放过** → 决定 source；\n2. 确认本 Study 是否已消耗一次 native 优化（`offline_nlp=0` 是否即该计数）→ 判定这是否是\"两次上限\"中的最后一次；\n3. 确认 `remaining_physical=2` 是否覆盖\"新 schedule + e85fc8 重放\"的语义；\n4. 再提交 `research_analysis(operation=mujoco_direct_control_v1, model_source=mujoco, candidate=e85fc8, control_optimization={source, settings})`，且 `research_intent=DIAGNOSE` 必须与 `action=diagnose` 配对。\n\n### 四、预先登记的\"什么会改变我的决定\"\n\n- 若源已被重放过 → 剩余物理额度只能用在新 schedule 上，不得复读同一输入；\n- 若 native 优化本 Study 已用尽 → 立即改走最便宜的数学判别（`task_capability` 或 `braking`，1 次评估、0 native 步）：若降阶模型复现 0.0430 m/s 则支持 H1，若复现不了则支持 H2，模型驱动调参不可迁移；\n- 若新 schedule 无法获得独立重放 → 本段不可能取得物理接受，应据实 STOP 而非继续消耗；\n- 若 ≤3 迭代无改进或触限 → 不重复同结构 native 优化，按 H3（耗散/端点权威受限）方向如实描述后 STOP。\n\n### 五、未解决的未知与不越界的表述\n\n- `629f68` 的 `actual_tension` 在快照中 `unavailable`，故\"同候选/同状态/同实际输入/同信号/同采样\"的模型误差无法仅凭现有证据建立；小内部残差不得当作物理保真；\n- 0.0430 m/s **不是**已证明的失败原因，H1/H2/H3 三条解释全部存活；峰速主导项是竖直分量（0.49 s：−0.0396 m/s → 0.50 s：−0.0355 m/s），只说明末端在减速但不够快；\n- 不主张全局可行或不可行；未耗尽预算 ≠ 已耗尽预算；\n- 一旦存在两份不同的张力轨迹，其**控制支出不等**（张力水平、节律、总量）必须如实报告，不得单独归因于结构。\n\n**本段结论**：C3 未产生任何新的物理或数学结论，未消耗科学预算（`proposed_budget=1` 未执行）。下一个科学行动维持为\"e85fc8 上 native 保持窗局部修正 + 唯一一次独立重放\"，并以第三节 1–4 的读取/确认为放行门槛。",
+    "tools": [],
+    "feedback": [],
+    "source": "provider_trace.tar.gz/B-control-2-request.json and B-control-2-response.json"
+  },
+  {
+    "case": "B",
+    "arm": "treatment",
+    "turn": 2,
+    "request_id": "r3-request-2aa74d3d55d04594b51b8a41731ae7ce",
+    "provider_response": {
+      "id": "dfbe6e8d-84f0-4554-860f-2cd91a66f010",
+      "created": 1793007028,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 39595,
+      "completion_tokens": 5644,
+      "total_tokens": 45239,
+      "prompt_tokens_details": {
+        "cached_tokens": 38272
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2474
+      },
+      "prompt_cache_hit_tokens": 38272,
+      "prompt_cache_miss_tokens": 1323
+    },
+    "input_bytes": 147533,
+    "content": "## 只读核查结论（本轮无任何科学执行）\n\n两处 source 的实测身份已确认，这直接影响下一步的合法性：\n\n| 源 | 类型 | 关键字段 | 可否作为开环修正起点 |\n|---|---|---|---|\n| `e3a06aa…` | explicit_control_schedule_v1，origin = **measured_nmpc_execution_v1**（父 = `629f68…`） | initialized=true、full_control_sequence=true、origin_status=measured_execution | **是**（唯一\"实测实际施加 ZOH 序列\"的完整源，无 channel_map） |\n| `e76d3b3…` | explicit_control_schedule_v1，origin = bounded_candidate_control_v1 | origin_status=unmeasured_control_plan、origin_reference=null、execution_references=[] | 可传法律校验，但**无实测父代**，不能代表实际已施加输入 |\n\n`mujoco_direct_control_v1` 模板确认：model_source=mujoco、operating_point 可用 standardized_initial_pretension、protocol=task-local-v2（duration 0.5 s、period 0.01 s、input_scale 8 N、samples 含 0.45/0.49 s），缺项只有 `control_optimization.source` 与 v2 settings（version、显式 correction_window_s、knots_s）。上限：≤24 evaluation_requests、≤3 iterations、≤4 knots。\n\n## 违规结构与竞争解释\n\n单一支配约束：`holding_speed = 0.043010 m/s`（限 0.020，2.15×，归一化超出 1.150）；位置类（terminal 0.004033、holding 0.004033 vs 0.010）、力界、求解错误全部通过。0.49/0.50 s 的速度以竖直向下为主（−0.0396、−0.0352 m/s），横向分量小——即末窗仍有未衰减的向下残余运动，而非位置偏移。\n\n- **A 时序/制动（控制可改）**：末窗向下残速是制动相位问题，同结构开环权限内可修。\n- **B 结构/驱动权限**：9.0 MPa 段的阻尼/刚度 + 8 N 上限 + 10 ms 控制网格使末窗无法在 0.5 s 内收敛；但**独立物理结构机会已用尽（cb6db6 与 e85fc8 共 2/2）**，此解释无法再通过第三个结构取证。\n- **C 降阶模型失配**：NMPC 用的是 GVS 降阶模型，其对末段制动效果的预测偏差会直接造成超速。\n- **D 采样/评估边缘**：已排除——这是真实超限，不是诊断假象。\n\n不可用/已耗尽：NMPC 0、offline_nlp 0、control_search unavailable、input_sensitivity 与 design_sensitivity blocked（仅 SoRoSim 实现）。因此唯一仍可能产出**完整任务通过**的路线，是\"以实测输入为起点、在 MuJoCo 真实动力学上做局部开环修正\"，再用剩余物理发射独立回放。\n\n## 下一动作（提案，本容器不执行）\n\n对 `e85fc8` 做**一次** MuJoCo 原生开环张力修正：\n- source = `e3a06aa…`（实测 ZOH 完整序列）；candidate = `e85fc8…`；model_source=mujoco\n- settings：`local_control_search_v2`、correction_window_s=[0.40, 0.50]、knots_s=[0.40, 0.46, 0.50]（3 ≤ 4）、iterations=3、evaluation_requests=24、method=response、difference_step=0.02 N、initial_radius 0.05 N、minimum_radius 1e-4 N、coefficient_limit=2.0\n- `safety_margin_fraction=0.10`：把**本地目标**压到约 0.018 m/s（原始物理接受标准不变、不放松），针对\"贴边界求解 + 模型误差\"这一已知失败模式\n- `active_coefficients` 受限（约 2 knot × 3 通道 = 6 个，knot-major 扁平索引）：使 1 + 3×(6+1) = 22 ≤ 24 回调，避免第一次 update 就把预算耗尽\n\n**为什么这条比其余选项更有信息量**：它直接分离解释 A、C 与 B。\n- 若真动力学上仍被卡在 ≳0.025 m/s → 剩余差距**不是**降阶模型失配、也**不是**再调权重能解决，结构/驱动权限解释占优，应停止而不是继续花预算；\n- 若达到 0.018 余量且独立回放完整通过 → 主因是末段制动的模型/时序偏差，任务可在剩余结构上完成，立即公开读取完整评估并 SELECT、零额外确认后停止。\n- 对比重放 `e76d3b3…`：它无实测父代，只能测被动/基线动力学，几乎不可能产出通过路径，却会消耗 2 次物理发射中的 1 次。\n- 对比 T1/T2 GVS 诊断：只是局部 GVS 诊断、不给出物理增益；保留 26 的数学余额用于**回放失败后**同候选/同状态/同实际输入上的模型误差量化更划算。\n\n**真实成本**：native ≤24 callbacks；后缀 rollout 自 0.40 s 起约 200 步/次 → 24×200 ≈ 4800，加必需前缀重建约 800 步 ≈ 6000 步，远低于 60000 步累计上限；数学评估 1 次（26 余额中）；若出现余量，再用 **1/2** 物理发射做精确独立回放（约 1000 物理步，独立计费）。**不等于已花费**。\n\n**未知（明确保留）**：① e85fc8 的腱数与通道顺序本轮未确认（可执行 3–4 通道），active_coefficients 的 knot-major 索引必须在提交前用候选参数视图核对，否则请求会被拒；② 该窗口内有限差分灵敏度对 0.10 s 后缀的保真度（短程 FD 只局部代表）；③ 0.10 的安全余量是否足以抵消 2.15 倍的超出——**最实质的削弱证据**是历史 M2 同结构原生搜索只削减了约 21%（0.1114→0.0879 m/s），而此处需要 53%，因此通过概率不高，但该负结果同样具有决定性诊断价值；④ 各通道实际张力消耗不均衡，必须在报告中据实给出，**不得**只归因于结构。\n\n**停止条件**：若优化未达到 0.018 m/s 余量、或用尽 24 回调/3 迭代仍 ≳0.025 m/s，则不追加同结构原生优化（不重复已用路线、不为花预算而花），改为公开读取 `all_fresh_results`，在合法 STOP 中引用全部新结果，如实报告未用预算、以及\"未决的模型失配 vs 结构权限\"。",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_Souv1ZnlUOo2pEMNVDYE1830",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"On candidate e85fc8, the single remaining violation (holding_speed 0.043010 m/s vs 0.020, normalized excess 1.150; position/terminal/force all pass) is dominated by residual downward tip motion in the final window (-0.0396 m/s at 0.49 s, -0.0352 m/s at 0.50 s) and is removable by a bounded late-window open-loop tension correction optimized against the true MuJoCo dynamics starting from the actually applied NMPC ZOH schedule e3a06aa; if instead the true-dynamics local authority cannot push the predicted holding speed inside a 0.018 m/s margin, the residual gap is structural/actuator authority rather than reduced-model mismatch or cost-weight tuning.\", \"expected_observation\": \"A local_control_search_v2 response optimization on e85fc8 with source e3a06aa, correction_window_s [0.40, 0.50], knots_s [0.40, 0.46, 0.50], iterations 3, evaluation_requests 24, safety_margin_fraction 0.10 yields a predicted holding-window tip speed at or below 0.018 m/s with holding position still below 0.010 m and all tensions inside [0, 8] N, so an exact independent physical replay of that returned schedule is worth one of the two remaining physical launches.\", \"weakening_observation\": \"The optimization exhausts its 24 callbacks / 3 iterations with predicted holding speed still above 0.025 m/s, or requires tensions pinned at a bound, or the predicted gain is only a few percent (consistent with the historical M2 native search reducing peak speed merely 0.1114 to 0.0879 m/s, ~21%, versus the 53% needed here); any of these weakens the open-loop-control explanation and favours structural/actuator-authority limits.\", \"fixed_conditions\": \"Frozen task tasks/reach_hold_b3_050.json: target [0.29,-0.035,0.19] m, zero initial state, 0.50 s, final [0.45,0.50] s hold, position <=0.010 m, speed <=0.020 m/s, tension [0,8] N, control period 0.01 s, physics 0.0005 s, 12 cells per segment, 8 N channel bounds, no relaxation of task or acceptance. Candidate fixed to e85fc8 (structure identity unchanged, no FamilySpace edit; physical structure opportunities already 2/2: cb6db6, e85fc8). Control source fixed to the complete initialized measured_nmpc_execution_v1 ZOH sequence e3a06aa (no channel_map, no unexecuted predictions). NMPC recipe parameters left untouched; no new NMPC (budget 0). No inherited physical acceptance; no reset, no new Study. Actual unequal per-channel tension expenditure to be reported separately and not attributed to structure alone.\", \"stopping_condition\": \"If the optimized schedule reaches the 0.018 m/s local margin with position and tension bounds satisfied, spend exactly one remaining physical launch on an exact independent replay of that same returned schedule; if that replay is a fresh complete task pass, publicly read the full evaluation and immediately SELECT with zero extra confirmations, then stop. If the optimization stalls above 0.025 m/s or hits the caps, do not repeat any same-structure native optimization; publicly read all_fresh_results, cite every new result in a legal STOP, and record the unresolved reduced-model-mismatch versus structural-authority question plus all unused budgets.\", \"interpretation\": \"Read-only checks this turn establish the two legal sources: e3a06aa is the only complete, initialized schedule whose origin is measured_nmpc_execution_v1 (parent 629f68), while e76d3b3 is an unmeasured bounded_candidate_control_v1 plan with no measured parent. Since NMPC (0), offline NLP (0), control_search (unavailable) and input/design sensitivity (SoRoSim only) are exhausted or blocked, and the two physical structure slots are spent, a MuJoCo-true open-loop correction from the actually applied input is the only route that can still produce a complete pass and simultaneously discriminate 'late-window braking / reduced-model mismatch' from 'structure-plus-actuator authority'. A negative result there is diagnostic, not a spending exercise, and the 26 mathematical units are better reserved for same-candidate, same-state, same-actual-input model-error quantification after a failed replay. No result in this turn is a scientific fact or a task acceptance.\", \"next_step\": \"diagnose\", \"supporting_evidence\": [{\"artifact_id\": \"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}], \"decision\": {\"version\": \"research_decision_v1\", \"hypothesis_id\": \"H-E85FC8-NATIVE-LATEWINDOW-BRAKE-01\", \"research_intent\": \"DIAGNOSE\", \"selected_method\": \"mujoco_direct_control_v1 native open-loop tension correction (v2, correction_window_s [0.40,0.50], knots_s [0.40,0.46,0.50], response, safety_margin_fraction 0.10, <=24 callbacks, 3 iterations) on candidate e85fc8 with source e3a06aa measured ZOH schedule\", \"selected_variables\": [\"late-window tension correction coefficients (knot-major, restricted active set)\", \"predicted holding-window tip speed\", \"predicted holding-window tip position\", \"per-channel tension expenditure\"], \"requested_budget\": 24, \"claimed_inference\": \"empirical_search\"}}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_Souv1ZnlUOo2pEMNVDYE1830",
+        "name": "research_plan",
+        "status": "success",
+        "error_code": null
+      }
+    ],
+    "source": "provider_trace.tar.gz/B-treatment-2-request.json and B-treatment-2-response.json"
+  },
+  {
+    "case": "A",
+    "arm": "treatment",
+    "turn": 2,
+    "request_id": "r3-request-a8517afa3a7e45db84193aaa823a7bac",
+    "provider_response": {
+      "id": "2ae84305-4653-4abe-955b-d0bdedb5959a",
+      "created": 1793007066,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 51478,
+      "completion_tokens": 4087,
+      "total_tokens": 55565,
+      "prompt_tokens_details": {
+        "cached_tokens": 49280
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 895
+      },
+      "prompt_cache_hit_tokens": 49280,
+      "prompt_cache_miss_tokens": 2198
+    },
+    "input_bytes": 196129,
+    "content": "",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_aKf5QfR6xV87rKTqqbsZ6674",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"候选 e85fc8 在 0.45–0.50 s 保持窗内的速度超限（0.043010 m/s，2.15×上限；峰值出现在 t=0.49 s，t=0.50 s 已降至 0.035529 m/s）主要是\\\"到达/制动时序偏晚约 40–60 ms\\\"的可控时序缺口，而不是该柔性结构在 0.5 s 内无法衰减的固有阻尼限制。依据：位置侧尚有 5.97 mm（59.7% 上限）余量，故可用位置预算换速度余量；由 0.49→0.50 s 速度比 0.0355/0.0430≈0.826/10 ms 反推衰减时间常数≈50 ms，缩短到 0.020 m/s 约需 40 ms 等效裕度。判别手段：以 e3a06aa1（同一候选、同一任务、实测 NMPC 实际施加 SI 张力的精确 50 区间 ZOH 开环排程，task_acceptance=unmeasured）为起点，在同结构上做一次原生 MuJoCo 响应式控制修正，读取保持窗末端 2 个 knot、4 条 tendon 的有限差分增益——该增益直接回答\\\"保持窗内速度对到达前张力调整是否敏感\\\"。\", \"decision\": {\"claimed_inference\": \"empirical_search\", \"hypothesis_id\": \"b3-r1-e85fc8-late-braking-timing-gap\", \"research_intent\": \"DIAGNOSE\", \"requested_budget\": 12, \"research_intent_note\": \"no_local_diagnostic_payload\", \"selected_candidate\": null, \"selected_method\": \"native fixed-structure MuJoCo control-response analysis (mujoco_direct_control_v1, model_source=mujoco, operating_point=standardized_initial_pretension, local_control_search_v2 response method) submitted via research_analysis\", \"selected_variables\": [\"late-window tension schedule coefficients (knots 0.30/0.40/0.50 s x tendon_0..tendon_3)\", \"holding-window tip speed (metric: holding_max_speed_m_s)\", \"holding/terminal position error (metrics: holding_max_error_m, terminal_error_m)\"]}, \"expected_observation\": \"research_analysis 受理并返回一次有界原生响应搜索：1 个基线 rollout（源 e3a06aa1 于 t=0 零初态，后缀 1000 步）+ 2 次更新 ×（8 个 FD 探针 + 1 个候选评估）= 19 次评估回调（≤24），迭代 2（≤3），knot 3 个（≤4），原生积分约 19000 步（含前缀重建，≤60000）。返回的差分增益显示保持窗前段（0.30–0.40 s）张力对保持窗内峰值速度具有同量级灵敏度，交付一条仍落在 [0,8] N 内的改进开环排程，且其自身预测 rollout 的保持窗内峰值速度 < 0.043 m/s（理想为 ≤0.020 m/s 且位置 ≤0.010 m）。原始接受标准与任务文件不做任何改动，全程消耗 0 次物理发射。\", \"fixed_conditions\": \"冻结任务 tasks/reach_hold_b3_050.json：目标 [0.29,-0.035,0.19] m、零初态、0.50 s、终窗 [0.45,0.50] s、位置 ≤0.010 m、速度 ≤0.020 m/s、张力 [0,8] N、控制 0.01 s、物理 0.0005 s、每段 12 单元。结构固定为 e85fc8（不改 FamilySpace、不新建结构、不复位、不重跑 NMPC——该结构唯一 NMPC 槽已用）。分析方法与操作点固定为已读请求模板：operation=mujoco_direct_control_v1、model_source=mujoco、operating_point=standardized_initial_pretension、protocol=task-local-v2 全冻结副本。搜索固定：version=local_control_search_v2、method=response、correction_window_s=[0.30,0.50]、knots_s=[0.30,0.40,0.50]、active_coefficients=[0..7]（前两个 knot × 4 tendon）、evaluation_requests=24、iterations=2、difference_step_n=0.02、initial_radius_n=0.25、minimum_radius_n=1e-3、coefficient_limit_n=2.0、safety_margin_fraction=0.1（仅内层目标留边，接受不变）。上游来源固定为 e3a06aa1（parent=e85fc8、来源测得的实际施加区间张力、effective_channel_map 恒等、inherited_acceptance=false）。\", \"interpretation\": \"本次为只读决策演练的一次全新读取后重估：三轮读取只返回了请求模板（确认 operating_point=standardized_initial_pretension、model_source=mujoco、protocol 全冻结）与来源 provenance（e3a06aa1 为 measured_nmpc_execution_v1 派生的 ZOH 开环排程、channel_map 恒等、task_acceptance=unmeasured、无继承接受），未产生任何新的物理或数学数值。因此下一步仍应落在唯一可能产生可接受结果的路径上——e85fc8 上尚未使用的原生控制修正槽（Study 记录 recorded_rollouts=0、recorded_physics_steps=0，非重复使用）。相比把两次剩余物理发射之一花在 e3a06aa1 的物理重放上（同一确定性 MuJoCo、同一零初态、同一实际施加张力 ⇒ 结果应逐样本复现已知的 0.043010 m/s 失败，新信息接近零），以及花在 e76d3b34（他结构优化得到的未测量排程，跨结构迁移，不可因果归因），原生响应搜索同时提供\\\"速度是否可被到达前张力驱动\\\"的判别证据和一条待验证排程，且不消耗物理发射。\", \"next_step\": \"diagnose\", \"stopping_condition\": \"本步在下列任一条件下停止：原生搜索返回且已记录实际回调数/迭代数/knot 数/原生步数/每通道张力消耗总量（与 e3a06aa1 的 0.5 s 张力消耗对比，不把差异单独归因于结构）；或返回不可用的增益/排程。仅当交付排程的自身预测保持窗内峰值速度 ≤0.020 m/s 且保持/终态位置 ≤0.010 m 时，才用该结构唯一一次完整独立物理重放（源为本次交付的排程，候选 e85fc8）验证；若预测速度不可得，则说明该判别未解决并给出显式、非不可行性结论的 STOP。一旦某次新鲜完整独立物理评估首次通过全部冻结终检，立即公开读取该完整评估并零额外确认 SELECT，然后停止；否则公开读取 all_fresh_results 并引用全部新结果做合法 STOP。若原生增益显示保持窗速度对 0.30–0.40 s 张力几乎不敏感、或搜索在系数限幅/张力边界饱和而预测速度仍 >0.020 m/s，则本结构在 0.5 s 内的时间裕度不足这一竞争解释获得支持，此时不得声称全局/结构不可行，也不得再消耗第二次原生优化（Study 级上限 2，保留给真正的新信息）。\", \"weakening_observation\": \"research_analysis 因准入/参数问题被拒（如 source 与候选/任务不匹配、correction_window_s 或 knots_s 缺失、operating_point 与模板不符），或返回的回调/迭代未实际收敛；或回报的差分增益显示 8 个末端系数对保持窗内峰值速度的归一化灵敏度极小（<0.01 N 级探针几乎不改变目标指标）；或交付排程预测保持窗峰值速度仍 ≥0.020 m/s，或改善速度却把保持位置推过 0.010 m（位置余量被耗尽）；或全部更新在 coefficient_limit_n/张力边界饱和。任一发生都弱化\\\"时序可控缺口 ~40–60 ms\\\"假说，转向轻阻尼模态在 0.5 s 内无法衰减的解释，并且不应把该结构唯一一次物理重放花在无预测支撑的排程上。\", \"hypothesis\">候选: {\"artifact_id\": \"e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543\", \"media_type\": \"application/json\"}, \"operation\": \"mujoco_direct_control_v1\", \"model_source\": \"mujoco\", \"operating_point\": \"standardized_initial_pretension\", \"control_optimization\": {\"source\": {\"artifact_id\": \"e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48\", \"media_type\": \"application/json\"}, \"settings\": {\"version\": \"local_control_search_v2\", \"method\": \"response\", \"correction_window_s\": [0.3, 0.5], \"knots_s\": [0.3, 0.4, 0.5], \"active_coefficients\": [0, 1, 2, 3, 4, 5, 6, 7], \"evaluation_requests\": 24, \"iterations\": 2, \"difference_step_n\": 0.02, \"initial_radius_n\": 0.25, \"minimum_radius_n\": 0.001, \"coefficient_limit_n\": 2.0, \"safety_margin_fraction\": 0.1}}, \"protocol\": {\"authority_reason\": \"No independently justified task-required MIMO gain threshold; usable bandwidth undefined.\", \"authority_rule\": \"Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.\", \"authority_threshold\": null, \"baseline_lengths_m\": {\"segment_0\": 0.16, \"segment_1\": 0.11, \"segment_2\": 0.14, \"segment_3\": 0.14, \"segment_4\": 0.14, \"segment_5\": 0.14, \"segment_6\": 0.14, \"segment_7\": 0.14, \"segment_8\": 0.14}, \"candidate_rule\": \"initial_target_equilibrium_halfway\", \"comparison_atol\": 1e-08, \"comparison_rtol\": 2e-06, \"construction_max_iterations\": 20, \"derivative_atol\": 2e-05, \"derivative_rtol\": 0.0002, \"derivative_step\": 1e-05, \"duration_s\": 0.5, \"endpoint_check_atol\": 1e-08, \"endpoint_max_iterations\": 100, \"equilibrium_normalized_residual\": 1e-05, \"frequency_rad_s\": [0.1, 1.0, 10.0, 100.0], \"horizon_alignment_atol_s\": 1e-12, \"input_scale_n\": 8.0, \"output_scale_m\": 0.01, \"period_s\": 0.01, \"pole_margin_s_inv\": 1e-07, \"protocol_id\": \"task-local-v2\", \"rank_atol\": 1e-12, \"rank_rtol\": 1e-09, \"samples_s\": [0.0, 0.1, 0.3, 0.45, 0.49], \"static_force_tolerance\": 1e-10, \"static_max_iterations\": 20, \"windows_s\": [0.05, 0.1, 0.5]}}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_aKf5QfR6xV87rKTqqbsZ6674",
+        "name": "research_plan",
+        "status": "error",
+        "error_code": "Expecting '"
+      }
+    ],
+    "source": "provider_trace.tar.gz/A-treatment-2-request.json and A-treatment-2-response.json"
+  },
+  {
+    "case": "A",
+    "arm": "control",
+    "turn": 2,
+    "request_id": "r3-request-f3c2eae09e154122b28a2a5d35a6976f",
+    "provider_response": {
+      "id": "a98516e9-941f-40a1-9f9b-2861a66ee8a2",
+      "created": 1793007092,
+      "model": "deepseek-flash",
+      "system_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501"
+    },
+    "usage": {
+      "prompt_tokens": 44368,
+      "completion_tokens": 6240,
+      "total_tokens": 50608,
+      "prompt_tokens_details": {
+        "cached_tokens": 36480
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 3835
+      },
+      "prompt_cache_hit_tokens": 36480,
+      "prompt_cache_miss_tokens": 7888
+    },
+    "input_bytes": 157296,
+    "content": "",
+    "tools": [
+      {
+        "index": 0,
+        "id": "call_00_8tjJuVYfFUEs722d82Ba4987",
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "arguments": "{\"action\": \"diagnose\", \"hypothesis\": \"在冻结结构 e85fc8 上，剩余唯一违约项（0.45–0.50 s 保持段最大尖端速度 0.043010 m/s，为 0.020 m/s 上限的 2.15 倍）主要来自末端“支撑/制动输入不足”而非结构极限：测得 0.49 s 速度为 (0.0163,0.0040,-0.0396) m/s、0.50 s 为 (0.0050,-0.0011,-0.0352) m/s，尖端 z=0.1878 m 低于目标 0.19 m 约 2.2 mm 且仍在缓慢下坠，属准静态沉降而非高频极限环；因此在 [0.30,0.50] s 内对合法开环张力排程做有限节点修正（≤4 节点、≤3 次迭代、≤24 次 evaluation_requests，原生 MuJoCo 动力学、与原验收同一物理/采样网格）应能把该原生预测保持速度显著压低，而不需改动结构或放宽任务。\", \"expected_observation\": \"1) 先以修正后的契约完成 initialize_control（method=baseline, candidate=e85fc8, parent=e85fc8, source=629f68a 完整 NMPC 执行结果, 不带 channel_map、不带 tensions_n），得到唯一绑定 e85fc8、50 个 0.01 s 区间、tendon_0..tendon_3、全部张力在 [0,8] N、task_acceptance=unmeasured 的开环 ZOH 排程；2) 随后 mujoco_direct_control_v1 修正只改动 [0.30,0.50] s 内的张力节点（其余区间恒等于起始排程），返回的原生预测显示保持段最大尖端速度 <0.020 m/s，且若 <0.016 m/s（约 20% 余量）、保持位置 ≤0.008 m、无张力贴边饱和（严格在 (0,8) N 内）则把该精确排程作为下一次独立物理回放（remaining_physical=2 中的一个）的唯一来源。\", \"weakening_observation\": \"initialize_control 再次被拒，或返回的排程未绑定 e85fc8 / 区间数≠50 / 通道序不符 / 含负值或越界张力 / 是拼接或未执行预测张力 / 带 channel_map / 继承任何物理验收；或原生修正完成后其自身预测保持速度仍 ≥0.025 m/s，或改进幅度落在数值噪声内，或需要某通道张力贴边 8 N（或 0 N）才能勉强见效，或修正把保持位置推高到 >0.008 m、或必须改动 [0,0.30] s 之外的区间才有效果。任一出现都说明“末端输入不足”假说在本预算与冻结 8 N 边界内无法确认，并指向结构顺应性/静支撑不足或模型—物理不一致等竞争解释，而不是确认不可行。\", \"fixed_conditions\": \"任务与验收完全冻结：tasks/reach_hold_b3_050.json，目标 [0.29,-0.035,0.19] m，零初态，0.50 s，保持窗 [0.45,0.50] s，位置 ≤0.010 m、速度 ≤0.020 m/s、张力 [0,8] N、控制周期 0.01 s、物理步长 0.0005 s、每段 12 cells 与通道上下界不得更改；候选结构与 control 来源身份固定为 e85fc8（segment_0 young_pa 9.0e6，其余与参考 cb6db62 完全相同：2 段、4 肌腱、同 mount [0,0,0.15]、同目标、同 tendon_0..tendon_3 顺序）；不接受跨结构或跨 control 来源的因果归因；不使用第二个 NMPC（已用尽，method_remaining nmpc=0），不再新增结构（两个独立物理评估结构名额已用）；math 已用 0/26、原生优化 0/2、物理发射剩余 2、完整独立回放剩余 2；原生积分（含必要前缀重建与一切原生诊断）总计 ≤60000 步；原生优化硬限 ≤24 evaluation_requests、≤3 次迭代、≤4 个节点；修正窗口限定 [0.30,0.50] s，其余区间保持起始排程不变；safety_margin_fraction 取小值（≤0.05）仅作局部目标内缩，不改原验收。\", \"stopping_condition\": \"若原生修正返回合法排程且原生预测保持速度 <0.016 m/s、位置 ≤0.008 m、无通道贴边，则立即用该精确来源做一次完整独立物理回放；一旦出现首个全新的、完整且终态达标的独立任务通过，公开读取该完整新评估并立即 SELECT 该精确 candidate/control/result（配置额外确认为 0），然后停止。若原生修正无法满足上述判据，或再次出现契约/身份校验失败，则不再重复同类原生优化（避免仅为消耗预算而重复），仅可使用剩余数学预算做一次廉价、可判别的诊断（如目标附近静平衡/输入支撑能力，并明确其不构成物理可信度证据），随后公开读取 all_fresh_results、逐条引用全部新结果并依法 STOP。任何局部控制改进、迭代截断或未收敛都不作为收敛性、全局或结构不可行的结论。\", \"interpretation\": \"读数确认：两个候选均只使用过 nmpc（methods_used=[\\\"nmpc\\\"]），has_local_search_start=false、mathematically_evaluated=false——原生控制优化与数学预算在本 Study 完全未用，而 NMPC 名额已耗尽、独立物理结构名额已用满，因此“固定结构 + 合法开环排程起点”的原生控制修正是当前唯一还能产生可通过候选的杠杆，也是最贴近验收动力学（原生 MuJoCo、同网格）的信息源。三个已注册开环排程 2a554eeb（cb6db62）、e76d3b34 与 e3a06aa（e85fc8）均为 explicit_control_schedule_v1、50 区间、4 通道、execution_references 为空，即未经任何物理执行的未测量排程、无继承验收；在没有任何局部搜索或测量证据表明它们优于 0.043010 m/s 的情况下直接消耗一次物理发射属于低信息支出，故先做原生修正以换取可判别的先验。竞争解释仍未被排除：(a) 结构顺应性/静支撑不足（segment_0 由 10.45e6 降至 9.0e6 提高顺应性，可能使保持平衡点低于目标并持续下坠），(b) 控制/制动时序与短视界（horizon 10、replan 0.1 s，末段仅一次 0.1 s 规划；(c) GVS 预测与实际 MuJoCo 的模型—物理不一致（NMPC 求解 0 错误且位置达标，却被实测速度击穿，提示预测速度偏差），(d) 保持速度取 6 个采样点最大值，存在相位/单采样峰值效应。历史 M2 同结构原生搜索（另一 Study，8 callbacks/2 次启动迭代/1 个完成响应步、8000 原生步，最好仅到 0.087888 m/s）说明该实现易被迭代上限截断，且其起点与结构不同于此处，故不重复其配置；本条新信息是：起点改为实测 NMPC 排程（0.043010 m/s，位置已达标），窗口收窄到末 0.2 s 并允许 4 节点。已知不确定项须如实保留：e76d3b34 与 e3a06aa 的具体内容/来源未知；上次 initialize_control 被拒的确切原因未知（疑为父/来源或不带 channel_map 的契约细节）；cb6db62 的 NMPC 所用 recipe 未核实（故两结构 0.111374→0.043010 的差异不可单独归因于结构，必须报告实际控制支出不等）；629f68a/65130099 记录中的 task_identity 为 a0e6777f…，与当前研究包 research.task_identity 062de8ca… 不一致，需在消耗物理发射前由提取契约的 parent/task/time/channel/bounds 校验确认其任务等价性；原生内部残差小并不等于物理保真，最终仍以独立物理验收为准。\", \"decision\": {\"version\": \"research_decision_v1\", \"hypothesis_id\": \"H-late-window-support-input-e85fc8\", \"claimed_inference\": \"empirical_search\", \"research_intent\": \"CONTROL_SEARCH\", \"selected_method\": \"mujoco_direct_control_v1 native fixed-structure local control correction (measured-NMPC-derived open-loop seed, correction window [0.30,0.50] s, <=4 knots, <=3 iterations, <=24 evaluation_requests) followed, only if it qualifies, by one full independent physical replay\", \"selected_variables\": [\"correction_window_s=[0.30,0.50]\", \"knots_s=[0.30,0.37,0.44,0.49]\", \"iterations=3\", \"evaluation_requests=24\", \"active coefficients = 4 knots x tendon_0..tendon_3 tension offsets (16)\", \"safety_margin_fraction<=0.05 (local target margin only, acceptance unchanged)\", \"physical launches consumed: 1 of remaining 2, only after qualification\"], \"requested_budget\": 24, \"selected_candidate\": null}, \"next_step\": \"diagnose\", \"supporting_evidence\": [{\"artifact_id\": \"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8\", \"media_type\": \"application/json\"}]}"
+        }
+      }
+    ],
+    "feedback": [
+      {
+        "tool_call_id": "call_00_8tjJuVYfFUEs722d82Ba4987",
+        "name": "research_plan",
+        "status": "error",
+        "error_code": "RESEARCH_INTENT_ACTION_MISMATCH"
+      }
+    ],
+    "source": "provider_trace.tar.gz/A-control-2-request.json and A-control-2-response.json"
+  }
+]
