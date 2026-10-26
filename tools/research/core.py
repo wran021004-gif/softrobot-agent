@@ -76,11 +76,47 @@ def read_evidence(host, query, *, record_read=True):
     root_value=value
     def navigation(exc,node,path):
         from tools.research.evidence_views import data_access
+        view=q.view if q.view in ('working_set','mathematical_capabilities') else 'summary'
         details=dict(reference=plain(q.reference),view=q.view,failed_pointer=q.pointer,
             parent_pointer=path,available_fields=list(node) if isinstance(node,dict) else None,
             list_length=len(node) if isinstance(node,list) else None,
-            parent_query=dict(reference=plain(q.reference),view=q.view if q.view in ('working_set','mathematical_capabilities') else 'summary',pointer=path),
+            parent_query=dict(reference=plain(q.reference),view=view,pointer=path),
             data_access=data_access(host,plain(q.reference),root_value))
+        details['corrected_query']=details['parent_query']
+        if path==q.pointer and isinstance(node,dict) and q.fields:
+            details['unavailable_fields']=[k for k in q.fields if k not in node]
+            fields=[k for k in q.fields if k in node]
+            if fields:details['corrected_query']=dict(reference=plain(q.reference),view=view if view!='summary' else 'fields',pointer=path,fields=fields)
+        if isinstance(node,list) and node and isinstance(node[0],dict) and q.fields:
+            fields=[k for k in q.fields if k in node[0]]
+            details['unavailable_fields']=[k for k in q.fields if k not in node[0]]
+            details['corrected_query']=dict(reference=plain(q.reference),view=view if view!='summary' else 'fields',
+                pointer=path+'/0',fields=fields) if fields else details['parent_query']
+        if isinstance(node,dict):
+            details['list_queries']=[dict(reference=plain(q.reference),view='range',pointer=path+'/'+k.replace('~','~0').replace('/','~1'),
+                start=0,count=min(20,max(1,len(v)))) for k,v in node.items() if isinstance(v,list)][:3] if view=='summary' else []
+        # Retrieval envelopes own /result; the underlying Store object does not.
+        if view=='summary' and isinstance(root_value,dict):
+            pointer=None
+            if q.pointer.startswith('/result/') and 'result' not in root_value:pointer=q.pointer[len('/result'):]
+            elif path=='' and isinstance(root_value.get('result'),dict) and q.pointer:pointer='/result'+q.pointer
+            if pointer:
+                selected=root_value
+                try:
+                    for token in pointer[1:].split('/'):
+                        token=token.replace('~1','/').replace('~0','~')
+                        selected=selected[int(token)] if isinstance(selected,list) else selected[token]
+                except (KeyError,IndexError,TypeError,ValueError):pass
+                else:
+                    corrected=dict(reference=plain(q.reference),view=q.view,pointer=pointer)
+                    if q.fields:
+                        fields=[k for k in q.fields if isinstance(selected,dict) and k in selected]
+                        details['unavailable_fields']=[k for k in q.fields if k not in fields]
+                        corrected['fields']=fields
+                    if q.view=='range' and not isinstance(selected,list):corrected['view']='summary'
+                    elif q.view=='range':corrected.update(start=q.start,count=q.count)
+                    if q.view=='fields' and not corrected.get('fields'):corrected['view']='summary'
+                    details['corrected_query']=corrected
         if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','method_requirements','all_fresh_results','research_history_index','action_trace'):
             proposed=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
             try:
@@ -90,14 +126,19 @@ def read_evidence(host, query, *, record_read=True):
             except ValueError:
                 proposed=None;projected=None
             if proposed:
-                if q.view=='fields' and q.fields and isinstance(projected,dict):
+                if q.fields and isinstance(projected,dict):
                     proposed['fields']=[key for key in q.fields if key in projected]
                     details['unavailable_fields']=[key for key in q.fields if key not in projected]
                     details['derived_available_fields']=list(projected)
                 details['derived_view_query']=proposed
+                details['corrected_query']=proposed
         if q.view=='fields' and not q.pointer:
             derived=next((k for k in q.fields if k in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','eligible_methods','read_coverage')),None)
-            if derived:details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer='/'+derived)
+            if derived:
+                proposed=dict(reference=plain(q.reference),view='working_set',pointer='/'+derived)
+                try:read_evidence(host,proposed,record_read=False)
+                except ValueError:pass
+                else:details.update(derived_view_query=proposed,corrected_query=proposed)
         if isinstance(root_value,dict) and root_value.get('acceptance') and ('task_passed' in (q.fields or []) or q.pointer=='/task_passed'):
             details['acceptance_query']=dict(reference=plain(q.reference),view='full',pointer='/acceptance')
         exc.evidence_navigation=details
@@ -123,13 +164,13 @@ def read_evidence(host, query, *, record_read=True):
         from tools.research.evidence_views import data_access
         value['data_access']=data_access(host,plain(q.reference),root_value)
     elif q.view=='fields' or (q.view in ('working_set','mathematical_capabilities') and q.fields):
-        if not isinstance(value,dict):raise ValueError('EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER')
+        if not isinstance(value,dict):raise navigation(ValueError('EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER'),value,q.pointer)
         missing=[key for key in q.fields if key not in value]
         if missing:raise navigation(KeyError(missing[0]),value,q.pointer)
         value={key:value[key] for key in q.fields}
     elif q.view=='range':
-        if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')
-        if q.start>len(value):raise ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value)))
+        if not isinstance(value,list):raise navigation(ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER'),value,q.pointer)
+        if q.start>len(value):raise navigation(ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value))),value,q.pointer)
         value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
     if q.view=='working_set' or not record_read:return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
@@ -545,6 +586,14 @@ def dispatch(host, value, request_id, origin='model'):
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic:
                 result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
+            result['execution_feedback']=dict(status='local_diagnostic_completed' if plan.diagnostic else 'read_only_diagnosis_completed',
+                new_scientific_computations=state(host).get('local_solves',0)-s.get('local_solves',0),
+                selected_method_status='intent_only; not dispatched by diagnose')
+            candidate=plain(plan.decision.selected_candidate) if plan.decision else None
+            if candidate:
+                result['execution_feedback']['execution_entry']=dict(tool='research_analysis',
+                    methods_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/methods'),
+                    request='Use the chosen registered method request_template and required_parameters; normal admission and budget checks apply.')
         elif plan.action in ('select','confirm'):
             from tools.research.feedback import eligibility, result_view, confirmation_progress
             choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)

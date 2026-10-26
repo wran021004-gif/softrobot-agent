@@ -130,7 +130,8 @@ class LayeredContextTests(unittest.TestCase):
         from tools.research.research_context import read_coverage
         h=cold_host();q=dict(reference=state(h)['family_space_reference'],view='working_set',pointer='/eligible_methods')
         body=json.dumps(read_evidence(h,q))
-        for i in range(2):
+        for i in range(3):
+            if i==2:body=json.dumps([dict(synthetic_fixture='changed dynamic delivery; not scientific evidence')])
             key='derived-fixture-'+str(i);use=dict(toolUseId=key,name='evidence_read',input=q)
             record(h,'model_original_tool_feedback',dict(tool_use=use,result=dict(toolUseId=key,status='success',content=[dict(text=body)])))
             wire=save(h,dict(messages=[dict(role='tool',tool_call_id=key,content=body)]))
@@ -139,7 +140,8 @@ class LayeredContextTests(unittest.TestCase):
                 h.store.event(db,h.run_id,'r3_request','sent',request=key,outputs=[metadata])
                 h.store.event(db,h.run_id,'r3_response','received',request=key,outputs=[response])
         rows=read_coverage(h)
-        self.assertEqual(len(rows),2);self.assertEqual(rows[-1]['classification'],'exact_repeat')
+        self.assertEqual(len(rows),3)
+        self.assertEqual([r['classification'] for r in rows],['new_query','exact_repeat','changed_content'])
         self.assertTrue(all(r['retrieval_view'] and r['successfully_provided'] and not r['complete_data'] for r in rows))
 
     def test_empty_cold_state_has_a_valid_detail_anchor(self):

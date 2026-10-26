@@ -234,13 +234,9 @@ def admit_decision(host,plan):
     if d is None:raise ValueError('VERSIONED_RESEARCH_DECISION_REQUIRED')
     if plan.action=='stop' and s.get('success_gate') and not s.get('selected'):
         raise ValueError('FRESH_PASS_REQUIRES_EXACT_SELECTION_BEFORE_STOP')
-    intents={'initialize_control':'CONTROL_SEARCH','generate':'DESIGN_MODIFICATION','propose':'DESIGN_MODIFICATION','execute':'NMPC_EXECUTION',
-        'control_search':'CONTROL_SEARCH','physical_replay':'PHYSICAL_VALIDATION','select':'SELECT','stop':'STOP',
-        'diagnose':'DIAGNOSE','search':'MATHEMATICAL_ANALYSIS','mechanics':'MATHEMATICAL_ANALYSIS',
-        'replay':'MATHEMATICAL_ANALYSIS','refine':'MATHEMATICAL_ANALYSIS','cross_replay':'MATHEMATICAL_ANALYSIS',
-        'matched_state':'DIAGNOSE','nmpc_prediction_diagnostic':'DIAGNOSE','confirm':'PHYSICAL_VALIDATION'}
-    if d.research_intent!=intents[plan.action]:
-        raise ValueError(f'RESEARCH_INTENT_ACTION_MISMATCH: action={plan.action} requires decision.research_intent={intents[plan.action]}; received={d.research_intent}')
+    from tools.research.contracts import PLAN_RESEARCH_INTENTS
+    if d.research_intent!=PLAN_RESEARCH_INTENTS[plan.action]:
+        raise ValueError(f'RESEARCH_INTENT_ACTION_MISMATCH: action={plan.action} requires decision.research_intent={PLAN_RESEARCH_INTENTS[plan.action]}; received={d.research_intent}')
     actual=plan.candidate
     if plan.control_seed:actual=plan.control_seed.candidate
     if plan.control_search:actual=plan.control_search.candidate

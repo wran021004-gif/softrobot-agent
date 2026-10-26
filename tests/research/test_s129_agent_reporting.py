@@ -74,6 +74,8 @@ class AgentReportingTests(unittest.TestCase):
         auto=reporter.scientific_feedback(self.h,dict(result=dict(reference=reference)),before)
         self.assertNotIn('report',auto)
         self.assertEqual(auto['scientific_result_reference'],reference)
+        self.assertTrue(auto['independent_physical_evaluation'])
+        self.assertEqual(auto['task_acceptance'],'measured_failure')
         self.assertEqual(self.h.store.artifact(auto['report_reference'])['report']['mode'],'result_summary')
         speed=next(m for m in self.h.store.artifact(auto['report_reference'])['report']['results'][0]['metrics'] if m['name']=='holding_speed')
         self.assertEqual((speed['value'],speed['threshold'],speed['unit'],speed['passed']),(.04,.02,'m/s',False))
@@ -85,6 +87,9 @@ class AgentReportingTests(unittest.TestCase):
         changes=compared.results[0].deterministic_summary['comparisons'][0]['metrics']
         self.assertAlmostEqual(next(m for m in changes if m['metric']=='holding_speed')['delta'],.01)
         math=self.put(self.f.math_result());update(self.h,analysis_results=[math])
+        math_feedback=reporter.scientific_feedback(self.h,dict(reference=math))
+        self.assertFalse(math_feedback['independent_physical_evaluation'])
+        self.assertEqual(math_feedback['task_acceptance'],'unmeasured')
         self.assertIsNotNone(reporter.assemble(self.h,[math]).results[0].mathematics)
         legacy=self.put(dict(operation='solve',status='computed',design_candidate=self.f.candidate,
             mathematical_facts=dict(status='inconclusive',objective=115.64175490824711,iterations=78),

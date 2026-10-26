@@ -246,6 +246,8 @@ def diagnose(host, refs):
                     initialized_vector_equal=rx.get('initialization',{}).get('initialized_vector')==ry.get('initialization',{}).get('initialized_vector'),
                     selection=[rx.get('selection'),ry.get('selection')],iterations=[x.get('optimization_selected_iteration'),y.get('optimization_selected_iteration')]))
     value=dict(status='read_only_diagnosis',sources=refs,
+        new_scientific_computations=0,
+        execution_scope='Reads existing records only; numerical_evidence describes prior results. No selected_method is executed.',
         numerical_evidence=numerical,incomplete_executions=incomplete,
         execution_evidence=[dict(execution_id=r['execution_id'],source=r['source'],updates=len(r['observations']),
             complete_records=sum('complete_update_record' in o for o in r['observations']),

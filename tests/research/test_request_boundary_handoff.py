@@ -126,10 +126,17 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         self.assertFalse(any(e['kind']=='model_original_turn' for e in events))
 
     def test_new_requests_refresh_query_schema_after_old_snapshot_verification(self):
+        from tools.research.agent import plan_schema,PLAN_TOOL_DESCRIPTION
         h=self.provision();sent=[]
         current=EvidenceQuery.model_json_schema();old=deepcopy(current)
         old['properties']['fields']['description']='Explicit synthetic older query description'
+        def old_plan_schema(*args,**kwargs):
+            schema=plan_schema(*args,**kwargs)
+            schema['allOf']=[r for r in schema['allOf'] if 'research_intent' not in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
+            return schema
         with patch.object(EvidenceQuery,'model_json_schema',return_value=old),\
+                patch('tools.research.agent.plan_schema',side_effect=old_plan_schema),\
+                patch('tools.research.agent.PLAN_TOOL_DESCRIPTION','Explicit synthetic older Plan description'),\
                 patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
@@ -142,6 +149,16 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         last=next(t for t in sent[-1]['tools'] if t['function']['name']=='evidence_read')['function']['parameters']
         self.assertEqual(first['properties']['fields']['description'],old['properties']['fields']['description'])
         self.assertEqual(last['properties']['fields']['description'],current['properties']['fields']['description'])
+        old_plan=next(t['function'] for t in sent[1]['tools'] if t['function']['name']=='research_plan')
+        new_plan=next(t['function'] for t in sent[-1]['tools'] if t['function']['name']=='research_plan')
+        self.assertEqual(old_plan['description'],'Explicit synthetic older Plan description')
+        self.assertEqual(new_plan['description'],PLAN_TOOL_DESCRIPTION)
+        from tools.research.contracts import PLAN_RESEARCH_INTENTS
+        constraints=[r for r in new_plan['parameters']['allOf'] if 'research_intent' in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
+        projected={a:r['then']['properties']['decision']['properties']['research_intent']['const']
+            for r in constraints for a in r['if']['properties']['action']['enum']}
+        self.assertEqual(projected,{a:PLAN_RESEARCH_INTENTS[a] for a in new_plan['parameters']['properties']['action']['enum']})
+        self.assertNotEqual(old_plan['parameters']['allOf'],new_plan['parameters']['allOf'])
 
     def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
         h=self.provision();sent=[];update(h,count_closeout=True)

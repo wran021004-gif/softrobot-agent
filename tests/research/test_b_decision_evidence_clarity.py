@@ -91,4 +91,133 @@ class EvidenceClarityTests(unittest.TestCase):
         host.store.transaction.assert_not_called();host.store.reserve.assert_not_called()
 
 
+class DecisionWorksetTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import gzip,io,tarfile
+        from tests.research.c3_readiness_audit import C3Archive
+        from tools.research.config import ROOT
+        path=ROOT/'evidence/b3_r1_history_assisted_050/immutable_artifacts.tar.gz'
+        cls.r1=C3Archive(path);cls.r1.archive.close()
+        # Read the immutable archive in memory, avoiding repeated gzip seeks.
+        cls.r1.archive=tarfile.open(fileobj=io.BytesIO(gzip.decompress(path.read_bytes())))
+        cls.addClassCleanup(cls.r1.archive.close)
+
+    def host(self):
+        h,s=self.r1.host();s['count_closeout']=False;h.actor='offline-fixture'
+        return h,s
+
+    def test_plan_schema_and_runtime_share_action_intents_and_payload_ownership(self):
+        from jsonschema import Draft202012Validator
+        from tools.research.agent import plan_schema,error_feedback
+        from tools.research.contracts import Plan,PLAN_RESEARCH_INTENTS
+        from tools.research.evidence_policy import admit_decision
+        from unittest.mock import patch
+        h,s=self.host();candidate=list(s['candidates'].values())[-1]
+        actions=Plan.model_json_schema()['properties']['action']['enum']
+        self.assertEqual(set(actions),set(PLAN_RESEARCH_INTENTS))
+        schema=plan_schema(actions,decision_required=True)
+        intents=[r for r in schema['allOf'] if 'research_intent' in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
+        validator=Draft202012Validator(dict(allOf=intents))
+        for action,intent in PLAN_RESEARCH_INTENTS.items():
+            validator.validate(dict(action=action,decision=dict(research_intent=intent)))
+            self.assertTrue(list(validator.iter_errors(dict(action=action,decision=dict(research_intent='RL_TRAINING')))))
+        expected=dict(execute='NMPC_EXECUTION',initialize_control='CONTROL_SEARCH',diagnose='DIAGNOSE',
+            replay='MATHEMATICAL_ANALYSIS',select='SELECT',stop='STOP')
+        payloads=dict(execute=dict(candidate=candidate),initialize_control=dict(control_seed=dict(candidate=candidate)),
+            replay=dict(mechanics_source=candidate),select=dict(selected_execution=candidate))
+        for action,intent in expected.items():
+            value=dict(action=action,hypothesis='Offline contract fixture',expected_observation='No worker',
+                weakening_observation='Contract mismatch',fixed_conditions='Frozen task',stopping_condition='End fixture',
+                interpretation='Not scientific evidence',decision=dict(hypothesis_id='fixture',research_intent=intent,
+                selected_method='fixture',selected_candidate=candidate),**payloads.get(action,{}))
+            Draft202012Validator(schema).validate(value);Plan.model_validate(value)
+            Draft202012Validator(plan_schema([action],decision_required=True)).validate(value)
+            wrong=deepcopy(value);wrong['decision']['research_intent']='RL_TRAINING'
+            self.assertTrue(list(Draft202012Validator(schema).iter_errors(wrong)))
+            with self.assertRaisesRegex(ValueError,'RESEARCH_INTENT_ACTION_MISMATCH') as caught:
+                admit_decision(h,Plan.model_validate(wrong))
+            with patch('tools.research.agent.record',return_value=candidate):
+                feedback=error_feedback(h,dict(name='research_plan',input=wrong),caught.exception,s)
+            self.assertIn('requires decision.research_intent='+intent,feedback['expected'])
+        h.store.reserve.assert_not_called()
+
+    def test_r1_current_sources_and_execution_boundaries_survive_compact_wire_and_handoff(self):
+        import json
+        from tools.research.research_context import agent_decision_brief
+        from tools.research.agent import DeepSeekModel
+        from tools.research.session_handoff import initial_messages
+        h,s=self.host();before=deepcopy(s);brief=agent_decision_brief(h);current=brief['current_candidate']
+        self.assertTrue(current['control_initialized']);self.assertTrue(current['has_completed_nmpc_execution'])
+        self.assertEqual(current['candidate'],self.r1.artifact(s['selected_solution'])['candidate'])
+        self.assertLessEqual(len(current['control_sources']),3)
+        self.assertNotIn('tensions_n',json.dumps(current))
+        origins={r['origin_status'] for r in current['control_sources']}
+        self.assertIn('measured_execution',origins);self.assertIn('mathematical_prediction',origins)
+        for source in current['control_sources']:
+            small=read_evidence(h,source['query'],record_read=False)
+            self.assertEqual(small['source'],source['source']);self.assertTrue(small['full_control_sequence'])
+            self.assertEqual(small['task_acceptance'],'unmeasured')
+            self.assertLess(len(json.dumps(small)),2200)
+        self.assertTrue(brief['best_valid']['task_gap']['accepted'])
+        self.assertFalse(brief['best_valid']['historical_only'])
+        self.assertEqual(brief['budget']['public_operation_budget']['remaining_total'],68)
+        self.assertEqual(brief['budget']['science_budget']['remaining_full_replays'],1)
+        self.assertEqual(brief['budget']['science_budget']['native']['recorded_physics_steps'],10000)
+        trace=read_evidence(h,brief['action_trace']['full_trace_query'],record_read=False)
+        self.assertTrue(any(r['execution_kind']=='read_only_diagnosis' for r in trace['recent']))
+        wire=self.r1.requests()[-1][2];tail=dict(role='user',content='CURRENT_RESEARCH_PACKET\n'+json.dumps(dict(research=brief)))
+        for messages in (wire['messages'][:-1]+[tail],[wire['messages'][0],*DeepSeekModel.format_request_messages(initial_messages(h.run_id)),tail]):
+            delivered=json.loads(json.dumps(messages))[-1]
+            self.assertEqual(json.loads(delivered['content'].split('\n',1)[1])['research']['current_candidate'],current)
+        self.assertEqual(s,before);h.store.transaction.assert_not_called();h.store.reserve.assert_not_called()
+
+    def test_r1_pointer_wrapper_range_and_fields_corrections_are_readable(self):
+        from tools.research.agent import error_feedback
+        from tools.research.config import ROOT
+        from tools.state_io import read
+        from unittest.mock import patch
+        h,s=self.host();errors=read(ROOT/'evidence/b3_r1_history_assisted_050/agent_error_inventory.json')['errors']
+        cases=[next(e for e in errors if e['tool']=='evidence_read' and predicate(e)) for predicate in (
+            lambda e:e['input_excerpt'].get('pointer','').startswith('/result/'),
+            lambda e:e['input_excerpt'].get('pointer')=='/control_result_links' and e['input_excerpt'].get('view')=='full',
+            lambda e:e['code']=='EVIDENCE_RANGE_REQUIRES_LIST_POINTER',
+            lambda e:e['code']=='INVALID_EVIDENCE_POINTER' and e['input_excerpt'].get('fields') and not e['input_excerpt'].get('pointer'),
+            lambda e:e['code']=='EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER')]
+        for entry in cases:
+            query=self.r1.artifact(entry['reference'])['tool_use']['input']
+            with self.subTest(query=query),patch('tools.research.agent.record',return_value=entry['reference']):
+                with self.assertRaises((ValueError,KeyError,IndexError)) as caught:
+                    read_evidence(h,query,record_read=False)
+                feedback=error_feedback(h,dict(name='evidence_read',input=query),caught.exception,s)
+                nav=feedback['evidence_navigation'];self.assertEqual(nav['reference'],query['reference'])
+                read_evidence(h,nav['corrected_query'],record_read=False)
+                for suggested in nav.get('list_queries',[]):read_evidence(h,suggested,record_read=False)
+        h.store.transaction.assert_not_called();h.store.reserve.assert_not_called()
+
+    def test_diagnose_intent_does_not_dispatch_native_or_charge_mathematics(self):
+        from unittest.mock import patch
+        from tools.research import core,diagnostic
+        from tools.research.research_context import tool_feedback
+        h,s=self.host();before=deepcopy(s);candidate=list(s['candidates'].values())[-1]
+        value=dict(action='diagnose',hypothesis='Offline intent fixture',expected_observation='Read existing evidence',
+            weakening_observation='No new computation',fixed_conditions='Frozen task',stopping_condition='End fixture',
+            interpretation='Not scientific evidence',decision=dict(hypothesis_id='fixture',research_intent='DIAGNOSE',
+            selected_method='mujoco_direct_control_v1',selected_candidate=candidate))
+        with patch.object(core,'guard'),patch.object(core,'save',return_value=candidate),patch.object(core,'update'),\
+                patch.object(diagnostic,'save',return_value=candidate),patch.object(diagnostic,'update'),\
+                patch('tools.research.research_context.save',return_value=candidate),\
+                patch.object(h.store,'reserve',return_value=(dict(execution_id='offline-fixture'),True)),\
+                patch('tools.research.analysis.dispatch') as worker:
+            output=core.dispatch(h,value,'offline-diagnose-fixture')
+            feedback=tool_feedback(h,output)
+        result=output['result'];self.assertEqual(result['numerical_evidence'],[])
+        self.assertEqual(result['new_scientific_computations'],0)
+        self.assertEqual(result['execution_feedback']['new_scientific_computations'],0)
+        self.assertEqual(result['execution_feedback']['status'],'read_only_diagnosis_completed')
+        self.assertEqual(feedback['execution_feedback'],result['execution_feedback'])
+        self.assertEqual(output['scientific_results'],[]);self.assertEqual(s,before);worker.assert_not_called()
+        read_evidence(h,result['execution_feedback']['execution_entry']['methods_query'],record_read=False)
+
+
 if __name__=='__main__':unittest.main()

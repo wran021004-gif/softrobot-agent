@@ -421,7 +421,7 @@ def read_coverage(host):
             delivered=json.loads(''.join(b.get('text','') for b in result['content']))
             provided=any(content==''.join(b.get('text','') for b in result['content']) for content in deliveries.get(use['toolUseId'],[]))
             expected=None
-            if q.view!='working_set':
+            if q.view in ('full','summary','fields','range'):
                 expected=host.store.artifact(q.reference)
                 if isinstance(expected,bytes):expected=json.loads(expected)
                 for part in q.pointer[1:].split('/') if q.pointer else []:
@@ -431,8 +431,9 @@ def read_coverage(host):
             complete=provided and q.view in ('full','fields','range') and delivered==expected
         except (ValueError,KeyError,IndexError,TypeError):continue
         query=plain(q);classification='new_query'
-        for prior in rows:
-            if query==prior['query'] and prior['successfully_provided'] and (q.view!='working_set' or prior['delivery_identity']==digest(delivered)):classification='exact_repeat';break
+        for prior in reversed(rows):
+            if query==prior['query'] and prior['successfully_provided']:
+                classification='exact_repeat' if prior['delivery_identity']==digest(delivered) else 'changed_content';break
             if plain(q.reference)!=prior['query']['reference'] or not prior['complete_data']:continue
             p=prior['query'];prefix=p['pointer']
             if p['view']=='full' and (q.pointer==prefix or q.pointer.startswith(prefix+'/')):classification='covered_subnode'
@@ -445,7 +446,7 @@ def read_coverage(host):
                 index=q.pointer[len(prefix)+1:].split('/')[0]
                 if index.isdecimal() and p['start']<=int(index)<p['start']+prior['item_count']:classification='covered_subnode'
         rows.append(dict(query=query,owning_study=host.run_id,tool_call_id=use['toolUseId'],feedback_reference=event['outputs'][0],
-            retrieval_view=q.view=='working_set',delivery_identity=digest(delivered),
+            retrieval_view=q.view in ('working_set','mathematical_capabilities','capabilities'),delivery_identity=digest(delivered),
             source_state_identity=saved.get('source_state_identity'),
             delivery_status=('complete_fields' if complete else 'summary_or_derived_view') if provided else
                 'summary_only' if use['toolUseId'] in summaries else 'not_confirmed_in_provider_request',
@@ -494,6 +495,8 @@ def working_set(host,current):
     references=current['all_fresh_results'];coverage=read_coverage(host)
     shown=candidates[-3:];best=current.get('best_valid') or {};important=best.get('executable_candidate',best.get('candidate'))
     if important in candidates and important not in shown:shown=[*shown[-2:],important]
+    selected=decision_candidate(host,current,research_intent(host))
+    if selected in candidates and selected not in shown:shown=[*shown[-2:],selected]
     for candidate in shown:
         c=host.store.artifact(candidate);results=[];math=[]
         controls=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==candidate]
@@ -502,15 +505,27 @@ def working_set(host,current):
             if value.get('candidate',value.get('design_candidate'))!=candidate:continue
             if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])]:math.append(ref)
             if ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:results.append((ref,value))
-        for source in controls[-3:]:
+        sources=[e['source'] for e in current['control_search_starts'] if e['candidate']==candidate and e['source'] not in controls]
+        sources=[*sources,*controls]
+        for source in sources[-3:]:
             control=host.store.artifact(source);tr=control['trajectory']
+            provenance=control.get('provenance',{})
+            prediction=next((r for r in math if host.store.artifact(r).get('control_schedule_reference')==source),None)
+            historical=next((e for e in s.get('research_history',[]) if e['source'] in (source,provenance.get('source')) or e['reference']==provenance.get('source')),None)
             links.append(dict(candidate=candidate,source=source,source_kind=control.get('source_kind'),
-                trajectory_query=dict(reference=source,pointer='/trajectory'),
+                initialized=source in controls,full_control_sequence=True,task_acceptance=control.get('task_acceptance','unmeasured'),
+                origin_reference=prediction or provenance.get('source') or provenance.get('mathematical_result'),
+                origin_kind=provenance.get('source_kind') or provenance.get('method') or provenance.get('control_initialization'),
+                origin_status='mathematical_prediction' if prediction else 'historical_measured_execution' if historical else 'measured_execution' if provenance.get('source_kind')=='measured_nmpc_execution_v1' else 'unmeasured_control_plan',
+                historical_origin=bool(historical) or any(e['source']==provenance.get('source') for e in s['spec'].get('research_decisions',{}).get('control_seeds',[])),
+                trajectory_query=dict(reference=source,view='full',pointer='/trajectory'),
                 grid=dict(intervals=len(tr['tensions_n']),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr['tendon_order']),
                 execution_references=[r for r,v in results if v.get('source_reference')==source]))
         for ref in math[-3:]:
             value=host.store.artifact(ref)
             links.append(dict(candidate=candidate,source=ref,evaluation_reference=ref,source_kind='mathematical_prediction',
+                initialized=value.get('control_schedule_reference') in controls if value.get('control_schedule_reference') else False,
+                full_control_sequence=bool(value.get('control_schedule_reference')),
                 control_source=value.get('control_schedule_reference'),
                 status=value.get('status'),operation=value.get('operation'),trajectory_query=dict(reference=ref,pointer='/trajectory') if value.get('trajectory') else None,
                 task_acceptance='unmeasured'))
@@ -535,10 +550,19 @@ def working_set(host,current):
             best_valid=valid[0] if valid else None))
         for ref,value in results[-6:]:
             source=value.get('source_reference',ref);control=host.store.artifact(source);tr=control.get('trajectory') or {}
+            nmpc_sequence=False
+            if not value.get('source_reference') and not value.get('run_id'):
+                from tools.research.rl import measured_nmpc_trajectory
+                try:measured_nmpc_trajectory(host,ref,bind_model=False);nmpc_sequence=True
+                except (ValueError,KeyError):pass  # As in compatible_references, missing records are unavailable.
             links.append(dict(candidate=candidate,source=source,evaluation_reference=ref,
                 data_access=__import__('tools.research.evidence_views',fromlist=['data_access']).data_access(host,ref,value),
                 source_kind='fixed_tension' if value.get('source_reference') else 'policy' if value.get('run_id') else 'nmpc_actual_execution',
-                trajectory_query=dict(reference=source,pointer='/trajectory') if tr else None,
+                initialized=source in controls,
+                full_control_sequence=bool(tr) or nmpc_sequence,
+                requires_initialization=nmpc_sequence,
+                initialization_request=dict(action='initialize_control',control_seed=dict(candidate=candidate,parent=candidate,source=ref)) if nmpc_sequence else None,
+                trajectory_query=dict(reference=source,view='full',pointer='/trajectory') if tr else None,
                 grid=dict(intervals=len(tr.get('tensions_n',[])),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr.get('tendon_order')) if tr else dict(reference=ref,pointer='/profile'),
                 task_gap=task_gap(value),original_acceptance=value.get('acceptance'),
                 scope='Recorded execution; cross-structure differences cannot be attributed to control alone'))
@@ -559,7 +583,8 @@ def working_set(host,current):
     return dict(version='evidence_working_set_v2',candidate_index=index,candidate_count=len(candidates),
         candidate_index_query='All candidate references remain in source_references; previews retain the latest three',
         control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage,read_coverage_count=len(coverage),
-        read_counts={k:sum(r['successfully_provided'] and r['classification']==k for r in coverage) for k in ('exact_repeat','covered_subnode','new_query')},
+        source_state_identity=digest(s),
+        read_counts={k:sum(r['successfully_provided'] and r['classification']==k for r in coverage) for k in ('exact_repeat','covered_subnode','changed_content','new_query')},
         method_requirements={r['action']+('/'+r['method'] if r.get('method') else ''):
             {k:r[k] for k in ('remaining_checks','scope','requires_agent_fields') if k in r} for r in current['decision_feedback']['actions']},
         coverage_scope='Delivery is not understanding. Repeated queries remain legal; scientific question/intent is not inferred.',
@@ -720,9 +745,11 @@ def decision_brief(current):
     brief['evidence_working_set']['read_state']=dict(completed_reads=len(ws['read_coverage']),
         read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
             classification=r['classification'],content_identity=r['delivery_identity'],
-            source_state_identity=r['source_state_identity']) for r in ws['read_coverage'][-3:]],
+            source_state_identity=r['source_state_identity'],
+            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'changed; reread to compare content')
+                if r['source_state_identity'] else 'immutable source or unrecorded state') for r in ws['read_coverage'][-3:]],
         full_list_query=dict(reference=anchor,view='working_set',pointer='/read_coverage'),
-        rule='Exact repeats refer to previously delivered unchanged content. Dynamic views may change. Rechecks remain allowed; delivery is not understanding.')
+        rule='Exact repeats refer to previously delivered unchanged content. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
     definitions={};actions=[]
     for row in feedback['actions']:
         method=row['action']+('/'+row['method'] if row.get('method') else '')
@@ -800,6 +827,13 @@ def plan_candidate(plan):
         if plan.get(k) and plan[k].get('candidate')),None)
 
 
+def decision_candidate(host,current,intent):
+    """Display the recorded decision candidate, then feedback/latest construction."""
+    return (next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
+        or (current.get('latest_scientific_feedback') or {}).get('candidate')
+        or next(iter(reversed(ordered_candidates(host,state(host)))),None))
+
+
 def compact_intent(intent):
     """Retain the explicit current question once; no automatic truth/lifecycle claim."""
     value=deepcopy(intent)
@@ -815,7 +849,7 @@ def compact_action_trace(trace):
         first=next((i for i,r in enumerate(rows) if r['action'] in actions and r['execution_status'] not in ('rejected','failed')),None)
         if first is not None:indices.add(first)
     indices.update(range(max(0,len(rows)-3),len(rows)))
-    value['recent']=[{k:r[k] for k in ('action','method','execution_status','candidate','result_references','source','outcome') if k in r}
+    value['recent']=[{k:r[k] for k in ('action','method','execution_status','execution_kind','candidate','result_references','source','outcome') if k in r}
         for i,r in enumerate(rows) if i in indices]
     value['selection_scope']='First route, first recorded structure/math/physics/control outcomes and latest three; no causal interpretation'
     return value
@@ -845,7 +879,8 @@ def research_action_trace(host, limit=5):
             execution_status=receipt['execution_status'] if receipt else 'pending',
             result_references=refs,receipt_output=receipt.get('output') if receipt else None,
             execution_id=receipt['execution_id'] if receipt else None,
-            outcome={k:result[k] for k in ('status','task_passed','stop_reason','error') if k in result},
+            outcome={**{k:result[k] for k in ('status','task_passed','stop_reason','error','execution_feedback') if k in result},
+                **(dict(local_diagnostic_completed=True) if result.get('local_comparison') else {})},
             source=source,_position=position)
     for ref in s.get('plans',[]):
         saved=host.store.artifact(ref);key=saved['request_id']
@@ -869,6 +904,12 @@ def research_action_trace(host, limit=5):
     ordered=sorted(rows.values(),key=lambda r:r['_position'])
     for row in ordered:
         row.pop('_position')
+        row['execution_kind']=('request_rejected_before_science' if row['execution_status']=='rejected' else
+            'scientific_result_recorded' if row['result_references'] else
+            'failed_request; inspect worker receipt/progress for actual computation' if row['execution_status']=='failed' else
+            'local_diagnostic_completed' if row['outcome'].get('local_diagnostic_completed') or row['outcome'].get('execution_feedback',{}).get('status')=='local_diagnostic_completed' else
+            'read_only_diagnosis' if row['action']=='diagnose' and row['outcome'].get('status')=='read_only_diagnosis' else
+            'pending_receipt' if row['execution_status']=='pending' else 'protocol_receipt_only; no scientific result recorded')
         row['interpretation_status']='Agent interpretation or mechanism hypothesis; no causal verification inferred'
         row['distinguishing_observation_status']='saved_scientific_evidence_available' if row['result_references'] else 'no_saved_scientific_result_for_this_action'
     return dict(total=len(ordered),failed_or_rejected=sum(r['execution_status'] in ('failed','rejected') for r in ordered),
@@ -908,7 +949,7 @@ def mathematics_authorization(host,s):
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
-    brief=decision_brief(context(host))
+    current=context(host);brief=decision_brief(current)
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
     brief['action_trace']=compact_action_trace(research_action_trace(host,limit=None))
@@ -938,10 +979,30 @@ def agent_decision_brief(host):
     if s.get('public_prior_manifest'):
         brief['public_prior_manifest']=dict(reference=s['public_prior_manifest'],view='full',
             scope='Frozen engineering priors; no historical experimental feedback')
-    candidate=next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
-    candidate=candidate or (brief.get('latest_scientific_feedback') or {}).get('candidate')
-    if candidate is None and len(s.get('candidates',{}))==1:candidate=next(iter(s['candidates'].values()))
+    candidate=decision_candidate(host,current,intent)
     if candidate:
+        ws=current['evidence_working_set'];anchor=brief['evidence_access']['reference']
+        row=next(r for r in ws['candidate_index'] if r['candidate']==candidate)
+        facts={k:deepcopy(row[k]) for k in ('candidate','structure_identity','executable_under_current_profile',
+            'generated','compiled','control_initialized','has_completed_nmpc_execution','methods_used',
+            'mathematically_evaluated','physically_evaluated','accepted')}
+        facts['best_valid_reference']=(row['best_valid'] or {}).get('reference')
+        sources=[];seen=set()
+        relevant=[(i,r) for i,r in enumerate(ws['control_result_links']) if r['candidate']==candidate]
+        # Initialized schedules precede observations/predictions, without choosing one.
+        for i,r in sorted(reversed(relevant),key=lambda pair:(bool(pair[1].get('initialized')),bool(pair[1].get('origin_status'))),reverse=True):
+            if r['source']['artifact_id'] in seen:continue
+            seen.add(r['source']['artifact_id'])
+            fields=[k for k in ('source','source_kind','origin_kind','origin_status','historical_origin','origin_reference','initialized',
+                'full_control_sequence','requires_initialization','initialization_request','task_acceptance','task_gap','control_source','trajectory_query','execution_references') if k in r]
+            sources.append({**{k:deepcopy(r[k]) for k in fields if k not in ('trajectory_query','execution_references')},
+                'query':dict(reference=anchor,view='working_set',pointer='/control_result_links/'+str(i),fields=fields)})
+            if len(sources)==3:break
+        facts.update(control_sources=sources,
+            control_source_status='complete_sequence_recorded' if any(r.get('full_control_sequence') for _,r in relevant) else 'no_complete_bound_sequence_recorded',
+            details_query=dict(reference=anchor,view='working_set',pointer='/candidate_index/'+str(ws['candidate_index'].index(row))),
+            control_source_scope='Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.')
+        brief['current_candidate']=facts
         from tools.research.task_constraints import mathematical_method_view, mathematical_catalog
         view=mathematical_method_view(host,candidate)
         brief['mathematical_capabilities']=mathematical_catalog(view)
@@ -950,6 +1011,9 @@ def agent_decision_brief(host):
     else:
         brief['mathematical_capabilities']=dict(status='candidate_selection_required',
             query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/methods/<method>")')
+        brief['current_candidate']=dict(status='not_generated',control_sources=[],control_source_status='missing')
+    brief['scientific_execution']=dict(pending={k:s['pending'][k] for k in ('kind','worker_request_id') if k in s['pending']} if s.get('pending') else None,
+        scope='Receipts/results establish execution. Plan selected_method is intent; read-only diagnosis starts no selected mathematical worker. Independent evaluation alone establishes task acceptance.')
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     from tools.research.evidence_views import result_card
@@ -1008,18 +1072,26 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                     if row.get('recovery'):
                         row['recovery']={k:row['recovery'][k] for k in ('attempted','selected','error') if k in row['recovery']}
     if decision_only:
+        candidate=(brief.get('current_candidate') or {}).get('candidate')
+        if candidate:
+            brief['available_research_actions']=[r for r in brief.get('available_research_actions',[]) if r.get('candidate') in (None,candidate)]
+            brief['research_actions_query']=dict(reference=brief['evidence_access']['reference'],view='working_set',pointer='/eligible_methods')
         catalog=brief.get('mathematical_capabilities',{})
-        for row in catalog.get('methods',{}).values():
+        for method,row in catalog.get('methods',{}).items():
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
                 if key not in ('planning_status','execution_status','missing','estimated_evaluations',
                         'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable',
-                        'execution_limits','control_initialization_query','preparation_query','preparation_hint','request_template_query'):
+                        'execution_limits','cost_scope','control_initialization_query','preparation_query','preparation_hint','request_template_query'):
                     row.pop(key)
+            if method!='mujoco_direct_control_v1':row.pop('request_template_query',None)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']['method']
             brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],'pointer':'/methods/'+selected})
         intent=brief.get('research_intent',{})
+        if isinstance(intent.get('unresolved_question'),str):
+            intent['unresolved_question']=intent['unresolved_question'][:240]
+            intent['question_scope']='Prior falsification target excerpt (at most 240 characters); original Plan remains authoritative. Main Agent chooses the next question.'
         for key in ('latest_decision','last_research'):
             item=intent.get(key)
             if item and item.get('agent_hypothesis'):
@@ -1066,6 +1138,8 @@ def compact_scientific_delivery(brief,*,decision_only=False):
             best.pop('violated_constraints',None)
         anchor=brief.get('evidence_access',{}).get('reference')
         if anchor:
+            ws=brief.get('evidence_working_set',{})
+            if ws.get('method_scope'):ws['method_scope']=dict(query=dict(reference=anchor,view='working_set',pointer='/method_scope'))
             for key,pointer in (('recent_searches','/recent_searches'),('method_requirements','/method_requirements')):
                 if brief.get(key):
                     brief[key]=dict(query=dict(reference=anchor,view='working_set',pointer=pointer))
@@ -1194,6 +1268,7 @@ def tool_feedback(host,value):
     if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
+        execution_feedback=result.get('execution_feedback') if isinstance(result,dict) else None,
         scientific_reference=reference if reference in known else None,new_facts=view)
 
 

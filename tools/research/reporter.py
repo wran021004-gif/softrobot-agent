@@ -237,7 +237,13 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
             [c['identity']['result']['reference'] for c in v['report']['results']]==references),None)
         if saved:ref,stored=saved;report=ScientificReport.model_validate(stored['report'])
         else:report=assemble(host,references);ref=_save(host,report)
+        raw=host.store.artifact(references[0])
+        from tools.research.feedback import task_gap
+        independent=references[0] in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+        gap=task_gap(raw) if independent else None
         return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
+            scientific_result_status=raw.get('status'),independent_physical_evaluation=independent,
+            task_acceptance=('passed' if gap['accepted'] else 'measured_failure' if gap['valid_complete'] else 'invalid_or_incomplete') if gap else 'unmeasured',
             scientific_result_reference=references[0],report_reference=ref,interpretation_status='deferred',
             operation_outcome={k:result[k] for k in ('candidate','source','reference','status',
                 'evaluation','selected','task_passed','stop_reason') if k in result},

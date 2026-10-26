@@ -14,6 +14,12 @@ from tools.research.state import (state, update, save, guard, enabled, protected
     closeout_operations, admit_closeout, readable_results)
 from tools.research.budget import engineering_closeout
 CALLER='research-provider'
+PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_replay/diagnose. '
+    'Diagnose reads existing evidence; selected_method does not execute a mathematical/native worker '
+    '(use research_analysis with its registered template). Only an explicit diagnostic payload requests local solves. '
+    'Control sources and optional NMPC handoff are described in control_initialization_methods. '
+    'Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. '
+    'Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.')
 class DeepSeekModel(OpenAIModel):
     """Public provider extension: retain DeepSeek reasoning on the next request.
 
@@ -275,7 +281,7 @@ def read_tool_evidence(host,query):
 
 def plan_schema(actions, *, decision_required=False,family_version=None):
     """Advertise only executable action payloads and their reachable definitions."""
-    from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS
+    from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
@@ -290,6 +296,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
         schema['required'].append('decision')
         schema['properties']['decision']={'$ref':'#/$defs/ResearchDecision'}
     schema['allOf']=[]
+    for intent in dict.fromkeys(PLAN_RESEARCH_INTENTS[a] for a in actions):
+        owners=[a for a in actions if PLAN_RESEARCH_INTENTS[a]==intent]
+        schema['allOf'].append({'if':{'properties':{'action':{'enum':owners}}},
+            'then':{'properties':{'decision':{'properties':{'research_intent':{'const':intent}}}}}})
     for field in dict.fromkeys(payloads.values()):
         owners=[a for a in actions if payloads.get(a)==field or field in PLAN_OPTIONAL_PAYLOADS.get(a,())]
         if not owners:continue
@@ -331,7 +341,7 @@ def error_feedback(host, use, exc, before):
     import traceback
     s=state(host)
     full=record(host,'tool_request_error',dict(tool_use=use,error=type(exc).__name__,message=str(exc),traceback=traceback.format_exc()))
-    counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','admitted_training_stages'))
+    counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','local_solves','admitted_training_stages'))
     message=str(exc);code=message.split(':',1)[0].split('\n',1)[0]
     field=None;expected=message[:300];refs=[]
     if hasattr(exc,'errors'):
@@ -364,7 +374,7 @@ def error_feedback(host, use, exc, before):
         field='protocol';expected='Use the complete frozen analysis_protocol from the method request_template/protocol in mathematical_capabilities. Do not add protocol fields; holding duration belongs to the frozen task.'
     if isinstance(exc,(KeyError,IndexError)) and use.get('name')=='evidence_read':
         code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
-        if use['input'].get('reference'):
+        if use['input'].get('reference') and not getattr(exc,'evidence_navigation',None):
             refs=[use['input']['reference']]
             try:
                 value=host.store.artifact(refs[0]);parent=''
@@ -381,9 +391,19 @@ def error_feedback(host, use, exc, before):
         if derived:
             code='EVIDENCE_VIEW_MISMATCH';field='view'
             expected='Use this exact derived-view query: '+json.dumps(derived,separators=(',',':'))
-    if code=='RESEARCH_INTENT_ACTION_MISMATCH':field='decision.research_intent'
+    if code=='RESEARCH_INTENT_ACTION_MISMATCH':
+        from tools.research.contracts import PLAN_RESEARCH_INTENTS
+        field='decision.research_intent';action=use['input']['action']
+        expected=f'action={action} requires decision.research_intent={PLAN_RESEARCH_INTENTS[action]}'
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
+    navigation=getattr(exc,'evidence_navigation',{})
+    if navigation:
+        query=navigation['corrected_query']
+        if navigation.get('derived_view_query'):code='EVIDENCE_VIEW_MISMATCH';field='view'
+        elif use['input'].get('fields'):field='fields'
+        else:field='pointer'
+        expected='Use exact query: '+json.dumps(query,separators=(',',':'))
     if 'PROTECTED_EVIDENCE_READ_REQUIRES' in message:
         field='reference';expected='Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP'
     citation={}
@@ -606,7 +626,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose/search/execute/initialize_control/physical_replay/diagnose. Control sources and optional NMPC handoff are described in control_initialization_methods. Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
+        for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
             ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
     if formal or rl_mode:
@@ -761,7 +781,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         current=decision_packet(host)
         if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:
-            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
+            native[0].tool_spec={**native[0].tool_spec,'description':PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None)}}
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
@@ -827,7 +847,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             event.cancel_tool='Protected closeout permits existing execution feedback only.'
     def after_tool(event):
         saved=dict(tool_use=event.tool_use,result=event.result)
-        if event.tool_use['name']=='evidence_read' and event.tool_use['input'].get('view')=='working_set':
+        if event.tool_use['name']=='evidence_read' and event.tool_use['input'].get('view') in ('working_set','mathematical_capabilities','capabilities'):
             saved['source_state_identity']=digest(state(host))
         record(host,'model_original_tool_feedback',saved)
         key='native-'+event.tool_use['toolUseId']

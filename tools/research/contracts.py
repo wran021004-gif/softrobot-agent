@@ -457,6 +457,12 @@ PLAN_PAYLOADS = dict(initialize_control='control_seed',generate='generation',pro
     refine='refinement',matched_state='matched_state',nmpc_prediction_diagnostic='nmpc_prediction_diagnostic',
     diagnose='diagnostic',confirm='selected_execution',select='selected_execution')
 PLAN_OPTIONAL_PAYLOADS = dict(propose=('mechanics_source',),diagnose=('diagnostic',))
+PLAN_RESEARCH_INTENTS = dict(initialize_control='CONTROL_SEARCH',generate='DESIGN_MODIFICATION',
+    propose='DESIGN_MODIFICATION',execute='NMPC_EXECUTION',control_search='CONTROL_SEARCH',
+    physical_replay='PHYSICAL_VALIDATION',select='SELECT',stop='STOP',diagnose='DIAGNOSE',
+    search='MATHEMATICAL_ANALYSIS',mechanics='MATHEMATICAL_ANALYSIS',replay='MATHEMATICAL_ANALYSIS',
+    refine='MATHEMATICAL_ANALYSIS',cross_replay='MATHEMATICAL_ANALYSIS',matched_state='DIAGNOSE',
+    nmpc_prediction_diagnostic='DIAGNOSE',confirm='PHYSICAL_VALIDATION')
 
 
 class Plan(Contract):
