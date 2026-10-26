@@ -1,6 +1,6 @@
 # A/B/C 汇合状态与 A 外力集成验收
 
-2026-10-26，Asia/Shanghai。用户在原只读准备后明确要求“开展A的集成任务”。**B 的通用外力运行时已选择性集成到 `integration/research-next`，14 项针对性检查通过，新增物理积分和 Provider 请求均为零。** 这是 A 分支工程集成，不是 main 合并或正式自主科研 Study 通过。
+2026-10-26，Asia/Shanghai。用户在原只读准备后明确要求“开展A的集成任务”。**B 的通用外力运行时已选择性集成到 `integration/research-next`，14 项针对性检查通过；另按新授权接入 C 后续小修复，5 项检查通过。新增物理积分和 Provider 请求均为零。** 这是 A 分支工程集成，不是 main 合并或正式自主科研 Study 通过。
 
 ## 分支与提交
 
@@ -8,7 +8,7 @@
 
 | 线 | 分支 | 起始本地/远端 HEAD | 本阶段本地结果 |
 |---|---|---|---|
-| A | `integration/research-next` | `2316fe2883f4aa438464c974dd1a35fb1fd0222b` | 本报告所在提交集成五个生产文件和两个测试文件 |
+| A | `integration/research-next` | `2316fe2883f4aa438464c974dd1a35fb1fd0222b` | `6e8a963523bbe884928f7104870d0018f227dca7` 外力集成；`2761590dc79c93d6fa6542bca237541c81182aa3` 接收独立 C 小修复；后续仅状态报告 |
 | B | `feat/b2-load-force-runtime` | `ed3e0d46e8754506ef4aa04aec62f78e87f1f3d9` | `26aaa0b` 冻结规范/入口；`23d3d4b` 失败检查点；结果报告 HEAD `a4861ede647beff8a778d257fb094645026cf6bd` |
 | C | `feat/c32-readonly-live-probe` | `c7642d97eaf742555ca5d982fa0c497f443ec44e` | 真实配对完成；结果报告 HEAD `a555ac23b24ba17c6cf1bad834a68b4cf51d3ea8`；生产代码及冻结两版未改 |
 
@@ -52,7 +52,9 @@ A 的 analysis、nonlinear/optimal capability、task constraints、contracts、c
 
 **C 已完成 12 次真实请求，未观察到可信判断改善。** 输入/输出/合计 Tokens 为 512,651/130,520/643,171；公开工具 25、读取 20、查询错误 2，科学执行全为零。输入/评分/模型/权限不变，无重试或补抽样。
 
-详见 C `docs/research/c32_live_scientific_review.md`。本会话按冻结 rubric 建议 fail，主要是动作/方法错配、遗漏授权和费用前提、局部估计过度解释；不是独立盲评。原自动 review 未评分的 insufficient_evidence 保持原样，没有确认新的生产证据泄漏/丢失。用户随后允许小修复；后续另记实际修改/回归，不改原 Treatment 或在原冻结集刷分。
+详见 C `docs/research/c32_live_scientific_review.md`。本会话按冻结 rubric 建议 fail，主要是动作/方法错配、遗漏授权和费用前提、局部估计过度解释；不是独立盲评。原自动 review 未评分的 insufficient_evidence 保持原样，没有确认新的生产证据泄漏/丢失。
+
+用户随后允许小修复，已在独立 `codex/c33-execution-feedback` 完成，并快进接入 A：补齐字段级路由/费用/权限说明，对不支持的 settings.regularization 提供精确合法字段反馈；两生产文件、一个新测试文件及记录，5 项零执行回归通过。修复详见 `docs/research/c33_execution_feedback_fix.md`；原字段域、验证及序列化 AST（去掉 description 后）保持相同，不改实际路由/授权/账本。原 Treatment、输入、评分及 C3.2 输出均未改、未重测；不能据此宣称模型科研判断问题已解决。
 
 六份原请求逐字节哈希再次核对一致，起始哈希及协议身份保留在 status.json。原请求/响应/推理/Store 未纳入公开提交。
 
@@ -60,10 +62,10 @@ A 的 analysis、nonlinear/optimal capability、task constraints、contracts、c
 
 | 门禁 | 当前结果 |
 |---|---|
-| A+B 工程集成 | A 分支最小闭包已集成，14 项关键检查通过；main 未合并 |
+| A+B 工程集成 | A 分支最小闭包已集成，14 项关键检查通过；C 后续说明/纠错修复另有 5 项通过；main 未合并 |
 | B2 冻结任务与完整见证 | 已建立，原阈值及身份保留 |
 | 结构辨别力 | 未建立，不得称结构设计优势 Benchmark |
-| C 真实科研判断 | 实验完成，未通过改善门禁；后续修复与独立新验证分开 |
+| C 真实科研判断 | 实验完成，未通过改善门禁；接口说明/纠错已小修复，模型决策收益仍待独立新验证 |
 | 正式 Agent Study | 未就绪：处理决策问题、隐藏答案隔离，另冻 Provider/数学/控制/物理预算 |
 
 A 本轮新增 Provider/科学积分为 0；B/C 各自完整成本保留，不记入 A 或清零。工程集成已完成，不扩大数学工具框架。
