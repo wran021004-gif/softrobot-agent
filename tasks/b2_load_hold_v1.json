@@ -1,0 +1,44 @@
+{
+  "extends": "b2_load_hold_zero_v1.json",
+  "task": {
+    "task_id": "b2-load-hold-v1-unfrozen-force-draft",
+    "name": "B2 constant body COM force hold: unfrozen draft",
+    "source": "2026-10-26 B1 task-only draft, not formally frozen. Pair with b2_load_hold_zero_v1.json on the same structure; controls may be optimized separately from constant 0.2 N. Target, magnitude and full holding-load window still require physical executability review. Original Reach/Hold thresholds unchanged.",
+    "goal": {
+      "data": {
+        "target_m": [
+          0.29,
+          -0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "data": {
+        "external_forces": [
+          {
+            "entity": "payload",
+            "point": "center_of_mass",
+            "frame": "world",
+            "force_n": [
+              0.0,
+              0.02,
+              -0.03
+            ],
+            "start_s": 0.1,
+            "end_s": 0.35
+          }
+        ]
+      }
+    },
+    "timing": {
+      "duration_s": 0.35
+    },
+    "sampling": {
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  }
+}
