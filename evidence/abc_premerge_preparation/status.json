@@ -84,7 +84,7 @@
     "physics_step_attempts": 899500,
     "provider_requests": 0,
     "tokens": 0,
-    "push": "auto_review_rejected_before_execution",
+    "push": "explicitly_authorized_push_succeeded_and_remote_verified",
     "remote_head_at_verification": "ed3e0d46e8754506ef4aa04aec62f78e87f1f3d9",
     "physics_steps": 899500,
     "native_full_rollouts": 1262,
@@ -92,9 +92,23 @@
     "authorized_cumulative_cap": 1500000,
     "unused_search_steps": 600500,
     "stopped_at_first_pair": true,
-    "hidden_answer_admitted_to_A": false
+    "hidden_answer_admitted_to_A": false,
+    "prior_push": "auto_review_rejected_before_execution"
   },
   "formal_agent_study_gate": "not_ready_decision_quality_and_new_budgets_pending",
-  "publishing": "local_commits_only; explicit destination/payload approval required after auto-review push rejection",
-  "engineering_integration_gate": "completed_with_focused_zero_step_checks"
+  "publishing": "user_explicitly_approved; four_branches_pushed_atomically_and_remote_heads_verified; this_status_update_pushed_under_same_scope",
+  "engineering_integration_gate": "completed_with_focused_zero_step_checks",
+  "publishing_receipt": {
+    "remote": "git@github.com:wran021004-gif/softrobot-agent.git",
+    "user_approval": "批准 (reply to exact four-branch destination and code/test/scalar-report scope)",
+    "force_push": false,
+    "main_changed": false,
+    "private_raw_data_published": false,
+    "remote_heads_verified_before_this_status_update": {
+      "integration/research-next": "3dc17cceaa649c3f5e0768bdbb1f9eccf892fcc1",
+      "feat/b2-load-force-runtime": "a4861ede647beff8a778d257fb094645026cf6bd",
+      "feat/c32-readonly-live-probe": "a555ac23b24ba17c6cf1bad834a68b4cf51d3ea8",
+      "codex/c33-execution-feedback": "2761590dc79c93d6fa6542bca237541c81182aa3"
+    }
+  }
 }

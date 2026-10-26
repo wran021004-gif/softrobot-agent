@@ -12,7 +12,7 @@
 | B | `feat/b2-load-force-runtime` | `ed3e0d46e8754506ef4aa04aec62f78e87f1f3d9` | `26aaa0b` 冻结规范/入口；`23d3d4b` 失败检查点；结果报告 HEAD `a4861ede647beff8a778d257fb094645026cf6bd` |
 | C | `feat/c32-readonly-live-probe` | `c7642d97eaf742555ca5d982fa0c497f443ec44e` | 真实配对完成；结果报告 HEAD `a555ac23b24ba17c6cf1bad834a68b4cf51d3ea8`；生产代码及冻结两版未改 |
 
-新增提交目前仅在本地。此前普通 B push 被自动审批拒绝：目标和待发送内容的外发授权未获认可；操作未执行，未用连接器绕过。需明确批准具体仓库/分支及非敏感提交范围后再普通推送。
+用户随后明确批准将 A/B/C 和 `codex/c33-execution-feedback` 的代码、测试及标量报告普通推送到 `git@github.com:wran021004-gif/softrobot-agent.git`。四分支已原子推送成功，并逐一核对远端 HEAD 与本地一致；本状态更新沿同一批准范围同步。此前 B push 曾因具体外发授权未获认可而被自动审批拒绝，旧拒绝未执行，也未绕过；本次使用新明确授权成功。没有上传隐藏答案、原始 Provider 数据或 Store，没有修改 main 或强制推送。
 
 ## A 最小集成范围
 
