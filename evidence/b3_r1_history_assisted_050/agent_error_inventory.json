@@ -1,0 +1,1169 @@
+{
+  "study": "b3-r1-history-assisted-050",
+  "freeze": "a29f3713450088cc5ba42a864630ccb6988cd9a9",
+  "status": "ready",
+  "snapshot_event": 1511,
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 96,
+      "tool_calls": 192,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 151,
+      "model_calls": 82,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 5032.528999999937
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 14,
+      "tool_calls": 41,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "raw_error_records": 32,
+  "agent_request_rejections": 31,
+  "supervisor_gate_rejections": 1,
+  "by_code": {
+    "INVALID_EVIDENCE_POINTER": 20,
+    "extra_forbidden": 1,
+    "EVIDENCE_MISSING_OR_CHANGED": 1,
+    "missing": 2,
+    "RESEARCH_INTENT_ACTION_MISMATCH": 3,
+    "EVIDENCE_RANGE_REQUIRES_LIST_POINTER": 2,
+    "NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION": 1,
+    "UNREGISTERED_RESEARCH_EVIDENCE": 1
+  },
+  "tool_counts": {
+    "evidence_read": 120,
+    "retrieve_context": 9,
+    "research_plan": 13,
+    "research_analysis": 2,
+    "research_investigate": 1
+  },
+  "evidence_reads": 120,
+  "exact_read_payload_repetitions": 40,
+  "frequent_read_payloads": [
+    {
+      "count": 14,
+      "input": {
+        "pointer": "/methods/mujoco_direct_control_v1",
+        "reference": {
+          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities"
+      }
+    },
+    {
+      "count": 7,
+      "input": {
+        "pointer": "/methods/mujoco_direct_control_v1/request_template",
+        "reference": {
+          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities"
+      }
+    },
+    {
+      "count": 6,
+      "input": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      }
+    },
+    {
+      "count": 3,
+      "input": {
+        "pointer": "/methods/mujoco_direct_control_v1",
+        "reference": {
+          "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities"
+      }
+    },
+    {
+      "count": 3,
+      "input": {
+        "pointer": "/method_requirements",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      }
+    },
+    {
+      "count": 3,
+      "input": {
+        "count": 20,
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      }
+    }
+  ],
+  "errors": [
+    {
+      "event": 35,
+      "reference": {
+        "artifact_id": "f468f984dd21cc604f10387c8eff67b249be993f3b74dd638ca8e8b95b4cee4f",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_zXotd5G8OdNoBuBbCy4d0892",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "f468f984dd21cc604f10387c8eff67b249be993f3b74dd638ca8e8b95b4cee4f",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 70,
+      "reference": {
+        "artifact_id": "6537258f3840611b9d1c537aa1ca1ba1bc680b38cab0d9c4b38c695ad0d0294c",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_DMpyzUmeG33rhI8jklS53138",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/research_history_index/0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca",
+        "reference": {
+          "artifact_id": "137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "6537258f3840611b9d1c537aa1ca1ba1bc680b38cab0d9c4b38c695ad0d0294c",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'research_history_index'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 149,
+      "reference": {
+        "artifact_id": "9d7678a3b790c6a212153de5375df4ba4328e4ca339f51ecce048c0b9bb11b1f",
+        "media_type": "application/json"
+      },
+      "tool": "research_analysis",
+      "tool_id": "call_00_emH3AEkKhftPqhRjrfCZ1489",
+      "action": null,
+      "input_excerpt": {
+        "candidate": {
+          "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+          "media_type": "application/json"
+        },
+        "model_source": "mujoco",
+        "operation": "mujoco_direct_control_v1"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "9d7678a3b790c6a212153de5375df4ba4328e4ca339f51ecce048c0b9bb11b1f",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "1 validation error for AnalysisRequest\nprotocol.horizon_s\n  Extra inputs are not permitted [type=extra_forbidden, input_value=0.01, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden",
+      "code": "extra_forbidden",
+      "field": "protocol",
+      "expected": "Use the complete frozen analysis_protocol from the method request_template/protocol in mathematical_capabilities. Do not add protocol fields; holding duration belongs to the frozen task.",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 198,
+      "reference": {
+        "artifact_id": "aaf49937a226c84c7eec4d8d3cb20e69462222bd6d8aa6af5f4ab6fb2ca5c2ad",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_TbcOPNHQ3litNsWD8QpS6067",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/error",
+        "reference": {
+          "artifact_id": "f46869a8c25de8e1294ee07bf8cfdf422ef04362b53210f5db03e5e265e55862",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "aaf49937a226c84c7eec4d8d3cb20e69462222bd6d8aa6af5f4ab6fb2ca5c2ad",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "EVIDENCE_MISSING_OR_CHANGED: f46869a8c25de8e1294ee07bf8cfdf422ef04362b53210f5db03e5e265e55862",
+      "code": "EVIDENCE_MISSING_OR_CHANGED",
+      "field": null,
+      "expected": "EVIDENCE_MISSING_OR_CHANGED: f46869a8c25de8e1294ee07bf8cfdf422ef04362b53210f5db03e5e265e55862",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 219,
+      "reference": {
+        "artifact_id": "9357364207c2e0730a8726a99bde129b99ca116b967a59624892202d23f98762",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_rXCvudOyTkItv7ulmsPe4106",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "9357364207c2e0730a8726a99bde129b99ca116b967a59624892202d23f98762",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 259,
+      "reference": {
+        "artifact_id": "ef593d3a6c5f79bbe68ab4067c10f4c48b2784b76977d40cf4cc7e235ec02a90",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_Qr5caSQxldi5LOFuO9Aj3231",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "controller_recipe",
+          "control_weights",
+          "numerical_source",
+          "settling",
+          "configuration",
+          "component_names"
+        ],
+        "pointer": "/parameters",
+        "reference": {
+          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "ef593d3a6c5f79bbe68ab4067c10f4c48b2784b76977d40cf4cc7e235ec02a90",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'numerical_source'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /parameters: control_weights, controller_recipe, family_space_identity, route_overrides, segment_count, segments, spans, strategy, tendon_count, tendon_parameters, version",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 294,
+      "reference": {
+        "artifact_id": "85641d79e7c233a0bafac66147348c9eca0bdcc11342efd0fc29ddcf417e17a2",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_WV3Pk50GB3IILqDKXJMQ3529",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/parameters/controller_recipe",
+        "reference": {
+          "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "85641d79e7c233a0bafac66147348c9eca0bdcc11342efd0fc29ddcf417e17a2",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'controller_recipe'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /parameters: control_weights, family_space_identity, segment_count, segments, spans, tendon_count, version",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 332,
+      "reference": {
+        "artifact_id": "9709a3ad6c304e342ef48d1582bf458cf876dd9da994ff1e60667e38c6da5f8d",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_n7qornhu6tjmoML0LDra2866",
+      "action": "initialize_control",
+      "input_excerpt": {
+        "action": "initialize_control"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "9709a3ad6c304e342ef48d1582bf458cf876dd9da994ff1e60667e38c6da5f8d",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "1 validation error for Plan\nweakening_observation\n  Field required [type=missing, input_value={'action': 'initialize_co...': 'application/json'}]}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing",
+      "code": "missing",
+      "field": "weakening_observation",
+      "expected": "Field required",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 482,
+      "reference": {
+        "artifact_id": "51b99e1900eb41c7189322243e0146f0231b7d7c44e459b20036a00a329db380",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_YigtKFSLFb5eaDflOGvo8863",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "51b99e1900eb41c7189322243e0146f0231b7d7c44e459b20036a00a329db380",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "code": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "field": null,
+      "expected": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 501,
+      "reference": {
+        "artifact_id": "759c62d58ce7182de458b2df93e3066e1036d1515f7178f1645a3eb8c4d48a8a",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_yJ2Vv93kG8mJCJribfc45366",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "759c62d58ce7182de458b2df93e3066e1036d1515f7178f1645a3eb8c4d48a8a",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 596,
+      "reference": {
+        "artifact_id": "979f02e9fe022ab3c1a22721c48e59f4e9eb140f3420a79087a5cea68a539d01",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_02_RfUuHUx05YHFxevXV6qN6835",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "tool_use",
+          "result"
+        ],
+        "pointer": "",
+        "reference": {
+          "artifact_id": "51b99e1900eb41c7189322243e0146f0231b7d7c44e459b20036a00a329db380",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "979f02e9fe022ab3c1a22721c48e59f4e9eb140f3420a79087a5cea68a539d01",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'result'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: error, message, tool_use, traceback",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 633,
+      "reference": {
+        "artifact_id": "0b855941920536004b975be2c012c61d78544de7a20b460789e427f89422e9aa",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_acvRgBhfmZJtKllSwTaa8652",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/result",
+        "reference": {
+          "artifact_id": "51b99e1900eb41c7189322243e0146f0231b7d7c44e459b20036a00a329db380",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "0b855941920536004b975be2c012c61d78544de7a20b460789e427f89422e9aa",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'result'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: error, message, tool_use, traceback",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 673,
+      "reference": {
+        "artifact_id": "c9cdbf6b2f15df9fc64888e9c73acfe9024b742fd09b1de2f83400f87d5ea0d7",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_tl7ZPjlIexYKvvjPx4wa3811",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "candidate",
+          "source",
+          "source_kind",
+          "grid",
+          "task_acceptance",
+          "intervals",
+          "method",
+          "updated_by"
+        ],
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "c9cdbf6b2f15df9fc64888e9c73acfe9024b742fd09b1de2f83400f87d5ea0d7",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 749,
+      "reference": {
+        "artifact_id": "486b2bd92d028466342b87dc5db98756ddc24bbe332e9be4305a4e16facd0b3c",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_V8Y30f69oGyDSlGz5Ym93166",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/tool_use/input/research_analysis/control_optimization",
+        "reference": {
+          "artifact_id": "51b99e1900eb41c7189322243e0146f0231b7d7c44e459b20036a00a329db380",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "486b2bd92d028466342b87dc5db98756ddc24bbe332e9be4305a4e16facd0b3c",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'research_analysis'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /tool_use/input: action, decision, expected_observation, fixed_conditions, hypothesis, interpretation, next_step, stopping_condition, weakening_observation",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 851,
+      "reference": {
+        "artifact_id": "f79eb427e75aed5a8344f11804eed42dad765ee7b6631cb675e48e1969cf1cd5",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_Y39OYqdZDXat7KvtGkaJ2490",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/trajectory",
+        "reference": {
+          "artifact_id": "e76d3b34f2d323fdad01757b58a4a62cc7a290517aaf0ae7ec3f19ebddee9524",
+          "media_type": "application/json"
+        },
+        "view": "range"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "f79eb427e75aed5a8344f11804eed42dad765ee7b6631cb675e48e1969cf1cd5",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "code": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "field": "pointer",
+      "expected": "Read the current reference root with view=summary, then use an advertised list read_pointer with view=range",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 856,
+      "reference": {
+        "artifact_id": "eb7702d136297ee426cd3cacfb8d3165a8ed3f55022c36d43c2efcdb2b6d7253",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_L4CTtVdmEtxvoX1o2UZ43875",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/trajectory",
+        "reference": {
+          "artifact_id": "e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48",
+          "media_type": "application/json"
+        },
+        "view": "range"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "eb7702d136297ee426cd3cacfb8d3165a8ed3f55022c36d43c2efcdb2b6d7253",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "code": "EVIDENCE_RANGE_REQUIRES_LIST_POINTER",
+      "field": "pointer",
+      "expected": "Read the current reference root with view=summary, then use an advertised list read_pointer with view=range",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 873,
+      "reference": {
+        "artifact_id": "cc12b43b30da073dbc777181bf2abc84a067cea7f17e8d918f67aa84bd3d7f4d",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_a4SB7c2pkZBGRuUBQuqn7134",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "source",
+          "candidate",
+          "source_kind",
+          "task_acceptance",
+          "label",
+          "status"
+        ],
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "cc12b43b30da073dbc777181bf2abc84a067cea7f17e8d918f67aa84bd3d7f4d",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 916,
+      "reference": {
+        "artifact_id": "193cc047fa1864c254f7f1d04d64e24ab3b2296172e27c71359409e16447f3a6",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_crOhd40fMPcokDxOHA9o4423",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "193cc047fa1864c254f7f1d04d64e24ab3b2296172e27c71359409e16447f3a6",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "code": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "field": null,
+      "expected": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 989,
+      "reference": {
+        "artifact_id": "73304c4dcaf8c9298517f73079b9ad4c4afafa58c0f828e0fb8f8ac52b8b2190",
+        "media_type": "application/json"
+      },
+      "tool": "research_analysis",
+      "tool_id": "call_00_DBBUeNOsguK4NjG1rF9R1458",
+      "action": null,
+      "input_excerpt": {
+        "candidate": {
+          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+          "media_type": "application/json"
+        },
+        "model_source": "mujoco",
+        "operation": "mujoco_direct_control_v1"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "73304c4dcaf8c9298517f73079b9ad4c4afafa58c0f828e0fb8f8ac52b8b2190",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "1 validation error for AnalysisRequest\n  Value error, NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION [type=value_error, input_value={'candidate': {'artifact_...argin_fraction': 0.05}}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error",
+      "code": "NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION",
+      "field": "operating_point",
+      "expected": "Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1022,
+      "reference": {
+        "artifact_id": "869c6391411fe4c624825bcecceb46997e2d575d6c43620b3d558c21407e5d48",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_Y55YklONxo9XOG18nyS83641",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "869c6391411fe4c624825bcecceb46997e2d575d6c43620b3d558c21407e5d48",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "code": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "field": null,
+      "expected": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1074,
+      "reference": {
+        "artifact_id": "d920a109275cc21c4a76cfe3905bf54b8aba5e03869e19f5c370e6a87b15a436",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_HaKNjivxV6XjZLPSBeIj8281",
+      "action": null,
+      "input_excerpt": {},
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "d920a109275cc21c4a76cfe3905bf54b8aba5e03869e19f5c370e6a87b15a436",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "1 validation error for Plan\naction\n  Field required [type=missing, input_value={'hypothesis': 'On candid...'next_step': 'diagnose'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing",
+      "code": "missing",
+      "field": "action",
+      "expected": "Field required",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1196,
+      "reference": {
+        "artifact_id": "56081e047f132f228f13127341e48fe4c66ee7a2d17657a52bb18e9c59b22523",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_ZOVGb4Y8OfCYhqBhKeY18138",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "range"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "56081e047f132f228f13127341e48fe4c66ee7a2d17657a52bb18e9c59b22523",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1220,
+      "reference": {
+        "artifact_id": "935cfdecac45ae3160b68f9d4f896a4924fc19094f8f9a9d3db145318a28bd7b",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_L5YkK8PqtYdcudit5xSl6480",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "935cfdecac45ae3160b68f9d4f896a4924fc19094f8f9a9d3db145318a28bd7b",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "UNREGISTERED_RESEARCH_EVIDENCE",
+      "code": "UNREGISTERED_RESEARCH_EVIDENCE",
+      "field": "supporting_evidence",
+      "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1284,
+      "reference": {
+        "artifact_id": "291b3a26ae310449308fe45a8942d2db7cfa657b73e54cecf9fc4764debaba6f",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_lsS1Ch9VuhIzrOC97rbL4777",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "analysis_operation",
+          "control_optimization",
+          "candidate",
+          "model_source",
+          "native",
+          "status",
+          "stop_reason",
+          "iterations",
+          "evaluations",
+          "best",
+          "schedule",
+          "predicted"
+        ],
+        "pointer": "",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "291b3a26ae310449308fe45a8942d2db7cfa657b73e54cecf9fc4764debaba6f",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'analysis_operation'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1307,
+      "reference": {
+        "artifact_id": "9e9d72b6c9ef709704cb964b151ac0a424dde708113ef23c2199ab1d974b4838",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_DEuinNUnObgnL1AgXqJO9792",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/result/reference",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "9e9d72b6c9ef709704cb964b151ac0a424dde708113ef23c2199ab1d974b4838",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'result'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1312,
+      "reference": {
+        "artifact_id": "7d7d19d26de187128487c64578a354a73cc0ca863ab3cbef71c9e6edc40bb491",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_yNYHRIvkllKPZvtO1rJp9030",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/result/status",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "7d7d19d26de187128487c64578a354a73cc0ca863ab3cbef71c9e6edc40bb491",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'result'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1317,
+      "reference": {
+        "artifact_id": "4fdc5de8938e132657b470dea9ab1bd88b7af37418d6118545701642859c922a",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_02_AvnMo5VKjOUWAcrbQiaL2086",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/result/numerical_evidence",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "4fdc5de8938e132657b470dea9ab1bd88b7af37418d6118545701642859c922a",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'result'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1385,
+      "reference": {
+        "artifact_id": "46d64ff9a28b5fa8832b164b0379a72183afbcb6b2a930e99e3ede475bc60e48",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_lcmnfliVAuDc0DHGioER9663",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "46d64ff9a28b5fa8832b164b0379a72183afbcb6b2a930e99e3ede475bc60e48",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1390,
+      "reference": {
+        "artifact_id": "9fc180d2e54b16f75a2f01f7f7208e664f831a5f37cb055ee6fb164ad52cee2d",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_Wa1Nk44oE8joOboAvNpe8611",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/method_requirements",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "9fc180d2e54b16f75a2f01f7f7208e664f831a5f37cb055ee6fb164ad52cee2d",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'method_requirements'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1483,
+      "reference": {
+        "artifact_id": "054717c4c77c1c1660966acffdc75546d683dce8a4993ab62bff3c92b3963835",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_NgQaEaIjRCrg0ZBoiehK5807",
+      "action": null,
+      "input_excerpt": {
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "054717c4c77c1c1660966acffdc75546d683dce8a4993ab62bff3c92b3963835",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1488,
+      "reference": {
+        "artifact_id": "691fbdb49bcf35434ddb60cfae7c091ddab7b6513e092bf1b17110163a033349",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_xjG1d8N9M2NBKfvf1FTV3471",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "operation",
+          "candidate",
+          "result",
+          "native",
+          "status",
+          "control_optimization",
+          "model_source"
+        ],
+        "pointer": "",
+        "reference": {
+          "artifact_id": "4ea52762f33856dd2757b9281196dbf22adffbdfcfd006389b22d127428ffc60",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "691fbdb49bcf35434ddb60cfae7c091ddab7b6513e092bf1b17110163a033349",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'operation'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: action_divergences, execution_evidence, first_action_divergence, incomplete_executions, numerical_evidence, sources, status, unique_cause",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1508,
+      "reference": {
+        "artifact_id": "25629d74880c55d21d434a6ea0e9fedf2c0d6fe13628a6d870a9545050406d89",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_01_aFnaou4ZERm7q3zwmpQW9488",
+      "action": "initialize_control",
+      "input_excerpt": {
+        "action": "initialize_control"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "25629d74880c55d21d434a6ea0e9fedf2c0d6fe13628a6d870a9545050406d89",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "AUTHORIZED_EXTENSION_REQUIRES_COMMITTED_EXPLICIT_MIGRATION",
+      "code": "AUTHORIZED_EXTENSION_REQUIRES_COMMITTED_EXPLICIT_MIGRATION",
+      "field": null,
+      "expected": "AUTHORIZED_EXTENSION_REQUIRES_COMMITTED_EXPLICIT_MIGRATION",
+      "scientific_execution_started": false,
+      "classification": "supervisor_migration_gate"
+    }
+  ],
+  "science": {
+    "math": 0,
+    "nmpc": 2,
+    "physical_replays": 0
+  },
+  "scope": "Observed request failures, not all failures of reasoning. Exact repeat counts do not establish unchanged dynamic content or wasted reads. Reporter preparation crash is a separate delivery defect, not a tool-request rejection."
+}
