@@ -1,0 +1,174 @@
+{
+  "label": "failed_nmpc_replay",
+  "runtime": {
+    "code_sha": "f41c7aadf0163836aac9e56371ce54729eab0d9f",
+    "driver_identity": "59cccf617f97ba10cab6b44706c48b3d0b0dfaec4b8c2fd67cbf9386c752d18f",
+    "utc": "2026-10-26T08:05:45.347669+00:00",
+    "python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+    "python_version": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+    "packages": {
+      "mujoco": "3.13.0",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "casadi": "3.7.2",
+      "pydantic": "2.14.0"
+    },
+    "research_llm_calls": 0,
+    "seed": 17
+  },
+  "acceptance": {
+    "contract": "research.task_acceptance",
+    "version": "1.0.0",
+    "protocol_id": "offline_reach_hold_v1",
+    "task_family": "task.reach",
+    "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+    "status": "valid_failure",
+    "accepted": false,
+    "components": {
+      "evaluation_validity": {
+        "value": "valid",
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "execution_complete": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "task_evaluator": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "evaluator:task_bound": {
+        "value": 0.0040334275990930235,
+        "passed": true,
+        "unit": "m",
+        "limit": 0.01,
+        "reason": null
+      },
+      "solver_errors": {
+        "value": 0,
+        "passed": true,
+        "unit": "count",
+        "limit": 0,
+        "reason": null
+      },
+      "force_bounds": {
+        "value": 0.0,
+        "passed": true,
+        "unit": "N",
+        "limit": 1e-08,
+        "reason": null
+      },
+      "holding_coverage": {
+        "value": true,
+        "passed": true,
+        "unit": "inclusive uniform samples",
+        "limit": 6,
+        "reason": null
+      },
+      "holding_position": {
+        "value": 0.0040334275990930235,
+        "passed": true,
+        "unit": "m",
+        "limit": 0.01,
+        "reason": null
+      },
+      "holding_speed": {
+        "value": 0.043009681835387996,
+        "passed": false,
+        "unit": "m/s",
+        "limit": 0.02,
+        "reason": null
+      }
+    },
+    "metrics": {
+      "terminal_error_m": 0.0040334275990930235,
+      "holding_max_error_m": 0.0040334275990930235,
+      "holding_max_speed_m_s": 0.043009681835387996
+    },
+    "missing": [],
+    "issues": [],
+    "execution_id": "failed_nmpc_replay",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "3d6d8844dd5c86b98834591673dc3c0e33a3830d261c1796fab6d5c5395189aa",
+        "media_type": "application/json"
+      },
+      "profile": null
+    },
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "3d6d8844dd5c86b98834591673dc3c0e33a3830d261c1796fab6d5c5395189aa",
+        "media_type": "application/json"
+      },
+      "profile": null,
+      "simulation": {
+        "artifact_id": "16a17d40119fa0a8bd39a2fce5f308dc5248258c6d51c0fa823cf0fab29ac433",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "source": {
+          "artifact_id": "16a17d40119fa0a8bd39a2fce5f308dc5248258c6d51c0fa823cf0fab29ac433",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null,
+        "original_execution_id": null
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "3d6d8844dd5c86b98834591673dc3c0e33a3830d261c1796fab6d5c5395189aa",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "16a17d40119fa0a8bd39a2fce5f308dc5248258c6d51c0fa823cf0fab29ac433",
+          "media_type": "application/json"
+        },
+        "execution_id": "failed_nmpc_replay"
+      }
+    },
+    "evaluator_tension_channels": null,
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.5,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005,
+      "real_time_required": false,
+      "real_time_demonstrated": null,
+      "deadline_misses": null,
+      "mean_update_s": null,
+      "simulation_wall_s": null
+    },
+    "continuous_time_guarantee": false
+  },
+  "configuration_identity": "bb29d2433e8061681a0f8fc2a9c50120db3b18296af43fc0afccbb0af546287e",
+  "trajectory_identity": "f27cc82ef2e22f486b2a40f29bea06929ed30b966ff014b15bcbe39a48be93d3",
+  "raw_reference": {
+    "artifact_id": "16a17d40119fa0a8bd39a2fce5f308dc5248258c6d51c0fa823cf0fab29ac433",
+    "media_type": "application/json"
+  },
+  "evaluation_reference": {
+    "artifact_id": "3d6d8844dd5c86b98834591673dc3c0e33a3830d261c1796fab6d5c5395189aa",
+    "media_type": "application/json"
+  },
+  "cost": {
+    "wall_s": 0.35256460000164225,
+    "model_builds": 1,
+    "full_rollouts": 1,
+    "physics_steps": 1000,
+    "physical_evaluations": 1,
+    "nmpc_updates": 0,
+    "ppo_steps": 0
+  }
+}
