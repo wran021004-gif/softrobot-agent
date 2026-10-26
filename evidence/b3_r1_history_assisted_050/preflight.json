@@ -1,0 +1,239 @@
+{
+  "study_id": "b3-r1-history-assisted-050",
+  "resolved_identity": "a5754add34ed56639bacb431e256569d03a99c9094a1f7af63f75d56411b718a",
+  "freeze": "7283d07d652d2a382e16e2ba33e9b99533572414",
+  "r0_source_commit": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+  "authorization": {
+    "artifact_id": "cc93c4e295158720cc6600d4c67fa2e8392d8c0b8b9bc90f01fe7f6181297734",
+    "media_type": "application/json"
+  },
+  "scope": {
+    "study_id": "b3-r1-history-assisted-050",
+    "resolved_identity": "a5754add34ed56639bacb431e256569d03a99c9094a1f7af63f75d56411b718a",
+    "frozen_implementation": "7283d07d652d2a382e16e2ba33e9b99533572414",
+    "r0_source_commit": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 26,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 4,
+      "protected_provider_requests": 4,
+      "protected_public_operations": 6,
+      "provider_requests": 48,
+      "public_operations": 96
+    },
+    "capabilities": [
+      "analysis",
+      "control_correction",
+      "physical_replay",
+      "nmpc"
+    ],
+    "provider": {
+      "adapter": "deepseek",
+      "adapter_version": "8.0.0",
+      "base_url": "https://api.deepseek.com",
+      "context_bytes": 4194304,
+      "context_guard": {
+        "context_limit_tokens": 1000000,
+        "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+        "framing_headroom_tokens": 8192,
+        "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "verified_date": "2026-10-03"
+      },
+      "investigation_max_tokens": 32768,
+      "max_no_progress": 3,
+      "max_repairs": 10,
+      "max_tokens": 32768,
+      "max_turns": 40,
+      "model": "deepseek-flash",
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 40,
+        "max_total": 40
+      },
+      "reasoning_effort": "high",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": "enabled",
+      "timeout_s": 600.0
+    },
+    "nmpc_limits": {
+      "executions": 2
+    },
+    "rl_limits": {
+      "actions_per_trial": null,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 0,
+      "seconds_per_trial": null,
+      "training_actions": null,
+      "training_active_seconds": null,
+      "training_stages": 0
+    },
+    "native_control_limits": {
+      "evaluation_requests": 24,
+      "iterations": 3,
+      "knots_s": 4
+    },
+    "physical_replay_limit": 2,
+    "physical_structures": 2,
+    "native_optimization_analyses": 2,
+    "native_analyses_per_structure": 1,
+    "native_physics_steps": 60000,
+    "execution_scopes": [
+      "registered mathematics",
+      "frozen B3 NMPC and physical replay",
+      "history-assisted legal control import"
+    ],
+    "provider_egress": {
+      "destination": "https://api.deepseek.com/chat/completions",
+      "payload": "Frozen B3 task, necessary robot structure and control parameters, explicitly authorized M2 historical research summaries, tool definitions, and new research feedback from this Study. Credentials only for authentication; no unrelated workspace data."
+    }
+  },
+  "admission": {
+    "artifact_id": "47459b9e33a370aaf42c3d6b5a27dfa72d9eef16838b5e17f9c48dd71bcabcd3",
+    "media_type": "application/json"
+  },
+  "current_candidate": {
+    "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+    "media_type": "application/json"
+  },
+  "imported_control": {
+    "candidate": {
+      "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "2a554eeb59e44ac776b68a3d7a573e6c11017cd6dfb762569dc733212e13d3ea",
+      "media_type": "application/json"
+    },
+    "task_acceptance": "unmeasured"
+  },
+  "history": {
+    "query": {
+      "reference": {
+        "artifact_id": "137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/research_history_index"
+    },
+    "conclusions": [
+      {
+        "study": "b3-t2-050-b-v2-draft",
+        "method": "nmpc",
+        "scope": "PHYSICAL_OBSERVATION",
+        "l1_pointer": "/research_history_index/137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+        "task_match": true,
+        "result": {
+          "accepted": false,
+          "metrics": {
+            "holding_max_error_m": 0.006038027478928508,
+            "holding_max_speed_m_s": 0.11137394399884916,
+            "terminal_error_m": 0.003148372648914904
+          }
+        }
+      },
+      {
+        "study": "b3-t2-050-c-v2-draft",
+        "method": "fixed_tension",
+        "scope": "PHYSICAL_OBSERVATION",
+        "l1_pointer": "/research_history_index/0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca",
+        "task_match": true,
+        "result": {
+          "accepted": false,
+          "metrics": {
+            "holding_max_error_m": 0.006675937086453473,
+            "holding_max_speed_m_s": 0.08788779126447174,
+            "terminal_error_m": 0.004515550349894086
+          }
+        }
+      }
+    ],
+    "decision_hint": "Existing work: read L1 before repeating. State new information or a reproducibility/numerical check purpose. Exact experimental equivalence is unknown until model, point, inputs and grid align. Historical results grant no current execution/SELECT credit; braking and model-physics mechanisms remain unresolved."
+  },
+  "native_limits_in_L0": {
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "knots_s": 4
+  },
+  "t2_preparation": {
+    "study_authorized": true,
+    "formal_execution_authorized": true,
+    "execution_status": "blocked",
+    "planning_status": "requires_parameters",
+    "missing": [
+      "missing_validated_model_stencil"
+    ],
+    "estimated_evaluations": 5,
+    "registered": true,
+    "authorized": true,
+    "applicable": true,
+    "executable": false,
+    "detail_pointer": "/methods/controlled-capability-sensitivity-v1",
+    "preparation_query": {
+      "reference": {
+        "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+        "media_type": "application/json"
+      },
+      "view": "mathematical_capabilities",
+      "pointer": "/methods/controlled-capability-sensitivity-v1/readiness"
+    },
+    "preparation_hint": "Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply."
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 48,
+      "tool_calls": 96,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 4,
+      "model_calls": 48,
+      "tool_calls": 96,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "pending": null,
+  "worker": "D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe",
+  "environment": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "scientific_execution_started": false,
+  "offline_complete_request": {
+    "bytes": 74525,
+    "native_limits": {
+      "evaluation_requests": 24,
+      "iterations": 3,
+      "knots_s": 4
+    },
+    "schema_conditionally_requires_selected_candidate": true,
+    "scope": "Production formatter/current schemas and frozen instructions; original M2 tool declarations, no transport or Provider reservation. This is not a sent request."
+  },
+  "automatic_approval": {
+    "status": "launch_rejected_before_process_creation",
+    "reason": "Reviewer requires trusted chat confirmation of exact DeepSeek destination and payload; confirmation pending.",
+    "provider_requests": 0
+  }
+}

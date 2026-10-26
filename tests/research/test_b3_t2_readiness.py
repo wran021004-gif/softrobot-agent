@@ -51,7 +51,12 @@ class B3T2Tests(unittest.TestCase):
                 ledger['remaining']['backend_solves']=budget['science_budget']['remaining_physical']
                 candidate=packet['research']['mathematical_capabilities']['candidate']
                 view=mathematical_method_view(h,candidate)
-                brief=agent_decision_brief(h)
+                # Preserve the exact historical L0, including its real feedback.
+                # Reproject only the changed catalog; never infer earlier context
+                # from final snapshot-only control/report fields.
+                brief=deepcopy(packet['research'])
+                brief['mathematical_capabilities']=compact_scientific_delivery(
+                    dict(mathematical_capabilities=mathematical_catalog(view)),decision_only=True)['mathematical_capabilities']
                 native=brief['mathematical_capabilities']['methods']['mujoco_direct_control_v1']
                 self.assertEqual(native['execution_limits'],s['spec']['native_control_limits'])
                 self.assertNotIn('execution_limits',packet['research']['mathematical_capabilities']['methods']['mujoco_direct_control_v1'])
