@@ -142,3 +142,24 @@ tokenizers 0.22.2、Strands 1.59.0/harness 0.2.0，原单线程设置。
 
 当前科研 go/no-go：**等待新外发和科学预算授权；行为门禁仍未验证。**
 用户可以一次批准上述三份额度并要求自动依门禁顺序推进；未通过则停在对应阶段，不自动消耗后续额度。
+
+## 冻结完成记录
+
+工程冻结提交 `75089982e`。六份真实生产投影均冻结，全部当前推荐查询可读，三对方法集和源状态一致。
+成对冻结身份 `6d6c4b8bb0c394c0bc818f79448fc8213ff22ed6a1e4d0a9073e5804ca3a136f`；
+标量清单在 `evidence/c4_preparation/paired_freeze.json`，原包仅保存在忽略的运行目录。
+完整 Handoff wire 的离线 tokenizer 估计分别为 A 31781→31822、B 33325→33364、C 40736→40775。
+修复增加约 39–41 个离线 Tokens，未删除科学信息；不能称 Token 压缩或真实交互改善。
+当前可执行推荐查询分别 27/29/23 项，两个版本均通过。
+
+两项正式准备经原 prepare/bind 完成，身份与 Store 分开：
+
+- Cold-start resolved_identity：`60a684e2389e5719b9c30afaaeb27215a9224087b5df33dc991662cf7a642d66`。
+  候选池 0，reference/selected 均 null，历史和当前数值结果全空。
+- Feedback-loop resolved_identity：`c6c451a57c78b14e8837808be5d52d41c131c8c452f6b01ead4ddcf5e436b89c`。
+  原导入器物化一个失败历史候选及控制、一个历史数学结果，当前数值结果全空。
+
+两 Store 的 Provider/public/physical/worker 已用额度均 0；没有物理步或新科学评价。
+真实 require_authorization 都拒绝继续，未记录授权事件。
+`prepared_studies.json` 保留初态与账本标量；`authorization_request.json` 是三份精确身份绑定的
+**授权请求草案，user_approval=null**，不是已授予许可。待用户批准后原样绑定相应范围。

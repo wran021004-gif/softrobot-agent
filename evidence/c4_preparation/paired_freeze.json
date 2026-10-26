@@ -1,0 +1,554 @@
+{
+  "status": "offline_frozen_pending_approval",
+  "study_id": "c4-decision-pairs-20261026",
+  "frozen_identity": "6d6c4b8bb0c394c0bc818f79448fc8213ff22ed6a1e4d0a9073e5804ca3a136f",
+  "commits": {
+    "control": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+    "treatment": "75089982ebd6054c43f7ec14393675c79e0cc4a9"
+  },
+  "scope": "C4 is an isolated read-only decision experiment. The packet is a frozen historical boundary, not a live Study. You may evidence_read first or propose your next action with research_plan/research_analysis. No proposal, including local_diagnostic, executes science here; no new physical/mathematical result will be supplied. Choose the method freely, considering the task violation, competing explanations, what different outcomes would change, evidence scope and real cost. State unknowns. There are at most two Provider turns for this case; use the advertised production contracts. No hidden context retrieval or Reporter is available. Respond in Chinese.",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "request_ceiling": 12,
+  "order": [
+    [
+      "A",
+      "control"
+    ],
+    [
+      "A",
+      "treatment"
+    ],
+    [
+      "B",
+      "treatment"
+    ],
+    [
+      "B",
+      "control"
+    ],
+    [
+      "C",
+      "control"
+    ],
+    [
+      "C",
+      "treatment"
+    ]
+  ],
+  "offline": [
+    {
+      "case": "A",
+      "arm": "control",
+      "source_state": {
+        "artifact_id": "1a9bcfaa13935293f03114cfe04bd35b63308c9ff68b5ab77a9db3ba6c7bd911",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "7b7ba1410559891aa4a8415027eafa0b3493a9b6f68f5a4a53b7040b0dc94422",
+        "media_type": "application/json"
+      },
+      "source_archive": "b3_r1_history_assisted_050",
+      "event_boundary": 382,
+      "sizes": {
+        "brief": {
+          "bytes": 48003,
+          "offline_serialized_tokens": 13956
+        },
+        "same_session": {
+          "bytes": 111063,
+          "offline_serialized_tokens": 31817
+        },
+        "handoff": {
+          "bytes": 110900,
+          "offline_serialized_tokens": 31781
+        },
+        "schema": {
+          "bytes": 35273,
+          "offline_serialized_tokens": 8811
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 70735,
+          "offline_serialized_tokens": 21877
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 0,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 2,
+          "results": 2,
+          "physical_replays": 0,
+          "analysis_results": 0,
+          "control_initializations": 2
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 1231,
+      "future_only_outputs_denied": 1231,
+      "packet_identity": "8e8bd8947af4412738ee8abf3a266cdbf98e7f97a683d1b772eaecf66e43088f"
+    },
+    {
+      "case": "A",
+      "arm": "treatment",
+      "source_state": {
+        "artifact_id": "1a9bcfaa13935293f03114cfe04bd35b63308c9ff68b5ab77a9db3ba6c7bd911",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "7b7ba1410559891aa4a8415027eafa0b3493a9b6f68f5a4a53b7040b0dc94422",
+        "media_type": "application/json"
+      },
+      "source_archive": "b3_r1_history_assisted_050",
+      "event_boundary": 382,
+      "sizes": {
+        "brief": {
+          "bytes": 48218,
+          "offline_serialized_tokens": 13997
+        },
+        "same_session": {
+          "bytes": 111278,
+          "offline_serialized_tokens": 31858
+        },
+        "handoff": {
+          "bytes": 111115,
+          "offline_serialized_tokens": 31822
+        },
+        "schema": {
+          "bytes": 35273,
+          "offline_serialized_tokens": 8811
+        },
+        "fixed_system": {
+          "bytes": 4389,
+          "offline_serialized_tokens": 979
+        },
+        "history": {
+          "bytes": 527,
+          "offline_serialized_tokens": 112
+        },
+        "dynamic": {
+          "bytes": 70950,
+          "offline_serialized_tokens": 21918
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 0,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 2,
+          "results": 2,
+          "physical_replays": 0,
+          "analysis_results": 0,
+          "control_initializations": 2
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 1231,
+      "future_only_outputs_denied": 1231,
+      "packet_identity": "13f913f93475b9ccafad6ffdc3a7efd8e2ff56c7d52c0ebc886f8a2bd75a6f69"
+    },
+    {
+      "case": "B",
+      "arm": "control",
+      "source_state": {
+        "artifact_id": "08b3c48a228f554b3aa6965252b26386ff940b3b0df80e772651f1ac465b2763",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "224e6b15518bd00391d41d6e6131b68412f78069850279a83f0beed6be03b36b",
+        "media_type": "application/json"
+      },
+      "source_archive": "b3_t2_pilot_050_c",
+      "event_boundary": 353,
+      "sizes": {
+        "brief": {
+          "bytes": 54262,
+          "offline_serialized_tokens": 15792
+        },
+        "same_session": {
+          "bytes": 115681,
+          "offline_serialized_tokens": 33361
+        },
+        "handoff": {
+          "bytes": 115518,
+          "offline_serialized_tokens": 33325
+        },
+        "schema": {
+          "bytes": 34902,
+          "offline_serialized_tokens": 8740
+        },
+        "fixed_system": {
+          "bytes": 3066,
+          "offline_serialized_tokens": 649
+        },
+        "history": {
+          "bytes": 521,
+          "offline_serialized_tokens": 115
+        },
+        "dynamic": {
+          "bytes": 77053,
+          "offline_serialized_tokens": 23819
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 1,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 1,
+          "results": 1,
+          "physical_replays": 0,
+          "analysis_results": 1,
+          "control_initializations": 2
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 99,
+      "future_only_outputs_denied": 99,
+      "packet_identity": "3d7de3cba68da47b4712c823bc417d1d0d68164a8f5c0ed1be0adda52d437b18"
+    },
+    {
+      "case": "B",
+      "arm": "treatment",
+      "source_state": {
+        "artifact_id": "08b3c48a228f554b3aa6965252b26386ff940b3b0df80e772651f1ac465b2763",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "224e6b15518bd00391d41d6e6131b68412f78069850279a83f0beed6be03b36b",
+        "media_type": "application/json"
+      },
+      "source_archive": "b3_t2_pilot_050_c",
+      "event_boundary": 353,
+      "sizes": {
+        "brief": {
+          "bytes": 54463,
+          "offline_serialized_tokens": 15831
+        },
+        "same_session": {
+          "bytes": 115882,
+          "offline_serialized_tokens": 33400
+        },
+        "handoff": {
+          "bytes": 115719,
+          "offline_serialized_tokens": 33364
+        },
+        "schema": {
+          "bytes": 34902,
+          "offline_serialized_tokens": 8740
+        },
+        "fixed_system": {
+          "bytes": 3066,
+          "offline_serialized_tokens": 649
+        },
+        "history": {
+          "bytes": 521,
+          "offline_serialized_tokens": 115
+        },
+        "dynamic": {
+          "bytes": 77254,
+          "offline_serialized_tokens": 23858
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 1,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 1,
+          "results": 1,
+          "physical_replays": 0,
+          "analysis_results": 1,
+          "control_initializations": 2
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 99,
+      "future_only_outputs_denied": 99,
+      "packet_identity": "fe42f0ff5fd1abdeac3debb1618bb37f08503546168e59396523b45868f082bf"
+    },
+    {
+      "case": "C",
+      "arm": "control",
+      "source_state": {
+        "artifact_id": "6d5aaa4090ed8f74a908f9c07a308fcba0300b68649d6cf1f71d7688f3b3b160",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "c37b73f73c32e02f1db6d4d8c8f45982520a48e200594507a48c1e3d6b133b20",
+        "media_type": "application/json"
+      },
+      "source_archive": "c3_math_search_ab_100ms_20261025",
+      "event_boundary": 472,
+      "sizes": {
+        "brief": {
+          "bytes": 63962,
+          "offline_serialized_tokens": 18900
+        },
+        "same_session": {
+          "bytes": 140091,
+          "offline_serialized_tokens": 40772
+        },
+        "handoff": {
+          "bytes": 139928,
+          "offline_serialized_tokens": 40736
+        },
+        "schema": {
+          "bytes": 47564,
+          "offline_serialized_tokens": 12033
+        },
+        "fixed_system": {
+          "bytes": 2512,
+          "offline_serialized_tokens": 457
+        },
+        "history": {
+          "bytes": 520,
+          "offline_serialized_tokens": 114
+        },
+        "dynamic": {
+          "bytes": 89356,
+          "offline_serialized_tokens": 28130
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 12,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 6,
+          "results": 1,
+          "physical_replays": 1,
+          "analysis_results": 6,
+          "control_initializations": 1
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 467,
+      "future_only_outputs_denied": 467,
+      "packet_identity": "afb36039c3e61e2f0001a0991028edad352e2e487b443763b1a0bbd13f06873f"
+    },
+    {
+      "case": "C",
+      "arm": "treatment",
+      "source_state": {
+        "artifact_id": "6d5aaa4090ed8f74a908f9c07a308fcba0300b68649d6cf1f71d7688f3b3b160",
+        "media_type": "application/json"
+      },
+      "preparation": {
+        "artifact_id": "c37b73f73c32e02f1db6d4d8c8f45982520a48e200594507a48c1e3d6b133b20",
+        "media_type": "application/json"
+      },
+      "source_archive": "c3_math_search_ab_100ms_20261025",
+      "event_boundary": 472,
+      "sizes": {
+        "brief": {
+          "bytes": 64163,
+          "offline_serialized_tokens": 18939
+        },
+        "same_session": {
+          "bytes": 140292,
+          "offline_serialized_tokens": 40811
+        },
+        "handoff": {
+          "bytes": 140129,
+          "offline_serialized_tokens": 40775
+        },
+        "schema": {
+          "bytes": 47564,
+          "offline_serialized_tokens": 12033
+        },
+        "fixed_system": {
+          "bytes": 2512,
+          "offline_serialized_tokens": 457
+        },
+        "history": {
+          "bytes": 520,
+          "offline_serialized_tokens": 114
+        },
+        "dynamic": {
+          "bytes": 89557,
+          "offline_serialized_tokens": 28169
+        }
+      },
+      "source_facts": {
+        "mathematical_evaluations": 12,
+        "physical_calls": null,
+        "nmpc_calls": null,
+        "research_status": "ready",
+        "counts": {
+          "candidates": 6,
+          "results": 1,
+          "physical_replays": 1,
+          "analysis_results": 6,
+          "control_initializations": 1
+        }
+      },
+      "methods": [
+        "equilibrium",
+        "linearization",
+        "controllability",
+        "endpoint",
+        "braking",
+        "instantaneous_braking_v1",
+        "trajectory_feasibility",
+        "task_capability",
+        "input_sensitivity",
+        "design_sensitivity",
+        "native_dynamics_v1",
+        "short_input_response_v1",
+        "fixed_input_structure_v1",
+        "mujoco_direct_control_v1",
+        "sampled-affine-conic-minimax-v1",
+        "controlled-capability-sensitivity-v1"
+      ],
+      "state_unchanged": true,
+      "final_r1_refs_absent": true,
+      "future_only_outputs": 467,
+      "future_only_outputs_denied": 467,
+      "packet_identity": "bc4a3105921400dc26d172c9bd97bb2feec95db7c0644cc30a87fdce7fe5e258"
+    }
+  ],
+  "provider_requests": 0,
+  "new_scientific_evaluations": 0,
+  "raw_inputs_location": "Ignored runs/c4-decision-pairs-20261026; not published"
+}
