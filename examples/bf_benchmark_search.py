@@ -87,7 +87,8 @@ def independent(cfg, schedule, folder):
     rawref = dict(artifact_id=digest(raw), media_type='application/json')
     evaluation, profile = evaluate_playback(cfg, raw, rawref, digest(cfg))
     eref = dict(artifact_id=digest(plain(evaluation)), media_type='application/json')
-    profile.update(execution_id=folder.name, simulation=rawref, evaluation=eref)
+    # Local fixed-program identity, not a Store receipt or freshness assertion.
+    profile.update(execution_id='fixed-replay-'+digest(str(folder.resolve())), simulation=rawref, evaluation=eref)
     pref = dict(artifact_id=digest(profile), media_type='application/json')
     acceptance = assemble_acceptance(cfg, evaluation, profile, evaluation_reference=eref,
         profile_reference=pref, motion=[dict(time_s=r['time_s']) for r in raw.get('samples',[])])

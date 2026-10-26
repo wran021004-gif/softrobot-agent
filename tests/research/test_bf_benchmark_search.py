@@ -49,10 +49,12 @@ class BenchmarkDriverTests(unittest.TestCase):
         with fixture_directory() as folder, \
                 patch.object(mujoco,'mj_step',side_effect=AssertionError('zero integration')), \
                 patch.object(bf,'playback_tensions',return_value=raw):
-            result=bf.independent(cfg,context['schedule'],Path(folder))
+            result=bf.independent(cfg,context['schedule'],Path(folder)/'first')
+            second=bf.independent(cfg,context['schedule'],Path(folder)/'second')
             self.assertEqual(result['acceptance']['status'],'valid_failure')
             self.assertFalse(result['acceptance']['components']['holding_position']['passed'])
             self.assertTrue(result['acceptance']['sources']['profile']['artifact_id'])
+            self.assertNotEqual(result['acceptance']['execution_id'],second['acceptance']['execution_id'])
 
 
 if __name__=='__main__':unittest.main()
