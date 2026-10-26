@@ -163,6 +163,8 @@ def provider_usage(host):
 C3_ARMS=('control','treatment')
 C3_ROOTS=dict(control=ROOT.parent/'b3-r0-decision-efficiency',treatment=ROOT)
 C3_COMMITS=dict(control='c153e1731ae0925e756467f75a783b28abce2873',treatment='5d73965e1ed52afed689a182976064a2af80ffac')
+C32_BASELINE='891c877a94823076222a8ffae52a5bc6a4950f45'
+C32_INPUTS=ROOT.parent/'c32-scientific-decision-probe/runs/c32-final'
 C3_SCOPE=(
     'C3 is an isolated read-only decision experiment. The packet is a frozen historical '
     'boundary, not a live Study. You may evidence_read first or propose your next action '
@@ -220,10 +222,11 @@ def c3_freeze(out):
     return rows
 
 
-async def c3_live(out,followup=False):
+async def c3_live(out,followup=False,*,c32=None,test_transport=None):
     """Reuse the original probe's transport/ledger; two bounded rounds, no dispatch."""
-    frozen=read(out/'frozen.json')
-    if not frozen['offline_passed'] or frozen['scope']!=C3_SCOPE:raise ValueError('C3_OFFLINE_GATE_REQUIRED')
+    frozen=c32['frozen'] if c32 else read(out/'frozen.json')
+    if not c32 and (not frozen['offline_passed'] or frozen['scope']!=C3_SCOPE):raise ValueError('C3_OFFLINE_GATE_REQUIRED')
+    run_id='c32-scientific-decision-probe' if c32 else 'c3-agent-decision-efficiency'
     summary_path=out/'summary.json'
     if summary_path.exists() and not followup:raise ValueError('C3_NO_AUTOMATIC_RESEND')
     if followup:
@@ -231,23 +234,29 @@ async def c3_live(out,followup=False):
         if (summary['status']!='first_six_complete' or summary['actual_requests']!=6 or
                 summary['confirmed_responses']!=6 or any(r['turn']==2 or r.get('error') for r in summary['results'])):
             raise ValueError('C3_FOLLOWUP_REQUIRES_EXACT_COMPLETED_FIRST_SIX')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id='c3-agent-decision-efficiency')
+        host=SimpleNamespace(store=Store(out/'provider'),run_id=run_id)
     else:
         if (out/'provider/platform.sqlite').exists():raise ValueError('C3_EXISTING_LEDGER_NO_RESEND')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id='c3-agent-decision-efficiency')
-        project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id+'-12',authorization_source=frozen['authorization'],
+        host=SimpleNamespace(store=Store(out/'provider'),run_id=run_id)
+        authorization=json.dumps(c32['approval'],ensure_ascii=False) if c32 else frozen['authorization']
+        project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id+'-12',authorization_source=authorization,
             budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1})
         host.store.create(project)
         host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='isolated read-only C3 Provider accounting; not a Study'))
         update(host,pilot=dict(provider=frozen['provider'],live_model_requests=0))
-        record(host,'provider_egress_authorization',dict(user_approval=frozen['authorization'],endpoint=frozen['provider']['base_url']+'/chat/completions',ceiling=12))
+        record(host,'provider_egress_authorization',dict(user_approval=authorization,endpoint=frozen['provider']['base_url']+'/chat/completions',ceiling=12))
         summary=dict(status='running',results=[],scientific_workers=0,formal_studies=0,physics_steps=0,reporter_requests=0)
-    provider=frozen['provider'];boundary=LiveBoundary(host);turn=2 if followup else 1
+        if c32:
+            summary.update(experiment='C3.2',commits=frozen['commits'],frozen_inputs=str(c32['inputs']),approval=c32['approval'])
+            atomic_json(out/'input_binding.json',dict(frozen=frozen,requests={f'{c}-{a}':w for (c,a),w in c32['requests'].items()}))
+    provider=frozen['provider'];boundary=LiveBoundary(host,test_transport);turn=2 if followup else 1
     try:
         for case,arm in (reversed(frozen['order']) if followup else frozen['order']):
-            base=read(out/f'{case}-{arm}.json');wire=deepcopy(base['handoff_wire'])
-            wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
-            wire['messages'][0]['content']+='\n\n'+C3_SCOPE
+            if c32:wire=deepcopy(c32['requests'][case,arm])
+            else:
+                base=read(out/f'{case}-{arm}.json');wire=deepcopy(base['handoff_wire'])
+                wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
+                wire['messages'][0]['content']+='\n\n'+C3_SCOPE
             if followup:
                 prior=read(out/f'{case}-{arm}-1-request.json');body=read(out/f'{case}-{arm}-1-response.json')
                 feedback=read(out/f'{case}-{arm}-1-feedback.json')
@@ -255,21 +264,37 @@ async def c3_live(out,followup=False):
                     dict(role='tool',tool_call_id=r['tool_call_id'],content=json.dumps(r,ensure_ascii=False)) for r in feedback]
                 wire['messages'].append(dict(role='user',content='This is the second and final C3 turn. Reassess the actual read-only feedback and submit your next decision. No scientific proposal was executed.'))
             # Provider configuration is identical to the original R1 model, both arms.
-            wire.update(model=provider['model'],max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],thinking={'type':provider['thinking']},stream=False,tool_choice='auto')
+            if not c32:wire.update(model=provider['model'],max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],thinking={'type':provider['thinking']},stream=False,tool_choice='auto')
             label=f'{case}-{arm}-{turn}';atomic_json(out/f'{label}-request.json',wire)
             result=dict(case=case,arm=arm,turn=turn,scientific_execution='not_dispatched',input_bytes=len(httpx.Request('POST','https://offline.invalid',json=wire).content))
             summary['results'].append(result)
+            if c32:boundary.last_request=None
             try:
                 response=await boundary.handle_async_request(httpx.Request('POST',provider['base_url'].rstrip('/')+'/chat/completions',json=wire,
                     headers={'Authorization':'Bearer '+os.environ['DEEPSEEK_API_KEY']},extensions={'timeout':dict(connect=30,read=provider['timeout_s'],write=30,pool=30)}))
                 response.raise_for_status();body=response.json();atomic_json(out/f'{label}-response.json',body)
-                calls=body['choices'][0]['message'].get('tool_calls') or []
+                result['message']=body['choices'][0]['message']
+                calls=result['message'].get('tool_calls') or []
                 result.update(request_id=boundary.last_request,usage=body.get('usage'),finish_reason=body['choices'][0].get('finish_reason'),tool_calls=len(calls),
                     evidence_reads=sum(c['function']['name']=='evidence_read' for c in calls))
                 atomic_json(out/f'{label}-tools.json',calls)
-                c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json')
+                if c32:
+                    definition=frozen['protocol']['cases'][case]
+                    c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json',
+                        source=(definition['folder'],definition['sequence']),roots=c32['roots'])
+                else:c3_boundary(case,arm,out/f'{label}-feedback.json',out/f'{label}-tools.json')
                 result['feedback']=read(out/f'{label}-feedback.json')
-                result['message']=body['choices'][0]['message']
+                if c32:
+                    permissions=next(r['method_permissions'] for r in frozen['offline'] if r['case']==case and r['arm']==arm)
+                    for call,feedback in zip(calls,result['feedback']):
+                        if feedback['name'] not in ('research_plan','research_analysis') or feedback['result'].get('status')!='proposal_recorded':continue
+                        args=json.loads(call['function']['arguments'])
+                        method=(args.get('decision') or {}).get('selected_method') or args.get('capability_method') or args.get('operation')
+                        feedback['result']['method_authorization']=dict(method=method,catalog=permissions.get(method),
+                            scope='Frozen planning authorization only; complete execution admission remains unchecked. Proposal recording grants no permission.')
+                    atomic_json(out/f'{label}-feedback.json',result['feedback'])
+                    result['feedback_reference']=record(host,'c32_read_only_feedback',dict(request_id=boundary.last_request,
+                        case=case,arm=arm,turn=turn,source_state=definition['source_state'],feedback=result['feedback']))
                 boundary.consumed()
                 print(label+': '+str(len(calls))+' tool calls',flush=True)
             except BaseException as exc:
@@ -284,7 +309,7 @@ async def c3_live(out,followup=False):
 
 
 def c32_freeze(out):
-    """Additional saved boundaries using the C3 archive/projection, with no live entry point."""
+    """Additional saved boundaries using the C3 archive/projection; never sends."""
     import subprocess
     from tools.research.provider_context import official_tokenizer
     protocol=read(Path(__file__).with_name('fixtures')/'c32_scientific_decision_protocol.json')
@@ -312,11 +337,7 @@ def c32_freeze(out):
                     d['future_only_outputs']!=d['future_only_outputs_denied']):raise ValueError('C32_TEMPORAL_GATE_FAILED')
             if any(q['status']=='failed' and not q['historical_read_query'] for q in d['query_checks']):
                 raise ValueError('C32_EVIDENCE_ENTRY_FAILED: '+str(path))
-            wire=deepcopy(d['handoff_wire'])
-            wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
-            wire['messages'][0]['content']+='\n\n'+scope
-            wire.update(model=provider['model'],max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
-                thinking={'type':provider['thinking']},stream=False,tool_choice='auto')
+            wire=c32_first_wire(d,provider,scope)
             atomic_json(out/f'{case}-{arm}-1-request.json',wire)
             rows.append(dict(case=case,arm=arm,**{k:d[k] for k in ('source_state','preparation','source_archive','event_boundary',
                 'original_next_request','methods','allowed_artifact_count','future_only_outputs','future_only_outputs_denied','source_facts')},
@@ -345,6 +366,169 @@ def c32_freeze(out):
         order=[(case,arm) for i,case in enumerate(protocol['cases']) for arm in (C3_ARMS if i%2==0 else C3_ARMS[::-1])])
     atomic_json(out/'frozen.json',summary)
     return summary
+
+
+def c32_first_wire(base,provider,scope):
+    """The original freeze projection, also used to check saved first requests."""
+    wire=deepcopy(base['handoff_wire'])
+    wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
+    wire['messages'][0]['content']+='\n\n'+scope
+    wire.update(model=provider['model'],max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
+        thinking={'type':provider['thinking']},stream=False,tool_choice='auto')
+    return wire
+
+
+def c32_inputs(inputs):
+    """Validate existing files against the committed protocol; no historical reprojection."""
+    import subprocess
+    def pinned(path):
+        return json.loads(subprocess.check_output(['git','show',C32_BASELINE+':'+path],cwd=ROOT,text=True,encoding='utf8'))
+    protocol=pinned('tests/research/fixtures/c32_scientific_decision_protocol.json')
+    published=pinned('evidence/c32_scientific_decision_probe/summary.json')
+    inputs=Path(inputs).resolve();frozen=read(inputs/'frozen.json')
+    if (read(ROOT/'tests/research/fixtures/c32_scientific_decision_protocol.json')!=protocol or
+            frozen['protocol']!=protocol or frozen['commits']!=protocol['commits'] or not frozen['offline_passed'] or
+            frozen['provider']!=published['provider'] or frozen['scope']!=C3_SCOPE.replace('C3 is','C3.2 is')):
+        raise ValueError('C32_FROZEN_PROTOCOL_OR_BASELINE_CHANGED')
+    order=[[case,arm] for i,case in enumerate(protocol['cases']) for arm in (C3_ARMS if i%2==0 else C3_ARMS[::-1])]
+    if frozen['order']!=order:raise ValueError('C32_FROZEN_ORDER_CHANGED')
+    roots={a:ROOT.parent/protocol['checkouts'][a] for a in C3_ARMS}
+    for arm,root in roots.items():
+        if subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()!=protocol['commits'][arm]:
+            raise ValueError('C32_BASELINE_MISMATCH: '+arm)
+        subprocess.run(['git','diff','--quiet','HEAD','--','tools','schemas','extensions','configs','tasks'],cwd=root,check=True)
+    requests={}
+    for case,arm in order:
+        base=read(inputs/f'{case}-{arm}.json');wire=read(inputs/f'{case}-{arm}-1-request.json')
+        row=next(r for r in frozen['offline'] if r['case']==case and r['arm']==arm)
+        saved=published['cases'][case]
+        if (base['source_state']!=saved['source']['source_state'] or row['source_facts']!=saved['facts'] or
+                row['method_permissions']!=saved['method_permissions'] or not base['state_unchanged'] or
+                not base['final_r1_refs_absent'] or base['future_only_outputs']!=base['future_only_outputs_denied']):
+            raise ValueError('C32_FROZEN_EVIDENCE_CHANGED')
+        if (wire!=c32_first_wire(base,frozen['provider'],frozen['scope']) or
+                len(httpx.Request('POST','https://offline.invalid',json=wire).content)!=saved['arms'][arm]['sizes']['probe_first_request']['bytes']):
+            raise ValueError('C32_FROZEN_REQUEST_CHANGED: '+case+'-'+arm)
+        requests[case,arm]=wire
+    return dict(inputs=inputs,frozen=frozen,roots=roots,requests=requests)
+
+
+def c32_approval(path,context):
+    """An explicit user approval record, separate from the pending frozen protocol."""
+    if path is None:raise ValueError('C32_EXPLICIT_EGRESS_APPROVAL_REQUIRED')
+    approval=read(path);f=context['frozen']
+    expected=dict(experiment='C3.2',approved=True,endpoint=f['provider']['base_url'].rstrip('/')+'/chat/completions',
+        model=f['provider']['model'],max_requests=12,commits=f['commits'],
+        data_scope='six_frozen_inputs_and_read_only_followup',scientific_execution=False,no_retries=True)
+    if (any(approval.get(k)!=v for k,v in expected.items()) or approval.get('approved') is not True or
+            approval.get('scientific_execution') is not False or approval.get('no_retries') is not True or
+            not isinstance(approval.get('user_approval'),str) or not approval['user_approval'].strip() or
+            approval['user_approval'].strip().upper().startswith('PENDING') or
+            Path(approval.get('frozen_inputs','')).resolve()!=context['inputs']):
+        raise ValueError('C32_EXPLICIT_EGRESS_APPROVAL_REQUIRED: frozen inputs, endpoint, model, 12-request ceiling and zero science must match')
+    return approval
+
+
+async def c32_live(out,inputs=C32_INPUTS,approval_file=None,followup=False,*,test_transport=None):
+    context=c32_inputs(inputs);out=Path(out).resolve()
+    context['approval']=c32_approval(approval_file,context)
+    if out==context['inputs'] or context['inputs'] in out.parents:raise ValueError('C32_OUTPUT_MUST_NOT_MODIFY_FROZEN_INPUTS')
+    if followup:
+        binding=read(out/'input_binding.json')
+        if (binding['frozen']!=context['frozen'] or binding['requests']!={f'{c}-{a}':w for (c,a),w in context['requests'].items()} or
+                read(out/'summary.json')['approval']!=context['approval']):raise ValueError('C32_BOUND_INPUT_OR_APPROVAL_CHANGED')
+        review=c32_review(out,context=context)
+        atomic_json(out/'review.json',review)
+        if not review['first_batch_validity']['passed']:raise ValueError('C32_FIRST_BATCH_VALIDITY_REQUIRED')
+    elif (out/'summary.json').exists() or (out/'provider/platform.sqlite').exists():
+        raise ValueError('C32_NO_AUTOMATIC_RESEND')
+    if test_transport is None:load_credential(Path('~/.codex/.env').expanduser())
+    return await c3_live(out,followup,c32=context,test_transport=test_transport)
+
+
+def c32_review(out,inputs=C32_INPUTS,*,context=None):
+    """Accounted outputs plus the frozen human rubric; never an automatic science grade."""
+    context=context or c32_inputs(inputs);out=Path(out);f=context['frozen']
+    summary=read(out/'summary.json') if (out/'summary.json').exists() else dict(status='not_started',results=[])
+    results=summary['results'];checks=[];totals=dict(public_tool_calls=0,evidence_reads=0,error_queries=0,
+        invalid_tool_json=0,schema_legal_proposals=0,unchanged_content_rechecks=0,empty_object_reads=0,unprocessed_tool_calls=0)
+    worksheets={case:{arm:dict(ratings={axis:None for axis in f['protocol']['rubric_offline_only']['axes']},
+        first_credible_proposal_cost=None,turns=[]) for arm in C3_ARMS} for case in f['protocol']['cases']}
+    seen={};first=[r for r in results if r['turn']==1]
+    checks.append(dict(check='six_original_first_turns',passed=[[r['case'],r['arm']] for r in first]==f['order']))
+    for r in results:
+        case,arm,turn=r['case'],r['arm'],r['turn'];label=f'{case}-{arm}-{turn}'
+        wire=read(out/f'{label}-request.json')
+        if turn==1:checks.append(dict(check=label+'-frozen-input',passed=wire==context['requests'][case,arm]))
+        message=r.get('message');calls=(message.get('tool_calls') or []) if isinstance(message,dict) else []
+        feedback=r.get('feedback',[])
+        checks.append(dict(check=label+'-processed-feedback',passed=not r.get('error') and
+            [c.get('id') for c in calls]==[v['tool_call_id'] for v in feedback] and isinstance(message,dict)))
+        totals['public_tool_calls']+=len(calls)
+        totals['unprocessed_tool_calls']+=max(0,len(calls)-len(feedback))
+        for i,call in enumerate(calls):
+            function=call.get('function') or {};name=function.get('name')
+            try:args=json.loads(function.get('arguments',''))
+            except (ValueError,TypeError):totals['invalid_tool_json']+=1;args=None
+            totals['evidence_reads']+=int(name=='evidence_read')
+            if i>=len(feedback):continue
+            value=feedback[i]
+            if name=='evidence_read':
+                totals['error_queries']+=int(value['status']=='error')
+                if value['status']=='success':
+                    key=(case,arm,json.dumps(args,sort_keys=True));content=json.dumps(value['result'],sort_keys=True)
+                    totals['unchanged_content_rechecks']+=int(seen.get(key)==content)
+                    totals['empty_object_reads']+=int(value['result']=={})
+                    seen[key]=content
+            elif name in ('research_plan','research_analysis') and value['status']=='success':
+                totals['schema_legal_proposals']+=1
+                checks.append(dict(check=label+'-proposal-not-executed',passed=value['result'].get('new_scientific_computations')==0
+                    and value['result'].get('observation') is None and bool(value['result'].get('unchecked_execution_preconditions'))))
+        worksheets[case][arm]['turns'].append(dict(turn=turn,request_id=r.get('request_id'),usage=r.get('usage'),
+            error=r.get('error'),message=r.get('message'),feedback=feedback))
+    if (out/'provider/platform.sqlite').exists():
+        host=SimpleNamespace(store=Store(out/'provider'),run_id='c32-scientific-decision-probe');accounting=provider_usage(host)
+        ledger=accounting['provider_ledger']
+        events=host.store.events(host.run_id)
+        feedback_records={v['request_id']:v for e in events if e['kind']=='c32_read_only_feedback'
+            for v in [host.store.artifact(e['outputs'][0])]}
+        receptions={e['request_id']:host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='r3_response'}
+        checks.append(dict(check='settled_ledger_and_zero_science',passed=accounting['actual_requests']==len(results)==accounting['confirmed_responses']
+            and ledger['occupied'].get('provider_request',0)==0 and ledger['used']['worker_calls']==0 and ledger['used']['backend_solves']==0
+            and not host.store.session(host.run_id)['state']['pilot'].get('unconsumed_response')))
+        for r in results:
+            event=next((e for e in host.store.events(host.run_id) if e['kind']=='r3_request' and e['request_id']==r.get('request_id')),None)
+            saved=host.store.artifact(host.store.artifact(event['outputs'][0])['request']) if event else None
+            checks.append(dict(check=str(r.get('request_id'))+'-store-wire',passed=saved==read(out/f"{r['case']}-{r['arm']}-{r['turn']}-request.json")))
+            if not r.get('error'):
+                label=f"{r['case']}-{r['arm']}-{r['turn']}"
+                original=json.loads(host.store.artifact(receptions[r['request_id']]['body'],raw=True))
+                feedback=feedback_records.get(r['request_id'],{})
+                checks.append(dict(check=label+'-original-response-and-feedback',passed=
+                    original==read(out/f'{label}-response.json') and original['choices'][0]['message']==r['message'] and
+                    feedback.get('feedback')==r.get('feedback')==read(out/f'{label}-feedback.json') and
+                    feedback.get('source_state')==f['protocol']['cases'][r['case']]['source_state']))
+    else:
+        accounting=dict(actual_requests=0,confirmed_responses=0,usage=dict(prompt_tokens=0,completion_tokens=0,total_tokens=0),money=None)
+        checks.append(dict(check='ledger_exists',passed=False))
+    events=host.store.events(host.run_id) if (out/'provider/platform.sqlite').exists() else []
+    responses={e['request_id']:host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='r3_response'}
+    sent_ids={e['request_id'] for e in events if e['kind']=='r3_request'}
+    for arms in worksheets.values():
+        for worksheet in arms.values():
+            for turn in worksheet['turns']:
+                response=responses.get(turn['request_id'])
+                if response:
+                    turn['response_record']=response
+                    turn['usage']=response.get('usage')
+            usage=[t['usage'] for t in worksheet['turns'] if t['request_id'] in sent_ids]
+            worksheet['actual_requests']=len(usage)
+            worksheet['usage']={key:sum(u[key] for u in usage) if all(u and key in u for u in usage) else None
+                for key in ('prompt_tokens','completion_tokens','total_tokens')}
+    return dict(status=summary['status'],**accounting,**totals,scientific_workers=0,physics_steps=0,formal_studies=0,
+        first_batch_validity=dict(passed=bool(first) and all(c['passed'] for c in checks),checks=checks),
+        rubric_offline_only=f['protocol']['rubric_offline_only'],worksheets=worksheets,
+        scientific_verdict='insufficient_evidence',review_scope='Unscored original outputs and frozen rubric. A human must assess scientific basis and first credible proposal; Schema acceptance is not scientific value. Rechecks are not automatically waste.')
 
 
 async def live(out=OUT, *, test_transport=None, host=None):
@@ -431,16 +615,26 @@ async def live(out=OUT, *, test_transport=None, host=None):
 def main():
     global SUMMARY
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live','c32-freeze'))
+    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live','c32-freeze','c32-live','c32-review'))
     parser.add_argument('--results',type=Path,help='Read-only review of saved original probe results')
     parser.add_argument('--cases',type=Path,default=CASES)
     parser.add_argument('--out',type=Path)
-    parser.add_argument('--approval-file',type=Path,help='Future explicit approval text; cannot authorize an unbound draft')
-    parser.add_argument('--c3-followup',action='store_true',help='One bounded second turn after the first six; shares the hard 12-request ledger')
+    parser.add_argument('--approval-file',type=Path,help='Explicit user egress approval record; C3.2 requires the bound JSON fields')
+    parser.add_argument('--frozen-inputs',type=Path,default=C32_INPUTS,help='Existing C3.2 frozen directory; never regenerated by live/review')
+    parser.add_argument('--c3-followup','--followup',action='store_true',help='One bounded second turn after the first six; shares the hard 12-request ledger')
     args = parser.parse_args()
     out=args.out or OUT
     if args.out:SUMMARY=out/'summary.json'
-    if args.mode=='c32-freeze':
+    if args.mode in ('c32-live','c32-review'):
+        if args.out is None:parser.error('C3.2 requires an independent --out directory')
+        if args.mode=='c32-live':
+            result=asyncio.run(c32_live(out,args.frozen_inputs,args.approval_file,args.c3_followup))
+            print(json.dumps({k:result[k] for k in ('status','actual_requests','usage')},ensure_ascii=False))
+        else:
+            result=c32_review(out,args.frozen_inputs)
+            atomic_json(out/'review.json',result)
+            print(json.dumps({k:result[k] for k in ('status','actual_requests','usage','first_batch_validity','scientific_verdict')},ensure_ascii=False))
+    elif args.mode=='c32-freeze':
         if args.out is None:parser.error('C3.2 requires an independent --out directory')
         result=c32_freeze(out.resolve())
         print('C3.2 offline pairs: '+str(len(result['offline']))+'; Provider=0; science=0; explicit egress approval pending')
