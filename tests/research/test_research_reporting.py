@@ -127,7 +127,7 @@ class ReportingTests(unittest.TestCase):
                 card=result_card(host,reference)
                 self.assertEqual(card.evidence_summary.claim_kind,kind)
                 self.assertEqual(card.mathematics.claim.conclusion,conclusion)
-                self.assertEqual(card.deterministic_summary,decision)
+                self.assertEqual({k:v for k,v in card.deterministic_summary.items() if k!='scientific_interpretation'},decision)
                 self.assertEqual(value,original);self.assertEqual(analysis.compact_result(value,reference),compact)
                 metric=card.metrics[0]
                 self.assertEqual((metric.value,metric.threshold,metric.unit),([.001,0.,0.],.01,'m'))

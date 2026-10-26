@@ -60,6 +60,9 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
     import numpy as np
     q=AnalysisRequest.model_validate(query)
+    if q.nonlinear_response is not None:
+        from tools.research.nonlinear_capability import calculate as aggregate
+        return aggregate(configuration,binding,q,describe_analysis_requirements(configuration,binding),design_context)
     if q.optimal_sensitivity is not None:
         from tools.research.optimal_capability import calculate_sensitivity
         if not design_context or design_context.get('kind')!='controlled-capability-sensitivity-v1':
@@ -245,8 +248,11 @@ def scoped_result(result, requirements, applicability, query):
         if result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
-            if query.operation=='mujoco_direct_control_v1':
+            if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
                 interpretation='Bounded native sequence search with nonlinear sampled checks; full physical replay and frozen task acceptance remain independent.'
+        elif result.get('nonlinear_response'):
+            conclusion,verification,pointer='diagnostic',result['nonlinear_response']['direction_status'],'/nonlinear_response'
+            interpretation='Evidence-only finite-budget structural secants; direction is conditional or unresolved.'
         elif result.get('optimal_sensitivity'):
             conclusion,verification,pointer='diagnostic',result['optimal_sensitivity']['direction_status'],'/optimal_sensitivity'
             interpretation='Controlled reoptimized finite differences of sampled local models; no strict structural gradient, regional descent or physical improvement guarantee.'
@@ -322,6 +328,10 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
+    from tools.research.nonlinear_capability import METHODS, saved_context
+    if q.operation in METHODS and ('analysis' not in state(host)['spec']['capabilities'] or
+            not state(host)['spec'].get('mathematical_methods',{}).get(METHODS[q.operation])):
+        return dict(status='not_applicable',reason='EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED',task_acceptance='unmeasured')
     if q.control_optimization:
         settings=q.control_optimization.settings
         for name,limit in state(host)['spec'].get('native_control_limits',{}).items():
@@ -342,7 +352,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     except (ValueError,KeyError) as exc:
         if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
         raise
-    sensitivity_context=None
+    sensitivity_context=saved_context(host,q) if q.nonlinear_response else None
     if q.structure_response:
         from tools.research.native_analysis import structure_context
         sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response)
@@ -392,7 +402,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if c.get('generation_version'):
         binding.update(canonical_task_identity=c['task_identity'],initialization_provenance=c['initialization_provenance'])
     point=None
-    if q.model_source=='mujoco':
+    if q.nonlinear_response:
+        binding['coordinate_order']=[]
+    elif q.model_source=='mujoco':
         from tools.research.numerics import native_point
         point=native_point(host,q,cfg)
         binding['coordinate_order']=point['dof_order']
@@ -522,9 +534,9 @@ def recover(host):
         value['recorded_return_boundaries']={kind:sum(e['kind']==kind and e['stage']=='returned' for e in value['numerical_call_events'])
             for kind in ('model_build','capability','dual_face')}
         value['attempt_boundary_semantics']='Durable pre-call boundaries; interruption between checkpoint and call cannot establish that the solver entered. Reserved evaluations never reset.'
-    if value['status'] not in ('computed','unavailable','not_applicable'):
+    if value['status'] not in ('computed','unavailable','not_applicable','not_comparable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
-    if value.get('operation')=='mujoco_direct_control_v1' and value['status']=='computed':
+    if value.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') and value['status']=='computed':
         from tools.research.physical_replay import binding as schedule_binding
         schedule=value['native_dynamics']['optimized_schedule']
         schedule_binding(verify_candidate(host,value['candidate'])['configuration'],schedule['trajectory'])
@@ -606,6 +618,8 @@ def compact_result(value, reference):
         from tools.research.capability import sensitivity_summary
         summary.pop('task_capability',None)
         summary['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
+    from tools.research.capability import nonlinear_summary
+    summary.update(nonlinear_summary(value))
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
@@ -676,6 +690,8 @@ def decision_result(value, reference):
         from tools.research.capability import sensitivity_summary
         result.pop('task_capability',None)
         result['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
+    from tools.research.capability import nonlinear_summary
+    result.update(nonlinear_summary(value))
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary

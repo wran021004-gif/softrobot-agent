@@ -17,6 +17,7 @@ def decision_summary(value):
     summary['question']={
         'native_dynamics_v1':'Which native forces and drive directions determine acceleration at this state?',
         'short_input_response_v1':'How do legal tensions affect the short endpoint, and does one local correction improve its constraints?',
+        'mujoco_nonlinear_task_capability_v1':'What is the best found full-task signed J under this finite native search?',
         'mujoco_direct_control_v1':'Can bounded native sequence optimization improve every holding sample before independent full replay?',
         'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
     if value['operation']=='native_dynamics_v1':
@@ -88,10 +89,14 @@ def applicability(requirements, query, assessed, point):
     point=point or {};start=point.get('actual_time_s')
     initial=query.operating_point=='standardized_initial_pretension'
     if initial:point=point or dict(actual_time_s=0.);start=0.
+    if query.operation=='mujoco_reoptimized_structure_response_v1':
+        return dict(status='not_applicable' if reasons else 'applicable',reasons=reasons,
+            constraint_coverage=[],full_task_supported=False,execution_support='saved_evidence_only',model_assessment=assessed,
+            horizon=dict(task_duration_s=requirements.duration_s,interpretation='Aggregate existing complete T1 evidence; no new integration.'))
     horizon=0. if query.operation=='native_dynamics_v1' else query.native.horizon_s
     if not initial and (query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay'))):
         reasons.append('Exact native integration checkpoint required; a GVS state cannot substitute.')
-    if query.operation=='mujoco_direct_control_v1':
+    if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
         from tools.research.native_control import window_applicability
         return window_applicability(requirements,query,assessed,point,reasons)
     p=query.protocol
@@ -131,7 +136,7 @@ def calculate(configuration, binding, query, point, requirements, comparisons, *
     from extensions.tendon_family.mujoco_analysis import calculate as kernel
     from tools.research.control_correction import constrained_response_step
     from tools.research.analysis import scoped_result
-    if query.operation=='mujoco_direct_control_v1':
+    if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
         from tools.research.native_control import calculate as optimize
         return optimize(configuration,binding,query,point,requirements,comparisons,checkpoint)
     started=time.perf_counter()

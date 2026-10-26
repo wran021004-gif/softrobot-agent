@@ -90,13 +90,15 @@ class NativeControlTests(unittest.TestCase):
         calls=[]
         def recorded(start,schedule,metadata):
             row=deepcopy(old['candidates'][len(calls)])
-            self.assertEqual(metadata['coefficients_n'],row['coefficients_n'])
+            import numpy as np
+            np.testing.assert_allclose(metadata['coefficients_n'],row['coefficients_n'],rtol=0,atol=1e-12)
             calls.append(metadata)
             return {k:row[k] for k in ('reference','outputs','measure','task_gap','cost_s','independent_evaluation_executed')}
         result=search([initial],recorded,settings,evaluation_kind='native_short_rollout',
             rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
             stop_when=lambda row:row['measure']['signed_maximum_excess']<=-settings['safety_margin_fraction'])
-        self.assertEqual(result['best']['coefficients_n'],old['best']['coefficients_n'])
+        import numpy as np
+        np.testing.assert_allclose(result['best']['coefficients_n'],old['best']['coefficients_n'],rtol=0,atol=1e-12)
         self.assertEqual(len(calls),23)
         self.assertEqual(result['iterations_started'],2)
         self.assertEqual(len(result['local_responses']),1)

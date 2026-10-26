@@ -275,3 +275,15 @@ def populate_sensitivity(mathematics, value, reference):
         for i,r in enumerate(value.get('reoptimized_finite_difference',[]))]
     return mathematics.model_copy(update=dict(quantities=quantities,
         problem_definition=EvidenceLocation(reference=reference,pointer='/optimal_sensitivity/parameter_identity')))
+
+
+def nonlinear_summary(value):
+    """Small L1 facts; schedules, trajectories and local responses stay in Store."""
+    result={}
+    if value.get('nonlinear_capability'):
+        t=value['nonlinear_capability']
+        result['nonlinear_capability']={k:t[k] for k in ('method','status','J','initial_J','improvement',
+            'best_metrics','stop_reason','callbacks','physics_steps','response_steps_completed','limitations','detail_pointer')}
+    if value.get('nonlinear_response'):
+        result['nonlinear_response']=value['nonlinear_response']
+    return result
