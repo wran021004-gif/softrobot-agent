@@ -59,11 +59,18 @@ def perfect_tracking_worker(command, log, timeout):
     request=read(Path(command[-1]));cfg=request['configuration']
     times=np.arange(round(cfg['task']['timing']['duration_s']/cfg['task']['timing']['sample_period_s'])+1)*cfg['task']['timing']['sample_period_s']
     positions=task_adapter(cfg).reference_at(times)[0]
+    oriented=cfg['task']['family']=='task.oriented_tracking'
+    if oriented:
+        from extensions.reference.contracts import OrientedTrackingGoal
+        goal=OrientedTrackingGoal.model_validate(cfg['task']['goal']['data'])
     atomic_json(Path(command[-1]).parent/'result.json',dict(
         fixture='Fabricated perfect motion; no physics executed', status='completed',
+        **(dict(rigid_tool_binding=dict(matched=True),environment_contact=dict(contact_free=True,
+            checked_physics_steps=round(cfg['task']['timing']['duration_s']/cfg['task']['timing']['timestep_s']))) if oriented else {}),
         physics_steps=round(cfg['task']['timing']['duration_s']/cfg['task']['timing']['timestep_s']),
         tendon_order=request['trajectory']['tendon_order'], samples=[dict(time_s=float(t),tip_m=p.tolist(),
             **(dict(tip_tool_axis_world=cfg['task']['goal']['data']['target_axis_world']) if cfg['task']['family']=='task.position_tool_axis' else {}),
+            **(dict(tip_tool_axis_world=goal.axis_at_time(float(t))) if oriented else {}),
             speed_m_s=0.,actual_tension_n=u) for t,p,u in zip(times,positions,[request['trajectory']['tensions_n'][0],*request['trajectory']['tensions_n']])]))
     return SimpleNamespace(returncode=0)
 
@@ -170,6 +177,9 @@ class CrossTaskIntegrationTests(unittest.TestCase):
     def test_bf5_public_generation_discovery_replay_read_select(self):
         self.public_route('study_bf5_public.json',{'tool_position','tool_axis_direction'})
 
+    def test_bf6_public_generation_discovery_replay_read_select(self):
+        self.public_route('study_bf6_public.json',{'timed_tracking','tool_axis_direction'})
+
     def public_route(self,leaf,constraints):
         from tools.research.agent import plan_schema
         from tools.research.task_constraints import mathematical_method_view
@@ -182,7 +192,7 @@ class CrossTaskIntegrationTests(unittest.TestCase):
                     family_version=spec['family_space']['version'])
                 self.assertIn('physical_replay',schema['properties']['action']['enum'])
                 request=dict(version='serial_family_generation_v2',family_space_identity=spec['family_space_identity'],
-                    segment_count=2,tendon_count=6,control_weights=dict(holding_tip_speed_weight=0.,terminal_tip_speed_weight=0.))
+                    segment_count=2,tendon_count=6)
                 generated=core.dispatch(host,plan('generate',generation=request),'generate')['result']
                 self.assertEqual(generated['status'],'generated',generated)
                 candidate=generated['candidate']
@@ -191,6 +201,15 @@ class CrossTaskIntegrationTests(unittest.TestCase):
                 self.assertTrue(native['formal_execution_authorized'])
                 self.assertNotEqual(native['planning_status'],'unsupported')
                 self.assertEqual({c['constraint_id'] for c in native['coverage']},constraints)
+                if 'tool_axis_direction' in constraints:
+                    from tools.research.research_context import context
+                    actions=context(host)['decision_feedback']['actions']
+                    routes=[r for r in actions if r.get('method') in ('nmpc','direct','residual')]
+                    self.assertTrue(routes)
+                    self.assertTrue(all(r['status']=='not_applicable' for r in routes))
+                    # Affine/GVS/CONIC coverage may not replace the required direction.
+                    self.assertFalse(methods['trajectory_feasibility']['full_task_supported'])
+                    self.assertEqual(methods['trajectory_feasibility']['planning_status'],'unsupported')
                 seed=core.dispatch(host,plan('initialize_control',candidate,
                     control_seed=dict(candidate=candidate)),'seed')['result']['source']
                 with patch('tools.service_execution._run_contained',side_effect=perfect_tracking_worker):
@@ -204,6 +223,23 @@ class CrossTaskIntegrationTests(unittest.TestCase):
                 self.assertFalse(eligibility(host,result['reference'],selection=True)['eligible'])
                 core.read_evidence(host,dict(reference=result['reference'],view='full'))
                 self.assertTrue(eligibility(host,result['reference'],selection=True)['eligible'])
+                if leaf=='study_bf6_public.json':
+                    # Existing SELECT must refuse complete contact failures and incomplete evidence.
+                    failed=deepcopy(result);failed.pop('reference')
+                    failed['acceptance'].update(status='valid_failure',accepted=False)
+                    failed['acceptance']['components']['no_environment_contact'].update(passed=False,value=False)
+                    failed_ref=save(host,failed,'fabricated_contact_failure_fixture')
+                    update(host,physical_replays=[*state(host)['physical_replays'],failed_ref])
+                    core.read_evidence(host,dict(reference=failed_ref,view='full'))
+                    self.assertFalse(eligibility(host,failed_ref,selection=True)['eligible'])
+                    incomplete=deepcopy(result);incomplete.pop('reference')
+                    incomplete['status']='execution_incomplete'
+                    incomplete['acceptance'].update(status='incomplete',accepted=None)
+                    incomplete['acceptance']['components']['execution_complete'].update(passed=False,value=False)
+                    incomplete_ref=save(host,incomplete,'fabricated_incomplete_fixture')
+                    update(host,physical_replays=[*state(host)['physical_replays'],incomplete_ref])
+                    core.read_evidence(host,dict(reference=incomplete_ref,view='full'))
+                    self.assertFalse(eligibility(host,incomplete_ref,selection=True)['eligible'])
                 selected=core.dispatch(host,plan('select',selected_execution=result['reference']),'select')
                 self.assertTrue(selected['result']['selected'])
                 self.assertEqual(host.store.remaining()['used']['backend_solves'],1)

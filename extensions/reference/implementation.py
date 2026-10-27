@@ -82,6 +82,63 @@ def evaluate_tool_axis(task,result,source,reg,identity):
         metrics=[Metric(name=n,value=v,units=u) for _,n,v,_,u in values],
         constraints=[ConstraintResult(name=n,satisfied=v<=limit,observed=v,limit=limit,units=u) for n,_,v,limit,u in values],**common)
 
+
+def oriented_position_task(task):
+    """Delegate the position condition to the unchanged timed Tracking evaluator."""
+    from extensions.reference.contracts import OrientedTrackingGoal,TrackingEvaluation
+    from schemas.platform import Payload,Binding
+    goal=OrientedTrackingGoal.model_validate(task.goal.data)
+    limits=TrackingEvaluation.model_validate({k:task.evaluator.parameters.data[k] for k in TrackingEvaluation.model_fields})
+    return task.model_copy(update=dict(family='task.tracking',
+        goal=Payload(contract='reference.tracking_goal',data=goal.position_goal().model_dump(mode='json')),
+        evaluator=Binding(extension_id='evaluate.tracking',parameters=Payload(contract='reference.tracking_evaluation',data=limits.model_dump(mode='json'))),
+        observations=[s for s in task.observations if s.name=='tip_position'],
+        objectives=[o for o in task.objectives if o.units=='m']))
+
+
+def oriented_tracking_task(task,reg):
+    from extensions.reference.contracts import OrientedTrackingGoal,OrientedTrackingEvaluation
+    if (type(reg.parse(task.goal)) is not OrientedTrackingGoal or type(reg.parse(task.evaluator.parameters)) is not OrientedTrackingEvaluation
+            or task.evaluator.extension_id!='evaluate.oriented_tracking'):
+        raise ValueError('ORIENTED_TRACKING_CONTRACT_MISMATCH')
+    required=[SignalSpec(name=n,entity='tip',dimension=3,units=u,frame='world',phase='post_step') for n,u in
+        (('tip_position','m'),('tip_tool_axis','1'))]
+    if len(task.observations)!=2 or any(task.observations.count(s)!=1 for s in required):
+        raise ValueError('ORIENTED_TRACKING_REQUIRES_POSITION_AND_UNIT_AXIS_SIGNALS')
+    units=dict(max_position_error='m',rms_position_error='m',terminal_position_error='m',max_tool_axis_angle_error='rad')
+    if any(units.get(o.metric)!=o.units for o in task.objectives):raise ValueError('ORIENTED_TRACKING_METRIC_OR_UNIT_UNAVAILABLE')
+    tracking_task(oriented_position_task(task),reg)
+    return Empty()
+
+
+def timed_tool_axis_angles(axes,targets):
+    """Use the original directed-axis geometry separately at each reference time."""
+    if len(axes)!=len(targets):raise ValueError('ALIGNED_AXIS_REFERENCE_SAMPLES_REQUIRED')
+    return [float(tool_axis_angles([a],b)[0]) for a,b in zip(axes,targets)]
+
+
+def evaluate_oriented_tracking(task,result,source,reg,identity):
+    import numpy as np
+    oriented_tracking_task(task,reg)
+    position=evaluate_tracking(oriented_position_task(task),result,source,reg,identity)
+    common=dict(source=source,evaluator=task.evaluator.extension_id,evaluator_version=task.evaluator.version,comparison_identity=identity)
+    def unavailable(validity,reason):
+        return EvaluationResult(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason,**common)
+    if position.validity!='valid':return unavailable(position.validity,position.reason)
+    spec=next(s for s in task.observations if s.name=='tip_tool_axis');signals=[s for s in result.signals if s.spec.name=='tip_tool_axis']
+    if not signals:return unavailable('incomplete','MISSING_TOOL_AXIS')
+    if len(signals)!=1 or signals[0].spec!=spec:return unavailable('invalid','ORIENTED_AXIS_SIGNAL_CONTRACT_MISMATCH')
+    dt=task.timing.sample_period_s;expected=np.arange(1,round(task.timing.duration_s/dt)+1)*dt;signal=signals[0]
+    if len(signal.times_s)!=len(expected):return unavailable('incomplete','INCOMPLETE_ORIENTED_SAMPLING')
+    if not np.allclose(signal.times_s,expected,rtol=0,atol=1e-12):return unavailable('invalid','ORIENTED_AXIS_TIME_GRID_MISMATCH')
+    goal=reg.parse(task.goal);limit=reg.parse(task.evaluator.parameters).angle_tolerance_rad
+    try:angles=timed_tool_axis_angles(signal.values,[goal.axis_at_time(min(float(t),goal.times_s[-1])) for t in expected])
+    except ValueError as exc:return unavailable('invalid',str(exc))
+    lo,hi=task.sampling.window_s;maximum=max(v for t,v in zip(expected,angles) if lo-1e-12<=t<=hi+1e-12)
+    return EvaluationResult(validity='valid',task_success=position.task_success and maximum<=limit,
+        metrics=[*position.metrics,Metric(name='max_tool_axis_angle_error',value=maximum,units='rad')],
+        constraints=[*position.constraints,ConstraintResult(name='tool_axis_direction',satisfied=maximum<=limit,observed=maximum,limit=limit,units='rad')],**common)
+
 def evaluate_signals(task, result, source, reg, comparison_identity, mode):
     if result.solver_status != 'completed':
         return EvaluationResult(validity='incomplete', task_success=None, metrics=[], constraints=[], source=source,

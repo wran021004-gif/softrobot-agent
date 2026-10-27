@@ -425,6 +425,24 @@ def dispatch(host,query,key,*,guard,origin='model'):
             schedule_binding(cfg,source['trajectory'])
             binding['physical_design_identity']=source['trajectory']['design_identity']
             sensitivity_context=dict(schedule=source,source=plain(q.control_optimization.source))
+            if q.control_optimization.resume_from:
+                previous=host.store.artifact(q.control_optimization.resume_from)
+                old=previous['requested_operation']['control_optimization']
+                if (plain(q.control_optimization.resume_from) not in state(host)['analysis_results']
+                        or previous['candidate']!=plain(q.candidate) or previous['status']!='computed'
+                        or old['source']!=plain(q.control_optimization.source) or old['settings']!=plain(settings)):
+                    raise ValueError('EXACT_OWNED_NATIVE_CONTINUATION_REQUIRED')
+                rejected=[]
+                for ref in q.control_optimization.failed_replays:
+                    replay=host.store.artifact(ref)
+                    if (plain(ref) not in state(host)['physical_replays'] or replay['candidate']!=plain(q.candidate)
+                            or replay['acceptance']['accepted']):
+                        raise ValueError('OWNED_FAILED_INDEPENDENT_REPLAY_REQUIRED')
+                    rejected.append(digest(host.store.artifact(replay['source_reference'])['trajectory']['tensions_n']))
+                if not rejected:raise ValueError('FAILED_VALIDATION_REQUIRED_FOR_NATIVE_CONTINUATION')
+                sensitivity_context.update(resume=previous['native_dynamics']['optimization'],rejected_sequences=rejected)
+            elif q.control_optimization.failed_replays:
+                raise ValueError('FAILED_VALIDATION_REQUIRES_NATIVE_CONTINUATION')
     elif q.execution:
         from tools.research.numerics import execution_update
         source=execution_update(host,q.execution,q.update_id)

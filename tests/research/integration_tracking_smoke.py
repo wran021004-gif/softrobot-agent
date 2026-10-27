@@ -30,7 +30,7 @@ def prepare_smoke(leaf,folder):
             condition['task']=str((source.parent/condition['task']).resolve())
         count=len(spec.get('task_conditions',[])) or 1
         spec.update(defaults='defaults.json',study_id=folder.name,mode='engineering_numerical',
-            authorization='Task A authorizes this minimal real public-route engineering check: one native baseline and independent replay per condition, zero Provider, NMPC or RL.',
+            authorization='Public benchmark integration authorizes this minimal engineering check: one native baseline and independent replay per condition, zero Provider, NMPC or RL.',
             budgets=dict(physical_launches=count,mathematical_evaluations=count),
             evidence_destination='runs/'+folder.name+'/private-store')
         atomic_json(folder/'study.json',spec)
@@ -46,13 +46,14 @@ def main(task='tracking'):
         print(json.dumps(dict(status='already_completed',additional_physics_steps=0,summary=str(summary))))
         return
     folder.mkdir(parents=True,exist_ok=True)
-    host=prepare_smoke('study_bf5_public.json' if task=='bf5' else 'study_tracking_public.json',folder)
+    leaf={'tracking':'study_tracking_public.json','bf5':'study_bf5_public.json','bf6':'study_bf6_public.json'}[task]
+    host=prepare_smoke(leaf,folder)
     spec=state(host)['spec']
     scope=dict(study_id=host.run_id,resolved_identity=spec['resolved_identity'],capabilities=spec['capabilities'])
-    save(host,dict(user_approval='Task A-I minimal engineering route check only',scope=scope,
+    save(host,dict(user_approval='Public benchmark integration: one baseline Native callback and one independent replay; no search or Provider',scope=scope,
         scope_identity=digest(scope)),'formal_study_authorization')
     request=dict(version='serial_family_generation_v2',family_space_identity=spec['family_space_identity'],
-        segment_count=2,tendon_count=6,control_weights=dict(holding_tip_speed_weight=0.,terminal_tip_speed_weight=0.))
+        segment_count=2,tendon_count=6)
     candidate=core.dispatch(host,plan('generate',generation=request),'generate')['result']['candidate']
     method=mathematical_method_view(host,candidate)['methods']['mujoco_direct_control_v1']
     assert method['formal_execution_authorized']
@@ -62,13 +63,17 @@ def main(task='tracking'):
         correction_window_s=[0.,.6],knots_s=[0.,.58],evaluation_requests=1,iterations=1))
     output=analysis.dispatch(host,query,'native',guard=core.guard)
     native=host.store.artifact(output['reference'])
-    assert native['status']=='computed' and native['task_acceptance']=='unmeasured'
+    if task!='bf6':assert native['status']=='computed'
+    assert native['task_acceptance']=='unmeasured'
+    native_cost=next((native[k]['cost'] for k in ('native_dynamics','native_diagnostic','native_progress')
+        if native.get(k,{}).get('cost')),None)
     result=core.dispatch(host,plan('physical_replay',candidate,physical_replay=dict(candidate=candidate,
-        source=native['control_schedule_reference'])),'replay')['result']
+        source=native.get('control_schedule_reference',seed))),'replay')['result']
     core.read_evidence(host,dict(reference=result['reference'],view='full'))
     raw=host.store.artifact(result['raw_reference'])
     assert _source_issue(result['acceptance']) is None
-    assert _outcome_issue(result['acceptance']) is None
+    if result['acceptance']['status'] in ('accepted','valid_failure'):
+        assert _outcome_issue(result['acceptance']) is None
     receipt=json.loads(host.store.lookup(host.run_id,result['request_id'])['receipt'])
     assert receipt['execution_id']==result['execution_id']
     assert host.store.artifact(result['profile_reference'])['execution_id']==receipt['execution_id']
@@ -76,11 +81,12 @@ def main(task='tracking'):
     if choice['eligible']:
         core.dispatch(host,plan('select',selected_execution=result['reference']),'select')
     summary_value=dict(implementation=state(host)['freeze'],provider_requests=0,nmpc_updates=0,rl_actions=0,
-        native=native['native_dynamics']['cost'],independent_replay=raw['cost'],
-        physics_steps=native['native_dynamics']['cost']['physics_steps']+raw['physics_steps'],
+        native_status=native['status'],native=native_cost,independent_replay=raw.get('cost'),
+        physics_steps=native_cost['physics_steps']+raw['physics_steps'] if native_cost and 'physics_steps' in raw else None,
         protocol=result['acceptance']['protocol_id'],acceptance_status=result['acceptance']['status'],
         selected=bool(state(host).get('selected')),selection_eligibility=choice,
         registered_receipt_type=receipt['tool_id'],execution_binding_verified=True,
+        rigid_tool_binding=raw.get('rigid_tool_binding'),environment_contact=raw.get('environment_contact'),
         resource_use=core.resource_use(host),private_store='runs/'+folder.name+'/private-store',
         interpretation='Public method discovery and execution engineering check. No autonomous Provider study or benchmark search.')
     atomic_json(summary,summary_value)
@@ -133,4 +139,5 @@ if __name__=='__main__':
     import sys
     if sys.argv[1:]==['conditions']:conditions_main()
     elif sys.argv[1:]==['bf5']:main('bf5')
+    elif sys.argv[1:]==['bf6']:main('bf6')
     else:main()

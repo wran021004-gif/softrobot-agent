@@ -649,16 +649,18 @@ def action_feedback(host,current):
         from tools.research.mechanics import warm_start
         from tools.research_tasks import task_adapter
         cfg=host.store.artifact(candidate)['configuration']
+        execution=task_adapter(cfg).execution_requirements()
+        unsupported=execution.get('unsupported_control_methods',[])
         from tools.research.rl import allocation_feedback, compatible_references
         rl_budget=allocation_feedback(host);refs=compatible_references(host,publish=False)
         for mode in ('direct','residual'):
             available=[r for r in refs if r['candidate']==candidate and r.get('available')]
             missing=[] if mode=='direct' or available else ['complete_exact_candidate_reference']
             rows.append(dict(action='research_rl',method=mode,candidate=candidate,
-                status='unavailable' if closed or 'rl' not in s['spec']['capabilities']
+                status='not_applicable' if 'ppo' in unsupported else 'unavailable' if closed or 'rl' not in s['spec']['capabilities']
                     or rl_budget['remaining_stages']==0 or rl_budget['remaining_allocatable_actions']==0
                     else 'blocked' if missing else 'prerequisites_only',
-                reason=missing or None,references=available if mode=='residual' else [],budget=rl_budget,
+                reason=execution['applicability'] if 'ppo' in unsupported else missing or None,references=available if mode=='residual' else [],budget=rl_budget,
                 remaining_checks=['full_RLRequest','ideal_tension_reach_environment','aligned_allocation','training_capacity'],
                 scope='Training/checkpoint is not task acceptance; direct PPO needs no reference'))
         rows.append(dict(action='initialize_control',method='baseline',candidate=candidate,
@@ -667,7 +669,8 @@ def action_feedback(host,current):
             remaining_checks=['full_plan_admission','selected_control_settings'],
             requires_agent_fields=['decision','hypothesis','control_seed']))
         rows.append(dict(action='execute',method='nmpc',candidate=candidate,
-            status='preflight_eligible' if not closed and 'execute' in current['actions'] and capacity>0 else 'unavailable',
+            status='not_applicable' if 'nmpc' in unsupported else 'preflight_eligible' if not closed and 'execute' in current['actions'] and capacity>0 else 'unavailable',
+            reason=execution['applicability'] if 'nmpc' in unsupported else None,
             remaining_checks=['full_plan_admission','method_budget','replication_admission','scientific_preflight'],
             task_acceptance='unmeasured'))
         requirements=task_adapter(cfg).analysis_requirements({})

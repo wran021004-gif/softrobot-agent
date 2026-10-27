@@ -46,7 +46,7 @@ def observation_specs(inp,reg):
         if direct
         else parameters.get('tension_execution_mode','actuator_realistic'))
     specs=[s for _,_,s in expanded(physics_for(inp),tension,execution_mode)]
-    if inp.task.family=='task.position_tool_axis':
+    if inp.task.family in ('task.position_tool_axis','task.oriented_tracking'):
         specs.append(SignalSpec(name='tip_tool_axis',entity='tip',dimension=3,units='1',frame='world',phase='post_step'))
     return specs
 
