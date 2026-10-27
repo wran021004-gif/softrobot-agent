@@ -1,0 +1,355 @@
+{
+  "version": "provider_decision_public_only_v2",
+  "date": "2026-10-27",
+  "implementation": "797c6c934",
+  "production_code_commit": "a3f7eed54",
+  "status": "completed",
+  "request_ceiling": 24,
+  "actual_requests": 9,
+  "confirmed_responses": 9,
+  "usage": {
+    "prompt_tokens": 49647,
+    "completion_tokens": 16312,
+    "total_tokens": 65959,
+    "prompt_cache_hit_tokens": 30720,
+    "prompt_cache_miss_tokens": 18927,
+    "reasoning_tokens": 10239
+  },
+  "money": null,
+  "money_status": "Token/cache counters are actual Provider reports. Currency was not returned; do not infer currency savings from total tokens.",
+  "by_model": {
+    "deepseek-flash": {
+      "actual_requests": 5,
+      "read_attempts": 1,
+      "accepted_decisions": 2,
+      "final_answers": 2,
+      "usage": {
+        "prompt_tokens": 26727,
+        "completion_tokens": 7330,
+        "total_tokens": 34057,
+        "prompt_cache_hit_tokens": 20480,
+        "prompt_cache_miss_tokens": 6247,
+        "reasoning_tokens": 3767
+      },
+      "money": null,
+      "provider_wall_s": 48.26599999998871
+    },
+    "deepseek-v4-pro": {
+      "actual_requests": 4,
+      "read_attempts": 0,
+      "accepted_decisions": 2,
+      "final_answers": 2,
+      "usage": {
+        "prompt_tokens": 22920,
+        "completion_tokens": 8982,
+        "total_tokens": 31902,
+        "prompt_cache_hit_tokens": 10240,
+        "prompt_cache_miss_tokens": 12680,
+        "reasoning_tokens": 6472
+      },
+      "money": null,
+      "provider_wall_s": 100.36000000000058
+    }
+  },
+  "results": [
+    {
+      "case_id": "bf5_failed_baseline",
+      "model": "deepseek-flash",
+      "actual_requests": 3,
+      "confirmed_responses": 3,
+      "usage": {
+        "prompt_tokens": 18358,
+        "completion_tokens": 4897,
+        "total_tokens": 23255,
+        "prompt_cache_hit_tokens": 12800,
+        "prompt_cache_miss_tokens": 5558,
+        "reasoning_tokens": 2682
+      },
+      "money": null,
+      "termination": "completed",
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 2,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 3,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 31.797000000005937
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 3,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "read_attempts": 1,
+      "extra_reads_of_inline_case": 1,
+      "read_queries": [
+        {
+          "view": "summary",
+          "pointer": null,
+          "fields": null
+        }
+      ],
+      "tool_refusals": 0,
+      "manual_review": {
+        "correct": [
+          "Recognizes valid_failure, missing per-objective errors and no structural infeasibility proof.",
+          "Keeps Native and independent cost counters separate and requests zero science."
+        ],
+        "issues": [
+          "Still reads the already inline summary once.",
+          "Sometimes treats small optimization budget as an established failure attribution, although elsewhere it leaves the cause unknown.",
+          "Treats STOP as if it implied infeasibility; a truthful unresolved STOP proposal was also available.",
+          "Final answer reports two Provider requests, while the settled ledger counts three including final follow-up."
+        ]
+      }
+    },
+    {
+      "case_id": "bf5_failed_baseline",
+      "model": "deepseek-v4-pro",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 13748,
+        "completion_tokens": 5780,
+        "total_tokens": 19528,
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 9652,
+        "reasoning_tokens": 4451
+      },
+      "money": null,
+      "termination": "completed",
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 1,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 66.125
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "read_attempts": 0,
+      "extra_reads_of_inline_case": 0,
+      "read_queries": [],
+      "tool_refusals": 0,
+      "manual_review": {
+        "correct": [
+          "Uses inline facts without another read and submits a valid Plan on the first request.",
+          "Distinguishes a valid failing baseline from success or structural infeasibility."
+        ],
+        "issues": [
+          "Conflates unmeasured Native acceptance with unavailable complete independent acceptance, although valid_failure was supplied.",
+          "Overstates DIAGNOSE as the only legal next action; a descriptive STOP was offered.",
+          "Final answer reports one Provider request; the settled ledger counts two."
+        ]
+      }
+    },
+    {
+      "case_id": "bf6_incomplete",
+      "model": "deepseek-v4-pro",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 9172,
+        "completion_tokens": 3202,
+        "total_tokens": 12374,
+        "prompt_cache_hit_tokens": 6144,
+        "prompt_cache_miss_tokens": 3028,
+        "reasoning_tokens": 2021
+      },
+      "money": null,
+      "termination": "completed",
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 1,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 34.23500000000058
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "read_attempts": 0,
+      "extra_reads_of_inline_case": 0,
+      "read_queries": [],
+      "tool_refusals": 0,
+      "manual_review": {
+        "correct": [
+          "Uses inline facts directly and distinguishes incomplete/null acceptance from success or structural infeasibility.",
+          "Names actual mass/COM and does not execute science."
+        ],
+        "issues": [
+          "Calls compiled_load valid without an independent binding check in this probe.",
+          "Reports Native 226-step cost without clearly separating it from the supplied aggregate 452-step lower bound and 453 attempted calls.",
+          "Uses empirical_search for a read-only diagnosis.",
+          "Final answer reports one Provider request; the settled ledger counts two."
+        ]
+      }
+    },
+    {
+      "case_id": "bf6_incomplete",
+      "model": "deepseek-flash",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 8369,
+        "completion_tokens": 2433,
+        "total_tokens": 10802,
+        "prompt_cache_hit_tokens": 7680,
+        "prompt_cache_miss_tokens": 689,
+        "reasoning_tokens": 1085
+      },
+      "money": null,
+      "termination": "completed",
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 1,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 16.46899999998277
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "read_attempts": 0,
+      "extra_reads_of_inline_case": 0,
+      "read_queries": [],
+      "tool_refusals": 0,
+      "manual_review": {
+        "correct": [
+          "Uses inline facts directly and distinguishes schema validation from full scientific admission.",
+          "Keeps success/infeasibility unknown and requests zero science."
+        ],
+        "issues": [
+          "Incorrectly describes 226 completed steps out of 453 attempted calls; 226 is one stage, while 452 is the aggregate completed lower bound.",
+          "Lists C data as missing even though C data is outside the case scope and is not needed for the stated diagnosis.",
+          "Mixes an A registration issue with possible physical/structural failure and overstates STOP evidence requirements.",
+          "Final answer reports one Provider request; the settled ledger counts two."
+        ]
+      }
+    }
+  ],
+  "science_workers": 0,
+  "physics_steps": 0,
+  "reporter_requests": 0,
+  "current_C_Study_accessed": false,
+  "historical_comparison": {
+    "v1_actual_requests": 8,
+    "v1_total_tokens": 46180,
+    "v1_read_attempts": 9,
+    "v2_read_attempts": 1,
+    "v1_valid_partial_decisions": 1,
+    "v2_valid_partial_decisions": 4,
+    "v1_final_answers": 0,
+    "v2_final_answers": 4,
+    "v1_schema_chars": 10617,
+    "v2_schema_chars": 7502,
+    "case_json_values_equal": true,
+    "cumulative_actual_requests": 17,
+    "cumulative_total_tokens": 112139
+  },
+  "read_budget": {
+    "new_hard_read_limit_added": false,
+    "reason": "Measure extra reads without blocking necessary evidence verification or SELECT reads. Existing six-Provider-request limit remains effective. No current Study policy changed."
+  },
+  "review": {
+    "first_v2_launch": "Automatic review rejected before process creation; zero Provider requests.",
+    "additional_check": "Unauthenticated GitHub API private=false and all three exact source files HTTP 200 with JSON equal to local inputs.",
+    "retry": "Same public payload approved after the low-risk checks; no alternate route or private payload."
+  },
+  "limitations": [
+    "Only two cases per model; no general model ranking or physical research efficiency conclusion.",
+    "Delivery, schema scope, instruction and request ceiling changed together; historical v1 comparison does not isolate their causal effects.",
+    "Historical v1 lacked four complete decision/final-answer pairs. Higher v2 total usage is not directly comparable to unfinished v1 cost.",
+    "The production handoff repair is covered by offline tests; this Provider-only cohort does not exercise live handoff or scientific dispatch.",
+    "All four Plans pass schema/reference/intent checks but all retain interpretation limitations. A valid format is not scientifically correct reasoning.",
+    "All four final answers undercount their own Provider requests by one. Only the settled original ledger owns actual usage, not model prose.",
+    "Cache state and latency are uncontrolled. Provider wall time is observed, not a normalized model speed benchmark.",
+    "No raw reasoning, credentials, candidate/control or private research Store material is published."
+  ]
+}

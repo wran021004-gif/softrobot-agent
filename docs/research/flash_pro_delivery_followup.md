@@ -54,4 +54,84 @@ three exact task/evidence source files return HTTP 200 with JSON equal to the
 local committed inputs. These checks and source URLs are retained in the v2
 payload review. No alternate Provider route or private payload is used.
 
-Live results will be appended after the bounded cohort finishes.
+## Completed v2 cohort
+
+After the public-source checks, automatic review approved the same launch.
+All four cases completed, using nine actual requests and nine confirmed HTTP
+200 responses, below the 24-request cap. No science worker, physics step,
+Reporter or C Study operation occurred. Results and original ledger counters:
+`evidence/integration_research_next/flash_pro_decisions_v2.json`.
+
+| Case | Model | Requests including final answer | Evidence reads | First valid Plan request | Total tokens |
+| --- | --- | ---: | ---: | ---: | ---: |
+| BF5 failed baseline | Flash | 3 | 1 | 2 | 23,255 |
+| BF5 failed baseline | Pro | 2 | 0 | 1 | 19,528 |
+| BF6 incomplete | Pro | 2 | 0 | 1 | 12,374 |
+| BF6 incomplete | Flash | 2 | 0 | 1 | 10,802 |
+
+Flash totals: five requests, one read, 34,057 tokens. Pro totals: four requests,
+zero reads, 31,902 tokens. Combined actual usage is 49,647 prompt + 16,312
+completion = 65,959 tokens; 10,239 reasoning tokens are already included in
+completion. Prompt cache hits/misses were 30,720/18,927. Currency was not returned.
+Observed Provider receipt wall time was 48.266 s for Flash and 100.360 s for Pro;
+these uncontrolled sequential measurements do not establish a general speed or
+price ratio. Pro's 6.3% lower total-token count here is not a currency claim.
+
+There were no tool refusals. All four Plans passed the partial production
+schema/reference/intent checks and all four received final prose. Read attempts,
+including rejected attempts, fell from nine in v1 to one in v2. Tool-schema JSON
+size fell from 10,617 to 7,502 characters using the same measurement. Pro made
+both decisions directly from inline evidence. Flash still requested the BF5
+summary, then submitted its Plan; BF6 needed no extra read. This is evidence
+that clearer delivery can reduce reads under the tested interface. The bundled
+changes and tiny cohort do not isolate a model-versus-context causal percentage.
+
+V1 had only one valid partial Plan and no final answers before its cap; v2 has
+four valid partial Plans with final answers. Its higher total token usage cannot
+be interpreted as a regression against unfinished v1 outputs. Both cohorts are
+retained: 17 actual requests and 112,139 total tokens cumulatively. The rejected
+launches sent zero requests and incurred no recorded Provider usage.
+
+## Evidence-understanding review and model decision
+
+Format compliance improved; scientific interpretation still needs care:
+
+- Flash BF5 recognizes the failed baseline and missing objective errors, but
+  sometimes treats the tiny search budget as an established failure cause and
+  treats STOP as if it implied infeasibility. Its final response is verbose.
+- Pro BF5 uses inline facts immediately, but conflates unmeasured Native
+  acceptance with missing complete independent acceptance even though the
+  independent `valid_failure` status was supplied. It overstates DIAGNOSE as the
+  only legal proposal; descriptive STOP was available.
+- Pro BF6 correctly preserves incomplete/null status and names mass/COM, but
+  calls the load valid without an independent binding check. It reports Native
+  cost without clearly distinguishing the aggregate 452-step lower bound and
+  453 attempted calls, and labels read-only diagnosis `empirical_search`.
+- Flash BF6 correctly separates format validation from scientific admission,
+  but explicitly mixes one stage's 226 steps with the aggregate 453 calls,
+  despite the supplied 452 completed-step lower bound. It also treats out-of-scope
+  C data as missing and mixes A registration with physical/structural failure.
+
+All four final answers undercount Provider requests by one: they count tool
+rounds and omit the request producing the final answer. The published counts
+come solely from settled LiveBoundary receipts. Model prose is not a cost owner.
+No valid Plan is relabeled as a fully correct scientific conclusion.
+
+Pro reduced round trips in these two cases but did not remove interpretation
+errors, and its observed Provider wall time was longer. There is still no basis
+for changing the frozen C Study's model or claiming improved physical research
+performance. The immediate gain is a clearer existing interface; further model
+selection should use completed decisions, factual accuracy and actual cost
+together, rather than format validity or self-reported budgets alone.
+
+## Read budget
+
+No independent hard read budget or current Study policy was introduced during
+the comparison. The user's follow-up question was addressed by recording reads
+and identifying the one extra query of already inline facts. An exact repeated
+reference/pointer/view is a useful diagnostic, but `summary` followed by `full`
+can legitimately add information. A future cap must preserve mandatory public
+acceptance reads before SELECT and share the existing admission/accounting
+boundary; simply blocking all reads after a low count can prevent legal closure.
+Here, reads dropped to one without a new hard limit. The production handoff
+change was verified offline; this live cohort did not exercise actual handoff.
