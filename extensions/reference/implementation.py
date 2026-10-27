@@ -21,6 +21,67 @@ def reach_task(task, reg):
         raise ValueError('EVALUATOR_METRIC_OR_UNIT_UNAVAILABLE')
     return Empty()
 
+
+def tool_axis_task(task,reg):
+    from extensions.reference.contracts import ToolAxisGoal,ToolAxisEvaluation
+    if (type(reg.parse(task.goal)) is not ToolAxisGoal
+            or type(reg.parse(task.evaluator.parameters)) is not ToolAxisEvaluation
+            or task.evaluator.extension_id!='evaluate.position_tool_axis'):
+        raise ValueError('TOOL_AXIS_GOAL_OR_EVALUATOR_MISMATCH')
+    required=[SignalSpec(name=n,entity='tip',dimension=3,units=u,frame='world',phase='post_step')
+        for n,u in (('tip_position','m'),('tip_tool_axis','1'))]
+    if len(task.observations)!=2 or any(task.observations.count(s)!=1 for s in required):
+        raise ValueError('TOOL_AXIS_REQUIRES_POSITION_AND_UNIT_AXIS_WORLD_POST_STEP')
+    dt=task.timing.sample_period_s
+    if (task.environment.contract!='experiment.assembly' or task.initializer.extension_id!='initialize.family'
+            or task.sampling.window_s[0]<dt or any(abs(t/dt-round(t/dt))>1e-8 for t in task.sampling.window_s)):
+        raise ValueError('TOOL_AXIS_REQUIRES_FAMILY_SCENE_AND_INCLUSIVE_POST_STEP_WINDOW')
+    units=dict(max_position_error='m',max_tool_axis_angle_error='rad')
+    if any(units.get(o.metric)!=o.units for o in task.objectives):
+        raise ValueError('TOOL_AXIS_METRIC_OR_UNIT_UNAVAILABLE')
+    return Empty()
+
+
+def tool_axis_angles(axes,target):
+    """True directed-axis angle in rad; rotation about that axis is unconstrained."""
+    import numpy as np
+    axes=np.asarray(axes,dtype=float);target=np.asarray(target,dtype=float)
+    if (axes.ndim!=2 or axes.shape[1]!=3 or target.shape!=(3,) or not np.isfinite(axes).all()
+            or not np.isfinite(target).all() or abs(np.linalg.norm(target)-1)>1e-10
+            or not np.allclose(np.linalg.norm(axes,axis=1),1,rtol=0,atol=1e-9)):
+        raise ValueError('FINITE_UNIT_WORLD_TOOL_AXIS_SIGNALS_REQUIRED')
+    return np.arccos(np.clip(axes@target,-1.,1.))
+
+
+def evaluate_tool_axis(task,result,source,reg,identity):
+    import numpy as np
+    tool_axis_task(task,reg)
+    common=dict(source=source,evaluator=task.evaluator.extension_id,evaluator_version=task.evaluator.version,comparison_identity=identity)
+    def unavailable(validity,reason):
+        return EvaluationResult(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason,**common)
+    if result.solver_status!='completed':return unavailable('incomplete','SOLVER_NOT_COMPLETE')
+    dt=task.timing.sample_period_s;expected=np.arange(1,round(task.timing.duration_s/dt)+1)*dt
+    found={}
+    for spec in task.observations:
+        rows=[s for s in result.signals if s.spec.name==spec.name]
+        if not rows:return unavailable('incomplete','MISSING_'+spec.name)
+        if len(rows)!=1 or rows[0].spec!=spec:return unavailable('invalid','TOOL_AXIS_SIGNAL_CONTRACT_MISMATCH')
+        signal=rows[0]
+        if len(signal.times_s)!=len(expected):return unavailable('incomplete','INCOMPLETE_TOOL_AXIS_SAMPLING')
+        if not np.allclose(signal.times_s,expected,rtol=0,atol=1e-12):return unavailable('invalid','TOOL_AXIS_TIME_GRID_MISMATCH')
+        found[spec.name]=np.asarray(signal.values)
+    goal=reg.parse(task.goal);limits=reg.parse(task.evaluator.parameters)
+    try:angles=tool_axis_angles(found['tip_tool_axis'],goal.target_axis_world)
+    except ValueError as exc:return unavailable('invalid',str(exc))
+    lo,hi=task.sampling.window_s;scored=(expected>=lo-1e-12)&(expected<=hi+1e-12)
+    position=float(max(np.linalg.norm(found['tip_position'][scored]-goal.target_m,axis=1)))
+    angle=float(max(angles[scored]))
+    values=[('tool_position','max_position_error',position,limits.position_tolerance_m,'m'),
+        ('tool_axis_direction','max_tool_axis_angle_error',angle,limits.angle_tolerance_rad,'rad')]
+    return EvaluationResult(validity='valid',task_success=all(v<=limit for _,_,v,limit,_ in values),
+        metrics=[Metric(name=n,value=v,units=u) for _,n,v,_,u in values],
+        constraints=[ConstraintResult(name=n,satisfied=v<=limit,observed=v,limit=limit,units=u) for n,_,v,limit,u in values],**common)
+
 def evaluate_signals(task, result, source, reg, comparison_identity, mode):
     if result.solver_status != 'completed':
         return EvaluationResult(validity='incomplete', task_success=None, metrics=[], constraints=[], source=source,

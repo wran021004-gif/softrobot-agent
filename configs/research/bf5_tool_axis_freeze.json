@@ -1,0 +1,46 @@
+{
+  "contract": "bf5.tool_axis_preparation_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 supplied Task B explicitly authorizes one physically audited position/tool-axis task, minimal interface and finite feasibility precheck. One prespecified private P1 structure, one constant 0.2 N start, 51 full native sequence callbacks/2 iterations, one full independent physical replay, 31200 integration steps maximum. No structural scan, threshold relaxation, Provider/NMPC/RL or robustness. Three earlier kinematic-only forward checks retained separately; no S2 controls or acceptance inherited.",
+  "task_file": "tasks/bf5_position_tool_axis_v1.json",
+  "task_file_identity": "3d96fde8e007a28e43a7caf5fa8c0856e5805fb85e80622fe33fbd65490f5d2d",
+  "study_file": "configs/research/study_bf5_tool_axis_preparation.json",
+  "private_generation": "runs/bf5-tool-axis/private-generation.json",
+  "private_generation_identity": "06d2803d18c2f0a5aa6dff0bce89d989c26036673fd3810e9853229d26266bf6",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 51,
+    "iterations": 2,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.0
+  },
+  "initial_tension_n": 0.2,
+  "physics_steps_per_callback": 600,
+  "maximum_native_rollouts": 51,
+  "maximum_independent_replays": 1,
+  "maximum_physics_steps": 31200,
+  "domain_audit": "runs/bf5-tool-axis/domain_audit.json",
+  "domain_audit_cost": {
+    "model_builds": 1,
+    "forward_evaluations": 3,
+    "physics_steps": 0
+  },
+  "axis_semantics": "a_world=R_tip_site @ a_local; acos(clamp(dot(a_world,target_axis_world),-1,1)), directed unit axes; angles in rad; no axial roll condition",
+  "response_semantics": "Unit-axis chord norm <= 2*sin(angle_tolerance/2) is exactly equivalent to the angular cone; actual ranking and independent scoring retain true arccos angle and position separately.",
+  "stop": "Proxy first meeting both original task constraints proceeds to the one independent replay. Pass stops immediately; failure is a finite precheck result without a new start, threshold change or extra validation."
+}

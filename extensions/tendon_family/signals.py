@@ -45,7 +45,10 @@ def observation_specs(inp,reg):
     execution_mode=(parameters.get('development_execution_mode') or 'ideal_tension'
         if direct
         else parameters.get('tension_execution_mode','actuator_realistic'))
-    return [s for _,_,s in expanded(physics_for(inp),tension,execution_mode)]
+    specs=[s for _,_,s in expanded(physics_for(inp),tension,execution_mode)]
+    if inp.task.family=='task.position_tool_axis':
+        specs.append(SignalSpec(name='tip_tool_axis',entity='tip',dimension=3,units='1',frame='world',phase='post_step'))
+    return specs
 
 
 def export(rows,p,tension_reference=False,execution_mode='actuator_realistic'):

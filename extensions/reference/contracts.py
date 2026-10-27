@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import Field, model_validator
+from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef, Signal, Payload, EvaluationResult, BackendResult, WorkerOutput, MemoryEntry, WorkOrder
 from schemas.design_spec import DesignSpec
@@ -17,6 +17,26 @@ class ReachGoal(Contract):
 
 class ReachEvaluation(Contract):
     tolerance_m: float = Field(gt=0)
+
+
+class ToolAxisGoal(Contract):
+    target_m: tuple[FiniteFloat, FiniteFloat, FiniteFloat]
+    axis_local: tuple[FiniteFloat, FiniteFloat, FiniteFloat]
+    target_axis_world: tuple[FiniteFloat, FiniteFloat, FiniteFloat]
+    frame: Literal['world'] = 'world'
+    axis_frame: Literal['tip_site_local'] = 'tip_site_local'
+
+    @model_validator(mode='after')
+    def unit_axes(self):
+        import math
+        if any(abs(math.hypot(*a)-1)>1e-10 for a in (self.axis_local,self.target_axis_world)):
+            raise ValueError('EXPLICIT_UNIT_LOCAL_AND_WORLD_TOOL_AXES_REQUIRED')
+        return self
+
+
+class ToolAxisEvaluation(Contract):
+    position_tolerance_m: FiniteFloat = Field(gt=0)
+    angle_tolerance_rad: FiniteFloat = Field(gt=0,lt=3.141592653589793)
 
 
 class TrackingGoal(Contract):
