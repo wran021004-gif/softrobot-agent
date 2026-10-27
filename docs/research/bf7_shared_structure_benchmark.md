@@ -49,4 +49,18 @@ Codex 组织有限研究，所有科学工作交给原 Study 工具；LLM Resear
 
 运行入口：`python -m tests.research.bf7_shared_structure prescreen`，随后 `physical best`、`physical peer`；只有另行提交续算配置后才能运行 `physical <role> continuation`。所有科学调用都来自该入口内部原 `core.dispatch / analysis.dispatch`；审计只读取原 Store。
 
-结果、真实成本和最终 Benchmark 状态将在计算完成后追加。
+## 首轮证据与一次有限 R1 修订
+
+冻结实现 `7cacc71d5` 的 9 个单任务 CONIC 均 computed/optimal，完整覆盖每任务的终点、四个保持位置点和四个保持速度点；实际 18 数学单位，86.007370100 s Store 数值、95.648562200 s driver。三结构共享分数分别为 1.30、2.80、0.20，均不是局部模型全部可行见证。按规则选择第 2 行和第 0 行，未人工覆盖排序。
+
+首轮五个完整 Native 搜索各 101 回调，独立回放均为 valid_failure，但归一化超限相对初始状态明显下降，最后阶段仍改善，满足原续算规则。其中短臂的 negative_low 已达到 9.786186 mm 位置误差，保持速度 30.001167 mm/s，仍按真实超限失败保留，未改容差。
+
+第 0 行结构的 central_high 在第 37 次 Native 回调、0.272 s 遇到 `floor/payload_shape` 接触，穿透距离 −8.025506 μm，触发原 `NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE`。已记录 36 次完整和 1 次部分回调，累计 21,872 个积分步；不是完整控制搜索或独立验收，未执行该项回放。原 Native 中断输出没有可执行的 best schedule，不重构隐藏控制或假装取得完整反馈。
+
+原任务文件保留 floor 的 `contype=0, conaffinity=1`，与 payload 的碰撞掩码仍可能配对。原协议文本中的“non-contact floor”是对应用意图的描述，**不是碰撞被禁用的事实**；以上真实接触揭示了该表述的局限。模型、碰撞掩码和任务未改变，接触未被忽略，也不推测数值发散先于接触。
+
+[一次 R1 阶段配置](../../configs/research/bf7_v1_continuation.json)在续算前另行提交。五个完整失败从各自本轮最好控制出发，至多再 100 次回调。中断项明确不符合原普通续算条件，使用用户允许“一次有限修订”的权限单独标记初始化修复：将本轮短臂、同一个 central_high 任务的 **valid_failure** 控制逐行不变地传给原 initialize_control，再把初始搜索半径减为 0.1 N。没有导入 B 历史答案，也未传递接受结论；源与目标结构不同，第一条 Native 反馈是固定控制转移后的物理观察，后续才是重新优化的控制表现。
+
+原五个完整失败和一个中断记录见[修订前原始摘要](../../evidence/bf7_v1/initial_before_revision.json)。每个正常续算项累计最多 201 回调；中断修复项最多 37+100=137 次尝试，未使用的 64 次不追加。所有新操作仍在原独立 Study 的既定总预算内，不清空或改写账本；任务、结构和物理限制保持 v1 身份。
+
+工程上同时补齐监督入口续算请求原 API 所要求的 `source + parent` 配对；这是编排参数修正，未改任何科学工具、方法或内核。结果与最终冻结状态将在 R1 完成后追加。

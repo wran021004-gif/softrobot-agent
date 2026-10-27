@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "phase": "BF7-v1 finite continuation and initialization revision R1",
+  "roles": [
+    "best",
+    "peer"
+  ],
+  "user_authorization": "BF7 section V permits one evidence-based finite revision after the first allocation; preserve original costs and ceilings. Codex organizes; original Study tools execute.",
+  "unchanged": "All three task v1 definitions, targets, tolerances, timing, physics, two chosen structures, material, routing, payload and original Study budgets.",
+  "settings": {
+    "evaluation_requests": 100,
+    "iterations": 4
+  },
+  "complete_failure_eligibility": {
+    "best": {
+      "positive_high": true,
+      "negative_low": true,
+      "central_high": true
+    },
+    "peer": {
+      "positive_high": true,
+      "negative_low": true,
+      "central_high": false
+    }
+  },
+  "initialization_repairs": {
+    "peer": {
+      "central_high": {
+        "reason": "Initial Native search terminated during callback 37 on floor/payload contact at 0.272s; 36 complete rollouts plus partial attempt charged. No bound best schedule returned. This is an explicit initialization repair, not ordinary complete-feedback continuation.",
+        "failed_analysis": {
+          "artifact_id": "14051acde87e4153e67af7144e475e95b208abb6083a1151192a94aaa6899df7",
+          "media_type": "application/json"
+        },
+        "store": "runs/bf7-v1/best/private-store",
+        "source_analysis": {
+          "artifact_id": "9924663549b5a9c8f0cc058fb4228cb96221b641f990e2c8518703d22a405b16",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "8bff815398af06ff8b04dc1eeb5770d9e59211e408d2d5251e1e1bcc1362f976",
+          "media_type": "application/json"
+        },
+        "source_independent_replay": {
+          "artifact_id": "5685644cff0c09800171768630a990a81f6c33ab3dc203aba6ba121a53db0dae",
+          "media_type": "application/json"
+        },
+        "source_acceptance": "valid_failure; BF7 v1 same central_high target, short structure; no inherited acceptance",
+        "transfer": "Exact unmodified SI tension rows from original Study-produced explicit schedule into original initialize_control(tensions_n); same six channels and 20ms grid. No private optimization or BF4/BF5/BF6 input.",
+        "settings": {
+          "initial_radius_n": 0.1
+        },
+        "purpose": "Test whether a complete BF7 same-target failure schedule can initialize the longer peer structure. First Native callback measures fixed-control response before reoptimization.",
+        "callback_attempts_already_spent": 37,
+        "completed_rollouts_already_spent": 36,
+        "native_callbacks_additional_cap": 100,
+        "cumulative_callback_attempts_cap": 137
+      }
+    }
+  },
+  "protocol_deviation": "Original ordinary continuation requires a complete valid failure. Peer/central_high does not qualify. This single explicit R1 initialization repair uses the user-authorized finite-revision provision; original protocol and false eligibility remain intact.",
+  "total_caps": "<=201 callback attempts and <=2 independent replays per target; repair target <=137 attempts. Same original per-Study <=6 Native analysis entries and <=6 replays. Unused budgets do not become another round.",
+  "stop": "Original joint SELECT after three independent passes on the same structure, otherwise STOP after this sole finite revision. No extra scan or task threshold changes."
+}

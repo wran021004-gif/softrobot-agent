@@ -117,10 +117,10 @@ def continuation_eligible(row, native):
         and min(scores[-26:])<min(scores[:51])-1e-4)
 
 
-def optimize(host, root, condition, settings, key, source=None):
+def optimize(host, root, condition, settings, key, source=None, parent=None, explicit_tensions=None):
     started=time.perf_counter()
     seed=dispatch(host,'initialize_control',key+'-seed',control_seed=dict(candidate=root,condition_id=condition,
-        **(dict(source=source) if source else dict(tensions_n=[[.2]*6]))))
+        **(dict(source=source,parent=parent) if source else dict(tensions_n=explicit_tensions if explicit_tensions is not None else [[.2]*6]))))
     candidate=seed['candidate'];spec=state(host)['spec']
     out=analysis.dispatch(host,dict(candidate=candidate,operation='mujoco_direct_control_v1',model_source='mujoco',
         operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],
@@ -155,7 +155,7 @@ def physical(role, phase='initial'):
     index=screen['selected'][role];chosen=next(d for d in screen['designs'] if d['index']==index)
     original=Store(RUNS/'math/private-store').artifact(chosen['candidate'])
     host=prepare(f['physical']['studies'][role],folder)
-    settings=deepcopy(f['physical']['initial_settings']);previous=None
+    settings=deepcopy(f['physical']['initial_settings']);previous=None;extension={}
     if phase=='continuation':
         extension=read(ROOT/'configs/research/bf7_v1_continuation.json')
         settings.update(extension['settings'])
@@ -169,9 +169,19 @@ def physical(role, phase='initial'):
         key=condition['condition_id']
         if key in rows:continue
         prior=previous['conditions'][key] if previous else None
-        if prior and (prior['accepted'] or not prior['continuation_eligible']):rows[key]=prior
+        repair=extension.get('initialization_repairs',{}).get(role,{}).get(key)
+        if prior and (prior['accepted'] or (not prior['continuation_eligible'] and not repair)):rows[key]=prior
         else:
-            rows[key]=optimize(host,root,key,settings,'bf7-'+role+'-'+phase+'-'+key,source=prior['control_source'] if prior else None)
+            local=deepcopy(settings);inputs=None
+            if repair:
+                failed=Store(ROOT/repair['store']).artifact(repair['control_source'])
+                assert failed['task_acceptance']=='unmeasured'
+                inputs=failed['trajectory']['tensions_n']
+                local.update(repair['settings'])
+            rows[key]=optimize(host,root,key,local,'bf7-'+role+'-'+phase+'-'+key,
+                source=prior['control_source'] if prior and not repair else None,
+                parent=prior['candidate'] if prior and not repair else None,explicit_tensions=inputs)
+            if repair:rows[key]['initialization_repair']=repair
         atomic_json(progress,rows)
         print(json.dumps(dict(role=role,phase=phase,condition=key,accepted=rows[key]['accepted'],
             callbacks=rows[key].get('native_callbacks'),metrics=rows[key].get('acceptance',{}).get('metrics'),
