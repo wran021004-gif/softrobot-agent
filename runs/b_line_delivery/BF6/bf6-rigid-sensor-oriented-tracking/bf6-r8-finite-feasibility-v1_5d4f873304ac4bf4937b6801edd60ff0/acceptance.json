@@ -1,0 +1,150 @@
+{
+  "accepted": true,
+  "components": {
+    "evaluation_validity": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": "valid"
+    },
+    "evaluator:tool_axis_direction": {
+      "limit": 0.17453292519943295,
+      "passed": true,
+      "reason": null,
+      "unit": "rad",
+      "value": 0.1736580579439453
+    },
+    "evaluator:tracking_max_error": {
+      "limit": 0.012,
+      "passed": true,
+      "reason": null,
+      "unit": "m",
+      "value": 0.01193999996314957
+    },
+    "execution_complete": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": true
+    },
+    "force_bounds": {
+      "limit": 1e-08,
+      "passed": true,
+      "reason": null,
+      "unit": "N",
+      "value": 0.0
+    },
+    "no_environment_contact": {
+      "limit": null,
+      "passed": true,
+      "reason": "Every independent physics step checked for environment contact; the frozen task does not permit contact",
+      "unit": null,
+      "value": true
+    },
+    "rigid_tool_binding": {
+      "limit": null,
+      "passed": true,
+      "reason": "Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution",
+      "unit": null,
+      "value": true
+    },
+    "solver_errors": {
+      "limit": 0,
+      "passed": true,
+      "reason": null,
+      "unit": "count",
+      "value": 0
+    },
+    "task_evaluator": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": true
+    },
+    "tool_axis_sampling": {
+      "limit": null,
+      "passed": true,
+      "reason": "Both real world position and unit tool-axis signals on the complete post-step grid",
+      "unit": null,
+      "value": true
+    }
+  },
+  "continuous_time_guarantee": false,
+  "contract": "research.task_acceptance",
+  "evaluator_tension_channels": null,
+  "evidence_binding": {
+    "evaluation": {
+      "artifact_id": "3895932c71da2a114bb64287b22906b58098640bb84f7fda9eadabca79defc32",
+      "media_type": "application/json"
+    },
+    "evaluation_binding": {
+      "original_execution_id": null,
+      "source": {
+        "artifact_id": "f04aa9ed9a941a232bb2b0a910a52f2ff1a9ad1ae236f3105790ce6cdc93e313",
+        "media_type": "application/json"
+      },
+      "source_execution_id": null
+    },
+    "profile": {
+      "artifact_id": "afcd392072ab4b65b1bdd47856a9742d39ffdaf74fb8c7696d8e2c312e90f577",
+      "media_type": "application/json"
+    },
+    "profile_binding": {
+      "evaluation": {
+        "artifact_id": "3895932c71da2a114bb64287b22906b58098640bb84f7fda9eadabca79defc32",
+        "media_type": "application/json"
+      },
+      "execution_id": "5d4f873304ac4bf4937b6801edd60ff0",
+      "simulation": {
+        "artifact_id": "f04aa9ed9a941a232bb2b0a910a52f2ff1a9ad1ae236f3105790ce6cdc93e313",
+        "media_type": "application/json"
+      }
+    },
+    "simulation": {
+      "artifact_id": "f04aa9ed9a941a232bb2b0a910a52f2ff1a9ad1ae236f3105790ce6cdc93e313",
+      "media_type": "application/json"
+    }
+  },
+  "execution_id": "5d4f873304ac4bf4937b6801edd60ff0",
+  "issues": [],
+  "metrics": {
+    "max_position_error": 0.01193999996314957,
+    "max_tool_axis_angle_error": 0.1736580579439453,
+    "rms_position_error": 0.009913727577454982,
+    "terminal_position_error": 0.011939999653198835
+  },
+  "missing": [],
+  "protocol_id": "offline_oriented_tracking_v2",
+  "sources": {
+    "evaluation": {
+      "artifact_id": "3895932c71da2a114bb64287b22906b58098640bb84f7fda9eadabca79defc32",
+      "media_type": "application/json"
+    },
+    "profile": {
+      "artifact_id": "afcd392072ab4b65b1bdd47856a9742d39ffdaf74fb8c7696d8e2c312e90f577",
+      "media_type": "application/json"
+    }
+  },
+  "status": "accepted",
+  "task_family": "task.oriented_tracking",
+  "task_identity": "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45",
+  "timing": {
+    "control_period_s": 0.02,
+    "deadline_misses": null,
+    "duration_s": 0.6,
+    "mean_update_s": null,
+    "real_time_demonstrated": null,
+    "real_time_required": false,
+    "sample_period_s": 0.02,
+    "simulation_wall_s": null,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.001
+  },
+  "version": "1.0.0"
+}

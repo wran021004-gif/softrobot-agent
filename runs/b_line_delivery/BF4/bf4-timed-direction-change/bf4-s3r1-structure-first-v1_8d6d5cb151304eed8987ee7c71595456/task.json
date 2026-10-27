@@ -1,0 +1,284 @@
+{
+  "actuator_channels": [
+    "actuator_commands"
+  ],
+  "contract_version": "1.0.0",
+  "environment": {
+    "contract": "experiment.assembly",
+    "data": {
+      "environment": {
+        "coordinate_frame": "world_base_x_forward_yz_cross_section",
+        "environment_id": "reach_free",
+        "gravity_m_s2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+        "lights": [
+          {
+            "direction": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "position_m": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "conaffinity": 1,
+            "contype": 0,
+            "half_size_m": [
+              2.0,
+              2.0,
+              0.1
+            ],
+            "kind": "plane",
+            "name": "floor",
+            "position_m": [
+              0.0,
+              0.0,
+              -0.02
+            ]
+          }
+        ],
+        "schema_version": "1",
+        "truth_status": "HUMAN_OWNED",
+        "units": "SI"
+      },
+      "external_forces": [],
+      "floor_id": "floor",
+      "mount": {
+        "position_m": [
+          0.0,
+          0.0,
+          0.15
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "version": "1.0.0"
+  },
+  "evaluator": {
+    "extension_id": "evaluate.tracking",
+    "parameters": {
+      "contract": "reference.tracking_evaluation",
+      "data": {
+        "geometry_step_m": 0.001,
+        "max_error_m": 0.012
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "failure_policy": "retain_invalid_and_constraint_failures",
+  "family": "task.tracking",
+  "goal": {
+    "contract": "reference.tracking_goal",
+    "data": {
+      "frame": "world",
+      "interpolation": "linear",
+      "progression": "ordered_start_to_end",
+      "time_requirement": "timed",
+      "times_s": [
+        0.0,
+        0.3,
+        0.6
+      ],
+      "units": "m",
+      "vertices_m": [
+        [
+          0.3,
+          0.0,
+          0.15
+        ],
+        [
+          0.285,
+          0.035,
+          0.17
+        ],
+        [
+          0.285,
+          -0.025,
+          0.18
+        ]
+      ]
+    },
+    "version": "1.0.0"
+  },
+  "initializer": {
+    "extension_id": "initialize.family",
+    "parameters": {
+      "contract": "family.initial",
+      "data": {
+        "qpos_rad": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0
+        },
+        "qvel_rad_s": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0
+        },
+        "unspecified": "zero"
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "name": "BF4 timed spatial direction-change tracking",
+  "objectives": [
+    {
+      "direction": "minimize",
+      "metric": "max_position_error",
+      "units": "m",
+      "weight": 1.0
+    },
+    {
+      "direction": "minimize",
+      "metric": "rms_position_error",
+      "units": "m",
+      "weight": 1.0
+    }
+  ],
+  "observations": [
+    {
+      "dimension": 3,
+      "entity": "tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_position",
+      "phase": "post_step",
+      "units": "m"
+    }
+  ],
+  "robot_families": [
+    "tendon_robot_family"
+  ],
+  "sampling": {
+    "aggregation": "per_instance",
+    "seeds": [
+      17
+    ],
+    "split": "development",
+    "window_s": [
+      0.02,
+      0.6
+    ]
+  },
+  "source": "BF4 v1 frozen before structural comparison. Engineering-reviewed timed task, no scientific execution grant. Original S132 development fixtures retained. 12 mm sampled tolerance is 4% of nominal 0.30 m reach; 60.8 mm separation between scored corner and endpoint excludes every constant tip position. No hardware accuracy claim.",
+  "status": "development_valid",
+  "task_id": "bf4-timed-direction-change",
+  "task_version": "1.0.0",
+  "timing": {
+    "control_period_s": 0.02,
+    "duration_s": 0.6,
+    "sample_period_s": 0.02,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.001
+  }
+}

@@ -1,0 +1,619 @@
+{
+  "benchmark": "BF1",
+  "condition": "zero",
+  "witness": "bf-hidden-20261026_bf1_R1-0.2_zero_1",
+  "source": {
+    "archive": "D:\\softrobot-agent\\.worktrees\\bf1f2-benchmark-discovery\\runs\\bf-hidden-20261026\\bf1\\R1-0.2\\zero\\1",
+    "execution_id": "playback",
+    "bindings": {
+      "configuration_identity": "0f28662c0199b369a652a5912d16f55463308d8de8232999e4f4896682af53f1",
+      "structure_identity": "23fc7f6cec4afe11c6439356a37a161454f7a35f35746edfae8293ba0bfc18a3",
+      "mesh_identity": "53d1658ec92683eafb9be00f8d1013f0aae972b23ae921a8d3b1560209bff0f1",
+      "task_identity": "00d0331cec58265d832ad9e4753253c7166c81eda883a9e23a059dfa3bc6c938",
+      "control_identity": "0722b33630ab99b4bad0622c7773ceb00a410d8fc790f78c9d2a7117c6ed8706",
+      "raw_reference": {
+        "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "validity": "valid",
+        "task_success": true,
+        "metrics": [
+          {
+            "name": "position_error",
+            "value": 0.009805208301820589,
+            "units": "m"
+          }
+        ],
+        "constraints": [
+          {
+            "name": "task_bound",
+            "satisfied": true,
+            "observed": 0.009805208301820589,
+            "limit": 0.01,
+            "units": "m"
+          }
+        ],
+        "source": {
+          "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+          "media_type": "application/json"
+        },
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "source_execution_id": null,
+        "original_execution_id": null,
+        "candidate_id": null,
+        "comparison_identity": "0f28662c0199b369a652a5912d16f55463308d8de8232999e4f4896682af53f1",
+        "reason": null
+      },
+      "profile": {
+        "complete": true,
+        "task": {
+          "contract_version": "1.0.0",
+          "task_id": "bf1-multidirectional-hold-v1-zero",
+          "task_version": "1.0.0",
+          "name": "BF1 predeclared multidirectional hold zero",
+          "status": "development_valid",
+          "source": "2026-10-26 Asia/Shanghai: frozen before BF1 physical screening; symmetric y directions, same B2 target/timing/thresholds; development data, not BF2 validation",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "version": "1.0.0",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            }
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "version": "1.0.0",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "initializer": {
+            "extension_id": "initialize.family",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.initial",
+              "version": "1.0.0",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0
+                },
+                "unspecified": "zero"
+              }
+            }
+          },
+          "timing": {
+            "timestep_s": 0.0005,
+            "control_period_s": 0.01,
+            "sample_period_s": 0.01,
+            "duration_s": 0.35,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ]
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "version": "1.0.0",
+              "data": {
+                "tolerance_m": 0.01
+              }
+            }
+          },
+          "objectives": [
+            {
+              "metric": "position_error",
+              "direction": "minimize",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "observations": [
+            {
+              "name": "tip_position",
+              "entity": "tip",
+              "dimension": 3,
+              "units": "m",
+              "frame": "world",
+              "phase": "post_step",
+              "missing": "unsupported"
+            }
+          ],
+          "sampling": {
+            "split": "development",
+            "seeds": [
+              17
+            ],
+            "aggregation": "per_instance",
+            "window_s": [
+              0.0,
+              0.35
+            ]
+          }
+        },
+        "official_task_success": true,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0,
+        "sampled_settling": {
+          "window_s": 0.05,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "available": true,
+          "max_error_m": 0.009830772533634591,
+          "max_speed_m_s": 0.0196417398570847,
+          "passed": true
+        },
+        "execution_id": "playback",
+        "simulation": {
+          "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "d7216a2a7803974a5f7c03c5d4bdfa8a8bef803cc6f70d71251abecf40ac38a4",
+          "media_type": "application/json"
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "00d0331cec58265d832ad9e4753253c7166c81eda883a9e23a059dfa3bc6c938",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.009805208301820589,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.009830772533634591,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.0196417398570847,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.009805208301820589,
+          "holding_max_error_m": 0.009830772533634591,
+          "holding_max_speed_m_s": 0.0196417398570847
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "playback",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "d7216a2a7803974a5f7c03c5d4bdfa8a8bef803cc6f70d71251abecf40ac38a4",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "42cbc11d7b9d914b985ccdb772cd80109af01dcd957b1456a9153b64a61832bf",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "d7216a2a7803974a5f7c03c5d4bdfa8a8bef803cc6f70d71251abecf40ac38a4",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "42cbc11d7b9d914b985ccdb772cd80109af01dcd957b1456a9153b64a61832bf",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "d7216a2a7803974a5f7c03c5d4bdfa8a8bef803cc6f70d71251abecf40ac38a4",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "143eca0f2093da24f5ca5f8bc816e7d2d335dbdde122d6185bccb846fb6d7b4e",
+              "media_type": "application/json"
+            },
+            "execution_id": "playback"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      }
+    }
+  },
+  "task_id": "bf1-multidirectional-hold-v1-zero",
+  "physical_model_identity": "28154008b3dec7898914317dfb82b48a304c21839809b63242faf8530ee502cb",
+  "scene_identity": "8e0a9735fcdfb7b5953463f4b773a7775cb219af12f4e8c1b8c93c6d00ea8f2f",
+  "design_identity": "46edf15be334cc796aca51e3e954835fe67743272ee28d14d7a3fb5f807202b4",
+  "execution_model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+  "original_xml_sha256": "70d6e588319c430caa7115a1924320e6fd2f340b4b7d83c5ded0693befb3ca84",
+  "scene_recomputed": true,
+  "tendon_order": [
+    "tendon_0",
+    "tendon_1",
+    "tendon_2",
+    "tendon_3",
+    "tendon_4",
+    "tendon_5"
+  ],
+  "actuators": [
+    "tendon_0_direct_tension",
+    "tendon_1_direct_tension",
+    "tendon_2_direct_tension",
+    "tendon_3_direct_tension",
+    "tendon_4_direct_tension",
+    "tendon_5_direct_tension"
+  ],
+  "initial_state": {
+    "qpos": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "qvel": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "seed": 17,
+  "timing": {
+    "physical_timestep_s": 0.0005,
+    "duration_s": 0.35000000000000003,
+    "control_intervals": 35
+  },
+  "semantics": "Ideal tendon tension in N, zero-order hold. State sample 0 is initial; later tensions refer to the preceding interval.",
+  "evidence_acceptance": "Original independent acceptance; engineering replay does not create a new acceptance.",
+  "files": {
+    "acceptance.json": "d354f1ce6cfafb07e4ead47f8c17c798051d5e5596e30942bfd1b3b60bfa26ba",
+    "applied_tension.csv": "e76697515524de00cb2c0172313ff34c9223ae435de63c6d43f6306e1a803d7c",
+    "control.csv": "e8f49b31b549dd5692b0d95ad4c3a13327df9156ed25bfea77698ae4d7e9afa9",
+    "external_forces.json": "9bb7e79008e6e12f985344cb322b4f3ad873ae63bfb1eb8915751d53bef0abe3",
+    "hardware_notes.md": "738292b85a64c75de16f3ebbb2503d8753e28a80489707de9ca602825fbc03da",
+    "parameters.json": "06739b519e4072a30ddfcdaacf6588af162468e323f64f142524f5d431a29e8b",
+    "README.md": "86c3b1ce5603df35e073dca9a25d8caf7212a8007106305d186dc789d998613e",
+    "replay.py": "24e65d9dc888191bd22e40e5aab170e32d29a988b72d482c6b6ed0513b0fea9c",
+    "robot.xml": "70d6e588319c430caa7115a1924320e6fd2f340b4b7d83c5ded0693befb3ca84",
+    "states.csv": "6c4a6d9ced22c7565e9f592e18c736c46c2e49aebf14214a2be2af6be6c3ceb7",
+    "task.json": "e06852f459e89fe8f9f56be850bd9dab3c9e9abfb694c3bdead9547b0a8511f4"
+  }
+}

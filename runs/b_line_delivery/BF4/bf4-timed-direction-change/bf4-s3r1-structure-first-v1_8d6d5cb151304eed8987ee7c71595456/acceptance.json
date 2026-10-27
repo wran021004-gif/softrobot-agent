@@ -1,0 +1,135 @@
+{
+  "accepted": true,
+  "components": {
+    "evaluation_validity": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": "valid"
+    },
+    "evaluator:tracking_max_error": {
+      "limit": 0.012,
+      "passed": true,
+      "reason": null,
+      "unit": "m",
+      "value": 0.011940000065283767
+    },
+    "execution_complete": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": true
+    },
+    "force_bounds": {
+      "limit": 1e-08,
+      "passed": true,
+      "reason": null,
+      "unit": "N",
+      "value": 0.0
+    },
+    "solver_errors": {
+      "limit": 0,
+      "passed": true,
+      "reason": null,
+      "unit": "count",
+      "value": 0
+    },
+    "task_evaluator": {
+      "limit": null,
+      "passed": true,
+      "reason": null,
+      "unit": null,
+      "value": true
+    },
+    "tracking_sampling": {
+      "limit": null,
+      "passed": true,
+      "reason": "Full post-step motion and pre-step tension grids; r(t) is scored on the frozen inclusive window",
+      "unit": null,
+      "value": true
+    }
+  },
+  "continuous_time_guarantee": false,
+  "contract": "research.task_acceptance",
+  "evaluator_tension_channels": [
+    "tendon_0",
+    "tendon_1",
+    "tendon_2",
+    "tendon_3",
+    "tendon_4",
+    "tendon_5"
+  ],
+  "evidence_binding": {
+    "evaluation": {
+      "artifact_id": "f0d4a51dae0f4d8347dd97887b4dba8ef13ce4159f2e72468abe295272038eb1",
+      "media_type": "application/json"
+    },
+    "evaluation_binding": {
+      "original_execution_id": null,
+      "source": {
+        "artifact_id": "b0ab6e2e60a2356baf688e9530380cf45fb7c6f40477cd3208f87be7c5ab8374",
+        "media_type": "application/json"
+      },
+      "source_execution_id": null
+    },
+    "profile": {
+      "artifact_id": "04e34a3e0cb3faa693a5611244df531c14c94ed5e44ad0b14dc7fc41b8dda77c",
+      "media_type": "application/json"
+    },
+    "profile_binding": {
+      "evaluation": {
+        "artifact_id": "f0d4a51dae0f4d8347dd97887b4dba8ef13ce4159f2e72468abe295272038eb1",
+        "media_type": "application/json"
+      },
+      "execution_id": "8d6d5cb151304eed8987ee7c71595456",
+      "simulation": {
+        "artifact_id": "b0ab6e2e60a2356baf688e9530380cf45fb7c6f40477cd3208f87be7c5ab8374",
+        "media_type": "application/json"
+      }
+    },
+    "simulation": {
+      "artifact_id": "b0ab6e2e60a2356baf688e9530380cf45fb7c6f40477cd3208f87be7c5ab8374",
+      "media_type": "application/json"
+    }
+  },
+  "execution_id": "8d6d5cb151304eed8987ee7c71595456",
+  "issues": [],
+  "metrics": {
+    "max_position_error": 0.011940000065283767,
+    "rms_position_error": 0.01098488437849098,
+    "terminal_position_error": 0.01193999998774161
+  },
+  "missing": [],
+  "protocol_id": "offline_timed_tracking_v1",
+  "sources": {
+    "evaluation": {
+      "artifact_id": "f0d4a51dae0f4d8347dd97887b4dba8ef13ce4159f2e72468abe295272038eb1",
+      "media_type": "application/json"
+    },
+    "profile": {
+      "artifact_id": "04e34a3e0cb3faa693a5611244df531c14c94ed5e44ad0b14dc7fc41b8dda77c",
+      "media_type": "application/json"
+    }
+  },
+  "status": "accepted",
+  "task_family": "task.tracking",
+  "task_identity": "e41a4600feefe39614b7f660147208a73373d1f5f6fde23a0790a0a13dde472c",
+  "timing": {
+    "control_period_s": 0.02,
+    "deadline_misses": null,
+    "duration_s": 0.6,
+    "mean_update_s": null,
+    "real_time_demonstrated": null,
+    "real_time_required": false,
+    "sample_period_s": 0.02,
+    "simulation_wall_s": null,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.001
+  },
+  "version": "1.0.0"
+}

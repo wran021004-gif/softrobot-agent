@@ -1,0 +1,255 @@
+{
+  "contract_version": "1.0.0",
+  "task_id": "b1-v1-plus_y",
+  "task_version": "1.0.0",
+  "name": "Independent development validation of a serial multi-segment soft arm",
+  "status": "development_valid",
+  "source": "B1 v1 cold-start workspace coverage, frozen before dynamics search",
+  "family": "task.reach",
+  "goal": {
+    "contract": "reference.reach_goal",
+    "version": "1.0.0",
+    "data": {
+      "target_m": [
+        0.276,
+        0.075,
+        0.15
+      ]
+    }
+  },
+  "environment": {
+    "contract": "experiment.assembly",
+    "version": "1.0.0",
+    "data": {
+      "environment": {
+        "coordinate_frame": "world_base_x_forward_yz_cross_section",
+        "environment_id": "reach_free",
+        "gravity_m_s2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+        "lights": [
+          {
+            "direction": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "position_m": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "conaffinity": 1,
+            "contype": 0,
+            "half_size_m": [
+              2.0,
+              2.0,
+              0.1
+            ],
+            "kind": "plane",
+            "name": "floor",
+            "position_m": [
+              0.0,
+              0.0,
+              -0.02
+            ]
+          }
+        ],
+        "schema_version": "1",
+        "truth_status": "HUMAN_OWNED",
+        "units": "SI"
+      },
+      "external_forces": [],
+      "floor_id": "floor",
+      "mount": {
+        "position_m": [
+          0.0,
+          0.0,
+          0.15
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "robot_families": [
+    "tendon_robot_family"
+  ],
+  "actuator_channels": [
+    "actuator_commands"
+  ],
+  "initializer": {
+    "extension_id": "initialize.family",
+    "version": "1.0.0",
+    "parameters": {
+      "contract": "family.initial",
+      "version": "1.0.0",
+      "data": {
+        "qpos_rad": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0
+        },
+        "qvel_rad_s": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0
+        },
+        "unspecified": "zero"
+      }
+    }
+  },
+  "timing": {
+    "timestep_s": 0.0005,
+    "control_period_s": 0.01,
+    "sample_period_s": 0.01,
+    "duration_s": 0.7,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ]
+  },
+  "evaluator": {
+    "extension_id": "evaluate.reach",
+    "version": "1.0.0",
+    "parameters": {
+      "contract": "reference.reach_evaluation",
+      "version": "1.0.0",
+      "data": {
+        "tolerance_m": 0.01
+      }
+    }
+  },
+  "objectives": [
+    {
+      "metric": "position_error",
+      "direction": "minimize",
+      "units": "m",
+      "weight": 1.0
+    }
+  ],
+  "failure_policy": "retain_invalid_and_constraint_failures",
+  "observations": [
+    {
+      "name": "tip_position",
+      "entity": "tip",
+      "dimension": 3,
+      "units": "m",
+      "frame": "world",
+      "phase": "post_step",
+      "missing": "unsupported"
+    }
+  ],
+  "sampling": {
+    "split": "development",
+    "seeds": [
+      17
+    ],
+    "aggregation": "per_instance",
+    "window_s": [
+      0.0,
+      0.7
+    ]
+  }
+}

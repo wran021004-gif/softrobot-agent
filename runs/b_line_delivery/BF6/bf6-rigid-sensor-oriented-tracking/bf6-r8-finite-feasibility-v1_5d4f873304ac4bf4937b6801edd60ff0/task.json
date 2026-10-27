@@ -1,0 +1,349 @@
+{
+  "actuator_channels": [
+    "actuator_commands"
+  ],
+  "contract_version": "1.0.0",
+  "environment": {
+    "contract": "experiment.assembly",
+    "data": {
+      "environment": {
+        "coordinate_frame": "world_base_x_forward_yz_cross_section",
+        "environment_id": "reach_free",
+        "gravity_m_s2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+        "lights": [
+          {
+            "direction": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "position_m": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "conaffinity": 1,
+            "contype": 0,
+            "half_size_m": [
+              2.0,
+              2.0,
+              0.1
+            ],
+            "kind": "plane",
+            "name": "floor",
+            "position_m": [
+              0.0,
+              0.0,
+              -0.02
+            ]
+          }
+        ],
+        "schema_version": "1",
+        "truth_status": "HUMAN_OWNED",
+        "units": "SI"
+      },
+      "external_forces": [],
+      "floor_id": "floor",
+      "mount": {
+        "position_m": [
+          0.0,
+          0.0,
+          0.15
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "version": "1.0.0"
+  },
+  "evaluator": {
+    "extension_id": "evaluate.oriented_tracking",
+    "parameters": {
+      "contract": "reference.oriented_tracking_evaluation",
+      "data": {
+        "angle_tolerance_rad": 0.17453292519943295,
+        "geometry_step_m": 0.001,
+        "max_error_m": 0.012
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "failure_policy": "retain_invalid_and_constraint_failures",
+  "family": "task.oriented_tracking",
+  "goal": {
+    "contract": "reference.oriented_tracking_goal",
+    "data": {
+      "axis_frame": "tip_site_local",
+      "axis_interpolation": "normalized_linear",
+      "axis_local": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "axis_vertices_world": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9656541190600237,
+          -0.17381774143080425,
+          -0.19313082381200475
+        ],
+        [
+          0.9738617339145248,
+          0.11686340806974296,
+          -0.19477234678290495
+        ]
+      ],
+      "frame": "world",
+      "interpolation": "linear",
+      "progression": "ordered_start_to_end",
+      "rigid_tool": {
+        "body": "payload",
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            1.2e-06,
+            2e-07,
+            0.0
+          ],
+          [
+            2e-07,
+            1.6e-06,
+            2e-07
+          ],
+          [
+            0.0,
+            2e-07,
+            1.8e-06
+          ]
+        ],
+        "mass_kg": 0.02,
+        "tip_position_local_m": [
+          0.014,
+          0.0,
+          0.0
+        ]
+      },
+      "time_requirement": "timed",
+      "times_s": [
+        0.0,
+        0.3,
+        0.6
+      ],
+      "units": "m",
+      "vertices_m": [
+        [
+          0.298,
+          0.0,
+          0.15
+        ],
+        [
+          0.29,
+          -0.025,
+          0.12
+        ],
+        [
+          0.29,
+          0.015,
+          0.12
+        ]
+      ]
+    },
+    "version": "1.0.0"
+  },
+  "initializer": {
+    "extension_id": "initialize.family",
+    "parameters": {
+      "contract": "family.initial",
+      "data": {
+        "qpos_rad": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0
+        },
+        "qvel_rad_s": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0
+        },
+        "unspecified": "zero"
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "name": "BF6 non-contact directed scanning with a rigid inertial sensor tool",
+  "objectives": [
+    {
+      "direction": "minimize",
+      "metric": "max_position_error",
+      "units": "m",
+      "weight": 1.0
+    },
+    {
+      "direction": "minimize",
+      "metric": "max_tool_axis_angle_error",
+      "units": "rad",
+      "weight": 1.0
+    }
+  ],
+  "observations": [
+    {
+      "dimension": 3,
+      "entity": "tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_position",
+      "phase": "post_step",
+      "units": "m"
+    },
+    {
+      "dimension": 3,
+      "entity": "tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_tool_axis",
+      "phase": "post_step",
+      "units": "1"
+    }
+  ],
+  "robot_families": [
+    "tendon_robot_family"
+  ],
+  "sampling": {
+    "aggregation": "per_instance",
+    "seeds": [
+      17
+    ],
+    "split": "development",
+    "window_s": [
+      0.02,
+      0.6
+    ]
+  },
+  "source": "Task B supplementary instruction: one minimal non-contact timed position/tool-axis scan with real 20 g rigid payload dynamics; frozen before any BF6 scientific search. Original BF4 S2 task and costs unchanged. No contact, writing, complete orientation or axial-roll claim.",
+  "status": "development_valid",
+  "task_id": "bf6-rigid-sensor-oriented-tracking",
+  "task_version": "1.0.0",
+  "timing": {
+    "control_period_s": 0.02,
+    "duration_s": 0.6,
+    "sample_period_s": 0.02,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.001
+  }
+}

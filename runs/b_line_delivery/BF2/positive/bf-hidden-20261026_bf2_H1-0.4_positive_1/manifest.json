@@ -1,0 +1,632 @@
+{
+  "benchmark": "BF2",
+  "condition": "positive",
+  "witness": "bf-hidden-20261026_bf2_H1-0.4_positive_1",
+  "source": {
+    "archive": "D:\\softrobot-agent\\.worktrees\\bf1f2-benchmark-discovery\\runs\\bf-hidden-20261026\\bf2\\H1-0.4\\positive\\1",
+    "execution_id": "playback",
+    "bindings": {
+      "configuration_identity": "7856ec55a0b06b985ecbe001efed8cea6fd7f3696e6ad6ae974ec63568d64d40",
+      "structure_identity": "7fcc4ac5fa01ee59f8f6de856c891bbd4595d964f8c56680c40dba3a118a73a3",
+      "mesh_identity": "53d1658ec92683eafb9be00f8d1013f0aae972b23ae921a8d3b1560209bff0f1",
+      "task_identity": "686ea7378db80d8c1e3c362ea3e8e56ed5b95b1ba0f6522b25f0ce70cf4e168f",
+      "control_identity": "1ffd3d23394a76b9ec8f73a3c96eb859f2ae35446945ea95285e0e092d154c0b",
+      "raw_reference": {
+        "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "validity": "valid",
+        "task_success": true,
+        "metrics": [
+          {
+            "name": "position_error",
+            "value": 0.0093845432303488,
+            "units": "m"
+          }
+        ],
+        "constraints": [
+          {
+            "name": "task_bound",
+            "satisfied": true,
+            "observed": 0.0093845432303488,
+            "limit": 0.01,
+            "units": "m"
+          }
+        ],
+        "source": {
+          "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+          "media_type": "application/json"
+        },
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "source_execution_id": null,
+        "original_execution_id": null,
+        "candidate_id": null,
+        "comparison_identity": "7856ec55a0b06b985ecbe001efed8cea6fd7f3696e6ad6ae974ec63568d64d40",
+        "reason": null
+      },
+      "profile": {
+        "complete": true,
+        "task": {
+          "contract_version": "1.0.0",
+          "task_id": "bf2-multidirectional-hold-frozen-v1-positive",
+          "task_version": "1.0.0",
+          "name": "BF2 frozen multidirectional hold positive",
+          "status": "development_valid",
+          "source": "2026-10-27 Asia/Shanghai: BF2 frozen after BF1 development screening and before held-out exact candidate validation; same physical tasks and original evaluator; new independent controls, two declared starts",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "version": "1.0.0",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            }
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "version": "1.0.0",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [
+                {
+                  "entity": "payload",
+                  "point": "center_of_mass",
+                  "frame": "world",
+                  "force_n": [
+                    0,
+                    0.02,
+                    -0.03
+                  ],
+                  "start_s": 0.1,
+                  "end_s": 0.35
+                }
+              ],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "initializer": {
+            "extension_id": "initialize.family",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.initial",
+              "version": "1.0.0",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0
+                },
+                "unspecified": "zero"
+              }
+            }
+          },
+          "timing": {
+            "timestep_s": 0.0005,
+            "control_period_s": 0.01,
+            "sample_period_s": 0.01,
+            "duration_s": 0.35,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ]
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "version": "1.0.0",
+              "data": {
+                "tolerance_m": 0.01
+              }
+            }
+          },
+          "objectives": [
+            {
+              "metric": "position_error",
+              "direction": "minimize",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "observations": [
+            {
+              "name": "tip_position",
+              "entity": "tip",
+              "dimension": 3,
+              "units": "m",
+              "frame": "world",
+              "phase": "post_step",
+              "missing": "unsupported"
+            }
+          ],
+          "sampling": {
+            "split": "development",
+            "seeds": [
+              17
+            ],
+            "aggregation": "per_instance",
+            "window_s": [
+              0.0,
+              0.35
+            ]
+          }
+        },
+        "official_task_success": true,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0,
+        "sampled_settling": {
+          "window_s": 0.05,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "available": true,
+          "max_error_m": 0.009900000000005002,
+          "max_speed_m_s": 0.01980000000008701,
+          "passed": true
+        },
+        "execution_id": "playback",
+        "simulation": {
+          "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "1d5d8bb657e528b4c4fd17b215a57afd7390e341608314d9b41aff627517c454",
+          "media_type": "application/json"
+        }
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "686ea7378db80d8c1e3c362ea3e8e56ed5b95b1ba0f6522b25f0ce70cf4e168f",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.0093845432303488,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.009900000000005002,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.01980000000008701,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.0093845432303488,
+          "holding_max_error_m": 0.009900000000005002,
+          "holding_max_speed_m_s": 0.01980000000008701
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "playback",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "1d5d8bb657e528b4c4fd17b215a57afd7390e341608314d9b41aff627517c454",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "2f0244b890e59a031e2f193a83eef3018a1e6749c01b7e4141754c21e2015a79",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "1d5d8bb657e528b4c4fd17b215a57afd7390e341608314d9b41aff627517c454",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "2f0244b890e59a031e2f193a83eef3018a1e6749c01b7e4141754c21e2015a79",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "1d5d8bb657e528b4c4fd17b215a57afd7390e341608314d9b41aff627517c454",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "4c9f849deb1a10f16c838f2351db1d0256f5bc8da61e1196f6759d51fa6071cf",
+              "media_type": "application/json"
+            },
+            "execution_id": "playback"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      }
+    }
+  },
+  "task_id": "bf2-multidirectional-hold-frozen-v1-positive",
+  "physical_model_identity": "f2ad126fcb0e440a31db4613610f87bf3ae9626b0bdc3181b15245adb8ba8294",
+  "scene_identity": "d04af22004c264ce4753816bb92980c4132618c83876ba21c10ad3580e244689",
+  "design_identity": "b096860f2b9f519f43c4f7376332d5a8c1e93459f5aadff337af268226141ad4",
+  "execution_model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+  "original_xml_sha256": "ef3a558767968821530d9d98218741e16202e612bdef3c60735972880198d245",
+  "scene_recomputed": true,
+  "tendon_order": [
+    "tendon_0",
+    "tendon_1",
+    "tendon_2",
+    "tendon_3",
+    "tendon_4",
+    "tendon_5"
+  ],
+  "actuators": [
+    "tendon_0_direct_tension",
+    "tendon_1_direct_tension",
+    "tendon_2_direct_tension",
+    "tendon_3_direct_tension",
+    "tendon_4_direct_tension",
+    "tendon_5_direct_tension"
+  ],
+  "initial_state": {
+    "qpos": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "qvel": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "seed": 17,
+  "timing": {
+    "physical_timestep_s": 0.0005,
+    "duration_s": 0.35000000000000003,
+    "control_intervals": 35
+  },
+  "semantics": "Ideal tendon tension in N, zero-order hold. State sample 0 is initial; later tensions refer to the preceding interval.",
+  "evidence_acceptance": "Original independent acceptance; engineering replay does not create a new acceptance.",
+  "files": {
+    "acceptance.json": "8f8b3af6104b3106fe0ea9d7efdee5f7ccdf6a874a92d65b4f7b072d2e469da4",
+    "applied_tension.csv": "b04dc42bffd70c3d8c32f16ca12deb90188e74150e39f1d54c2ba021aee83db8",
+    "control.csv": "b04dc42bffd70c3d8c32f16ca12deb90188e74150e39f1d54c2ba021aee83db8",
+    "external_forces.json": "479c9869580b3cf88a715e62cc1a39567b41fa2da00161392ec4e3d46f09da1f",
+    "hardware_notes.md": "738292b85a64c75de16f3ebbb2503d8753e28a80489707de9ca602825fbc03da",
+    "parameters.json": "9ef8738ffe47d6a493e8f685bc01c515a36e185a3f4eb7fcb312ca73bae6e39f",
+    "README.md": "bfdc420f17b99d4e7fb9ef29abbb859841629030d1aabd539cc6eb538e8fcf2e",
+    "replay.py": "24e65d9dc888191bd22e40e5aab170e32d29a988b72d482c6b6ed0513b0fea9c",
+    "robot.xml": "ef3a558767968821530d9d98218741e16202e612bdef3c60735972880198d245",
+    "states.csv": "fcf66efc5b23d8f62161cc3fe094c2aa77561167e98372009696b0308f4ddb5e",
+    "task.json": "c07f9c4108c12cc80611209597e0fbcec389ef40ebcf52327ba41582bab1ca95"
+  }
+}
