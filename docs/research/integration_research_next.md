@@ -135,7 +135,52 @@ minimal real two-condition check after commit: one Native baseline and full
 independent replay per frozen condition; zero Provider/NMPC/RL and no structure
 search. The separate private Store records all actual outcomes and costs.
 
-## A-III
+A-II was committed as `0bfa26d44`. The real two-condition check completed
+700 Native + 700 replay steps per condition (2,800 total), two complete independent
+receipts and 5.2990101 s cumulative measured numerical cost. Both original task
+outcomes were `valid_failure`; joint SELECT correctly rejected them. Provider,
+NMPC and RL counts were zero. The sanitized summary is published beside A-I.
 
-The Task Intake thin adaptation follows separately. Benchmark execution always
-consumes the frozen TaskDefinition directly; Intake is not a prerequisite.
+## A-III: independent Task Intake preview
+
+The original `schemas/task_intake.py` contract, source tracing, N1 parser,
+questions and deterministic review flow remain. `compile_draft` now accepts an
+explicit complete snapshot for a registered timed Tracking task and its real
+controller/backend compatibility. It copies that exact path, times and limits;
+it cannot compile new paths, circles, arbitrary evaluators or changed thresholds.
+There is no resolver/Store/Study/Provider/science call inside compilation.
+
+Example supported clauses, separated by semicolons:
+
+- `末端跟踪参考配置的时间轨迹`
+- `采用参考配置的轨迹顶点与时间点`
+- `世界坐标系`
+- `跟踪误差不超过 0.012 m` (must match the supplied BF4 reference)
+- `采用参考配置的其余验收与执行设置`
+
+The ordinary CLI accepts offline N1 response JSON and `--compile-reference`
+pointing to the explicitly supplied full SessionInput snapshot. Compilation
+returns `status=draft`, `authorization=not_authorized`, preserved numeric sources,
+frozen `r(t)` constraints and pending original protocol evidence. Tracking has
+no invented holding speed. A draft can compose missing-evidence diagnostics;
+supplying physical observations still requires the original development-valid
+Tracking admission. Questions, event relations, unknown clauses, absent path
+adoption, changed limits and unsupported tasks remain unresolved for review.
+
+38 Intake tests passed (12 parser/source tests and 26 compilation checks), with
+zero Provider or physics. The directly related stale endpoint-coverage assertion
+was corrected to `partial`: its terminal sample covers only part of the holding
+window, while full-task support remains false. Reach previews preserve their
+original effective configuration. Benchmark studies always read B's frozen
+TaskDefinition directly and never depend on Task Intake.
+
+## Remaining scope
+
+No autonomous Provider Study was launched by this integration. Positive SELECT
+paths use explicitly labeled fabricated motion with real Store/evaluator gates;
+the small real baselines failed honestly. C owns future finite-budget autonomous
+Tracking studies. Multi-condition extra repetitions, heterogeneous protocol
+aggregation and joint RL/NMPC selection remain explicit unsupported combinations.
+The two unrelated old family-space digest/size assertions remain documented
+above; no old success result, private Store, raw Provider reasoning or key is
+published.

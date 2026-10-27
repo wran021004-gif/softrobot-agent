@@ -86,7 +86,40 @@ class CompilationTests(unittest.TestCase):
         self.assertEqual(math['status'], 'assessed')
         endpoint = next(r for r in math['operations'] if r['operation'] == 'endpoint')
         self.assertFalse(endpoint['full_task_supported'])
-        self.assertEqual(endpoint['coverage'][1]['status'], 'not_applicable')
+        self.assertEqual(endpoint['coverage'][1]['status'], 'partial')
+
+    def test_registered_timed_tracking_reference_preview(self):
+        spec=resolve(ROOT/'configs/research/study_tracking_public.json')
+        cfg=deepcopy(spec['configuration']);before=deepcopy(cfg)
+        clauses={'末端跟踪参考配置的时间轨迹':'behavior','采用参考配置的轨迹顶点与时间点':'constraint',
+            '世界坐标系':'constraint','跟踪误差不超过 0.012 m':'acceptance',ADOPT_REFERENCE:'constraint'}
+        draft=complete_draft(clauses,intent='tracking')
+        with patch('tools.research.config.resolve',side_effect=AssertionError('No Study resolution or execution')):
+            result=compile_draft(draft,trusted_reference=cfg,reference_label='Frozen BF4 reference fixture',
+                analysis_protocol=spec['analysis_protocol'])
+        self.assertEqual(result.diagnostics,[])
+        self.assertEqual(result.candidate_task.status,'draft')
+        self.assertEqual(cfg,before)
+        self.assertEqual(result.candidate_task.goal.model_dump(mode='json'),cfg['task']['goal'])
+        self.assertEqual(result.capabilities['authorization']['status'],'not_authorized')
+        self.assertIsNone(result.configuration_preview.policy.controller.parameters.data['settling'])
+        pending=result.acceptance_spec['pending_evidence']
+        self.assertEqual(pending['protocol_id'],'offline_timed_tracking_v1')
+        self.assertEqual(pending['status'],'missing_evidence')
+        self.assertNotIn('holding_speed',pending['components'])
+        self.assertEqual(result.capabilities['mathematics']['requirements']['constraints'][0]['constraint_id'],'timed_tracking')
+        for extra in ('保持窗口速度不超过 0.02 m/s','避开障碍物','跟踪圆形轨迹'):
+            changed={**clauses,extra:'constraint'}
+            rejected=compile_draft(complete_draft(changed,intent='tracking'),trusted_reference=cfg,reference_label='fixture')
+            self.assertIsNone(rejected.configuration_preview)
+            self.assertTrue(any('UNMAPPED_USER_CONSTRAINT' in d for d in rejected.diagnostics))
+        changed=dict(clauses);changed.pop('跟踪误差不超过 0.012 m');changed['跟踪误差不超过 0.01 m']='acceptance'
+        conflict=compile_draft(complete_draft(changed,intent='tracking'),trusted_reference=cfg,reference_label='fixture')
+        self.assertIsNone(conflict.configuration_preview)
+        self.assertTrue(any('REFERENCE_CONFLICT' in d for d in conflict.diagnostics))
+        changed=dict(clauses);changed.pop('采用参考配置的轨迹顶点与时间点')
+        missing=compile_draft(complete_draft(changed,intent='tracking'),trusted_reference=cfg,reference_label='fixture')
+        self.assertIn('reference_trajectory',missing.capabilities['semantic']['missing'])
 
     def test_missing_tolerance_and_time_are_explicit(self):
         draft = complete_draft({'让末端到达目标': 'behavior', '世界坐标系': 'constraint'}, intent='reach')
@@ -301,7 +334,7 @@ class CompilationTests(unittest.TestCase):
         self.assertIsNone(self.compile(complete_draft(clauses, intent='reach')).candidate_task)
 
     def test_unsupported_task_compilation_and_implementation_diagnostics(self):
-        for case, expected in [('tracking', 'reviewed tracking evaluator mapping and explicit time semantics (N2 remains Reach-only)'), ('obstacle', 'collision/distance signals'),
+        for case, expected in [('tracking', 'reviewed timed Tracking reference with explicit trajectory adoption'), ('obstacle', 'collision/distance signals'),
                                ('catch', 'contact/capture evaluator'), ('disturbance', 'platform/disturbance signals')]:
             text, proposal = CASES[case]
             draft = parse_response(text, json.dumps(proposal)).draft

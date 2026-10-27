@@ -54,8 +54,8 @@ def acceptance_view(value, *, source_label='supplied_context'):
         collect(raw_task[field], '/task/' + field)
     interval, limits = None, None
     limitations = ['Configuration contract-checked only; physical performance and full execution compatibility unassessed.',
-                  'TaskDefinition evaluator does not alone define research reach-and-hold acceptance.',
-                  'Research acceptance also checks execution/validity, solver errors, force bounds and holding coverage; this view does not evaluate them.']
+                  'TaskDefinition evaluator does not alone define complete physical acceptance.',
+                  'Research acceptance also checks execution/validity, solver errors, force bounds and task sample coverage; this view does not evaluate them.']
     if task.family == 'task.reach':
         settling = (snapshot.policy.controller.parameters.data.get('settling') if snapshot else value.get('settling'))
         prefix = SETTLING if snapshot else '/settling/'
@@ -304,6 +304,10 @@ REACH_FIELDS = {
     'hold_position': SETTLING + 'position_limit_m',
     'hold_speed': SETTLING + 'speed_limit_m_s',
 }
+TRACKING_FIELDS = {
+    'tracking_error': '/task/evaluator/parameters/data/max_error_m',
+    'duration': '/task/timing/duration_s',
+}
 
 
 def _reach_clause(text):
@@ -334,6 +338,16 @@ def _clauses(text):
     return [part.strip() for part in re.split('[；;。\n]', text) if part.strip()]
 
 
+def _tracking_clause(text):
+    """Adopt an existing timed reference; do not invent paths or thresholds."""
+    if text == '末端跟踪参考配置的时间轨迹':return 'behavior', 'tracking'
+    if text == '采用参考配置的轨迹顶点与时间点':return 'reference_trajectory', True
+    match=re.fullmatch(r'跟踪误差不超过\s*(-?(?:\d+(?:\.\d+)?)(?:[eE][+-]?\d+)?)\s*m',text)
+    if match:return 'tracking_error',float(match[1])
+    key,value=_reach_clause(text)
+    return (key,value) if key in ('reference_settings','frame','duration') else (None,None)
+
+
 def _holding_relations(draft, view):
     """Only existing inclusive sampled hold limits; no event/deadline inference."""
     roles = {}
@@ -362,7 +376,7 @@ def _holding_relations(draft, view):
 def compile_draft(draft, *, trusted_reference=None, reference_label=None, analysis_protocol=None):
     """Compile a review preview against an explicitly supplied complete snapshot.
 
-    Only identical reference semantics are supported in N2. No arbitrary patches,
+    Only identical Reach/Hold or registered timed Tracking references compile. No arbitrary patches,
     approval transition, context reconstruction, Store, or execution occurs here.
     """
     from tools.research_tasks import assemble_acceptance
@@ -370,6 +384,9 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
 
     draft = TaskIntakeDraft.model_validate(draft)
     supported = draft.intent in ('reach', 'reach_and_hold')
+    tracking=draft.intent=='tracking'
+    fields=TRACKING_FIELDS if tracking else REACH_FIELDS
+    clause=_tracking_clause if tracking else _reach_clause
     diagnostics, mappings = [], []
     reg = registry()
     capabilities = dict(
@@ -391,7 +408,11 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
             check_definition(cfg['task'], reg)
             view = acceptance_view(cfg, source_label=reference_label)
             identity = digest(cfg)
-            if cfg['task']['family'] != 'task.reach' or cfg['task']['environment']['data']['environment']['environment_id'] != 'reach_free':
+            if tracking:
+                if cfg['task']['family']!='task.tracking' or cfg['task']['goal']['data']['time_requirement']!='timed':
+                    raise ValueError('TRACKING_REFERENCE_TASK_MISMATCH: registered timed task.tracking expected')
+                supported=True
+            elif cfg['task']['family'] != 'task.reach' or cfg['task']['environment']['data']['environment']['environment_id'] != 'reach_free':
                 raise ValueError('N2_REFERENCE_REQUIRES_REACH_FREE')
             reference_check = task_adapter(cfg).check_compatibility()['technical_compatibility']
         except (ValueError, TypeError, KeyError) as exc:
@@ -419,7 +440,7 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         meaning='Quotation diagnostic only; every original clause must separately map before preview.')
 
     clauses = _clauses(draft.user_text)
-    parsed = [(text, *_reach_clause(text)) for text in clauses]
+    parsed = [(text, *clause(text)) for text in clauses]
     adoption = any(key == 'reference_settings' for _, key, _ in parsed)
     facts, conflicts = {}, []
     for text, key, value in parsed:
@@ -429,7 +450,7 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         if key in facts and facts[key] != value:
             conflicts.append('CONFLICTING_USER_VALUES: ' + key)
         facts[key] = value
-        pointer = REACH_FIELDS.get(key)
+        pointer = fields.get(key)
         if view and pointer and view.facts.get(pointer) != value:
             conflicts.append('REFERENCE_CONFLICT: ' + pointer + '; user=' + json.dumps(value)
                              + '; reference=' + json.dumps(view.facts.get(pointer)))
@@ -442,8 +463,8 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         status = 'needs_confirmation'
         if row.source == 'user_explicit':
             for text in _clauses(row.quote):
-                key, value = _reach_clause(text)
-                pointer = REACH_FIELDS.get(key)
+                key, value = clause(text)
+                pointer = fields.get(key)
                 state = 'unmapped' if key is None else 'mapped'
                 if view and pointer and view.facts.get(pointer) != value:
                     state = 'conflict'
@@ -471,11 +492,12 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         note='Compare supplied facts with questions; no question is removed or considered answered automatically.')
     if supported:
         try:
-            task_extension = reg.get('task.reach', kind='task')
-            evaluator = reg.get('evaluate.reach', kind='evaluator')
+            task_extension = reg.get('task.tracking' if tracking else 'task.reach', kind='task')
+            evaluator = reg.get('evaluate.tracking' if tracking else 'evaluate.reach', kind='evaluator')
             capabilities['evaluation'] = dict(status='registered', task=task_extension.extension_id,
                 evaluator=evaluator.extension_id, availability=reg.inspect(evaluator, [evaluator.extension_id]),
-                scope='Endpoint evaluator plus existing offline_reach_hold_v1 composition; no evaluation performed.')
+                scope='Registered timed r(t) evaluator plus offline_timed_tracking_v1; no evaluation performed.' if tracking else
+                    'Endpoint evaluator plus existing offline_reach_hold_v1 composition; no evaluation performed.')
         except ValueError as exc:
             diagnostics.append('EVALUATOR_UNAVAILABLE: ' + str(exc))
     else:
@@ -488,23 +510,23 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         if draft.intent=='tracking' and 'task.tracking' in capabilities['registered_tasks']:
             capabilities['evaluation']['registered_definition']=dict(task='task.tracking',evaluator='evaluate.tracking',
                 scope='Piecewise-linear paths up to two segments: untimed geometric or explicitly timed references. No automatic mapping of the requested Tracking task.')
-            needs=['reviewed tracking evaluator mapping and explicit time semantics (N2 remains Reach-only)', 'verified path-following controller/backend execution']
+            needs=['reviewed timed Tracking reference with explicit trajectory adoption', 'verified path-following controller/backend execution']
         capabilities['evaluation']['reasons'] = needs
         diagnostics.append('UNSUPPORTED_TASK: ' + draft.intent + '; requires ' + ', '.join(needs))
         capabilities['mathematics'] = dict(status='not_applicable', reason='No supported task translation; original semantics retained.')
     missing = list(draft.missing_definitions)
     if supported:
-        required = ['target', 'frame', 'tolerance', 'duration']
+        required = ['reference_trajectory','frame','tracking_error','duration'] if tracking else ['target', 'frame', 'tolerance', 'duration']
         if draft.intent == 'reach_and_hold':
             required += ['hold_window', 'hold_position', 'hold_speed']
         missing += [key for key in required if key not in facts and not (adoption and view and
-                    key not in ('target', 'frame') and REACH_FIELDS[key] in view.facts)]
+                    key not in ('target','frame') and key in fields and fields[key] in view.facts)]
         if not any(key in facts for key in ('behavior', 'target')):
-            missing.append('explicit reach behavior')
+            missing.append('explicit tracking behavior' if tracking else 'explicit reach behavior')
     if draft.task_object is None:
         missing.append('task object')
     temporal = _holding_relations(draft, view if not diagnostics and supported else None)
-    capabilities['temporal'] = dict(mappings=temporal, scope='Existing sampled final-window limits only')
+    capabilities['temporal'] = dict(mappings=temporal, scope='Frozen timed-reference samples only; new event relations require review' if tracking else 'Existing sampled final-window limits only')
     if any(edge['status'] != 'mapped' for edge in temporal):
         diagnostics.append('TEMPORAL_RELATIONS_REQUIRE_REVIEW: outside existing sampled holding constraints')
     if supported and not adoption:
@@ -529,7 +551,7 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         acceptance = dict(source_identity=identity, source_label=reference_label,
             facts=view.facts, adapter=adapter.describe(), limits=adapter.ranking_limits(),
             protocol_owner='tools.research_tasks.assemble_acceptance', pending_evidence=pending,
-            evaluator_owner='extensions.reference.implementation.evaluate_reach',
+            evaluator_owner='extensions.reference.implementation.evaluate_tracking' if tracking else 'extensions.reference.implementation.evaluate_reach',
             note='Pending evidence only. Independent evaluator constraints and all protocol components remain required.')
         acceptance['condition_sources'] = {name: dict(owner='tools.research_tasks.assemble_acceptance',
             reference_identity=identity, evidence_status='missing') for name in pending['components']}

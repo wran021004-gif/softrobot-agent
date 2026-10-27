@@ -439,7 +439,8 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     from tools.platform_store import plain
     adapter = task_adapter(configuration)
     cfg, task = (adapter.configuration, adapter.task)
-    if task['family']=='task.tracking' and (task['status']!='development_valid' or
+    preview_only=task['status']=='draft' and evaluation is None and profile is None
+    if task['family']=='task.tracking' and ((task['status']!='development_valid' and not preview_only) or
             cfg['policy']['controller']['version']!='12.0.0'):
         raise ValueError('TRACKING_COMPOSITE_ACCEPTANCE_UNSUPPORTED: independent evaluator available; execution/force protocol not implemented')
     expected_protocol = adapter.execution_requirements()['protocol_template_id']
