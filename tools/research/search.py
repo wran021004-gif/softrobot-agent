@@ -305,7 +305,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             if mixed:
                 from tools.research.mixed_moves import initial,next_move,generation
                 space=s['spec']['family_space']
-                best=min((r for r in rows if r.get('candidate_id') and (not native or rank(r,q)[0]==0)),
+                best=min((r for r in rows if r.get('candidate_id') and rank(r,q)[0]==0),
                     key=lambda row:rank(row,q),default=None)
                 if not rows:
                     point=initial(space,q)
@@ -449,7 +449,9 @@ def run_search(host,query,key,*,guard,execute,capacity):
                         numerical_s=0 if reused else r.get('charged_numerical_s'))})
         rows.append(row)
         checkpoint['pending']=None
-        checkpoint['updates'].append(dict(candidate_id=c['candidate_id'],incumbent_after=min(rows,key=lambda row:rank(row,q,limits))['candidate_id']))
+        ranked=[r for r in rows if not mathematical or rank(r,q,limits)[0]==0]
+        incumbent=min(ranked,key=lambda row:rank(row,q,limits)) if ranked else None
+        checkpoint['updates'].append(dict(candidate_id=c['candidate_id'],incumbent_after=incumbent['candidate_id'] if incumbent else None))
         if state(host).get('success_gate'):
             checkpoint['termination']='fresh_task_pass_requires_closeout'
         if mixed and q.stop_score is not None and rank(row,q)[0]==0:
@@ -462,7 +464,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
     best=min(rows,key=lambda row:rank(row,q,limits)) if rows else None
     supported=best is not None and rank(best,q,limits)[0]==0
     result=dict(problem_identity=identity,status=('best_finite_budget_native_candidate' if supported else 'no_supported_result') if native else ('best_mathematical_candidate' if supported else 'no_supported_result') if mathematical else 'bounded_backend_search',
-        requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported and not native else None,best_observed=best,evaluated=rows,
+        requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported and not native else None,best_observed=best if supported or not mathematical else None,evaluated=rows,
         termination_reason=checkpoint['termination'],search_updates=checkpoint['updates'],search_state=checkpoint_ref,
         analysis_rejection=checkpoint.get('analysis_rejection'),
         resource_use=dict(evaluated_designs=len(rows),proposed_designs=checkpoint['proposal_count'],

@@ -162,4 +162,24 @@ class PrerequisiteTests(unittest.TestCase):
         finally:archive.archive.close()
 
 
+class ScientificStatusProjectionTests(unittest.TestCase):
+    def test_incomplete_native_retains_execution_and_cost(self):
+        from tools.research.analysis import compact_result
+        ref={'artifact_id':'a'*64,'media_type':'application/json'}
+        value=dict(status='execution_incomplete',boundary={'worker_started':True},
+            native_progress={'cost':{'physics_steps':327,'callbacks':0}},error='Hessian',
+            charged_analysis_evaluations=1,charged_numerical_s=2.0)
+        view=compact_result(value,ref)['scientific_computation']
+        self.assertEqual(view['status'],'numerically_incomplete')
+        self.assertTrue(view['worker_started'])
+        self.assertEqual(view['native_cost']['physics_steps'],327)
+        self.assertFalse(view['reliable_finite_J'])
+        self.assertEqual(view['evidence_reference'],ref)
+        self.assertEqual(compact_result({'status':'not_applicable'},ref)['scientific_computation']['status'],'unsupported')
+        self.assertEqual(compact_result({'status':'not_run'},ref)['scientific_computation']['status'],'not_evaluated')
+        from tools.research.analysis import scientific_status
+        completed=scientific_status({'status':'computed','nonlinear_capability':{'J':0.4}})
+        self.assertTrue(completed['reliable_finite_J'])
+
+
 if __name__=='__main__':unittest.main()

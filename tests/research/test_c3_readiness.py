@@ -16,6 +16,18 @@ from tests.research import test_mixed_search as mixed
 
 
 class C3ReadinessTests(unittest.TestCase):
+    def test_agent_choice_keeps_structure_routes_available(self):
+        from tools.research.research_context import agent_decision_brief
+        fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)
+        host=fixture.host;spec=deepcopy(state(host)['spec'])
+        spec['initial_structure_strategy']='agent_choice';update(host,spec=spec)
+        self.assertIsNone(core.initial_structure_action(host))
+        brief=agent_decision_brief(host)
+        self.assertIn('generate',brief['actions']);self.assertIn('search',brief['actions'])
+        self.assertIn('generate',brief['research_intent_choices']['design_modification'])
+        self.assertIn('search',brief['research_intent_choices']['design_modification'])
+        self.assertIn('stop',brief['research_intent_choices']['validation_or_stop'])
+
     def test_strict_generate_retries_and_releases_common_actions(self):
         from tools.research.research_context import agent_decision_brief
         fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)

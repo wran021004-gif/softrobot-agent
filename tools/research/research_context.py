@@ -984,6 +984,14 @@ def agent_decision_brief(host):
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
+    if s['spec'].get('start_mode')=='family_space' and s['spec'].get('initial_structure_strategy') in (None,'agent_choice'):
+        actions=brief.get('actions',[])
+        brief['research_intent_choices']={
+            'design_modification':[a for a in actions if a in ('generate','propose','search')],
+            'control_optimization':[a for a in actions if a in ('initialize_control','control_search','execute')],
+            'diagnosis':[a for a in actions if a in ('diagnose','mechanics','nmpc_prediction_diagnostic')]+(['research_analysis'] if 'analysis' in s['spec'].get('capabilities',[]) else []),
+            'validation_or_stop':[a for a in actions if a in ('physical_replay','replay','cross_replay','refine','select','stop')],
+            'scope':'Choose freely among currently admitted actions; method details and resource admission remain available on request.'}
     from tools.research.experience import retrieval_hint
     hint=retrieval_hint(host)
     if hint:brief['experience_guidance']=hint

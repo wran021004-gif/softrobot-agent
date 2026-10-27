@@ -604,11 +604,37 @@ def recover(host):
     return compact_result(value,ref)
 
 
+def scientific_status(value):
+    """Project a result without changing its persisted historical status."""
+    import math
+    status=value.get('status')
+    boundary=value.get('boundary') or {}
+    cost=next(((value.get(k) or {}).get('cost') for k in
+        ('native_dynamics','native_progress','native_diagnostic') if (value.get(k) or {}).get('cost')),None)
+    native=value.get('nonlinear_capability') or {}
+    j=native.get('J')
+    finite_j=isinstance(j,(int,float)) and not isinstance(j,bool) and math.isfinite(j)
+    if status=='computed': projected='computed'
+    elif status in ('not_applicable','not_comparable','unavailable') and boundary.get('worker_started') is not True:
+        projected='unsupported'
+    elif status in ('not_evaluated','not_run'): projected='not_evaluated'
+    else: projected='numerically_incomplete'
+    return dict(status=projected,worker_started=boundary.get('worker_started'),
+        native_cost=cost,complete=projected=='computed',failure_type=value.get('error') or value.get('reason'),
+        reliable_finite_J=bool(projected=='computed' and finite_j),
+        charged_analysis_evaluations=value.get('charged_analysis_evaluations'),
+        charged_numerical_s=value.get('charged_numerical_s'),
+        conclusion_scope=('Only the declared computation is complete; independent task acceptance remains separate.' if projected=='computed'
+            else 'No task success, structural infeasibility, or performance ranking follows from this result.'))
+
+
 def compact_result(value, reference):
     """Compatible public tool response, with exact pointers into raw evidence."""
     summary=dict(reference=reference,**{k:value.get(k) for k in (
         'status','candidate','operation','proxy_values','origin','owning_study','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
+    summary['scientific_computation']=scientific_status(value)
+    summary['scientific_computation']['evidence_reference']=reference
     summary['stored_result_keys']=list(value)
     if value.get('status') not in ('computed','not_comparable'):
         summary['execution_feedback']=dict(status=value.get('status'),error=value.get('error'),reason=value.get('reason'),

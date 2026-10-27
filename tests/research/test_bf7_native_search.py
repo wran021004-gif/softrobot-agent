@@ -180,6 +180,8 @@ class NativeMixedSearchTests(unittest.TestCase):
         with patch.object(core,'guard'),patch.object(analysis,'dispatch',side_effect=incomplete):
             out=core.dispatch(self.host,self.plan(q),'incomplete-native-fixture')['result']['result']
         self.assertIsNone(out['best_native_candidate'])
+        self.assertIsNone(out['best_observed'])
+        self.assertTrue(all(u['incumbent_after'] is None for u in out['search_updates']))
         self.assertTrue(search.initial_search_progress(self.host)['requirement_satisfied'])
         self.assertNotIn('best',out['evaluated'][1]['lineage']['decision'])
 
