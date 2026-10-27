@@ -1,0 +1,144 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "reach-hold-native-autonomous-20261027",
+  "base_commit": "c7e83a112bd5b15972abac7c259783b923695dd8",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: User authorized this bounded new autonomous Reach/Hold Study on 2026-10-27; bind identity before execution.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold.json",
+  "control": "control.json",
+  "runtime": "runtime_reach_hold_native_autonomous.json",
+  "evidence_destination": "evidence/reach_hold_native_autonomous_20261027",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 64,
+    "protected_provider_requests": 8,
+    "public_operations": 120,
+    "protected_public_operations": 12,
+    "physical_launches": 6,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 12,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 5,
+  "reserve_rl_evaluation": false,
+  "native_control_limits": {
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "mujoco-nonlinear-task-capability-v1": "Authorized bounded MuJoCo Native control analysis; independent physical acceptance required."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_proposals": 3,
+    "max_evaluations": 3,
+    "evaluation_modes": [
+      "mujoco_control"
+    ]
+  },
+  "execution_instructions": "Own this one autonomous Reach/Hold study from an EMPTY scientific candidate pool; no prior successful structure, control or experimental result is supplied. Family defaults and geometry are public engineering grammar, not a demonstrated design. Start by choosing and executing a finite family_mixed_search_v1 with evaluation_mode=mujoco_control and objective=task_violation. Choose its structural variables, topology, ranges, tension initialization and control search yourself; explain hypothesis, expected observation, weakening observation, fixed conditions, stopping condition and cost. At most three proposals and three analysis entries per search are granted; a first-search callback cap near 51 may conserve resources but is your choice within the frozen maximum. No GVS dynamics or CONIC scoring is authorized; family generator coordinates and geometry metadata are engineering preparation, not GVS dynamics.\nAfter the completed finite search, independently choose whether to search again, reoptimize control, alter initialization, diagnose, request Reporter analysis, read optional procedural Knowledge, replay or STOP. Compare alternatives using actual task errors, convergence, saturation and predicted versus observed improvements, their limitations and remaining costs. A single failure or bounded stagnation cannot prove structural infeasibility or global optimality. Knowledge is historical guidance, not current scientific evidence, and cross-task validity is unverified. Distinguish Native full-window predictions from separately charged independent MuJoCo physical replay. No historical task numbers or control results transfer as acceptance evidence.\nOnly a complete independent final-fidelity physical replay evaluated against every frozen original Reach/Hold acceptance constraint establishes success. After the first such pass, immediately publicly read and SELECT its exact candidate and execution; no extra confirmation. Otherwise STOP with best result, unmet constraints, experiments performed, alternatives not tried, remaining budget and uncertainty. Do not assume a numerical failure or rejected request is physical infeasibility. All original counts, protected closeout and recovery rules apply; never relaunch an unknown request or worker and do not expand budgets.",
+  "initial_structure_strategy": "native_search"
+}

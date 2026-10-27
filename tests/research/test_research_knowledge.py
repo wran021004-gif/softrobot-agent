@@ -58,6 +58,19 @@ class KnowledgeTests(unittest.TestCase):
         update(self.h,spec={**before['spec'],'mode':'autonomous','budgets':dict(protected_provider_requests=0)})
         self.assertIsNone(retrieval_hint(self.h))
 
+    def test_cross_task_guidance_is_labeled_and_not_scientific_evidence(self):
+        s=state(self.h);update(self.h,spec={**s['spec'],'canonical_task':{'family':'task.reach'}})
+        hint=retrieval_hint(self.h)
+        self.assertEqual(hint['query'],{'operation':'search'})
+        result=retrieve(self.h,dict(operation='read',entry_id='research-contact-causality',revision='1'))
+        row=result['results'][0]
+        self.assertEqual(row['current_task_type'],'task.reach')
+        self.assertEqual(row['historical_task_type'],'oriented_tracking')
+        self.assertIn('unverified',row['applicability'])
+        self.assertIn('not current Study scientific evidence',result['scope'])
+        self.assertFalse(result['scientific_evidence'])
+        self.assertEqual(registered_references(self.h),[])
+
     def test_reporter_records_reads_without_scientific_registration(self):
         from tools.research import reporter
         ref=save(self.h,dict(fixture='Existing evidence, no scientific claim'))
