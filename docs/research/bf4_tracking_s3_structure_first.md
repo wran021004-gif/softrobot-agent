@@ -34,4 +34,8 @@
 
 [R1 冻结](../../configs/research/bf4_tracking_s3r1_freeze.json)及三个 `study_bf4_s3r1_*` 配置重新提交后才执行。新独立账本保持原 8 proposals/10 数学单位及每臂 201 Native/8 response/1 replay/121,200 步上限；不是借用旧余额。公开编排入口 `tests/research/bf4_tracking_s3r1.py` 仍仅调用原 Study 工具，且**将首轮全部失败开销纳入结构优先总成本**。后续比较既不会删除该失败，也不会把其耗时分摊给直接控制对照。
 
+R1 首次启动时，执行前的 fingerprint assertion 发现外部总协议错误地使用完整族域 digest，而原 Study 解析器会先应用已冻结 topology_scope，得到仅两段/六通道的精确族域。此时原 Study 为 ready，候选、数学评价与分析结果均为空，没有科学工具调用。原 Study 的权威配置/预算本来就是正确的，未修改它们或创建新余额。
+
+总协议版本 1.0.1 改为原 Study 已有的精确 fingerprint，并通过原 bind 带明确原因登记实现迁移，发生在第一项科学调用之前；保留原预算及 startup。该次失败命令耗时为执行工具实测 **1.4803855 s**，另列操作启动开销并加入结构优先 driver 总额，不伪装成数学求解耗时。详见 [manifest 检查记录](../../evidence/bf4_s3r1_manifest_check/summary.json)。不将这次登记错误解释为物理/结构失败。
+
 结果将在 R1 执行后追加；本轮不修改原 TaskDefinition，不扩建新任务类别。

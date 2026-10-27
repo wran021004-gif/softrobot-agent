@@ -24,6 +24,9 @@ def prepare(path,destination,frozen):
     host=core.prepare(ROOT/path,directory=destination/'private-store')
     os.environ.update(state(host)['spec']['numerical_environment'])
     if 'freeze' not in state(host):core.bind(host)
+    elif state(host)['freeze']==frozen['pre_admission_correction']['prior_implementation'] and host.run_id=='bf4-s3r1-structure-search-v1':
+        assert state(host)['mathematical_evaluations']==0 and not state(host)['candidates']
+        core.bind(host,reason='Correct external manifest fingerprint to the already-frozen topology-scoped family before first science; original budget and startup costs retained.')
     if state(host).get('pending'):core.recover(host)
     spec=state(host)['spec']
     assert spec['canonical_task_identity']==frozen['canonical_task_identity']
@@ -130,7 +133,7 @@ def main():
         different=not same_robot_structure(store.artifact(screen['first_candidate'])['configuration'],store.artifact(screen['selected_candidate'])['configuration'])
     prior_failed=read(ROOT/frozen['prior_failed_summary'])['screen']
     totals=dict(control_only_numerical_s=base['numerical_s'],structure_first_numerical_s=prior_failed['numerical_s']+screen['numerical_s']+changed['numerical_s'],
-        control_only_driver_s=base['driver_elapsed_s'],structure_first_driver_s=prior_failed['driver_elapsed_s']+screen['driver_elapsed_s']+changed['driver_elapsed_s'])
+        control_only_driver_s=base['driver_elapsed_s'],structure_first_driver_s=prior_failed['driver_elapsed_s']+frozen['pre_admission_correction']['recorded_failed_command_elapsed_s']+screen['driver_elapsed_s']+changed['driver_elapsed_s'])
     comparable=bool(base['accepted'] and changed['accepted'])
     comparison=dict(both_independently_passed=comparable,structure_changed=different,**totals,
         nominal_total_numeric_speedup=totals['control_only_numerical_s']/totals['structure_first_numerical_s'] if comparable else None,
