@@ -2,9 +2,11 @@
 import json
 import os
 import time
+import argparse
 from tools.research import core,analysis
 from tools.research.config import ROOT
-from tools.research.state import state
+from tools.research.state import state,save
+from tools.platform_store import Store
 from tools.research_tasks import _outcome_issue,_source_issue
 from tools.state_io import read,digest,atomic_json
 from tests.research.bf4_tracking_s2 import plan as comparison_plan
@@ -13,17 +15,19 @@ from tests.research.bf4_tracking_s2 import plan as comparison_plan
 def plan(action,**payload):
     value=comparison_plan(action,**payload)
     value.update(hypothesis='One legal soft arm may independently satisfy world position and directed tool-axis constraints after finite native control optimization.',
-        fixed_conditions='Frozen BF5 position/tool-axis task, P1 structure, zero physical state, 0.2 N initialization, 51 callbacks/2 iterations and one full replay.',
+        fixed_conditions='Frozen BF5 position/tool-axis task, P1 structure, zero physical state, candidate-bound initialization declared in the owning precheck/continuation Study, 51 callbacks/2 iterations and one full replay per declared stage.',
         stopping_condition='Stop after the single independent replay; no threshold relaxation, structural search, restarts or score polishing.',
         interpretation='A complete independent pass is one same-model position/tool-axis witness; finite failure leaves dynamic feasibility unresolved.')
     return value
 
 
-def main():
-    started=time.perf_counter();destination=ROOT/'runs/bf5-tool-axis';summary=destination/'summary.json'
+def main(continuation=False):
+    stage='bf5-tool-axis-continuation' if continuation else 'bf5-tool-axis'
+    started=time.perf_counter();destination=ROOT/'runs'/stage;summary=destination/'summary.json'
     if summary.exists():
         print(json.dumps(dict(status='sealed_bf5',additional_computations=0)));return
-    frozen=read(ROOT/'configs/research/bf5_tool_axis_freeze.json');generation=read(ROOT/frozen['private_generation'])
+    protocol='bf5_tool_axis_continuation_freeze.json' if continuation else 'bf5_tool_axis_freeze.json'
+    frozen=read(ROOT/'configs/research'/protocol);generation=read(ROOT/frozen['private_generation'])
     assert digest(generation)==frozen['private_generation_identity']
     assert digest(read(ROOT/frozen['task_file']))==frozen['task_file_identity']
     host=core.prepare(ROOT/frozen['study_file'],directory=destination/'private-store')
@@ -31,7 +35,16 @@ def main():
     if 'freeze' not in state(host):core.bind(host)
     if state(host).get('pending'):core.recover(host)
     candidate=core.dispatch(host,plan('generate',generation=generation),'bf5-design',origin='engineering')['result']['candidate']
-    source=core.dispatch(host,plan('initialize_control',control_seed=dict(candidate=candidate,tensions_n=[[frozen['initial_tension_n']]*6])),
+    seed=dict(candidate=candidate,tensions_n=[[frozen['initial_tension_n']]*6])
+    prior=None
+    if continuation:
+        prior=read(ROOT/'runs/bf5-tool-axis/summary.json')
+        previous=Store(ROOT/'runs/bf5-tool-axis/private-store')
+        assert prior['acceptance']['status']=='valid_failure' and not prior['accepted']
+        original=previous.artifact(prior['analysis'])
+        seed=dict(candidate=candidate,source=save(host,previous.artifact(original['control_schedule_reference']),'prior_failing_control_source'),
+            parent=save(host,previous.artifact(prior['candidate']),'prior_source_candidate'))
+    source=core.dispatch(host,plan('initialize_control',control_seed=seed),
         'bf5-seed',origin='engineering')['result']['source']
     spec=state(host)['spec']
     out=analysis.dispatch(host,dict(candidate=candidate,operation='mujoco_direct_control_v1',model_source='mujoco',
@@ -57,10 +70,14 @@ def main():
     row.update(implementation=s['freeze'],protocol_identity=digest(frozen),resolved_identity=spec['resolved_identity'],
         task_identity=spec['canonical_task_identity'],accepted=bool(s.get('selected')),selected=s.get('selected'),ledger=host.store.remaining(),
         numerical_s=s['numerical_s'],driver_elapsed_s=time.perf_counter()-started,domain_audit=read(ROOT/frozen['domain_audit']))
+    if prior:row.update(prior_stage_summary='runs/bf5-tool-axis/summary.json',prior_stage_analysis=prior['analysis'],
+        prior_native_cost=prior['native_cost'],prior_replay_cost=prior['replay_cost'],prior_numerical_s=prior['numerical_s'])
     assert row.get('callbacks',0)<=51
     assert row.get('native_cost',{}).get('physics_steps',0)+row.get('replay_cost',{}).get('physics_steps',0)<=31200
     atomic_json(summary,row)
     print(json.dumps({k:row.get(k) for k in ('accepted','callbacks','best_measure','native_cost','replay_cost','numerical_s','driver_elapsed_s')}),flush=True)
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--continuation',action='store_true')
+    main(parser.parse_args().continuation)

@@ -1,0 +1,51 @@
+{
+  "contract": "bf5.tool_axis_continuation_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 current-chat user steering: 我们以找到可行解为目的，只能使用研究链路中提供的工具. Prospectively bounded continuation of the already sealed BF5 failed precheck, with original failure/cost retained. Only existing initialize_control, research_analysis native response, physical_replay, evidence_read and SELECT. One same P1 structure, its own prior failing complete control source, reset zero physical state, at most 51 additional full native callbacks/2 iterations and one independent replay (31200 additional physics steps); no threshold/goal/model changes, structure scan, Provider/NMPC/RL, external optimizer or post-pass optimization.",
+  "task_file": "tasks/bf5_position_tool_axis_v1.json",
+  "task_file_identity": "3d96fde8e007a28e43a7caf5fa8c0856e5805fb85e80622fe33fbd65490f5d2d",
+  "study_file": "configs/research/study_bf5_tool_axis_continuation.json",
+  "private_generation": "runs/bf5-tool-axis/private-generation.json",
+  "private_generation_identity": "06d2803d18c2f0a5aa6dff0bce89d989c26036673fd3810e9853229d26266bf6",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 51,
+    "iterations": 2,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "initial_tension_n": 0.2,
+  "physics_steps_per_callback": 600,
+  "maximum_native_rollouts": 51,
+  "maximum_independent_replays": 1,
+  "maximum_physics_steps": 31200,
+  "domain_audit": "runs/bf5-tool-axis/domain_audit.json",
+  "domain_audit_cost": {
+    "model_builds": 1,
+    "forward_evaluations": 3,
+    "physics_steps": 0
+  },
+  "axis_semantics": "a_world=R_tip_site @ a_local; acos(clamp(dot(a_world,target_axis_world),-1,1)), directed unit axes; angles in rad; no axial roll condition",
+  "response_semantics": "Unit-axis chord norm <= 2*sin(angle_tolerance/2) is exactly equivalent to the angular cone; actual ranking and independent scoring retain true arccos angle and position separately. Existing solver safety_margin_fraction=0.005 aims slightly inside the same limits to offset the observed local-response residual; independent thresholds remain exactly 8 mm and 3 degrees. This is not a new acceptance standard or a change to sealed S2/precheck.",
+  "stop": "Existing native search stops on its declared local target or finite cap; perform the single independent replay and SELECT/stop immediately on a complete pass; no post-pass optimization.",
+  "prior_stage": "runs/bf5-tool-axis/summary.json",
+  "initialization": "Existing research initialize_control imports the same candidate's complete failing native best schedule; no manual input editing; acceptance never inherited.",
+  "cumulative_bf5_maximum_native_rollouts": 102,
+  "cumulative_bf5_maximum_independent_replays": 2,
+  "cumulative_bf5_maximum_physics_steps": 62400
+}
