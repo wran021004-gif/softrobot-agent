@@ -75,6 +75,7 @@ def task_gap(result):
         source_pointer='/acceptance/components/'+name.replace('~','~0').replace('/','~1')) for name in signed}
     required=('evaluation_validity','execution_complete','tool_axis_sampling' if axis_task else 'tracking_sampling' if tracking else 'holding_coverage','solver_errors','force_bounds')
     if acceptance.get('task_family')=='task.oriented_tracking':required=(*required,'rigid_tool_binding')
+    if acceptance.get('protocol_id')=='offline_oriented_tracking_v2':required=(*required,'no_environment_contact')
     valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True for k in required))
     return dict(normalized_gap=max(ratios.values()) if len(ratios)==len(scored) else None,
         components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),

@@ -379,6 +379,8 @@ def _protocol_requirements(result):
         return common | {'tool_axis_sampling','evaluator:tool_position','evaluator:tool_axis_direction'}
     if (protocol,family)==('offline_oriented_tracking_v1','task.oriented_tracking'):
         return common | {'tool_axis_sampling','evaluator:tracking_max_error','evaluator:tool_axis_direction','rigid_tool_binding'}
+    if (protocol,family)==('offline_oriented_tracking_v2','task.oriented_tracking'):
+        return common | {'tool_axis_sampling','evaluator:tracking_max_error','evaluator:tool_axis_direction','rigid_tool_binding','no_environment_contact'}
     return None
 
 
@@ -424,7 +426,7 @@ def _source_issue(result, evidence=None):
             evaluation_binding.get('original_execution_id') not in (None,execution) or
             evaluation_binding.get('source') not in (None,evidence['simulation'])):
         return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
-    if result['protocol_id'] in ('offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1','offline_oriented_tracking_v1'):
+    if result['protocol_id'] in ('offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1','offline_oriented_tracking_v1','offline_oriented_tracking_v2'):
         for kind in ('evaluation', 'simulation', 'execution_id'):
             if not binding.get(kind):
                 return 'PROTOCOL_REQUIRED_SOURCE_MISSING:profile_' + kind
@@ -524,6 +526,9 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         if task['family']=='task.oriented_tracking':
             bound=report.get('rigid_tool_binding')
             components['rigid_tool_binding']=_component(bound,bound,reason='Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution')
+            if protocol_id=='offline_oriented_tracking_v2':
+                contact_free=report.get('no_environment_contact')
+                components['no_environment_contact']=_component(contact_free,contact_free,reason='Every independent physics step checked for environment contact; the frozen task does not permit contact')
     else:
         covered = report.get('tracking_sampling_complete')
         components['tracking_sampling'] = _component(covered, covered, reason=(

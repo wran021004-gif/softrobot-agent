@@ -80,7 +80,7 @@ class ToolAxisTaskAdapter(ResearchTaskAdapter):
 
 
 class OrientedTrackingTaskAdapter(ToolAxisTaskAdapter):
-    protocol_id='offline_oriented_tracking_v1'
+    protocol_id='offline_oriented_tracking_v2'
 
     def condition_view(self):
         task=self.task;limits=task['evaluator']['parameters']['data'];rows=[]

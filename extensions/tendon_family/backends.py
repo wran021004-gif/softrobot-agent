@@ -201,7 +201,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
             speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
             requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
     rows=[sample(0,None,np.zeros(len(aids)))];atomic_json(folder/'samples.json',rows)
-    steps=0;failure=None
+    steps=0;failure=None;maximum_contacts=0;contact_steps=0;first_contact_time=None
     for k,command in enumerate(u):
         data.ctrl[aids]=command
         _apply_mujoco_forces(model,data,forces)
@@ -212,13 +212,20 @@ def playback_tensions(inp, physics, scene, commands, folder):
         for j in range(substeps):
             _apply_mujoco_forces(model,data,forces)
             previous=float(data.time);safety.call(data,mujoco.mj_step,'playback.step');steps+=1
+            if inp.task.family=='task.oriented_tracking':
+                maximum_contacts=max(maximum_contacts,int(data.ncon))
+                if data.ncon:
+                    contact_steps+=1
+                    if first_contact_time is None:first_contact_time=float(data.time)
             if _mujoco_state_failed(data,previous):
                 failure=dict(interval=k,substep=j+1,reason='MUJOCO_NUMERICAL_FAILURE',time_s=float(data.time));break
         if failure:break
         rows.append(sample(k+1,command,-data.actuator_force[aids].copy()))
         atomic_json(folder/'samples.json',rows)
     return dict(status='completed' if failure is None and len(rows)==intervals+1 else 'incomplete',
-        **(dict(rigid_tool_binding=tool_binding) if tool_binding is not None else {}),
+        **(dict(rigid_tool_binding=tool_binding,environment_contact=dict(maximum_contacts=maximum_contacts,
+            contact_steps=contact_steps,first_contact_time_s=first_contact_time,checked_physics_steps=steps,
+            contact_free=maximum_contacts==0)) if tool_binding is not None else {}),
         failure=failure,samples=rows,physics_steps=steps,command_intervals=len(rows)-1,
         physics_step_attempts=safety.attempted_steps,
         cost=dict(model_builds=1,rollouts=1,physics_steps=steps,physics_step_attempts=safety.attempted_steps,

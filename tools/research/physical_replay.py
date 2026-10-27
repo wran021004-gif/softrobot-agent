@@ -468,6 +468,8 @@ def playback_profile(inp,raw,evaluation):
             except (KeyError,ValueError):profile['tool_axis_sampling_complete']=False
         if inp.task.family=='task.oriented_tracking':
             profile['rigid_tool_binding']=raw.get('rigid_tool_binding',{}).get('matched')
+            contact=raw.get('environment_contact',{})
+            profile['no_environment_contact']=(contact.get('contact_free') if contact.get('checked_physics_steps')==raw.get('physics_steps') and complete else None)
     else:
         limits=adapter.ranking_limits();settling=inp.policy.controller.parameters.data['settling']
         hold=[v for v in samples if v['time_s']>=adapter.holding_start_s()-1e-12]

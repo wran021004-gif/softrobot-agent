@@ -30,6 +30,7 @@ class OrientedTrackingTests(unittest.TestCase):
     def raw(self):
         return dict(status='completed',physics_steps=600,tendon_order=[t['id'] for t in self.cfg['robot']['structure']['data']['tendons']],
             fixture='Fabricated independent evaluator fixture; no physics execution',rigid_tool_binding=dict(matched=True),
+            environment_contact=dict(contact_free=True,checked_physics_steps=600),
             samples=[dict(time_s=float(t),tip_m=self.goal.at_time(float(t))[0],tip_tool_axis_world=self.goal.axis_at_time(float(t)),
                 tip_velocity_m_s=[0.,0.,0.],speed_m_s=0.,actual_tension_n=[.2]*6) for t in self.times])
 
@@ -66,7 +67,7 @@ class OrientedTrackingTests(unittest.TestCase):
 
     def test_independent_acceptance_and_original_position_evaluator(self):
         ev,a=self.accept(self.raw());self.assertTrue(ev.task_success);self.assertTrue(a['accepted'])
-        self.assertEqual(len(a['components']),9);self.assertIsNone(_outcome_issue(a));self.assertIsNone(_source_issue(a))
+        self.assertEqual(len(a['components']),10);self.assertIsNone(_outcome_issue(a));self.assertIsNone(_source_issue(a))
         from extensions.reference.implementation import oriented_position_task,evaluate_tracking
         from tools.platform_registry import registry
         # Exact reuse of the existing timed evaluator, including its RMS diagnostics.
@@ -94,6 +95,8 @@ class OrientedTrackingTests(unittest.TestCase):
         ev,a=self.accept(raw);self.assertEqual(ev.validity,'invalid');self.assertIsNone(a['accepted'])
         raw=self.raw();raw.pop('rigid_tool_binding')
         _,a=self.accept(raw);self.assertIsNone(a['accepted'])
+        raw=self.raw();raw['environment_contact']['contact_free']=False
+        _,a=self.accept(raw);self.assertFalse(a['accepted']);self.assertFalse(a['components']['no_environment_contact']['passed'])
 
     def test_response_keeps_both_real_timed_constraints(self):
         raw=self.raw();out=dict(times_s=self.times.tolist(),tip_positions_m=[r['tip_m'] for r in raw['samples']],
