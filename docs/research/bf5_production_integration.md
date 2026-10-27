@@ -241,3 +241,6 @@ that branch expands into the common summary. Two directed offline checks passed:
 actual sequence-shape refusal with no worker/science charge, and the pre-existing
 citation refusal with one bounded reason. No sequence correction, relaxed
 admission, configuration change, C Study access, Provider request or physics run.
+
+The subsequent information-delivery repair and separately accounted v2 model
+comparison are recorded in `docs/research/flash_pro_delivery_followup.md`.

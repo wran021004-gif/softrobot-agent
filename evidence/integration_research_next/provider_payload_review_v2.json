@@ -1,0 +1,85 @@
+{
+  "destination": "https://api.deepseek.com/chat/completions",
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "request_ceiling": 24,
+  "output_token_ceiling_per_request": 8192,
+  "scientific_workers": 0,
+  "original_rejected_launch_provider_requests": 0,
+  "payload_sources": [
+    "tasks/bf5_position_tool_axis_v1.json",
+    "evidence/integration_research_next/bf5_engineering.json",
+    "research/bf4-cross-family-benchmark@e67d9d68e:evidence/bf6_sensor_oriented_tracking/summary.json"
+  ],
+  "case_payload_keys": {
+    "bf5_failed_baseline": {
+      "case_fields": [
+        "task",
+        "evidence"
+      ],
+      "evidence_fields": [
+        "kind",
+        "source",
+        "source_implementation",
+        "acceptance_status",
+        "selected",
+        "native_task_acceptance",
+        "native_cost",
+        "independent_cost",
+        "physics_steps",
+        "scope"
+      ]
+    },
+    "bf6_incomplete": {
+      "case_fields": [
+        "evidence"
+      ],
+      "evidence_fields": [
+        "stage",
+        "status",
+        "independent_witness",
+        "native_cost",
+        "native_complete_rollouts",
+        "native_callback_attempts",
+        "independent_status",
+        "kind",
+        "source_commit",
+        "acceptance",
+        "task_success",
+        "compiled_load",
+        "completed_physics_steps_lower_bound",
+        "attempted_step_calls",
+        "failed_call_internal_progress",
+        "integration_status",
+        "scope"
+      ]
+    }
+  },
+  "excluded": [
+    "C Study",
+    "candidate designs",
+    "control sequences",
+    "Store paths and original artifact refs",
+    "raw research receipts",
+    "historical successful witnesses",
+    "provider reasoning",
+    "credentials"
+  ],
+  "authorization": "User 2026-10-27 explicitly requests fixing information delivery and tool round trips, then rerunning Flash/Pro; permits increased allowance and real models without further approval. New independent cohort: up to six requests per case/model, 24 total, zero scientific workers. Same committed public BF5/BF6 evidence; no current C Study or unrelated private data.",
+  "review_scope": "User explicitly requests this rerun after information-delivery fixes, allows increased model allowance and no additional approval. Independent v2 grant; original eight requests and all failure/cost records preserved.",
+  "version": "provider_decision_public_only_v2",
+  "delivery": "Same public cases byte-equivalent as JSON values to v1. Exact scalar evidence now inline. Descriptive production Plan schema and optional static evidence reads. All science allowances zero.",
+  "packet_keys": [
+    "case_id",
+    "evidence_reference",
+    "evidence",
+    "task",
+    "evidence_delivery",
+    "scientific_budget",
+    "scope"
+  ],
+  "old_cohort_preserved": true,
+  "current_C_Study_accessed": false
+}

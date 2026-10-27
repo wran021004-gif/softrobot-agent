@@ -18,22 +18,25 @@ from strands.tools.executors import SequentialToolExecutor
 
 from schemas.platform import ProjectConfig
 from tools.platform_store import Store, plain
-from tools.research.agent import build_harness, LiveBoundary, live_model_class, load_credential, plan_schema
+from tools.research.agent import build_harness, LiveBoundary, live_model_class, load_credential, error_feedback
 from tools.research.config import ROOT, resolve
 from tools.research.contracts import EvidenceQuery, Plan, PLAN_RESEARCH_INTENTS
 from tools.research.core import read_evidence
 from tools.research.state import state, update, save
 from tools.state_io import atomic_json, read
-from tests.research.agent_math_decision_probe import provider_usage
+from tests.research.agent_math_decision_probe import provider_usage, decision_schema
 
-OUT=ROOT/'runs/flash-pro-public-decisions'
+OUT=ROOT/'runs/flash-pro-public-v2'
 INSTRUCTIONS=('You are the public Softrobot research decision Agent in an independent read-only comparison. '
     'Use the frozen task and visible evidence to choose the next decision, explain what it establishes and '
-    'what remains unknown. You may evidence_read or submit a typed diagnose/stop/select research_plan decision. '
+    'what remains unknown. Submit one typed diagnose/stop research_plan decision, then finish with a short assessment. '
+    'The exact public scalar evidence is already inline with its reference. Optional evidence_read is for '
+    'a named missing fact, not a prerequisite to deciding from the supplied value. '
     'Every scientific proposal is intercepted: no generation, initialization, analysis, solve, replay, '
     'SELECT or STOP is executed. Schema/reference/intent checks are distinct from full scientific '
     'admission, which is not tested. The isolated ledger has zero science allowance. '
-    'At most two Provider requests are available for this case, including tool follow-up. '
+    'Tool arguments are the Plan object itself, without an outer plan property. '
+    'At most {requests} Provider requests are available for this case, including correction and tool follow-up. '
     'Cite visible evidence and state budget units. Do not infer structural infeasibility or task success '
     'from finite optimization or incomplete execution. Answer in Chinese; keep scope and unknowns explicit.')
 
@@ -58,7 +61,7 @@ def freeze(folder=OUT):
         failed_call_internal_progress='unknown',integration_status='not_registered_in_A',
         scope='Public incomplete-result facts only; no candidate/control/Store identity or C data.')
     frozen=dict(protocol=protocol,provider=spec['runtime']['provider'],
-        credentials_reference=spec['runtime']['credentials_reference'],instructions=INSTRUCTIONS,
+        credentials_reference=spec['runtime']['credentials_reference'],instructions=INSTRUCTIONS.format(requests=protocol['requests_per_case_model']),
         cases=dict(bf5_failed_baseline=dict(task=read(ROOT/'tasks/bf5_position_tool_axis_v1.json')['task'],evidence=bf5),
             bf6_incomplete=dict(evidence=bf6)))
     folder.mkdir(parents=True,exist_ok=True);atomic_json(folder/'frozen.json',frozen)
@@ -68,7 +71,9 @@ def freeze(folder=OUT):
 def tools_for(host,case,reference,rows):
     def handle(name):
         def run(use,**kwargs):
-            value=use['input'];row=dict(tool=name,scientific_execution_started=False)
+            value=use['input'];before=deepcopy(state(host))
+            row=dict(tool=name,input=value,scientific_execution_started=False,
+                provider_request_number=host.store.remaining()['used']['model_calls'])
             try:
                 if name=='evidence_read':
                     query=EvidenceQuery.model_validate(value);row['schema_valid']=True
@@ -78,27 +83,29 @@ def tools_for(host,case,reference,rows):
                     row.update(contract='valid',scope='frozen_read')
                 elif name=='research_plan':
                     plan=Plan.model_validate(value);row['schema_valid']=True
-                    if plan.action not in ('diagnose','stop','select'):raise ValueError('OUTSIDE_READ_ONLY_DECISION_SCOPE')
+                    if plan.action not in ('diagnose','stop'):raise ValueError('OUTSIDE_READ_ONLY_DECISION_SCOPE')
                     if plan.decision is None or plan.decision.research_intent!=PLAN_RESEARCH_INTENTS[plan.action]:
                         raise ValueError('ACTION_DECISION_INTENT_MISMATCH')
                     if any(plain(r)!=reference for r in plan.supporting_evidence):raise ValueError('UNSCOPED_SUPPORTING_EVIDENCE')
                     row.update(contract='valid',action=plan.action,intent=plan.decision.research_intent,
                         selected_method=plan.decision.selected_method,claimed_inference=plan.decision.claimed_inference,
                         requested_budget=plan.decision.requested_budget)
-                    if plan.action=='select':row['selection_eligible']=False
-                    output=dict(status='proposal_intercepted',scientific_admission='not_tested_zero_allowance',**row)
-                row['input']=value
+                    output=dict(status='proposal_intercepted',scientific_admission='not_tested_zero_allowance',
+                        next='Decision recorded; finish with a short assessment. No scientific action was executed.',
+                        **{k:v for k,v in row.items() if k!='input'})
                 save(host,row,'probe_tool_check');rows.append({k:v for k,v in row.items() if k!='input'})
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(output))])
             except (ValueError,KeyError) as exc:
-                row.update(contract='rejected',error=str(exc));save(host,row,'probe_tool_check');rows.append(row)
-                return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(row))])
+                feedback=error_feedback(host,use,exc,before)
+                row.update(contract='rejected',error_code=feedback['error_code'],reason=feedback['reason'])
+                save(host,row,'probe_tool_check');rows.append({k:v for k,v in row.items() if k!='input'})
+                return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(feedback))])
         return run
     evidence_schema=EvidenceQuery.model_json_schema()
     evidence_schema['properties']['view']['enum']=['full','summary','fields','range']
     tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),handle(name))
         for name,description,schema in [('evidence_read','Read the committed public summary with production pointer/view semantics',evidence_schema),
-            ('research_plan','Validate a read-only production decision; never execute',plan_schema(['diagnose','stop','select'],decision_required=True))]]
+            ('research_plan','Validate the descriptive production Plan directly, without an outer plan property; never execute',decision_schema())]]
     return tools
 
 
@@ -129,15 +136,18 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
         save(host,previous,'probe_pre_send_storage_failure_retained')
         update(host,pilot={**current['pilot'],'framework_session_id':short_session})
     case=frozen['cases'][case_id];reference=save(host,case['evidence'],'probe_frozen_evidence');rows=[]
-    packet=dict(case_id=case_id,evidence_reference=reference,task=case.get('task'),
+    packet=dict(case_id=case_id,evidence_reference=reference,evidence=case['evidence'],task=case.get('task'),
+        evidence_delivery='Exact public scalar projection; no scientific registration, complete-result read credit or inherited acceptance.',
         scientific_budget=0,scope='Read the frozen evidence, then submit a typed decision or proposal and explain its scope.')
-    boundary=LiveBoundary(host,transport);error=None
+    boundary=LiveBoundary(host,transport);error=None;final_text=''
     try:
         agent=build_harness(host,transport=boundary,api_key='offline-fixture' if transport else os.environ['DEEPSEEK_API_KEY'],
             instructions=frozen['instructions'],model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),
             research_tools=tools_for(host,case,reference,rows),configuration_path=destination/'framework.json',
             session_directory=folder/'sdk'/short_session,session_id=short_session)
         await agent.invoke_async(json.dumps(packet,ensure_ascii=False))
+        final_text=''.join(b.get('text','') for b in agent.messages[-1]['content'])
+        save(host,dict(text=final_text),'probe_final_answer')
     except Exception as exc:error=type(exc).__name__+': '+str(exc)[:300]
     finally:await boundary.aclose()
     usage=provider_usage(host)
@@ -146,6 +156,9 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
         if e['kind']=='r3_send_rejected']
     termination='request_limit_reached' if error and rejections and rejections[-1]=='PROVIDER_COUNT_EXHAUSTED' else error or 'completed'
     summary=dict(case_id=case_id,model=model,tool_checks=rows,termination=termination,harness_error=error,
+        accepted_decisions=sum(r['tool']=='research_plan' and r['contract']=='valid' for r in rows),
+        first_valid_decision_request=next((r['provider_request_number'] for r in rows if r['tool']=='research_plan' and r['contract']=='valid'),None),
+        final_answer_present=bool(final_text),
         scientific_workers=0,physics_steps=0,reporter_requests=0,formal_studies=0,
         scientific_admission='not_tested_zero_allowance',**usage)
     atomic_json(destination/'summary.json',summary)
@@ -154,7 +167,7 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
 
 async def main(live=False,recover_unsent=False):
     frozen=freeze()
-    if not live:print(json.dumps(dict(status='frozen',request_ceiling=8,science_workers=0)));return
+    if not live:print(json.dumps(dict(status='frozen',request_ceiling=len(frozen['cases'])*len(frozen['protocol']['models'])*frozen['protocol']['requests_per_case_model'],science_workers=0)));return
     load_credential(Path(frozen['credentials_reference']).expanduser())
     results=[]
     for index,case in enumerate(frozen['protocol']['cases']):

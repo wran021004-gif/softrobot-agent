@@ -22,6 +22,26 @@ def initial_messages(study_id):
         'evidence remain queryable from Store. Study: '+study_id))])]
 
 
+def selected_evidence_facts(parsed, query, limit):
+    """Keep bounded selected facts through handoff; full evidence stays in L2."""
+    summary=query.get('view')=='summary' and isinstance(parsed,dict) and 'value' in parsed
+    value=parsed['value'] if summary else parsed
+    if not isinstance(value,dict):return None
+    facts=dict(selected_value={},available_keys=list(value),omitted_keys=list(value),
+        scope='Partial selected evidence; omitted fields remain at the original query. '
+            +('Values retain the original deterministic preview semantics.' if summary else 'Retained fields are exact; no full-read credit from this projection.'))
+    def size(item):return len(json.dumps(item).encode())
+    if size(facts)>limit:return None
+    # Scalars cannot disappear merely because a sibling array is large.
+    keys=sorted(value,key=lambda k:isinstance(value[k],(dict,list)))
+    for key in keys:
+        candidate=deepcopy(facts)
+        candidate['selected_value'][key]=value[key]
+        candidate['omitted_keys'].remove(key)
+        if size(candidate)<=limit:facts=candidate
+    return facts
+
+
 def feedback_delivery(host, tool_ids):
     """Project the verified last tool round, without synthesizing SDK messages."""
     from tools.research.research_context import compact_evidence
@@ -51,6 +71,9 @@ def feedback_delivery(host, tool_ids):
                     return {**{k:node[k] for k in keep if k in node},
                         **(dict(acceptance_metrics=node['original_acceptance'].get('metrics')) if node.get('original_acceptance') else {})}
                 facts=dict(total=len(parsed),recent=[important(v) for v in parsed[-3:]]) if isinstance(parsed,list) else important(parsed)
+            if value['tool_use']['name']=='evidence_read' and result['status']=='success':
+                selected=selected_evidence_facts(parsed,value['tool_use']['input'],min(3000,remaining))
+                if selected is not None:facts=selected
             if (value['tool_use']['name']=='evidence_read' and
                     value['tool_use']['input'].get('view')=='mathematical_capabilities' and isinstance(parsed,dict)):
                 for field in ('request_template','execution_limits','required_parameters','measured_control_initialization'):

@@ -15,6 +15,7 @@ from tools.research.state import (state, update, save, guard, enabled, protected
 from tools.research.budget import engineering_closeout
 CALLER='research-provider'
 PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_replay/diagnose. '
+    'Tool arguments are the Plan object itself, without an outer plan property. '
     'control_search uses physical replay callbacks; Native mathematical sequence optimization uses research_analysis, not a selected_method label. '
     'Diagnose reads existing evidence; selected_method does not execute a mathematical/native worker '
     '(use research_analysis with its registered template). Only an explicit diagnostic payload requests local solves. '
