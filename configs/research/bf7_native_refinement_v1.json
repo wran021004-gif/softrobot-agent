@@ -1,0 +1,39 @@
+{
+  "version": "bf7_native_refinement_v1",
+  "structure_id": "B",
+  "study": "study_bf7_native_refinement_v1.json",
+  "settings": {
+    "version": "local_control_search_v2",
+    "correction_window_s": [
+      0,
+      0.6
+    ],
+    "safety_margin_fraction": 0.02,
+    "method": "response",
+    "knots_s": [
+      0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "coefficient_limit_n": 8.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "evaluation_requests": 201,
+    "iterations": 8
+  },
+  "decision": {
+    "shared_J": 7.139579527365042,
+    "relative_worst_improvement": 0.5765658095007802,
+    "evidence": "runs/bf7-native-v1/screen/summary.json",
+    "basis": "B has the lower complete shared J under identical 51-callback/2-response opportunities; all three second-response proposals improve, with >5% baseline improvement. Only this one continuation is authorized."
+  },
+  "initialization": "Exact B screen best schedule for its own task, fresh zero state, no acceptance transfer",
+  "caps": {
+    "native_callbacks": 603,
+    "independent_replays": 3,
+    "physics_step_attempts": 363600
+  },
+  "stop": "One finite refinement only; original joint SELECT if all three independently pass, else STOP. No additional scientific stages."
+}

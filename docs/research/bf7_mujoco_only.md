@@ -27,3 +27,13 @@
 只有完整结果显示相对起点 J 降低至少 5%，且第二 response 的最好 J 继续下降，才选择共享 J 最小结构进行一次精化。精化决定和新 grant 在运行前另行冻结；每目标至多 201 回调、一次回放，无循环续算。公平初筛和精化单列。有限失败不证明结构不可行。
 
 权威配置：`configs/research/bf7_native_protocol_v1.json`、`study_bf7_native_v1.json`；编排入口 `python -m tests.research.bf7_native_benchmark screen`，只调用原研究工具。阶段三后不重跑本批科学计算。
+
+## 初筛结果与精化冻结
+
+初筛实现 `48d090311`；6 项均 51 完整回调、2 response、一次完整独立回放，原验收均 valid_failure。A/B 的逐条件 best J 为 `(6.263104,3.768657,8.126199)` / `(6.007782,4.668359,7.139580)`；共享 J 为 8.126199 / 7.139580。B 降低最坏值约 12.14%，但 negative_low 更差，未覆盖更多通过目标。共同固定 0.2 N 下 A/B 最坏 J 为 14.407247 / 16.861131：固定输入排序与重新优化后的共享排序相反。
+
+T1 六次均 computed。T2 三次逐条件请求均明确 not_comparable：原 Study 没有额外的 `family_sensitivity_variables` 授权，报 `AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED`。不追加权限重解释冻结账本，不混合目标；沿用 Store 原 J、样点和成本做确定性比较。T2 实际新积分/模型构建均为零，三次分析入口和 worker 时间仍计费。
+
+初筛实际 306 完整 Native 回调、0 失败回调、183600 Native 步，加 6×600 独立回放步，共 187200 步；Native/replay 模型构建各 6。9 分析单位，37.466073 s Store 数值，57.978254 s driver。完整结构/条件结果、原度量、成本及 T2 拒绝见 `evidence/bf7_native_v1/screen_summary.json`。
+
+按事前规则选 B：三个任务相对起点均改善超过 5%，第二 response 全部继续改善；例如 central_high 从 16.861131 到第一轮 9.539955（以原 Store 精确值为准）再到 7.139580。唯一精化 grant 见 `bf7_native_refinement_v1.json`：每目标最多 201 回调、8 response、一次独立回放，在新独立 Study 中从该目标自己的 B 初筛最好控制重新从零执行。最大新增 603 回调、3 回放、363600 步；不再续算。初筛成本不会并入公平对比中的 B 性能，也不会清空。
