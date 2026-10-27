@@ -6,6 +6,7 @@ All scientific records stay under ignored runs; no successful controls are expor
 import json
 import time
 import argparse
+import os
 
 from tools.research import core, analysis
 from tools.research.config import ROOT
@@ -36,6 +37,8 @@ def main(continuation=False):
         print(json.dumps(dict(status='sealed_s1',additional_computations=0,summary=str(summary_file))))
         return
     host=core.prepare(ROOT/('configs/research/study_bf4_tracking_'+stage+'.json'),directory=destination/'private-store')
+    # Prospective worker launches inherit the frozen limits; sealed runs remain unchanged.
+    os.environ.update(state(host)['spec']['numerical_environment'])
     if 'freeze' not in state(host):core.bind(host)
     if state(host).get('pending'):
         raise ValueError('RECOVER_OWNED_PENDING_RESULT_BEFORE_RESUME; no unknown worker may be relaunched')
