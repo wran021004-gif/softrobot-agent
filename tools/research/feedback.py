@@ -89,7 +89,7 @@ def search_feedback(host, reference):
     from tools.research.state import state
     from tools.research.design import final_generation_request
     result=host.store.artifact(reference)['result']
-    best=result.get('best_mathematical_candidate') or {}
+    best=result.get('best_native_candidate') or result.get('best_mathematical_candidate') or {}
     candidate=best.get('evidence',{}).get('candidate')
     materialization=None
     if candidate:
@@ -102,7 +102,10 @@ def search_feedback(host, reference):
                 note='Copy exact physical choices; cite source search/candidate and evidence actually used in the new plan. Screening evidence is not transferred to the new candidate.')
     return dict(reference=reference,status=result['status'],best_candidate=candidate,
         proxy_values=best.get('proxy_values'),final_materialization=materialization,
-        lineage_pointer='/result/evaluated',task_acceptance='unmeasured')
+        lineage_pointer='/result/evaluated',task_acceptance='unmeasured',
+        **(dict(score_semantics=result['score_semantics'],conditions=best.get('evidence',{}).get('conditions',{}),
+            independent_validation='Read each condition result and independently replay its exact candidate and control source; every frozen condition must pass.')
+            if result.get('comparison_summary') is not None else {}))
 
 
 def solution_identity(host, result, candidate):

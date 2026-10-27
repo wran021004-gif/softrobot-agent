@@ -23,8 +23,9 @@ def retrieval_hint(host):
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')
-    if not any(r['task']==name for r in entries(host)):return None
-    return dict(query=dict(operation='search',task=name),
+    available=sorted({r['task'] for r in entries(host)})
+    if not available:return None
+    return dict(query=dict(operation='search',task=name) if name in available else dict(operation='search'), available_historical_tasks=available,
         scope='Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.')
 
 
@@ -49,11 +50,12 @@ def retrieve(host,query,*,reader='agent'):
         if q.operation=='read':walk(content)
         rows.append(dict(**entry,key=entry.get('legacy_key',canonical),exact_key=canonical,
             content_sha256=hashlib.sha256(body).hexdigest(),original_evidence_references=refs,
-            applicability='Check trigger, versions and tested scope; recommendation with generalization unverified',
+            applicability='Transfer diagnostic principles only after checking trigger and scope; historical task numbers and controls do not transfer. Cross-task validity is unverified.',
+            historical_task_type=entry['task'], current_task_type=state(host)['spec'].get('canonical_task',{}).get('family'),
             **(dict(content=content) if q.operation=='read' else {})))
     if q.operation=='read' and len(rows)!=1:raise ValueError('EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION')
     record=dict(query=plain(q),results=rows,supplied_startup_context=False,
-        reader=reader,scientific_evidence=False,scope='Historical procedural guidance; no current acceptance, citation eligibility or scientific action authorization')
+        reader=reader,scientific_evidence=False,scope='Historical procedural guidance, not current Study scientific evidence; transfer analytical principles only, not historical task values or control results. Cross-task validity is unverified; no acceptance or action authorization')
     ref=save(host,record,'actual_experience_retrieval')
     update(host,retrievals=[*state(host)['retrievals'],ref])
     return dict(reference=ref,**record)

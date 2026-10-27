@@ -1003,9 +1003,14 @@ def agent_decision_brief(host):
     if s['spec'].get('family_search'):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])
+        if 'mujoco_control' in s['spec']['family_search'].get('evaluation_modes',[]):
+            conditions=len(s['spec'].get('task_conditions',[])) or 1
+            remaining=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+            brief['structure_actions']['native_budget']=dict(remaining_analysis_entries=remaining, analysis_entries_per_structure=conditions,
+                per_condition_control_limits=s['spec'].get('native_control_limits'), scope='Shared analysis allowance; independent replay has a separate physical budget.')
         from tools.research.core import initial_structure_action
         from tools.research.search import initial_search_progress
-        if s['spec'].get('initial_structure_strategy')=='math_search':
+        if s['spec'].get('initial_structure_strategy') in ('math_search','native_search'):
             brief['structure_actions']['initial_search_progress']=initial_search_progress(host)
         initial=initial_structure_action(host)
         if initial:
@@ -1013,7 +1018,8 @@ def agent_decision_brief(host):
             brief['available_research_actions']=[r for r in brief['available_research_actions'] if r['action'] in brief['actions']]
             brief['structure_actions'].pop('search' if initial=='generate' else 'generate',None)
             brief['structure_actions']['first_structure_requirement']=dict(action=initial,
-                objective='task_violation' if initial=='search' else None,release='After first legal generate / completed finite mathematical search, including unresolved results')
+                objective='task_violation' if initial=='search' else None,
+                evaluation_mode=('mujoco_control' if s['spec'].get('initial_structure_strategy')=='native_search' else 'mathematical_proxy') if initial=='search' else None,release='After first legal generate / completed finite mathematical search, including unresolved results')
     if s.get('engineering_feedback_correction'):
         ref=s['engineering_feedback_correction']
         brief['recorded_evidence_corrections']=current_evidence_corrections(host.store.artifact(ref),ref)
