@@ -1114,7 +1114,7 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                         'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable',
                         'execution_limits','cost_scope','control_initialization_query','preparation_query','preparation_hint','request_template_query','action_prerequisites'):
                     row.pop(key)
-            if method!='mujoco_direct_control_v1':row.pop('request_template_query',None)
+            if not row.get('action_prerequisites'):row.pop('request_template_query',None)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']
             fields=[k for k in ('candidate','operation','request_template','required_parameters','formal_execution_authorized',

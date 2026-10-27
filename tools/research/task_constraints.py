@@ -197,6 +197,11 @@ def mathematical_method_view(host, reference):
             item['execution_status']='conditional_on_admission' if item['executable'] else 'blocked'
             item['estimated_evaluations']=1
             item['required_parameters']=['nonlinear_response v1: {variable,unit,t1_results} OR v2: {version,directions}; read analysis_request_schema']
+            item['action_prerequisites']=dict(candidate=reference,
+                required_agent_fields=['nonlinear_response'],unmet=item['missing'],
+                estimated_mathematical_evaluations=item['estimated_evaluations'],remaining_mathematical=remaining,
+                callback_unit='saved T1 evidence aggregation; no new Native rollout or independent physical replay',
+                scope='Comparable completed T1 sources and original request bindings are checked at admission; no new initial state or control window is selected.')
             item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
