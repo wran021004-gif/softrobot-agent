@@ -1,0 +1,35 @@
+{
+  "contract": "bf6.r2.stable_initialization_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 explicit current-chat BF6-R instructions B-R1/R2: preserve original 20 g task, P1, floor and all physics, use only existing research tools to try at most two prespecified physically justified legal constant initializations for a complete 600-step, contact-free numerically stable sequence. New independent allocation: up to two physical replays (1200 integration attempts), zero mathematical/native search calls; stop at first stable sequence or first full original-task pass. No BF5 successful control import, no model/goal/tolerance changes or scans. Original BF6 452 confirmed steps and failed step uncertainty remain sealed; no unused balance transfer.",
+  "study_file": "configs/research/study_bf6_r2_stability.json",
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "private_initializations": "runs/bf6-r2/private-initializations.json",
+  "private_initializations_identity": "1eecb21119989f1751397bf73f98238c704a9c62af7c44c774ef1a93a0f7b7f6",
+  "candidate_label": "P1",
+  "initialization_order": [
+    "G1",
+    "G2"
+  ],
+  "maximum_new_native_calls": 0,
+  "maximum_new_mathematical_calls": 0,
+  "maximum_new_replays": 2,
+  "maximum_new_physics_step_attempts": 1200,
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "stability_gate": "Completed 600-step replay with complete 30 post-step position and axis samples; original evaluator validity, execution, solver, force bounds, dual-signal coverage, real rigid-tool binding and no_environment_contact all true; complete source/outcome binding. Task position/direction may remain valid failures.",
+  "stop": "First stable sequence ends R2; if it is also an independent original-task pass, immediately SELECT and seal. Otherwise STOP and only then freeze a separate R3 allowance. After two unstable attempts STOP unresolved, no automatic model change or extra starts.",
+  "historical_cost_scope": "Original BF6 452 confirmed steps plus one failed-step internal uncertainty and 3.150107299996307 s remain separate, not inherited balances.",
+  "research_tools_only": [
+    "research_plan.generate",
+    "research_plan.initialize_control",
+    "research_plan.physical_replay",
+    "evidence_read",
+    "research_plan.select",
+    "research_plan.stop"
+  ]
+}
