@@ -135,3 +135,51 @@ acceptance reads before SELECT and share the existing admission/accounting
 boundary; simply blocking all reads after a low count can prevent legal closure.
 Here, reads dropped to one without a new hard limit. The production handoff
 change was verified offline; this live cohort did not exercise actual handoff.
+
+## Subsequent C formal Study closeout evidence
+
+C delivered its independent closeout in `da096fc0b`. A reviewed the committed
+sanitized audits only; no private Store, design/control package, runtime or
+configuration was imported. A compact provenance-bound review is in
+`evidence/integration_research_next/c4_closeout_review.json`. This is additional
+observational evidence, not another Flash/Pro comparison or a new experiment.
+
+The formal Flash Study legally stopped without a solution, with no final
+engineering blocker and without exhausting its budget. It still had 22
+mathematical units, seven shared physical launches, four fixed replays and 17
+Provider requests (including protected allowance). The best independent result
+had terminal error 9.7163 mm (passes 10 mm), holding error 10.3096 mm (fails
+10 mm) and holding speed 20.6248 mm/s (fails 20 mm/s). No SELECT or task pass.
+
+The last saved discovery checkpoint still supplied `structure_actions.search`.
+Controlled structural sensitivity was registered/authorized, with the missing
+validated stencil an unprepared prerequisite rather than a prohibition. The
+Agent submitted no structural search or sensitivity, kept numerical work on one
+two-segment/six-tendon structure, then stopped on local control stagnation.
+The initial `heuristic_generate` rule applied to the first legal structure;
+mathematical structure comparison was available afterwards. Thus final legal
+STOP does not validate the Agent's substantive claim that useful routes were
+exhausted, nor prove a global physical tradeoff or structural infeasibility.
+
+The read audit records 135 attempts and 57 complete-read records, classified as
+45 new queries, ten exact repeats, one covered subnode and one changed-content
+read. It also reports 30 repeated query signatures. These totals do not mean
+135 wasted reads: previews and dynamic method/working-set views need different
+interpretation. Of 102 main requests, 67 were read-only; 30 included illegal
+tool feedback, some caused by documented engineering presentation/intervention.
+Neither aggregate is entirely attributable to model error.
+
+C's separate cost is 111 confirmed Provider requests (102 main + nine Reporter),
+7,547,550 tokens (6,713,318 input + 834,232 output; 743,742 reasoning included),
+with currency unknown. Scientific work used 14 mathematical units, 11 Native
+searches/891 internal rollouts/891,000 steps, one NMPC run and eight fixed
+independent replays. These costs are not combined with A's two Provider-only
+cohorts, and no raw reasoning is imported.
+
+This closeout strengthens the evidence that research-route selection and
+stopping judgment are additional Agent limitations. Delivery defects were real
+and required repair, but cannot account for all observed inefficiency. Read
+limits can contain cost; they cannot make an Agent test an unexamined mechanism
+or justify stopping. There is no paired formal Pro run, so the closeout still
+cannot establish that switching models would produce a physical solution.
+The closed Study and all original receipts remain unchanged; no new Study starts.
