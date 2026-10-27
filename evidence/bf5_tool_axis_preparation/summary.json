@@ -1,0 +1,139 @@
+{
+  "implementation": "ba68617d80d21b19638fbfb85a4bfd235c871ac6",
+  "protocol_identity": "3d99fce110b452c1f401a13a6e2aa7b45f2b7c506ff122bc56747501e865d0ad",
+  "resolved_identity": "1e97beba197195a0d06d407b41665953a62a23078398756133730df8b69e1a14",
+  "task_identity": "5bf2dfd66aa0e480abae53b1d502677b06891339c40573cae8af00d8296db3ab",
+  "accepted": false,
+  "analysis_status": "computed",
+  "callbacks": 51,
+  "baseline_measure": {
+    "component_signed_excess": {
+      "position": 5.922911968569609,
+      "tool_axis": 4.18153504731099
+    },
+    "max_position_error_m": 0.055383295748556875,
+    "max_tool_axis_angle_error_rad": 0.27130454064917076,
+    "normalized_gap": 5.922911968569609,
+    "signed_maximum_excess": 5.922911968569609,
+    "sum_normalized_excess": 18.90916499542361
+  },
+  "best_measure": {
+    "component_signed_excess": {
+      "position": -0.0037568247482696604,
+      "tool_axis": 0.0005725471229622858
+    },
+    "max_position_error_m": 0.007969945402013843,
+    "max_tool_axis_angle_error_rad": 0.05238985605708542,
+    "normalized_gap": 0.0005725471229622858,
+    "signed_maximum_excess": 0.0005725471229622858,
+    "sum_normalized_excess": 0.0005725471229622858
+  },
+  "search_stop": "iteration_limit",
+  "native_cost": {
+    "completed_response_steps": 2,
+    "forward_evaluations": 3112,
+    "kernel_wall_s": 2.9477428999962285,
+    "mechanics_evaluations": 0,
+    "model_builds": 1,
+    "optimization_evaluations": 51,
+    "optimization_iterations": 2,
+    "physics_step_attempts": 30600,
+    "physics_steps": 30600,
+    "rollouts": 51
+  },
+  "replay_cost": {
+    "forward_evaluations": 61,
+    "kernel_wall_s": 0.17000279999047052,
+    "model_builds": 1,
+    "physics_step_attempts": 600,
+    "physics_steps": 600,
+    "rollouts": 1
+  },
+  "evaluation_reference": {
+    "artifact_id": "538279b2a8ac7bd2d3a05cccb5a3ac92f6eef1c28f659988d4e87b738550003d",
+    "media_type": "application/json"
+  },
+  "numerical_s": 5.672947899991414,
+  "driver_elapsed_s": 9.403429900004994,
+  "stage": "BF5 minimal preparation",
+  "status": "valid_failure",
+  "independent_metrics": {
+    "max_position_error": 0.007969945402013843,
+    "max_tool_axis_angle_error": 0.05238985605708542
+  },
+  "independent_components": {
+    "evaluation_validity": {
+      "value": "valid",
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "execution_complete": {
+      "value": true,
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "task_evaluator": {
+      "value": false,
+      "passed": false,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "evaluator:tool_position": {
+      "value": 0.007969945402013843,
+      "passed": true,
+      "unit": "m",
+      "limit": 0.008,
+      "reason": null
+    },
+    "evaluator:tool_axis_direction": {
+      "value": 0.05238985605708542,
+      "passed": false,
+      "unit": "rad",
+      "limit": 0.05235987755982988,
+      "reason": null
+    },
+    "solver_errors": {
+      "value": 0,
+      "passed": true,
+      "unit": "count",
+      "limit": 0,
+      "reason": null
+    },
+    "force_bounds": {
+      "value": 0.0,
+      "passed": true,
+      "unit": "N",
+      "limit": 1e-08,
+      "reason": null
+    },
+    "tool_axis_sampling": {
+      "value": true,
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": "Both real world position and unit tool-axis signals on the complete post-step grid"
+    }
+  },
+  "physics_steps": 31200,
+  "domain_audit_cost": {
+    "model_builds": 1,
+    "forward_evaluations": 3,
+    "physics_steps": 0,
+    "physics_step_attempts": 0,
+    "rollouts": 0,
+    "mechanics_evaluations": 0
+  },
+  "independent_witness": false,
+  "interpretation": "Finite-search failure. Position passed but directed tool-axis angle exceeded the original 3 degree line; no relaxation. Dynamic feasibility remains unresolved. Original private controls, structure and Store retained locally.",
+  "limitations": [
+    "Only one P1 structure and 0.2 N start",
+    "No complete 3D orientation or axial-roll condition",
+    "No GVS/affine axis derivatives or NMPC/RL support",
+    "No hardware, robustness or continuous-time guarantee"
+  ]
+}
