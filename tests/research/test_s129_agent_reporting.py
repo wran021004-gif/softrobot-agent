@@ -162,7 +162,10 @@ class AgentReportingTests(unittest.TestCase):
                 references=[reference],reads=queries))
             wire=reporter._wire(self.h,initial['report_reference'],self.h.store.artifact(initial['report_reference']))
             payload=json.loads(wire['messages'][-1]['content'])
-            self.assertEqual([r['query'] for r in payload['selected_reads']],queries)
+            delivered=[r['query'] for r in payload['selected_reads']]
+            self.assertEqual(delivered[:len(queries)],queries)
+            self.assertEqual(delivered[-1]['pointer'],'/diagnostic_relations')
+            self.assertEqual(delivered[-1]['reference'],reference)
             for query in queries:
                 self.assertIn(dict(reference=query['reference'],pointer=''),payload['source_catalog'].values())
                 self.assertNotIn(dict(reference=query['reference'],pointer=query['pointer']),payload['source_catalog'].values())

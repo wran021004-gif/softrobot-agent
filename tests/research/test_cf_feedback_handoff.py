@@ -6,8 +6,8 @@ from tools.research.session_handoff import feedback_delivery
 
 
 class SelectedFeedbackTests(unittest.TestCase):
-    def project(self, value, view='full'):
-        result=dict(status='success',content=[dict(text=json.dumps(value))])
+    def project(self, value, view='full', status='success'):
+        result=dict(status=status,content=[dict(text=json.dumps(value))])
         original=dict(tool_use=dict(toolUseId='fixture-tool',name='evidence_read',
             input=dict(reference={'artifact_id':'fixture'},view=view,pointer='/diagnostic')),result=result)
         host=Mock();host.run_id='fixture'
@@ -37,6 +37,45 @@ class SelectedFeedbackTests(unittest.TestCase):
         self.assertEqual(facts['selected_value']['J'],.125)
         self.assertIn('preview semantics',facts['scope'])
         self.assertEqual(self.project(dict(J=.125))['delivery'],'exact_feedback')
+
+    def test_large_error_keeps_original_reason_expectation_and_input(self):
+        error=dict(status='rejected',error_code='fixture_window',field='window',
+            reason='Actual window starts at 1; state is at 0.',expected='Cover [0, task duration].',
+            evidence_navigation=dict(large_details=list(range(5000))))
+        row=self.project(error,status='error')
+        self.assertEqual(row['facts']['reason'],error['reason'])
+        self.assertEqual(row['facts']['expected'],error['expected'])
+        self.assertEqual(row['query']['pointer'],'/diagnostic')
+
+    def test_exact_static_read_reuses_projection_but_preserves_full_data(self):
+        from unittest.mock import patch
+        from tests.research.test_research_reporting import offline_host, ref
+        from tools.research import core
+        value=dict(metrics=dict(J=.125),samples=list(range(40)))
+        reference=ref(value);values={reference['artifact_id']:value}
+        host,current=offline_host(values,physical_replays=[reference])
+        q=dict(reference=reference,view='full',pointer='')
+        def update(h,**fields):current.update(fields)
+        with patch.object(core,'update',side_effect=update):
+            first=core.read_evidence(host,q,record_read=False)
+            self.assertEqual(current['evaluation_reads'],[])
+            # A public cache hit must still record the public read marker.
+            second=core.read_evidence(host,q)
+            self.assertEqual(first,second);self.assertIn(reference,current['evaluation_reads'])
+            second['metrics']['J']=999
+            self.assertEqual(core.read_evidence(host,q)['metrics']['J'],.125)
+            self.assertEqual(core.read_evidence(host,{**q,'pointer':'/samples','view':'range','count':2})['items'],[0,1])
+            self.assertEqual(core.read_evidence(host,{**q,'view':'fields','fields':['metrics']}),dict(metrics=value['metrics']))
+            values[reference['artifact_id']]=dict(metrics=dict(J=.25))  # changed-content fixture
+            self.assertEqual(core.read_evidence(host,q)['metrics']['J'],.25)
+
+    def test_report_projection_preserves_unresolved_and_weakened_interpretations(self):
+        from tools.research.research_context import compact_scientific_delivery
+        findings=[dict(kind=k,text='Fixture scoped interpretation',sources=[])
+            for k in ('hypothesis','unresolved_question','further_investigation')]
+        brief=dict(latest_reports=[dict(interpretations=findings,findings=[])])
+        shown=compact_scientific_delivery(brief,decision_only=True)
+        self.assertEqual(shown['latest_reports'][0]['interpretations'],findings)
 
 
 if __name__=='__main__':unittest.main()

@@ -74,6 +74,11 @@ def feedback_delivery(host, tool_ids):
             if value['tool_use']['name']=='evidence_read' and result['status']=='success':
                 selected=selected_evidence_facts(parsed,value['tool_use']['input'],min(3000,remaining))
                 if selected is not None:facts=selected
+            if result['status']=='error' and isinstance(parsed,dict):
+                # Error reason/expectation must survive beside the exact input
+                # already in row.query, even when navigation details are large.
+                facts={k:parsed[k] for k in ('status','error_code','field','reason','expected',
+                    'worker_started','scientific_execution_started','charged_method_counts','full_error_reference') if k in parsed}
             if (value['tool_use']['name']=='evidence_read' and
                     value['tool_use']['input'].get('view')=='mathematical_capabilities' and isinstance(parsed,dict)):
                 for field in ('request_template','execution_limits','required_parameters','measured_control_initialization'):

@@ -26,7 +26,7 @@ class InvestigationRequest(Contract):
     focus: list[str] = Field(default_factory=list)
     constraints: list[str] = Field(default_factory=lambda: ['Use existing evidence only'])
     reads: list[EvidenceQuery] = Field(default_factory=list,
-        description='Optional exact fields/range/JSON Pointer reads; never formal reading credit')
+        description='Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit')
 
 
 class InterpretationResponse(Contract):
@@ -194,6 +194,12 @@ def investigate(host, request):
     q.reads.extend(EvidenceQuery.model_validate({k:c[k] for k in ('reference','pointer','view')})
         for c in applicable_corrections(host,[plain(r) for r in q.references]))
     report=assemble(host,q.references,question=q.question)
+    # Investigation owns detailed cross-model reading; main Agent receives L1.
+    for reference in q.references:
+        raw=host.store.artifact(reference)
+        if not raw.get('candidate'):continue
+        query=EvidenceQuery(reference=reference,view='working_set',pointer='/diagnostic_relations')
+        if query not in q.reads:q.reads.append(query)
     # Validate explicit reads now; only selected subnodes enter the Reporter input.
     for query in q.reads:read_evidence(host,plain(query),record_read=False)
     ref=_save(host,report,request=q)
@@ -418,7 +424,9 @@ def _wire(host, reference, saved):
             '. Every item requires source_ids selected only from source_catalog. '
             'Usually return 1-3 important interpretations; more only for an explicitly complex investigation. '
             'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
-            'Explain quantitative new information, '
+            'Explain quantitative new information with exact values, units and valid comparison scope. '
+            'Use selected diagnostic_relations to assess possible failure mechanisms and observations '
+            'that support or weaken them; explicitly state what cannot be concluded. '
             'supported/weakened hypotheses, unresolved questions and discriminating observations. '
             'Respect focus and constraints as evidence scope. Request missing evidence in further_investigation. '
             'Facts, identities, metrics, costs and relations are frozen. Multi-factor differences do not '

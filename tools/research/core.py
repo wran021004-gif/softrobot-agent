@@ -38,6 +38,13 @@ def read_evidence(host, query, *, record_read=True):
         except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact') from exc
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
+    # Reuse only exact static projections of the verified Store content. Dynamic
+    # views and summaries (whose navigation can change) are recomputed normally.
+    cacheable=q.view in ('full','fields','range')
+    cache=getattr(host,'_evidence_query_cache',{})
+    cache_key=digest(dict(query=plain(q),content=value)) if cacheable else None
+    if cache_key in cache:
+        return _record_evidence_read(host,q,s,deepcopy(cache[cache_key]),record_read)
     if q.view=='working_set':
         from tools.research.evidence_policy import registered_references
         from tools.research.research_context import context
@@ -177,6 +184,14 @@ def read_evidence(host, query, *, record_read=True):
         if not isinstance(value,list):raise navigation(ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER'),value,q.pointer)
         if q.start>len(value):raise navigation(ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value))),value,q.pointer)
         value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
+    if cacheable:
+        cache[cache_key]=deepcopy(value)
+        host._evidence_query_cache=cache
+    return _record_evidence_read(host,q,s,value,record_read)
+
+
+def _record_evidence_read(host,q,s,value,record_read):
+    """Cache hits retain the same public read markers; internal reads grant none."""
     if q.view=='working_set' or not record_read:return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])

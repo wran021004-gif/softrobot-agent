@@ -908,6 +908,9 @@ def research_action_trace(host, limit=5):
             # after_tool may persist a completed *protocol* receipt for a request
             # rejected before science admission. That is not a failed worker.
             rows[key]['execution_status']='failed' if rows[key]['execution_status']=='failed' else 'rejected'
+            if event['kind']=='tool_request_error' and 'message' in value:
+                rows[key]['outcome']['error']=value['message'][:1000]
+                rows[key]['outcome']['error_reference']=event['outputs'][0]
     ordered=sorted(rows.values(),key=lambda r:r['_position'])
     for row in ordered:
         row.pop('_position')
@@ -1165,14 +1168,15 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                     preferred_parameter_direction=t2['preferred_parameter_direction'],physical_acceptance='unmeasured'),
                     detail_query=dict(reference=ref,view='working_set',pointer='/mathematical_decision_view/optimal_sensitivity'))
         for report in brief.get('latest_reports',[]):
-            report['interpretations']=[dict(kind='hypothesis',text=i['text'],sources=i['sources'])
-                for i in report.get('interpretations',[])[:1]]
+            report['interpretations']=[{k:i[k] for k in ('kind','text','sources')}
+                for i in report.get('interpretations',[])[:3]]
             for finding in report.get('findings',[]):
                 finding['metrics']=finding.get('metrics',[])[:3]
                 best=brief.get('best_valid')
                 if best and finding['result']['reference']==best['reference']:
                     finding['metrics']=[]
                     finding['physical_facts']=dict(same_as='best_valid/physical_diagnostic')
+                    finding.get('recorded_summary',{}).pop('task_gap',None)
                 math=finding.get('mathematics') or {}
                 native=math.get('native_analysis') or {}
                 if native.get('comparison'):
