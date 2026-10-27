@@ -1,0 +1,131 @@
+{
+  "defaults": "bf7_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v3.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "study_id": "p2-v3-positive-high-agent-20261028",
+  "authorization": "Explicit current user P2 authorization 2026-10-28: independent empty-pool Agent decision validation; aggregate P2 costs and limits in docs/research/p2_v3_protocol.md. No P3 authorization.",
+  "evidence_destination": "runs/p2-v3-positive-high-agent-20261028/private-store",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 8,
+    "protected_provider_requests": 2,
+    "public_operations": 29,
+    "protected_public_operations": 3,
+    "mathematical_evaluations": 2,
+    "physical_launches": 1
+  },
+  "physical_replay_limit": 1,
+  "native_control_limits": {
+    "evaluation_requests": 51,
+    "iterations": 1,
+    "knots_s": 4
+  },
+  "initial_structure_strategy": "agent_choice",
+  "family_search": {
+    "evaluation_modes": [
+      "mathematical_proxy",
+      "mujoco_control"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 2,
+    "methods": [
+      "adaptive_joint_block_v1"
+    ]
+  },
+  "mathematical_method_scope": "registered_applicable_v1",
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "routes.*.segments.*.radius_m",
+      "routes.*.segments.*.angle_rad"
+    ]
+  },
+  "task": "../../tasks/bf7_shared_reach_v1_positive_high.json",
+  "mode": "formal_research",
+  "numerical_execution_guard": {
+    "version": "bounded_worker_v1",
+    "limit_s": 300,
+    "worker_timeout_s": 180,
+    "margin_s": 30
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "execution_instructions": "Independently investigate the frozen positive_high task from an EMPTY candidate and evidence pool. Family defaults are a design grammar, not a known solution. Choose the research starting method, legal candidate parameters, evidence reads and next actions yourself; do not assume an untried structure or direction works. A local tendon-force result is an instantaneous diagnostic; Native J is a dimensionless finite-budget score and is not global optimality or independent task acceptance. A changed structure requires its own bound and adapted control for a fair comparison. Incomplete computations cannot rank candidates or establish infeasibility. Only an independent full replay can establish task acceptance; STOP truthfully when resources run out. Use only this Study's evidence and preserve all costs."
+}
