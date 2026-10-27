@@ -117,6 +117,8 @@ CONTRACTS=[('experiment.assembly','1.0.0',m0.Assembly),
 ('reference.reach_evaluation','1.0.0',m2.ReachEvaluation),
 ('reference.tracking_goal','1.0.0',m2.TrackingGoal),
 ('reference.tracking_evaluation','1.0.0',m2.TrackingEvaluation),
+('reference.tool_axis_goal','1.0.0',m2.ToolAxisGoal),
+('reference.tool_axis_evaluation','1.0.0',m2.ToolAxisEvaluation),
 ('family.design','1.0.0',m3.Design),
 ('family.initial','1.0.0',m3.Initial),
 ('family.dynamics_model','1.0.0',m3.DynamicsModel),
@@ -136,6 +138,8 @@ Extension(extension_id='evaluate.reach',kind='evaluator',version='1.0.0',input_s
 Extension(extension_id='task.reach',kind='task',version='1.0.0',input_schema=m6.TaskDefinition,output_schema=m2.Empty,binding='extensions.reference.implementation:reach_task',description='Development task using existing reach semantics',dependencies=(),extension_dependencies=(),resources=(),cache=False,side_effects='none',capabilities={'category': 'evaluation_comparison', 'role': 'adapter'},sources=PLATFORM_SOURCES + ('extensions/reference/contracts.py', 'extensions/reference/implementation.py')),
 Extension(extension_id='task.tracking',kind='task',version='1.0.0',input_schema=m6.TaskDefinition,output_schema=m2.Empty,binding='extensions.reference.implementation:tracking_task',description='World tip tracking: optional timed nodes or free ordered geometric progress',sources=PLATFORM_SOURCES + ('extensions/reference/contracts.py','extensions/reference/implementation.py')),
 Extension(extension_id='evaluate.tracking',kind='evaluator',version='1.0.0',input_schema=m2.TrackingEvaluation,output_schema=m6.EvaluationResult,binding='extensions.reference.implementation:evaluate_tracking',description='Independent timed or geometric saved-trajectory evaluation with diagnostic RMS',dependencies=('numpy',),sources=PLATFORM_SOURCES + ('extensions/reference/contracts.py','extensions/reference/implementation.py')),
+Extension(extension_id='task.position_tool_axis',kind='task',version='1.0.0',input_schema=m6.TaskDefinition,output_schema=m2.Empty,binding='extensions.reference.implementation:tool_axis_task',description='Sampled world position plus directed tip-local tool axis; no axial-roll requirement',sources=PLATFORM_SOURCES + ('extensions/reference/contracts.py','extensions/reference/implementation.py','tools/research/tool_axis_task.py')),
+Extension(extension_id='evaluate.position_tool_axis',kind='evaluator',version='1.0.0',input_schema=m2.ToolAxisEvaluation,output_schema=m6.EvaluationResult,binding='extensions.reference.implementation:evaluate_tool_axis',description='Independent position distance and arccos of directed unit-axis dot product, in m and rad',dependencies=('numpy',),sources=PLATFORM_SOURCES + ('extensions/reference/contracts.py','extensions/reference/implementation.py','tools/research/tool_axis_task.py')),
 Extension(extension_id='evidence.read',kind='tool',version='1.0.0',input_schema=m7.ReadEvidence,output_schema=m7.EvidencePage,binding='tools.platform_tools:read_evidence',description='Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed.',dependencies=(),extension_dependencies=(),resources=(),cache=False,side_effects='none',capabilities={'category': 'platform_services', 'role': 'public_tool'},sources=PLATFORM_SOURCES + TOOL_SOURCES),
 Extension(extension_id='simulation.run',kind='tool',version='1.0.0',input_schema=m7.Simulate,output_schema=m6.BackendResult,binding='tools.platform_tools:simulate',description='Execute the frozen task and selected candidate, charging one backend attempt. Saves results and trajectory; use evaluation.run to score the result.',dependencies=(),extension_dependencies=(),resources=(),cache=True,side_effects='current session/project only',capabilities={'preflight': 'tools.platform_tools:simulation_preflight', 'cache_reuse': 'tools.platform_tools:simulation_reuse', 'category': 'simulation', 'role': 'public_tool'},sources=PLATFORM_SOURCES + PHYSICAL_SOURCES + NMPC_SOURCES + TOOL_SOURCES),
 Extension(extension_id='evaluation.run',kind='tool',version='1.0.0',input_schema=m7.Evaluate,output_schema=m6.EvaluationResult,binding='tools.platform_tools:evaluate',description='Evaluate an existing saved simulation result with the frozen task evaluator. No solve; returns validity, metrics and task_success separately.',dependencies=(),extension_dependencies=(),resources=(),cache=False,side_effects='current session/project only',capabilities={'category': 'evaluation_comparison', 'role': 'public_tool'},sources=PLATFORM_SOURCES + TOOL_SOURCES),
@@ -257,6 +261,10 @@ EXTENSIONS.append(replace(_sr_controller, version='12.0.0',
 _backend = next(e for e in EXTENSIONS if e.extension_id=='backend.family_mujoco' and e.version=='1.1.0')
 EXTENSIONS.append(replace(_backend, version='1.2.0', capabilities={**_backend.capabilities,
     'families':['task.reach','task.tracking']}))
+EXTENSIONS.append(replace(_backend,version='1.3.0',binding='extensions.tendon_family.backends:NativeSequenceMujocoBackend',
+    description='Same MuJoCo mechanics; position/tool-axis execution requires an explicit native sequence and independent playback',
+    capabilities={**_backend.capabilities,'families':['task.position_tool_axis'],
+        'signals':[*_backend.capabilities['signals'],'tip_tool_axis'],'execution_route':'explicit_native_sequence_only'}))
 for _i,_entry in enumerate(EXTENSIONS):
     _support=_entry.capabilities.get('parameter_support') if _entry.kind=='candidate_builder' else None
     if _support:
@@ -265,3 +273,10 @@ for _i,_entry in enumerate(EXTENSIONS):
             'backend':[*_support['backend'],'backend.family_mujoco@1.2.0'],
             'task_families':[*_support['task_families'],'task.tracking']},
             'tracking_scope':'Only reviewed development tasks with GVS controller 12; checked by route_applicability'})
+for _i,_entry in enumerate(EXTENSIONS):
+    _support=_entry.capabilities.get('parameter_support') if _entry.kind=='candidate_builder' else None
+    if _support:
+        EXTENSIONS[_i]=replace(_entry,capabilities={**_entry.capabilities,'parameter_support':{**_support,
+            'backend':[*_support['backend'],'backend.family_mujoco@1.3.0'],
+            'task_families':[*_support['task_families'],'task.position_tool_axis']},
+            'tool_axis_scope':'Explicit native sequence and physical_replay only; GVS/NMPC orientation optimization not applicable'})

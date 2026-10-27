@@ -165,6 +165,8 @@ def playback_tensions(inp, physics, scene, commands, folder):
         mujoco.mj_jacSite(model,data,jac,None,tip)
         position=data.site_xpos[tip].copy();velocity=jac@data.qvel
         return dict(control_step=k,time_s=k*scene['control_period_s'],engine_time_s=float(data.time),
+            **(dict(tip_tool_axis_world=(data.site_xmat[tip].reshape(3,3)@np.asarray(inp.task.goal.data['axis_local'])).tolist())
+                if inp.task.family=='task.position_tool_axis' else {}),
             tip_m=position.tolist(),tip_velocity_m_s=velocity.tolist(),
             speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
             requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
@@ -415,3 +417,9 @@ class MujocoBackend(SerialBackend):
             rows.append(row);previous_lengths=lengths
         self.timings['solve']=time.perf_counter()-start
         return rows,self.controller.observations,complete,reason,steps
+
+
+class NativeSequenceMujocoBackend(MujocoBackend):
+    """Advertise the new observation only on the implemented explicit-schedule route."""
+    def solve(self,timeout_s):
+        raise ValueError('TOOL_AXIS_REQUIRES_EXPLICIT_NATIVE_SEQUENCE_AND_PHYSICAL_REPLAY; NMPC orientation is not implemented')

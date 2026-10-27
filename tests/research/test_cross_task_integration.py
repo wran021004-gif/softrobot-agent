@@ -63,6 +63,7 @@ def perfect_tracking_worker(command, log, timeout):
         fixture='Fabricated perfect motion; no physics executed', status='completed',
         physics_steps=round(cfg['task']['timing']['duration_s']/cfg['task']['timing']['timestep_s']),
         tendon_order=request['trajectory']['tendon_order'], samples=[dict(time_s=float(t),tip_m=p.tolist(),
+            **(dict(tip_tool_axis_world=cfg['task']['goal']['data']['target_axis_world']) if cfg['task']['family']=='task.position_tool_axis' else {}),
             speed_m_s=0.,actual_tension_n=u) for t,p,u in zip(times,positions,[request['trajectory']['tensions_n'][0],*request['trajectory']['tensions_n']])]))
     return SimpleNamespace(returncode=0)
 
@@ -164,11 +165,17 @@ class CrossTaskIntegrationTests(unittest.TestCase):
                     joint_assessment(host,[result['reference'],mixed_ref])
 
     def test_public_generation_discovery_replay_read_select(self):
+        self.public_route('study_tracking_public.json',{'timed_tracking'})
+
+    def test_bf5_public_generation_discovery_replay_read_select(self):
+        self.public_route('study_bf5_public.json',{'tool_position','tool_axis_direction'})
+
+    def public_route(self,leaf,constraints):
         from tools.research.agent import plan_schema
         from tools.research.task_constraints import mathematical_method_view
         from tools.research.feedback import eligibility
         with fixture_directory() as folder:
-            host=fixture_host(folder)
+            host=fixture_host(folder,leaf)
             with patch('tools.research.core.guard'),patch('tools.research.state.guard'),patch('tools.research.physical_replay.guard'):
                 spec=state(host)['spec']
                 schema=plan_schema(spec['allowed_plan_actions'],decision_required=True,
@@ -183,7 +190,7 @@ class CrossTaskIntegrationTests(unittest.TestCase):
                 native=methods['mujoco_direct_control_v1']
                 self.assertTrue(native['formal_execution_authorized'])
                 self.assertNotEqual(native['planning_status'],'unsupported')
-                self.assertEqual({c['constraint_id'] for c in native['coverage']},{'timed_tracking'})
+                self.assertEqual({c['constraint_id'] for c in native['coverage']},constraints)
                 seed=core.dispatch(host,plan('initialize_control',candidate,
                     control_seed=dict(candidate=candidate)),'seed')['result']['source']
                 with patch('tools.service_execution._run_contained',side_effect=perfect_tracking_worker):

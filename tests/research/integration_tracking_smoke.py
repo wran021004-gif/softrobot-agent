@@ -39,14 +39,14 @@ def prepare_smoke(leaf,folder):
     return host
 
 
-def main():
-    folder=ROOT/'runs/integration-tracking-smoke'
+def main(task='tracking'):
+    folder=ROOT/('runs/integration-'+task+'-smoke')
     summary=folder/'summary.json'
     if summary.exists():
         print(json.dumps(dict(status='already_completed',additional_physics_steps=0,summary=str(summary))))
         return
     folder.mkdir(parents=True,exist_ok=True)
-    host=prepare_smoke('study_tracking_public.json',folder)
+    host=prepare_smoke('study_bf5_public.json' if task=='bf5' else 'study_tracking_public.json',folder)
     spec=state(host)['spec']
     scope=dict(study_id=host.run_id,resolved_identity=spec['resolved_identity'],capabilities=spec['capabilities'])
     save(host,dict(user_approval='Task A-I minimal engineering route check only',scope=scope,
@@ -81,7 +81,7 @@ def main():
         protocol=result['acceptance']['protocol_id'],acceptance_status=result['acceptance']['status'],
         selected=bool(state(host).get('selected')),selection_eligibility=choice,
         registered_receipt_type=receipt['tool_id'],execution_binding_verified=True,
-        resource_use=core.resource_use(host),private_store='runs/integration-tracking-smoke/private-store',
+        resource_use=core.resource_use(host),private_store='runs/'+folder.name+'/private-store',
         interpretation='Public method discovery and execution engineering check. No autonomous Provider study or benchmark search.')
     atomic_json(summary,summary_value)
     print(json.dumps(summary_value))
@@ -132,4 +132,5 @@ def conditions_main():
 if __name__=='__main__':
     import sys
     if sys.argv[1:]==['conditions']:conditions_main()
+    elif sys.argv[1:]==['bf5']:main('bf5')
     else:main()

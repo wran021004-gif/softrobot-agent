@@ -39,7 +39,9 @@ def corrected_tensions(reference, times, knots, coefficients, limits, window=Non
 
 def task_outputs(raw):
     if 'samples' in raw:
-        return dict(times_s=[v['time_s'] for v in raw['samples']],
+        return dict(**(dict(tip_tool_axes_world=[v['tip_tool_axis_world'] for v in raw['samples']])
+                if raw['samples'] and 'tip_tool_axis_world' in raw['samples'][0] else {}),
+            times_s=[v['time_s'] for v in raw['samples']],
             tip_positions_m=[v['tip_m'] for v in raw['samples']],
             tip_velocities_m_s=[v['tip_velocity_m_s'] for v in raw['samples']])
     return {key:raw[key] for key in ('times_s','tip_positions_m','tip_velocities_m_s')}
@@ -60,8 +62,29 @@ def tracking_vectors(outputs, tracking):
     return (positions[indices]-reference)/tracking['max_error_m']
 
 
+def tool_axis_samples(outputs,options):
+    from extensions.reference.implementation import tool_axis_angles
+    times=np.asarray(outputs['times_s']);scored=np.asarray(options['times_s'])
+    indices=np.searchsorted(times,scored-1e-12)
+    if np.any(indices>=len(times)) or not np.allclose(times[indices],scored,rtol=0,atol=1e-12):
+        raise ValueError('ALL_SCORED_TOOL_AXIS_SAMPLES_REQUIRED')
+    p=np.asarray(outputs['tip_positions_m'])[indices];axes=np.asarray(outputs['tip_tool_axes_world'])[indices]
+    angles=tool_axis_angles(axes,options['target_axis_world'])
+    return p,axes,angles
+
+
 def task_measure(outputs, target=None, holding_start=None, position_limit=None, speed_limit=None,
-                 terminal_position_limit=None, tracking=None):
+                 terminal_position_limit=None, tracking=None,tool_axis=None):
+    if tool_axis is not None:
+        p,axes,angles=tool_axis_samples(outputs,tool_axis)
+        position=np.linalg.norm(p-tool_axis['target_m'],axis=1)
+        ratios=np.r_[position/tool_axis['position_tolerance_m'],angles/tool_axis['angle_tolerance_rad']]
+        excess=np.maximum(ratios-1,0)
+        return dict(normalized_gap=float(max(excess)),sum_normalized_excess=float(sum(excess)),
+            signed_maximum_excess=float(max(ratios)-1),max_position_error_m=float(max(position)),
+            max_tool_axis_angle_error_rad=float(max(angles)),
+            component_signed_excess=dict(position=float(max(position)/tool_axis['position_tolerance_m']-1),
+                tool_axis=float(max(angles)/tool_axis['angle_tolerance_rad']-1)))
     if tracking is not None:
         ratios=np.linalg.norm(tracking_vectors(outputs,tracking),axis=1)
         excess=np.maximum(ratios-1,0);worst=int(np.argmax(ratios))
@@ -149,9 +172,14 @@ def improvement_test(base_model, new_model, base_sim, new_sim, base_budget, new_
 
 
 def constraint_vectors(outputs, target=None, holding_start=None, position_limit=None, speed_limit=None,
-                       terminal_position_limit=None, tracking=None):
+                       terminal_position_limit=None, tracking=None,tool_axis=None):
     """Every terminal/holding norm constraint, without averaging away a violation."""
     if tracking is not None:return tracking_vectors(outputs,tracking)
+    if tool_axis is not None:
+        p,axes,_=tool_axis_samples(outputs,tool_axis)
+        # For unit axes ||a-b||=2 sin(angle/2), so this cone is exactly equivalent.
+        return np.vstack([(p-tool_axis['target_m'])/tool_axis['position_tolerance_m'],
+            (axes-tool_axis['target_axis_world'])/(2*np.sin(tool_axis['angle_tolerance_rad']/2))])
     task_measure(outputs,target,holding_start,position_limit,speed_limit,terminal_position_limit)
     p=(np.asarray(outputs['tip_positions_m'])-target)/position_limit
     v=np.asarray(outputs['tip_velocities_m_s'])/speed_limit

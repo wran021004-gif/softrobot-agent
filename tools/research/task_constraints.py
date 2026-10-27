@@ -19,7 +19,7 @@ METHOD_MEANINGS = {
     'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
-    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold or timed Tracking. Reuse local response/pattern search with cloned native rollouts covering every registered norm sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
+    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold, timed Tracking or position/tool-axis. Reuse local response/pattern search with cloned native rollouts covering every registered norm sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
     'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.'),
     'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two input step sizes, optional bounded correction checked by native integration. Neither two FD sizes nor two integration timesteps prove numerical convergence or a regional bound; a failed local correction does not establish infeasibility.'),
     'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates at fixed input; this response is not reoptimized structural capability or an optimal-value gradient.'),
@@ -144,7 +144,7 @@ def mathematical_method_view(host, reference):
                     scope='Measured applied NMPC tensions only, exact candidate/task/channels/grid/bounds; acceptance is not inherited.')
                 break
             methods[key]['cost_scope']='Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.'
-            methods[key]['supported_task_families']=['task.reach','task.tracking:timed']
+            methods[key]['supported_task_families']=['task.reach','task.tracking:timed','task.position_tool_axis']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']
             methods[key]['kernel_supported']=row['planning_status']!='unsupported'
             methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (pretension or explicit tensions), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
@@ -411,6 +411,8 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
         return applicability(requirements,query,assessment,exact_point)
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
+    if requirements.binding.get('task_family')=='task.position_tool_axis':
+        reasons.append('Position/tool-axis mathematical analysis is not_applicable for existing affine/GVS methods; use the native sequence response with both real constraints.')
     if query.operating_point in ('target_equilibrium','halfway_waypoint'):
         positions=[c for c in requirements.constraints if c.signal.name=='tip_position']
         if any(c.kind!='norm_bound' for c in positions) or len({tuple(r) for c in positions for r in c.reference})!=1:

@@ -37,6 +37,7 @@ class NativeModel:
         self.aids=[m.actuator(n+'_direct_tension').id for n in self.tendons]
         self.tids=[m.tendon(n).id for n in self.tendons];self.tip=m.site('tip_site').id
         self.limits=m.actuator_ctrlrange[self.aids].copy()
+        self.tool_axis_local=(np.asarray(inp.task.goal.data['axis_local']) if inp.task.family=='task.position_tool_axis' else None)
         if m.nq!=len(self.order) or m.nv!=len(self.order) or m.na:
             raise ValueError('NATIVE_V1_REQUIRES_COMPLETE_NAMED_HINGE_STATE')
         self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,physics_step_attempts=0,rollouts=0,mechanics_evaluations=0)
@@ -130,8 +131,10 @@ class NativeModel:
 
     def motion(self, d):
         jac=np.zeros((3,self.model.nv));mujoco.mj_jacSite(self.model,d,jac,None,self.tip)
-        return dict(time_s=float(d.time),tip_position_m=d.site_xpos[self.tip].tolist(),
-            tip_velocity_m_s=(jac@d.qvel).tolist()),jac
+        motion=dict(time_s=float(d.time),tip_position_m=d.site_xpos[self.tip].tolist(),tip_velocity_m_s=(jac@d.qvel).tolist())
+        if self.tool_axis_local is not None:
+            motion['tip_tool_axis_world']=(d.site_xmat[self.tip].reshape(3,3)@self.tool_axis_local).tolist()
+        return motion,jac
 
     def mechanics(self, d, u):
         m=self.model;self.apply(d,u);self.cost['mechanics_evaluations']+=1
@@ -239,6 +242,7 @@ class NativeModel:
         result=dict(times_s=[s['time_s'] for s in samples],
             tip_positions_m=[s['tip_position_m'] for s in samples],
             tip_velocities_m_s=[s['tip_velocity_m_s'] for s in samples],actual_tensions_n=actual)
+        if self.tool_axis_local is not None:result['tip_tool_axes_world']=[s['tip_tool_axis_world'] for s in samples]
         if peak is not None:result['peak_speed_state']=peak
         return result
 
