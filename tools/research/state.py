@@ -98,9 +98,20 @@ def require_authorization(host):
     raise ValueError('INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE')
 
 
+def bounded_worker_timeout(host):
+    """Opt-in P2 worker boundary; existing count-only studies remain unchanged."""
+    s=state(host)
+    policy=s['spec'].get('numerical_execution_guard')
+    if policy is None:return None
+    remaining=policy['limit_s']-s['numerical_s']-policy['margin_s']
+    if remaining<=0:raise ValueError('BOUNDED_NUMERICAL_ALLOWANCE_EXHAUSTED')
+    return min(policy['worker_timeout_s'],remaining)
+
+
 def guard(host, expensive=False):
     s=state(host)
     require_authorization(host)
+    bounded_worker_timeout(host)
     if s['research_status']=='stopped':
         raise ValueError('ACCEPTED_STOP_SEALED')
     if expensive and s.get('success_gate'):

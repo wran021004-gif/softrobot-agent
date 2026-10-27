@@ -502,6 +502,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if applicability['status']=='not_applicable':
         return dict(status='not_applicable',analysis_applicability=applicability,
             task_acceptance='unmeasured',additional_analysis_evaluations=0)
+    from tools.research.state import bounded_worker_timeout
+    timeout=bounded_worker_timeout(host)
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
@@ -530,7 +532,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     started=time.perf_counter()
     try:
         with (folder/'worker.log').open('w',encoding='utf8') as log:
-            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,None,
+            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,timeout,
                 lifecycle_path=folder/'worker_lifecycle.json')
         boundary=dict(termination_confirmed=True,returncode=done.returncode,timed_out=False,worker_started=True)
     except subprocess.TimeoutExpired as exc:

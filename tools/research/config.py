@@ -142,6 +142,14 @@ def _reference(source, key, provenance):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    execution_guard=study.pop('numerical_execution_guard',None)
+    if execution_guard is not None:
+        if (set(execution_guard)!={'version','limit_s','worker_timeout_s','margin_s'}
+                or execution_guard['version']!='bounded_worker_v1'
+                or any(type(execution_guard[k]) not in (int,float) or not 0 < execution_guard[k] <= 600
+                    for k in ('limit_s','worker_timeout_s','margin_s'))
+                or execution_guard['margin_s']>=execution_guard['limit_s']):
+            raise ValueError('BOUNDED_NUMERICAL_EXECUTION_GUARD_REQUIRED')
     conditions=study.pop('task_conditions',None)
     if conditions is not None:
         if (len(conditions) not in (2,3) or any(set(c)!={'condition_id','task'} or not c['condition_id'] for c in conditions)
@@ -296,6 +304,7 @@ def resolve(path, profile=None, *, backend_profile=None):
             or any(type(v) is not int or v<1 for v in native_limits.values())):
         raise ValueError('POSITIVE_NATIVE_CONTROL_COUNT_LIMITS_REQUIRED')
     if native_limits is not None:study['native_control_limits']=native_limits
+    if execution_guard is not None:study['numerical_execution_guard']=execution_guard
     replay_limit=study.get('physical_replay_limit')
     if replay_limit is not None and (type(replay_limit) is not int or not 0<=replay_limit<=b['physical_launches']):
         raise ValueError('PHYSICAL_REPLAY_LIMIT_MUST_SHARE_BACKEND_CEILING')

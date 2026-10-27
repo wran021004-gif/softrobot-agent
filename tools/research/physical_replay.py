@@ -423,6 +423,8 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
         if old['request_hash']!=digest(request):raise ValueError('PHYSICAL_REPLAY_OPERATION_COLLISION')
         if not old['receipt']:raise ValueError('RECOVER_PHYSICAL_REPLAY_NO_RELAUNCH')
         return dict(reference=json.loads(old['receipt'])['output'],additional_physical_launches=0)
+    from tools.research.state import bounded_worker_timeout
+    timeout=bounded_worker_timeout(host)
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
         from tools.research.budget import backend_capacity
@@ -442,7 +444,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     try:
         with (folder/'worker.log').open('w',encoding='utf8') as log:
             done=_run_contained([s['spec']['runtime']['research_python'],'-m','tools.research.execution_worker',
-                str(folder/'request.json')],log,None)
+                str(folder/'request.json')],log,timeout)
         boundary=dict(termination_confirmed=True,returncode=done.returncode)
     except subprocess.TimeoutExpired as exc:
         boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)
