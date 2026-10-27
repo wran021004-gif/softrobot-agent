@@ -33,6 +33,9 @@ class NativeFirstProgressTests(unittest.TestCase):
             self.assertEqual(search.initial_search_progress(host)['status'],'completed_unresolved')
             row['evidence']['conditions']['primary']['callbacks']=0
             self.assertFalse(search.initial_search_progress(host)['requirement_satisfied'])
+            row['evidence']['conditions']['primary']['cost']={'physics_steps':327}
+            self.assertEqual(search.initial_search_progress(host)['status'],'completed_unresolved')
+            row['evidence']['conditions']['primary']['cost']={'physics_steps':0}
             row['evidence']['conditions']['primary']['callbacks']=2
             result['termination_reason']='analysis_not_admitted'
             self.assertFalse(search.initial_search_progress(host)['requirement_satisfied'])
@@ -159,6 +162,24 @@ class NativeMixedSearchTests(unittest.TestCase):
         self.assertEqual(set(result['best_native_candidate']['evidence']['conditions']),{'primary'})
         self.assertTrue(search.initial_search_progress(self.host)['requirement_satisfied'])
         self.assertFalse(state(self.host).get('success_gate'))
+
+    def test_unrankable_native_rows_are_not_described_as_best(self):
+        def incomplete(host,query,key,**kwargs):
+            request=plain(AnalysisRequest.model_validate(query))
+            value=dict(status='execution_incomplete',operation_key=key+'-analysis',candidate=query['candidate'],
+                requested_operation=request,charged_analysis_evaluations=1,charged_numerical_s=0.,fixture=True,
+                native_progress=dict(cost=dict(physics_steps=10,rollouts=1)))
+            ref=save(host,value,'synthetic_incomplete_native_fixture');s=state(host)
+            update(host,analysis_results=[*s['analysis_results'],ref],mathematical_evaluations=s['mathematical_evaluations']+1)
+            return dict(reference=ref)
+        spec=deepcopy(self.spec);spec.pop('task_conditions',None);spec['initial_structure_strategy']='native_search'
+        update(self.host,spec=spec)
+        q=self.query();q.update(max_proposals=2,max_evaluations=2)
+        with patch.object(core,'guard'),patch.object(analysis,'dispatch',side_effect=incomplete):
+            out=core.dispatch(self.host,self.plan(q),'incomplete-native-fixture')['result']['result']
+        self.assertIsNone(out['best_native_candidate'])
+        self.assertTrue(search.initial_search_progress(self.host)['requirement_satisfied'])
+        self.assertNotIn('best',out['evaluated'][1]['lineage']['decision'])
 
     def test_interrupted_native_condition_resumes_saved_analysis(self):
         calls=[]

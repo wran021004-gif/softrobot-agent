@@ -350,6 +350,10 @@ def error_feedback(host, use, exc, before):
     field=None;expected=message[:300];refs=[]
     if hasattr(exc,'errors'):
         errors=exc.errors(include_url=False,include_context=False,include_input=False)
+        search=use.get('input',{}).get('search')
+        if isinstance(search,dict) and search.get('version')=='family_mixed_search_v1':
+            matching=[e for e in errors if any('FamilyMixedSearch' in str(part) for part in e['loc'])]
+            if matching:errors=matching
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']

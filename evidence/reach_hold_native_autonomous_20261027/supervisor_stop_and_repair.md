@@ -1,0 +1,11 @@
+# Stopped Reach/Hold Native Study and gate repair
+
+Study `reach-hold-native-autonomous-20261027` was stopped at the user's request before an Agent SELECT or STOP. Its formal Store and export preserve the frozen identity, original requests, evidence, and full charges; this is an engineering stop, not a scientific conclusion. The in-flight Provider response was allowed to settle. A fourth Native analysis already in progress also settled after the stop request; its cost is retained. Final ledger: 23 Provider requests, 32 public operations, 4 mathematical analysis entries, and 0 independent backend launches. All reservations were settled before export.
+
+The first Native family search completed three analysis entries, each ending with an incomplete rollout after 326–328 MuJoCo steps. The recorded diagnostic identifies payload-floor contact and the Native kernel's contact-free applicability boundary; no finite J or independent pass was obtained. This observation is limited to those runs and does not establish structural infeasibility.
+
+The initial-search projection incorrectly required a completed callback count, while incomplete rollouts had null callback counts despite recorded physical steps and immutable analysis receipts. It thus reported an already completed finite attempt as incomplete and blocked normal follow-up routes. The repair recognizes actual recorded physics steps in an owned analysis receipt as computation, while continuing to require a completed search result and reject unadmitted or uncomputed work. An additional Native lineage correction prevents unrankable rows being labeled as the best result. No task, physics, acceptance criterion, or old Study record is changed.
+
+A separate blank Study was explicitly requested by the user after this stop. It receives its own configuration, identity, authorization, session, and finite ledger. Nothing from this stopped Study is supplied as candidate or scientific evidence to the new Agent.
+
+The Agent's first Native search request was also rejected by validation. The short error feedback exposed the unrelated legacy Search union branch instead of the FamilyMixedSearch validation error. The repair reports the matching branch; the full original error remains in the immutable archive.

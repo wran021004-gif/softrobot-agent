@@ -94,7 +94,8 @@ def initial_search_progress(host):
         evaluated_math=any(row.get('evidence',{}).get('analysis') in s.get('analysis_results',[])
             for row in result.get('evaluated',[]))
         if native:
-            evaluated_math=any(r.get('analysis') in s.get('analysis_results',[]) and (r.get('callbacks') or 0)>0
+            evaluated_math=any(r.get('analysis') in s.get('analysis_results',[]) and
+                ((r.get('callbacks') or 0)>0 or (r.get('cost') or {}).get('physics_steps',0)>0)
                 for row in result.get('evaluated',[]) for r in row.get('evidence',{}).get('conditions',{}).values())
         complete=bool(ref and evaluated_math and result.get('termination_reason')!='analysis_not_admitted')
         attempts.append(dict(reference=ref,status='candidate_found' if complete and (result.get('best_native_candidate') if native else result.get('best_mathematical_candidate'))
@@ -295,7 +296,8 @@ def run_search(host,query,key,*,guard,execute,capacity):
             if mixed:
                 from tools.research.mixed_moves import initial,next_move,generation
                 space=s['spec']['family_space']
-                best=min((r for r in rows if r.get('candidate_id')),key=lambda row:rank(row,q),default=None)
+                best=min((r for r in rows if r.get('candidate_id') and (not native or rank(r,q)[0]==0)),
+                    key=lambda row:rank(row,q),default=None)
                 if not rows:
                     point=initial(space,q)
                     if q.previous_candidate_ref:

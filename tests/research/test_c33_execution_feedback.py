@@ -43,6 +43,21 @@ class ExecutionFeedbackTests(unittest.TestCase):
             self.assertEqual(current,before)
             host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
 
+    def test_family_search_validation_reports_matching_union_branch(self):
+        host,current=offline_host({});reference=dict(artifact_id='c'*64,media_type='application/json')
+        search=dict(version='family_mixed_search_v1',family_space_identity='a'*64,variable_groups=['lengths'],
+            segment_counts=[2],tendon_counts=[4],screening_fidelity='standard',objective='task_violation',
+            operating_point='standardized_initial_pretension',max_proposals=1,max_evaluations=1,
+            evaluation_mode='mujoco_control',initial_tension_n=.2,control_settings=None)
+        value=dict(action='search',search=search,hypothesis='Fixture',expected_observation='Fixture',
+            weakening_observation='Fixture',fixed_conditions='Fixture',stopping_condition='Fixture',interpretation='Fixture')
+        with self.assertRaises(ValueError) as caught:Plan.model_validate(value)
+        with patch('tools.research.agent.record',return_value=reference):
+            feedback=error_feedback(host,dict(name='research_plan',input=value),caught.exception,current)
+        self.assertIn('FamilyMixedSearch',feedback['field'])
+        self.assertIn('NATIVE_SEARCH_REQUIRES',feedback['expected'])
+        self.assertFalse(feedback['scientific_execution_started'])
+
     def test_unrelated_unknown_parameter_keeps_its_original_error(self):
         host,current=offline_host({});reference=dict(artifact_id='b'*64,media_type='application/json')
         with self.assertRaises(ValueError) as caught:LocalControlSearchSettings.model_validate(dict(other_field=1))

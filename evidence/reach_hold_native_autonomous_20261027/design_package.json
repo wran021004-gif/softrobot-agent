@@ -1,0 +1,194 @@
+{
+  "version": "robot_design_delivery_v1",
+  "study_id": "reach-hold-native-autonomous-20261027",
+  "implementation": "fd7775e7e218d198d98f582b75cbaaa43256c16d",
+  "frozen_study_identity": "763d20d925744cbb9458ee29761c056724604180b97c29c7c29bba2186cf7ed3",
+  "canonical_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "status": "development_valid",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "accepted": false,
+  "status": "no_valid_candidate",
+  "ledger": {
+    "limit": {
+      "backend_solves": 6,
+      "model_calls": 64,
+      "tool_calls": 120,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 32,
+      "model_calls": 23,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 462.821219200021
+    },
+    "remaining": {
+      "backend_solves": 6,
+      "model_calls": 41,
+      "tool_calls": 88,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "stop": {
+    "artifact_id": "884be993358fd8c1aed1f5f7cc1acd81063f413960267727ddc8f39f546da810",
+    "media_type": "application/json"
+  },
+  "archive_manifest": "archive_manifest.json",
+  "scope": "Frozen nominal sampled task only; optimality, robustness, hardware and repeatability unassessed",
+  "content_identity": "8c09f5788faef0bf3229be5713f48396231961a9af17adf1f1fada6cc276f7c3"
+}
