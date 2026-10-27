@@ -45,7 +45,32 @@ def task_outputs(raw):
     return {key:raw[key] for key in ('times_s','tip_positions_m','tip_velocities_m_s')}
 
 
-def task_measure(outputs, target, holding_start, position_limit, speed_limit, terminal_position_limit=None):
+def tracking_vectors(outputs, tracking):
+    """Exactly the scored r(t) samples; missing or shifted times are unsupported."""
+    times=np.asarray(outputs['times_s']);positions=np.asarray(outputs['tip_positions_m'])
+    scored=np.asarray(tracking['times_s']);reference=np.asarray(tracking['reference_m'])
+    if (positions.shape!=(len(times),3) or reference.shape!=(len(scored),3) or not len(scored)
+            or np.any(np.diff(times)<=0) or np.any(np.diff(scored)<=0)
+            or not all(np.isfinite(a).all() for a in (times,positions,scored,reference))
+            or tracking['max_error_m']<=0):
+        raise ValueError('FINITE_ALIGNED_TIMED_TRACKING_REQUIRED')
+    indices=np.searchsorted(times,scored-1e-12)
+    if np.any(indices>=len(times)) or not np.allclose(times[indices],scored,atol=1e-12,rtol=0):
+        raise ValueError('ALL_SCORED_TRACKING_SAMPLES_REQUIRED')
+    return (positions[indices]-reference)/tracking['max_error_m']
+
+
+def task_measure(outputs, target=None, holding_start=None, position_limit=None, speed_limit=None,
+                 terminal_position_limit=None, tracking=None):
+    if tracking is not None:
+        ratios=np.linalg.norm(tracking_vectors(outputs,tracking),axis=1)
+        excess=np.maximum(ratios-1,0);worst=int(np.argmax(ratios))
+        errors=ratios*tracking['max_error_m']
+        return dict(normalized_gap=float(max(excess)),sum_normalized_excess=float(sum(excess)),
+            signed_maximum_excess=float(max(ratios)-1),max_position_error_m=float(max(errors)),
+            rms_position_error_m=float(np.sqrt(np.mean(errors**2))),
+            worst_constraint=dict(kind='timed_tracking',time_s=tracking['times_s'][worst],
+                normalized_signed_excess=float(ratios[worst]-1)))
     terminal_position_limit=position_limit if terminal_position_limit is None else terminal_position_limit
     times=np.asarray(outputs['times_s']);p=np.asarray(outputs['tip_positions_m'])
     v=np.asarray(outputs['tip_velocities_m_s']);target=np.asarray(target)
@@ -123,8 +148,10 @@ def improvement_test(base_model, new_model, base_sim, new_sim, base_budget, new_
         scope='A posteriori at the two evaluated endpoints; prospective guarantee requires independently valid endpoint error bounds before execution')
 
 
-def constraint_vectors(outputs, target, holding_start, position_limit, speed_limit, terminal_position_limit=None):
+def constraint_vectors(outputs, target=None, holding_start=None, position_limit=None, speed_limit=None,
+                       terminal_position_limit=None, tracking=None):
     """Every terminal/holding norm constraint, without averaging away a violation."""
+    if tracking is not None:return tracking_vectors(outputs,tracking)
     task_measure(outputs,target,holding_start,position_limit,speed_limit,terminal_position_limit)
     p=(np.asarray(outputs['tip_positions_m'])-target)/position_limit
     v=np.asarray(outputs['tip_velocities_m_s'])/speed_limit

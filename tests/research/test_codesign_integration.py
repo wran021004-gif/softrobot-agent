@@ -42,8 +42,10 @@ assert ResearchTaskAdapter(effective_input(dict(configuration=cfg))).reference_a
         for module in (gvs_profile,generated_serial):
             self.assertIs(module.checked_reach,module.checked_control)
             module.checked_reach(cfg,execution=False)
-            with self.assertRaisesRegex(ValueError,'TIMED_TRACKING_PHYSICAL_ROUTE_UNSUPPORTED'):
-                module.checked_control(cfg)
+            module.checked_control(cfg)
+            draft=deepcopy(cfg);draft['task']['status']='draft'
+            with self.assertRaisesRegex(ValueError,'TRACKING_REQUIRES_REVIEWED_DEVELOPMENT_TASK'):
+                module.checked_control(draft)
         cfg['policy']['controller']['parameters']['data']['numerical_source']='bundled_guess'
         with self.assertRaisesRegex(ValueError,'CANDIDATE_PRETENSION'):
             gvs_profile.mathematical_numerical(cfg)

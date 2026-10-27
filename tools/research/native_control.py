@@ -26,9 +26,15 @@ def window_applicability(requirements, query, assessed, point, reasons):
     if query.operation=='mujoco_nonlinear_task_capability_v1' and window and abs(window[0])>1e-12:
         reasons.append('Nonlinear T1 requires the complete frozen task from 0 s.')
     coverage=[]
-    expected={'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'}
+    tracking=requirements.binding.get('task_family')=='task.tracking'
+    expected=({'timed_tracking':'tip_position'} if tracking else
+        {'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'})
+    if tracking and query.operation!='mujoco_direct_control_v1':
+        reasons.append('Tracking nonlinear T1/T2 is not applicable; only direct sequence control is adapted.')
+    if abs(requirements.sample_period_s-query.protocol.period_s)>1e-12:
+        reasons.append('Native control requires matched sample and control grids.')
     if {c.constraint_id for c in requirements.constraints}!=set(expected):
-        reasons.append('Native control v1 requires the registered Reach/Hold norm constraints.')
+        reasons.append('Native control requires registered Reach/Hold or timed Tracking norm constraints.')
     for c in requirements.constraints:
         matched=[i for i in c.indices if window and window[0]-1e-12<=requirements.time_grid_s[i]<=window[1]+1e-12]
         supported=(c.kind=='norm_bound' and c.signal.entity=='tip' and c.signal.frame=='world' and
@@ -48,13 +54,15 @@ def window_applicability(requirements, query, assessed, point, reasons):
 def calculate(configuration, binding, query, point, requirements, context, checkpoint=None):
     from extensions.tendon_family.mujoco_analysis import NativeModel
     from tools.research.local_control_search import search
-    from tools.research.control_correction import task_measure
+    from tools.research.control_correction import task_measure, constraint_vectors
     from tools.research_tasks import task_adapter
     from tools.research.native_analysis import assessment, applicability
     from tools.research.analysis import scoped_result
     from schemas.platform import SessionInput
     started=time.perf_counter();q=query.control_optimization;settings=q.settings
-    if configuration['task']['family']!='task.reach':raise ValueError('NATIVE_CONTROL_V1_SUPPORTS_REACH_HOLD_ONLY')
+    tracking=configuration['task']['family']=='task.tracking'
+    if tracking and query.operation!='mujoco_direct_control_v1':
+        raise ValueError('TRACKING_NONLINEAR_T1_T2_NOT_APPLICABLE')
     source=context['schedule'];tr=source['trajectory'];times=np.asarray(tr['times_s'])
     k=round(point['actual_time_s']/query.protocol.period_s)
     prefix=point.get('prefix_tensions_n')
@@ -66,9 +74,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
         cost={**native.cost,'kernel_wall_s':time.perf_counter()-started}))
     point,start=native.reconstruct(point) if point.get('native_replay') else (point,native.restore(point))
     if not np.allclose(native.limits[:,0],0,atol=0,rtol=0):raise ValueError('ZERO_LOWER_TENSION_BOUND_REQUIRED')
-    adapter=task_adapter(configuration);limits=adapter.ranking_limits()
-    options=dict(target=configuration['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
-        position_limit=limits['holding_max_error_m'],terminal_position_limit=limits['terminal_error_m'],speed_limit=limits['holding_max_speed_m_s'])
+    adapter=task_adapter(configuration);options=adapter.control_search_options()
     if abs(configuration['task']['timing']['sample_period_s']-query.protocol.period_s)>1e-12:
         raise ValueError('NATIVE_CONTROL_V1_REQUIRES_MATCHED_SAMPLE_AND_CONTROL_GRIDS')
     initial=dict(id='native',schedule=source,limits=native.limits[:,1].tolist(),task_options=options)
@@ -78,7 +84,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
         nonlocal peak_state
         try:
             outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:],
-                **(dict(capture_speed_after_s=options['holding_start']) if not evaluations else {}))
+                **(dict(capture_speed_after_s=options['holding_start']) if not tracking and not evaluations else {}))
             peak_state=outputs.pop('peak_speed_state',peak_state)
         except Exception:
             if checkpoint:checkpoint('native_progress_'+str(len(evaluations)+1).zfill(4),dict(
@@ -88,21 +94,26 @@ def calculate(configuration, binding, query, point, requirements, context, check
             raise
 
         measure=task_measure(outputs,**options)
-        hold=np.asarray(outputs['times_s'])>=options['holding_start']-1e-12
-        p=np.linalg.norm(np.asarray(outputs['tip_positions_m'])-options['target'],axis=1)
-        v=np.linalg.norm(outputs['tip_velocities_m_s'],axis=1)
-        ratios=np.r_[p[-1]/options['terminal_position_limit'],p[hold]/options['position_limit'],v[hold]/options['speed_limit']]
-        sample_times=np.r_[outputs['times_s'][-1],np.asarray(outputs['times_s'])[hold],np.asarray(outputs['times_s'])[hold]]
-        worst=int(np.argmax(ratios));measure['worst_constraint']=dict(
-            kind='terminal_position' if worst==0 else 'holding_position' if worst<=sum(hold) else 'holding_speed',
-            time_s=float(sample_times[worst]),normalized_signed_excess=float(ratios[worst]-1))
+        if tracking:
+            ratios=np.linalg.norm(constraint_vectors(outputs,**options),axis=1)
+            components=dict(tracking=float(max(ratios)-1))
+        else:
+            hold=np.asarray(outputs['times_s'])>=options['holding_start']-1e-12
+            p=np.linalg.norm(np.asarray(outputs['tip_positions_m'])-options['target'],axis=1)
+            v=np.linalg.norm(outputs['tip_velocities_m_s'],axis=1)
+            ratios=np.r_[p[-1]/options['terminal_position_limit'],p[hold]/options['position_limit'],v[hold]/options['speed_limit']]
+            sample_times=np.r_[outputs['times_s'][-1],np.asarray(outputs['times_s'])[hold],np.asarray(outputs['times_s'])[hold]]
+            worst=int(np.argmax(ratios));measure['worst_constraint']=dict(
+                kind='terminal_position' if worst==0 else 'holding_position' if worst<=sum(hold) else 'holding_speed',
+                time_s=float(sample_times[worst]),normalized_signed_excess=float(ratios[worst]-1))
+            components=dict(terminal=float(ratios[0]-1),position=float(max(p[hold])/options['position_limit']-1),
+                speed=float(max(v[hold])/options['speed_limit']-1))
         evaluations.append(measure)
         if checkpoint:checkpoint('native_progress_'+str(len(evaluations)).zfill(4),dict(completed_rollouts=len(evaluations),latest=measure,
             cost={**native.cost,'kernel_wall_s':time.perf_counter()-started}))
         return dict(reference='native-rollout-'+str(len(evaluations)-1),outputs=outputs,measure=measure,
             task_gap=dict(valid_complete=True,accepted=False,normalized_gap=measure['normalized_gap'],
-                components=dict(terminal=ratios[0]-1,position=float(max(p[hold])/options['position_limit']-1),
-                    speed=float(max(v[hold])/options['speed_limit']-1))),
+                components=components),
             cost_s=0.,independent_evaluation_executed=False)
     result=search([initial],evaluate,settings,evaluation_kind='native_short_rollout',
         rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
@@ -125,12 +136,14 @@ def calculate(configuration, binding, query, point, requirements, context, check
             provenance=dict(method='baseline_rollout_holding_speed_peak',source=context['source'],inherited_acceptance=False))
         raw['baseline_peak_speed_state']=peak_state
     baseline=evaluations[0];comparison=dict(baseline=baseline,best=best['measure'])
-    quantities=[dict(name=name,value=row[field],unit=unit,
+    fields=([('max_position_error','max_position_error_m','m'),
+        ('rms_position_error','rms_position_error_m','m')] if tracking else [
+        ('holding_max_speed','holding_max_speed_m_s','m/s'),
+        ('holding_max_position_error','holding_max_position_error_m','m')])
+    fields.append(('signed_maximum_excess','signed_maximum_excess','1'))
+    quantities=[dict(name=label+'_'+name,value=row[field],unit=unit,
         source_pointer='/native_dynamics/optimization/'+('candidates/0' if label=='baseline' else 'best')+'/measure/'+field)
-        for label,row in comparison.items() for name,field,unit in [
-            (label+'_holding_max_speed','holding_max_speed_m_s','m/s'),
-            (label+'_holding_max_position_error','holding_max_position_error_m','m'),
-            (label+'_signed_maximum_excess','signed_maximum_excess','1')]]
+        for label,row in comparison.items() for name,field,unit in fields]
     summary=dict(question='Bounded native sequence control optimization',basis=dict(model='model.mujoco_native@1.0.0',
         state_time_s=point['actual_time_s'],window_s=settings.correction_window_s,channels=native.tendons,
         search_dimension=result['search_dimension'],sample_count=len(best['outputs']['times_s'])),quantities=quantities,

@@ -1,0 +1,184 @@
+{
+  "contract": "bf4.tracking_freeze",
+  "version": "1.0.0",
+  "baseline_commit": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+  "preparation_spec": "configs/research/study_bf4_tracking_preparation.json",
+  "task_file": "tasks/bf4_tracking_direction_change_v1.json",
+  "task_file_identity": "4d5488fe0d70c8ecf91dc3dbc9cb06d95d06415a2d0d8ac7e598d583b1b897b2",
+  "canonical_task_identity": "fbc2ec1ad6a11d2ec7a753cabbf269844bef64b6f8cc85a951d102475b7910d4",
+  "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+  "scope": "Research-development preparation; candidate definitions below were fixed before any BF4 physical measurement. No blind Agent handoff or successful answers.",
+  "candidate_requests": {
+    "full_span": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.16,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.11,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 6,
+          "phase_rad": 0.0
+        }
+      ]
+    },
+    "split_span": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.16,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.11,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 0.0
+        },
+        {
+          "first_segment": 1,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 1.0471975511965976
+        }
+      ]
+    },
+    "redistributed_lengths": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.135,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.135,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 0.0
+        },
+        {
+          "first_segment": 1,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 1.0471975511965976
+        }
+      ]
+    }
+  },
+  "candidate_order": [
+    "full_span",
+    "split_span",
+    "redistributed_lengths"
+  ],
+  "initialization": {
+    "primary": "constant candidate pretension (0.2 N all channels)",
+    "independent": "constant 0.6 N all channels",
+    "state": "all candidate named qpos/qvel zero; no historical controls or warm trajectories"
+  },
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 76,
+    "iterations": 3,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.05
+  },
+  "comparison": {
+    "priority": [
+      "independent_task_acceptance",
+      "maximum_normalized_violation",
+      "callbacks_to_first_independent_pass",
+      "total_physics_steps",
+      "measured_numerical_wall_s"
+    ],
+    "fairness": "Same algorithm, knots, per-start callback ceiling, physical fidelity and initial tensions for every design. Include all failed callbacks and independent replays. Compare matched initialization strata; censor costs at first independent pass. Finite failures do not prove structural infeasibility."
+  },
+  "stages": {
+    "preparation": {
+      "authorization": "BF4 supplied task: minimal engineering tests only",
+      "active_scientific_allowances": 0,
+      "maximum_engineering_native_rollouts": 1,
+      "maximum_engineering_physical_replays": 1,
+      "maximum_engineering_physics_steps": 1200
+    },
+    "feasibility": {
+      "authorization": "PENDING_EXPLICIT_FINITE_ALLOCATION",
+      "maximum_designs": 3,
+      "starts_per_design": 1,
+      "maximum_native_search_calls": 3,
+      "maximum_native_rollouts": 228,
+      "maximum_independent_replays": 3,
+      "maximum_physics_steps": 138600,
+      "stop": "Stop all feasibility search at first complete independent pass; proxy success alone is insufficient."
+    },
+    "structure_comparison": {
+      "authorization": "PENDING_SEPARATE_STAGE_ALLOCATION_AFTER_FEASIBILITY_REVIEW",
+      "designs": 3,
+      "initializations": 2,
+      "maximum_native_search_calls": 6,
+      "maximum_native_rollouts": 456,
+      "maximum_independent_replays": 6,
+      "maximum_physics_steps": 277200,
+      "prior_results": "Re-use exact matching feasibility strata and count all their costs; these are total ceilings including feasibility, not a reset or extra hidden balance.",
+      "stop": "Each design/start stops on its first independent pass; no score polishing. Publish matched finite observations including failures."
+    },
+    "mathematics": {
+      "authorization": "No extra scientific allocation",
+      "status": "Only finite response probes inside the declared search are planned; no new GVS/T1/T2 experiments."
+    }
+  }
+}
