@@ -1,0 +1,248 @@
+{
+  "results": [
+    {
+      "arm": "off",
+      "case_id": "off",
+      "model": "deepseek-v4-pro",
+      "tool_checks": [
+        {
+          "tool": "research_plan",
+          "scientific_execution_started": false,
+          "provider_request_number": 1,
+          "schema_valid": true,
+          "contract": "valid",
+          "action": "diagnose",
+          "intent": "DIAGNOSE",
+          "selected_method": "diagnose",
+          "claimed_inference": "read_only_diagnostic",
+          "requested_budget": 0
+        }
+      ],
+      "termination": "completed",
+      "harness_error": null,
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 1,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 19497,
+        "completion_tokens": 10172,
+        "total_tokens": 29669,
+        "prompt_cache_hit_tokens": 9728,
+        "prompt_cache_miss_tokens": 9769,
+        "reasoning_tokens": 7952
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 141.46799999999348
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "public_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "read_only_diagnostic",
+            "hypothesis_id": "bf5_valid_failure_vs_bf6_contact_numerical_failure_v1",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "diagnose",
+            "selected_variables": [
+              "per_physics_step_acceleration",
+              "contact_frame",
+              "actuator_commands",
+              "tip_position",
+              "tip_tool_axis",
+              "unrounded_metrics"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "若读取到 BF6 缺失的逐物理步加速度与接触帧，显示 0.225 s 接触之后才出现接触约束与数值发散，且 BF5 全程无接触、1200 步执行完成，则支持“两类独立失败：完成型性能失败 vs 接触型数值失败”。",
+          "fixed_conditions": "冻结公开标量证据：BF5=valid_failure、offline_position_tool_axis_v1、physics_steps=1200、independent_execution_complete=true、误差幅值未报告（unrounded_metrics 缺失，不得推断）；BF6=incomplete、offline_oriented_tracking_v2、0.225 s 首次 floor/payload 接触、MUJOCO_NUMERICAL_FAILURE、native_reason=NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE、真实 20 g 刚体质量/质心/全惯量已绑定且无替代力；science_budget=0；仅读取既有证据，不执行任何 generation/initialization/analysis/solve/replay/SELECT/STOP。",
+          "hypothesis": "BF5 与 BF6 不是同一失效机制：BF5 是执行完成但未达验收阈值的 valid_failure（性能/精度类），BF6 是 0.225 s 首次地板/载荷接触诱导、native 要求有限无接触无约束状态而被 MUJOCO 数值发散中断的 incomplete（接触/数值稳定性类）。",
+          "interpretation": "诊断结论（仅依据冻结标量证据）：BF5 与 BF6 属于两种不同的失败类别。BF5 为“完成但未达标”的 valid_failure：independent_execution_complete=true、physics_steps=1200，说明积分器全程跑完但验收未通过；其 unrounded_metrics 在公开工程摘要中缺失，因此不得推断位置/姿态误差的具体量级（numerical_s=5.637207600011607 仅作为已报告标量记录，不解读为误差幅值）。BF6 为“执行未完成”的 incomplete：native 与独立重放均在约 225 步处因 MUJOCO_NUMERICAL_FAILURE 中断，native_reason 要求有限、无接触、无约束状态；contact_observation 记录 0.225 s 首次 floor/payload 接触，且重放同样先接触后数值失败；load_binding 表明已编译真实 20 g 刚体质量/质心/全惯量、无替代力，排除了“负载未绑定/替代力”这一原因。竞争原因（BF6 数值失败）：(a) 接触诱导约束奇异性——目标 tip z 由 0.15 m 降至 0.12 m 且 tool axis 发生倾转，20 g 刚体载荷几何在 0.225 s 触及地板（地板顶面约 z=0.08 m），引入 native 不支持的接触约束导致发散；(b) 控制不稳定——tendon_robot_family 在真实惯量下输出过大/不连续指令，接触只是不稳定之后果；(c) 肌腱+刚性载荷耦合的病态/刚性；(d) 协议差异——BF5 为 offline_position_tool_axis_v1 且完成，BF6 为 offline_oriented_tracking_v2 且中断，指向定向跟踪新增的轴约束。由于缺少逐物理步加速度与接触帧，无法判定接触与发散谁先发生。判别性证据读取（只读）：1) BF6 逐物理步加速度与接触帧（当前缺失）——若接触后发散则支持 (a)，若接触前已发散则支持 (b)；2) BF6 actuator_commands 轨迹对照参考，检查 0.225 s 附近是否超限/跳变；3) BF5 的 unrounded_metrics 与逐步状态，判断 BF5 是否也有近接触以及距验收阈值的差距，用于跨协议对照；4) 两协议的控制源与种子，判断失败是控制器特异性还是任务/协议特异性。成功路线与前提（不承诺成功）：前提一是恢复上述缺失的逐步状态/接触帧，完成接触-发散因果分类；前提二是构造全程无接触轨迹（tip 与载荷本体保持在地板顶面以上并留裕量），或改用支持接触的求解器替代有限无接触 native 路径；前提三是验证 tendon_robot_family 在真实 20 g 惯量下于 0.6 s/0.02 s 控制周期内控制可行；前提四是获得科学授权（science_budget>0）与有效身份/适用性/预算，任何 generation/initialization/analysis/replay 均需授权，且通过结果须为注册范围证据（BF5、BF6 均 selected=false、均未被接受，不可继承）。可行路线：先只读诊断分类，再设计无接触参考/控制，用支持接触或无接触求解器完成独立重放，并注册验收指标（max_position_error≤0.012 m 且 max_tool_axis_angle_error≤0.1745 rad）。不能承诺成功：BF5 证明跑完仍可能验收失败，BF6 的接触诱导发散尚未被表征。STOP 边界：当前不需要正式 STOP——以 action=diagnose、research_intent=DIAGNOSE 记录只读分析，零科学预算下合法且不触发执行；但 science_budget=0 且所有科学提案均被拦截，无 generation/initialization/analysis/solve/replay/SELECT/STOP 可执行，故本 diagnose 之后不再有已授权科学工作，仅可继续只读诊断。未来工作须以新增证据（逐步状态/接触帧）、支持接触的求解器路径或明确科学预算/授权为前提；在此之前应停留在只读。",
+          "stopping_condition": "当且仅当不存在任何已授权可执行的科学工作（science_budget=0、所有科学提案均被拦截）时，本决策以 diagnose 记录只读分析为终点；出现新增逐步证据（加速度/接触帧）或科学授权/预算后，方可进入后续设计、重放与验收验证。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "52d5ed8b095f1650e80a7e35d346c9cef6db813cb581d6883a8e24bcfd7778f3",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若 BF5 也存在接触/近接触但仍完成，或 BF6 在 0.225 s 接触之前加速度已发散，则表明二者共享接触/约束或控制不稳定根源，两类失败并非独立。"
+        }
+      ]
+    },
+    {
+      "arm": "on",
+      "case_id": "on",
+      "model": "deepseek-v4-pro",
+      "tool_checks": [
+        {
+          "tool": "evidence_read",
+          "scientific_execution_started": false,
+          "provider_request_number": 1,
+          "schema_valid": true,
+          "contract": "valid",
+          "scope": "frozen_read"
+        },
+        {
+          "tool": "experience_retrieve",
+          "scientific_execution_started": false,
+          "provider_request_number": 1,
+          "contract": "valid",
+          "operation": "search",
+          "exact_keys": [
+            "research-contact-causality@1",
+            "research-stable-start@1",
+            "research-bounded-continuation@1",
+            "research-witness-and-cost@1"
+          ]
+        },
+        {
+          "tool": "experience_retrieve",
+          "scientific_execution_started": false,
+          "provider_request_number": 2,
+          "contract": "valid",
+          "operation": "read",
+          "exact_keys": [
+            "research-contact-causality@1"
+          ]
+        },
+        {
+          "tool": "experience_retrieve",
+          "scientific_execution_started": false,
+          "provider_request_number": 2,
+          "contract": "valid",
+          "operation": "read",
+          "exact_keys": [
+            "research-stable-start@1"
+          ]
+        },
+        {
+          "tool": "research_plan",
+          "scientific_execution_started": false,
+          "provider_request_number": 3,
+          "schema_valid": true,
+          "contract": "valid",
+          "action": "diagnose",
+          "intent": "DIAGNOSE",
+          "selected_method": "saved_evidence_comparison",
+          "claimed_inference": "read_only_evidence_comparison",
+          "requested_budget": 0
+        }
+      ],
+      "termination": "completed",
+      "harness_error": null,
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 3,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "actual_requests": 4,
+      "confirmed_responses": 4,
+      "usage": {
+        "prompt_tokens": 56829,
+        "completion_tokens": 11854,
+        "total_tokens": 68683,
+        "prompt_cache_hit_tokens": 44032,
+        "prompt_cache_miss_tokens": 12797,
+        "reasoning_tokens": 9262
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 4,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 179.40600000000268
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "public_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "read_only_evidence_comparison",
+            "hypothesis_id": "bf5-bf6-failure-class-comparison-v1",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "saved_evidence_comparison",
+            "selected_variables": [
+              "acceptance_status",
+              "physics_steps",
+              "native_reason",
+              "contact_observation",
+              "load_binding"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "若进一步读取 0.200–0.225 s 的 pre-step 状态、接触几何体/接触对与接触位置/帧/法向、引擎警告时序以及瞬时约束力/qacc，可判别“接触触发失稳”“失稳导致接触”“耦合”“几何穿透”等假设；读取 BF5 的 unrounded_metrics 与逐航点误差可定位未过目标/航点（不预设幅度）。",
+          "fixed_conditions": "冻结任务 BF6（0.6s@0.001s、真实 20 g 刚性载荷、无接触定位/轴扫描、目标 ≤0.012m 与 ≤0.1745rad）与 BF5/BF6 公开标量证据；科学额度=0；所有生成/初始化/分析/求解/回放/SELECT/STOP 提案被拦截；本次仅读既有证据。",
+          "hypothesis": "BF5 与 BF6 分属不同失败层：BF5 是完整执行后的度量层 valid_failure（1200 步跑完但未达验收，误差幅度未报告、不可推断）；BF6 是接触/数值层导致的执行未完成（225 步、0.225s 记录地面/载荷接触、回放 MUJOCO_NUMERICAL_FAILURE、native V1 因非有限无接触无约束状态而拒绝），尚未进入评分。BF6 的接触与数值失败因果在现有标量投影中未被唯一确定。",
+          "interpretation": "【失败类别对比】BF5（offline_position_tool_axis_v1）：acceptance_status=valid_failure，physics_steps=1200，independent_execution_complete=true，selected=false——这是“执行完整、度量未通过”的度量层失败，公开摘要未给 unrounded_metrics，故不得推断任何误差幅度；numerical_s=5.637207600011607 已报告但语义未注明，不作误差解读。BF6（offline_oriented_tracking_v2）：native_status=execution_incomplete，native_reason=NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE；native 225 步/225 次尝试；独立回放 225 步/226 次尝试、reason=MUJOCO_NUMERICAL_FAILURE；confirmed_completed_steps_lower_bound=450，attempted_physics_step_calls=451；0.225s 记录首次地面/载荷接触，回放同样在数值失败前记录接触；load_binding 表明 20g 质量/COM/完整惯量真实绑定、无力度量。这是“执行未完成、接触/数值层失败、未进入评分”的执行层失败，与 BF5 不同层。注意 native 拒绝理由（V1 准入门槛）与回放失败理由（求解器数值失败）是两种机制，应分开记录。【竞争假设】H1 接触触发失稳：0.225s 接触冲量使求解器随后发散；H2 失稳导致接触：失败调用前状态已极端，接触只是症状；H3 耦合；H4 几何穿透：工具轴姿态使载荷角低于地面间隙（goal 顶点 z 0.15→0.12，轴向下倾斜），接触是几何性的；H5 评估器准入门槛：任务声明 no contact，native 只接受有限无接触无约束状态，任何接触被评分前硬拒。现有标量投影缺 per-step 加速度与接触帧（missing 字段明示），因果未唯一化。【判别性观察/下一步已存证据读取】在 artifact 52d5ed8b…（keys: bf5,bf6,question,sources）上：1) /bf6 在 0.200–0.225s 的 pre-step 位姿/速度（若有 qacc）区分 H1/H2；2) /bf6 接触几何对与接触位置/帧/法向区分载荷角 vs 连杆 vs 地面（H4 vs H1/H2）；3) /bf6 引擎警告时序（QVEL 相对接触时刻）约束因果；4) /bf6 瞬时约束力/qacc（非稀疏差分代理）判定求解器失败性质；5) /bf5 的 unrounded_metrics 与逐航点误差定位未过目标/航点；6) /sources 两个 sha256 文件是否暴露逐步帧——若标量投影不含，则这些判别性观察在当前已提交证据中不可得，需新生成证据，而零科学授权下禁止。独立回放须在每个物理步核验接触，采样时刻为零不能替代。【成功路线与前提（不承诺成功）】两阶段：A 先获得合法、有限、无接触、完整 600 步执行（稳定冷启动点+全程逐步接触核验+真实 20g 绑定），把“无法完整执行”与“任务残差过大”分开；B 在无接触完整执行成立后，把剩余位置/轴误差作为对两目标（≤0.012m、≤0.1745rad）的控制优化处理（control_search+逐步接触核验）。前提：恢复控制搜索/物理回放额度（当前 0）；有效身份/授权/适用性/预算且候选匹配；存在满足 V1 有限无接触无约束门槛的 control_seed/candidate；有逐步接触与加速度已存证据确认评分前无接触。不承诺成功：完整无接触执行≠度量通过（历史程序性指引 R2 曾完整 600 步无接触但位置/轴仍失败，generalization=unverified，非当前通过证据）；有限优化或未完成执行不能推出结构不可行或任务成功。地面/载荷/容差改动会改变问题本身，不能作为原任务通过依据。【STOP 边界与未来工作】零科学授权下不得运行任何科学动作，diagnose（无 diagnostic 载荷）只读既有证据、仍被允许，因此本次以 action=diagnose 记录只读比较而非 stop；有效停止边界是本诊断提交后已无经授权科学工作可继续。未来工作唯有在额度与授权恢复、且 BF6 无接触条件可被已存证据逐步核验后才具正当性；届时再判断是否值得单独验证稳定起点或数值假设。【预算】Provider 请求已用 4/4（evidence_read 1 + experience_retrieve search/read 3）；科学额度 0/0；历史程序性指引非本案例证据、不授权科学动作。",
+          "stopping_condition": "完成本次只读比较并提交 diagnose 决策后停止：不再生成、初始化、分析、求解、回放或执行 SELECT/STOP；仅当科学额度与有效身份/授权/适用性/预算恢复、且 BF6 无接触条件可被已存证据逐步核验时才重新开放。",
+          "weakening_observation": "若已提交 artifact 的标量投影确实不含逐物理步状态、接触帧、约束力（missing 字段已提示），则上述判别性观察无法由当前已存证据获得，因果唯一化不能在只读范围内完成；届时只能保留多重解释，不能仅凭 0.225s 时序断言接触是唯一原因，也不能据此推断结构不可行。"
+        }
+      ]
+    }
+  ],
+  "actual_requests": 6,
+  "usage": {
+    "prompt_tokens": 76326,
+    "completion_tokens": 22026,
+    "total_tokens": 98352,
+    "prompt_cache_hit_tokens": 53760,
+    "prompt_cache_miss_tokens": 22566,
+    "reasoning_tokens": 17214
+  },
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "formal_studies": 0,
+  "money": null,
+  "limitations": "One ordered off/on case, no population or causal benefit claim; prompt/cache/order differ. Scientific admission not exercised; only schema/reference/intent checks and retrieval receipts."
+}

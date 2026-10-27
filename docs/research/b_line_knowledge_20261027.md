@@ -2,6 +2,8 @@
 
 生产起点 `c190f64ae`；分支 `integration/research-next` 已 fetch 并快进核对，远端无更新。B 来源固定为 `8a6a15d4667b946d4e1dd6b20e544cc8d683452a`。只读正式报告与公开 summary/audit 中的真实收据、验收和费用，没有打开或复制私有 Store、成功结构/控制数组，没有重算 evaluator、建立 Native model、forward、搜索或物理回放。来源 blob 哈希见本次公开 `evidence/research_knowledge_20261027/source_audit.json`。
 
+最新交付状态：6 条解释型经验已接入原按需检索与 Reporter；BF4/BF5/BF6 的 PPO 仍明确不支持，Native T1/T2 的目录误投影已修正。按用户追加授权取消应用层输出 cap 后，两侧真实对照均完成，开放侧实际读到两条经验并给出更贴近稳定起点的分析，但仍有路线/证据/费用单位错误。新一轮 6 请求、98,352 Token；两轮累计 10 请求、164,095 Token，科学执行为零。明细见文末 v2 与 `delivery.json`。
+
 用户后续明确：不提炼数学结构搜索 Skill；经验应像教师传授判断方法，重点是成功任务类型、路线、分析，以及失败触发的诊断，而非逐步操作指令。故本次不创建 Skill、Runtime、记忆库或经验 Schema。S3 仅在本审计中分析，不进入结构搜索知识条目。
 
 ## 可复用经验（6 条，revision 1）
@@ -118,7 +120,7 @@ PPO 兼容性与最小适配见 `ppo_cross_task_audit_20261027.md`。本次仅�
 | on | 1 / 1 | 5,339 | 8,189 | 13,528 | 首次响应 length 截断，原边界拒绝未完成输出；没有经验读取、Plan 或最终答复 |
 | 合计 | 4 / 4 | 43,612 | 22,131 | 65,743 | 科学 worker/物理步/Reporter Provider/正式 Study 均 0 |
 
-Prompt cache hit/miss 为 27,904/15,708；reasoning 为 19,755 Token，已包含在 Completion 中，不重复相加。货币账单未知，不写成零。on 的较低费用源于提前截断，不是已证明更省 Token。未重发或追加“凑成功”的对照。
+Prompt cache hit/miss 为 27,904/15,708；reasoning 为 19,755 Token，已包含在 Completion 中，不重复相加。货币账单未知，不写成零。on 的较低费用源于提前截断，不是已证明更省 Token。首轮未自动重发；后续仅在用户新增授权后重做 v2，两份结果及费用分别保留。
 
 off 正确区分有效完整失败与执行不完整，承认缺少 BF5 误差量级及 BF6 接触/失稳因果；零科学授权边界也正确。但其 expected_observation 把 BF6 的 12 mm/10° 用于 BF5，成功路线用 tip 高度表达整个负载的间隙也不足。它把 1,200 合计步解释为独立执行步数；输入投影没有拆分这项计数，对此有歧义。该小输入还没有完整 BF5 TaskDefinition，故不应编造其阈值。工具合法仅指隔离探针的 schema/reference/intent 通过，不是正式 scientific admission 或实际 STOP。
 
@@ -143,4 +145,32 @@ on 有简短提示及原检索工具，但在第一次完整工具调用前截�
 
 `test_provider_context` 5 项在已有 `.f3-prestudy-env` 通过；真实 Harness 省略字段及 Reporter wire 的定向 mock 检查通过。`.mainline5-env` 缺少旧 context fixtures 所需的 matlab.engine/tokenizers，首次整组检查因此没有进入目标断言；使用已安装的 f3 环境完成，没有安装依赖。该环境问题与 actual Provider 失败分别记录。
 
-v2 实际请求、Token 与诊断观察将在 `decisions_v2.json` 和后续结果段落记录；这段执行前声明不预判效果。
+v2 实际请求、Token 与诊断观察见 `decisions_v2.json`、`review_v2.json` 及下节；执行前冻结声明不预判效果。
+
+
+## 取消应用输出 cap 后的 v2 实测
+
+提交 `20ba4789c` 后的新授权 cohort 正常完成。全部 6 个实际出站请求均没有 `max_tokens`，没有 length 截断，6 个 HTTP 200 均确认；无自动重发或未知发送。每侧最多 4 个请求，实际 off 2、on 4，均有一个通过隔离 schema/reference/intent 检查的只读 DIAGNOSE 和后续答复。
+
+| arm | 实际请求 | Prompt | Completion | Total Token | 主 Agent 行为 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| off | 2 | 19,497 | 10,172 | 29,669 | 首请求提交只读诊断，第二请求后续答复 |
+| on | 4 | 56,829 | 11,854 | 68,683 | evidence_read 与 search；两条 exact read；第 3 请求提交诊断；第 4 请求后续答复 |
+| 合计 | 6 | 76,326 | 22,026 | 98,352 | 无科学 worker/物理/正式 Study/Reporter Provider |
+
+on 通过原 `experience_retrieve` search 后读取 `research-contact-causality@1`、`research-stable-start@1`，保存的 reader、query、内容 hash 和实际收据见 `review_v2.json`。经验不在启动时预载，也没有通过资格或预算转移。它没有读取其余四条全文。
+
+本例可观察到的变化：开放侧明确区分 Native 的接触准入拒绝与独立回放数值失败，保留接触触发/失稳导致/耦合解释；成功路线更像“先完整稳定无接触执行，再处理位置与轴的联合残差”，并明确稳定失败不等于任务成功、地面/负载/阈值改变不能证明原任务成功。这与两条已读经验一致，是一次实际教学内容进入决策的观察，不是普遍或因果效用证明。
+
+两侧仍有错误，原 Plan 与后续答复均保留：
+
+- off 的 typed Plan 捏造 floor 顶面 z=0.08 m，原冻结任务为 −0.02 m；把不同失败层过强地说成不同失效机制，并提出“设计无接触参考/控制”，更改原参考不能证明原任务通过。Native refusal 与独立数值失败仍有混淆。
+- on 的未来路线写了 `control_search`，而 BF6 公共模板要求注册的 Native `mujoco_direct_control_v1` 分析路线；没有实际提交非法科学调用，但不能因此认定工具选择已正确。历史 B 的极端 pre-call 状态进入当前 A 的 H2 叙述，当前 A 标量并不提供此状态，须保留为待验证解释。它还把已存逐步加速度/接触证明说得像未来工作的一般前置条件，过于绝对。
+- 两侧仍受 BF5 步数投影歧义影响。费用单位也未完全学会：off 后续答复自称只用了 1 次 Provider，而该答复本身是第 2 次；on 在第 3 请求的 Plan 用四次读取工具来计四次 Provider。真实费用只取原账本。on 的 typed Plan 未填写 supporting_evidence，隔离协议未测试正式科学引用 admission，不能说完整生产准入已通过。
+- 两侧均维持零科学边界，实际动作只是被拦截的只读诊断，没有新 Study 的真实 STOP/SELECT。on 明确历史指引不是本案例证据；这条声明本身仍不能免除具体事实逐项核对。
+
+on 本次比 off 多消耗 39,014 Token；缓存、请求次数与上下文不同，不能据一个有序案例推断规范化成本效果。v2 cache hit/miss=53,760/22,566，reasoning=17,214，已包含在 Completion。首轮加 v2 累计 10 次实际/确认请求、119,938 Prompt、44,157 Completion、164,095 总 Token。货币账单未返回，未知。
+
+定向检查合计 26 个不同检查：7 个诊断/接入 fixture、13 个原 Reporter fixture、1 个 Native 目录只读兼容检查、5 个 Provider context 检查。针对修改点的重查不重复计数；旧 C1 断言和首次环境缺依赖问题仍按前文保留，未伪装全仓通过。
+
+下一轮正式 Study 的准备状态：原 Native 公共任务、经验按需阅读、Reporter 委托与费用链均已接通；本例的经验使用确实被观察到，但诊断可靠性、合法具体工具选择和费用单位仍需谨慎核对，不能宣称已自主掌握成功解法。PPO 仍未适配三类任务；公开模板保持零额度/待授权；没有创建、执行或批准下一轮正式 Study。

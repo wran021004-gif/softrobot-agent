@@ -1,0 +1,203 @@
+{
+  "implementation": "20ba4789c",
+  "protocol": "protocol_v2.json",
+  "outcomes": "decisions_v2.json",
+  "user_authorized_redo": true,
+  "previous_cohort_retained": true,
+  "actual_requests": 6,
+  "confirmed_responses": 6,
+  "wire_checks": {
+    "off": [
+      {
+        "request_id": "r3-request-7d12e078b407479f9b4c64e909f66310",
+        "max_tokens_present": false
+      },
+      {
+        "request_id": "r3-request-d9ec0fec1afb4a10abf6bc21a63f4e4e",
+        "max_tokens_present": false
+      }
+    ],
+    "on": [
+      {
+        "request_id": "r3-request-00f499def2894af893e6dd5a69a1e8a1",
+        "max_tokens_present": false
+      },
+      {
+        "request_id": "r3-request-7959de0e1e1946feaaaabb2a2e04dde4",
+        "max_tokens_present": false
+      },
+      {
+        "request_id": "r3-request-d639eca06fb840ab94e79f2106afc57a",
+        "max_tokens_present": false
+      },
+      {
+        "request_id": "r3-request-e704312b5b7349f785224936bb32599a",
+        "max_tokens_present": false
+      }
+    ]
+  },
+  "experience_receipts": {
+    "off": [],
+    "on": [
+      {
+        "reference": {
+          "artifact_id": "824519844111e004acf61fc89e24aa3145ae509372351b94c2d79283a1d7a17d",
+          "media_type": "application/json"
+        },
+        "reader": "agent",
+        "query": {
+          "entry_id": null,
+          "failure_type": null,
+          "key": null,
+          "operation": "search",
+          "revision": null,
+          "structure": null,
+          "task": "oriented_tracking",
+          "version": null
+        },
+        "scientific_evidence": false,
+        "results": [
+          {
+            "entry_id": "research-contact-causality",
+            "revision": "1",
+            "content_sha256": "532a1a3ebcfdfedaa765847fb209781adec950eb9798122e3db60beec4e8a430"
+          },
+          {
+            "entry_id": "research-stable-start",
+            "revision": "1",
+            "content_sha256": "7eb26c76087c809b2da38405258cad93e63a3874606a59f4020a63e46cf5894e"
+          },
+          {
+            "entry_id": "research-bounded-continuation",
+            "revision": "1",
+            "content_sha256": "ca39b1e5a72e595528415b21af754ab912c3d45ceeb7a5638098d50a2d9779c3"
+          },
+          {
+            "entry_id": "research-witness-and-cost",
+            "revision": "1",
+            "content_sha256": "59e140a16f92fb7f51dc59c3427257eb98cfcc462e54d5946efab09f5461d321"
+          }
+        ]
+      },
+      {
+        "reference": {
+          "artifact_id": "b11acd3572daa61e0a20ead9f1e739f79b47303ed249614d0c39cae7a8e9080a",
+          "media_type": "application/json"
+        },
+        "reader": "agent",
+        "query": {
+          "entry_id": null,
+          "failure_type": null,
+          "key": "research-contact-causality@1",
+          "operation": "read",
+          "revision": null,
+          "structure": null,
+          "task": null,
+          "version": null
+        },
+        "scientific_evidence": false,
+        "results": [
+          {
+            "entry_id": "research-contact-causality",
+            "revision": "1",
+            "content_sha256": "532a1a3ebcfdfedaa765847fb209781adec950eb9798122e3db60beec4e8a430"
+          }
+        ]
+      },
+      {
+        "reference": {
+          "artifact_id": "534a9422ddd1350601a153443d91646e72b375c496aa1eba1080d441d33690ad",
+          "media_type": "application/json"
+        },
+        "reader": "agent",
+        "query": {
+          "entry_id": null,
+          "failure_type": null,
+          "key": "research-stable-start@1",
+          "operation": "read",
+          "revision": null,
+          "structure": null,
+          "task": null,
+          "version": null
+        },
+        "scientific_evidence": false,
+        "results": [
+          {
+            "entry_id": "research-stable-start",
+            "revision": "1",
+            "content_sha256": "7eb26c76087c809b2da38405258cad93e63a3874606a59f4020a63e46cf5894e"
+          }
+        ]
+      }
+    ]
+  },
+  "public_final_assessments": {
+    "off": [
+      "决策已记录（diagnose，DIAGNOSE，schema_valid=true，scientific_execution_started=false，proposal_intercepted，scientific_admission=not_tested_zero_allowance）。\n\n**简短评估**\n\n- **失败类别对比**：BF5 是「完成但未达标」的 valid_failure（1200 步、independent_execution_complete=true，验收未通过；误差幅值未报告，不予推断）；BF6 是「执行未完成」的 incomplete（约 225 步、0.225 s 首次 floor/payload 接触后 MUJOCO_NUMERICAL_FAILURE，native 要求有限无接触无约束状态）。二者机制不同，非同一失效。\n- **已排除原因**：真实 20 g 刚体质量/质心/全惯量已编译绑定、无替代力，故不是负载绑定问题。\n- **竞争假设**：①接触诱导约束奇异（目标 tip z 由 0.15 m 降至 0.12 m，载荷触及地板顶面）；②控制不稳定（接触仅为其后果）；③肌腱+刚性载荷病态耦合；④协议差异（BF5 position_tool_axis 完成 vs BF6 oriented_tracking 中断）。\n- **仍未知**：BF6 接触与数值发散谁先发生、BF5 的具体误差与是否近接触——因逐物理步加速度/接触帧缺失，无法判别。\n- **下一步判别性只读读取**：BF6 逐步加速度与接触帧、BF6 actuator_commands 轨迹、BF5 unrounded_metrics 与逐步状态、两协议控制源/种子。\n- **STOP 边界**：当前不需要正式 STOP；diagnose 是零科学预算下唯一合法动作。但 science_budget=0、所有科学提案被拦截，本诊断之后无已授权科学工作；未来仅当出现新增逐步证据、支持接触的求解器路径或明确科学授权/预算时，才可进入无接触轨迹设计、重放与验收注册。\n- **预算单位**：科学预算 scientific_budget=0（零科学额度）；Provider 请求已用 1/4 次，剩余 3 次（证据已内联，本次未调用 evidence_read）。"
+    ],
+    "on": [
+      "**决策已记录（read-only diagnose）**：`research_plan` 校验通过、契约有效、未启动任何科学执行，返回 `proposal_intercepted / scientific_admission: not_tested_zero_allowance`，符合“科学额度=0、所有提案被拦截”的边界。\n\n**短评估**\n- **失败类别不同层**：BF5 是“完整执行、度量未通过”的 `valid_failure`（1200 步跑完，误差幅度未报告，不推断）；BF6 是“执行未完成”的接触/数值层失败（225 步、0.225s 地面/载荷接触、回放 `MUJOCO_NUMERICAL_FAILURE`、native 因非有限无接触无约束状态拒绝），未进入评分。\n- **因果未唯一化**：现有标量投影缺 per-step 加速度与接触帧，接触时序≠因果，需保留“接触触发失稳 / 失稳导致接触 / 耦合 / 几何穿透 / 准入门槛”多重解释。\n- **下一步判别性读取**：`/bf6` 0.200–0.225s pre-step 状态、接触几何对/位置/帧、引擎警告时序、瞬时约束力；`/bf5` 的 unrounded_metrics；`/sources` 是否暴露逐步帧——若不含则需新生成证据，而当前被禁止。\n- **成功路线（不承诺）**：先取得无接触、完整 600 步的合法稳定起点并逐步核验接触，再对两个目标做控制优化；前提是额度与授权恢复、候选满足 V1 无接触门槛、有逐步接触/加速度证据。完整无接触执行≠度量通过。\n- **STOP 边界**：零额度下不执行任何科学动作，故本次用 `diagnose` 记录只读比较而非 `stop`；本诊断提交后已无经授权科学工作可继续，未来工作仅在额度/授权恢复且 BF6 无接触条件可逐步核验后才具正当性。\n- **预算**：Provider 请求已用 4/4（evidence_read 1 + experience_retrieve 3）；科学额度 0/0；历史程序性指引非本案例证据、不授权任何科学动作。"
+    ]
+  },
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "reporter_provider_requests": 0,
+  "formal_studies": 0,
+  "assessments": {
+    "off": {
+      "diagnosis": "Distinguishes valid complete failure from incomplete execution and names competing causes, but overstates different failure classes as different mechanisms.",
+      "errors": [
+        "Typed Plan invents floor top z=0.08 m; frozen task specifies z=-0.02 m.",
+        "Proposes designing a no-contact reference as well as control; changing the frozen reference cannot establish original-task success.",
+        "Conflates Native contact admission refusal with replay numerical failure.",
+        "Reads combined 1,200 physics steps as complete independent execution; outbound projection failed to label Native+replay components.",
+        "Final assessment says Provider used 1/4 although it itself is the second paid request; calls diagnose the only legal action though the isolated schema also permits stop."
+      ],
+      "route": "Generic no-contact execution; does not distinguish a stable failed start from a task passing witness as clearly as the guided arm.",
+      "stop": "Acknowledges zero scientific authority; descriptive diagnose only, no actual Study STOP executed.",
+      "tools": "One typed Plan passes isolated schema/reference/intent checks; full scientific admission untested."
+    },
+    "on": {
+      "diagnosis": "Actually searched then read contact-causality and stable-start. Distinguishes Native refusal from independent numerical failure, preserves contact/instability/coupling explanations, explains complete stable failure versus task success and per-physics-step contact.",
+      "route": "Two-stage stable initialization then coupled position/axis control optimization; explicitly rejects treating changed floor/load/tolerance as original-task success. Historical R2 is identified as advisory and not current evidence.",
+      "remaining_errors": [
+        "Uses generic control_search in its future route, although the BF6 public route requires registered mujoco_direct_control_v1 analysis; no illegal scientific call was actually dispatched.",
+        "Describes the extreme pre-call state from historical B under a current-case hypothesis; A scalar input does not contain that state, so it must remain a hypothesis rather than an established A observation.",
+        "Makes already-stored per-step acceleration/contact proof sound like a prerequisite for all future authorized work; such diagnostics are not generally required before proposing new evidence acquisition.",
+        "Confuses tool counts with Provider request counts: its Plan at Provider request 3 calls four read tools four Provider requests. Final actual requests are four, but the reasoning by tool count remains wrong.",
+        "Retains the ambiguous combined 1,200-step interpretation; BF5 full task/magnitudes remain absent from input.",
+        "Typed Plan omits supporting_evidence; only descriptive schema/reference/intent checks were exercised, not production scientific citation admission."
+      ],
+      "stop": "Zero science authority and historical guidance boundaries are explicitly retained; no actual Study STOP or SELECT executed.",
+      "tools": "One evidence_read, one experience search, two exact experience reads and one typed Plan all pass isolated checks; read receipts are not scientific evidence."
+    }
+  },
+  "actual_plan_request_numbers": {
+    "off": 1,
+    "on": 3
+  },
+  "interpretation": "This one case demonstrates working on-demand retrieval and a more task-appropriate stable-start analysis after reading the two lessons. It does not establish general reliability, causal performance gain, lower cost or transferable scientific success. Both arms retain errors. Do not promote historical facts into current evidence.",
+  "cost": {
+    "v2": {
+      "prompt_tokens": 76326,
+      "completion_tokens": 22026,
+      "total_tokens": 98352,
+      "prompt_cache_hit_tokens": 53760,
+      "prompt_cache_miss_tokens": 22566,
+      "reasoning_tokens": 17214
+    },
+    "prior_tokens": 65743,
+    "cumulative_tokens": 164095,
+    "prior_requests": 4,
+    "cumulative_requests": 10,
+    "money": null,
+    "meaning": "Enabled arm costs more in this instance: 68,683 versus 29,669 tokens. Cache, number of requests and context differ; no normalized cost-effectiveness inference. Reasoning is already included in completion."
+  },
+  "output_policy": "All six new HTTP requests omit max_tokens; no length truncation. The service default still applies. Input/framing capacity and request/science constraints remain enforced.",
+  "limitations": [
+    "Single sequential public case; no repeatability, held-out task-family generalization or statistical efficacy claim.",
+    "BF5 full TaskDefinition and unrounded errors are absent, and its combined physics_steps label is ambiguous; same input supplied to both arms.",
+    "No successful structure, control sequence, raw trajectory, private scientific Store or C evidence was sent.",
+    "No automatic retry; v2 is the explicit user-authorized fresh cohort, with all old charges preserved."
+  ]
+}
