@@ -216,3 +216,14 @@ observations retain the original live schema defect and actual order, and do
 not support a model ranking. The scalar BF6 input also omits a complete frozen
 TaskDefinition and trajectories, so this comparison cannot establish full
 oriented Tracking or per-step no-contact reasoning capability.
+
+## C follow-up: saved-evidence prerequisites and exact queries
+
+Selectively applied the two production edits and one directed fixture from C's
+`0d2a2db7c`. T2 now exposes its own `nonlinear_response`, comparable saved T1,
+remaining mathematical allowance and zero-new-rollout prerequisites. Compact
+delivery preserves exact template queries for methods with action prerequisites,
+including the original hyphenated T1/T2 keys. The existing generic query still
+uses shared fields only. Both the new fixture and that generic-query regression
+passed offline. No tools/configuration, scientific admission, C Study, Provider
+request or physical execution changed.

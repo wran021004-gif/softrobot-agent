@@ -85,6 +85,28 @@ class PrerequisiteTests(unittest.TestCase):
         self.assertIsNone(feedback['worker_started'])
         self.assertIsNone(feedback['native_cost'])
 
+    def test_native_exact_queries_and_evidence_only_prerequisites(self):
+        from tests.research.test_c1_method_context import C1Archive
+        from tools.research.task_constraints import mathematical_method_view,mathematical_catalog
+        from tools.research.research_context import compact_scientific_delivery
+        from tools.research.nonlinear_capability import T1,T2
+        archive=C1Archive()
+        try:
+            host,s=archive.host();s['spec']['mathematical_methods']={T1:'offline fixture',T2:'offline fixture'}
+            view=mathematical_method_view(host,s['reference_candidate'])
+            brief=compact_scientific_delivery(dict(mathematical_capabilities=mathematical_catalog(view)),decision_only=True)
+            for key in ('mujoco_direct_control_v1',T1,T2):
+                query=brief['mathematical_capabilities']['methods'][key]['request_template_query']
+                self.assertEqual(query['pointer'],'/methods/'+key)
+                self.assertTrue(set(query['fields'])<=set(view['methods'][key]))
+            prerequisites=view['methods'][T2]['action_prerequisites']
+            self.assertEqual(prerequisites['required_agent_fields'],['nonlinear_response'])
+            self.assertEqual(prerequisites['unmet'],view['methods'][T2]['missing'])
+            self.assertNotIn('initial_state',prerequisites)
+            self.assertNotIn('per_request_limits',prerequisites)
+            host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
+        finally:archive.archive.close()
+
     def test_generic_template_query_uses_only_shared_fields(self):
         from tests.research.test_c1_method_context import C1Archive
         from tools.research.task_constraints import mathematical_method_view,mathematical_catalog
