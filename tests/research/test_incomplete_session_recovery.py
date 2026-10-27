@@ -103,3 +103,15 @@ class IncompleteSessionRecoveryTests(unittest.TestCase):
         self.assertTrue(any(e['kind']=='supervisor_pause' for e in self.h.store.events(self.h.run_id)))
         self.assertFalse(state(self.h)['pilot'].get('unconsumed_response'))
         self.assertEqual(state(self.h)['research_status'],'ready')
+
+    def test_invalid_v3_section_feedback_reports_exact_station_counts(self):
+        from tools.research.design import generate_candidate
+        spec=state(self.h)['spec']
+        section={'kind':'circle','parameters':{'radius_m':.008}}
+        request={'version':'serial_family_generation_v3','family_space_identity':spec['family_space_identity'],
+            'segment_count':3,'tendon_count':3,'segments':{'1':{'sections':[section]}}}
+        result=generate_candidate(self.h,request,{'origin':'offline-fixture'})
+        self.assertEqual(result['reason'],'EXACT_SECTION_STATIONS_REQUIRED')
+        self.assertEqual([v['required_stations'] for v in result['diagnostic']['segments']],[1,2,2])
+        self.assertIn('Omit sections',result['diagnostic']['instruction'])
+        self.assertIsNone(result['candidate'])

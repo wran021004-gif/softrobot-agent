@@ -286,7 +286,7 @@ def read_tool_evidence(host,query):
     return read_evidence(host,query)
 
 
-def plan_schema(actions, *, decision_required=False,family_version=None):
+def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -304,6 +304,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
                 'Optional: omit to inherit the segment prototype sections. If supplied, '
                 'the list must have exactly the number of stations in that specific prototype; '
                 'query the frozen family-space assembly before editing sections.')
+            if family_space:
+                from tools.research.design import section_station_requirements
+                counts=section_station_requirements(family_space,dict(segment_count=2))['segments']
+                schema['$defs']['SegmentChoiceV2']['properties']['sections']['description']+=(
+                    ' Frozen prototype counts: root '+str(counts[0]['required_stations'])+
+                    ', each subsequent segment '+str(counts[1]['required_stations'])+'.')
             method=schema['$defs']['FamilyMixedSearch']['properties']['method']
             method['enum']=['adaptive_joint_block_v1'];method.pop('default',None)
             schema['$defs']['FamilyMixedSearch']['required'].append('method')
@@ -882,7 +888,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         current=decision_packet(host)
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
-                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None)}}
+                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
+                family_space=s['spec'].get('family_space'))}}
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
         # Provider readiness is checked per selected model by analysis.dispatch;

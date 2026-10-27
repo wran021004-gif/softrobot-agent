@@ -77,3 +77,15 @@ class P2ExecutionGuardTests(TestCase):
         self.assertIn('exactly the number of stations',v3['$defs']['SegmentChoiceV2']['properties']['sections']['description'])
         v2=plan_schema(['generate','stop'],family_version='serial_family_space_v2')
         self.assertIn('spans',v2['$defs']['GenerationRequestV2']['properties'])
+
+    def test_v3_station_feedback_uses_each_frozen_prototype(self):
+        from tools.research.design import section_station_requirements
+        from tools.research.agent import plan_schema
+        spec=resolve(ROOT/'configs/research/study_p2_v3_agent_positive_high.json')
+        request={'segment_count':3,'segments':{'0':{'sections':[{}]},'1':{'sections':[{}]},'2':{}}}
+        result=section_station_requirements(spec['family_space'],request)
+        self.assertEqual([v['required_stations'] for v in result['segments']],[1,2,2])
+        self.assertEqual([v['supplied_stations'] for v in result['segments']],[1,1,None])
+        schema=plan_schema(['generate'],family_version='serial_family_space_v3',family_space=spec['family_space'])
+        description=schema['$defs']['SegmentChoiceV2']['properties']['sections']['description']
+        self.assertIn('root 1, each subsequent segment 2',description)

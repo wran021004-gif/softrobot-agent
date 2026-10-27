@@ -218,6 +218,22 @@ def final_generation_request(spec, candidate):
     return request
 
 
+def section_station_requirements(space,request):
+    """Explain inherited V3 prototype station counts, without changing the builder."""
+    rule=space['serial_assembly']
+    prototypes={c['id']:c for c in space['assembly']['components']}
+    segments=request.get('segments',{})
+    rows=[]
+    for i in range(request['segment_count']):
+        prototype=rule['root_segment'] if i==0 else rule['repeated_segment']
+        choice=segments.get(str(i),segments.get(i,{})) or {}
+        supplied=choice.get('sections')
+        rows.append(dict(segment_index=i,prototype=prototype,required_stations=len(prototypes[prototype]['sections']),
+            supplied_stations=None if supplied is None else len(supplied)))
+    return dict(status='actionable',segments=rows,
+        instruction='Omit sections to inherit the prototype; when overriding, provide exactly the listed station count for each segment.')
+
+
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration
@@ -314,6 +330,8 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
         return dict(status='not_yet_supported',unsupported_capability=str(exc),candidate=None,task_success=None)
     except ValueError as exc:
         diagnostic=deepcopy(getattr(exc,'diagnostic',dict(status='unavailable',reason='No structured facts captured by this check')))
+        if str(exc)=='EXACT_SECTION_STATIONS_REQUIRED' and request.get('version')=='serial_family_generation_v3':
+            diagnostic=section_station_requirements(spec['family_space'],request)
         reference=save(host,dict(request=request,reason=str(exc),diagnostic=diagnostic,
             scientific_acceptance='unmeasured'),'generation_failure')
         return dict(status='invalid',reason=str(exc),candidate=None,task_success=None,
