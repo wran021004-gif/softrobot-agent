@@ -514,6 +514,9 @@ def recover(host):
     if not boundary['termination_confirmed']:
         raise ValueError('UNKNOWN_PHYSICAL_REPLAY_OUTCOME_RETAINS_RESERVATION')
     raw=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',reason='worker_result_missing')
+    # Preserve compiled-load and first-contact facts even if a later engine call raises.
+    if (folder/'rigid_tool_binding.json').exists():raw.setdefault('rigid_tool_binding',read(folder/'rigid_tool_binding.json'))
+    if (folder/'first_environment_contact.json').exists():raw.setdefault('environment_contact',read(folder/'first_environment_contact.json'))
     if raw.get('status')!='completed' and (folder/'samples.json').exists():
         raw['samples']=read(folder/'samples.json')
     raw.update(boundary=boundary,implementation=p['implementation'])

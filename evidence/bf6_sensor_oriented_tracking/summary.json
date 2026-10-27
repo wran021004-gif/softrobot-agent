@@ -1,0 +1,253 @@
+{
+  "stage": "BF6 rigid sensor oriented timed tracking",
+  "status": "incomplete",
+  "independent_witness": false,
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "original_implementation": "d4139adbdfd9ff87b068dcac99b1bb74fd919690",
+  "validation_implementation": "0aa7e382c6abc769bbe33b1505a1f86ac6d0c9b7",
+  "original_analysis_reference": {
+    "artifact_id": "f3526b86bea1b4424c9e8e9a7bf52a47d577807368c3c4d90582c76809463f7e",
+    "media_type": "application/json"
+  },
+  "independent_evaluation_reference": {
+    "artifact_id": "3cdbc408bc5218e1b29385a78178ea7176ef7f5b19162e1648747dde8064cb88",
+    "media_type": "application/json"
+  },
+  "original_native_status": "execution_incomplete",
+  "native_failure": {
+    "reason": "NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE",
+    "time_s": 0.22600000000000017,
+    "contact_count": 2,
+    "constraint_count": 8,
+    "contacts": [
+      {
+        "distance_m": -0.0002627959758971475,
+        "geom1": "floor",
+        "geom2": "payload_shape"
+      },
+      {
+        "distance_m": -0.00034864451250570666,
+        "geom1": "floor",
+        "geom2": "payload_shape"
+      }
+    ]
+  },
+  "native_cost": {
+    "forward_evaluations": 25,
+    "kernel_wall_s": 0.06645179999759421,
+    "mechanics_evaluations": 0,
+    "model_builds": 1,
+    "physics_step_attempts": 226,
+    "physics_steps": 226,
+    "rollouts": 1
+  },
+  "native_complete_rollouts": 0,
+  "native_callback_attempts": 1,
+  "independent_status": "incomplete",
+  "independent_acceptance": {
+    "accepted": null,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": false,
+        "reason": null,
+        "unit": null,
+        "value": "incomplete"
+      },
+      "evaluator:tool_axis_direction": {
+        "limit": null,
+        "passed": null,
+        "reason": "Required registered protocol component absent",
+        "unit": null,
+        "value": null
+      },
+      "evaluator:tracking_max_error": {
+        "limit": null,
+        "passed": null,
+        "reason": "Required registered protocol component absent",
+        "unit": null,
+        "value": null
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": false,
+        "reason": null,
+        "unit": null,
+        "value": false
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "no_environment_contact": {
+        "limit": null,
+        "passed": null,
+        "reason": "Every independent physics step checked for environment contact; the frozen task does not permit contact",
+        "unit": null,
+        "value": null
+      },
+      "rigid_tool_binding": {
+        "limit": null,
+        "passed": null,
+        "reason": "Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution",
+        "unit": null,
+        "value": null
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": false,
+        "reason": null,
+        "unit": "count",
+        "value": 1
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": null,
+        "reason": null,
+        "unit": null,
+        "value": null
+      },
+      "tool_axis_sampling": {
+        "limit": null,
+        "passed": false,
+        "reason": "Both real world position and unit tool-axis signals on the complete post-step grid",
+        "unit": null,
+        "value": false
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "3cdbc408bc5218e1b29385a78178ea7176ef7f5b19162e1648747dde8064cb88",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": null,
+        "source": {
+          "artifact_id": "589a0ff8504c80c51f91613fdd870ef81fef9b5194ed29626448a6431fd57478",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null
+      },
+      "profile": {
+        "artifact_id": "16f4c93d9973e7d9e5c904cfb7b83abbf46f3f7ada2fb7d3f2a2e8391b1ce840",
+        "media_type": "application/json"
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "3cdbc408bc5218e1b29385a78178ea7176ef7f5b19162e1648747dde8064cb88",
+          "media_type": "application/json"
+        },
+        "execution_id": "53f0531fdc7a4c17beed06c2a22559d5",
+        "simulation": {
+          "artifact_id": "589a0ff8504c80c51f91613fdd870ef81fef9b5194ed29626448a6431fd57478",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "589a0ff8504c80c51f91613fdd870ef81fef9b5194ed29626448a6431fd57478",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "53f0531fdc7a4c17beed06c2a22559d5",
+    "issues": [],
+    "metrics": {},
+    "missing": [
+      "task_evaluator",
+      "rigid_tool_binding",
+      "no_environment_contact",
+      "evaluator:tool_axis_direction",
+      "evaluator:tracking_max_error"
+    ],
+    "protocol_id": "offline_oriented_tracking_v2",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "3cdbc408bc5218e1b29385a78178ea7176ef7f5b19162e1648747dde8064cb88",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "16f4c93d9973e7d9e5c904cfb7b83abbf46f3f7ada2fb7d3f2a2e8391b1ce840",
+        "media_type": "application/json"
+      }
+    },
+    "status": "incomplete",
+    "task_family": "task.oriented_tracking",
+    "task_identity": "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45",
+    "timing": {
+      "control_period_s": 0.02,
+      "deadline_misses": null,
+      "duration_s": 0.6,
+      "mean_update_s": null,
+      "real_time_demonstrated": null,
+      "real_time_required": false,
+      "sample_period_s": 0.02,
+      "simulation_wall_s": null,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.001
+    },
+    "version": "1.0.0"
+  },
+  "independent_failure": {
+    "reason": "MUJOCO_NUMERICAL_FAILURE",
+    "time_before_call_s": 0.22600000000000017,
+    "constraints_before_call": {
+      "ncon": 2,
+      "nefc": 8
+    },
+    "attempted_steps": 227,
+    "confirmed_completed_steps": 226,
+    "failed_call_internal_steps": "unknown",
+    "last_recorded_sample_s": 0.22
+  },
+  "replay_cost": {
+    "model_builds": 1,
+    "rollouts": 1,
+    "physics_steps_lower_bound": 226,
+    "physics_step_attempts": 227,
+    "forward_evaluations": 24,
+    "accounting": "Worker exception: confirmed completed steps are a lower bound; failed mj_step internal progress is unknown"
+  },
+  "retained_independent_xml_tool": {
+    "mass_kg": 0.02,
+    "com_local_m": "0.0070000000000000001 0.001 -0.002",
+    "fullinertia_kg_m2": "1.1999999999999999e-06 1.5999999999999999e-06 1.7999999999999999e-06 1.9999999999999999e-07 0 1.9999999999999999e-07",
+    "tip_position_local_m": "0.014 0 0",
+    "source": "Retained independent worker robot.xml; read only, no recompilation/forward/integration"
+  },
+  "cumulative_cost": {
+    "native_attempts": 1,
+    "native_complete_rollouts": 0,
+    "native_search_calls": 1,
+    "independent_replay_launches": 1,
+    "complete_independent_replays": 0,
+    "confirmed_completed_physics_steps": 452,
+    "physics_step_attempts": 453,
+    "failed_step_internal_progress": "unknown",
+    "model_builds": 2,
+    "numerical_s": 3.150107299996307,
+    "original_numerical_s": 1.4840971999947214,
+    "validation_numerical_s": 1.6660101000015857,
+    "original_driver_elapsed_s": 3.7726709000125993,
+    "validation_driver_elapsed_s": null
+  },
+  "validation_sealed": true,
+  "validation_source_issue": null,
+  "validation_outcome_issue": "PROTOCOL_REQUIRED_COMPONENT_MISSING_OR_UNKNOWN",
+  "recovery": {
+    "additional_physics_steps": 0,
+    "additional_native_calls": 0,
+    "additional_backend_launches": 0,
+    "note": "Reused the completed replay receipt after the supervisor rejected an incomplete acceptance; preserved partial outcome and stopped without rerunning."
+  },
+  "threshold_relaxation": false,
+  "external_force_approximation": false,
+  "interpretation": "Frozen candidate and true rigid-tool interface delivered; no complete stable execution or feasible witness. At this cold start the numerical trajectory became unstable with floor contact; no structural infeasibility or reliable physical drop claim. Need a legal contact-free numerically stable initialization before this Native response method can optimize. BF4 S2 and prior BF5 evidence unchanged."
+}

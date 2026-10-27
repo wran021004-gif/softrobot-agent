@@ -42,6 +42,10 @@ def main():
         control_optimization=dict(source=source,settings=frozen['search_settings'])),'bf6-native',guard=core.guard,origin='engineering_preflight')
     native=host.store.artifact(out['reference']);core.read_evidence(host,dict(reference=out['reference'],view='full'))
     row=dict(analysis=out['reference'],candidate=candidate,analysis_status=native['status'])
+    if native['status']!='computed':
+        progress=native.get('native_progress',{})
+        row.update(native_cost=progress.get('cost'),native_callback_attempts=progress.get('cost',{}).get('rollouts'),
+            completed_native_rollouts=progress.get('completed_rollouts'),failure_reason=native.get('reason'))
     if native['status']=='computed':
         raw=native['native_dynamics'];search=raw['optimization']
         row.update(native_cost=raw['cost'],callbacks=search['cost_feedback']['evaluation_callbacks'],baseline_measure=search['candidates'][0]['measure'],

@@ -163,6 +163,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
     xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
     model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
     tool_binding=check_rigid_tool_model(inp,model) if inp.task.family=='task.oriented_tracking' else None
+    if tool_binding is not None:atomic_json(folder/'rigid_tool_binding.json',tool_binding)
     forces=_bind_mujoco_forces(model,scene)
     safety=MujocoFailureSnapshot(model,physics['identity'],folder)
     joints=[model.joint(name).id for name in physics['dofs']]
@@ -216,7 +217,10 @@ def playback_tensions(inp, physics, scene, commands, folder):
                 maximum_contacts=max(maximum_contacts,int(data.ncon))
                 if data.ncon:
                     contact_steps+=1
-                    if first_contact_time is None:first_contact_time=float(data.time)
+                    if first_contact_time is None:
+                        first_contact_time=float(data.time)
+                        atomic_json(folder/'first_environment_contact.json',dict(contact_free=False,first_contact_time_s=first_contact_time,
+                            observed_contacts=int(data.ncon),checked_physics_steps=steps,scope='Partial refutation of contact-free execution, not a complete trajectory'))
             if _mujoco_state_failed(data,previous):
                 failure=dict(interval=k,substep=j+1,reason='MUJOCO_NUMERICAL_FAILURE',time_s=float(data.time));break
         if failure:break
