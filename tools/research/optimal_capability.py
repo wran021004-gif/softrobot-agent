@@ -31,7 +31,7 @@ def freeze_family_variables(space, grant):
         return deepcopy(grant)
     request=dict(family_space_identity=digest(space),segment_count=max(space['executable_segment_counts']),
         tendon_count=space['executable_tendon_count_bounds'][0])
-    if space['version']=='serial_family_space_v2':request['version']='serial_family_generation_v2'
+    if space['version'] in ('serial_family_space_v2','serial_family_space_v3'):request['version']='serial_family_generation_v3' if space['version'].endswith('_v3') else 'serial_family_generation_v2'
     domains={r['parameter_id']:r for r in parameter_capabilities(space,request)}
     for path in grant['variables']:
         radius=re.fullmatch(r'spans\.(0|[1-9][0-9]*)\.radius_m',path)
@@ -72,7 +72,7 @@ def family_parameters(spec, candidate, path, *, continuous=True):
     from extensions.tendon_family.family_space import parse_build, resolved_request
     from extensions.tendon_family.generated_serial import generate_family
     if not family_variable_authorized(spec,path):raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
-    if candidate.get('generation_version') not in ('serial_family_generation_v1','serial_family_generation_v2'):
+    if candidate.get('generation_version') not in ('serial_family_generation_v1','serial_family_generation_v2','serial_family_generation_v3'):
         raise ValueError('CURRENT_GENERATED_FAMILY_CANDIDATE_REQUIRED')
     build=parse_build(dict(space=spec['family_space'],request=candidate['parameters']))
     params=resolved_request(spec['family_space'],candidate['parameters'])

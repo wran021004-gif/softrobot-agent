@@ -207,6 +207,11 @@ class FamilySpaceV2(FamilySpace):
         return self
 
 
+class FamilySpaceV3(FamilySpaceV2):
+    """New physical routing semantics; older family identities remain unchanged."""
+    version: Literal['serial_family_space_v3'] = 'serial_family_space_v3'
+
+
 class SegmentChoiceV2(SegmentChoice):
     cells: int | None = Field(default=None,ge=1,strict=True)
     physical_parameters: dict[str,FiniteFloat] = Field(default_factory=dict)
@@ -232,19 +237,57 @@ class GenerationRequestV2(GenerationRequest):
         return result
 
 
+class SegmentRouteV3(Contract):
+    radius_m: FiniteFloat = Field(gt=0)
+    angle_rad: FiniteFloat
+    guide_s: FiniteFloat = Field(gt=0,lt=1)
+
+
+class TendonRouteV3(Contract):
+    anchor_segment: int = Field(ge=0,strict=True)
+    segments: list[SegmentRouteV3] = Field(min_length=1)
+    anchor_s: FiniteFloat = Field(gt=0,le=1)
+
+    @model_validator(mode='after')
+    def continuous(self):
+        if len(self.segments)!=self.anchor_segment+1:
+            raise ValueError('V3_REQUIRES_EVERY_SEGMENT_FROM_BASE_TO_ANCHOR')
+        if self.segments[-1].guide_s>=self.anchor_s:
+            raise ValueError('V3_GUIDE_MUST_PRECEDE_ANCHOR')
+        return self
+
+
+class GenerationRequestV3(GenerationRequestV2):
+    version: Literal['serial_family_generation_v3'] = 'serial_family_generation_v3'
+    routes: list[TendonRouteV3] = Field(default_factory=list)
+
+    @model_validator(mode='after')
+    def v3_routes(self):
+        if self.spans or self.route_overrides:
+            raise ValueError('V3_USES_EXPLICIT_BASE_ANCHORED_ROUTES_ONLY; spans and route_overrides unsupported')
+        if self.routes and (len(self.routes)!=self.tendon_count or any(r.anchor_segment>=self.segment_count for r in self.routes)):
+            raise ValueError('V3_REQUIRES_ONE_LEGAL_ROUTE_PER_TENDON')
+        return self
+
+
 class FamilyBuildV2(Contract):
     space: FamilySpaceV2
     request: GenerationRequestV2
 
 
+class FamilyBuildV3(FamilyBuildV2):
+    space: FamilySpaceV3
+    request: GenerationRequestV3
+
+
 def parse_space(value):
-    return (FamilySpaceV2 if value.get('version')=='serial_family_space_v2' else FamilySpace).model_validate(value)
+    return ({'serial_family_space_v3':FamilySpaceV3,'serial_family_space_v2':FamilySpaceV2}.get(value.get('version'),FamilySpace)).model_validate(value)
 
 
 def parse_build(value):
     from tools.platform_store import plain
     value=plain(value)
-    return (FamilyBuildV2 if value['space'].get('version')=='serial_family_space_v2' else FamilyBuild).model_validate(value)
+    return ({'serial_family_space_v3':FamilyBuildV3,'serial_family_space_v2':FamilyBuildV2}.get(value['space'].get('version'),FamilyBuild)).model_validate(value)
 
 
 class UnsupportedGeneration(ValueError):
@@ -293,7 +336,7 @@ def decision_summary(value, evidence, operations):
     result['domain_encoding'] = '[minimum, maximum, default]; indexed segment fields override generic domain'
     if isinstance(space,FamilySpaceV2):
         result['serial_assembly']=plain(space.serial_assembly)
-        result['generation_version']='serial_family_generation_v2'
+        result['generation_version']='serial_family_generation_v3' if isinstance(space,FamilySpaceV3) else 'serial_family_generation_v2'
     else:
         result['generation_version']='serial_family_generation_v1'
     result.update(family_space_identity=digest(frozen),full_specification=evidence, available_operations=operations,
@@ -307,6 +350,14 @@ def decision_summary(value, evidence, operations):
             guides=[dict(envelope_halfsize_m=c.envelope_halfsize_m,hole_radius_m=c.hole_radius_m)
                 for c in space.assembly.components if isinstance(c,Rigid) and c.kind=='guide']),
         numerical_support='Candidate-specific validation required; physical generation does not certify dynamics, control or task success')
+    if isinstance(space,FamilySpaceV3):
+        result.update(routing_strategy='base_anchored_segment_routes_v3',
+            span_semantics='Each tendon has one fixed_base start, ordered segments 0 through anchor_segment, and one segment anchor.',
+            angular_semantics='routes[i].segments[j] contains absolute angle_rad and radius_m; each segment has one guide station.',
+            conditional_parameters='One route per tendon; arbitrary spans and route_overrides are unsupported.',
+            attachment_constraints=dict(local_frame='coaxial unrotated segment YZ planes',
+                clearance='Conservative enclosing section radius plus tendon radius along straight chords; pairwise tendon clearance along common segment intervals; owned guide holes.',
+                scope='Ideal frictionless tendons; no cable friction, swept self-collision or manufacturing process simulation.'))
     result['execution_effects']=dict(mode='ideal_tension',
         effective=['segment topology','tendon count/spans','length','material','section geometry/rotation','mesh cells',
             'tendon diameter/clearance','force bounds','pretension initialization','polar and explicit routes'],
@@ -336,7 +387,7 @@ def resolved_request(value, request):
     """Materialize inherited choices using the generator's named prototypes."""
     from tools.platform_store import plain
     space=parse_space(value)
-    r=(GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(request)
+    r=(GenerationRequestV3 if isinstance(space,FamilySpaceV3) else GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(request)
     validate_request(space,r);params=plain(r)
     parts={p.id:p for p in space.assembly.components}
     prototypes=[p for p in space.assembly.components if isinstance(p,Segment)]
@@ -359,7 +410,11 @@ def resolved_request(value, request):
             angles={st['angle_rad'] for st in choice['sections']}
             if 'section_angle_rad' in d.physical_domains and len(angles)==1:
                 choice.setdefault('physical_parameters',{}).setdefault('section_angle_rad',angles.pop())
-    params['spans']=params['spans'] or [plain(Span(last_segment=r.segment_count-1,count=r.tendon_count))]
+    if isinstance(space,FamilySpaceV3):
+        from .generated_serial import v3_default_routes
+        params['routes']=params['routes'] or v3_default_routes(space,r)
+    else:
+        params['spans']=params['spans'] or [plain(Span(last_segment=r.segment_count-1,count=r.tendon_count))]
     for span in params['spans']:
         for k in ('radius_m','anchor_s'):
             if span[k] is None:span[k]=space.routing_domains[k].default
@@ -367,7 +422,7 @@ def resolved_request(value, request):
         if not span['angular_offsets_rad']:span['angular_offsets_rad']=[0.]*span['count']
     for k,d in space.tendon_domains.items():params['tendon_parameters'].setdefault(k,d.default)
     for k,d in space.control_domains.items():params['control_weights'].setdefault(k,d.default)
-    return plain((GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(params))
+    return plain((GenerationRequestV3 if isinstance(space,FamilySpaceV3) else GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(params))
 
 
 def parameter_capabilities(value, request):
@@ -431,6 +486,15 @@ def parameter_capabilities(value, request):
         add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,
             effective=k!='length_servo_gain_n_m',reason=reason,source='tendon_domains.'+k,
             input_set_changes=k=='force_limit_n')
+    if isinstance(space,FamilySpaceV3):
+        for i,route in enumerate(params['routes']):
+            for j,segment in enumerate(route['segments']):
+                for field,domain_key,unit in (('radius_m','radius_m','m'),('angle_rad','phase_rad','rad'),('guide_s','guide_s','normalized_station')):
+                    add(f'routes.{i}.segments.{j}.{field}','routing','number',unit,space.routing_domains[domain_key],
+                        source='routing_domains.'+domain_key,affected_tendon_indices=[i])
+            add(f'routes.{i}.anchor_s','routing','number','normalized_station',space.routing_domains['anchor_s'],affected_tendon_indices=[i])
+        for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False,reason='Controller parameter')
+        return rows
     # Retain declaration templates for existing consumers; only concrete paths are analyzable.
     for k,d in space.routing_domains.items():
         add('spans.*.'+k,'routing','number','rad' if k.endswith('_rad') else 'm' if k=='radius_m' else 'normalized_station',d,

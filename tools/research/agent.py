@@ -289,7 +289,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
     schema=Plan.model_json_schema()
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
-        generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
+        generation={'serial_family_space_v3':'GenerationRequestV3','serial_family_space_v2':'GenerationRequestV2'}.get(family_version,'GenerationRequest')
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
@@ -355,8 +355,9 @@ def error_feedback(host, use, exc, before):
             matching=[e for e in errors if any('FamilyMixedSearch' in str(part) for part in e['loc'])]
             if matching:errors=matching
         generation=use.get('input',{}).get('generation')
-        if isinstance(generation,dict) and generation.get('version')=='serial_family_generation_v2':
-            matching=[e for e in errors if any('GenerationRequestV2' in str(part) for part in e['loc'])]
+        if isinstance(generation,dict) and generation.get('version') in ('serial_family_generation_v2','serial_family_generation_v3'):
+            branch='GenerationRequestV3' if generation['version'].endswith('_v3') else 'GenerationRequestV2'
+            matching=[e for e in errors if any(branch in str(part) for part in e['loc'])]
             if matching:errors=matching
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]

@@ -1,0 +1,47 @@
+{
+  "version": "serial_family_space_v3",
+  "family_id": "serial_external_tendons_v3",
+  "executable_segment_counts": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "unsupported": [
+    "8-12 tendons: declared, not execution validated",
+    "polygon section domain not granted in this example",
+    "axial extension",
+    "shear",
+    "twist",
+    "friction",
+    "swept self-collision",
+    "High segment-count dynamics and controller compatibility require candidate-specific validation",
+    "V3: arbitrary route overrides and non-coaxial or rotated segment interfaces",
+    "V3: chord clearance conservatively encloses the section; friction and cable deformation omitted"
+  ],
+  "serial_assembly": {
+    "root_segment": "segment_0",
+    "repeated_segment": "segment_1",
+    "guide": "mid_guide",
+    "connector": "connector",
+    "payload": "payload",
+    "cell_count_bounds": [
+      1,
+      32
+    ],
+    "default_cells": 12
+  },
+  "base_space": "family_space_v1.json",
+  "assembly": {
+    "provenance": {
+      "source": "Frozen SI serial-family prototypes owned by family_space_v3.json",
+      "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+      "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics"
+    }
+  }
+}

@@ -179,6 +179,14 @@ EXTENSIONS.append(replace(_source_builder,version='6.0.0',input_schema=FamilyBui
         'parameter_declarations':'extensions.tendon_family.generated_serial:serial_declarations'},
     sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))
 
+from .family_space import FamilyBuildV3
+CONTRACTS.append(('family.serial_space_build_v3','1.0.0',FamilyBuildV3))
+EXTENSIONS.append(replace(_source_builder,version='7.0.0',input_schema=FamilyBuildV3,
+    description='Base-anchored serial tendon paths with per-segment geometry and conservative clearance checks',
+    capabilities={**_source_builder.capabilities,
+        'parameter_declarations':'extensions.tendon_family.generated_serial:serial_v3_declarations'},
+    sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))
+
 # The predictor is separate from policy.dynamics_model (MuJoCo's cell model).
 from .sorosim_control import SorosimReachControl
 SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (

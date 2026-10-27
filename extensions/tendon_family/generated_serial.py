@@ -153,7 +153,7 @@ def authorize(inp,space,changes):
     builder=inp.policy.candidate_builder
     topology=(builder.version,builder.parameters.contract,builder.parameters.version)==('4.0.0','family.topology_space','1.0.0')
     family_space=(builder.version,builder.parameters.contract) in (
-        ('5.0.0','family.serial_space_build'),('6.0.0','family.serial_space_build_v2'))
+        ('5.0.0','family.serial_space_build'),('6.0.0','family.serial_space_build_v2'),('7.0.0','family.serial_space_build_v3'))
     design,mesh,_=(generate_family if family_space else generate_topology if topology else generate)(space)
     if design!=inp.robot.structure.data or mesh!=inp.policy.discretization.data:raise ValueError('SOURCE_CANDIDATE_BINDING_MISMATCH')
 
@@ -236,13 +236,46 @@ class GeometryFailure(ValueError):
         self.diagnostic=diagnostic
 
 
+def v3_default_routes(space, request):
+    """A symmetric base-to-distal proposal; never a task-success assumption."""
+    bounds=space.routing_domains
+    return [dict(anchor_segment=request.segment_count-1,anchor_s=bounds['anchor_s'].default,
+        segments=[dict(radius_m=bounds['radius_m'].default,angle_rad=2*np.pi*j/request.tendon_count,
+            guide_s=bounds['guide_s'].default) for _ in range(request.segment_count)])
+        for j in range(request.tendon_count)]
+
+
+def v3_clearance(segments, paths, diameter):
+    """Conservative straight-chord clearance, including between sampled stations."""
+    from .sections import properties
+    def closest(a,b):
+        delta=b-a;den=float(delta@delta)
+        t=0. if den==0 else min(1.,max(0.,-float(a@delta)/den))
+        return float(np.linalg.norm(a+t*delta))
+    def at(path,s):
+        for (a,x),(b,y) in zip(path,path[1:]):
+            if s<=b+1e-12:return x+(y-x)*(s-a)/(b-a)
+        return path[-1][1]
+    for i,segment in enumerate(segments):
+        envelope=max(np.linalg.norm(properties(st['section'])['outer_yz_m'],axis=1).max() for st in segment['sections'])
+        active=[p[i] for p in paths if i in p]
+        for path in active:
+            if any(closest(a[1],b[1]) < envelope+diameter/2-1e-12 for a,b in zip(path,path[1:])):
+                raise ValueError('V3_SECTION_ROUTE_CLEARANCE')
+        for n,a in enumerate(active):
+            for b in active[n+1:]:
+                end=min(a[-1][0],b[-1][0]);knots=sorted({0.,end,*[s for s,_ in a if s<end],*[s for s,_ in b if s<end]})
+                if any(closest(at(a,x)-at(b,x),at(a,y)-at(b,y)) < diameter-1e-12 for x,y in zip(knots,knots[1:])):
+                    raise ValueError('V3_TENDON_PATH_CLEARANCE')
+
+
 def generate_family(value):
     """Expand polar spans; v1 preserves its assembly, v2 expands named prototypes."""
-    from .family_space import parse_build, Span, validate_request, FamilyBuildV2
+    from .family_space import parse_build, Span, validate_request, FamilyBuildV2, FamilyBuildV3, UnsupportedGeneration
     from .sections import properties
     build=parse_build(value);space=build.space;r=build.request
     validate_request(space,r)
-    serial=isinstance(build,FamilyBuildV2)
+    serial=isinstance(build,FamilyBuildV2);v3=isinstance(build,FamilyBuildV3)
     if serial:
         components,mesh,tip=serial_components(space,r)
     else:
@@ -289,7 +322,21 @@ def generate_family(value):
     def point(part,s,position,role,hole=None):
         return dict(attachment=dict(part=part,s=s,position_m=position),role=role,hole=hole)
     def yz(radius,angle):return [0.,radius*float(np.cos(angle)),radius*float(np.sin(angle))]
-    spans=r.spans or [Span(last_segment=len(segments)-1,count=r.tendon_count)]
+    routes_v3=[plain(v) for v in r.routes] if v3 and r.routes else v3_default_routes(space,r) if v3 else []
+    if v3:
+        # The compact clearance model below assumes coaxial, unrotated serial
+        # interfaces. Other mount geometry needs a different physical analysis.
+        for part in components:
+            if part['id']=='payload':continue
+            c=part['connection']
+            if c['quaternion_wxyz']!=[1.,0.,0.,0.] or any(abs(x)>1e-12 for x in c['position_m'][1:]):
+                raise UnsupportedGeneration('V3_REQUIRES_COAXIAL_UNROTATED_SERIAL_INTERFACES')
+        if any(g['hole_radius_m'] < tendon_values['diameter_m']/2 for g in guides):
+            raise ValueError('V3_GUIDE_HOLE_TOO_SMALL')
+    v3_paths=[]
+    spans=([Span(last_segment=x['anchor_segment'],count=1,phase_rad=x['segments'][0]['angle_rad'],
+        radius_m=x['segments'][0]['radius_m'],guide_s=[x['segments'][0]['guide_s']],anchor_s=x['anchor_s']) for x in routes_v3]
+        if v3 else r.spans or [Span(last_segment=len(segments)-1,count=r.tendon_count)])
     for span_index,span in enumerate(spans):
         bounds=space.routing_domains
         radius=bounds['radius_m'].check(span.radius_m if span.radius_m is not None else bounds['radius_m'].default,'radius_m')
@@ -305,14 +352,33 @@ def generate_family(value):
             index=len(tendons);name='tendon_'+str(index)
             angle=span.phase_rad+2*np.pi*j/span.count+(span.angular_offsets_rad[j] if span.angular_offsets_rad else 0.)
             route=[]
+            selected=routes_v3[index] if v3 else None
+            if v3:
+                for seg in selected['segments']:
+                    bounds['radius_m'].check(seg['radius_m'],'route_radius_m')
+                    bounds['phase_rad'].check(seg['angle_rad'],'route_angle_rad')
+                    bounds['guide_s'].check(seg['guide_s'],'guide_s')
+                bounds['anchor_s'].check(selected['anchor_s'],'anchor_s')
             if span.first_segment==0:route.append(point('fixed_base',0.,yz(radius,angle),'start'))
             for i in range(span.first_segment,span.last_segment+1):
+                seg=selected['segments'][i] if v3 else None
+                seg_radius=seg['radius_m'] if v3 else radius
+                seg_angle=seg['angle_rad'] if v3 else angle+span.guide_angle_offset_rad
+                seg_stations=[seg['guide_s']] if v3 else stations
                 if i>0:
                     guide=guides_by_segment[i]
-                    hole=name+'_hole';guide['guide_holes'][hole]=yz(radius,angle+span.guide_angle_offset_rad)
+                    hole=name+'_hole';guide['guide_holes'][hole]=yz(seg_radius,seg_angle)
                     route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==i else 'guide',hole))
-                for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
-            route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
+                for s in seg_stations:route.append(point(segments[i]['id'],s,yz(seg_radius,seg_angle),'guide'))
+            last=selected['segments'][-1] if v3 else None
+            route.append(point(segments[span.last_segment]['id'],anchor,yz(last['radius_m'],last['angle_rad']) if v3 else yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
+            if v3:
+                paths={}
+                for i,seg in enumerate(selected['segments']):
+                    v=np.asarray(yz(seg['radius_m'],seg['angle_rad'])[1:])
+                    end=(np.asarray(yz(selected['segments'][i+1]['radius_m'],selected['segments'][i+1]['angle_rad'])[1:]) if i<span.last_segment else v)
+                    paths[i]=[(0.,v),(seg['guide_s'],v),(1. if i<span.last_segment else anchor,end)]
+                v3_paths.append(paths)
             if index in r.route_overrides:route=[plain(p) for p in r.route_overrides[index]]
             # Explicit overrides retain span ownership, local radial and station bounds.
             order=[]
@@ -362,6 +428,7 @@ def generate_family(value):
             actuators.append(dict(id='actuator_'+str(index),command_type='displacement',units='m',
                 limits=space.actuator_defaults.limits_m,velocity_limit=space.actuator_defaults.velocity_limit_m_s,
                 transmission=[dict(tendon=name,ratio=1.)]))
+    if v3:v3_clearance(segments,v3_paths,tendon_values['diameter_m'])
     used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
     for guide in guides:guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
     design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
@@ -411,3 +478,9 @@ def serial_declarations():
     return dict(contract='serial_family_space_v2',execution='declared serial segment and tendon domains subject to physical checks',
         routing='consecutive spans; independent angular offsets and typed route overrides',
         numerical='candidate-specific compatibility; no task-feasibility claim')
+
+
+def serial_v3_declarations():
+    return dict(contract='serial_family_space_v3',execution='base-anchored piecewise paths subject to conservative physical clearance checks',
+        routing='one fixed-base start, explicit per-segment polar path and one flexible-segment anchor',
+        numerical='coaxial unrotated serial interfaces; ideal frictionless model; no task-feasibility claim')

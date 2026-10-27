@@ -144,7 +144,7 @@ def verify_candidate(host,reference):
                 c['task_identity']!=digest(condition['task']) or c['effective_task_identity']!=digest(c['configuration']['task'])):
             raise ValueError('FROZEN_CONDITION_CANDIDATE_IDENTITY_MISMATCH')
         return c
-    if c.get('generation_version') in ('serial_family_generation_v1','serial_family_generation_v2'):
+    if c.get('generation_version') in ('serial_family_generation_v1','serial_family_generation_v2','serial_family_generation_v3'):
         if (host.store.artifact(c['configuration_reference'])!=c['configuration'] or
                 c['family_space_identity']!=s['spec']['family_space_identity'] or
                 c['task_identity']!=s['spec']['canonical_task_identity'] or
@@ -209,7 +209,7 @@ def final_fidelity_matches(spec, candidate):
 
 def final_generation_request(spec, candidate):
     """Copy exact physical choices to the frozen final mesh; never dispatch work."""
-    if not spec.get('fidelity_policy') or candidate.get('generation_version')!='serial_family_generation_v2':
+    if not spec.get('fidelity_policy') or candidate.get('generation_version') not in ('serial_family_generation_v2','serial_family_generation_v3'):
         return None
     request=deepcopy(candidate['parameters'])
     cells=spec['fidelity_policy']['final_evaluation']['cells_per_segment']
@@ -247,9 +247,10 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             from tools.research.config import same_robot_structure
             if not same_robot_structure(cfg,host.store.artifact(spec['fixed_structure_reference'])['configuration']):
                 raise ValueError('FROZEN_REFERENCE_STRUCTURE_REQUIRED')
-        serial=build.request.version=='serial_family_generation_v2'
-        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
-            parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
+        serial=build.request.version in ('serial_family_generation_v2','serial_family_generation_v3')
+        v3=build.request.version=='serial_family_generation_v3'
+        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='7.0.0' if v3 else '6.0.0' if serial else '5.0.0',
+            parameters=dict(contract='family.serial_space_build_v3' if v3 else 'family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
         for key,d in build.space.control_domains.items():
             cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
         if serial:

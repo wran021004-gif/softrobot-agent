@@ -381,7 +381,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         duration_s=task['task']['timing']['duration_s'], period_s=task['task']['timing']['control_period_s'])
     if family_mode:
         study['analysis_protocol']['baseline_lengths_m']={k:v['length_m'] for k,v in segments.items()}
-        if family_space['version']=='serial_family_space_v2':
+        if family_space['version'] in ('serial_family_space_v2','serial_family_space_v3'):
             study['analysis_protocol']['baseline_lengths_m']={f'segment_{i}':
                 family_space['segment_domains'].get(str(i),family_space['segment_domain'])['length_m']['default']
                 for i in range(family_space['segment_count_bounds'][1])}
@@ -499,6 +499,6 @@ def family_bootstrap(space, execution):
     initial['unspecified'] = 'zero'
     return dict(robot=robot,discretization=dict(contract='family.discretization',version='1.0.0',data=mesh),
         **execution, provenance=dict(source='frozen family assembly',scientific_candidate=False)), dict(
-        builder=dict(extension_id='candidate.family',version='6.0.0' if space['version']=='serial_family_space_v2' else '5.0.0',parameters=dict(
-            contract='family.serial_space_build_v2' if space['version']=='serial_family_space_v2' else 'family.serial_space_build',version='1.0.0',data=plain(build))),
+        builder=dict(extension_id='candidate.family',version={'serial_family_space_v3':'7.0.0','serial_family_space_v2':'6.0.0'}.get(space['version'],'5.0.0'),parameters=dict(
+            contract={'serial_family_space_v3':'family.serial_space_build_v3','serial_family_space_v2':'family.serial_space_build_v2'}.get(space['version'],'family.serial_space_build'),version='1.0.0',data=plain(build))),
         initializer=initial,request=plain(build.request))

@@ -5,7 +5,7 @@ from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
-from extensions.tendon_family.family_space import GenerationRequest, GenerationRequestV2
+from extensions.tendon_family.family_space import GenerationRequest, GenerationRequestV2, GenerationRequestV3
 from tools.research.capability import CapabilityComparison
 
 
@@ -582,7 +582,7 @@ class Plan(Contract):
     stopping_condition: str = Field(min_length=1)
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
-    generation: GenerationRequest | GenerationRequestV2 | None = None
+    generation: GenerationRequest | GenerationRequestV2 | GenerationRequestV3 | None = None
     search: Search | FamilyMixedSearch | None = None
     candidate: EvidenceRef | None = Field(default=None,description='Required top-level candidate for action=execute only. For initialize_control or physical_replay use the nested action payload candidate instead.')
     selected_execution: EvidenceRef | list[EvidenceRef] | None = Field(default=None, description='Exact publicly read passing evaluation. A frozen multi-condition Study requires a list containing one independent physical_replay result per condition on the identical structure; order is irrelevant.')
