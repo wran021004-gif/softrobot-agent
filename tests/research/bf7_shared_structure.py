@@ -96,6 +96,8 @@ def prescreen():
     selected={}
     if len(ranked)>=2:
         best=ranked[0];peer=next((d for d in ranked if d['index']==0 and d['index']!=best['index']),ranked[1])
+        if f['prescreen'].get('physical_selection')=='proposal_order_unvalidated_model':
+            best,peer=sorted(ranked,key=lambda d:d['index'])[:2]
         selected=dict(best=best['index'],peer=peer['index'])
     stop(host,'bf7-math-stop');s=state(host)
     value=dict(stage='prescreen',implementation=s['freeze'],family_space_identity=spec['family_space_identity'],
@@ -149,6 +151,7 @@ def optimize(host, root, condition, settings, key, source=None, parent=None, exp
 def physical(role, phase='initial'):
     if phase not in ('initial','continuation'):raise ValueError('UNKNOWN_FROZEN_PHASE')
     f=read(PROTOCOL);folder=RUNS/role;summary=folder/(phase+'.json')
+    if phase=='continuation' and not f['physical'].get('allow_continuation',True):raise ValueError('NO_CONTINUATION_AUTHORIZED_IN_THIS_GRANT')
     if summary.exists():return read(summary)
     started=time.perf_counter();screen=read(RUNS/'math/summary.json')
     if not screen['selected']:raise ValueError('NO_TWO_COMPLETE_THREE_TARGET_MATHEMATICAL_CANDIDATES')
@@ -170,6 +173,7 @@ def physical(role, phase='initial'):
         if key in rows:continue
         prior=previous['conditions'][key] if previous else None
         repair=extension.get('initialization_repairs',{}).get(role,{}).get(key)
+        initial_seed=f['physical'].get('initial_seeds',{}).get(key) if phase=='initial' else None
         if prior and (prior['accepted'] or (not prior['continuation_eligible'] and not repair)):rows[key]=prior
         else:
             local=deepcopy(settings);inputs=None
@@ -178,10 +182,15 @@ def physical(role, phase='initial'):
                 assert failed['task_acceptance']=='unmeasured'
                 inputs=failed['trajectory']['tensions_n']
                 local.update(repair['settings'])
+            elif initial_seed:
+                failed=Store(ROOT/initial_seed['store']).artifact(initial_seed['control_source'])
+                assert failed['task_acceptance']=='unmeasured'
+                inputs=failed['trajectory']['tensions_n']
             rows[key]=optimize(host,root,key,local,'bf7-'+role+'-'+phase+'-'+key,
                 source=prior['control_source'] if prior and not repair else None,
                 parent=prior['candidate'] if prior and not repair else None,explicit_tensions=inputs)
             if repair:rows[key]['initialization_repair']=repair
+            if initial_seed:rows[key]['initial_seed']=initial_seed
         atomic_json(progress,rows)
         print(json.dumps(dict(role=role,phase=phase,condition=key,accepted=rows[key]['accepted'],
             callbacks=rows[key].get('native_callbacks'),metrics=rows[key].get('acceptance',{}).get('metrics'),
@@ -189,7 +198,7 @@ def physical(role, phase='initial'):
     accepted=all(r['accepted'] for r in rows.values())
     if accepted:
         dispatch(host,'select','bf7-'+role+'-joint-select',selected_execution=[r['replay'] for r in rows.values()],supporting_evidence=[r['analysis'] for r in rows.values()])
-    if accepted or phase=='continuation' or not any(r.get('continuation_eligible') for r in rows.values()):stop(host,'bf7-'+role+'-stop')
+    if accepted or phase=='continuation' or not f['physical'].get('allow_continuation',True) or not any(r.get('continuation_eligible') for r in rows.values()):stop(host,'bf7-'+role+'-stop')
     s=state(host)
     value=dict(role=role,phase=phase,screen_index=index,candidate=root,conditions=rows,all_independently_accepted=accepted,
         selected=s.get('selected'),research_status=s['research_status'],implementation=s['freeze'],
@@ -200,7 +209,10 @@ def physical(role, phase='initial'):
 
 
 if __name__=='__main__':
-    if sys.argv[1:]==['prescreen']:prescreen()
-    elif len(sys.argv) in (3,4) and sys.argv[1]=='physical' and sys.argv[2] in ('best','peer'):
-        physical(sys.argv[2],sys.argv[3] if len(sys.argv)==4 else 'initial')
-    else:raise SystemExit('prescreen | physical {best,peer} [initial|continuation]')
+    args=sys.argv[1:]
+    if args[:1]==['r2']:
+        PROTOCOL=ROOT/'configs/research/bf7_r2_protocol.json';RUNS=ROOT/'runs/bf7-r2';args=args[1:]
+    if args==['prescreen']:prescreen()
+    elif len(args) in (2,3) and args[0]=='physical' and args[1] in ('best','peer'):
+        physical(args[1],args[2] if len(args)==3 else 'initial')
+    else:raise SystemExit('[r2] prescreen | [r2] physical {best,peer} [initial|continuation]')

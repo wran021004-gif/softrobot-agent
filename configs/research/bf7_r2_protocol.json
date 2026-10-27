@@ -1,0 +1,218 @@
+{
+  "version": "R2-1.0.0",
+  "benchmark": "BF7 Multi-Target Shared-Structure Reachability",
+  "base_commit": "a1566b91a387316405bdb2fc79eb8a087ea20e8a",
+  "branch": "research/bf7-shared-structure-benchmark",
+  "organizer": "Codex; no LLM Research Agent",
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "task_definition": {
+    "duration_s": 0.6,
+    "timestep_s": 0.001,
+    "control_period_s": 0.02,
+    "sample_period_s": 0.02,
+    "initial_state": "all_candidate_dofs_zero_v1",
+    "seed": 17,
+    "terminal_tolerance_m": 0.01,
+    "holding_window_s": [
+      0.54,
+      0.6
+    ],
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.03,
+    "frame": "world_base_x_forward_yz_cross_section",
+    "environment": "reach_hold.json original gravity, mount, non-contact floor and no external forces",
+    "payload": "Original family_space_v2/v1 rigid 0.01 kg payload, declared COM and full inertia, no payload modification"
+  },
+  "structure_domain": {
+    "family": "family_space_bf7_r2.json",
+    "vary": [
+      "lengths",
+      "Young moduli"
+    ],
+    "length_bounds_m": [
+      0.1,
+      0.16
+    ],
+    "young_bounds_pa": [
+      8000000.0,
+      15000000.0
+    ],
+    "default_hypothesis": {
+      "lengths_m": [
+        0.16,
+        0.12
+      ],
+      "young_pa": [
+        12000000.0,
+        10000000.0
+      ]
+    },
+    "fixed": "Original two segments/six distributed_consecutive tendons, sections, mass/inertia/payload, 12 cells, 0..8N, backend/model and exact v1 tasks."
+  },
+  "prescreen": {
+    "study": "study_bf7_r2_prescreen.json",
+    "maximum_designs": 2,
+    "maximum_mathematical_units": 12,
+    "proposal_search": {
+      "version": "family_mixed_search_v1",
+      "method": "bounded_mixed_coordinate_v1",
+      "variable_groups": [
+        "lengths",
+        "materials"
+      ],
+      "segment_counts": [
+        2
+      ],
+      "tendon_counts": [
+        6
+      ],
+      "span_strategies": [
+        "distributed_consecutive"
+      ],
+      "bounds": {
+        "length_m": [
+          0.1,
+          0.16
+        ],
+        "young_pa": [
+          8000000.0,
+          15000000.0
+        ]
+      },
+      "screening_fidelity": "standard",
+      "objective": "task_violation",
+      "operating_point": "standardized_initial_pretension",
+      "max_proposals": 8,
+      "max_evaluations": 4,
+      "step": 0.25,
+      "minimum_step": 0.03125
+    },
+    "coverage": "Search proposes/ranks on positive_high ONLY. Then each proposed structure is actually solved for all three tasks; no single-task score is presented as a shared score.",
+    "aggregate": "V_BF7 = max of three finite trajectory.replayed_violation values; all task-specific CONIC solves, valid affine replay and full norm/sample coverage required. Otherwise unresolved.",
+    "selection": "After complete three-task model coverage, test proposals in original order, not minute proxy differences. The prior affine ranking disagreed with physical performance; do not treat it as a validated optimizer of physical coverage.",
+    "physical_selection": "proposal_order_unvalidated_model"
+  },
+  "physical": {
+    "studies": {
+      "best": "study_bf7_r2_best.json",
+      "peer": "study_bf7_r2_peer.json"
+    },
+    "initial_settings": {
+      "version": "local_control_search_v2",
+      "method": "response",
+      "correction_window_s": [
+        0.0,
+        0.6
+      ],
+      "knots_s": [
+        0.0,
+        0.4,
+        0.58
+      ],
+      "active_coefficients": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "coefficient_limit_n": 8.0,
+      "difference_step_n": 0.02,
+      "initial_radius_n": 0.1,
+      "minimum_radius_n": 0.0001,
+      "safety_margin_fraction": 0.01,
+      "evaluation_requests": 401,
+      "iterations": 32
+    },
+    "initial_seeds": {
+      "positive_high": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "c9105c800c12177a6eec85a6f2fcbab981928ab8707c26ce479170adcdd876b8",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "320d1f413265070deff7fc4126eddd5df89c07632cd6c5747c23522af68bd5d0",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "6fc30001723115a238855bed66be8a2a99e7d9c18a768de2477e80515e741838",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      },
+      "negative_low": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "1202de360b5769bbf51b06577c6bade721cc93c577fbf88cc11d6ca6dfd9c02c",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "9371ec2d447fc0a9806b3240b6093cca4d8fcf859b7f8ae8db05eff11890c34b",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "845b09dacb4a9f73db3501bc5dbf7ad33b40f31a2e82b9e5347f949f158cd94d",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      },
+      "central_high": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "ca333ffaceaa336a8ca5814989832546c2d828349d73dcb83a8c897632b12e59",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "ec6d7c425d52cab97c2d12b563d68c639bd819d35be1fd4070f63d7d18690399",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "be83a9631deccf9dd43698b7fbe1db0549192c46f96a003d6256faf28b61b15a",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      }
+    },
+    "allow_continuation": false,
+    "per_structure_task_cap": {
+      "native_callbacks": 401,
+      "independent_replays": 1,
+      "physics_step_attempts": 241200
+    },
+    "total_new_cap": {
+      "native_callbacks": 2406,
+      "independent_replays": 6,
+      "physics_step_attempts": 1447200
+    },
+    "control_rationale": "V1 whole-horizon 24-column responses were nearly redundant at the final hold (stored condition estimates ~1e10), with a SLSQP linesearch failure. Retain each actual failed BF7 input as a baseline; change only the later two knot offsets (12 active columns) while always replaying the full horizon from zero. This is not a derivative guarantee.",
+    "acceptance": "Original registered evaluate.reach and offline Reach/Hold acceptance on complete 600-step runs, terminal 10mm, four inclusive holding samples with 10mm/30mm_s bounds, force bounds and solver validity; joint SELECT only with three passing owned independent replays on identical structure/discretization.",
+    "stop": "Test first new structure across all three v1 targets. First full independent joint pass SELECT and stop R2 scientific work. Only if no joint pass, test the second new structure within its separate cap. No further automatic continuation, no task relaxation."
+  },
+  "accounting": "New R2 grants, no transfer of prior balances. Old BF7 v1 stores STOP sealed and all 175.87390530007542 numeric seconds /1067 callback attempts/646472 physics steps retained. Exact source control rows are BF7 failures, no BF4/BF5/BF6 success designs or controls.",
+  "prior_sealed_costs": "evidence/bf7_v1/sealed_costs_before_r2.json",
+  "environment_semantics_correction": "Original floor masks remain unchanged and permit payload contact; Native v1 rejects contact. Earlier non-contact-floor wording described intent, not disabled collisions."
+}

@@ -1,0 +1,162 @@
+{
+  "version": "serial_family_space_v2",
+  "family_id": "bf7_r2_length_stiffness_hypotheses",
+  "executable_segment_counts": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "unsupported": [
+    "8-12 tendons: declared, not execution validated",
+    "polygon section domain not granted in this example",
+    "axial extension",
+    "shear",
+    "twist",
+    "friction",
+    "swept self-collision",
+    "High segment-count dynamics and controller compatibility require candidate-specific validation"
+  ],
+  "serial_assembly": {
+    "root_segment": "segment_0",
+    "repeated_segment": "segment_1",
+    "guide": "mid_guide",
+    "connector": "connector",
+    "payload": "payload",
+    "cell_count_bounds": [
+      1,
+      32
+    ],
+    "default_cells": 12
+  },
+  "base_space": "family_space_v1.json",
+  "assembly": {
+    "provenance": {
+      "source": "Frozen SI serial-family prototypes owned by family_space_v2.json",
+      "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+      "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics",
+      "bf7_r2": "Explicit physics-motivated domain defaults, not inherited success: modest distal length increase and larger Young moduli to test reach reserve/gravity deflection. Original physical prototypes, mass, inertia and section domains retained."
+    }
+  },
+  "segment_domains": {
+    "0": {
+      "length_m": {
+        "minimum": 0.08,
+        "maximum": 0.24,
+        "default": 0.16
+      },
+      "young_pa": {
+        "minimum": 2000000.0,
+        "maximum": 15000000.0,
+        "default": 12000000.0
+      },
+      "section_dimensions_m": {
+        "circle": {
+          "radius_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.008
+          }
+        },
+        "tube": {
+          "outer_radius_m": {
+            "minimum": 0.005,
+            "maximum": 0.012,
+            "default": 0.009
+          },
+          "inner_radius_m": {
+            "minimum": 0.001,
+            "maximum": 0.004,
+            "default": 0.003
+          }
+        },
+        "ellipse": {
+          "semi_y_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0095
+          },
+          "semi_z_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0076
+          }
+        },
+        "rectangle": {
+          "width_y_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0133
+          },
+          "height_z_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0095
+          }
+        }
+      }
+    },
+    "1": {
+      "length_m": {
+        "minimum": 0.06,
+        "maximum": 0.2,
+        "default": 0.12
+      },
+      "young_pa": {
+        "minimum": 2000000.0,
+        "maximum": 15000000.0,
+        "default": 10000000.0
+      },
+      "section_dimensions_m": {
+        "circle": {
+          "radius_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.008
+          }
+        },
+        "tube": {
+          "outer_radius_m": {
+            "minimum": 0.005,
+            "maximum": 0.012,
+            "default": 0.009
+          },
+          "inner_radius_m": {
+            "minimum": 0.001,
+            "maximum": 0.004,
+            "default": 0.003
+          }
+        },
+        "ellipse": {
+          "semi_y_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0095
+          },
+          "semi_z_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0076
+          }
+        },
+        "rectangle": {
+          "width_y_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0133
+          },
+          "height_z_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0095
+          }
+        }
+      }
+    }
+  }
+}
