@@ -47,4 +47,11 @@ it cannot assign a causal percentage to context versus model, rank general
 research ability or establish physical progress. Cache state is uncontrolled;
 currency remains unknown unless actually returned by the Provider.
 
+The first v2 launch was rejected by automatic review before process creation,
+with zero requests. In response to review's request for low-risk evidence,
+unauthenticated HTTP checks confirmed the GitHub repository is public and all
+three exact task/evidence source files return HTTP 200 with JSON equal to the
+local committed inputs. These checks and source URLs are retained in the v2
+payload review. No alternate Provider route or private payload is used.
+
 Live results will be appended after the bounded cohort finishes.

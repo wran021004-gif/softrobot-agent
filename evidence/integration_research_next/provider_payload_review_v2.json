@@ -70,7 +70,7 @@
   "authorization": "User 2026-10-27 explicitly requests fixing information delivery and tool round trips, then rerunning Flash/Pro; permits increased allowance and real models without further approval. New independent cohort: up to six requests per case/model, 24 total, zero scientific workers. Same committed public BF5/BF6 evidence; no current C Study or unrelated private data.",
   "review_scope": "User explicitly requests this rerun after information-delivery fixes, allows increased model allowance and no additional approval. Independent v2 grant; original eight requests and all failure/cost records preserved.",
   "version": "provider_decision_public_only_v2",
-  "delivery": "Same public cases byte-equivalent as JSON values to v1. Exact scalar evidence now inline. Descriptive production Plan schema and optional static evidence reads. All science allowances zero.",
+  "delivery": "Same public cases JSON-value-identical to v1. Exact scalar evidence now inline. Descriptive production Plan schema and optional static evidence reads. All science allowances zero.",
   "packet_keys": [
     "case_id",
     "evidence_reference",
@@ -81,5 +81,34 @@
     "scope"
   ],
   "old_cohort_preserved": true,
-  "current_C_Study_accessed": false
+  "current_C_Study_accessed": false,
+  "initial_v2_launch": {
+    "automatic_review": "rejected_before_process_creation",
+    "provider_requests": 0
+  },
+  "unauthenticated_source_verification": {
+    "repository_api_http": 200,
+    "repository_private": false,
+    "sources": [
+      {
+        "name": "task",
+        "http": 200,
+        "json_equal_local": true,
+        "url": "https://raw.githubusercontent.com/wran021004-gif/softrobot-agent/integration/research-next/tasks/bf5_position_tool_axis_v1.json"
+      },
+      {
+        "name": "bf5",
+        "http": 200,
+        "json_equal_local": true,
+        "url": "https://raw.githubusercontent.com/wran021004-gif/softrobot-agent/integration/research-next/evidence/integration_research_next/bf5_engineering.json"
+      },
+      {
+        "name": "bf6",
+        "http": 200,
+        "json_equal_local": true,
+        "url": "https://raw.githubusercontent.com/wran021004-gif/softrobot-agent/e67d9d68ee114bf76321e4a9abdf58945eacbf2b/evidence/bf6_sensor_oriented_tracking/summary.json"
+      }
+    ],
+    "scope": "No GitHub credentials or auth headers. Checks performed after automatic review asked for evidence of low risk. The retry uses these same public values, not private research data."
+  }
 }
