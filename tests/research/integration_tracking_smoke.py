@@ -64,7 +64,7 @@ def main(task='tracking'):
     output=analysis.dispatch(host,query,'native',guard=core.guard)
     native=host.store.artifact(output['reference'])
     if task!='bf6':assert native['status']=='computed'
-    assert native['task_acceptance']=='unmeasured'
+    assert native.get('task_acceptance') in (None,'unmeasured')
     native_cost=next((native[k]['cost'] for k in ('native_dynamics','native_diagnostic','native_progress')
         if native.get(k,{}).get('cost')),None)
     result=core.dispatch(host,plan('physical_replay',candidate,physical_replay=dict(candidate=candidate,
@@ -80,10 +80,18 @@ def main(task='tracking'):
     choice=eligibility(host,result['reference'],selection=True)
     if choice['eligible']:
         core.dispatch(host,plan('select',selected_execution=result['reference']),'select')
+    if task=='bf6':
+        s=state(host)
+        core.dispatch(host,plan('stop',next_step='stop',supporting_evidence=[*s['analysis_results'],*s['physical_replays']]),'stop')
+    failure=raw.get('numerical_failure',{})
+    replay_cost=raw.get('cost') or (dict(confirmed_completed_steps=failure['confirmed_completed_steps'],
+        physics_step_attempts=failure['attempted_steps'],failed_call_internal_steps=failure['failed_call_internal_steps']) if failure else None)
     summary_value=dict(implementation=state(host)['freeze'],provider_requests=0,nmpc_updates=0,rl_actions=0,
-        native_status=native['status'],native=native_cost,independent_replay=raw.get('cost'),
+        native_status=native['status'],native_reason=native.get('reason'),native=native_cost,independent_replay=replay_cost,
         physics_steps=native_cost['physics_steps']+raw['physics_steps'] if native_cost and 'physics_steps' in raw else None,
-        protocol=result['acceptance']['protocol_id'],acceptance_status=result['acceptance']['status'],
+        confirmed_physics_steps=native_cost['physics_steps']+failure['confirmed_completed_steps'] if native_cost and failure else None,
+        physics_step_attempts=native_cost['physics_step_attempts']+failure['attempted_steps'] if native_cost and failure else None,
+        protocol=result['acceptance']['protocol_id'],acceptance_status=result['acceptance']['status'],research_status=state(host)['research_status'],
         selected=bool(state(host).get('selected')),selection_eligibility=choice,
         registered_receipt_type=receipt['tool_id'],execution_binding_verified=True,
         rigid_tool_binding=raw.get('rigid_tool_binding'),environment_contact=raw.get('environment_contact'),

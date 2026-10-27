@@ -1,0 +1,230 @@
+{
+  "target_baseline": "a1566b91a387316405bdb2fc79eb8a087ea20e8a",
+  "source_head": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+  "implementation_commit": "af85bf94cc6742442bf50280b4d84a236bf5cd91",
+  "checks": [
+    {
+      "command": "python -m unittest tests.research.test_cross_task_integration tests.research.test_bf6_oriented_tracking tests.research.test_bf5_tool_axis tests.research.test_bf4_tracking tests.research.test_native_control tests.research.test_s136_task_contracts tests.research.test_s137_task_runtime tests.research.test_cf_prerequisites tests.research.test_c33_execution_feedback",
+      "tests": 70,
+      "status": "passed"
+    },
+    {
+      "command": "python -m unittest tests.research.test_s129_agent_reporting.AgentReportingTests",
+      "tests": 13,
+      "status": "passed"
+    },
+    {
+      "command": "python -m unittest tests.research.test_tracking_math",
+      "tests": 7,
+      "status": "passed"
+    },
+    {
+      "command": "python -m unittest tests.research.test_cross_task_integration.CrossTaskIntegrationTests.test_bf6_public_generation_discovery_replay_read_select tests.research.test_tracking_math",
+      "tests": 8,
+      "status": "passed",
+      "scope": "Final BF6 public template and Tracking math recheck"
+    }
+  ],
+  "test_runtime": "D:/softrobot-agent/.f3-prestudy-env/Scripts/python.exe; PYTHONPATH includes tests/research for legacy absolute test imports",
+  "limitations": [
+    {
+      "test": "tests.research.test_s129_agent_reporting.ReportingSessionTests.test_three_real_sdk_sessions_keep_tools_budget_and_bounded_input",
+      "error": "KeyError: decision",
+      "baseline_reproduced": true,
+      "scope": "Reproduced on unmodified A a1566b91a in the same installed environment; no Reporter/session fix attempted"
+    },
+    {
+      "scope": "Initial mainline5 Tracking math run",
+      "reason": "cvxpy absent; rerun successfully in existing f3-prestudy environment; no dependency installation"
+    },
+    {
+      "scope": "CLARABEL dual-face fixtures",
+      "reason": "Installed solver emits Solution may be inaccurate warning; existing conditional numerical-diagnostic assertions passed"
+    }
+  ],
+  "physical_check": {
+    "implementation": "af85bf94cc6742442bf50280b4d84a236bf5cd91",
+    "provider_requests": 0,
+    "nmpc_updates": 0,
+    "rl_actions": 0,
+    "native_status": "execution_incomplete",
+    "native_reason": "NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE",
+    "native": {
+      "forward_evaluations": 25,
+      "mechanics_evaluations": 0,
+      "model_builds": 1,
+      "physics_step_attempts": 225,
+      "physics_steps": 225,
+      "rollouts": 1
+    },
+    "independent_replay": {
+      "status": "execution_incomplete",
+      "confirmed_completed_steps": 225,
+      "physics_step_attempts": 226,
+      "forward_evaluations": 24,
+      "failed_call_internal_steps": "unknown",
+      "reason": "MUJOCO_NUMERICAL_FAILURE"
+    },
+    "physics_steps": null,
+    "protocol": "offline_oriented_tracking_v2",
+    "acceptance_status": "incomplete",
+    "selected": false,
+    "selection_eligibility": {
+      "eligible": false,
+      "reasons": [
+        "result did not pass complete original task evaluation"
+      ],
+      "required_field": "selected_execution",
+      "selected_execution": {
+        "artifact_id": "fedb339e03259d667f20956f0b5d10177d2d5858f32d4484dc3b9c755c476c5e",
+        "media_type": "application/json"
+      },
+      "owning_study": "integration-bf6-smoke",
+      "historical_input": false,
+      "completed_confirmations": 0,
+      "progress": {
+        "required_total": 0,
+        "historical_confirmations": 0,
+        "current_study_confirmations": 0,
+        "remaining": 0,
+        "failures": 0,
+        "invalid_executions": 0,
+        "executions": [],
+        "confirmed": false,
+        "correct_operation": {
+          "tool": "research_plan",
+          "action": "select",
+          "selected_execution": {
+            "artifact_id": "fedb339e03259d667f20956f0b5d10177d2d5858f32d4484dc3b9c755c476c5e",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "confirmation_reservation": {
+        "admitted": 0,
+        "selection_without_execution": true
+      }
+    },
+    "registered_receipt_type": "research.physical_replay",
+    "execution_binding_verified": true,
+    "rigid_tool_binding": {
+      "body": "payload",
+      "com_local_m": [
+        0.007,
+        0.001,
+        -0.002
+      ],
+      "inertia_com_local_kg_m2": [
+        [
+          1.1999999962042225e-06,
+          1.999999975322546e-07,
+          2.4446717878240944e-15
+        ],
+        [
+          1.999999975322546e-07,
+          1.600000003078915e-06,
+          1.9999999831351787e-07
+        ],
+        [
+          2.444671847524381e-15,
+          1.9999999831351793e-07,
+          1.8000000007169023e-06
+        ]
+      ],
+      "mass_kg": 0.02,
+      "matched": true,
+      "semantics": "Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation",
+      "tip_position_local_m": [
+        0.014,
+        0.0,
+        0.0
+      ]
+    },
+    "environment_contact": {
+      "checked_physics_steps": 225,
+      "contact_free": false,
+      "first_contact_time_s": 0.22500000000000017,
+      "observed_contacts": 2,
+      "scope": "Partial refutation of contact-free execution, not a complete trajectory"
+    },
+    "resource_use": {
+      "shared_ledger": {
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 40,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 2.1027591999882134
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 37,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "numerical_s": 2.5945912999741267,
+      "numerical_reserved_s": 0.0,
+      "remaining_numerical_s": null,
+      "charged_starts": 0,
+      "shared_start_limit": null,
+      "elapsed_s": 56.28547024726868
+    },
+    "private_store": "runs/integration-bf6-smoke/private-store",
+    "interpretation": "Public method discovery and execution engineering check. No autonomous Provider study or benchmark search.",
+    "confirmed_physics_steps": 450,
+    "physics_step_attempts": 451,
+    "cost_scope": "450 confirmed completed integration steps, 451 attempted calls. Internal steps in the final failed independent call remain unknown; physics_steps is not claimed exact.",
+    "source_summary": "runs/integration-bf6-smoke/summary.json",
+    "source_failure_snapshot": "runs/integration-bf6-smoke/private-store/physical_replay/f18dad3337a441f4aa55b2aaedcb58c1/numerical_failure.json",
+    "closeout": {
+      "research_status": "stopped",
+      "pending": null,
+      "mathematical_evaluations": 1,
+      "physical_replay_launches": 1,
+      "resource_use": {
+        "shared_ledger": {
+          "limit": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 40,
+            "wall_s": null,
+            "worker_calls": 0
+          },
+          "used": {
+            "tool_calls": 4,
+            "model_calls": 0,
+            "backend_solves": 1,
+            "worker_calls": 0,
+            "wall_s": 2.1027591999882134
+          },
+          "remaining": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 36,
+            "wall_s": null,
+            "worker_calls": 0
+          },
+          "occupied": {}
+        },
+        "numerical_s": 2.5945912999741267,
+        "numerical_reserved_s": 0.0,
+        "remaining_numerical_s": null,
+        "charged_starts": 0,
+        "shared_start_limit": null,
+        "elapsed_s": 297.7866520881653
+      }
+    }
+  },
+  "no_historical_witness_or_budget_imported": true,
+  "no_provider_or_formal_study_or_bf7": true
+}
