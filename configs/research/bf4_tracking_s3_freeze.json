@@ -1,0 +1,95 @@
+{
+  "contract": "bf4.s3.structure_first_comparison_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 explicit current-chat user instruction: choose a previously independently feasible task, perform structure search/optimization first and then control solving entirely through existing Study tools, test whether total time-to-first-independent-pass improves. Choose unchanged BF4 timed Tracking task/seed17/original payload/floor/physics/30 points/12 mm. New prespecified nominal A/B study: S0 is exactly the first original family-search candidate independent of score; Sstar is the tool-ranked best mathematical candidate. Structure search via research_plan.search family_mixed_search_v1/task_violation, fixed two segments/six tendons/routing/material/sections/fidelity, only two lengths allowed 0.10..0.16 m, at most8 proposals and10 math evaluation units (up to5 model builds+5 SOCP solves). Each independent control arm uses same fresh constant0.2 N, original Native response, at most201 callbacks/eight iterations/one independent replay/121200 integration attempts. No historical successful controls or mathematical control witness transfer. Include ALL search/construction/failure/control/validation costs in structure-first route; no advantage claim unless fresh comparable outcomes establish it. First independent pass SELECTs within each separately authorized arm; other arm is a separate benchmark comparison. Finite failure STOP with all partial costs, no extra scans. Engineering commits/ordinary push remain authorized.",
+  "task_file": "tasks/bf4_tracking_direction_change_v1.json",
+  "task_file_identity": "4d5488fe0d70c8ecf91dc3dbc9cb06d95d06415a2d0d8ac7e598d583b1b897b2",
+  "canonical_task_identity": "fbc2ec1ad6a11d2ec7a753cabbf269844bef64b6f8cc85a951d102475b7910d4",
+  "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+  "search_study": "configs/research/study_bf4_s3_structure_search.json",
+  "control_studies": {
+    "control_only": "configs/research/study_bf4_s3_control_only.json",
+    "structure_first": "configs/research/study_bf4_s3_structure_first.json"
+  },
+  "search_query": {
+    "version": "family_mixed_search_v1",
+    "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "lengths"
+    ],
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ],
+    "span_strategies": [
+      "distributed_consecutive"
+    ],
+    "section_types": [],
+    "bounds": {
+      "length_m": [
+        0.1,
+        0.16
+      ]
+    },
+    "screening_fidelity": "standard",
+    "objective": "task_violation",
+    "operating_point": "standardized_initial_pretension",
+    "max_proposals": 8,
+    "max_evaluations": 10,
+    "step": 0.25,
+    "minimum_step": 0.125
+  },
+  "control_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0,
+      0.6
+    ],
+    "knots_s": [
+      0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 201,
+    "iterations": 8,
+    "coefficient_limit_n": 8.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "initial_tension_n": 0.2,
+  "baseline_rule": "Exactly the first legally constructed row at index0 of the original admitted family_mixed_search result, independent of proxy value. If index0 invalid, do not substitute a later favorable baseline; report unresolved.",
+  "optimized_rule": "Exactly best_mathematical_candidate returned by original search. If none, no manual structural replacement or fallback objective. If unchanged from S0, disclose no structural improvement.",
+  "structure_search_limits": {
+    "max_proposals": 8,
+    "max_mathematical_evaluation_units": 10,
+    "max_complete_models": 5,
+    "max_conic_solves": 5,
+    "maximum_native_callbacks": 0,
+    "maximum_independent_replays": 0
+  },
+  "each_control_limits": {
+    "max_native_callbacks": 201,
+    "max_response_iterations": 8,
+    "max_independent_replays": 1,
+    "max_physics_step_attempts": 121200
+  },
+  "maximum_total_native_callbacks": 402,
+  "maximum_total_physics_step_attempts": 242400,
+  "execution_order": [
+    "structure_search",
+    "structure_first",
+    "control_only"
+  ],
+  "cost_rule": "Structure-first total = full structure-search preparation/construction/mathematics plus selected-structure generation/control/independent evaluation. Control-only total = S0 generation/control/independent evaluation. Record Store numeric and enclosing driver separately, all actual failed work; do not count mathematical predictions as accepted physics.",
+  "comparison_rule": "Primary nominal comparison is fresh total cost to first independent pass, only ratio if both pass. Also report Native callbacks/steps separately. Any budget-censored failure has unknown actual first-pass cost; unchanged structure is not a positive structure effect. One deterministic pair is not a statistical or general speedup result.",
+  "identity_rule": "Same BF4 TaskDefinition/seed/zero state/original rigid payload/physics/discretization12/force0..8 N/30 post-step samples/12 mm. Search model is local affine/GVS CONIC diagnostic; independent MuJoCo evaluator alone establishes pass. Relative coefficient limit8 is a prespecified identical control setting for both new arms, not a change in physical bounds or reuse of old experiment identity.",
+  "old_costs": "BF4 original feasibility/S2 and BF6 first-witness receipts remain sealed and separate. No old source controls, candidate ranking results, accepted identities or balances imported.",
+  "stop": "Within each separate control Study, first complete independent pass immediately SELECTs. Otherwise STOP at first replay/failure/cap. Search always STOPs after bounded result; no private numerical optimization, additional structural screens or parameter sweeps."
+}
