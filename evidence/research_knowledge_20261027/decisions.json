@@ -1,0 +1,169 @@
+{
+  "results": [
+    {
+      "arm": "off",
+      "case_id": "off",
+      "model": "deepseek-v4-pro",
+      "tool_checks": [
+        {
+          "tool": "evidence_read",
+          "scientific_execution_started": false,
+          "provider_request_number": 1,
+          "schema_valid": true,
+          "contract": "valid",
+          "scope": "frozen_read"
+        },
+        {
+          "tool": "research_plan",
+          "scientific_execution_started": false,
+          "provider_request_number": 2,
+          "schema_valid": true,
+          "contract": "valid",
+          "action": "diagnose",
+          "intent": "DIAGNOSE",
+          "selected_method": "read_only_evidence_diagnosis",
+          "claimed_inference": "read_only_diagnosis",
+          "requested_budget": 0
+        }
+      ],
+      "termination": "completed",
+      "harness_error": null,
+      "accepted_decisions": 1,
+      "first_valid_decision_request": 2,
+      "final_answer_present": true,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "actual_requests": 3,
+      "confirmed_responses": 3,
+      "usage": {
+        "prompt_tokens": 38273,
+        "completion_tokens": 13942,
+        "total_tokens": 52215,
+        "prompt_cache_hit_tokens": 27392,
+        "prompt_cache_miss_tokens": 10881,
+        "reasoning_tokens": 11634
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 3,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 179.17300000000978
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "public_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "read_only_diagnosis",
+            "hypothesis_id": "bf5-vs-bf6-failure-class-diagnosis",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "read_only_evidence_diagnosis",
+            "selected_variables": [
+              "tip_position",
+              "tip_tool_axis",
+              "contact_frame",
+              "qacc",
+              "numerical_s"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "若诊断成立，应观察到：BF6 原生与独立回放均在约 225 步（0.225 s）处出现首次地板/载荷接触并随后数值失败，且接触前状态有限；BF5 独立执行完成（1200 物理步）且数值有效，但验收未达 0.012 m / 0.1745 rad 阈值；本标量投影（仅 bf5/bf6/question/sources 四键）无逐步加速度、接触帧或 BF5 未舍入指标。",
+          "fixed_conditions": "任务 BF6 冻结于任何科学搜索之前；合同固定：重力 [0,0,-9.81] m/s²、20 g 载荷真实质量/质心/全惯量、时长 0.6 s、步长 0.001 s、验收 max_position_error≤0.012 m 且 max_tool_axis_angle_error≤0.1745 rad、地板 z=-0.02 m；科学配额为 0；仅内联公共标量证据与已提交摘要可读。",
+          "hypothesis": "BF5 与 BF6 属于两类不同的失败：BF5 为执行完成、数值有效但未达验收的精度类失败（valid_failure），BF6 为 0.225 s 载荷-地板接触后 MuJoCo 数值失败导致的执行不完整（execution_incomplete）；在零科学配额下，本决策只做只读诊断，任何科学执行必须停在 STOP 边界。",
+          "interpretation": "【失败类别对比】BF5（offline_position_tool_axis_v1）为 valid_failure：独立执行完成、1200 物理步、数值有效，但验收未达标；未报告未舍入指标，numerical_s=5.637207600011607 仅是记录在案的数值标量，不构成跟踪误差量级，不得据此推断 BF5 超差大小。BF6（offline_oriented_tracking_v2）为 execution_incomplete：原生在 225 步（0.225 s）因 NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE 中止（forward_evaluations=25、mechanics_evaluations=0、model_builds=1、physics_steps=225、rollouts=1）；独立回放同处 MUJOCO_NUMERICAL_FAILURE（confirmed_completed_steps=225、attempts=226、forward_evaluations=24），并记录 0.225 s 首次地板/载荷接触先于数值失败。合成确认步数下界 450、尝试调用 451。两者 selected=false，均非可接受候选；BF6 载荷绑定正确（真实 20 g 质量/质心/全惯量、无力替代），排除绑定错误，但也意味着低惯量刚体接触可能病态。【已知】BF6 接触（0.225 s）与数值失败在时间上重合、独立回放可复现；但本投影明确缺失每步加速度与接触帧，无法确定因果方向。BF5 完成但精度不足，具体超差目标与量级缺失。【竞争性假设】BF6 数值失败：H_A 接触诱发求解发散；H_B 离线轨迹下探触地（几何/控制不可行，数值失败为下游症状）；H_C 低惯量刚体+硬接触数值病态（惯量 ~1e-6 kg·m²）；H_D 状态在接触前已发散（需逐步数据区分，当前无法判定）。BF5 仅可定性：位置/轴角/时序任一超差或系统偏置/瞬态超调，不可量化。【下一步判别性读取】1) BF6 第 220–230 步 qpos/qvel/qacc、接触帧（接触对/法向/穿透/约束冲量）与 MuJoCo 警告文本，区分 H_A/H_B/H_C/H_D 并确定接触与发散的时序；2) BF5 未舍入指标与逐窗口 tip 位置/轴时间序列，定位超差目标与偏置/瞬态性质；3) v1 与 v2 离线指令序列及初值对比。注意当前工件仅 bf5/bf6/question/sources 四键，上述字段需到更完整持久化存储/新注册证据中查找。【成功路线与前提（不承诺成功）】路线：生成/选择一条全程接触自由扫描，使 tip 在 0.6 s 内保持 z>地板+裕度、600 步状态有限无约束，独立回放无数值失败，并在接触自由下达到 0.012 m / 0.1745 rad 验收。前提：非零科学预算与有效身份/授权/适用性/正式范围注册；满足原生“有限、无接触、无约束”前置条件；如需，采用不改动冻结合同（重力/质量/惯量/步长/容差）的数值稳定设置；通过独立回放与注册范围证据后再谈 SELECT/CONFIRM/STOP。不得由有限优化或不完整执行推断结构不可行或成功。【STOP 判定】是：科学配额=0，生成/初始化/分析/求解/回放/SELECT/STOP 一律被拦截，无可执行授权科学工作，故任何科学执行必须停在 STOP 边界；当前仅允许只读诊断（本决策 action=diagnose 只读既有证据）。未来工作仅当取得非零预算、正式范围注册与候选授权并满足前置条件后才有依据；历史配方不授权科学、不构成当前通过结果。",
+          "stopping_condition": "当科学配额为 0 时，生成/初始化/分析/求解/回放/SELECT/STOP 均被拦截，无任何可执行的授权科学工作，必须停在只读诊断边界；只有取得非零预算、有效候选身份、适用性与正式范围注册，并满足原生“有限、无接触、无约束”前置条件后，才可进入后续科学工作。",
+          "weakening_observation": "若在更完整证据中发现 BF6 的 qvel/qacc 在 0.225 s 接触之前已发散为非有限，或接触帧显示无接触约束时仍数值失败，则“接触诱发”假说被削弱，根因转向控制发散/求解器病态；若 BF5 未舍入指标显示误差在容差内却判为失败，则其验收分类需修正。"
+        }
+      ]
+    },
+    {
+      "arm": "on",
+      "case_id": "on",
+      "model": "deepseek-v4-pro",
+      "tool_checks": [],
+      "termination": "IncompleteModelOutput: R3_LENGTH_TRUNCATED_NO_NATIVE_SUBMISSION: {\"request_id\":\"r3-request-3c34ad1eff534f3bb7d4af95a86d6876\",\"transport\":\"confirmed_http_200\",\"http_status\":200,\"outcome_unknown\":false,\"response_saved\":true,\"provider_charged\":true,\"finish_reasons\":[\"length\"],\"model_output\":\"confirmed_incomplete\",\"native_too",
+      "harness_error": "IncompleteModelOutput: R3_LENGTH_TRUNCATED_NO_NATIVE_SUBMISSION: {\"request_id\":\"r3-request-3c34ad1eff534f3bb7d4af95a86d6876\",\"transport\":\"confirmed_http_200\",\"http_status\":200,\"outcome_unknown\":false,\"response_saved\":true,\"provider_charged\":true,\"finish_reasons\":[\"length\"],\"model_output\":\"confirmed_incomplete\",\"native_too",
+      "accepted_decisions": 0,
+      "first_valid_decision_request": null,
+      "final_answer_present": false,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "actual_requests": 1,
+      "confirmed_responses": 1,
+      "usage": {
+        "prompt_tokens": 5339,
+        "completion_tokens": 8189,
+        "total_tokens": 13528,
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 4827,
+        "reasoning_tokens": 8121
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 115.07799999999406
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 3,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "public_decisions": []
+    }
+  ],
+  "actual_requests": 4,
+  "usage": {
+    "prompt_tokens": 43612,
+    "completion_tokens": 22131,
+    "total_tokens": 65743,
+    "prompt_cache_hit_tokens": 27904,
+    "prompt_cache_miss_tokens": 15708,
+    "reasoning_tokens": 19755
+  },
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "formal_studies": 0,
+  "money": null,
+  "limitations": "One ordered off/on case, no population or causal benefit claim; prompt/cache/order differ. Scientific admission not exercised; only schema/reference/intent checks and retrieval receipts."
+}

@@ -129,7 +129,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         expected=pilot(host)['provider']
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
             or wire.get('model')!=expected['model'] or wire.get('thinking')!={'type':expected['thinking']}
-            or wire.get('reasoning_effort')!=expected['reasoning_effort'] or wire.get('max_tokens')!=expected['max_tokens']
+            or wire.get('reasoning_effort')!=expected['reasoning_effort']
+            or (('max_tokens' in wire) if expected.get('max_tokens') is None else wire.get('max_tokens')!=expected['max_tokens'])
             or wire.get('stream') is not False or wire.get('tool_choice','auto')!='auto'):
             raise ValueError('R3_PROVIDER_CONFIGURATION_MISMATCH')
         saved=pilot(host).get('unconsumed_response')
@@ -464,7 +465,7 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
         timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=transport,follow_redirects=False))
     model=model_class(model_id=provider['model'],stream=False,
         context_window_limit=provider['context_guard']['context_limit_tokens'],
-        params=dict(max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
+        params=dict(**(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),reasoning_effort=provider['reasoning_effort'],
             extra_body=dict(thinking=dict(type=provider['thinking']))),client=client)
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
@@ -862,7 +863,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
-            if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+provider['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
+            if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']:
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')

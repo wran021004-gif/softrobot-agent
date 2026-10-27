@@ -13,6 +13,16 @@ from tests.research.test_s126_checkpoint import cold_host
 
 
 class ProviderContextTests(unittest.TestCase):
+    def test_no_client_output_cap_keeps_input_capacity_check(self):
+        from schemas.platform import ModelConfig
+        self.assertIsNone(ModelConfig(max_tokens=None).model_dump()['max_tokens'])
+        provider=deepcopy(state(cold_host())['pilot']['provider'])
+        provider['max_tokens']=None
+        estimate=capacity_estimate(b'{}',provider)
+        self.assertIsNone(estimate['reserved_output_tokens'])
+        provider['context_guard']['context_limit_tokens']=provider['context_guard']['framing_headroom_tokens']
+        with self.assertRaisesRegex(ValueError,'CONTEXT_CAPACITY'):capacity_estimate(b'{}',provider)
+
     def test_large_request_keeps_all_bytes_and_original_charge(self):
         h=cold_host();p=deepcopy(state(h)['pilot']);p['provider']['context_guard']['context_limit_tokens']=100000
         update(h,pilot=p);payload=wire(h);payload['messages'][0]['content']='Offline repeated input. '*10000

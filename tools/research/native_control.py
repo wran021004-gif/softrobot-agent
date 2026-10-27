@@ -10,6 +10,15 @@ import numpy as np
 from tools.platform_store import plain
 
 
+def nonlinear_task_reason(family):
+    """Current T1/T2 task boundary shared by admission and its catalog."""
+    if family=='task.tracking':
+        return 'Tracking nonlinear T1/T2 is not applicable; only direct sequence control is adapted.'
+    if family in ('task.position_tool_axis','task.oriented_tracking'):
+        return 'Tool-axis nonlinear T1/T2 is not applicable; only direct native sequence control is adapted.'
+    return None
+
+
 def window_facts(requirements, point):
     """Time facts shared by planning and admission; never construct a request."""
     start=point.get('actual_time_s')
@@ -42,10 +51,8 @@ def window_applicability(requirements, query, assessed, point, reasons):
     expected=({'timed_tracking':'tip_position','tool_axis_direction':'tip_tool_axis'} if requirements.binding.get('task_family')=='task.oriented_tracking' else
         {'tool_position':'tip_position','tool_axis_direction':'tip_tool_axis'} if axis_task else {'timed_tracking':'tip_position'} if tracking else
         {'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'})
-    if tracking and query.operation!='mujoco_direct_control_v1':
-        reasons.append('Tracking nonlinear T1/T2 is not applicable; only direct sequence control is adapted.')
-    if axis_task and query.operation!='mujoco_direct_control_v1':
-        reasons.append('Tool-axis nonlinear T1/T2 is not applicable; only direct native sequence control is adapted.')
+    reason=nonlinear_task_reason(requirements.binding.get('task_family'))
+    if reason and query.operation!='mujoco_direct_control_v1':reasons.append(reason)
     if abs(requirements.sample_period_s-query.protocol.period_s)>1e-12:
         reasons.append('Native control requires matched sample and control grids.')
     if {c.constraint_id for c in requirements.constraints}!=set(expected):

@@ -218,7 +218,8 @@ class ModelConfig(Contract):
     protocol_recovery: ModelProtocolRecovery | None = None
     tool_naming: ModelToolNaming | None = None
     readonly_batch_limit: int | None = Field(default=None, ge=2, le=3)
-    max_tokens: int = Field(default=2000,ge=1)
+    max_tokens: int | None = Field(default=2000,ge=1,
+        description='Explicit output cap; null omits max_tokens and uses the Provider default.')
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
     supports_images: bool = False

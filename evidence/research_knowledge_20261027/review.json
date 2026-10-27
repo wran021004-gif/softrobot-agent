@@ -1,0 +1,77 @@
+{
+  "validation": "One real public held-out A integration case; sequential Knowledge off/on; no repeated cohort",
+  "implementation": "1256b0964",
+  "sources": {
+    "protocol": "protocol.json",
+    "outcomes": "decisions.json"
+  },
+  "confirmed_http_responses": 4,
+  "actual_requests": 4,
+  "worker_calls": 0,
+  "physics_steps": 0,
+  "formal_studies": 0,
+  "reporter_provider_requests": 0,
+  "criteria": {
+    "diagnostic_correctness": {
+      "off": {
+        "supported": [
+          "Correctly distinguishes BF5 valid_failure from BF6 execution_incomplete",
+          "Does not infer BF5 unreported error magnitudes or a unique contact-instability cause"
+        ],
+        "errors": [
+          "expected_observation incorrectly applies BF6 12 mm / 10 degree limits to BF5",
+          "Treats the 1,200-step combined engineering count as an independent execution count; projection ambiguity contributed"
+        ],
+        "limitations": [
+          "BF5 full TaskDefinition was absent from this small combined case; unsupported BF5 thresholds should have remained unknown"
+        ]
+      },
+      "on": "Unassessed: first response finish_reason=length; no complete tool submission or decision"
+    },
+    "route_analysis": {
+      "off": "Generic no-contact full-horizon route; tip height is not a sufficient rigid-payload clearance condition. Conditional future work is described, but no task-appropriate Native optimization analysis was demonstrated.",
+      "on": "Unassessed"
+    },
+    "stop_judgment": {
+      "off": "Zero-science boundary acknowledged; typed DIAGNOSE requested zero new budget. No actual STOP/SELECT was dispatched.",
+      "on": "Unassessed; transport boundary stopped truncated output before any tool dispatch"
+    },
+    "tool_legality": {
+      "off": "One evidence_read and one Plan pass the isolated schema/reference/intent checks; full formal scientific admission was not exercised.",
+      "on": "No executed tool calls; truncated partial output was not treated as an illegal submitted call"
+    },
+    "retrieval": {
+      "off": 0,
+      "on": 0,
+      "interpretation": "The enabled arm had the production hint and original search/read tool, but did not exercise them before truncation. The real comparison does not establish the effect of reading Knowledge. Retrieval and Reporter boundaries were exercised by offline fixtures only."
+    }
+  },
+  "token_cost": {
+    "prompt_tokens": 43612,
+    "completion_tokens": 22131,
+    "total_tokens": 65743,
+    "prompt_cache_hit_tokens": 27904,
+    "prompt_cache_miss_tokens": 15708,
+    "reasoning_tokens": 19755
+  },
+  "money": null,
+  "cost_interpretation": "Provider-reported reasoning_tokens are included in completion_tokens. Raw SDK/HTTP material stays in ignored runs/kdiag. Currency unavailable. Lower enabled-arm totals reflect premature truncation, not demonstrated cost efficiency.",
+  "limitations": [
+    "One ordered case; cache, response length and number of requests differ; no statistical or causal effectiveness claim.",
+    "The BF5 scalar physics_steps field is combined Native+replay cost but the outbound projection did not label its components. Neither arm had the full BF5 TaskDefinition or unrounded errors.",
+    "Both arms share the same public input; no B successful structure/control/trajectory or private research Store was provided.",
+    "Protocol maximum eight requests; four actually sent and confirmed. No automatic or paid retry after truncation."
+  ],
+  "engineering_closeout": "Both result artifacts were saved before an optional final console print failed on Windows GBK for a superscript character. Console logging now prints ASCII counters only; no Provider request was repeated.",
+  "checks": {
+    "new_diagnostic_tests": 7,
+    "new_diagnostic_status": "passed (six initial fixtures plus one T1/T2 catalog fixture; closeout hint targeted recheck passed)",
+    "reporter_tests": 13,
+    "reporter_status": "passed",
+    "existing_c1_assertion": {
+      "test": "tests.research.test_c1_method_context.MethodContextTests.test_method_planning_and_execution_applicability_remain_distinct",
+      "reason": "Existing expectation that a nonzero external force makes direct Native unsupported; current projection returns requires_parameters.",
+      "baseline_reproduction": "Same assertion failed after loading c190f64ae task_constraints.py and native_control.py in memory in the same installed environment; baseline files and sealed evidence unchanged. No fix to this unrelated old expectation."
+    }
+  }
+}

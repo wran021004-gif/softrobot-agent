@@ -24,9 +24,11 @@ def capacity_estimate(content,provider):
     This is an offline estimate, not a Provider-reported prompt-token count.
     """
     context=provider['context_guard']
-    reserved=provider['max_tokens']+context['framing_headroom_tokens']
+    # With no client output cap this checks input headroom only; the Provider
+    # owns the output default and final combined-context admission.
+    reserved=(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']
     estimate=dict(method='serialized_utf8_byte_upper_estimate',input_estimate=len(content),
-        serialized_bytes=len(content),reserved_output_tokens=provider['max_tokens'],
+        serialized_bytes=len(content),reserved_output_tokens=provider.get('max_tokens'),
         framing_headroom_tokens=context['framing_headroom_tokens'],
         context_limit_tokens=context['context_limit_tokens'])
     if len(content)+reserved>context['context_limit_tokens']:

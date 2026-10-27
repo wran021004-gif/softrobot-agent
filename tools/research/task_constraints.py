@@ -172,6 +172,16 @@ def mathematical_method_view(host, reference):
             request_template=dict(candidate=reference,operation=operation,model_source='mujoco',
                 operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+method))
+        from tools.research.native_control import nonlinear_task_reason
+        reason=nonlinear_task_reason(cfg['task']['family'])
+        item['supported_task_families']=['task.reach']
+        if reason:
+            item.update(kernel_supported=False,full_task_supported=False,coverage=[],
+                execution_status='blocked',planning_status='unsupported',applicable=False,executable=False,
+                missing=[*item['missing'],reason],applicability=dict(status='not_applicable',reasons=[reason]))
+            item.pop('action_prerequisites',None)
+            methods[method]=item
+            continue
         if method==T2:
             item['missing']=[m for m in item['missing'] if not m.startswith('control_optimization')]
             item['missing'].append('three comparable completed T1 results')

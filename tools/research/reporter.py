@@ -423,7 +423,8 @@ def _wire(host, reference, saved):
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
         for card in report.results if 'task_capability' in card.deterministic_summary]
     return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
-        reasoning_effort=provider['reasoning_effort'],max_tokens=provider['max_tokens'],stream=False,
+        reasoning_effort=provider['reasoning_effort'],stream=False,
+        **(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Return JSON with only interpretations, a list '
             'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+

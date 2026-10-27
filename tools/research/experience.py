@@ -1,6 +1,6 @@
 """Curated procedural guidance; immutable read receipts never grant science credit."""
 from pathlib import Path
-from tools.research.state import save,update,state
+from tools.research.state import save,update,state,protected
 from tools.state_io import read
 ROOT=Path(__file__).resolve().parents[2]
 import hashlib
@@ -19,7 +19,7 @@ def entries(host):
 
 def retrieval_hint(host):
     s=state(host)
-    if s['spec'].get('rl_evaluation_source') or s.get('research_status')=='stopped':return None
+    if s['spec'].get('rl_evaluation_source') or s.get('research_status')=='stopped' or protected(host):return None
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')

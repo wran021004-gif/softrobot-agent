@@ -1,0 +1,82 @@
+{
+  "protocol": {
+    "models": [
+      "deepseek-v4-pro"
+    ],
+    "requests_per_case_model": 4,
+    "max_tokens": null,
+    "thinking": "enabled",
+    "reasoning_effort": "high",
+    "authorization": "User 2026-10-27 explicitly requests removing the output Token cap and redoing both Knowledge arms. New independent Provider-only cohort: at most eight requests, same public inputs, zero science; previous four requests and costs retained.",
+    "scientific_workers": 0,
+    "physics_steps": 0,
+    "reporter_requests": 0,
+    "version": "diagnostic_knowledge_v2_no_client_output_cap",
+    "prior_actual_requests": 4,
+    "cumulative_request_ceiling": 12,
+    "output_policy": "Do not send max_tokens. Provider default and combined context constraints apply; application imposes no explicit output Token cap.",
+    "provider_default_source": "https://api-docs.deepseek.com/api/create-chat-completion/"
+  },
+  "instructions": "You are the public Softrobot research decision Agent in an independent read-only comparison. Use the frozen task and visible evidence to choose the next decision, explain what it establishes and what remains unknown. Submit one typed diagnose/stop research_plan decision, then finish with a short assessment. The exact public scalar evidence is already inline with its reference. Optional evidence_read is for a named missing fact, not a prerequisite to deciding from the supplied value. Every scientific proposal is intercepted: no generation, initialization, analysis, solve, replay, SELECT or STOP is executed. Schema/reference/intent checks are distinct from full scientific admission, which is not tested. The isolated ledger has zero science allowance. Tool arguments are the Plan object itself, without an outer plan property. At most 4 Provider requests are available for this case, including correction and tool follow-up. Cite visible evidence and state budget units. Do not infer structural infeasibility or task success from finite optimization or incomplete execution. Answer in Chinese; keep scope and unknowns explicit. If an optional experience hint/tool is present, decide whether to retrieve relevant guidance by search/read; do not assume it is evidence of this case. Historical recipes do not authorize science or provide a current passing result. Use action stop if no authorized work remains, or diagnose to record read-only analysis; either must explain the stop boundary. Submit diagnostic analysis, competing hypotheses, discriminating observations and future route in the typed Plan interpretation; do not require another prose turn. No new Study, Native search, physical replay or training may run. All science allowances are zero.",
+  "evidence": {
+    "bf5": {
+      "acceptance_status": "valid_failure",
+      "selected": false,
+      "protocol": "offline_position_tool_axis_v1",
+      "physics_steps": 1200,
+      "independent_execution_complete": true,
+      "unrounded_metrics": "Not present in public engineering summary",
+      "numerical_s": 5.637207600011607
+    },
+    "bf6": {
+      "native_status": "execution_incomplete",
+      "native_reason": "NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE",
+      "native": {
+        "forward_evaluations": 25,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "physics_step_attempts": 225,
+        "physics_steps": 225,
+        "rollouts": 1
+      },
+      "independent_replay": {
+        "status": "execution_incomplete",
+        "confirmed_completed_steps": 225,
+        "physics_step_attempts": 226,
+        "forward_evaluations": 24,
+        "failed_call_internal_steps": "unknown",
+        "reason": "MUJOCO_NUMERICAL_FAILURE"
+      },
+      "protocol": "offline_oriented_tracking_v2",
+      "acceptance_status": "incomplete",
+      "selected": false,
+      "confirmed_completed_steps_lower_bound": 450,
+      "attempted_physics_step_calls": 451,
+      "contact_observation": "First floor/payload contact recorded at 0.225 s; independent replay also records contact before numerical failure.",
+      "load_binding": "Compiled actual 20 g rigid mass/COM/full inertia matched; no force surrogate.",
+      "missing": "No saved per-physics-step acceleration or contact frame in this scalar projection; contact/instability cause unknown."
+    },
+    "sources": [
+      {
+        "path": "evidence/bf4_bf6_public_integration_20261027/summary.json",
+        "sha256": "5e14ddf37f2dbed9183263059d7519c4c1fe0cede39a8d594c358589f9fb2f3d"
+      },
+      {
+        "path": "evidence/integration_research_next/bf5_engineering.json",
+        "sha256": "04b62c87511f9b4f8dc55f1c91bc5ccd62a26754cdc525ac1a96f22e47e0d92a"
+      }
+    ],
+    "question": "Compare the failure classes; diagnose what is known, competing causes and the next discriminating saved-evidence reads. Describe a task-appropriate successful route and its prerequisites without promising success. Explain whether STOP is required with zero science authorization and what would justify future work. Do not infer unreported BF5 error magnitudes."
+  },
+  "task_sources": [
+    "tasks/bf6_sensor_oriented_tracking_v1.json"
+  ],
+  "knowledge_sources": "Only the six public procedure files in memory/diagnostics/research-*_v1.json via original search/read; no private Store or successful control/design. B successful outcomes are not the held-out A integration executions.",
+  "exclusions": [
+    "credentials",
+    "private Stores",
+    "raw Provider reasoning",
+    "successful structure coordinates",
+    "control arrays"
+  ]
+}

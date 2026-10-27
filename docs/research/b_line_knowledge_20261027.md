@@ -43,7 +43,7 @@ R3–R7 固定同一 P1、原任务、零物理初态、20 g 真实刚性负载�
 
 | 阶段 | Native / 独立回放 | 确认步 / 调用尝试 | Store 数值 s | driver s | 停止原因 |
 | --- | --- | --- | ---: | ---: | --- |
-| BF4 S0 | 1 / 1 | 1,200 / 1,200 | 2.651406 | 原报告单列 | 预检结束 |
+| BF4 S0 | 1 / 1 | 1,200 / 1,200 | 2.651406 | 6.6551613 | 预检结束 |
 | BF4 S1 | 228 / 3 | 138,600 | 20.423402 | 29.620165 | 有限迭代失败 |
 | BF4 S1b | 101 / 1 | 61,200 | 8.206989 | 12.836997 | 独立通过 SELECT；代理硬界先达，内部裕量仍耗真实费用 |
 | BF4 S2 | 606 / 6 | 367,200 | 51.497991 | 87.084570 | 六组有限失败，结构效应未决 |
@@ -95,7 +95,7 @@ Agent 的 `experience_disposition` 仍只接受实际 read 收据或准确 `entr
 
 GVS/affine/CONIC 支持声明的模型内位置/速度范数、分量及定时样本约束；几何路径 progress 是另有边界的代理。BF5/BF6 的方向及整个负载/接触验收并未被支持，不能降级成只位置问题。CONIC 的数值 primal/dual/gap 不建立严格最优，更不建立物理验收。目录说明现已明确这些边界。
 
-`design_sensitivity` 为固定物理输入的静态响应；`fixed_input_structure_v1` 为固定控制 Native 响应。CONIC controlled sensitivity 对成对模型重优化控制，Native T1/T2 另有保存控制重优化及 fixed-U 对照；其受支持任务范围、对齐要求和未决梯度条件仍由原目录决定，不能据名字声称 BF5/BF6 完整适用。模型与物理对照须对齐候选、实际输入、初态、通道、输出、时间格与时域，不同控制下的差别不能单独归因为模型误差。
+`design_sensitivity` 为固定物理输入的静态响应；`fixed_input_structure_v1` 为固定控制 Native 响应。CONIC controlled sensitivity 对成对模型重优化控制，Native T1/T2 另有保存控制重优化及 fixed-U 对照。本次发现目录误继承 direct-control 的支持列表，现复用原 Native 适用性理由，明确 T1/T2 仅 Reach/Hold；BF4/BF5/BF6 在目录即为 unsupported，不能据名字声称完整适用。对齐要求和未决梯度条件不变。模型与物理对照须对齐候选、实际输入、初态、通道、输出、时间格与时域，不同控制下的差别不能单独归因为模型误差。
 
 PPO 兼容性与最小适配见 `ppo_cross_task_audit_20261027.md`。本次仅增加诚实能力投影与既有不支持语义的提前拒绝；不实现新环境或训练。
 
@@ -103,6 +103,44 @@ PPO 兼容性与最小适配见 `ppo_cross_task_audit_20261027.md`。本次仅�
 
 ## 定向验证
 
-`test_research_knowledge` 6 项通过：正式索引隔离、search/read/处置与科学注册边界、L0 不预载、Reporter 实际读取与来源隔离、BF4/BF5/BF6 在模型/XML 前拒绝 PPO、真实 Harness/mock HTTP 读取及 Plan 拦截。fixture 不构成科学结果。
+`test_research_knowledge` 7 项通过：正式索引隔离、search/read/处置与科学注册边界、L0 不预载、Reporter 实际读取与来源隔离、BF4/BF5/BF6 在模型/XML 前拒绝 PPO、真实 Harness/mock HTTP 读取及 Plan 拦截，以及 Native T1/T2 的跨任务目录拒绝。Reporter 原 13 项定向检查通过。fixture 不构成科学结果。
 
 真实 Provider 对照的固定输入与范围见 `evidence/research_knowledge_20261027/protocol.json`，结果和实际 Token 成本另记 `decisions.json` 与本报告后续记录。仅使用 A 集成的公开失败投影和原任务，不提供 B 成功轨迹/控制/结构。所有提议拦截，无新正式 Study、科学 worker、Native、物理回放或训练。
+
+
+## 真实小型对照结果与局限
+
+在实现提交 `1256b0964` 后，复用原 production Harness、LiveBoundary、Plan/EvidenceQuery 与独立零科学账本完成一次 held-out A 集成失败对照。模型 `deepseek-v4-pro`、thinking enabled/high、输出上限 8,192；顺序 off 后 on，最多 8 次、实际 4 次请求，全部 HTTP 200 已确认。原请求/响应与 reasoning 留在 ignored `runs/kdiag`；公开 `decisions.json` 保留 Plan 原文、工具检查和账本计数，`review.json` 区分观察与评价。
+
+| arm | 实际请求/确认 | Prompt | Completion | Total Token | 实际观察 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| off | 3 / 3 | 38,273 | 13,942 | 52,215 | 1 次 evidence_read，1 个合法只读 DIAGNOSE，第 2 请求产生 Plan，第 3 请求完成后续 |
+| on | 1 / 1 | 5,339 | 8,189 | 13,528 | 首次响应 length 截断，原边界拒绝未完成输出；没有经验读取、Plan 或最终答复 |
+| 合计 | 4 / 4 | 43,612 | 22,131 | 65,743 | 科学 worker/物理步/Reporter Provider/正式 Study 均 0 |
+
+Prompt cache hit/miss 为 27,904/15,708；reasoning 为 19,755 Token，已包含在 Completion 中，不重复相加。货币账单未知，不写成零。on 的较低费用源于提前截断，不是已证明更省 Token。未重发或追加“凑成功”的对照。
+
+off 正确区分有效完整失败与执行不完整，承认缺少 BF5 误差量级及 BF6 接触/失稳因果；零科学授权边界也正确。但其 expected_observation 把 BF6 的 12 mm/10° 用于 BF5，成功路线用 tip 高度表达整个负载的间隙也不足。它把 1,200 合计步解释为独立执行步数；输入投影没有拆分这项计数，对此有歧义。该小输入还没有完整 BF5 TaskDefinition，故不应编造其阈值。工具合法仅指隔离探针的 schema/reference/intent 通过，不是正式 scientific admission 或实际 STOP。
+
+on 有简短提示及原检索工具，但在第一次完整工具调用前截断，诊断、路线、STOP 判断和实际 Knowledge 阅读均未建立。**本次真实对照不能证明 Knowledge 改善决策**；已有的是按需入口、阅读/权限/Reporter 隔离的离线验证，以及一次需要保留费用的真实失败观察。不得用 mock 成功冒充实际效用。
+
+保存结果后的可选控制台全文打印因 Windows GBK 无法编码上标字符而退出；两个结果文件此前已经落盘。已将控制台日志改成 ASCII 计数，没有重发 Provider。
+
+额外旧 C1 applicability 测试有一处历史断言失败：它预期带外力的 direct Native 为 unsupported，当前为 requires_parameters。用 `c190f64ae` 的 task_constraints/native_control 两个相关原模块在同一环境加载后复现相同断言，未修改旧测试或 sealed evidence。此次 T1/T2 三任务目录拒绝由新的只读 fixture 独立验证。
+
+收尾还令 protected closeout 的 L0 不再展示已被移除的经验检索提示，避免提示与实际工具可用性不一致；该定向边界复查通过。B worktree 的 tracked status 仍干净，HEAD 仍为原来源提交。
+
+下一轮状态：Native 公共任务接口与 Knowledge 检索接入已准备，公开模板仍零额度/待授权；Knowledge 的真实决策增益未证，不能据此宣称 Agent 已学会成功路线。PPO 三类任务仍需本报告列出的明确适配。没有启动或批准下一轮正式 Study。
+
+
+## 用户授权取消显式输出上限并重做对照
+
+用户随后明确要求“输出不限制 token 上限”及“重新做对比”。据此另行冻结 v2 cohort（`protocol_v2.json`，本地独立 `runs/kdiag2`）：相同公开 case、模型、thinking/high、提示和任务；关闭/开放 Knowledge 各至多 4 次，共最多 8 次新请求。首轮 4 次仍计入历史，累计请求上限 12，不恢复或重写截断请求。
+
+`ModelConfig.max_tokens=null` 现在表示不发送这个字段，原整数配置/默认值保留原含义；production Harness、Reporter 和真实 transport 校验都识别这种显式选择。原 SDK/mock HTTP 检查确认出站 JSON 无 `max_tokens`，没有 SDK 默认补回。上下文 guard 继续检查输入与 framing 空间，输出 reservation 标为 null，不能声称预留了一个有限的最坏输出额度。请求/科学额度、timeout 和不完整响应处理不因此解除。
+
+[DeepSeek 官方 Chat Completions 文档](https://api-docs.deepseek.com/api/create-chat-completion/)（本次 2026-10-27 核对）说明：省略时 thinking/high 使用服务端 64K 默认，API 接受的最大输出为 393,216 Token；应用不设显式上限并不代表服务端无限输出。没有把旧 8,192 改成另一固定客户端上限来冒充取消。
+
+`test_provider_context` 5 项在已有 `.f3-prestudy-env` 通过；真实 Harness 省略字段及 Reporter wire 的定向 mock 检查通过。`.mainline5-env` 缺少旧 context fixtures 所需的 matlab.engine/tokenizers，首次整组检查因此没有进入目标断言；使用已安装的 f3 环境完成，没有安装依赖。该环境问题与 actual Provider 失败分别记录。
+
+v2 实际请求、Token 与诊断观察将在 `decisions_v2.json` 和后续结果段落记录；这段执行前声明不预判效果。

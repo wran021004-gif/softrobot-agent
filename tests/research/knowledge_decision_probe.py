@@ -17,6 +17,7 @@ from tools.state_io import read, atomic_json
 from tools.platform_store import Store
 
 OUT=ROOT/'runs/kdiag'
+UNCAPPED_OUT=ROOT/'runs/kdiag2'
 PUBLIC=ROOT/'evidence/research_knowledge_20261027'
 
 
@@ -57,27 +58,44 @@ def freeze():
     return frozen
 
 
-async def main(live=False):
-    frozen=freeze()
+def freeze_uncapped():
+    if (UNCAPPED_OUT/'frozen.json').exists():return read(UNCAPPED_OUT/'frozen.json')
+    frozen=deepcopy(freeze())
+    frozen['protocol'].update(version='diagnostic_knowledge_v2_no_client_output_cap',max_tokens=None,
+        authorization='User 2026-10-27 explicitly requests removing the output Token cap and redoing both Knowledge arms. New independent Provider-only cohort: at most eight requests, same public inputs, zero science; previous four requests and costs retained.',
+        prior_actual_requests=4,cumulative_request_ceiling=12,
+        output_policy='Do not send max_tokens. Provider default and combined context constraints apply; application imposes no explicit output Token cap.',
+        provider_default_source='https://api-docs.deepseek.com/api/create-chat-completion/')
+    UNCAPPED_OUT.mkdir(parents=True,exist_ok=True)
+    atomic_json(UNCAPPED_OUT/'frozen.json',frozen)
+    public=deepcopy(read(PUBLIC/'protocol.json'));public['protocol']=frozen['protocol']
+    atomic_json(PUBLIC/'protocol_v2.json',public)
+    return frozen
+
+
+async def main(live=False,uncapped=False):
+    frozen=freeze_uncapped() if uncapped else freeze()
+    folder=UNCAPPED_OUT if uncapped else OUT
     if not live:print(json.dumps(dict(status='frozen',maximum_provider_requests=8,scientific_workers=0)));return
     load_credential(Path(frozen['credentials_reference']).expanduser())
     results=[]
     for arm in ('off','on'):
-        result=await run_case(OUT,frozen,arm,'deepseek-v4-pro',experience_enabled=arm=='on')
-        store=Store(OUT/(arm+'-deepseek-v4-pro'))
-        run_id='probe-'+OUT.name+'-'+arm+'-deepseek-v4-pro'
+        result=await run_case(folder,frozen,arm,'deepseek-v4-pro',experience_enabled=arm=='on')
+        store=Store(folder/(arm+'-deepseek-v4-pro'))
+        run_id='probe-'+folder.name+'-'+arm+'-deepseek-v4-pro'
         plans=[store.artifact(e['outputs'][0]) for e in store.events(run_id) if e['kind']=='probe_tool_check']
         result['public_decisions']=[r['input'] for r in plans if r['tool']=='research_plan']
         results.append(dict(arm=arm,**result))
-        atomic_json(OUT/'summary.json',dict(results=results))
+        atomic_json(folder/'summary.json',dict(results=results))
     output=dict(results=results,actual_requests=sum(r['actual_requests'] for r in results),
         usage={k:sum(r['usage'][k] for r in results) if all(r['usage'][k] is not None for r in results) else None for k in results[0]['usage']},
         scientific_workers=0,physics_steps=0,formal_studies=0,money=None,
         limitations='One ordered off/on case, no population or causal benefit claim; prompt/cache/order differ. Scientific admission not exercised; only schema/reference/intent checks and retrieval receipts.')
-    atomic_json(PUBLIC/'decisions.json',output)
-    print(json.dumps(output,ensure_ascii=False))
+    atomic_json(PUBLIC/('decisions_v2.json' if uncapped else 'decisions.json'),output)
+    print(json.dumps(dict(actual_requests=output['actual_requests'],usage=output['usage'],scientific_workers=0)))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--live',action='store_true')
-    asyncio.run(main(parser.parse_args().live))
+    parser.add_argument('--uncapped',action='store_true',help='New authorized cohort; omit explicit output cap, retain old results')
+    args=parser.parse_args();asyncio.run(main(args.live,args.uncapped))

@@ -1,5 +1,6 @@
 """Diagnostic retrieval boundaries; synthetic sessions, no science or Provider."""
 import json
+from copy import deepcopy
 from pathlib import Path
 import shutil
 import gc
@@ -27,7 +28,7 @@ class KnowledgeTests(unittest.TestCase):
             budget=dict(model_calls=0,tool_calls=0,worker_calls=0,backend_solves=0,wall_s=None))
         self.h.store.create(project)
         self.h.store.create_session(dict(input=dict(run_id=self.h.run_id,policy=dict(budget=plain(project.budget))),purpose='Offline fixture; no Study'))
-        update(self.h,spec=dict(capabilities=['analysis'],canonical_task=dict(family='task.oriented_tracking')),retrievals=[],research_status='ready')
+        update(self.h,spec=dict(mode='engineering_numerical',capabilities=['analysis'],canonical_task=dict(family='task.oriented_tracking')),retrievals=[],research_status='ready')
 
     def test_search_read_and_disposition_preserve_evidence_boundary(self):
         ledger=self.h.store.remaining()
@@ -54,6 +55,8 @@ class KnowledgeTests(unittest.TestCase):
         self.assertEqual(state(self.h),before)
         update(self.h,spec={**before['spec'],'rl_evaluation_source':{'fixture':True}})
         self.assertIsNone(retrieval_hint(self.h))
+        update(self.h,spec={**before['spec'],'mode':'autonomous','budgets':dict(protected_provider_requests=0)})
+        self.assertIsNone(retrieval_hint(self.h))
 
     def test_reporter_records_reads_without_scientific_registration(self):
         from tools.research import reporter
@@ -70,12 +73,13 @@ class KnowledgeTests(unittest.TestCase):
     def test_reporter_wire_keeps_guidance_outside_scientific_sources(self):
         from tools.research import reporter
         receipt=retrieve(self.h,dict(operation='read',entry_id='research-contact-causality',revision='1'),reader='reporter')
-        update(self.h,pilot=dict(provider=dict(model='fixture',thinking='disabled',reasoning_effort='high',max_tokens=100)))
+        update(self.h,pilot=dict(provider=dict(model='fixture',thinking='disabled',reasoning_effort='high',max_tokens=None)))
         saved=dict(report={'fixture':'No scientific result'},request=dict(experience_receipts=[receipt['reference']]))
         # Only the wire's advisory boundary is exercised; no report is registered.
         with patch.object(reporter.ScientificReport,'model_validate',return_value=SimpleNamespace(results=[],relations=[])):
             wire=reporter._wire(self.h,receipt['reference'],saved)
         packet=json.loads(wire['messages'][-1]['content'])
+        self.assertNotIn('max_tokens',wire)
         self.assertEqual(packet['source_catalog'],{})
         self.assertEqual(len(packet['procedural_guidance']),1)
         self.assertFalse(packet['procedural_guidance'][0]['scientific_evidence'])
@@ -86,10 +90,11 @@ class KnowledgeTests(unittest.TestCase):
         from tests.research.flash_pro_decision_probe import run_case
         from tests.research.test_cross_task_integration import plan
         spec=resolve(ROOT/'configs/research/study_bf6_public.json')
-        frozen=dict(protocol=dict(requests_per_case_model=4,max_tokens=8192,thinking='enabled',reasoning_effort='high',authorization='Synthetic mock-HTTP fixture'),
+        frozen=dict(protocol=dict(requests_per_case_model=4,max_tokens=None,thinking='enabled',reasoning_effort='high',authorization='Synthetic mock-HTTP fixture; client output cap omitted'),
             provider=spec['runtime']['provider'],instructions='Fixture only',cases=dict(on=dict(evidence={'fixture':True})))
         seen=[]
         def reply(request):
+            self.assertNotIn('max_tokens',json.loads(request.content))
             seen.append(request)
             n=len(seen)
             calls=[('experience_retrieve',dict(operation='search',task='oriented_tracking')),
@@ -122,6 +127,29 @@ class KnowledgeTests(unittest.TestCase):
                     rl.prepare_input(self.h,SimpleNamespace(candidate={}))
         geometric=json.loads((ROOT/'tasks/tracking_linear_development.json').read_text(encoding='utf8'))
         self.assertTrue(task_adapter(geometric).ppo_applicability()['supported'])
+
+    def test_native_t1_t2_catalog_does_not_inherit_direct_control_task_support(self):
+        from tests.research.test_c1_method_context import C1Archive
+        from tools.research.task_constraints import mathematical_method_view
+        from tools.research.nonlinear_capability import T1,T2
+        archive=C1Archive();self.addCleanup(archive.archive.close)
+        host,s=archive.host();ref=s['reference_candidate']
+        candidate=deepcopy(archive.artifact(ref))
+        # Synthetic task substitution isolates catalog projection, not admission.
+        host.store.artifact.side_effect=lambda r:candidate if plain(r)==ref else archive.artifact(r)
+        s['analysis_results']=[]
+        s['spec']['mathematical_methods']={T1:{'fixture':True},T2:{'fixture':True}}
+        for leaf in ('study_tracking_public.json','study_bf5_public.json','study_bf6_public.json'):
+            spec=resolve(ROOT/'configs/research'/leaf)
+            candidate['configuration']=spec['configuration']
+            s['spec']['analysis_protocol']=spec['analysis_protocol']
+            with patch('tools.research.design.verify_candidate',return_value=candidate),patch('tools.research.optimal_capability.candidate_methods',return_value={}),patch('tools.research.research_context.history_index',return_value=[]):
+                methods=mathematical_method_view(host,ref)['methods']
+            for method in (T1,T2):
+                self.assertEqual(methods[method]['planning_status'],'unsupported')
+                self.assertFalse(methods[method]['kernel_supported'])
+                self.assertFalse(methods[method]['executable'])
+                self.assertEqual(methods[method]['supported_task_families'],['task.reach'])
 
 
 if __name__=='__main__':unittest.main()
