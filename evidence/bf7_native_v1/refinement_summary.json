@@ -1,0 +1,3433 @@
+{
+  "structures": [
+    {
+      "id": "B",
+      "candidate": {
+        "artifact_id": "041128186ed8e1265407766a92046df71f211cdbd03bf50c8821287f7610a498",
+        "media_type": "application/json"
+      },
+      "conditions": {
+        "positive_high": {
+          "candidate": {
+            "artifact_id": "041128186ed8e1265407766a92046df71f211cdbd03bf50c8821287f7610a498",
+            "media_type": "application/json"
+          },
+          "analysis": {
+            "artifact_id": "5027bf6f0c49d30fc97c634add0099b26428a88e23887224d6460538cf2687df",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "accepted": true,
+          "charged_numerical_s": 12.176445400007651,
+          "charged_analysis_evaluations": 1,
+          "t1": {
+            "J": -0.020928191015021858,
+            "best_control": {
+              "coefficients_n": [
+                -0.5866604622094155,
+                1.0451800501113175,
+                0.9303077868364581,
+                0.3366942386796724,
+                0.3975901324356077,
+                3.242059557948276e-17,
+                0.34021443749993935,
+                1.471602002788907,
+                1.7476799512098176,
+                -0.6999999999999998,
+                -0.3184753320044705,
+                -0.7000000000000002,
+                1.4976518601563011,
+                2.0403481064259434,
+                1.3146504375486312,
+                0.8749140713372279,
+                0.9269791333988667,
+                0.004111512868242498,
+                1.3735531925538311,
+                1.9192823233657068,
+                1.3155618269158296,
+                0.4727803561927808,
+                0.9329749179356179,
+                -3.8576357121198684e-16
+              ],
+              "label": "finite_difference",
+              "rollout": "native-rollout-197",
+              "schedule_pointer": "/native_dynamics/optimized_schedule",
+              "source": {
+                "candidate": {
+                  "artifact_id": "041128186ed8e1265407766a92046df71f211cdbd03bf50c8821287f7610a498",
+                  "media_type": "application/json"
+                },
+                "inherited_acceptance": false,
+                "method": "mujoco_nonlinear_task_capability_v1",
+                "settings": {
+                  "coefficient_limit_n": 8.0,
+                  "correction_window_s": [
+                    0.0,
+                    0.6
+                  ],
+                  "difference_step_n": 0.02,
+                  "evaluation_requests": 201,
+                  "initial_radius_n": 0.2,
+                  "iterations": 8,
+                  "knots_s": [
+                    0.0,
+                    0.2,
+                    0.4,
+                    0.58
+                  ],
+                  "method": "response",
+                  "minimum_radius_n": 0.0001,
+                  "safety_margin_fraction": 0.02,
+                  "version": "local_control_search_v2"
+                },
+                "source": {
+                  "artifact_id": "afaf41e054b13a766ac14ad710d5f6937cfc132f87d6ffac186cf5d8ed8c9c19",
+                  "media_type": "application/json"
+                },
+                "state_provenance": {
+                  "inherited_acceptance": false,
+                  "initialization": "frozen_task_initializer_and_candidate_pretension"
+                }
+              }
+            },
+            "best_found_J": -0.020928191015021858,
+            "best_metrics": {
+              "holding_max_position_error_m": 0.009767010733730706,
+              "holding_max_speed_m_s": 0.029372154269549342,
+              "normalized_gap": 0.0,
+              "returned_array_gap_interval": [
+                0.0,
+                0.0
+              ],
+              "signed_maximum_excess": -0.020928191015021858,
+              "sum_normalized_excess": 0.0,
+              "terminal_position_error_m": 0.009767010733730706,
+              "worst_constraint": {
+                "constraint_id": "holding_max_speed_m_s",
+                "kind": "holding_speed",
+                "limit": 0.03,
+                "normalized_signed_excess": -0.020928191015021858,
+                "time_s": 0.6000000000000004,
+                "unit": "m/s",
+                "value": 0.029372154269549342
+              }
+            },
+            "callbacks": 198,
+            "coefficient_boundary": false,
+            "cost": {
+              "completed_response_steps": 7,
+              "forward_evaluations": 12079,
+              "kernel_wall_s": 10.931180200001108,
+              "mechanics_evaluations": 0,
+              "model_builds": 1,
+              "optimization_evaluations": 198,
+              "optimization_iterations": 8,
+              "physics_step_attempts": 118800,
+              "physics_steps": 118800,
+              "rollouts": 198
+            },
+            "detail_pointer": "/native_dynamics",
+            "evidence_level": "finite_budget_observation",
+            "improvement": 6.028710667318823,
+            "independent_task_acceptance": "unmeasured",
+            "initial_J": 6.007782476303801,
+            "initial_metrics": {
+              "holding_max_position_error_m": 0.06657479233263998,
+              "holding_max_speed_m_s": 0.21023347428911401,
+              "normalized_gap": 6.007782476303801,
+              "returned_array_gap_interval": [
+                6.007782476303795,
+                6.007782476303804
+              ],
+              "signed_maximum_excess": 6.007782476303801,
+              "sum_normalized_excess": 17.310473346910346,
+              "terminal_position_error_m": 0.06645211637342548,
+              "worst_constraint": {
+                "constraint_id": "holding_max_speed_m_s",
+                "kind": "holding_speed",
+                "limit": 0.03,
+                "normalized_signed_excess": 6.007782476303801,
+                "time_s": 0.5400000000000004,
+                "unit": "m/s",
+                "value": 0.21023347428911401
+              }
+            },
+            "input_saturation": {
+              "lower": true,
+              "maximum_n": 2.740348106425943,
+              "minimum_n": 0.0,
+              "upper": false
+            },
+            "iterations_started": 8,
+            "limitations": [
+              "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+              "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+              "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+            ],
+            "local_responses": [
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 0,
+                "resolved_subspace_condition": 3269532579.7686706,
+                "response_rank": 24,
+                "singular_values": [
+                  39.8049042317938,
+                  32.52132895894138,
+                  19.903014327874754,
+                  10.08848517117822,
+                  6.505819955620708,
+                  4.115773931725353,
+                  0.783227345494175,
+                  0.31045096167813857,
+                  0.2647702730798017,
+                  0.15124651789169136,
+                  0.03198406809874733,
+                  0.018669555132604827,
+                  0.004383075061682558,
+                  0.002821234888019732,
+                  0.0022939466979350963,
+                  0.0003306366305551649,
+                  0.0002139685547601521,
+                  5.29040796754548e-05,
+                  1.9787619330523232e-05,
+                  1.0488049963588626e-06,
+                  2.4379674543942814e-07,
+                  9.361757246751395e-08,
+                  1.9600848699982872e-08,
+                  1.2174493833797527e-08
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 1,
+                "resolved_subspace_condition": 111840091421.20032,
+                "response_rank": 24,
+                "singular_values": [
+                  40.73698100689371,
+                  32.66337607610276,
+                  20.49542749488271,
+                  10.469197590491335,
+                  6.766054588612944,
+                  4.232779187371689,
+                  1.1208783593429317,
+                  0.3379740649452839,
+                  0.27279340196325796,
+                  0.18167209611405355,
+                  0.041601104516209256,
+                  0.017579799381686634,
+                  0.004297566572724342,
+                  0.0033249099232932526,
+                  0.0012144953673280529,
+                  0.00031891529186851207,
+                  0.00020193032249291,
+                  7.943680714309893e-05,
+                  1.339373844156268e-05,
+                  1.319971047730661e-06,
+                  1.8105667402057042e-07,
+                  1.124545674761536e-07,
+                  4.5154681542065356e-08,
+                  3.6424309466517157e-10
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 2,
+                "resolved_subspace_condition": 59113228244.05526,
+                "response_rank": 24,
+                "singular_values": [
+                  41.560894959053634,
+                  32.73306073139434,
+                  21.043267018689075,
+                  10.663291863012663,
+                  7.026923656658854,
+                  4.2954116027520275,
+                  1.4987953792675208,
+                  0.39685583397253177,
+                  0.278984477772791,
+                  0.19742819996974056,
+                  0.058040411489659494,
+                  0.017096173194135773,
+                  0.005219448639899665,
+                  0.0030450507947147026,
+                  0.0007556486801741917,
+                  0.000272076940550359,
+                  0.00016760824789899896,
+                  8.414750874238273e-05,
+                  8.51243922573151e-06,
+                  1.4982446330600412e-06,
+                  1.938249183178202e-07,
+                  1.4551872819140394e-07,
+                  4.099444088144661e-08,
+                  7.030726656893961e-10
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 3,
+                "resolved_subspace_condition": 930538801745.862,
+                "response_rank": 24,
+                "singular_values": [
+                  43.025929160531405,
+                  32.86552844601884,
+                  21.87445744213312,
+                  10.756538465690163,
+                  7.473401517103169,
+                  4.353820116517261,
+                  2.1759708274641896,
+                  0.52699501348987,
+                  0.2888599275770846,
+                  0.21137635558238463,
+                  0.08450175279148288,
+                  0.016854016545762494,
+                  0.006380640398644009,
+                  0.002512006107572508,
+                  0.0005245272013620263,
+                  0.0002626981205627565,
+                  0.00014357041153471796,
+                  5.579315907143236e-05,
+                  4.253415087114375e-06,
+                  1.8968035941345248e-06,
+                  3.0763299352952224e-07,
+                  2.1220079715419776e-07,
+                  3.345742689848414e-08,
+                  4.62376518634224e-11
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 4,
+                "resolved_subspace_condition": 3737632904.183453,
+                "response_rank": 24,
+                "singular_values": [
+                  44.43794652096666,
+                  33.02041909171875,
+                  22.745689025846485,
+                  10.554696792847306,
+                  7.991039718435278,
+                  4.346453268234539,
+                  3.059623801006872,
+                  0.7045099385206287,
+                  0.29688836209289376,
+                  0.2331951601579599,
+                  0.11410295025978227,
+                  0.017291505262606068,
+                  0.00621621730857579,
+                  0.0024183788165776884,
+                  0.0006456983676445499,
+                  0.00036209282526415535,
+                  0.00011327647258123438,
+                  2.8302844141052775e-05,
+                  2.9233688610846134e-06,
+                  5.927574528860647e-07,
+                  4.2788433405084955e-07,
+                  2.6295928524620576e-07,
+                  4.14375617419438e-08,
+                  1.1889328797172192e-08
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 5,
+                "resolved_subspace_condition": 41859928333.99894,
+                "response_rank": 24,
+                "singular_values": [
+                  46.206876140308,
+                  33.2717905216812,
+                  24.558117168545046,
+                  10.360425317937773,
+                  8.763262679608737,
+                  4.397327426582286,
+                  4.2686848981322845,
+                  0.9499196196971128,
+                  0.30922654435111807,
+                  0.304103791817936,
+                  0.1375056037605801,
+                  0.019162611539764538,
+                  0.008755933061274956,
+                  0.0027634896080352407,
+                  0.0009503612028400813,
+                  0.00030941585460833744,
+                  0.00011615049076859605,
+                  9.71056820784274e-05,
+                  1.6140266101125858e-06,
+                  9.941688568872338e-07,
+                  7.128582431888671e-07,
+                  3.1558033421631323e-07,
+                  1.260923004068785e-07,
+                  1.1038450847699716e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 6,
+                "resolved_subspace_condition": 15366725376.219797,
+                "response_rank": 24,
+                "singular_values": [
+                  47.08903790247062,
+                  33.38391363878357,
+                  26.56820310989722,
+                  10.188031340795735,
+                  8.7181232871909,
+                  5.288698754110626,
+                  4.1815646443633145,
+                  1.059990832107408,
+                  0.3341253330994388,
+                  0.30754791824171285,
+                  0.0938976872512427,
+                  0.022102352170475265,
+                  0.008217903578631952,
+                  0.00341402274370235,
+                  0.0013591191221766102,
+                  0.00016374427668405556,
+                  0.00012434874871593415,
+                  5.5470953178308224e-05,
+                  1.8211343580520637e-06,
+                  6.320180376972599e-07,
+                  4.4741182807066147e-07,
+                  2.972654474180359e-07,
+                  4.47416693206309e-08,
+                  3.0643508457137853e-09
+                ],
+                "start": "native"
+              }
+            ],
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "metric_units": {
+              "holding_max_position_error_m": "m",
+              "holding_max_speed_m_s": "m/s",
+              "signed_maximum_excess": "1",
+              "terminal_position_error_m": "m"
+            },
+            "physics_steps": 118800,
+            "problem": {
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "indices": [
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/task/evaluator/parameters/data/tolerance_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.285,
+                      0.035,
+                      0.185
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_error_m",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/position_limit_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.285,
+                      0.035,
+                      0.185
+                    ],
+                    [
+                      0.285,
+                      0.035,
+                      0.185
+                    ],
+                    [
+                      0.285,
+                      0.035,
+                      0.185
+                    ],
+                    [
+                      0.285,
+                      0.035,
+                      0.185
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/speed_limit_m_s",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.03,
+                  "reference": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_velocity",
+                    "phase": "post_step",
+                    "units": "m/s"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                }
+              ],
+              "initial_state_pointer": "/native_dynamics/initial_state",
+              "input_bounds_n": [
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ]
+              ],
+              "model": {
+                "channels": [
+                  "tendon_0",
+                  "tendon_1",
+                  "tendon_2",
+                  "tendon_3",
+                  "tendon_4",
+                  "tendon_5"
+                ],
+                "model": "model.mujoco_native@1.0.0",
+                "sample_count": 31,
+                "search_dimension": 24,
+                "state_time_s": 0.0,
+                "window_s": [
+                  0.0,
+                  0.6
+                ]
+              },
+              "model_source": "model.mujoco_native@1.0.0",
+              "protocol": {
+                "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+                "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+                "authority_threshold": null,
+                "baseline_lengths_m": {
+                  "segment_0": 0.16,
+                  "segment_1": 0.12,
+                  "segment_2": 0.14,
+                  "segment_3": 0.14,
+                  "segment_4": 0.14,
+                  "segment_5": 0.14,
+                  "segment_6": 0.14,
+                  "segment_7": 0.14,
+                  "segment_8": 0.14
+                },
+                "candidate_rule": "initial_target_equilibrium_halfway",
+                "comparison_atol": 1e-08,
+                "comparison_rtol": 2e-06,
+                "construction_max_iterations": 20,
+                "derivative_atol": 2e-05,
+                "derivative_rtol": 0.0002,
+                "derivative_step": 1e-05,
+                "duration_s": 0.6,
+                "endpoint_check_atol": 1e-08,
+                "endpoint_max_iterations": 100,
+                "equilibrium_normalized_residual": 1e-05,
+                "frequency_rad_s": [
+                  0.1,
+                  1.0,
+                  10.0,
+                  100.0
+                ],
+                "horizon_alignment_atol_s": 1e-12,
+                "input_scale_n": 8.0,
+                "output_scale_m": 0.01,
+                "period_s": 0.02,
+                "pole_margin_s_inv": 1e-07,
+                "protocol_id": "task-local-v2",
+                "rank_atol": 1e-12,
+                "rank_rtol": 1e-09,
+                "samples_s": [
+                  0.0,
+                  0.2,
+                  0.4,
+                  0.58
+                ],
+                "static_force_tolerance": 1e-10,
+                "static_max_iterations": 20,
+                "windows_s": [
+                  0.06,
+                  0.3,
+                  0.6
+                ]
+              },
+              "task_identity": "bba6b2817da1feb38893287e811964f0ff935c68f6a005456e852bb63c38c8fc",
+              "time_grid_s": [
+                0.0,
+                0.02,
+                0.04,
+                0.06,
+                0.08,
+                0.1,
+                0.12,
+                0.14,
+                0.16,
+                0.18,
+                0.2,
+                0.22,
+                0.24,
+                0.26,
+                0.28,
+                0.3,
+                0.32,
+                0.34,
+                0.36,
+                0.38,
+                0.4,
+                0.42,
+                0.44,
+                0.46,
+                0.48,
+                0.5,
+                0.52,
+                0.54,
+                0.56,
+                0.58,
+                0.6
+              ]
+            },
+            "response_steps_completed": 7,
+            "rollouts": 198,
+            "search_quality": {
+              "active_coefficients": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ],
+              "convergence": "unresolved",
+              "finite_budget_observations_retained": true,
+              "global_optimality": "not_established",
+              "initialization": "candidate-owned frozen zero state and original absolute-tension sequence",
+              "initialization_pointer": "/native_dynamics/original_schedule",
+              "numerical_inner_solver": {
+                "last_local_solver": {
+                  "global_optimality_proved": false,
+                  "iterations": 9,
+                  "numerical_status": "Optimization terminated successfully",
+                  "predicted_gap": 0.0,
+                  "predicted_signed_excess": -0.019999999992767914,
+                  "success": true,
+                  "target_margin_fraction": 0.02
+                },
+                "stop_reason": "local_target_reached"
+              },
+              "search_dimension": 24,
+              "solver_pointer": "/native_dynamics/optimization"
+            },
+            "settings": {
+              "coefficient_limit_n": 8.0,
+              "correction_window_s": [
+                0.0,
+                0.6
+              ],
+              "difference_step_n": 0.02,
+              "evaluation_requests": 201,
+              "initial_radius_n": 0.2,
+              "iterations": 8,
+              "knots_s": [
+                0.0,
+                0.2,
+                0.4,
+                0.58
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.02,
+              "version": "local_control_search_v2"
+            },
+            "status": "finite_budget_diagnostic",
+            "stop_reason": "local_target_reached",
+            "task_acceptance": "unmeasured"
+          },
+          "control_source": {
+            "artifact_id": "c956cd30644a1cbf83445bd2ce98b265b6f642c796ef84eada043cab3154aa2b",
+            "media_type": "application/json"
+          },
+          "native_cost": {
+            "completed_response_steps": 7,
+            "forward_evaluations": 12079,
+            "kernel_wall_s": 10.931180200001108,
+            "mechanics_evaluations": 0,
+            "model_builds": 1,
+            "optimization_evaluations": 198,
+            "optimization_iterations": 8,
+            "physics_step_attempts": 118800,
+            "physics_steps": 118800,
+            "rollouts": 198
+          },
+          "response_progress": [
+            {
+              "callback": 1,
+              "J": 6.007782476303801,
+              "label": "baseline"
+            },
+            {
+              "callback": 26,
+              "J": 5.165448000269983,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 51,
+              "J": 4.211409842520475,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 76,
+              "J": 3.2776267187194517,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 101,
+              "J": 1.8607753337580797,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 126,
+              "J": 0.656443234889706,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 151,
+              "J": 0.05573448502733558,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 176,
+              "J": -0.01989450122316072,
+              "label": "local_response_proposal"
+            }
+          ],
+          "replay": {
+            "artifact_id": "6a5b7a0e2b186f35e2e90a9bf5a0960f1861780b526801881076eb8f5215f20f",
+            "media_type": "application/json"
+          },
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "bba6b2817da1feb38893287e811964f0ff935c68f6a005456e852bb63c38c8fc",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.009767010733730706,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 4,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.009767010733730706,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.029372154269549342,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.03,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.009767010733730706,
+              "holding_max_error_m": 0.009767010733730706,
+              "holding_max_speed_m_s": 0.029372154269549342
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "2f8c15666e8c4ff68d70e91edf0a932e",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "877cb55c641936121e25f41da8fc8e81ae7f49593c055371bac55378a6f036fe",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "b160ca228382847a2701a99d22d5af2c775812640aeccb625132de4bd4d39377",
+                "media_type": "application/json"
+              }
+            },
+            "evidence_binding": {
+              "evaluation": {
+                "artifact_id": "877cb55c641936121e25f41da8fc8e81ae7f49593c055371bac55378a6f036fe",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "b160ca228382847a2701a99d22d5af2c775812640aeccb625132de4bd4d39377",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "e088fddc32bf5be8059e30121245d8efcf3ebddefed3a1f97d0ab3ec8faf4700",
+                "media_type": "application/json"
+              },
+              "evaluation_binding": {
+                "source": {
+                  "artifact_id": "e088fddc32bf5be8059e30121245d8efcf3ebddefed3a1f97d0ab3ec8faf4700",
+                  "media_type": "application/json"
+                },
+                "source_execution_id": null,
+                "original_execution_id": null
+              },
+              "profile_binding": {
+                "evaluation": {
+                  "artifact_id": "877cb55c641936121e25f41da8fc8e81ae7f49593c055371bac55378a6f036fe",
+                  "media_type": "application/json"
+                },
+                "simulation": {
+                  "artifact_id": "e088fddc32bf5be8059e30121245d8efcf3ebddefed3a1f97d0ab3ec8faf4700",
+                  "media_type": "application/json"
+                },
+                "execution_id": "2f8c15666e8c4ff68d70e91edf0a932e"
+              }
+            },
+            "evaluator_tension_channels": null,
+            "timing": {
+              "control_period_s": 0.02,
+              "duration_s": 0.6,
+              "sample_period_s": 0.02,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.001,
+              "real_time_required": false,
+              "real_time_demonstrated": null,
+              "deadline_misses": null,
+              "mean_update_s": null,
+              "simulation_wall_s": null
+            },
+            "continuous_time_guarantee": false
+          },
+          "replay_cost": {
+            "forward_evaluations": 61,
+            "kernel_wall_s": 0.1372933000093326,
+            "model_builds": 1,
+            "physics_step_attempts": 600,
+            "physics_steps": 600,
+            "rollouts": 1
+          },
+          "replay_steps": 600,
+          "replay_step_attempts": 600,
+          "driver_elapsed_s": 16.94521389999136
+        },
+        "negative_low": {
+          "candidate": {
+            "artifact_id": "277a58861de4c57a8c35a57228690318a3b294aa1365acd61a8896daa834dfd2",
+            "media_type": "application/json"
+          },
+          "analysis": {
+            "artifact_id": "db8c486e6e59519c765556f581db7abc57883798051f4273d712a40289796d67",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "accepted": false,
+          "charged_numerical_s": 12.712444700009655,
+          "charged_analysis_evaluations": 1,
+          "t1": {
+            "J": 2.340448971560775,
+            "best_control": {
+              "coefficients_n": [
+                0.6236549840155701,
+                1.7355382811175704,
+                1.415753885569717,
+                0.1529712935998739,
+                -1.0495077029659683e-15,
+                5.112604049648056e-17,
+                -0.5379206503970252,
+                1.192171436458778,
+                2.026964122019317,
+                0.7873595693368254,
+                -0.19110622927618798,
+                -0.3598973446722118,
+                0.2268574332639572,
+                2.0249999999999826,
+                1.611060183360211,
+                2.0249999999999995,
+                1.4048049410352668,
+                -8.898022252687075e-17,
+                0.09571405828428917,
+                2.0249999999999924,
+                1.3270270134449276,
+                2.0249999999999995,
+                1.5903452840522792,
+                7.818535806804921e-17
+              ],
+              "label": "finite_difference",
+              "rollout": "native-rollout-184",
+              "schedule_pointer": "/native_dynamics/optimized_schedule",
+              "source": {
+                "candidate": {
+                  "artifact_id": "277a58861de4c57a8c35a57228690318a3b294aa1365acd61a8896daa834dfd2",
+                  "media_type": "application/json"
+                },
+                "inherited_acceptance": false,
+                "method": "mujoco_nonlinear_task_capability_v1",
+                "settings": {
+                  "coefficient_limit_n": 8.0,
+                  "correction_window_s": [
+                    0.0,
+                    0.6
+                  ],
+                  "difference_step_n": 0.02,
+                  "evaluation_requests": 201,
+                  "initial_radius_n": 0.2,
+                  "iterations": 8,
+                  "knots_s": [
+                    0.0,
+                    0.2,
+                    0.4,
+                    0.58
+                  ],
+                  "method": "response",
+                  "minimum_radius_n": 0.0001,
+                  "safety_margin_fraction": 0.02,
+                  "version": "local_control_search_v2"
+                },
+                "source": {
+                  "artifact_id": "8d0d1aaa7538f38e230cb4577a705b289d2f027c564360a360d42e84be2095db",
+                  "media_type": "application/json"
+                },
+                "state_provenance": {
+                  "inherited_acceptance": false,
+                  "initialization": "frozen_task_initializer_and_candidate_pretension"
+                }
+              }
+            },
+            "best_found_J": 2.340448971560775,
+            "best_metrics": {
+              "holding_max_position_error_m": 0.03340448971560775,
+              "holding_max_speed_m_s": 0.09551800688228504,
+              "normalized_gap": 2.340448971560775,
+              "returned_array_gap_interval": [
+                2.3404489715607717,
+                2.340448971560778
+              ],
+              "signed_maximum_excess": 2.340448971560775,
+              "sum_normalized_excess": 6.864831505864384,
+              "terminal_position_error_m": 0.03340448971560775,
+              "worst_constraint": {
+                "constraint_id": "terminal_error_m",
+                "kind": "terminal_position",
+                "limit": 0.01,
+                "normalized_signed_excess": 2.340448971560775,
+                "time_s": 0.6000000000000004,
+                "unit": "m",
+                "value": 0.03340448971560775
+              }
+            },
+            "callbacks": 201,
+            "coefficient_boundary": false,
+            "cost": {
+              "completed_response_steps": 8,
+              "forward_evaluations": 12262,
+              "kernel_wall_s": 11.470855599996867,
+              "mechanics_evaluations": 0,
+              "model_builds": 1,
+              "optimization_evaluations": 201,
+              "optimization_iterations": 8,
+              "physics_step_attempts": 120600,
+              "physics_steps": 120600,
+              "rollouts": 201
+            },
+            "detail_pointer": "/native_dynamics",
+            "evidence_level": "finite_budget_observation",
+            "improvement": 2.3279095627564765,
+            "independent_task_acceptance": "unmeasured",
+            "initial_J": 4.668358534317251,
+            "initial_metrics": {
+              "holding_max_position_error_m": 0.05490032927802268,
+              "holding_max_speed_m_s": 0.17005075602951752,
+              "normalized_gap": 4.668358534317251,
+              "returned_array_gap_interval": [
+                4.668358534317247,
+                4.668358534317256
+              ],
+              "signed_maximum_excess": 4.668358534317251,
+              "sum_normalized_excess": 13.648424389921788,
+              "terminal_position_error_m": 0.05490032927802268,
+              "worst_constraint": {
+                "constraint_id": "holding_max_speed_m_s",
+                "kind": "holding_speed",
+                "limit": 0.03,
+                "normalized_signed_excess": 4.668358534317251,
+                "time_s": 0.6000000000000004,
+                "unit": "m/s",
+                "value": 0.17005075602951752
+              }
+            },
+            "input_saturation": {
+              "lower": true,
+              "maximum_n": 2.7249999999999996,
+              "minimum_n": 0.0,
+              "upper": false
+            },
+            "iterations_started": 8,
+            "limitations": [
+              "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+              "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+              "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+            ],
+            "local_responses": [
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 0,
+                "resolved_subspace_condition": 6789127048.984715,
+                "response_rank": 24,
+                "singular_values": [
+                  40.13347515269195,
+                  32.607295144095986,
+                  19.685568454938842,
+                  10.092342528421371,
+                  6.551182930932351,
+                  4.088653362516929,
+                  0.5862849698994529,
+                  0.3047453604955114,
+                  0.25550229964464566,
+                  0.11652708435314153,
+                  0.024531353280752875,
+                  0.011100978405988152,
+                  0.006634200241720702,
+                  0.003131924349723977,
+                  0.0013798421375675132,
+                  0.00042270905928481383,
+                  0.00028358402037504077,
+                  5.3137169596718284e-05,
+                  2.0086757603868993e-05,
+                  2.8302903715229206e-06,
+                  2.3534150784403935e-07,
+                  9.256233193191563e-08,
+                  3.498218445226254e-08,
+                  5.911433806308535e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 1,
+                "resolved_subspace_condition": 6419427117.697268,
+                "response_rank": 24,
+                "singular_values": [
+                  41.04538952387794,
+                  32.7799020914304,
+                  20.20427058007293,
+                  10.464333291071256,
+                  6.79090839863748,
+                  4.2213042513500385,
+                  0.8712938942916835,
+                  0.31559428400455414,
+                  0.27344957684824267,
+                  0.15171825174433382,
+                  0.03852858541444124,
+                  0.010595135996855243,
+                  0.004894622766669264,
+                  0.0021156225257891567,
+                  0.0008840681016666997,
+                  0.0005688463679901617,
+                  0.00016703468309005776,
+                  6.433071607439649e-05,
+                  9.72208229210527e-06,
+                  7.99817515521616e-06,
+                  1.8226248806582578e-07,
+                  9.074363353547704e-08,
+                  3.87714447986482e-08,
+                  6.393933410463184e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 2,
+                "resolved_subspace_condition": 8417368977.38314,
+                "response_rank": 24,
+                "singular_values": [
+                  41.97141921685517,
+                  33.008220242202924,
+                  20.817028498024555,
+                  10.75968004552434,
+                  7.041696550880555,
+                  4.329525426426591,
+                  1.1281481164319338,
+                  0.3407479279313696,
+                  0.29050047195094575,
+                  0.17404817798089647,
+                  0.0460719354632305,
+                  0.013406085605523314,
+                  0.004950020387639937,
+                  0.0018896746872234713,
+                  0.0005313410663286305,
+                  0.00043170804161030087,
+                  0.00019045110173809387,
+                  6.445865654953938e-05,
+                  7.29581978003654e-06,
+                  2.6058248210598952e-06,
+                  3.856532764706146e-07,
+                  1.0165814256817388e-07,
+                  2.5681322611716087e-08,
+                  4.986287203237654e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 3,
+                "resolved_subspace_condition": 6877231616.799072,
+                "response_rank": 24,
+                "singular_values": [
+                  42.772035808021336,
+                  33.20614172663007,
+                  21.413018456236507,
+                  10.954611833336752,
+                  7.294436599151601,
+                  4.406107112640048,
+                  1.3966709824243824,
+                  0.38540759464099955,
+                  0.30263049332344055,
+                  0.18582720291138388,
+                  0.05330627500247465,
+                  0.014820155181598137,
+                  0.004819433362821756,
+                  0.0018014673265728922,
+                  0.00046903151271581736,
+                  0.00036323864012448385,
+                  0.0002224596321929108,
+                  6.007956954423008e-05,
+                  4.84325213614986e-06,
+                  1.5442313110315477e-06,
+                  5.472692657128993e-07,
+                  1.3787808016724563e-07,
+                  2.7444514646395865e-08,
+                  6.219368227113613e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 4,
+                "resolved_subspace_condition": 8749006406.802427,
+                "response_rank": 24,
+                "singular_values": [
+                  43.84095089858092,
+                  33.464452528135766,
+                  22.262297017602943,
+                  11.094643321907228,
+                  7.673628620424802,
+                  4.456753639347772,
+                  1.887371565911593,
+                  0.48354256466549417,
+                  0.3068994839909342,
+                  0.19409139704327596,
+                  0.07764048513717202,
+                  0.016860771314363542,
+                  0.004662288515966743,
+                  0.0019475731444302247,
+                  0.000679125174251246,
+                  0.000342556615675001,
+                  0.00022203895246386625,
+                  3.913270368362112e-05,
+                  4.441099360029751e-06,
+                  1.8966394520757725e-06,
+                  5.233872740213352e-07,
+                  3.349920942929394e-07,
+                  5.96559429570631e-08,
+                  5.010963400883351e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 5,
+                "resolved_subspace_condition": 8011022388.32534,
+                "response_rank": 24,
+                "singular_values": [
+                  45.68844753477202,
+                  33.64420862182827,
+                  24.251335657304878,
+                  11.044871025977036,
+                  8.328242311577917,
+                  4.463338096505849,
+                  2.7473560658463656,
+                  0.671740761897627,
+                  0.31200614836938473,
+                  0.19955969215143643,
+                  0.0730520485997525,
+                  0.01585516864140516,
+                  0.006204129302817023,
+                  0.0016838356530330223,
+                  0.0008203738111770051,
+                  0.0004346184960254878,
+                  0.00019131083757762746,
+                  5.5055747638191544e-05,
+                  6.045193126674265e-06,
+                  1.6394851661241993e-06,
+                  5.894998251696491e-07,
+                  2.1013453440012624e-07,
+                  5.133001873119865e-08,
+                  5.703198083849437e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 6,
+                "resolved_subspace_condition": 4136798691.721269,
+                "response_rank": 24,
+                "singular_values": [
+                  46.19606654164188,
+                  33.39731276129527,
+                  27.57600652055732,
+                  10.555825275480563,
+                  8.812262535210397,
+                  4.347175376544367,
+                  4.017042905415614,
+                  0.9222583187041321,
+                  0.3111206419355268,
+                  0.22164446598411527,
+                  0.05230682439296084,
+                  0.020212254322891345,
+                  0.009365452365631046,
+                  0.0038563101705984923,
+                  0.0015517927333594654,
+                  0.000336816456487109,
+                  0.00015372553451980492,
+                  0.00010947737361496025,
+                  2.137336251987351e-06,
+                  1.0679031652854388e-06,
+                  2.512077733524091e-07,
+                  1.2513832386481762e-07,
+                  8.045809958160008e-08,
+                  1.1167105287016104e-08
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 7,
+                "resolved_subspace_condition": 4321804205.46085,
+                "response_rank": 24,
+                "singular_values": [
+                  46.19491946745313,
+                  33.39484436564595,
+                  27.61860431091705,
+                  10.536592761609972,
+                  8.794860415660684,
+                  4.346866616592813,
+                  4.016017260747792,
+                  0.9226324194348205,
+                  0.31085030342618514,
+                  0.22127990619049892,
+                  0.05307791666570971,
+                  0.02033206801219315,
+                  0.009723234172186566,
+                  0.003750991907535675,
+                  0.0015433404851900188,
+                  0.0003396559761914901,
+                  0.00015633750296414637,
+                  0.0001090364289633534,
+                  2.0754959698474895e-06,
+                  1.1358794895976754e-06,
+                  2.398548304373415e-07,
+                  1.2892383845865785e-07,
+                  8.119136672223817e-08,
+                  1.0688804321371888e-08
+                ],
+                "start": "native"
+              }
+            ],
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "metric_units": {
+              "holding_max_position_error_m": "m",
+              "holding_max_speed_m_s": "m/s",
+              "signed_maximum_excess": "1",
+              "terminal_position_error_m": "m"
+            },
+            "physics_steps": 120600,
+            "problem": {
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "indices": [
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/task/evaluator/parameters/data/tolerance_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.275,
+                      -0.04,
+                      0.135
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_error_m",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/position_limit_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.275,
+                      -0.04,
+                      0.135
+                    ],
+                    [
+                      0.275,
+                      -0.04,
+                      0.135
+                    ],
+                    [
+                      0.275,
+                      -0.04,
+                      0.135
+                    ],
+                    [
+                      0.275,
+                      -0.04,
+                      0.135
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/speed_limit_m_s",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.03,
+                  "reference": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_velocity",
+                    "phase": "post_step",
+                    "units": "m/s"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                }
+              ],
+              "initial_state_pointer": "/native_dynamics/initial_state",
+              "input_bounds_n": [
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ]
+              ],
+              "model": {
+                "channels": [
+                  "tendon_0",
+                  "tendon_1",
+                  "tendon_2",
+                  "tendon_3",
+                  "tendon_4",
+                  "tendon_5"
+                ],
+                "model": "model.mujoco_native@1.0.0",
+                "sample_count": 31,
+                "search_dimension": 24,
+                "state_time_s": 0.0,
+                "window_s": [
+                  0.0,
+                  0.6
+                ]
+              },
+              "model_source": "model.mujoco_native@1.0.0",
+              "protocol": {
+                "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+                "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+                "authority_threshold": null,
+                "baseline_lengths_m": {
+                  "segment_0": 0.16,
+                  "segment_1": 0.12,
+                  "segment_2": 0.14,
+                  "segment_3": 0.14,
+                  "segment_4": 0.14,
+                  "segment_5": 0.14,
+                  "segment_6": 0.14,
+                  "segment_7": 0.14,
+                  "segment_8": 0.14
+                },
+                "candidate_rule": "initial_target_equilibrium_halfway",
+                "comparison_atol": 1e-08,
+                "comparison_rtol": 2e-06,
+                "construction_max_iterations": 20,
+                "derivative_atol": 2e-05,
+                "derivative_rtol": 0.0002,
+                "derivative_step": 1e-05,
+                "duration_s": 0.6,
+                "endpoint_check_atol": 1e-08,
+                "endpoint_max_iterations": 100,
+                "equilibrium_normalized_residual": 1e-05,
+                "frequency_rad_s": [
+                  0.1,
+                  1.0,
+                  10.0,
+                  100.0
+                ],
+                "horizon_alignment_atol_s": 1e-12,
+                "input_scale_n": 8.0,
+                "output_scale_m": 0.01,
+                "period_s": 0.02,
+                "pole_margin_s_inv": 1e-07,
+                "protocol_id": "task-local-v2",
+                "rank_atol": 1e-12,
+                "rank_rtol": 1e-09,
+                "samples_s": [
+                  0.0,
+                  0.2,
+                  0.4,
+                  0.58
+                ],
+                "static_force_tolerance": 1e-10,
+                "static_max_iterations": 20,
+                "windows_s": [
+                  0.06,
+                  0.3,
+                  0.6
+                ]
+              },
+              "task_identity": "b64cd99d153b358b038b7d88f09a79dd52f231580d1dc10675715f1dcbcea09e",
+              "time_grid_s": [
+                0.0,
+                0.02,
+                0.04,
+                0.06,
+                0.08,
+                0.1,
+                0.12,
+                0.14,
+                0.16,
+                0.18,
+                0.2,
+                0.22,
+                0.24,
+                0.26,
+                0.28,
+                0.3,
+                0.32,
+                0.34,
+                0.36,
+                0.38,
+                0.4,
+                0.42,
+                0.44,
+                0.46,
+                0.48,
+                0.5,
+                0.52,
+                0.54,
+                0.56,
+                0.58,
+                0.6
+              ]
+            },
+            "response_steps_completed": 8,
+            "rollouts": 201,
+            "search_quality": {
+              "active_coefficients": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ],
+              "convergence": "unresolved",
+              "finite_budget_observations_retained": true,
+              "global_optimality": "not_established",
+              "initialization": "candidate-owned frozen zero state and original absolute-tension sequence",
+              "initialization_pointer": "/native_dynamics/original_schedule",
+              "numerical_inner_solver": {
+                "last_local_solver": {
+                  "global_optimality_proved": false,
+                  "iterations": 32,
+                  "numerical_status": "Optimization terminated successfully",
+                  "predicted_gap": 1.8753305201007264,
+                  "predicted_signed_excess": 1.8753305201007264,
+                  "success": true,
+                  "target_margin_fraction": 0.02
+                },
+                "stop_reason": "iteration_limit"
+              },
+              "search_dimension": 24,
+              "solver_pointer": "/native_dynamics/optimization"
+            },
+            "settings": {
+              "coefficient_limit_n": 8.0,
+              "correction_window_s": [
+                0.0,
+                0.6
+              ],
+              "difference_step_n": 0.02,
+              "evaluation_requests": 201,
+              "initial_radius_n": 0.2,
+              "iterations": 8,
+              "knots_s": [
+                0.0,
+                0.2,
+                0.4,
+                0.58
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.02,
+              "version": "local_control_search_v2"
+            },
+            "status": "finite_budget_diagnostic",
+            "stop_reason": "iteration_limit",
+            "task_acceptance": "unmeasured"
+          },
+          "control_source": {
+            "artifact_id": "3478699d7055599a1ba239173f5e33b1f4bcf2fae3dd8527f382f394eaae1646",
+            "media_type": "application/json"
+          },
+          "native_cost": {
+            "completed_response_steps": 8,
+            "forward_evaluations": 12262,
+            "kernel_wall_s": 11.470855599996867,
+            "mechanics_evaluations": 0,
+            "model_builds": 1,
+            "optimization_evaluations": 201,
+            "optimization_iterations": 8,
+            "physics_step_attempts": 120600,
+            "physics_steps": 120600,
+            "rollouts": 201
+          },
+          "response_progress": [
+            {
+              "callback": 1,
+              "J": 4.668358534317251,
+              "label": "baseline"
+            },
+            {
+              "callback": 26,
+              "J": 4.293468270021016,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 51,
+              "J": 4.0120107659900714,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 76,
+              "J": 3.6985274479941523,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 101,
+              "J": 3.399693077304147,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 126,
+              "J": 2.8929688282129287,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 151,
+              "J": 2.4000151836713544,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 176,
+              "J": 4.207591848808355,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 201,
+              "J": 2.5620335985881715,
+              "label": "local_response_proposal"
+            }
+          ],
+          "replay": {
+            "artifact_id": "1edae8962d38c9e212f686b8e7960776f1423ebe9faf68cacdebcf0a27cb74e1",
+            "media_type": "application/json"
+          },
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "b64cd99d153b358b038b7d88f09a79dd52f231580d1dc10675715f1dcbcea09e",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": false,
+                "passed": false,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.03340448971560775,
+                "passed": false,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 4,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.03340448971560775,
+                "passed": false,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.09551800688228504,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.03,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.03340448971560775,
+              "holding_max_error_m": 0.03340448971560775,
+              "holding_max_speed_m_s": 0.09551800688228504
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "25434fa54d764189897347a6509cd3bf",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "196e7829b96751b34f96cdd995e49aae93601397c089d7d79373c78bbd3694a5",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "2ffbafb3e8da9fb2661c1743006d35efa44f826407e743d9572541f7e5d97777",
+                "media_type": "application/json"
+              }
+            },
+            "evidence_binding": {
+              "evaluation": {
+                "artifact_id": "196e7829b96751b34f96cdd995e49aae93601397c089d7d79373c78bbd3694a5",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "2ffbafb3e8da9fb2661c1743006d35efa44f826407e743d9572541f7e5d97777",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "9b9d16f9c34675294856baf5ee73c093e5919daa87c596653bf22578913c897f",
+                "media_type": "application/json"
+              },
+              "evaluation_binding": {
+                "source": {
+                  "artifact_id": "9b9d16f9c34675294856baf5ee73c093e5919daa87c596653bf22578913c897f",
+                  "media_type": "application/json"
+                },
+                "source_execution_id": null,
+                "original_execution_id": null
+              },
+              "profile_binding": {
+                "evaluation": {
+                  "artifact_id": "196e7829b96751b34f96cdd995e49aae93601397c089d7d79373c78bbd3694a5",
+                  "media_type": "application/json"
+                },
+                "simulation": {
+                  "artifact_id": "9b9d16f9c34675294856baf5ee73c093e5919daa87c596653bf22578913c897f",
+                  "media_type": "application/json"
+                },
+                "execution_id": "25434fa54d764189897347a6509cd3bf"
+              }
+            },
+            "evaluator_tension_channels": null,
+            "timing": {
+              "control_period_s": 0.02,
+              "duration_s": 0.6,
+              "sample_period_s": 0.02,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.001,
+              "real_time_required": false,
+              "real_time_demonstrated": null,
+              "deadline_misses": null,
+              "mean_update_s": null,
+              "simulation_wall_s": null
+            },
+            "continuous_time_guarantee": false
+          },
+          "replay_cost": {
+            "forward_evaluations": 61,
+            "kernel_wall_s": 0.13789169999654405,
+            "model_builds": 1,
+            "physics_step_attempts": 600,
+            "physics_steps": 600,
+            "rollouts": 1
+          },
+          "replay_steps": 600,
+          "replay_step_attempts": 600,
+          "driver_elapsed_s": 18.485567200012156
+        },
+        "central_high": {
+          "candidate": {
+            "artifact_id": "bf2f01b8f38ac2c2b129282b427b513f03db54ce6fd2e12e046a050562addb62",
+            "media_type": "application/json"
+          },
+          "analysis": {
+            "artifact_id": "972e92d74566f69d4b9283cd30aef2ff9a325acd5194f258825b1153501df746",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "accepted": true,
+          "charged_numerical_s": 10.064287200002582,
+          "charged_analysis_evaluations": 1,
+          "t1": {
+            "J": -0.03322293989754266,
+            "best_control": {
+              "coefficients_n": [
+                -0.29888897466328185,
+                1.0259177260123733,
+                0.37537618919581467,
+                0.2329543198412106,
+                0.5119733269757021,
+                1.4756973700430674e-15,
+                -0.6964211562508432,
+                1.2717854055824391,
+                1.5110529089937117,
+                -0.666071928955804,
+                -0.3787701274517477,
+                -0.6999999999999971,
+                0.6497686185800001,
+                1.3157491435353021,
+                1.2100686577762878,
+                1.084002538088829,
+                0.2336533815467222,
+                6.714553846335774e-16,
+                0.826427462839456,
+                1.2394095311996083,
+                1.5187721897011217,
+                1.1442344830373767,
+                -3.6551608883752094e-14,
+                -6.657848665427272e-15
+              ],
+              "label": "finite_difference",
+              "rollout": "native-rollout-146",
+              "schedule_pointer": "/native_dynamics/optimized_schedule",
+              "source": {
+                "candidate": {
+                  "artifact_id": "bf2f01b8f38ac2c2b129282b427b513f03db54ce6fd2e12e046a050562addb62",
+                  "media_type": "application/json"
+                },
+                "inherited_acceptance": false,
+                "method": "mujoco_nonlinear_task_capability_v1",
+                "settings": {
+                  "coefficient_limit_n": 8.0,
+                  "correction_window_s": [
+                    0.0,
+                    0.6
+                  ],
+                  "difference_step_n": 0.02,
+                  "evaluation_requests": 201,
+                  "initial_radius_n": 0.2,
+                  "iterations": 8,
+                  "knots_s": [
+                    0.0,
+                    0.2,
+                    0.4,
+                    0.58
+                  ],
+                  "method": "response",
+                  "minimum_radius_n": 0.0001,
+                  "safety_margin_fraction": 0.02,
+                  "version": "local_control_search_v2"
+                },
+                "source": {
+                  "artifact_id": "4ebf49daecaee5fe59fb241d4a1624867cdb8d647302eef89cc12f801aac22a2",
+                  "media_type": "application/json"
+                },
+                "state_provenance": {
+                  "inherited_acceptance": false,
+                  "initialization": "frozen_task_initializer_and_candidate_pretension"
+                }
+              }
+            },
+            "best_found_J": -0.03322293989754266,
+            "best_metrics": {
+              "holding_max_position_error_m": 0.008774149939082425,
+              "holding_max_speed_m_s": 0.02900331180307372,
+              "normalized_gap": 0.0,
+              "returned_array_gap_interval": [
+                0.0,
+                0.0
+              ],
+              "signed_maximum_excess": -0.03322293989754266,
+              "sum_normalized_excess": 0.0,
+              "terminal_position_error_m": 0.008774149939082425,
+              "worst_constraint": {
+                "constraint_id": "holding_max_speed_m_s",
+                "kind": "holding_speed",
+                "limit": 0.03,
+                "normalized_signed_excess": -0.03322293989754266,
+                "time_s": 0.5400000000000004,
+                "unit": "m/s",
+                "value": 0.02900331180307372
+              }
+            },
+            "callbacks": 147,
+            "coefficient_boundary": false,
+            "cost": {
+              "completed_response_steps": 5,
+              "forward_evaluations": 8968,
+              "kernel_wall_s": 8.831609200002276,
+              "mechanics_evaluations": 0,
+              "model_builds": 1,
+              "optimization_evaluations": 147,
+              "optimization_iterations": 6,
+              "physics_step_attempts": 88200,
+              "physics_steps": 88200,
+              "rollouts": 147
+            },
+            "detail_pointer": "/native_dynamics",
+            "evidence_level": "finite_budget_observation",
+            "improvement": 7.172802467262584,
+            "independent_task_acceptance": "unmeasured",
+            "initial_J": 7.139579527365042,
+            "initial_metrics": {
+              "holding_max_position_error_m": 0.0780400778109303,
+              "holding_max_speed_m_s": 0.24418738582095126,
+              "normalized_gap": 7.139579527365042,
+              "returned_array_gap_interval": [
+                7.139579527365037,
+                7.139579527365048
+              ],
+              "signed_maximum_excess": 7.139579527365042,
+              "sum_normalized_excess": 20.7475950895511,
+              "terminal_position_error_m": 0.0780400778109303,
+              "worst_constraint": {
+                "constraint_id": "holding_max_speed_m_s",
+                "kind": "holding_speed",
+                "limit": 0.03,
+                "normalized_signed_excess": 7.139579527365042,
+                "time_s": 0.5400000000000004,
+                "unit": "m/s",
+                "value": 0.24418738582095126
+              }
+            },
+            "input_saturation": {
+              "lower": true,
+              "maximum_n": 2.218772189701122,
+              "minimum_n": 0.0,
+              "upper": false
+            },
+            "iterations_started": 6,
+            "limitations": [
+              "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+              "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+              "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+            ],
+            "local_responses": [
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 0,
+                "resolved_subspace_condition": 4286560281.202084,
+                "response_rank": 24,
+                "singular_values": [
+                  39.78127806286311,
+                  32.39452515024924,
+                  20.141109241982424,
+                  10.039459949553274,
+                  6.503077136716973,
+                  4.092132490257445,
+                  0.8254491611790907,
+                  0.3086319911771867,
+                  0.26488888873467187,
+                  0.1636599357825953,
+                  0.024345841758401814,
+                  0.014024493556967043,
+                  0.00451329704322326,
+                  0.00275948253018145,
+                  0.0015373725147857144,
+                  0.0004169328159070569,
+                  0.00025635870645251003,
+                  0.00014953313656809001,
+                  8.639693688320285e-06,
+                  1.2596001524223208e-06,
+                  1.7314168581835384e-07,
+                  1.0621117815554009e-07,
+                  2.1164454356091185e-08,
+                  9.280466260399167e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 1,
+                "resolved_subspace_condition": 3111066205.058728,
+                "response_rank": 24,
+                "singular_values": [
+                  40.85793356761832,
+                  32.566007595149536,
+                  20.78037019073083,
+                  10.487299384974452,
+                  6.77704700017533,
+                  4.233463782944053,
+                  1.193784106786243,
+                  0.3531806327004945,
+                  0.27220754178402806,
+                  0.19000651421662246,
+                  0.039758958381351205,
+                  0.015470774785213236,
+                  0.0052226949480926295,
+                  0.003422625767326796,
+                  0.0006940179441768821,
+                  0.0003108492448823826,
+                  0.0002495372001576781,
+                  0.00014876506474929097,
+                  3.385464544475088e-06,
+                  1.0136684524143664e-06,
+                  1.5567096331250583e-07,
+                  9.7310713571555e-08,
+                  4.606821482256236e-08,
+                  1.3133096782441194e-08
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 2,
+                "resolved_subspace_condition": 3386960200.693659,
+                "response_rank": 24,
+                "singular_values": [
+                  41.82664963728959,
+                  32.716831760735445,
+                  21.422171240247184,
+                  10.721359804271428,
+                  7.060193088847912,
+                  4.310320752038005,
+                  1.59690014146062,
+                  0.4238216534254523,
+                  0.27662369097431244,
+                  0.20146934703425373,
+                  0.05514780106325068,
+                  0.01580195110449071,
+                  0.006841331127415572,
+                  0.0028353791635126716,
+                  0.00041566889557253953,
+                  0.000298861610357758,
+                  0.0001817370176527699,
+                  2.7659569786694454e-05,
+                  2.3892417881734502e-06,
+                  1.1056979796934121e-06,
+                  1.4991010314021683e-07,
+                  1.4451505826365364e-07,
+                  4.009796739779792e-08,
+                  1.234931831461243e-08
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 3,
+                "resolved_subspace_condition": 31088800214.948822,
+                "response_rank": 24,
+                "singular_values": [
+                  43.14268599673605,
+                  32.83301999743004,
+                  22.300561354992084,
+                  10.786954755294586,
+                  7.503483869585758,
+                  4.356686791390002,
+                  2.349662580560362,
+                  0.5720900917913984,
+                  0.28258358789662047,
+                  0.2148653048647965,
+                  0.0840165800385361,
+                  0.016376010056590753,
+                  0.0090060354367612,
+                  0.0021127377475085637,
+                  0.000325556453142508,
+                  0.000212013438830243,
+                  0.00017326533716092472,
+                  4.224866541895488e-05,
+                  2.0630209351036504e-06,
+                  1.7420493555290466e-06,
+                  2.418643986929347e-07,
+                  1.95842953270953e-07,
+                  1.8139225572790876e-07,
+                  1.3877243797909964e-09
+                ],
+                "start": "native"
+              },
+              {
+                "diagnostic": "resolved_local_response",
+                "effective_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ],
+                "input_direction_rank": 24,
+                "iteration": 4,
+                "resolved_subspace_condition": 48735582727.593315,
+                "response_rank": 24,
+                "singular_values": [
+                  44.890396301876784,
+                  33.1485978906463,
+                  23.765090389702245,
+                  10.370798643767998,
+                  8.268782361722275,
+                  4.3078604866005366,
+                  3.8267746003061984,
+                  0.860532161152538,
+                  0.29568898330703114,
+                  0.2733739573625693,
+                  0.13014558438663368,
+                  0.017333812715961638,
+                  0.011826484995637898,
+                  0.001973504171875443,
+                  0.0008299399501502039,
+                  0.0001712159716229692,
+                  0.0001505339497697491,
+                  0.00010247539412103148,
+                  1.4457606684113086e-06,
+                  5.640143143691225e-07,
+                  4.6660146075498525e-07,
+                  2.344037300728242e-07,
+                  1.217386493407995e-07,
+                  9.211010475198556e-10
+                ],
+                "start": "native"
+              }
+            ],
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "metric_units": {
+              "holding_max_position_error_m": "m",
+              "holding_max_speed_m_s": "m/s",
+              "signed_maximum_excess": "1",
+              "terminal_position_error_m": "m"
+            },
+            "physics_steps": 88200,
+            "problem": {
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "indices": [
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/task/evaluator/parameters/data/tolerance_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.295,
+                      0.0,
+                      0.215
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_error_m",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/position_limit_m",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.01,
+                  "reference": [
+                    [
+                      0.295,
+                      0.0,
+                      0.215
+                    ],
+                    [
+                      0.295,
+                      0.0,
+                      0.215
+                    ],
+                    [
+                      0.295,
+                      0.0,
+                      0.215
+                    ],
+                    [
+                      0.295,
+                      0.0,
+                      0.215
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "indices": [
+                    27,
+                    28,
+                    29,
+                    30
+                  ],
+                  "kind": "norm_bound",
+                  "lower": null,
+                  "provenance": [
+                    "/policy/controller/parameters/data/settling/speed_limit_m_s",
+                    "/task/timing",
+                    "/task/goal",
+                    "/policy/controller/parameters/data/settling/window_s"
+                  ],
+                  "radius": 0.03,
+                  "reference": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0
+                    ]
+                  ],
+                  "signal": {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_velocity",
+                    "phase": "post_step",
+                    "units": "m/s"
+                  },
+                  "unsupported_requirement": null,
+                  "upper": null
+                }
+              ],
+              "initial_state_pointer": "/native_dynamics/initial_state",
+              "input_bounds_n": [
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ]
+              ],
+              "model": {
+                "channels": [
+                  "tendon_0",
+                  "tendon_1",
+                  "tendon_2",
+                  "tendon_3",
+                  "tendon_4",
+                  "tendon_5"
+                ],
+                "model": "model.mujoco_native@1.0.0",
+                "sample_count": 31,
+                "search_dimension": 24,
+                "state_time_s": 0.0,
+                "window_s": [
+                  0.0,
+                  0.6
+                ]
+              },
+              "model_source": "model.mujoco_native@1.0.0",
+              "protocol": {
+                "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+                "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+                "authority_threshold": null,
+                "baseline_lengths_m": {
+                  "segment_0": 0.16,
+                  "segment_1": 0.12,
+                  "segment_2": 0.14,
+                  "segment_3": 0.14,
+                  "segment_4": 0.14,
+                  "segment_5": 0.14,
+                  "segment_6": 0.14,
+                  "segment_7": 0.14,
+                  "segment_8": 0.14
+                },
+                "candidate_rule": "initial_target_equilibrium_halfway",
+                "comparison_atol": 1e-08,
+                "comparison_rtol": 2e-06,
+                "construction_max_iterations": 20,
+                "derivative_atol": 2e-05,
+                "derivative_rtol": 0.0002,
+                "derivative_step": 1e-05,
+                "duration_s": 0.6,
+                "endpoint_check_atol": 1e-08,
+                "endpoint_max_iterations": 100,
+                "equilibrium_normalized_residual": 1e-05,
+                "frequency_rad_s": [
+                  0.1,
+                  1.0,
+                  10.0,
+                  100.0
+                ],
+                "horizon_alignment_atol_s": 1e-12,
+                "input_scale_n": 8.0,
+                "output_scale_m": 0.01,
+                "period_s": 0.02,
+                "pole_margin_s_inv": 1e-07,
+                "protocol_id": "task-local-v2",
+                "rank_atol": 1e-12,
+                "rank_rtol": 1e-09,
+                "samples_s": [
+                  0.0,
+                  0.2,
+                  0.4,
+                  0.58
+                ],
+                "static_force_tolerance": 1e-10,
+                "static_max_iterations": 20,
+                "windows_s": [
+                  0.06,
+                  0.3,
+                  0.6
+                ]
+              },
+              "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+              "time_grid_s": [
+                0.0,
+                0.02,
+                0.04,
+                0.06,
+                0.08,
+                0.1,
+                0.12,
+                0.14,
+                0.16,
+                0.18,
+                0.2,
+                0.22,
+                0.24,
+                0.26,
+                0.28,
+                0.3,
+                0.32,
+                0.34,
+                0.36,
+                0.38,
+                0.4,
+                0.42,
+                0.44,
+                0.46,
+                0.48,
+                0.5,
+                0.52,
+                0.54,
+                0.56,
+                0.58,
+                0.6
+              ]
+            },
+            "response_steps_completed": 5,
+            "rollouts": 147,
+            "search_quality": {
+              "active_coefficients": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ],
+              "convergence": "unresolved",
+              "finite_budget_observations_retained": true,
+              "global_optimality": "not_established",
+              "initialization": "candidate-owned frozen zero state and original absolute-tension sequence",
+              "initialization_pointer": "/native_dynamics/original_schedule",
+              "numerical_inner_solver": {
+                "last_local_solver": {
+                  "global_optimality_proved": false,
+                  "iterations": 36,
+                  "numerical_status": "Optimization terminated successfully",
+                  "predicted_gap": 0.0,
+                  "predicted_signed_excess": -0.019999999995661044,
+                  "success": true,
+                  "target_margin_fraction": 0.02
+                },
+                "stop_reason": "local_target_reached"
+              },
+              "search_dimension": 24,
+              "solver_pointer": "/native_dynamics/optimization"
+            },
+            "settings": {
+              "coefficient_limit_n": 8.0,
+              "correction_window_s": [
+                0.0,
+                0.6
+              ],
+              "difference_step_n": 0.02,
+              "evaluation_requests": 201,
+              "initial_radius_n": 0.2,
+              "iterations": 8,
+              "knots_s": [
+                0.0,
+                0.2,
+                0.4,
+                0.58
+              ],
+              "method": "response",
+              "minimum_radius_n": 0.0001,
+              "safety_margin_fraction": 0.02,
+              "version": "local_control_search_v2"
+            },
+            "status": "finite_budget_diagnostic",
+            "stop_reason": "local_target_reached",
+            "task_acceptance": "unmeasured"
+          },
+          "control_source": {
+            "artifact_id": "5852f79ec0c723915bf276248cde76d7984a8fe5c64cbc585cabe38829615356",
+            "media_type": "application/json"
+          },
+          "native_cost": {
+            "completed_response_steps": 5,
+            "forward_evaluations": 8968,
+            "kernel_wall_s": 8.831609200002276,
+            "mechanics_evaluations": 0,
+            "model_builds": 1,
+            "optimization_evaluations": 147,
+            "optimization_iterations": 6,
+            "physics_step_attempts": 88200,
+            "physics_steps": 88200,
+            "rollouts": 147
+          },
+          "response_progress": [
+            {
+              "callback": 1,
+              "J": 7.139579527365042,
+              "label": "baseline"
+            },
+            {
+              "callback": 26,
+              "J": 6.294095392279898,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 51,
+              "J": 5.338807738867986,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 76,
+              "J": 4.03394829414351,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 101,
+              "J": 1.7897078776477042,
+              "label": "local_response_proposal"
+            },
+            {
+              "callback": 126,
+              "J": 0.13303018384233223,
+              "label": "local_response_proposal"
+            }
+          ],
+          "replay": {
+            "artifact_id": "08e1f2c3879e028d7a36462446fecb5b4c6fa7d8ee5fedc620b1e1878142f3de",
+            "media_type": "application/json"
+          },
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.008774149939082425,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 4,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.008774149939082425,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.02900331180307372,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.03,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.008774149939082425,
+              "holding_max_error_m": 0.008774149939082425,
+              "holding_max_speed_m_s": 0.02900331180307372
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "7ef4289b9ecf478aaf1decc229983365",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "9bd3849038db5a7bb54d44cebfd3d59f342413ace2768ed1aaba5117a0cbbbc8",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "a15986c69100058bd04982ac1264f3aed86989cd5adb2478bed4b48e1a14d2b2",
+                "media_type": "application/json"
+              }
+            },
+            "evidence_binding": {
+              "evaluation": {
+                "artifact_id": "9bd3849038db5a7bb54d44cebfd3d59f342413ace2768ed1aaba5117a0cbbbc8",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "a15986c69100058bd04982ac1264f3aed86989cd5adb2478bed4b48e1a14d2b2",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "78e83eeb6875026be08e4d489edf6ae2c0fc52b41fc273b3ee7bfba3d36d10ea",
+                "media_type": "application/json"
+              },
+              "evaluation_binding": {
+                "source": {
+                  "artifact_id": "78e83eeb6875026be08e4d489edf6ae2c0fc52b41fc273b3ee7bfba3d36d10ea",
+                  "media_type": "application/json"
+                },
+                "source_execution_id": null,
+                "original_execution_id": null
+              },
+              "profile_binding": {
+                "evaluation": {
+                  "artifact_id": "9bd3849038db5a7bb54d44cebfd3d59f342413ace2768ed1aaba5117a0cbbbc8",
+                  "media_type": "application/json"
+                },
+                "simulation": {
+                  "artifact_id": "78e83eeb6875026be08e4d489edf6ae2c0fc52b41fc273b3ee7bfba3d36d10ea",
+                  "media_type": "application/json"
+                },
+                "execution_id": "7ef4289b9ecf478aaf1decc229983365"
+              }
+            },
+            "evaluator_tension_channels": null,
+            "timing": {
+              "control_period_s": 0.02,
+              "duration_s": 0.6,
+              "sample_period_s": 0.02,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.001,
+              "real_time_required": false,
+              "real_time_demonstrated": null,
+              "deadline_misses": null,
+              "mean_update_s": null,
+              "simulation_wall_s": null
+            },
+            "continuous_time_guarantee": false
+          },
+          "replay_cost": {
+            "forward_evaluations": 61,
+            "kernel_wall_s": 0.1356177999987267,
+            "model_builds": 1,
+            "physics_step_attempts": 600,
+            "physics_steps": 600,
+            "rollouts": 1
+          },
+          "replay_steps": 600,
+          "replay_step_attempts": 600,
+          "driver_elapsed_s": 17.64343569999619
+        }
+      }
+    }
+  ],
+  "implementation": "8e6b65a82ec07ceef6f5974290cb610470265d30",
+  "study_id": "bf7-native-refinement-v1",
+  "numerical_s": 39.79038810005295,
+  "construction_numerical_s": 0.32317250000778586,
+  "control_initialization_s": 1.1567438000201946,
+  "analysis_preparation_s": null,
+  "compatibility_preparation_s": 0.5360224999894854,
+  "mathematical_evaluations": 3,
+  "selected": null,
+  "research_status": "stopped",
+  "ledger": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 0,
+      "tool_calls": 80,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 11,
+      "model_calls": 0,
+      "backend_solves": 3,
+      "worker_calls": 0,
+      "wall_s": 38.31047180002497
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 69,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "driver_elapsed_s": 55.19455480000761
+}

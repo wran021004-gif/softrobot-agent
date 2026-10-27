@@ -123,7 +123,31 @@ def run_refinement():
     atomic_json(summary,result);return result
 
 
+def audit_saved():
+    """Exercise original recovery and exact receipt reuse; never launch science."""
+    output=ROOT/'evidence/bf7_native_v1';output.mkdir(parents=True,exist_ok=True)
+    records={}
+    for phase,study in [('screen','study_bf7_native_v1.json'),('refinement','study_bf7_native_refinement_v1.json')]:
+        host=prepare(study,BASE/phase);s=state(host)
+        before=dict(mathematical_evaluations=s['mathematical_evaluations'],numerical_s=s['numerical_s'],ledger=host.store.remaining())
+        recovered=core.recover(host)
+        ref=s['analysis_results'][0];a=host.store.artifact(ref)
+        key=a['operation_key'].removesuffix('-analysis')
+        cached=analysis.dispatch(host,a['requested_operation'],key,guard=lambda *args:(_ for _ in ()).throw(AssertionError('No scientific admission allowed')),origin='engineering_preflight')
+        replay_plan=next(host.store.artifact(r) for r in s['plans'] if host.store.artifact(r)['original_plan']['action']=='physical_replay')
+        cached_replay=core.dispatch(host,replay_plan['original_plan'],replay_plan['request_id'],origin='engineering')
+        after=dict(mathematical_evaluations=state(host)['mathematical_evaluations'],numerical_s=state(host)['numerical_s'],ledger=host.store.remaining())
+        assert before==after and cached['reference']==ref
+        records[phase]=dict(recovery=recovered,analysis_reuse=cached.get('operation_reuse'),
+            replay_reused=bool(cached_replay),before=before,after=after,scientific_cost_delta=0)
+        core.export(host,output/phase)
+        atomic_json(output/(phase+'_summary.json'),read(BASE/phase/'summary.json'))
+    atomic_json(output/'receipt_recovery.json',records)
+    return records
+
+
 if __name__=='__main__':
     if sys.argv[1:]==['screen']:run_screen()
     elif sys.argv[1:]==['refine']:run_refinement()
-    else:raise SystemExit('screen | refine')
+    elif sys.argv[1:]==['audit']:audit_saved()
+    else:raise SystemExit('screen | refine | audit')
