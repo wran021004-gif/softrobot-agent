@@ -179,4 +179,45 @@ R4 仅从 R3 自己的完整 best 失败控制开始：注册 schedule artifact 
 
 公开监督入口 `tests/research/bf6_r4_feasibility.py` 只编排原 typed dispatch，不引入新优化器。仅对返回的完整新 best（原 minimax/sum 排序严格优于新 baseline 且 sequence hash 不同）做最多一次独立回放。首次完整独立通过立即 SELECT；失败或预算封顶 STOP，无更好新控制则不重复回放。全部实际成本及异常部分成本保留，原 BF6/R2/R3 余额不转移。
 
-实际结果在本阶段封存后追加。
+### R4 执行结果：完整稳定，原任务仍为 valid_failure
+
+执行前冻结提交为 `04d8ce685fda5e50e092ef856da74a4ab8dd4349`。Native 正常完成 51 个完整回调：1 baseline、48 单侧探针、2 proposal，共 30,600 步；无缓存或重复序列。baseline 与原 R3 best 的全部 measure 完全一致，导入前后控制张力、时间格、绳序均精确相同，确认唯一源是 R3 自身控制。返回的新 best 排序严格改善，随后仅进行一次新独立物理回放，共 600 步；新实际总额 **31,200 步**，没有追加启动。
+
+| 注册独立评价指标 | R3 原 best | R4 新 best | 变化 | 原条件 |
+|---|---:|---:|---:|---:|
+| 最大位置误差 | 22.748539 mm | **18.849433 mm** | -3.899105 mm（下降 17.14%） | ≤12 mm，失败 |
+| RMS 位置误差 | 18.716163 mm | 15.111780 mm | -3.604383 mm（下降 19.26%） | 仅报告 |
+| 末点位置误差 | 22.748539 mm | 18.849433 mm | -3.899105 mm | 全点最大误差条件 |
+| 最大工具轴角误差 | 18.834777° | **15.199879°** | -3.634898°（下降 19.30%） | ≤10°，失败 |
+
+30 个评分点全覆盖；R4 位置有 22 点超限，从 0.18 s 起（R3 为 23 点、从 0.16 s 起），最大仍在 0.60 s。轴方向有 28 点超限，仍从 0.06 s 起，最差点由 R3 的 0.30 s 移到 R4 的 0.14 s。逐点变化见 [R4 审计](../../evidence/bf6_r4_feasibility/audit.json)，均由已存独立信号只读汇总，不是重新运行 evaluator。
+
+独立执行 `21eefc94b0904fa3a43419edd3ce8000` 正常 completed；31 个记录样本含初态与 30 个 post-step 评分样本，600/600 步均检查环境接触，0 contact、0 solver error、0 N 张力越界；真实 0.020 kg 质量、原 COM/惯量/site 绑定 matched。v2 的 10 个组件中，完整性、有效性、力界、solver、双信号覆盖、真实负载和无接触这 7 项通过，task evaluator、最大位置和轴方向这 3 项失败，无缺失未知项，source_issue/outcome_issue 都为 null。独立注册评价为 `evaluate.oriented_tracking@1.0.0`，artifact `80328d1c7fee62f39c30723ac7a775f576525c4f7647e456029ffd4e7943617c`。完整原 acceptance 见 [R4 结果摘要](../../evidence/bf6_r4_feasibility/summary.json)。
+
+因此 **accepted=false，selected=null，Study 已 STOP**，未找到完整原任务可行见证。有限失败保留原阈值和所有实际成本；不将误差改善当作任务通过或结构不可行证明。
+
+### R4 收敛与工具链
+
+| 回调号 | 位置最大 mm | 轴角最大 ° | 最大归一化超限 | 实际改善 / 预测改善 |
+|---|---:|---:|---:|---:|
+| 1，新 baseline | 22.748539 | 18.834777 | 0.895712 | — |
+| 26，response 1 | 20.949873 | 17.253322 | 0.745823 | 0.894 |
+| 51，response 2 | 18.849433 | 15.199879 | 0.570786 | 0.805 |
+
+两轮原局部求解器均成功，停止原因为冻结的 `iteration_limit`。当前相对新 baseline 的最大修正系数约 0.5 N，未碰 ±2 N 新相对系数界；最高实际张力 3.694263 N，无 8 N 上界触及，61/180 个条目处于合法零张力下界。实际张力与请求逐元素相同。重设中心后的有限新邻域确实改善了两类最大误差，与“旧人工边界限制搜索”的诊断一致，但这并未证明该限制是全部瓶颈，仍有耦合及下界限制。原记录的两轮 response 秩均为 24、条件数约 2.61e4 和 3.03e4；未另算新灵敏度或做控制能力证明。原算法建议下一半径 0.45 N 仅是保存记录，不产生新的额度或自动续算。
+
+实际调用为 prepare/bind → generate → initialize_control → research_analysis(`mujoco_direct_control_v1`) → evidence_read → physical_replay → evidence_read → STOP。Store 共 6 个真实 receipts：generate、seed、Native、外层 replay、子物理 replay、STOP，均 completed、cache_hit=false。Native analysis 执行 ID 为 `4650d3961f864028b71cfb623c237d38`，与独立执行不同；新 raw/profile/evaluation/控制引用保持绑定。任务评价和 profile 在物理回放工具内部执行，未冒充额外 `evaluation.run` 或 `simulation.run` 工具调用。Provider、NMPC、RL、私有链路外搜索及额外物理调用均为 0。
+
+### R4 新成本与 BF6 累计
+
+| 范围 | Native 尝试 / 完整 | 独立回放尝试 / 完整 | 确认步 / 调用尝试 | Store 数值 s | driver s |
+|---|---:|---:|---:|---:|---:|
+| **R4 新独立账本** | **51 / 51** | **1 / 1** | **31,200 / 31,200** | **5.6956721** | **9.5225476** |
+| 原 BF6 + R2/R3 封存累计 | 152 / 151 | 3 / 2 | ≥92,252 / 92,253 | 16.3335400 | 历史 validation 未记录 |
+| **含 R4 的 BF6 累计** | **203 / 202** | **4 / 3** | **≥123,452 / 123,453** | **22.0292121** | **合计仍未知** |
+
+R4 的 Native 和 replay 分别 30,600 / 600 步、1 / 1 model build，forward 3,112 / 61；新增 2 次构建、3,173 forward，BF6 科学阶段累计 7 次物理 model build。原失败调用内部进度未知及其 452 个确认步仍保留，不将下界改成精确累计。新额度实际用满后 STOP，不搬用历史余额。
+
+R4 Store 数值费分解为 construction 0.3339877 s、initialize_control 0.1964903 s、Native worker 4.0272449 s、独立 replay 1.1379492 s，合计 5.6956721 s；startup compatibility 另记 0.5686411 s。driver 已含准备、数值与编排，不能重复相加，也不补造历史未知 driver。Provider 请求为 0，机器货币成本未记录。
+
+本次工程检查仅为冻结 JSON、监督代码纯语法与保存来源/账本一致性检查；没有重跑旧测试、额外模型试验或全仓测试。结果整理不新增积分、优化、回放或注册评价。公开版本仅含冻结、监督入口和精选证据；完整 Store、结构和控制数组继续留在本地忽略目录。
