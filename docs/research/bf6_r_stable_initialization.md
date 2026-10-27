@@ -284,4 +284,58 @@ R7 新增数值时间 **11.6393395 s**、driver **15.6206751 s**、2 model build
 
 用户得知 R7 仍严格失败后，再次明确“几乎快要通过了，请提高预算，找到可行解”。因此新增 R8 授权，而非自动绕过原 R7 STOP：[新 R8 冻结](../../configs/research/bf6_r8_feasibility_freeze.json)、[新 Study](../../configs/research/study_bf6_r8_feasibility.json)，`bf6-r8-finite-feasibility-v1`，本地 Store `runs/bf6-r8/private-store`。只导入 R7 自身完整失败控制与 parent，保持原任务/P1/20 g 真实惯量/地面/初态/物理/30 点/12 mm/10° 不变，原工具四 knot response 设置不变，初始半径采用 R7 后段已实际使用的 **0.075 N**。
 
-R8 新上限仍为 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**；先提交冻结，再绑定新账本，首个完整独立通过即 SELECT 停止。若有限失败则 STOP，不自动加批次或回放，保留全部实际成本，原余额不转移。结果封存后追加。
+R8 新上限仍为 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**；先提交冻结，再绑定新账本，首个完整独立通过即 SELECT 停止。若有限失败则 STOP，不自动加批次或回放，保留全部实际成本，原余额不转移。
+
+## R8：BF6 原任务首次完整独立通过
+
+R8 执行前冻结提交 `68d52c80737c1c445cf4e1b3b502e73eed06f39e`。原 Native response 在第 **76 个回调、3 轮 response** 达到冻结的 0.005 内部规划余量，正常以 `local_target_reached` 返回；随后唯一一次独立 physical_replay 完整通过，立即 SELECT 并封存，Study 状态 stopped。配置上限 151 回调/6 轮未用满，其余 75 次回调机会不继续花费或转移。首次完整独立通过后没有任何新增数学、物理、优化或评价执行。
+
+### 独立验收与误差变化
+
+| 原验收条件 | 独立实测结果 | 结论 |
+|---|---:|---|
+| 全部 30 个 post-step 位置误差 ≤12 mm | 最大 **11.939999963 mm** | 通过 |
+| 全部 30 个有向工具轴角误差 ≤10° | 最大 **9.949873799°**，0.1736580579439453 rad | 通过 |
+| 完整 0.6 s、1 ms 物理积分 | **600/600 步**，31 个记录含初态及 30 个评分点 | 通过 |
+| 无环境接触 | 每个独立积分步检查，**0/600** 接触 | 通过 |
+| 原 solver 与 0..8 N 力界 | 0 solver error，0 N 越界 | 通过 |
+| 原 20 g 真实刚性负载 | 质量/COM/完整惯量/site 编译绑定 matched | 通过 |
+| 完整世界位置/工具轴采样及来源 | 完整，source_issue/outcome_issue=null | 通过 |
+
+Registry `evaluate.oriented_tracking@1.0.0` 与 v2 acceptance 的 **10 个组件全部通过**，accepted=true、task_success=true，无缺失未知项。独立执行 ID 为 `5d4f873304ac4bf4937b6801edd60ff0`，Native 分析执行 ID 为 `33a42cff25f040bdab3b88111839e3a1`，两者不同；独立 raw 为 `f04aa9ed9a941a232bb2b0a910a52f2ff1a9ad1ae236f3105790ce6cdc93e313`，注册 evaluation 为 `3895932c71da2a114bb64287b22906b58098640bb84f7fda9eadabca79defc32`，profile 与执行绑定完整，SELECT 指向本次独立回放结果。
+
+完整 acceptance 见 [R8 通过摘要](../../evidence/bf6_r8_feasibility/summary.json)；[R8 独立验收与费用审计](../../evidence/bf6_r8_feasibility/audit.json)保留 30 点误差标量、每点通过标志、原 receipts、来源绑定及全部成本。整理只读取已存数组与冻结参考，没有重跑 evaluator。R4 与 R8 独立 raw 的物理 XML SHA256 完全相同（完整哈希见审计），原 P1、20 g 实体惯量及工具轴定义、地面、初态、物理步长、时长、任务与 12 mm/10° 阈值保持原样，外力近似为 false。
+
+| 独立阶段 | 最大位置 mm | 最大轴角 ° | 全任务 |
+|---|---:|---:|---|
+| R2 G1 稳定起点 | 97.558257 | 37.193883 | valid_failure |
+| R3 best | 22.748539 | 18.834777 | valid_failure |
+| R4 best | 18.849433 | 15.199879 | valid_failure |
+| R5 best | 14.501218 | 11.252786 | valid_failure |
+| R6 best | 12.578171 | 10.425222 | valid_failure |
+| R7 best | 12.034913 | 9.954196 | valid_failure，位置末点仍超限 |
+| **R8 witness** | **11.940000** | **9.949874** | **accepted，已 SELECT** |
+
+### 实际工具链、数学作用与结构结论
+
+R8 仍仅使用 prepare/bind → generate → initialize_control → research_analysis(`mujoco_direct_control_v1`) → evidence_read → physical_replay → evidence_read → SELECT。实际 Store 6 个 receipts 分别为 generate、seed、Native、外层 replay、子物理 replay、SELECT，均 completed、cache_hit=false。一个 Native 请求包含 76 个完整 600 步预测（1 baseline、72 单侧探针、3 proposal），独立回放另为 600 步，新建物理实例独立生成真实世界位置信号和工具轴信号。注册评价与 profile 嵌在回放工具内，不把它们虚报成额外独立工具调用。
+
+第 26 次 Native 回调首先达到原硬阈值代理，通过冻结的 0.005 内部规划余量是在第 76 次；仅在后者之后做一次独立回放。这个区别保留真实首达口径，不能把 Native 代理称为已验收或将成本缩写为仅 26 个回调。物理独立通过后立即 SELECT，未再追分。
+
+数学工具在固定 P1 上确实产生了最终可行控制：原有限差分响应和受约束 SLSQP 局部步骤协调了位置与方向，结合逐阶段有限预算和独立验收消除了原残差。该结果是同 MuJoCo 模型、真实刚性惯量负载下的一个名义采样见证，未建立结构最优、全局最优、硬件或鲁棒性结论。P1 仍是代理事先指定合法参数、经 generate 构造校验的结构；本次成功不是新结构优化器的产物。PPO 没有调用；现有接口未支持该 oriented_tracking 任务，且本例已清晰数学表达并经现有路线获得见证，没有把 PPO 当作“数学不好表示”的自动替代。
+
+### 到首个独立通过的完整费用
+
+| 阶段 | Native 完整回调 | 独立完整回放 | 积分步 | Store 数值 s | driver s |
+|---|---:|---:|---:|---:|---:|
+| R5 | 101 | 1 | 61,200 | 8.8649125 | 12.7946522 |
+| R6 | 151 | 1 | 91,200 | 11.7691171 | 15.6798663 |
+| R7 | 151 | 1 | 91,200 | 11.6393395 | 15.6206751 |
+| **R8 首次通过** | **76** | **1** | **46,200** | **7.0940742** | **11.4023622** |
+| **本轮追加 R5–R8 合计** | **479** | **4** | **289,800** | **39.3674433** | **55.4975558** |
+
+R8 单独为 45,600 Native 步 +600 独立步、2 model builds、4,637+61 forward。数值时间分解为 construction 0.3428828 s、initialize_control 0.1974008 s、Native worker 5.4420341 s、独立 replay 1.1117565 s，合计 7.0940742 s；startup compatibility 另记 0.5359153 s，包含在 driver 口径内。所有阶段的 driver 均包含数值与编排，不与数值列重复相加。
+
+**BF6 原失败起算，到 R8 首个完整独立通过累计：682 次 Native 尝试（681 完整），8 次独立回放尝试（7 完整），≥413,252 个确认积分步 / 413,253 次调用尝试，15 次科学 model builds，61.3966554 s Store 数值累计。**原失败 step 内部进度未知，故确认步数仍是下界；原 validation driver 未记录，不能补造全历史 driver 总时间。R5–R8 的独立新账本全部结算，所有旧失败及费用保留，不将 R8 单段 76 回调冒充总成本。工程 fixture 先前的 1 次编译构建继续按原记录单列，不计作科学 rollout。
+
+Provider、PPO、NMPC/RL 调用均为 0；机器货币费未记录。BF4/BF5 另封存，不纳入以上 BF6 合计。本次只新增公开冻结/监督入口/精选证据和说明；完整成功控制、结构参数和 Store 留在本地忽略目录，不上传。首次可行见证已完成，停止一切后续科学计算。
