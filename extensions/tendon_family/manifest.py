@@ -250,10 +250,10 @@ for _i,_entry in enumerate(EXTENSIONS):
 # S135 development-only route; old Reach registrations remain available.
 EXTENSIONS.append(replace(_sr_controller, version='12.0.0',
     binding='extensions.tendon_family.gvs_nmpc:TaskConditionedNMPCController',
-    description='Existing GVS NMPC with constant or ordered state-projected local path reference',
+    description='Existing GVS NMPC with constant, timed or ordered state-projected local path reference',
     capabilities={**_sr_controller.capabilities, 'profile_id':'gvs_task_conditioned_development_v1',
-        'task_support':['task.reach', 'task.tracking:untimed:development_valid'],
-        'timed_tracking':'offline workspace only; physical route unsupported'}))
+        'task_support':['task.reach', 'task.tracking:untimed:development_valid', 'task.tracking:timed:development_valid'],
+        'timed_tracking':'Reviewed development task; offline_timed_tracking_v1 independent acceptance; performance unmeasured'}))
 _backend = next(e for e in EXTENSIONS if e.extension_id=='backend.family_mujoco' and e.version=='1.1.0')
 EXTENSIONS.append(replace(_backend, version='1.2.0', capabilities={**_backend.capabilities,
     'families':['task.reach','task.tracking']}))
@@ -264,4 +264,4 @@ for _i,_entry in enumerate(EXTENSIONS):
             **_support,'controller':[*_support['controller'],'controller.gvs_nmpc@12.0.0'],
             'backend':[*_support['backend'],'backend.family_mujoco@1.2.0'],
             'task_families':[*_support['task_families'],'task.tracking']},
-            'tracking_scope':'Only reviewed untimed development tasks with GVS controller 12; checked by route_applicability'})
+            'tracking_scope':'Only reviewed development tasks with GVS controller 12; checked by route_applicability'})

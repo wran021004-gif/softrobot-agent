@@ -510,9 +510,10 @@ def recover(host):
     evaluation,profile=evaluate_playback(cfg,raw,raw_ref,digest(dict(candidate=p['candidate'],source=p['source_reference'])))
     evaluation_ref=save(host,plain(evaluation),'physical_playback_endpoint_evaluation')
     profile.update(execution_id=folder.name,simulation=raw_ref,evaluation=evaluation_ref)
+    profile_ref=save(host,profile,'physical_playback_profile')
     complete=profile['complete']
     acceptance=assemble_acceptance(cfg,evaluation,profile,evaluation_reference=evaluation_ref,
-        profile_reference=None,motion=[dict(time_s=v['time_s']) for v in samples])
+        profile_reference=profile_ref,motion=[dict(time_s=v['time_s']) for v in samples])
     predicted=source.get('mathematical_outputs')
     aligned=bool(predicted and len(samples)==len(predicted['times_s']) and
         all(abs(v['time_s']-t)<1e-12 for v,t in zip(samples,predicted['times_s'])))
@@ -535,8 +536,8 @@ def recover(host):
         scientific_configuration=candidate['scientific_configuration'],profile_identity=candidate['profile_identity'],
         evaluation_version=candidate['evaluation_version'],
         model_identity=source['trajectory']['model_identity'],design_identity=source['trajectory']['design_identity'],
-        owning_study=host.run_id,execution_id=p['worker_request_id'],
-        source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,
+        owning_study=host.run_id,execution_id=folder.name,request_id=p['worker_request_id'],
+        source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,profile_reference=profile_ref,
         acceptance=acceptance,comparison=comparison,profile=profile,boundary=boundary,
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
         physical_launches=1,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)

@@ -516,7 +516,7 @@ class ControlSeedRequest(Contract):
 class ResearchDecision(Contract):
     version: Literal['research_decision_v1'] = 'research_decision_v1'
     hypothesis_id: str = Field(min_length=1)
-    claimed_inference: str = Field(default='empirical_search',min_length=1,description='Use empirical_search for a proposed falsifiable experiment, including testing a mathematical prediction in physics. This is not a proven inference. Any stronger claim must match supported_inferences of registered supporting_evidence with the required identity and scope.')
+    claimed_inference: str = Field(default='empirical_search',min_length=1,description='Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.')
     research_intent: Literal['DIAGNOSE','MATHEMATICAL_ANALYSIS','CONTROL_SEARCH','DESIGN_MODIFICATION','NMPC_EXECUTION','RL_TRAINING','PHYSICAL_VALIDATION','SELECT','STOP']
     selected_method: str = Field(min_length=1,description='Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.')
     selected_variables: list[str] = Field(default_factory=list)

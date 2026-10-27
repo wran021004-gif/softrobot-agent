@@ -32,7 +32,7 @@ def readable_results(s, host=None):
         linked += [host.store.artifact(e['reference'])['raw_reference'] for e in s.get('research_history',[])]
         for ref in s.get('physical_replays',[]):
             replay=host.store.artifact(ref)
-            linked += [replay[k] for k in ('source_reference','raw_reference','evaluation_reference') if replay.get(k)]
+            linked += [replay[k] for k in ('source_reference','raw_reference','evaluation_reference','profile_reference') if replay.get(k)]
     if host:
         if s.get('pilot',{}).get('handoff'):
             preparation=host.store.artifact(s['pilot']['handoff'])

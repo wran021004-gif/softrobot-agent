@@ -63,6 +63,7 @@ def task_gap(result):
     scored=(('evaluator:tracking_max_error','evaluator:path_coverage','evaluator:path_start',
         'evaluator:path_end','evaluator:path_progress_regression') if tracking else
         ('evaluator:task_bound','holding_position','holding_speed'))
+    if acceptance.get('protocol_id')=='offline_timed_tracking_v1':scored=('evaluator:tracking_max_error',)
     signed={name:row['value']/row['limit']-1 for name,row in components.items()
         if name in scored
         and isinstance(row.get('value'),(float,int)) and math.isfinite(row['value']) and row.get('limit',0)>0}

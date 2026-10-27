@@ -144,6 +144,8 @@ class MainlineTests(unittest.TestCase):
         relation=mathematical_physical_relation(raw,[(ref,physical)])
         self.assertEqual(relation['status'],'constraint_mismatch')
         self.assertEqual(relation['causal_explanation'],'not_established')
+        self.assertIn('not a test of which constraints were included',relation['comparison_basis'])
+        self.assertIn('does not mean speed was omitted',relation['reason'])
         update(self.h,physical_replays=[ref])
         mathref=self.register(raw)
         reporter.scientific_feedback(self.h,dict(reference=mathref),{})

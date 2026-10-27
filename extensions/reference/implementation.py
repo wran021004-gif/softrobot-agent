@@ -127,7 +127,7 @@ def tracking_condition_specs(task):
 
 
 def evaluate_tracking(task,result,source,reg,identity):
-    """Ordered geometric path, no timed reference, speed or arrival deadline."""
+    """Timed r(t) samples or ordered geometric path, using the frozen goal mode."""
     import numpy as np
     tracking_task(task,reg)
     common=dict(source=source,evaluator=task.evaluator.extension_id,

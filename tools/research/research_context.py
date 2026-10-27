@@ -753,10 +753,10 @@ def decision_brief(current):
         read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
             classification=r['classification'],content_identity=r['delivery_identity'],
             source_state_identity=r['source_state_identity'],
-            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'changed; reread to compare content')
+            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'state changed; queried content change unverified')
                 if r['source_state_identity'] else 'immutable source or unrecorded state') for r in ws['read_coverage'][-3:]],
         full_list_query=dict(reference=anchor,view='working_set',pointer='/read_coverage'),
-        rule='Exact repeats refer to previously delivered unchanged content. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
+        rule='Exact repeats refer to previously delivered unchanged content. A changed whole-session identity alone does not require rereading: Provider counters, read markers and handoff metadata also change it. Read for a specific missing fact or to verify a relevant change. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
     definitions={};actions=[]
     for row in feedback['actions']:
         method=row['action']+('/'+row['method'] if row.get('method') else '')
@@ -953,6 +953,18 @@ def mathematics_authorization(host,s):
         method_preconditions='Candidate/model-group/dependency and remaining-budget admission still required; authorization does not supply missing prerequisites.')
 
 
+def controller_capabilities(host):
+    """Existing frozen controller owner; large schema is retrieved through L1."""
+    from tools.research_tasks import task_adapter
+    spec=state(host)['spec'];controller=spec['configuration']['policy']['controller']
+    return dict(recipe_defaults=controller['parameters']['data']['recipe'],
+        frozen_replan_period_s=spec.get('nmpc_replan_period_s'),
+        task_reference=task_adapter(spec['configuration']).control_reference(),
+        parameter_schema=host.reg.get(controller['extension_id'],controller['version'],'controller').input_schema.model_json_schema(),
+        solver_defaults=controller['parameters']['data'].get('solver'),
+        patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -1063,7 +1075,7 @@ def agent_decision_brief(host):
         brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,
             view='working_set',pointer='/all_fresh_results'),
             rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
-        brief.pop('citation_eligibility',None)
+        # Keep the compact registration rule/query in L0; the inventory stays in L1.
         ws=brief.get('evidence_working_set',{})
         for key in ('candidate_index','control_result_links','control_comparisons'):
             if key in ws:
@@ -1091,6 +1103,10 @@ def compact_scientific_delivery(brief,*,decision_only=False):
             brief['available_research_actions']=[r for r in brief.get('available_research_actions',[]) if r.get('candidate') in (None,candidate)]
             brief['research_actions_query']=dict(reference=brief['evidence_access']['reference'],view='working_set',pointer='/eligible_methods')
         catalog=brief.get('mathematical_capabilities',{})
+        if catalog.get('methods'):
+            catalog['request_template_query_format']=dict(reference=catalog['candidate'],view='mathematical_capabilities',
+                pointer='/methods/<exact method key>',fields=['candidate','operation','request_template',
+                    'required_parameters','formal_execution_authorized','missing','cost_scope'])
         for method,row in catalog.get('methods',{}).items():
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
@@ -1100,8 +1116,11 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                     row.pop(key)
             if method!='mujoco_direct_control_v1':row.pop('request_template_query',None)
         if brief.get('selected_mathematical_method'):
-            selected=brief['selected_mathematical_method']['method']
-            brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],'pointer':'/methods/'+selected})
+            selected=brief['selected_mathematical_method']
+            fields=[k for k in ('candidate','operation','request_template','required_parameters','formal_execution_authorized',
+                'execution_limits','cost_scope','missing') if k in selected]
+            brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],
+                'pointer':'/methods/'+selected['method'],**(dict(fields=fields) if fields else {})})
         intent=brief.get('research_intent',{})
         if isinstance(intent.get('unresolved_question'),str):
             intent['unresolved_question']=intent['unresolved_question'][:240]
@@ -1296,8 +1315,13 @@ def tool_feedback(host,value):
                 changed_leaf_count=len(changes),causal_attribution='Unassessed; parameter differences do not establish single-factor causality')
     if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
+    execution=result.get('execution_feedback') if isinstance(result,dict) else None
+    if isinstance(result,dict) and result.get('status')=='not_applicable':
+        execution=dict(status='not_applicable',scientific_execution_started=False,
+            additional_analysis_evaluations=result.get('additional_analysis_evaluations'),
+            reasons=(result.get('analysis_applicability') or {}).get('reasons',[]))
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
-        execution_feedback=result.get('execution_feedback') if isinstance(result,dict) else None,
+        execution_feedback=execution,
         scientific_reference=reference if reference in known else None,new_facts=view)
 
 

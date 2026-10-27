@@ -190,7 +190,7 @@ def dispatch(host,plan,key,*,origin='model'):
         raise ValueError('BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY')
     def make_start(item,index):
         cfg=verify_candidate(host,item.candidate)['configuration'];adapter=task_adapter(cfg)
-        if cfg['task']['family']!='task.reach':raise ValueError('UNSUPPORTED_CONTROL_SEARCH_TASK_CONSTRAINTS')
+        options=adapter.control_search_options()
         source=host.store.artifact(item.source)
         from tools.research.physical_replay import explicit_control_source, numerically_verified_source
         if not (explicit_control_source(source) or numerically_verified_source(source)):
@@ -204,13 +204,11 @@ def dispatch(host,plan,key,*,origin='model'):
             if old_task!=new_task:raise ValueError('CROSS_TASK_ADAPTATION_REQUIRES_INDEPENDENT_TRANSFER_STUDY')
             source=initialize_schedule(cfg,source,item.adaptation_from)
         binding(cfg,source['trajectory'])
-        limits=adapter.ranking_limits()
         tendon_limits={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
         return dict(id=str(index)+'-'+plain(item.source)['artifact_id'],candidate=plain(item.candidate),schedule=source,
             configuration=cfg,source=plain(item.source),
             limits=[tendon_limits[t] for t in source['trajectory']['tendon_order']],
-            task_options=dict(target=cfg['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
-                position_limit=limits['holding_max_error_m'],terminal_position_limit=limits['terminal_error_m'],speed_limit=limits['holding_max_speed_m_s']))
+            task_options=options)
     if q.settings.version!='local_control_search_v2':raise ValueError('PUBLIC_SEARCH_REQUIRES_V2_SETTINGS')
     starts=[make_start(item,i) for i,item in enumerate([q,*q.additional_starts])]
     def factory(start,action,**kwargs):

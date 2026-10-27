@@ -408,6 +408,18 @@ def error_feedback(host, use, exc, before):
         expected=f'action={action} requires decision.research_intent={PLAN_RESEARCH_INTENTS[action]}'
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
+    if code=='BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY':
+        from tools.research.budget import decision_budget
+        science=decision_budget(host)['science_budget']
+        requested=(use['input'].get('control_search') or {}).get('settings',{}).get('evaluation_requests')
+        maximum=s['spec']['budgets']['physical_launches']+1
+        field='control_search.settings.evaluation_requests'
+        expected=(f'Plan control_search cap {requested} exceeds frozen declared callback maximum {maximum} '
+            '(physical_launches + one possibly reusable baseline). Each new callback uses a full physical replay; '
+            f'raw remaining shared launches={science["remaining_physical"]}, full replays={science["remaining_full_replays"]}. '
+            'These are remaining totals, not permission or a guarantee that a batch fits. Response FD needs a baseline plus '
+            'effective coefficient probes and one candidate per completed update. Native optimization instead requires '
+            'research_analysis with its registered template and mathematical allowance; internal native rollouts are not independent replay credits.')
     navigation=getattr(exc,'evidence_navigation',{})
     if use['name']=='evidence_read' and 'EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS' in message:
         code='EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS';field='fields'
@@ -625,6 +637,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
                     report=scientific_feedback(host,original,before)
                     if report is not None:value=report
+                if isinstance(original,dict) and original.get('inference_assessment'):
+                    value['inference_assessment']=original['inference_assessment']
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']
@@ -936,20 +950,19 @@ def decision_packet(host):
     from tools.research.core import packet
     from tools.research.research_context import ordered_candidates
     if state(host)['spec'].get('research_decisions'):
-        from tools.research.research_context import agent_decision_brief
+        from tools.research.research_context import agent_decision_brief,controller_capabilities
         from extensions.tendon_family.family_space import decision_summary
         from tools.research_tasks import task_adapter
         s=state(host);spec=s['spec']
-        return dict(research=agent_decision_brief(host),implementation=s['freeze'],study_id=host.run_id,
+        research=agent_decision_brief(host)
+        controller=controller_capabilities(host)
+        controller.pop('parameter_schema')
+        controller['parameter_schema_query']=dict(reference=research['evidence_access']['reference'],
+            view='working_set',pointer='/controller_capabilities/parameter_schema')
+        return dict(research=research,implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
-            controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
-                frozen_replan_period_s=spec.get('nmpc_replan_period_s'),
-                task_reference=task_adapter(spec['configuration']).control_reference(),
-                parameter_schema=host.reg.get(spec['configuration']['policy']['controller']['extension_id'],
-                    spec['configuration']['policy']['controller']['version'],'controller').input_schema.model_json_schema(),
-                solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
-                patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
+            controller_capabilities=controller,
             candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],
             candidate_profile_bindings=[dict(candidate=r,profile_identity=host.store.artifact(r)['profile_identity'],
                 executable_under_current_profile=host.store.artifact(r)['profile_identity']==s['profile']['identity'])

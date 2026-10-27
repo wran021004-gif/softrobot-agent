@@ -19,7 +19,7 @@ METHOD_MEANINGS = {
     'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
-    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold only. Reuse local response/pattern search with cloned native rollouts covering every holding sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
+    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold or timed Tracking. Reuse local response/pattern search with cloned native rollouts covering every registered norm sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
     'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.'),
     'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two input step sizes, optional bounded correction checked by native integration. Neither two FD sizes nor two integration timesteps prove numerical convergence or a regional bound; a failed local correction does not establish infeasibility.'),
     'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates at fixed input; this response is not reoptimized structural capability or an optimal-value gradient.'),
@@ -92,8 +92,7 @@ def mathematical_method_view(host, reference):
             model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
             coverage=row.get('coverage',[]),full_task_supported=row.get('full_task_supported',False),
             study_authorized=authorized,formal_scope_authorized=authorization['registered_study_scope_authorized'],
-            formal_execution_authorized=bool(authorized and authorization['registered_study_scope_authorized'] is True
-                and cfg['task']['family']!='task.tracking'),
+            formal_execution_authorized=bool(authorized and authorization['registered_study_scope_authorized'] is True),
             execution_status='blocked' if reasons or not authorized or closed else 'conditional_on_admission',
             missing=reasons+row.get('parameter_requirements',[])+([] if authorized else ['study_method_grant_required'])+
                 ([] if authorization['registered_study_scope_authorized'] is True else ['formal_study_math_scope_required'])+
@@ -130,7 +129,7 @@ def mathematical_method_view(host, reference):
                     scope='Measured applied NMPC tensions only, exact candidate/task/channels/grid/bounds; acceptance is not inherited.')
                 break
             methods[key]['cost_scope']='Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.'
-            methods[key]['supported_task_families']=['task.reach']
+            methods[key]['supported_task_families']=['task.reach','task.tracking:timed']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']
             methods[key]['kernel_supported']=row['planning_status']!='unsupported'
             methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (pretension or explicit tensions), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
@@ -199,7 +198,9 @@ def mathematical_catalog(view):
             'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits',
             'registered','authorized','applicable','executable') if k in row}
         item['detail_pointer']='/methods/'+row['method']
-        item['request_template_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/request_template'}
+        item['request_template_query']={**row['detail_query'],
+            'fields':[k for k in ('candidate','operation','request_template','required_parameters',
+                'formal_execution_authorized','missing','execution_limits','cost_scope') if k in row]}
         if row.get('measured_control_initialization'):
             item['control_initialization_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/measured_control_initialization'}
         if row['method']==SENSITIVITY and row.get('authorized') and 'missing_validated_model_stencil' in row['missing']:
@@ -249,8 +250,6 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         assessment=model_assessment(configuration,requirements,operation,model=model,model_source='mujoco' if native else 'controller')
         applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
         reasons=list(applicability['reasons'])
-        if operation=='mujoco_direct_control_v1' and configuration.task.family!='task.reach':
-            reasons.append('MuJoCo-direct v1 supports Reach/Hold only.')
         if operation=='instantaneous_braking_v1' and exact_point is None:
             reasons.append('Exact saved state required.')
         planning='unsupported' if reasons else 'requires_parameters' if parameters else 'ready'

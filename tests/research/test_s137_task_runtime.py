@@ -91,8 +91,8 @@ class TaskRuntimeTests(unittest.TestCase):
         self.assertEqual(positions[1].tolist(), req.constraints[0].reference[-1])
         self.assertEqual(velocities.shape, (2, 3))
         self.assertEqual(adapter.control_reference()['kind'], 'timed')
-        self.assertIsNone(adapter.execution_requirements()['protocol_id'])
-        self.assertTrue(adapter.execution_requirements()['missing'])
+        self.assertEqual(adapter.execution_requirements()['protocol_id'],'offline_timed_tracking_v1')
+        self.assertFalse(adapter.execution_requirements()['missing'])
 
     def test_task_only_references_do_not_invent_frozen_hold_or_execution_data(self):
         for task, kind in ((self.spec['configuration']['task'], 'constant'), (TASK, 'free_progress'), (self.timed, 'timed')):
@@ -221,7 +221,7 @@ class TaskRuntimeTests(unittest.TestCase):
             self.assertEqual(view['protocol_id'], view['protocol_template_id'])
             self.assertEqual(adapter.check_compatibility()['technical_compatibility']['status'], 'unsupported')
             if task == self.timed:
-                self.assertIsNone(view['protocol_template_id'])
+                self.assertEqual(view['protocol_template_id'], 'offline_timed_tracking_v1')
             cfg['task']['status'] = 'development_valid'
             reviewed = task_adapter(cfg).execution_requirements()
             self.assertTrue(reviewed['task_reviewed'])

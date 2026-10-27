@@ -25,7 +25,10 @@ def mathematical_physical_relation(value, physical):
         trajectory=sensitivity['numerical_optimality'][0]['result']
     active=[r for r in trajectory.get('dual_checks',{}).get('constraint_multipliers',[]) if r['epigraph_active']]
     signals=sorted({r['signal']['name'] for r in active})
+    checked=sorted({r['constraint_id'] for r in trajectory.get('coverage',[])})
     result=dict(status='not_assessed',mathematical_active_signals=signals,sources=[],
+        comparison_basis='Epigraph active signals versus failed physical components; not a test of which constraints were included.',
+        mathematical_checked_constraint_ids=checked,
         reason='No complete same-candidate same-task physical observation with alignable constraints.',
         causal_explanation='not_established',physical_improvement='unverified')
     aligned=[]
@@ -42,7 +45,9 @@ def mathematical_physical_relation(value, physical):
         mismatch=(signals==['tip_position'] and bool(failed & {'holding_speed','holding_tip_speed','speed'}))
         result.update(status='constraint_mismatch' if mismatch else 'aligned_observations_causality_unresolved',
             physical_failed_components=sorted(failed),sources=aligned[-3:],aligned_observation_count=len(aligned),
-            reason='Position-dominated mathematics does not explain the recorded holding-speed failure.' if mismatch else
+            reason=('The mathematical active set is position-dominated while physical holding speed fails. '
+                'Inactive checked speed constraints are still included in the sampled minimax problem; '
+                'this status does not mean speed was omitted or establish a failure cause.') if mismatch else
                 'Aligned observations are available; no validated mathematical-to-physical explanation.')
     return result
 HYPOTHESES={
@@ -254,7 +259,8 @@ def admit_decision(host,plan):
     if plan.control_search and d.requested_budget!=plan.control_search.settings.evaluation_requests:
         raise ValueError('DECISION_SEARCH_BUDGET_MISMATCH')
     known=registered_references(host)
-    summaries=[]
+    summaries=[];claim_scope_issues=[]
+    experiment=plan.action not in ('select','confirm','stop')
     for ref in plan.supporting_evidence:
         if plain(ref) not in known:raise ValueError('UNREGISTERED_RESEARCH_EVIDENCE')
         value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
@@ -264,14 +270,25 @@ def admit_decision(host,plan):
             task=comparable_task(s['spec'],source_cfg['task'])
             expected=s['spec'].get('canonical_task',s['base_configuration']['task'])
             background=[e['reference'] for e in s['spec'].get('research_decisions',{}).get('background',[])]
-            if task!=expected and not (d.claimed_inference=='empirical_search' and plain(ref) in background):
-                raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+            if task!=expected:
+                if plain(ref) not in background or (not experiment and d.claimed_inference!='empirical_search'):
+                    raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+                if d.claimed_inference!='empirical_search':claim_scope_issues.append('EVIDENCE_TASK_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:
-                raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+                if not experiment:raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+                claim_scope_issues.append('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and any(source_cfg['policy'][k]!=cfg['policy'][k] for k in ('backend','discretization','dynamics_model')):
-                raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
+                if not experiment:raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
+                claim_scope_issues.append('EVIDENCE_MODEL_SCOPE_MISMATCH')
         summaries.append(summary)
-    if d.claimed_inference!='empirical_search' and not any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries):
+    supported=not claim_scope_issues and (d.claimed_inference=='empirical_search' or any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries))
+    if not supported and plan.action in ('select','confirm','stop'):
         raise ValueError('INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: '+d.claimed_inference)
-    return dict(version=d.version,claimed_inference=d.claimed_inference,
+    result=dict(version=d.version,claimed_inference=d.claimed_inference,
         resolved_evidence=[v['evidence_reference'] for v in summaries],prospective_guarantee=False)
+    if not supported:
+        result.update(inference_status='unsupported_inference',execution_basis='empirical_experiment',
+            claim_scope_issues=claim_scope_issues,
+            scope='The original claim is retained as an unsupported hypothesis, not a scientific fact. '
+                'Its interpretation does not veto this experiment; all identity, authorization, applicability and resource checks still apply.')
+    return result

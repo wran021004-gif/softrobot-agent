@@ -18,7 +18,7 @@ def decision_summary(value):
         'native_dynamics_v1':'Which native forces and drive directions determine acceleration at this state?',
         'short_input_response_v1':'How do legal tensions affect the short endpoint, and does one local correction improve its constraints?',
         'mujoco_nonlinear_task_capability_v1':'What is the best found full-task signed J under this finite native search?',
-        'mujoco_direct_control_v1':'Can bounded native sequence optimization improve every holding sample before independent full replay?',
+        'mujoco_direct_control_v1':'Can bounded native sequence optimization improve every registered task sample before independent full replay?',
         'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
     if value['operation']=='native_dynamics_v1':
         mechanics=raw['mechanics'];names={q['name'] for q in summary['quantities']}

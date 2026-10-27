@@ -1,0 +1,121 @@
+{
+  "controller_defaults": {
+    "extension_id": "controller.gvs_nmpc",
+    "parameters": {
+      "contract": "family.gvs_reach_control",
+      "data": {
+        "numerical_source": "initial_state_pretension",
+        "recipe": {
+          "stopping_policy": "research_work_v1",
+          "integration_method": "implicit_euler",
+          "root_tolerance": 1e-10,
+          "holding_speed_cost_mode": "time_integral_v1",
+          "holding_speed_cost_window_s": 0.05,
+          "position_error_scale_m": null,
+          "tip_speed_scale_m_s": 0.02,
+          "holding_brake_lead_s": 0.0,
+          "recover_returned_tensions": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "feasible_return": null,
+          "regenerate_warm_states": true,
+          "terminal_velocity_weight": 0.0,
+          "max_unusable_updates": 3,
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "rate_scale_rad_m_s": 1000.0,
+          "max_cpu_s": null,
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "horizon": 10,
+          "substeps": 1,
+          "tracking_weight": 1.0,
+          "terminal_weight": 5.0,
+          "velocity_weight": 0.0,
+          "tension_weight": 0.0001,
+          "variation_weight": 0.001,
+          "max_iterations": 120,
+          "tolerance": 1e-06,
+          "evaluation_threads": 1,
+          "reference_mode": "timed",
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        }
+      },
+      "version": "1.0.0"
+    },
+    "version": "12.0.0"
+  },
+  "rl_defaults": {
+    "mode": "direct",
+    "reference": null,
+    "budget": {
+      "actions": 2048,
+      "active_seconds": null
+    },
+    "stop_at_boundary": null,
+    "observation": {
+      "position_scale_m": 0.01,
+      "speed_scale_m_s": 0.02
+    },
+    "action": {
+      "residual_scale_n": 8.0
+    },
+    "reward": {
+      "position": 1.0,
+      "holding_speed": 1.0,
+      "smoothness": 0.001,
+      "failure_penalty": -10000.0
+    },
+    "ppo": {
+      "learning_rate": 0.0003,
+      "n_steps": 256,
+      "batch_size": 64,
+      "n_epochs": 10,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "clip_range": 0.2,
+      "clip_range_vf": null,
+      "normalize_advantage": true,
+      "ent_coef": 0.0,
+      "vf_coef": 0.5,
+      "max_grad_norm": 0.5,
+      "use_sde": false,
+      "sde_sample_freq": -1,
+      "target_kl": null,
+      "policy_kwargs": {
+        "net_arch": {
+          "pi": [
+            64,
+            64
+          ],
+          "vf": [
+            64,
+            64
+          ]
+        },
+        "log_std_init": -3.0
+      },
+      "device": "cpu",
+      "verbose": 0
+    },
+    "initial_tension_n": null
+  },
+  "continuation": {
+    "ppo": [
+      "learning_rate",
+      "n_steps",
+      "batch_size",
+      "n_epochs",
+      "ent_coef"
+    ],
+    "reward": [
+      "position",
+      "holding_speed",
+      "smoothness",
+      "failure_penalty"
+    ],
+    "optimizer": "preserve"
+  }
+}

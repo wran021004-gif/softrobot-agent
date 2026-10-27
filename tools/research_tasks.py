@@ -92,7 +92,7 @@ class ResearchTaskAdapter:
         reach = task['family'] == 'task.reach'
         timed = not reach and task['goal']['data']['time_requirement'] == 'timed'
         complete = {'robot', 'policy'} <= self.configuration.keys()
-        protocol = 'offline_reach_hold_v1' if reach else 'development_tracking_v1' if not timed else None
+        protocol = 'offline_reach_hold_v1' if reach else 'offline_timed_tracking_v1' if timed else 'development_tracking_v1'
         signals = list(task['observations'])
         if reach:
             position = next(s for s in signals if s['name'] == 'tip_position')
@@ -102,8 +102,7 @@ class ResearchTaskAdapter:
         policy = self.configuration.get('policy', {})
         bindings = {key: {field: policy[key][field] for field in ('extension_id', 'version')}
                     for key in ('controller', 'backend', 'dynamics_model') if policy.get(key)}
-        missing = (['Timed Tracking has no composite physical acceptance protocol'] if timed else []) + (
-            [] if complete else ['Frozen effective configuration is required for execution/protocol requirements'])
+        missing = [] if complete else ['Frozen effective configuration is required for execution/protocol requirements']
         blockers = list(missing)
         if task['status'] != 'development_valid':
             blockers.append('Development execution requires development_valid; drafts cannot execute and formal approval needs an independent policy')
@@ -149,6 +148,22 @@ class ResearchTaskAdapter:
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return dict(terminal_error_m=self.task['evaluator']['parameters']['data']['tolerance_m'],
             holding_max_error_m=settling['position_limit_m'],holding_max_speed_m_s=settling['speed_limit_m_s'])
+
+    def control_search_options(self):
+        """The registered task's norm constraints for the existing sequence search."""
+        if self.task['family'] == 'task.tracking':
+            if self.task['goal']['data']['time_requirement'] != 'timed':
+                raise ValueError('UNTIMED_CONTROL_SEARCH_UNSUPPORTED: saved-polyline conditions required')
+            period = self.task['timing']['sample_period_s']
+            lo, hi = self.task['sampling']['window_s']
+            times = [i*period for i in range(round(lo/period), round(hi/period)+1)]
+            reference, _ = self.reference_at(times)
+            return dict(tracking=dict(times_s=times, reference_m=reference.tolist(),
+                max_error_m=self.task['evaluator']['parameters']['data']['max_error_m']))
+        limits = self.ranking_limits()
+        return dict(target=self.task['goal']['data']['target_m'], holding_start=self.holding_start_s(),
+            position_limit=limits['holding_max_error_m'], terminal_position_limit=limits['terminal_error_m'],
+            speed_limit=limits['holding_max_speed_m_s'])
 
     def reference_at(self, times):
         """Reach has a constant timed reference; geometric Tracking has none."""
@@ -352,6 +367,8 @@ def _protocol_requirements(result):
     if (protocol, family) == ('development_tracking_v1', 'task.tracking'):
         return common | {'tracking_sampling', 'evaluator:tracking_max_error', 'evaluator:path_coverage',
                          'evaluator:path_start', 'evaluator:path_end', 'evaluator:path_progress_regression'}
+    if (protocol, family) == ('offline_timed_tracking_v1', 'task.tracking'):
+        return common | {'tracking_sampling', 'evaluator:tracking_max_error'}
     return None
 
 
@@ -396,7 +413,7 @@ def _source_issue(result, evidence=None):
             evaluation_binding.get('original_execution_id') not in (None,execution) or
             evaluation_binding.get('source') not in (None,evidence['simulation'])):
         return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
-    if result['protocol_id']=='offline_reach_hold_v1':
+    if result['protocol_id'] in ('offline_reach_hold_v1', 'offline_timed_tracking_v1'):
         for kind in ('evaluation', 'simulation', 'execution_id'):
             if not binding.get(kind):
                 return 'PROTOCOL_REQUIRED_SOURCE_MISSING:profile_' + kind
@@ -425,8 +442,11 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     if task['family']=='task.tracking' and (task['status']!='development_valid' or
             cfg['policy']['controller']['version']!='12.0.0'):
         raise ValueError('TRACKING_COMPOSITE_ACCEPTANCE_UNSUPPORTED: independent evaluator available; execution/force protocol not implemented')
+    expected_protocol = adapter.execution_requirements()['protocol_template_id']
     if protocol_id is None:
-        protocol_id = 'offline_reach_hold_v1' if task['family'] == 'task.reach' else 'development_tracking_v1'
+        protocol_id = expected_protocol
+    if protocol_id != expected_protocol:
+        raise ValueError('TASK_ACCEPTANCE_PROTOCOL_MISMATCH')
     ev = plain(evaluation) if evaluation is not None else None
     if ev is not None:
         ev = plain(EvaluationResult.model_validate(ev))
@@ -489,7 +509,13 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         metrics.update(holding_max_error_m=settling.get('max_error_m'), holding_max_speed_m_s=settling.get('max_speed_m_s'))
     else:
         covered = report.get('tracking_sampling_complete')
-        components['tracking_sampling'] = _component(covered, covered, reason='Profile verifies recorded post-step motion and pre-step tension grids; acquisition completeness is not a task deadline')
+        components['tracking_sampling'] = _component(covered, covered, reason=(
+            'Full post-step motion and pre-step tension grids; r(t) is scored on the frozen inclusive window'
+            if protocol_id == 'offline_timed_tracking_v1' else
+            'Profile verifies recorded post-step motion and pre-step tension grids; acquisition completeness is not a task deadline'))
+    required = _protocol_requirements(dict(protocol_id=protocol_id, task_family=task['family']))
+    for name in sorted(required - components.keys()):
+        components[name] = _component(None, None, reason='Required registered protocol component absent')
     missing = [name for name, c in components.items() if c['passed'] is None]
     if issues or validity == 'invalid':
         status, accepted = ('invalid', None)

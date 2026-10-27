@@ -189,8 +189,6 @@ def checked_control(inp, *, execution=True):
     if tracking:
         if (inp.policy.controller.extension_id, inp.policy.controller.version) != ('controller.gvs_nmpc', '12.0.0'):
             raise ValueError('TRACKING_CONTROLLER_UNSUPPORTED')
-        if execution and reference['kind'] == 'timed':
-            raise ValueError('TIMED_TRACKING_PHYSICAL_ROUTE_UNSUPPORTED: offline workspace only')
         if execution and inp.task.status != 'development_valid':
             raise ValueError('TRACKING_REQUIRES_REVIEWED_DEVELOPMENT_TASK')
         if control.settling is not None or any((control.recipe.holding_tip_speed_weight,
