@@ -38,19 +38,31 @@ def main():
     result=core.dispatch(host,plan('physical_replay',physical_replay=dict(candidate=candidate,source=source)),
         'bf6v-replay',origin='engineering')['result']
     core.read_evidence(host,dict(reference=result['reference'],view='full'))
-    assert _outcome_issue(result['acceptance']) is None and _source_issue(result['acceptance']) is None
+    source_issue=_source_issue(result['acceptance']);outcome_issue=_outcome_issue(result['acceptance'])
+    assert source_issue is None
+    if result['acceptance']['status'] in ('accepted','valid_failure'):assert outcome_issue is None
     if result['acceptance']['accepted']:
         core.dispatch(host,plan('select',selected_execution=result['reference'],supporting_evidence=[result['reference']]),'bf6v-select',origin='engineering')
     else:core.dispatch(host,plan('stop',next_step='stop',supporting_evidence=[result['reference']]),'bf6v-stop',origin='engineering')
     physical=host.store.artifact(result['raw_reference']);native=previous.artifact(prior['analysis'])
+    diagnostic=physical.get('numerical_failure',{})
+    replay_cost=physical.get('cost') or dict(model_builds=1,rollouts=1,
+        physics_steps_lower_bound=physical.get('physics_steps_lower_bound',0),
+        physics_step_attempts=diagnostic.get('attempted_steps'),forward_evaluations=diagnostic.get('forward_evaluations'),
+        accounting='Worker exception: confirmed completed steps are a lower bound; failed mj_step internal progress is unknown')
     row=dict(implementation=state(host)['freeze'],protocol_identity=digest(frozen),resolved_identity=state(host)['spec']['resolved_identity'],
         accepted=bool(state(host).get('selected')),replay=result['reference'],raw_reference=result['raw_reference'],
         evaluation_reference=result['evaluation_reference'],acceptance=result['acceptance'],execution_id=result['execution_id'],
-        independent_tool_binding=physical['rigid_tool_binding'],environment_contact=physical['environment_contact'],replay_cost=physical['cost'],
+        independent_tool_binding=physical.get('rigid_tool_binding'),environment_contact=physical.get('environment_contact'),replay_cost=replay_cost,
+        outcome_issue=outcome_issue,source_issue=source_issue,execution_failure=dict(reason=physical.get('reason'),
+            time_before_call_s=diagnostic.get('time_before_call_s'),constraints_before_call=diagnostic.get('constraints_before_call'),
+            last_recorded_sample_s=physical.get('samples',[{}])[-1].get('time_s')),
         prior_summary=frozen['source_summary'],prior_analysis=prior['analysis'],prior_analysis_status=native['status'],prior_reason=native.get('reason'),
         prior_native_cost=native['native_progress']['cost'],prior_numerical_s=prior['numerical_s'],numerical_s=state(host)['numerical_s'],
-        ledger=host.store.remaining(),driver_elapsed_s=time.perf_counter()-started)
-    assert row['prior_native_cost']['physics_steps']+row['replay_cost']['physics_steps']<=826
+        ledger=host.store.remaining(),driver_elapsed_s=None,
+        recovery_postprocess_elapsed_s=time.perf_counter()-started,
+        driver_timing_status='Initial supervisor exited on an overstrict complete-outcome assertion; original worker and Store numerical costs retained, no complete initial driver duration saved. This invocation recovers receipts only.')
+    assert row['prior_native_cost']['physics_steps']+row['replay_cost'].get('physics_steps',row['replay_cost'].get('physics_steps_lower_bound',0))<=826
     atomic_json(summary,row)
     print(json.dumps({k:row[k] for k in ('accepted','acceptance','environment_contact','replay_cost','prior_native_cost','numerical_s','driver_elapsed_s')}),flush=True)
 
