@@ -1,0 +1,392 @@
+{
+  "version": "c4r_final_audit_v1",
+  "date": "2026-10-27",
+  "study_id": "c4-feedback-loop-20261026",
+  "study_status": "stopped",
+  "verdict": "engineering_hard_gate_and_minimum_real_feedback_loop_observed; scientific_efficiency_and_native_request_reliability_not_proven",
+  "original_c4": {
+    "requests": 20,
+    "total_tokens": 1006288,
+    "no_go_unchanged": true
+  },
+  "actual_requests": 14,
+  "confirmed_responses": 14,
+  "usage": {
+    "prompt_tokens": 506367,
+    "completion_tokens": 69085,
+    "total_tokens": 575452,
+    "prompt_cache_hit_tokens": 162048,
+    "prompt_cache_miss_tokens": 344319,
+    "reasoning_tokens": 55268
+  },
+  "money": null,
+  "provider_by_purpose": {
+    "conversation": 13,
+    "reporter": 1
+  },
+  "first_legal_numerical_action_cost": {
+    "requests": 4,
+    "total_tokens": 155761
+  },
+  "first_feedback_used_action_cost": {
+    "requests": 8,
+    "total_tokens": 303628
+  },
+  "sdk_tool_calls": 17,
+  "sdk_tools": {
+    "evidence_read": 8,
+    "research_analysis": 2,
+    "research_plan": 7
+  },
+  "plan_actions": {
+    "execute": 2,
+    "initialize_control": 1,
+    "control_search": 2,
+    "stop": 2
+  },
+  "public_accounting": "SDK attempts differ from charged ledger operations: pre-reservation contract failures are uncharged; NMPC child simulation/evaluation/profile share original public ledger.",
+  "errors": [
+    {
+      "tool": "research_plan",
+      "action": "execute",
+      "error_code": "missing",
+      "field": "hypothesis",
+      "scientific_execution_started": false
+    },
+    {
+      "tool": "evidence_read",
+      "action": null,
+      "error_code": "INVALID_EVIDENCE_POINTER",
+      "field": "pointer",
+      "scientific_execution_started": false
+    },
+    {
+      "tool": "research_plan",
+      "action": "control_search",
+      "error_code": "BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY",
+      "field": null,
+      "scientific_execution_started": false
+    },
+    {
+      "tool": "research_plan",
+      "action": "control_search",
+      "error_code": "BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY",
+      "field": null,
+      "scientific_execution_started": false
+    },
+    {
+      "tool": "research_plan",
+      "action": "stop",
+      "error_code": "INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE",
+      "field": null,
+      "scientific_execution_started": false
+    }
+  ],
+  "not_applicable_attempts": [
+    {
+      "tool": "research_analysis",
+      "reasons": [
+        "Native optimization window must start at selected state time 0.0 s and end at task duration 0.5 s; received (0.4, 0.5). Frozen initialization starts at 0 s; a later window requires a matching saved state."
+      ],
+      "additional_analysis_evaluations": 0
+    },
+    {
+      "tool": "research_analysis",
+      "reasons": [
+        "Native optimization window must start at selected state time 0.0 s and end at task duration 0.5 s; received (0.35, 0.5). Frozen initialization starts at 0 s; a later window requires a matching saved state."
+      ],
+      "additional_analysis_evaluations": 0
+    }
+  ],
+  "new_science": {
+    "nmpc_executions": 1,
+    "independent_full_task_evaluations": 1,
+    "full_fixed_replays": 0,
+    "mathematical_evaluations": 0,
+    "native_rollouts": 0,
+    "native_physics_steps": 0,
+    "ppo": 0,
+    "result_reference": {
+      "artifact_id": "2ebd45f891344ea6a11001de73f29356f880a9c12e918eecdc153854e960bfd9",
+      "media_type": "application/json"
+    },
+    "implementation": "e638546d60eb9326c98a4ff70356cb1e6ade80b0",
+    "status": "evaluated",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.003148372648914904
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.006038027478928508
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.11137394399884916
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "fb7e4751514f9476f26cca65e62be8d97f5df77ed94b211dfaab6aeadbb8d5ca",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "d001c6f724df4815ab06ee3f88a7542b",
+          "source": {
+            "artifact_id": "ea6652541e759466bb1cc23c5fe00e9c530267626f78486072113508845940a0",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "d001c6f724df4815ab06ee3f88a7542b"
+        },
+        "profile": {
+          "artifact_id": "101daa51c0407a256a59bc55eaed3094a4bf6e686051deac1f8b59ce9702e1eb",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "fb7e4751514f9476f26cca65e62be8d97f5df77ed94b211dfaab6aeadbb8d5ca",
+            "media_type": "application/json"
+          },
+          "execution_id": "d001c6f724df4815ab06ee3f88a7542b",
+          "simulation": {
+            "artifact_id": "ea6652541e759466bb1cc23c5fe00e9c530267626f78486072113508845940a0",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "ea6652541e759466bb1cc23c5fe00e9c530267626f78486072113508845940a0",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "d001c6f724df4815ab06ee3f88a7542b",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.006038027478928508,
+        "holding_max_speed_m_s": 0.11137394399884916,
+        "terminal_error_m": 0.003148372648914904
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "fb7e4751514f9476f26cca65e62be8d97f5df77ed94b211dfaab6aeadbb8d5ca",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "101daa51c0407a256a59bc55eaed3094a4bf6e686051deac1f8b59ce9702e1eb",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 5,
+        "duration_s": 0.5,
+        "mean_update_s": 9.287488665998971,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 468.9850000000006,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "nmpc_actual_solver_calls": 5,
+    "applied_control_updates": 50,
+    "nominal_physical_steps": 1000,
+    "physical_steps_basis": "Complete original0.5s execution at0.0005s; full registered acceptance confirms coverage. Internal controller prediction integrations are not added to this task-step count.",
+    "result_numerical_s": 470.9851803000056,
+    "simulation_wall_s": 468.9850000000006,
+    "graph_construction_s": 1.5775855999963824,
+    "solver_construction_s": 4.779853400003049,
+    "measured_backend_timings_s": {
+      "backend_call": 466.26416670001345,
+      "engine_compile": 0.027818699993076734,
+      "prepare_compile": 0.05880060000345111,
+      "solve": 465.9296036000014
+    },
+    "numerical_resource_total_s": 472.2953282000235
+  },
+  "feedback_loop": {
+    "reporter_completed": 1,
+    "public_current_result_read": true,
+    "next_action": "Agent initialized complete open-loop control from the actual new NMPC applied tensions, with exact candidate+parent+execution binding. This zero-integration transcription inherits no acceptance.",
+    "initialized_control_reference": {
+      "artifact_id": "fc1bf281b5ecf749db855fd0f72079a0722e1c537d0fdeea52ec4c2859f11c77",
+      "media_type": "application/json"
+    },
+    "initialized_origin": {
+      "candidate": {
+        "artifact_id": "c9ca2200b0f3f30818bf4169cf68b39d5b60d79189673d3e0f591eb34937abbc",
+        "media_type": "application/json"
+      },
+      "channel_map": null,
+      "command_origin": "measured_applied_interval_inputs",
+      "control_initialization": "bounded_candidate_control_v1",
+      "effective_channel_map": {
+        "tendon_0": "tendon_0",
+        "tendon_1": "tendon_1",
+        "tendon_2": "tendon_2",
+        "tendon_3": "tendon_3"
+      },
+      "execution_id": "d001c6f724df4815ab06ee3f88a7542b",
+      "execution_reference": {
+        "artifact_id": "2ebd45f891344ea6a11001de73f29356f880a9c12e918eecdc153854e960bfd9",
+        "media_type": "application/json"
+      },
+      "inherited_acceptance": false,
+      "measured_input_reference": {
+        "artifact_id": "91f5b0624cf7da271299679afc088dc01d937e6637f21bacbf2df3518815c927",
+        "media_type": "application/octet-stream"
+      },
+      "operation_key": "native-call_00_wjud1Bd6iMfbuU09sOf33909",
+      "parent": {
+        "artifact_id": "c9ca2200b0f3f30818bf4169cf68b39d5b60d79189673d3e0f591eb34937abbc",
+        "media_type": "application/json"
+      },
+      "semantics": "open_loop_zero_order_hold",
+      "source": {
+        "artifact_id": "2ebd45f891344ea6a11001de73f29356f880a9c12e918eecdc153854e960bfd9",
+        "media_type": "application/json"
+      },
+      "source_kind": "measured_nmpc_execution_v1",
+      "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+      "time_rule": "zero-order hold; hold last input beyond source horizon; new channels use candidate pretension",
+      "units": "N"
+    },
+    "judgment_update": "From feedback-removes-residual H2 to testing final cached-plan tail excitation after the observed speed failure. Competing structural/authority explanations remain hypotheses.",
+    "stop_reference": {
+      "artifact_id": "7cc28d490fa39d6896418f8eb62dd368c1e3669dedad08cb43d373a666186bb8",
+      "media_type": "application/json"
+    },
+    "selected": null,
+    "outcome": "No task pass and no SELECT. Exact all_fresh_results citation accepted by original STOP."
+  },
+  "read_audit": {
+    "attempts": 8,
+    "successful_sdk_reads": 7,
+    "read_coverage_confirmed_complete": 5,
+    "observed_classifications": {
+      "new_query": 3,
+      "exact_repeat": 2
+    },
+    "repeated_exact_query_signatures": 1,
+    "scope": "Coverage parser confirms a subset of successful SDK reads; unconfirmed coverage is not failed delivery. The repeated Native template leaf added no state/window requirements. Rechecks after refusal can have a verification purpose; no blanket classification of all rereads as waste."
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 16,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 20,
+      "model_calls": 14,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 892.611000000019
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 2,
+      "tool_calls": 20,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "unknown_provider_outcomes": 0,
+  "incomplete_provider_outputs": 0,
+  "automatic_resends": 0,
+  "hard_gate_observed": [
+    "Native state/window applicability refused before numerical spending",
+    "Missing Plan hypothesis refused and corrected by Agent",
+    "Full candidate-bound authorized NMPC genuinely executed",
+    "Oversized physical callback batches refused without replay",
+    "Unsupported formal STOP inference refused, then scoped empirical STOP accepted"
+  ],
+  "remaining_errors": [
+    "Native state/window mismatch repeated; query repair was delivered but the revised bundled query was not observed being read by the Agent.",
+    "Plan control_search caps20 and12 both exceed frozen callback maximum5; neither passed capacity or started a numerical worker. Agent final interpretation incorrectly says cap12 passed then failed for an unidentified ValueError.",
+    "Agent describes three full replays as exhausted although raw ledger still has three shared physical launches and three full replay slots. Mathematical allowance remains4, not a substitute for Plan control_search replay costs.",
+    "One invalid evidence /samples pointer and one unsupported STOP inference label caused corrections; no claim of reliable first-try request conversion.",
+    "Mechanism/sampling/structural explanations remain uncertain; this finite failure establishes no structural impossibility."
+  ],
+  "engineering_repairs_after_stop": [
+    "Expose not_applicable refusal/reasons at top-level execution_feedback without changing applicability",
+    "Report physical batch cap, shared remainder and full replay remainder explicitly, preserving original admission",
+    "Separate cited-evidence claim transfer across designs/models from legal experiment identity; formal conclusions and actual payload/source/task binding stay hard"
+  ],
+  "limitations": [
+    "No paired causal efficiency claim; offline L0 size reduction is not observed Provider token saving.",
+    "One existing failed candidate was used, not a cold-generated candidate. No full Cold-start/C5 ran.",
+    "Only one numerical research action executed. The post-STOP feedback refinements have targeted offline verification, no further live sampling.",
+    "Monetary price not returned; reasoning tokens already included in completion tokens."
+  ],
+  "future_start_condition": "Original engine/contract/authorization/budget/source/acceptance hard guards plus at least one actual lawful feedback-used loop, now observed. No subjective explanation-perfect gate. Full cold study remains excluded from this C4-R task."
+}

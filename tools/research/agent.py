@@ -408,6 +408,18 @@ def error_feedback(host, use, exc, before):
         expected=f'action={action} requires decision.research_intent={PLAN_RESEARCH_INTENTS[action]}'
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
+    if code=='BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY':
+        from tools.research.budget import decision_budget
+        science=decision_budget(host)['science_budget']
+        requested=(use['input'].get('control_search') or {}).get('settings',{}).get('evaluation_requests')
+        maximum=s['spec']['budgets']['physical_launches']+1
+        field='control_search.settings.evaluation_requests'
+        expected=(f'Plan control_search cap {requested} exceeds frozen declared callback maximum {maximum} '
+            '(physical_launches + one possibly reusable baseline). Each new callback uses a full physical replay; '
+            f'raw remaining shared launches={science["remaining_physical"]}, full replays={science["remaining_full_replays"]}. '
+            'These are remaining totals, not permission or a guarantee that a batch fits. Response FD needs a baseline plus '
+            'effective coefficient probes and one candidate per completed update. Native optimization instead requires '
+            'research_analysis with its registered template and mathematical allowance; internal native rollouts are not independent replay credits.')
     navigation=getattr(exc,'evidence_navigation',{})
     if use['name']=='evidence_read' and 'EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS' in message:
         code='EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS';field='fields'

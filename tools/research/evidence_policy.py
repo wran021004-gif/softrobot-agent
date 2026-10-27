@@ -259,7 +259,8 @@ def admit_decision(host,plan):
     if plan.control_search and d.requested_budget!=plan.control_search.settings.evaluation_requests:
         raise ValueError('DECISION_SEARCH_BUDGET_MISMATCH')
     known=registered_references(host)
-    summaries=[]
+    summaries=[];claim_scope_issues=[]
+    experiment=plan.action not in ('select','confirm','stop')
     for ref in plan.supporting_evidence:
         if plain(ref) not in known:raise ValueError('UNREGISTERED_RESEARCH_EVIDENCE')
         value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
@@ -269,20 +270,25 @@ def admit_decision(host,plan):
             task=comparable_task(s['spec'],source_cfg['task'])
             expected=s['spec'].get('canonical_task',s['base_configuration']['task'])
             background=[e['reference'] for e in s['spec'].get('research_decisions',{}).get('background',[])]
-            if task!=expected and not (d.claimed_inference=='empirical_search' and plain(ref) in background):
-                raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+            if task!=expected:
+                if plain(ref) not in background or (not experiment and d.claimed_inference!='empirical_search'):
+                    raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+                if d.claimed_inference!='empirical_search':claim_scope_issues.append('EVIDENCE_TASK_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:
-                raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+                if not experiment:raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+                claim_scope_issues.append('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and any(source_cfg['policy'][k]!=cfg['policy'][k] for k in ('backend','discretization','dynamics_model')):
-                raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
+                if not experiment:raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
+                claim_scope_issues.append('EVIDENCE_MODEL_SCOPE_MISMATCH')
         summaries.append(summary)
-    supported=d.claimed_inference=='empirical_search' or any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries)
+    supported=not claim_scope_issues and (d.claimed_inference=='empirical_search' or any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries))
     if not supported and plan.action in ('select','confirm','stop'):
         raise ValueError('INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: '+d.claimed_inference)
     result=dict(version=d.version,claimed_inference=d.claimed_inference,
         resolved_evidence=[v['evidence_reference'] for v in summaries],prospective_guarantee=False)
     if not supported:
         result.update(inference_status='unsupported_inference',execution_basis='empirical_experiment',
+            claim_scope_issues=claim_scope_issues,
             scope='The original claim is retained as an unsupported hypothesis, not a scientific fact. '
                 'Its interpretation does not veto this experiment; all identity, authorization, applicability and resource checks still apply.')
     return result

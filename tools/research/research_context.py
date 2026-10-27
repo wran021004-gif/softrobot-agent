@@ -1315,8 +1315,13 @@ def tool_feedback(host,value):
                 changed_leaf_count=len(changes),causal_attribution='Unassessed; parameter differences do not establish single-factor causality')
     if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
+    execution=result.get('execution_feedback') if isinstance(result,dict) else None
+    if isinstance(result,dict) and result.get('status')=='not_applicable':
+        execution=dict(status='not_applicable',scientific_execution_started=False,
+            additional_analysis_evaluations=result.get('additional_analysis_evaluations'),
+            reasons=(result.get('analysis_applicability') or {}).get('reasons',[]))
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
-        execution_feedback=result.get('execution_feedback') if isinstance(result,dict) else None,
+        execution_feedback=execution,
         scientific_reference=reference if reference in known else None,new_facts=view)
 
 

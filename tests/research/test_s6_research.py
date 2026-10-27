@@ -34,6 +34,17 @@ def decision(intent='DIAGNOSE',inference='empirical_search',**changes):
 
 
 class ContractTests(unittest.TestCase):
+    def test_not_applicable_feedback_exposes_actual_refusal_without_science(self):
+        from tools.research.research_context import tool_feedback
+        value=dict(status='not_applicable',analysis_applicability=dict(reasons=['Fixture window does not start at selected state']),
+            task_acceptance='unmeasured',additional_analysis_evaluations=0)
+        with patch('tools.research.research_context.save',return_value=dict(artifact_id='a'*64)),patch(
+                'tools.research.evidence_policy.registered_references',return_value=[]):
+            result=tool_feedback(SimpleNamespace(),value)
+        self.assertEqual(result['execution_feedback']['reasons'],value['analysis_applicability']['reasons'])
+        self.assertFalse(result['execution_feedback']['scientific_execution_started'])
+        self.assertEqual(result['execution_feedback']['additional_analysis_evaluations'],0)
+
     def test_old_serialization_does_not_add_new_semantics(self):
         p=plan();self.assertNotIn('decision',p.model_dump(mode='json'));self.assertNotIn('control_search',p.model_dump(mode='json'))
         legacy=LocalControlSearchSettings().model_dump(mode='json')
@@ -167,8 +178,14 @@ class AdmissionTests(unittest.TestCase):
         self.host.store.artifact.side_effect=lambda r:dict(candidate=self.ref) if r==self.ref else {}
         with patch('tools.research.evidence_policy.summarize_evidence',return_value={}),patch.object(self.host.store,'artifact',side_effect=[dict(candidate=self.ref),dict(configuration=dict(task={'id':'other'}))]):
             with self.assertRaisesRegex(ValueError,'TASK_IDENTITY'):admit_decision(self.host,plan(decision=decision(),supporting_evidence=[self.ref]))
+        self.s['spec']['research_decisions']['background']=[dict(reference=self.ref)]
+        with patch('tools.research.evidence_policy.summarize_evidence',return_value={'evidence_reference':self.ref}),patch.object(
+                self.host.store,'artifact',side_effect=[dict(candidate=self.ref),dict(configuration=dict(task={'id':'other'}))]):
+            result=admit_decision(self.host,plan(decision=decision(inference='local_diagnostic'),supporting_evidence=[self.ref]))
+        self.assertEqual(result['inference_status'],'unsupported_inference')
+        self.assertIn('EVIDENCE_TASK_IDENTITY_MISMATCH',result['claim_scope_issues'])
 
-    def test_wrong_design_and_model_scope_rejected(self):
+    def test_claim_transfer_is_soft_for_experiment_and_hard_for_formal_conclusion(self):
         self.s['results']=[self.ref]
         target=dict(robot={'id':'r'},task={'id':'t'},policy={k:{} for k in ('backend','discretization','dynamics_model')})
         for mismatch in ('design','model'):
@@ -176,10 +193,16 @@ class AdmissionTests(unittest.TestCase):
             if mismatch=='design':source['robot']['id']='different'
             else:source['policy']['backend']={'different':True}
             with patch('tools.research.design.verify_candidate',return_value={'configuration':target}),patch(
-                    'tools.research.evidence_policy.summarize_evidence',return_value={}),patch.object(self.host.store,'artifact',
+                    'tools.research.evidence_policy.summarize_evidence',return_value={'evidence_reference':self.ref}),patch.object(self.host.store,'artifact',
+                    side_effect=[dict(candidate=self.ref),dict(configuration=source)]):
+                result=admit_decision(self.host,plan(decision=decision(inference='local_diagnostic',selected_candidate=self.ref),supporting_evidence=[self.ref]))
+                self.assertEqual(result['inference_status'],'unsupported_inference')
+                self.assertIn('EVIDENCE_DESIGN_IDENTITY_MISMATCH' if mismatch=='design' else 'EVIDENCE_MODEL_SCOPE_MISMATCH',result['claim_scope_issues'])
+            with patch('tools.research.design.verify_candidate',return_value={'configuration':target}),patch(
+                    'tools.research.evidence_policy.summarize_evidence',return_value={'evidence_reference':self.ref}),patch.object(self.host.store,'artifact',
                     side_effect=[dict(candidate=self.ref),dict(configuration=source)]):
                 with self.assertRaisesRegex(ValueError,'DESIGN_IDENTITY' if mismatch=='design' else 'MODEL_SCOPE'):
-                    admit_decision(self.host,plan(decision=decision(inference='local_diagnostic',selected_candidate=self.ref),supporting_evidence=[self.ref]))
+                    admit_decision(self.host,plan('stop',decision=decision('STOP',inference='local_diagnostic',selected_candidate=self.ref),supporting_evidence=[self.ref]))
 
 
 class HistoryTests(unittest.TestCase):
