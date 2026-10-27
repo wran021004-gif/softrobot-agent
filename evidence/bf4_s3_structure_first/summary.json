@@ -1,0 +1,222 @@
+{
+  "contract": "bf4.s3.structure_first_comparison",
+  "version": "1.0.0",
+  "stage": "BF4-S3R1",
+  "date": "2026-10-27",
+  "protocol_identity": "521ee1841e16a34354179e100e94b1efc039a36e0544fe01288ceae47e31f6dd",
+  "implementation": "b39264962ddabd8c96dc45b2f08f83ae4e3aeb0c",
+  "task_file": "tasks/bf4_tracking_direction_change_v1.json",
+  "task_file_identity": "4d5488fe0d70c8ecf91dc3dbc9cb06d95d06415a2d0d8ac7e598d583b1b897b2",
+  "canonical_task_identity": "fbc2ec1ad6a11d2ec7a753cabbf269844bef64b6f8cc85a951d102475b7910d4",
+  "conclusion": "Both independently accepted; the frozen structure-first route did not accelerate this nominal pair.",
+  "tool_chain": [
+    "Study prepare/bind",
+    "core.search/family_mixed_search_v1/bounded_mixed_coordinate_v1",
+    "core.generate",
+    "research_analysis/task_capability/model.gvs/sampled-affine-conic-minimax-v1/CVXPY-CLARABEL",
+    "core.generate final candidates",
+    "core.initialize_control constant 0.2N",
+    "research_analysis/mujoco_direct_control_v1/local_control_search_v2/response",
+    "core.physical_replay",
+    "registered evaluator/offline_timed_tracking_v1",
+    "Store/read/select/stop"
+  ],
+  "screen": {
+    "status": "best_mathematical_candidate",
+    "resource_use": {
+      "actual_mathematical_evaluations": 10,
+      "elapsed_s": 48.97331094741821,
+      "evaluated_designs": 5,
+      "legally_constructed": 5,
+      "proposed_designs": 7,
+      "skipped_moves": [
+        {
+          "additional_evaluations": 0,
+          "changed_paths": [
+            "segments.0.length_m"
+          ],
+          "proposal": 2,
+          "reason": "duplicate_or_clipped_no_change"
+        },
+        {
+          "additional_evaluations": 0,
+          "changed_paths": [
+            "segments.0.length_m"
+          ],
+          "proposal": 6,
+          "reason": "duplicate_or_clipped_no_change"
+        }
+      ]
+    },
+    "mathematical_evaluations": 10,
+    "model_builds": 5,
+    "conic_solves": 5,
+    "numerical_s": 46.175743799991324,
+    "driver_elapsed_s": 51.151634699999704,
+    "proxy_values": [
+      0.0833333333334427,
+      1.3333333333344815,
+      0.33333333333333565,
+      -0.08333333333333254,
+      -0.12499999999990209
+    ],
+    "structure_changed": true,
+    "task_acceptance": "unmeasured",
+    "disposition": "STOP"
+  },
+  "arms": {
+    "structure_first": {
+      "accepted": true,
+      "native_callbacks": 201,
+      "physics_step_attempts": 121200,
+      "native_cost": {
+        "completed_response_steps": 8,
+        "forward_evaluations": 12262,
+        "kernel_wall_s": 11.013508299991372,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 201,
+        "optimization_iterations": 8,
+        "physics_step_attempts": 120600,
+        "physics_steps": 120600,
+        "rollouts": 201
+      },
+      "replay_cost": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.13146400000550784,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "baseline_measure": {
+        "max_position_error_m": 0.17784207136920993,
+        "normalized_gap": 13.820172614100827,
+        "rms_position_error_m": 0.12143201276560664,
+        "signed_maximum_excess": 13.820172614100827,
+        "sum_normalized_excess": 249.868250391916,
+        "worst_constraint": {
+          "kind": "timed_tracking",
+          "normalized_signed_excess": 13.820172614100827,
+          "time_s": 0.26
+        }
+      },
+      "best_measure": {
+        "max_position_error_m": 0.011940000065283767,
+        "normalized_gap": 0.0,
+        "rms_position_error_m": 0.01098488437849098,
+        "signed_maximum_excess": -0.004999994559686138,
+        "sum_normalized_excess": 0.0,
+        "worst_constraint": {
+          "kind": "timed_tracking",
+          "normalized_signed_excess": -0.004999994559686138,
+          "time_s": 0.46
+        }
+      },
+      "search_stop": "iteration_limit",
+      "first_hard_proxy_callback": 151,
+      "numerical_s": 13.674175400024978,
+      "driver_elapsed_s": 18.064290499998606,
+      "disposition": "SELECT"
+    },
+    "control_only": {
+      "accepted": true,
+      "native_callbacks": 201,
+      "physics_step_attempts": 121200,
+      "native_cost": {
+        "completed_response_steps": 8,
+        "forward_evaluations": 12262,
+        "kernel_wall_s": 10.880566799998633,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 201,
+        "optimization_iterations": 8,
+        "physics_step_attempts": 120600,
+        "physics_steps": 120600,
+        "rollouts": 201
+      },
+      "replay_cost": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.13350350000837352,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "baseline_measure": {
+        "max_position_error_m": 0.1820077185539777,
+        "normalized_gap": 14.167309879498143,
+        "rms_position_error_m": 0.1243762736979447,
+        "signed_maximum_excess": 14.167309879498143,
+        "sum_normalized_excess": 256.21508486000033,
+        "worst_constraint": {
+          "kind": "timed_tracking",
+          "normalized_signed_excess": 14.167309879498143,
+          "time_s": 0.28
+        }
+      },
+      "best_measure": {
+        "max_position_error_m": 0.01194000001950014,
+        "normalized_gap": 0.0,
+        "rms_position_error_m": 0.010633248963385737,
+        "signed_maximum_excess": -0.004999998374988324,
+        "sum_normalized_excess": 0.0,
+        "worst_constraint": {
+          "kind": "timed_tracking",
+          "normalized_signed_excess": -0.004999998374988324,
+          "time_s": 0.46
+        }
+      },
+      "search_stop": "iteration_limit",
+      "first_hard_proxy_callback": 151,
+      "numerical_s": 13.522699899971485,
+      "driver_elapsed_s": 17.97418339998694,
+      "disposition": "SELECT"
+    }
+  },
+  "comparison": {
+    "both_independently_passed": true,
+    "structure_changed": true,
+    "control_only_numerical_s": 13.522699899971485,
+    "structure_first_numerical_s": 60.299929400047404,
+    "control_only_driver_s": 17.97418339998694,
+    "structure_first_driver_s": 74.78019479999146,
+    "nominal_total_numeric_speedup": 0.22425730899712884,
+    "nominal_total_driver_speedup": 0.24036021098983543,
+    "native_callback_difference": 0,
+    "interpretation": "One frozen nominal pair including complete screening cost; failures are censored, no global/general speed claim."
+  },
+  "cost_buckets": {
+    "prior_failed_configuration_numeric_s": 0.4500102000311017,
+    "prior_failed_configuration_driver_s": 4.083884099993156,
+    "failed_pre_science_manifest_command_s": 1.4803855,
+    "corrected_structure_search_numeric_s": 46.175743799991324,
+    "corrected_structure_search_driver_s": 51.151634699999704
+  },
+  "new_experiment_cumulative": {
+    "native_callbacks": 402,
+    "independent_replays": 2,
+    "physics_steps": 242400,
+    "physics_step_attempts": 242400,
+    "mathematical_evaluations": 12,
+    "gvs_model_builds": 5,
+    "conic_solves": 5,
+    "native_and_independent_replay_model_builds": 4,
+    "numerical_s": 73.82262930001889,
+    "driver_s": 92.7543781999784,
+    "provider_requests": 0,
+    "worker_calls": 0,
+    "monetary_cost": "not_metered; reported units are calls, steps and measured seconds",
+    "structure_search_mathematical_evaluations": 10,
+    "native_analysis_entry_evaluations": 2
+  },
+  "limitations": [
+    "One fixed execution order and one nominal pair; no statistical or general speed conclusion.",
+    "The local affine model is not independently physically validated; its improved proxy does not prove faster nonlinear control.",
+    "Callback 151 is internal model feedback, not independent acceptance; both original Native tool calls ran their frozen 201-callback, eight-iteration allocation before the sole independent replay.",
+    "All historical BF4 S2, BF5 and BF6 task identities and costs remain sealed; no historical successful controls or affine witness controls were imported.",
+    "The original BF4 protocol has position-only acceptance; no axis, 20g payload or no-contact claim is added.",
+    "Driver timings include recorded startup and orchestration, exclude interactive reading/documentation/commit time, overlap numerical time, and are not added to it.",
+    "Public evidence excludes full private Stores, winning structure coordinates and control arrays."
+  ]
+}
