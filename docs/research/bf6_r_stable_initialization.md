@@ -260,4 +260,16 @@ R5 新增 60,600 Native 步 +600 独立步=**61,200 步**，2 model builds，Sto
 
 用户在得知 R5 结果后再次明确“继续增加预算”。据此单独批准并冻结 R6，而不是扩写 R5 账本：[R6 冻结](../../configs/research/bf6_r6_feasibility_freeze.json)、[R6 配置](../../configs/research/study_bf6_r6_feasibility.json)，新 Study `bf6-r6-expanded-feasibility-v1`，本地 Store `runs/bf6-r6/private-store`。只接 R5 自己完整失败 best 控制 `0adc162c5fd1e5dee3cdd2486c4d2469da249a841ca7e2a4d59bd6a3de3805c6` 及原 parent，不更改原任务/P1/20 g/物理/初态/验收，不继承通过。
 
-R6 新上限为 **151 个 Native 回调、6 轮 response、1 次独立回放、91,200 积分调用尝试**；原 4 knots、24 系数、±2 N 修正、0.02 N 差分、0.3 N 初始半径及原信赖域更新规则不变。先提交配置再执行；首个完整独立通过立即 SELECT，否则在本次有限额度内 STOP，任何实际失败和部分成本保留；不引入结构搜索、PPO 或链路外优化，不搬历史余量。R6 结果在封存后追加。
+R6 新上限为 **151 个 Native 回调、6 轮 response、1 次独立回放、91,200 积分调用尝试**；原 4 knots、24 系数、±2 N 修正、0.02 N 差分、0.3 N 初始半径及原信赖域更新规则不变。先提交配置再执行；首个完整独立通过立即 SELECT，否则在本次有限额度内 STOP，任何实际失败和部分成本保留；不引入结构搜索、PPO 或链路外优化，不搬历史余量。
+
+### R6 封存与最后一个自主批准批次
+
+R6 在提交 `41f19e6d0` 冻结后完成全部 151 个 Native 回调、6 轮 response、一次独立回放，实际 91,200 步。独立最大位置 **12.578171 mm**、最大轴角 **10.425222°**，仍严格 valid_failure；完整性、无接触、真实负载、力界、solver 和采样/来源通过。结果与全部 costs 见 [R6 摘要](../../evidence/bf6_r6_feasibility/summary.json)、[R6 审计](../../evidence/bf6_r6_feasibility/audit.json)。Study 已 STOP，无 SELECT。
+
+R6 第 2 个 proposal 在 0.3 N 半径下退步，原算法自动减半至 0.15 N；之后四个 proposal 均改善，最后改善 0.022866 的归一化超限。最终按原 minimax 排名选中的 best 来自有限差分探针，因此与最后一个 proposal 的最大位置/轴角略有不同，按真实 best 独立执行，没有择优混拼指标。最高张力 4.859948 N、相对系数最大 0.47 N，未触物理上界或系数总界。该记录支持在已实际有效的 0.15 N 半径附近再做一次有限精化，不支持放宽阈值。
+
+R6 新增 11.7691171 s Store 数值、15.6798663 s driver、2 model builds。含 R6 的 BF6 累计 **≥275,852 确认步 / 275,853 调用尝试、42.6632417 s Store 数值**；Native 尝试/完整 455/454，独立回放尝试/完整 6/5，科学 model builds 为 11。原失败未知进度、所有失败与成本原样保留。
+
+用户此前明确授予“值得续算就直接批准”的 go/no-go 权限，并两次授权增加预算。依据上述末段正改善，代理在这一权限内另行批准**最后一个 R7 批次**，已明确告知用户，不把 R6 上限或余额直接延长。执行前提交 [R7 冻结](../../configs/research/bf6_r7_feasibility_freeze.json)、[R7 配置](../../configs/research/study_bf6_r7_feasibility.json)，独立 Study `bf6-r7-finite-feasibility-v1`、本地 Store `runs/bf6-r7/private-store`。
+
+R7 仅导入 R6 自身完整失败 best 控制 `37bd111300c1ab057ba9691f512c4eb4cab5fee81f52cc7252532dd4920443e8`，原任务、P1、20 g 真实负载、全部物理与验收不变；原 response 四 knot 设置不变，初始半径取 R6 后段已用的 0.15 N。新上限 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**，首个完整独立通过即 SELECT。若仍失败，R7 STOP 后结束本次续算，不自动开 R8、不扩大扫描；任何部分失败也计成本。R7 结果封存后追加。

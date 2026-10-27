@@ -1,0 +1,64 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.15,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "steps_per_full_sequence": 600,
+  "contract": "bf6.r7.finite_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 user delegated direct go/no-go approval for worthwhile continuation without asking, explicitly authorized increased budget and then said continue increasing budget. Agent read sealed R6 evidence: stable complete failure near threshold, 0.15 N radius recovered positive final improvements after 0.3 N overprediction. Under that delegation approve exactly ONE final separately frozen R7 batch, not a transfer or unbounded scan. Cap one Native request/151 full callbacks/six response iterations/one independent replay/91200 integration attempts. Source only R6 own best valid_failure controls. Preserve P1/original BF6 task/20 g true load/floor/zero state/all physics/30 points/12 mm/10 deg/v2 protocol; same response settings except initial radius is recorded valid 0.15 N. First complete independent pass SELECTs immediately. If this final batch fails, STOP this continuation run; no automatic R8. Retain all costs. Commit/push authorized.",
+  "study_file": "configs/research/study_bf6_r7_feasibility.json",
+  "prior_summary": "runs/bf6-r6/summary.json",
+  "prior_summary_identity": "156fe955a920aad5b1e134b2e721c220803ac3195def5d7518e86a350048bbfb",
+  "prior_store": "runs/bf6-r6/private-store",
+  "prior_analysis": {
+    "artifact_id": "6a422fd0d5f436c3a3a5ecb3f5abb758c5682782dc4ef6f1aad9955bfb29dbb0",
+    "media_type": "application/json"
+  },
+  "prior_independent_replay": {
+    "artifact_id": "894e8cf5912efed55032e093218e232644e4677b8ae8aae8c74e6be7b600a06a",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "b2e96373aef31e3bd0aab52e894a306edd1a8cb91f6e559bdd12d52c4c6aff03",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "37bd111300c1ab057ba9691f512c4eb4cab5fee81f52cc7252532dd4920443e8",
+    "media_type": "application/json"
+  },
+  "maximum_native_analysis_requests": 1,
+  "maximum_native_rollouts": 151,
+  "maximum_response_iterations": 6,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 91200,
+  "source_semantics": "Exact R6 own best valid_failure schedule plus parent via existing initialize_control, correction coefficients recentered to zero, physical zero state preserved, no inherited acceptance or hand edits.",
+  "replay_policy": "Replay at most one complete returned schedule strictly better than fresh baseline in original native minimax/sum ranking and with a different sequence hash. If no new better complete control, STOP without duplicating original R6 replay.",
+  "stop": "Only one bounded batch. Stop Native on existing first margin target or frozen caps; validate at most one strictly better new complete schedule. Independent full pass SELECTs immediately, any incomplete/failed independent acceptance STOPs; no extra validation. Native contact/numerical/solver failure or no improved complete schedule STOPs with retained partial costs, no private salvage. Further batches are not preauthorized by this allocation. This is the final additional R7 batch for the current continuation run; no automatic R8 if it fails.",
+  "historical_costs": "All earlier stages STOP, no old balances. Retain 275852 confirmed steps / 275853 attempts, 42.663241699992795 s Store numeric and original failed-step uncertainty."
+}
