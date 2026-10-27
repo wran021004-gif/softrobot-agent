@@ -168,12 +168,26 @@ Agent 将原“反馈能消除残速”假设，更新为“0.40s接受后的末
 原空池 Cold-start 已离线核验：reference/selected=null、候选/历史/数学/控制种子/supplied_evidence为空，
 原任务/profile/全部阈值不变，首个结构仍由 Agent 自己 generate。候选域没有人工缩窄，无历史成功答案导入。
 新实现绑定、原formal scope、环境及L1查询在零Provider/零科学条件下通过。
+原 request-feedback Handoff 已单独绑定该准备 Study，原 `converse(restore_only=True)` 也通过，
+没有发出模型请求或加入科研对话。不是只检查配置文件存在。
 最终实现绑定记录见 `final_readiness.json`；这些准备不会创建科学候选或当前结果。
 
 工程启动条件为：原契约/身份/授权/实际资源/工具适用与安全可靠，并已观察到至少一个真实合法、反馈被使用的闭环。
 本轮已满足；不再要求多个只读案例主观科学解释满分。完整 Cold-start 仍不在本轮执行范围。
 后续正式研究需持续记录 Native 请求、预算理解及机制推论错误，不能宣称现在已具备高效可靠的自主科研能力。
 
+后续范围包含完整 Cold-start 时，可使用以下原入口。原授权归属执行 checkout 已固定在
+`2c64f5a50`，避免复制 Store/授权索引；修改实现应先走原 bind 迁移。这条正式运行命令本轮**没有执行**：
+
+```powershell
+Set-Location 'D:/softrobot-agent/.worktrees/c4-decision-efficiency-coldstart'
+$env:MKL_NUM_THREADS='1'
+$env:OMP_NUM_THREADS='1'
+$env:OPENBLAS_NUM_THREADS='1'
+& 'D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe' -X utf8 -m tools.research run --run-id c4-coldstart-reach-hold-20261026 --session-handoff --handoff-request-bytes 160000 --pause-exploration-remaining 4
+```
+
 监督 Codex 完成的是工程修复、账本/进程核对、实现迁移与故障恢复；科学方法、NMPC执行和控制转录由主Agent选择并提交，
 数值计算/验收由原程序完成。没有监督代做搜索或给出成功控制。
 正常进程未被重启，原失败及成本完整保存；本轮最终报告发布后暂停自动监督。
+历史C4与本轮分别记账，合计34请求、1581740 Tokens；这不是冷启动到首个可行解的成本。
