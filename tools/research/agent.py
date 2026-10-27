@@ -444,7 +444,11 @@ def error_feedback(host, use, exc, before):
             recent_registered=citation_inventory(host)[-3:],
             inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
             missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
+    new_analysis=[host.store.artifact(r) for r in s.get('analysis_results',[]) if r not in before.get('analysis_results',[])]
+    worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
+        worker_started=worker_started,
+        charged_method_counts={k:s.get(k,0)-before.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations')},
         evidence_navigation=getattr(exc,'evidence_navigation',None),
         expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
@@ -637,6 +641,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
                     report=scientific_feedback(host,original,before)
                     if report is not None:value=report
+                result=original.get('result',original) if isinstance(original,dict) else {}
+                if result.get('execution_feedback'):value['execution_feedback']=result['execution_feedback']
                 if isinstance(original,dict) and original.get('inference_assessment'):
                     value['inference_assessment']=original['inference_assessment']
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])

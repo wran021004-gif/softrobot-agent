@@ -119,6 +119,21 @@ def mathematical_method_view(host, reference):
             methods[key]['structural_proposal']='Optional research_plan(action=generate, generation=<copy current parameters with one bounded edit>, supporting_evidence=[T2 result], decision.claimed_inference=empirical_search). Choose direction and step from the evidence; unresolved permits contrasts or no edit. New candidate requires its own T1 control reoptimization (1 model + B solves); physical acceptance remains unmeasured.'
         if key=='mujoco_direct_control_v1':
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
+            from tools.research.native_control import window_facts
+            from tools.research.budget import decision_budget
+            budget=decision_budget(host)['science_budget']
+            methods[key]['action_prerequisites']=dict(candidate=reference,
+                initial_state=dict(operating_point='standardized_initial_pretension',**window_facts(requirements,dict(actual_time_s=0.))),
+                recorded_control_sources=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==reference][-3:],
+                required_agent_fields=['control_optimization.source','control_optimization.settings with explicit v2 window and knots'],
+                unmet=['control_source_selection_required','explicit_search_settings_required'],
+                callback_unit='cloned native sequence rollout; not a new independent physical replay',
+                per_request_limits=spec.get('native_control_limits'),
+                remaining_mathematical=budget['remaining_mathematical'],
+                remaining_shared_physical=budget['remaining_physical'],
+                remaining_replay_sublimit=budget['remaining_full_replays'],
+                available_full_replays=budget['available_full_replays'],
+                scope='Planning facts for this template, not execution permission or selected control. Saved-state requests resolve their actual origin and prefix at admission.')
             executions=[r for r in s.get('results',[]) if host.store.artifact(r).get('candidate')==reference]
             from tools.research.rl import measured_nmpc_trajectory
             for execution in reversed(executions):
@@ -201,7 +216,8 @@ def mathematical_catalog(view):
         item['detail_pointer']='/methods/'+row['method']
         item['request_template_query']={**row['detail_query'],
             'fields':[k for k in ('candidate','operation','request_template','required_parameters',
-                'formal_execution_authorized','missing','execution_limits','cost_scope') if k in row]}
+                'formal_execution_authorized','missing','execution_limits','cost_scope','action_prerequisites') if k in row]}
+        if row.get('action_prerequisites'):item['action_prerequisites']=row['action_prerequisites']
         if row.get('measured_control_initialization'):
             item['control_initialization_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/measured_control_initialization'}
         if row['method']==SENSITIVITY and row.get('authorized') and 'missing_validated_model_stencil' in row['missing']:

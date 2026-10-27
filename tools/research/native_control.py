@@ -10,6 +10,17 @@ import numpy as np
 from tools.platform_store import plain
 
 
+def window_facts(requirements, point):
+    """Time facts shared by planning and admission; never construct a request."""
+    start=point.get('actual_time_s')
+    samples=[requirements.time_grid_s[i] for c in requirements.constraints for i in c.indices]
+    return dict(state_time_s=start,task_deadline_s=requirements.duration_s,
+        legal_correction_window_s=None if start is None else [start,requirements.duration_s],
+        earliest_required_sample_s=min(samples) if samples else None,
+        covers_required_samples=start is not None and all(start-1e-12<=t<=requirements.duration_s+1e-12 for t in samples),
+        state_requirement='Frozen standardized initialization is at 0 s. A later origin requires an exact owned native checkpoint or verified measured prefix; a correction window does not move the initial state.')
+
+
 def window_applicability(requirements, query, assessed, point, reasons):
     q=getattr(query,'control_optimization',None)
     if q is None:
@@ -42,6 +53,7 @@ def window_applicability(requirements, query, assessed, point, reasons):
         constraint_coverage=coverage,full_task_supported=False,execution_support='independent_full_replay_required',
         model_assessment=assessed,horizon=dict(task_duration_s=requirements.duration_s,
             origin=point.get('actual_time_s'),analysis_window_s=window,period_s=query.protocol.period_s,
+            **window_facts(requirements,point),
             interpretation='Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.'))
 
 

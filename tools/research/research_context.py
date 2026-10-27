@@ -1106,19 +1106,19 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         if catalog.get('methods'):
             catalog['request_template_query_format']=dict(reference=catalog['candidate'],view='mathematical_capabilities',
                 pointer='/methods/<exact method key>',fields=['candidate','operation','request_template',
-                    'required_parameters','formal_execution_authorized','missing','cost_scope'])
+                    'required_parameters','formal_execution_authorized','missing','cost_scope','action_prerequisites'])
         for method,row in catalog.get('methods',{}).items():
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
                 if key not in ('planning_status','execution_status','missing','estimated_evaluations',
                         'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable',
-                        'execution_limits','cost_scope','control_initialization_query','preparation_query','preparation_hint','request_template_query'):
+                        'execution_limits','cost_scope','control_initialization_query','preparation_query','preparation_hint','request_template_query','action_prerequisites'):
                     row.pop(key)
             if method!='mujoco_direct_control_v1':row.pop('request_template_query',None)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']
             fields=[k for k in ('candidate','operation','request_template','required_parameters','formal_execution_authorized',
-                'execution_limits','cost_scope','missing') if k in selected]
+                'execution_limits','cost_scope','missing','action_prerequisites') if k in selected]
             brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],
                 'pointer':'/methods/'+selected['method'],**(dict(fields=fields) if fields else {})})
         intent=brief.get('research_intent',{})
@@ -1316,10 +1316,11 @@ def tool_feedback(host,value):
     if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
     execution=result.get('execution_feedback') if isinstance(result,dict) else None
-    if isinstance(result,dict) and result.get('status')=='not_applicable':
-        execution=dict(status='not_applicable',scientific_execution_started=False,
+    if isinstance(result,dict) and result.get('status')=='not_applicable' and not reference:
+        execution=dict(status='not_applicable',scientific_execution_started=False,worker_started=False,
             additional_analysis_evaluations=result.get('additional_analysis_evaluations'),
-            reasons=(result.get('analysis_applicability') or {}).get('reasons',[]))
+            reasons=(result.get('analysis_applicability') or {}).get('reasons',[]) or [result.get('reason') or result.get('admission')],
+            horizon=(result.get('analysis_applicability') or {}).get('horizon'))
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
         execution_feedback=execution,
         scientific_reference=reference if reference in known else None,new_facts=view)
