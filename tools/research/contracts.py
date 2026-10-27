@@ -84,7 +84,7 @@ class FidelityPolicy(Contract):
 class FamilyMixedSearch(Contract):
     version: Literal['family_mixed_search_v1']
     family_space_identity: str = Field(min_length=1)
-    method: Literal['bounded_mixed_coordinate_v1','normalized_joint_block_v1'] = 'bounded_mixed_coordinate_v1'
+    method: Literal['bounded_mixed_coordinate_v1','normalized_joint_block_v1','adaptive_joint_block_v1'] = 'bounded_mixed_coordinate_v1'
     variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
     segment_counts: list[int] = Field(min_length=1)
     tendon_counts: list[int] = Field(min_length=1)
@@ -105,16 +105,30 @@ class FamilyMixedSearch(Contract):
     evaluation_mode: Literal['mathematical_proxy','mujoco_control'] = 'mathematical_proxy'
     control_settings: 'LocalControlSearchSettings | None' = None
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0)
+    block_parameters: list[str] = Field(default_factory=list)
+    block_direction: dict[str,FiniteFloat] = Field(default_factory=dict)
+    block_bounds: dict[str,tuple[FiniteFloat,FiniteFloat]] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def preserve_proxy_requests(self,handler):
         value=handler(self)
+        for key in ('block_parameters','block_direction','block_bounds'):
+            if not getattr(self,key):value.pop(key,None)
         if self.evaluation_mode=='mathematical_proxy':
             for key in ('evaluation_mode','control_settings','initial_tension_n'):value.pop(key,None)
         return value
 
     @model_validator(mode='after')
     def selected_coordinates(self):
+        if self.method=='adaptive_joint_block_v1':
+            if not self.previous_candidate_ref or not self.block_parameters or len(set(self.block_parameters))!=len(self.block_parameters):
+                raise ValueError('ADAPTIVE_BLOCK_REQUIRES_PREVIOUS_CANDIDATE_AND_UNIQUE_PARAMETER_PATHS')
+            if set(self.block_direction)-set(self.block_parameters) or set(self.block_bounds)-set(self.block_parameters):
+                raise ValueError('BLOCK_DIRECTION_AND_BOUNDS_REQUIRE_SELECTED_PARAMETERS')
+            if self.block_direction and not any(self.block_direction.values()):raise ValueError('NONZERO_BLOCK_DIRECTION_REQUIRED')
+            if any(lo>=hi for lo,hi in self.block_bounds.values()):raise ValueError('ORDERED_BLOCK_BOUNDS_REQUIRED')
+        elif self.block_parameters or self.block_direction or self.block_bounds:
+            raise ValueError('BLOCK_PATHS_REQUIRE_ADAPTIVE_JOINT_METHOD')
         native=self.evaluation_mode=='mujoco_control'
         if native:
             settings=self.control_settings

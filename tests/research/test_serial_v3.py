@@ -42,6 +42,9 @@ class V3RoutingTests(unittest.TestCase):
         import mujoco
         single=design.generate_candidate(self.host,self.request(1),dict(origin='offline_fixture'))
         self.assertEqual(single['status'],'generated',single)
+        three=design.generate_candidate(self.host,self.request(3),dict(origin='offline_fixture'))
+        self.assertEqual(three['status'],'generated',three)
+        self.assertTrue(all(t['points'][0]['attachment']['part']=='fixed_base' for t in three['resolved']['tendons']))
         result=design.generate_candidate(self.host,self.request(),dict(origin='offline_fixture'))
         self.assertEqual(result['status'],'generated',result)
         candidate=design.verify_candidate(self.host,result['candidate']);cfg=candidate['configuration']
@@ -64,6 +67,10 @@ class V3RoutingTests(unittest.TestCase):
         np.testing.assert_array_equal(model.actuator_trnid[:,0],np.arange(3))
         self.assertTrue(np.all(np.isfinite(g['Jlength'])))
         self.assertFalse(state(self.host).get('success_gate'))
+        from extensions.tendon_family.family_space import parameter_capabilities
+        caps={x['parameter_id']:x for x in parameter_capabilities(self.spec['family_space'],self.request())}
+        self.assertTrue(caps['routes.1.segments.1.radius_m']['continuous_perturbation'])
+        self.assertTrue(caps['routes.1.segments.1.angle_rad']['continuous_perturbation'])
         self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
         bad=self.request();bad['routes'][1]['segments'][1]['angle_rad']=2.1+np.pi
         invalid=design.generate_candidate(self.host,bad,dict(origin='offline_fixture'))
@@ -119,6 +126,24 @@ class V3RoutingTests(unittest.TestCase):
         repeated=analysis.dispatch(self.host,plain(query),'v3-force',guard=lambda *args:None)
         self.assertEqual(repeated['operation_reuse']['additional_analysis_evaluations'],0)
         self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
+
+    def test_joint_block_projection_and_direction_bounds(self):
+        from types import SimpleNamespace
+        from tools.research.mixed_moves import adaptive_block_move
+        request={'segments':{'0':{'length_m':.14},'1':{'length_m':.14}},'routes':[{'segments':[{'radius_m':.018,'angle_rad':0.}]}]}
+        paths=['segments.0.length_m','segments.1.length_m','routes.0.segments.0.radius_m']
+        q=SimpleNamespace(block_parameters=paths,block_direction={paths[0]:1.,paths[1]:1.,paths[2]:1.})
+        domains={paths[0]:[.1,.2],paths[1]:[.1,.2],paths[2]:[.014,.023]}
+        out,changed,_=adaptive_block_move(request,q,domains,0,.25,{'aggregate_bounds_m':[.27,.29]})
+        self.assertLessEqual(sum(v['length_m'] for v in out['segments'].values()),.29+1e-12)
+        self.assertAlmostEqual(sum(v['length_m'] for v in out['segments'].values()),.29,places=11)
+        self.assertEqual(set(changed),set(paths))
+        q.block_direction={paths[0]:1.,paths[1]:-1.,paths[2]:1.}
+        fixed,changed,_=adaptive_block_move(request,q,domains,0,.25,{'fixed_total_m':.28})
+        self.assertAlmostEqual(sum(v['length_m'] for v in fixed['segments'].values()),.28,places=11)
+        self.assertEqual(set(changed),set(paths))
+        with self.assertRaisesRegex(ValueError,'EMPTY_COUPLED_LENGTH_DOMAIN'):
+            adaptive_block_move(request,q,domains,0,.25,{'fixed_total_m':.5})
 
     def test_legacy_v2_distal_start_is_not_reinterpreted(self):
         from tools.research.config import resolve

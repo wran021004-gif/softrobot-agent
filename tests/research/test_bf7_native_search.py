@@ -153,6 +153,80 @@ class NativeMixedSearchTests(unittest.TestCase):
             reused=search.run_search(self.host,self.query(),'another-plan',guard=core.guard,execute=None,capacity=None)
         self.assertTrue(reused['reused']);self.assertEqual(state(self.host)['mathematical_evaluations'],6)
 
+    def test_v3_adaptive_coupled_search_rebinds_controls_and_preserves_unresolved(self):
+        from tools.research.config import resolve
+        from tools.research.feedback import search_feedback
+        spec=deepcopy(self.spec);spec.pop('task_conditions',None);spec['initial_structure_strategy']='agent_choice'
+        space=resolve(ROOT/'configs/research/study_serial_v3_dev.json')['family_space']
+        spec['family_space']=space;spec['family_space_identity']=digest(space)
+        spec['family_search']['methods']=['bounded_mixed_coordinate_v1','adaptive_joint_block_v1']
+        update(self.host,spec=spec)
+        seed=design.generate_candidate(self.host,dict(version='serial_family_generation_v3',
+            family_space_identity=spec['family_space_identity'],segment_count=2,tendon_count=6),
+            dict(origin='offline_fixture'),screening_fidelity='standard')
+        self.assertEqual(seed['status'],'generated',seed)
+        total=sum(x['length_m'] for x in seed['resolved']['segments'])
+        spec['length_constraint']={'fixed_total_m':total};update(self.host,spec=spec)
+        q=self.query();q.update(family_space_identity=spec['family_space_identity'],method='adaptive_joint_block_v1',
+            previous_candidate_ref=seed['candidate'],span_strategies=['whole_chain'],
+            max_proposals=4,max_evaluations=4,variable_groups=['lengths','routing'],
+            block_parameters=['segments.0.length_m','segments.1.length_m','routes.1.segments.1.radius_m','routes.1.segments.1.angle_rad'],
+            block_direction={'segments.0.length_m':1.,'segments.1.length_m':-1.,
+                'routes.1.segments.1.radius_m':1.,'routes.1.segments.1.angle_rad':1.},
+            block_bounds={'routes.1.segments.1.angle_rad':[.95,1.15]},bounds={})
+        invalid=deepcopy(q);invalid['block_parameters']=['tendon_parameters.length_servo_gain_n_m'];invalid['block_direction']={};invalid['block_bounds']={};invalid['variable_groups']=['routing']
+        with self.assertRaisesRegex(ValueError,'ADAPTIVE_BLOCK_REQUIRES_EFFECTIVE_SELECTED_PARAMETER'):
+            search.search_problem(self.host,invalid,4)
+        invalid=deepcopy(q);invalid['block_bounds']={'segments.0.length_m':[.001,1.]}
+        with self.assertRaisesRegex(ValueError,'ADAPTIVE_BLOCK_BOUND_OUTSIDE_DOMAIN'):
+            search.search_problem(self.host,invalid,4)
+        calls=[]
+        def score_or_incomplete(host,query,key,**kwargs):
+            calls.append(key)
+            if len(calls)<4:return self.scored(host,query,key,**kwargs)
+            value=dict(status='execution_incomplete',operation_key=key+'-analysis',candidate=query['candidate'],
+                requested_operation=plain(AnalysisRequest.model_validate(query)),charged_analysis_evaluations=1,charged_numerical_s=0.,
+                native_progress=dict(cost=dict(physics_steps=10,rollouts=1)),fixture=True)
+            ref=save(host,value,'synthetic_incomplete_native_fixture');s=state(host)
+            update(host,analysis_results=[*s['analysis_results'],ref],mathematical_evaluations=s['mathematical_evaluations']+1)
+            return dict(reference=ref)
+        with patch.object(core,'guard'),patch.object(analysis,'dispatch',side_effect=score_or_incomplete):
+            out=core.dispatch(self.host,self.plan(q),'v3-adaptive-fixture')['result']
+        value=out['result'];rows=value['evaluated'];updates=value['search_updates']
+        self.assertEqual(len(rows),4)
+        for row in rows:
+            self.assertAlmostEqual(sum(v['length_m'] for v in row['parameters']['segments'].values()),total,places=11)
+            self.assertEqual(row['parameters']['version'],'serial_family_generation_v3')
+            self.assertEqual(len(row['evidence']['conditions']),1)
+        self.assertEqual(len(rows[1]['lineage']['variables_or_topology_changed']),4)
+        self.assertEqual([u['decision'] for u in updates],['baseline','accepted_improvement','rejected_no_improvement','unresolved'])
+        self.assertGreater(updates[1]['radius_after'],updates[1]['radius_before'])
+        self.assertLess(updates[2]['radius_after'],updates[2]['radius_before'])
+        self.assertEqual(updates[3]['radius_after'],updates[3]['radius_before'])
+        self.assertIsNone(rows[3]['proxy_values'].get('task_violation'))
+        self.assertEqual(len(state(self.host)['control_initializations']),4)
+        self.assertEqual(search_feedback(self.host,out['reference'])['final_materialization']['generation']['version'],'serial_family_generation_v3')
+        self.assertFalse(state(self.host).get('success_gate'))
+        with patch.object(analysis,'dispatch',side_effect=AssertionError('No recomputation')):
+            reused=search.run_search(self.host,q,'v3-second-plan',guard=lambda *a:None,execute=None,capacity=None)
+        self.assertTrue(reused['reused'])
+        # A saved T1 receipt is recovered after interruption; no extra evaluation.
+        q2=deepcopy(q);q2.update(max_proposals=2,max_evaluations=2,step=.2)
+        q2['control_settings']['iterations']=1
+        observed=[]
+        def interrupt_after_save(*args,**kwargs):
+            value=self.scored(*args,**kwargs);observed.append(value)
+            if len(observed)==2:raise RuntimeError('synthetic interruption after saved result')
+            return value
+        with patch.object(analysis,'dispatch',side_effect=interrupt_after_save):
+            with self.assertRaisesRegex(RuntimeError,'synthetic interruption'):
+                search.run_search(self.host,q2,'v3-interrupted',guard=lambda *a:None,execute=None,capacity=None)
+        count=state(self.host)['mathematical_evaluations']
+        with patch.object(analysis,'dispatch',side_effect=self.scored):
+            recovered=search.run_search(self.host,q2,'v3-interrupted',guard=lambda *a:None,execute=None,capacity=None)
+        self.assertEqual(state(self.host)['mathematical_evaluations'],count)
+        self.assertEqual(recovered['result']['evaluated'][1]['evidence']['conditions']['primary']['analysis'],observed[-1]['reference'])
+
     def test_single_task_native_search_uses_one_analysis_per_structure(self):
         spec=deepcopy(self.spec);spec.pop('task_conditions',None);spec['initial_structure_strategy']='native_search'
         update(self.host,spec=spec)

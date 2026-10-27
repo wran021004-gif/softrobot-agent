@@ -61,6 +61,12 @@ def generation(space, query, point):
             guide_s=[r['guide_s']],anchor_s=r['anchor_s']))
     request=dict(version='serial_family_generation_v2',family_space_identity=query.family_space_identity,
         segment_count=n,tendon_count=t,spans=spans,segments={},control_weights={k:v['default'] for k,v in space['control_domains'].items()})
+    if space['version']=='serial_family_space_v3':
+        request['version']='serial_family_generation_v3'
+        request.pop('spans')
+        request['routes']=[dict(anchor_segment=span['last_segment'],anchor_s=span['anchor_s'],
+            segments=[dict(radius_m=span['radius_m'],angle_rad=span['phase_rad']+span['angular_offsets_rad'][0],guide_s=span['guide_s'][0])
+                for _ in range(span['last_segment']+1)]) for span in spans]
     prototypes={c['id']:c for c in space['assembly']['components']};rule=space['serial_assembly']
     for i,v in p['segments'].items():
         proto=prototypes[rule['root_segment'] if i=='0' else rule['repeated_segment']]
@@ -127,3 +133,45 @@ def next_move(space, query, best, cursor, step):
         name,d=domain;lo,hi=interval(query,name,d)
         parent[key]=min(hi,max(lo,parent[key]+direction*effective*(hi-lo)))
     return p,[path],effective
+
+
+def adaptive_block_move(request, query, domains, cursor, radius, constraint):
+    """Bounded normalized pattern step and exact aggregate-length projection."""
+    from tools.research.design import parameter_value,set_parameter
+    p=deepcopy(request);paths=query.block_parameters
+    coeff=[query.block_direction.get(k,0.) for k in paths] if query.block_direction else [1. if i%2==0 else -1. for i in range(len(paths))]
+    norm=math.sqrt(sum(v*v for v in coeff))
+    if not norm:raise ValueError('NONZERO_BLOCK_DIRECTION_REQUIRED')
+    sign=1. if cursor%2==0 else -1.
+    scaled=[sign*radius*v/norm for v in coeff]
+    alpha=1.
+    for path,dx in zip(paths,scaled):
+        lo,hi=domains[path];x=(parameter_value(p,path)-lo)/(hi-lo)
+        if dx>0:alpha=min(alpha,(1.-x)/dx)
+        elif dx<0:alpha=min(alpha,-x/dx)
+    alpha=max(0.,min(1.,alpha))
+    for path,dx in zip(paths,scaled):
+        lo,hi=domains[path];set_parameter(p,path,parameter_value(p,path)+alpha*dx*(hi-lo))
+    lengths=[k for k in paths if k.startswith('segments.') and k.endswith('.length_m')]
+    total=sum(v['length_m'] for v in p['segments'].values())
+    fixed=constraint.get('fixed_total_m');bounds=constraint.get('aggregate_bounds_m')
+    target=fixed if fixed is not None else min(max(total,bounds[0]),bounds[1]) if bounds else total
+    if abs(total-target)>1e-12:
+        if not lengths:raise ValueError('COUPLED_LENGTH_CONSTRAINT_REQUIRES_SELECTED_LENGTHS')
+        other=total-sum(parameter_value(p,k) for k in lengths)
+        wanted=target-other;low=sum(domains[k][0] for k in lengths);high=sum(domains[k][1] for k in lengths)
+        if wanted<low-1e-12 or wanted>high+1e-12:raise ValueError('EMPTY_COUPLED_LENGTH_DOMAIN')
+        # Projection in normalized coordinates: xi(lambda)=clip(zi-lambda*(hi-lo),0,1).
+        z=[(parameter_value(p,k)-domains[k][0])/(domains[k][1]-domains[k][0]) for k in lengths]
+        widths=[domains[k][1]-domains[k][0] for k in lengths]
+        left=min((v-1.)/w for v,w in zip(z,widths))-1.;right=max(v/w for v,w in zip(z,widths))+1.
+        for _ in range(80):
+            mid=(left+right)/2
+            value=sum(domains[k][0]+w*min(1.,max(0.,v-mid*w)) for k,w,v in zip(lengths,widths,z))
+            if value>wanted:left=mid
+            else:right=mid
+        lam=(left+right)/2
+        for k,w,v in zip(lengths,widths,z):
+            lo,_=domains[k];set_parameter(p,k,lo+w*min(1.,max(0.,v-lam*w)))
+    changed=[k for k in paths if abs(parameter_value(p,k)-parameter_value(request,k))>1e-14*max(1.,abs(parameter_value(request,k)))]
+    return p,changed,radius

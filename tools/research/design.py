@@ -239,6 +239,13 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
                 segment['cells']=level['cells_per_segment']
         build=parse_build(dict(space=spec['family_space'],request=plain(request)))
         robot,mesh,physics=family.generate_family(build)
+        if build.request.version=='serial_family_generation_v3':
+            constraint=spec.get('length_constraint') or {}
+            total=sum(c['length_m'] for c in robot['components'] if c['kind']=='flexible_segment')
+            if constraint.get('fixed_total_m') is not None and abs(total-constraint['fixed_total_m'])>1e-12:
+                raise ValueError('CANDIDATE_FIXED_TOTAL_LENGTH')
+            if constraint.get('aggregate_bounds_m') and not constraint['aggregate_bounds_m'][0]<=total<=constraint['aggregate_bounds_m'][1]:
+                raise ValueError('CANDIDATE_AGGREGATE_LENGTH_CONSTRAINT')
         cfg=deepcopy(s['base_configuration']);cfg['run_id']=host.run_id
         cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
         cfg['robot']['structure']['data']=robot

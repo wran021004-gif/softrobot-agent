@@ -52,16 +52,42 @@ def search_problem(host,query,count):
                 requested=len(q.control_settings.knots_s) if name=='knots_s' else getattr(q.control_settings,name)
                 if requested>limit:raise ValueError('STUDY_NATIVE_CONTROL_LIMIT: '+name)
             if count<len(tasks):raise ValueError('ALL_CONDITIONS_MUST_FIT_NATIVE_ANALYSIS_ALLOWANCE')
+        adaptive=q.method=='adaptive_joint_block_v1';block_domains={};seed_request=None
         if q.previous_candidate_ref:
             previous=verify_candidate(host,q.previous_candidate_ref)
-            if previous.get('generation_version')!='serial_family_generation_v2' or previous['family_space_identity']!=q.family_space_identity:
+            expected='serial_family_generation_v3' if s['spec']['family_space']['version']=='serial_family_space_v3' else 'serial_family_generation_v2'
+            if previous.get('generation_version')!=expected or previous['family_space_identity']!=q.family_space_identity:
                 raise ValueError('PREVIOUS_CANDIDATE_REQUIRES_EXACT_SERIAL_FAMILY')
+            if expected.endswith('_v3') and not adaptive:
+                raise ValueError('V3_PREVIOUS_CANDIDATE_REQUIRES_ADAPTIVE_BLOCK_METHOD')
+        if adaptive:
+            if s['spec']['family_space']['version']!='serial_family_space_v3':raise ValueError('ADAPTIVE_BLOCK_REQUIRES_V3_FAMILY')
+            if q.bounds:raise ValueError('ADAPTIVE_BLOCK_USES_EXPLICIT_BLOCK_BOUNDS')
+            from extensions.tendon_family.family_space import parameter_capabilities,resolved_request
+            seed_request=resolved_request(s['spec']['family_space'],previous['parameters'])
+            if q.segment_counts!=[seed_request['segment_count']] or q.tendon_counts!=[seed_request['tendon_count']]:
+                raise ValueError('ADAPTIVE_BLOCK_REQUIRES_FIXED_CANDIDATE_TOPOLOGY')
+            available={v['parameter_id']:v for v in parameter_capabilities(s['spec']['family_space'],previous['parameters'])}
+            for path in q.block_parameters:
+                row=available.get(path)
+                group=('routing' if path.startswith('routes.') else 'lengths' if path.endswith('.length_m') else
+                    'materials' if path.endswith('.young_pa') or '.physical_parameters.' in path else 'sections' if '.sections.' in path else None)
+                if not row or not row['continuous_perturbation'] or group not in q.variable_groups:
+                    raise ValueError('ADAPTIVE_BLOCK_REQUIRES_EFFECTIVE_SELECTED_PARAMETER: '+path)
+                lo,hi=q.block_bounds.get(path,(row['minimum'],row['maximum']))
+                if not row['minimum']<=lo<hi<=row['maximum'] or not lo<=row['current_value']<=hi:
+                    raise ValueError('ADAPTIVE_BLOCK_BOUND_OUTSIDE_DOMAIN_OR_CANDIDATE: '+path)
+                block_domains[path]=[lo,hi]
+            total=sum(v['length_m'] for v in seed_request['segments'].values());constraint=s['spec'].get('length_constraint') or {}
+            if (constraint.get('fixed_total_m') is not None and abs(total-constraint['fixed_total_m'])>1e-12 or
+                    constraint.get('aggregate_bounds_m') and not constraint['aggregate_bounds_m'][0]<=total<=constraint['aggregate_bounds_m'][1]):
+                raise ValueError('ADAPTIVE_SEED_VIOLATES_FROZEN_LENGTH_CONSTRAINT')
         from tools.research.state import readable_results
         for ref in q.evidence_used:
             if plain(ref) not in readable_results(s,host):
                 raise ValueError('OWNED_SEARCH_EVIDENCE_REQUIRED')
             host.store.artifact(ref)
-        return dict(query=plain(q),max_evaluations=count,domains=domains,profile=s['profile']['identity'],
+        return dict(query=plain(q),max_evaluations=count,domains=domains,**(dict(block_domains=block_domains,seed_request=seed_request,length_constraint=s['spec'].get('length_constraint') or {}) if adaptive else {}),profile=s['profile']['identity'],
             configuration_identity=s['spec']['resolved_identity'],task_identity=s['spec']['canonical_task_identity'],
             fidelity=s['spec']['fidelity_policy'],protocol=s['spec']['analysis_protocol'],
             **(dict(conditions=[c['condition_id'] for c in s['spec'].get('task_conditions',[])] or ['primary'],
@@ -115,7 +141,7 @@ def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
     grant=spec['family_search']
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
-            version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
+            version='serial_family_generation_v3' if spec['family_space'].get('version')=='serial_family_space_v3' else 'serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
         search=dict(tool='research_plan',action='search',payload='search',
             version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant.get('method',grant.get('methods',[None])[0]),available_methods=grant.get('methods',[grant.get('method')]),
             required=['variable_groups','segment_counts','tendon_counts','screening_fidelity','objective','operating_point','max_proposals','max_evaluations'],
@@ -131,7 +157,7 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
-    if spec['family_space'].get('version')=='serial_family_space_v2':
+    if spec['family_space'].get('version') in ('serial_family_space_v2','serial_family_space_v3'):
         space=spec['family_space']; rule=space['serial_assembly']
         parts={p['id']:p for p in space['assembly']['components']}
         guidance['generate']['segment_section_format']=dict(
@@ -140,6 +166,10 @@ def request_guidance(spec):
             required_section_counts=dict(first=len(parts[rule['root_segment']]['sections']),
                 subsequent=len(parts[rule['repeated_segment']]['sections'])),
             scope='Counts derive from frozen prototypes; station positions remain prototype-owned.')
+    if spec['family_space'].get('version')=='serial_family_space_v3':
+        guidance['generate']['routing']='One base-anchored route per tendon; each has anchor_segment, anchor_s and ordered segments with radius_m, angle_rad, guide_s. Omit routes for symmetric default; spans and route_overrides are unsupported.'
+        guidance['search']['parameter_blocks']['routing']='V3 per-tendon, per-segment paths; adaptive method accepts concrete capability paths.'
+        guidance['search']['adaptive_block']='adaptive_joint_block_v1 requires previous_candidate_ref, block_parameters and optional block_direction/block_bounds; effective concrete paths from candidate parameter capabilities. Each new structure is evaluated under the chosen mode.'
     if 'mujoco_control' in grant.get('evaluation_modes',[]):
         guidance['search']['native_mode']=dict(evaluation_mode='mujoco_control',objective='task_violation',
             inner_analysis='mujoco_nonlinear_task_capability_v1',
@@ -309,24 +339,36 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 space=s['spec']['family_space']
                 best=min((r for r in rows if r.get('candidate_id') and rank(r,q)[0]==0),
                     key=lambda row:rank(row,q),default=None)
-                if not rows:
-                    point=initial(space,q)
-                    if q.previous_candidate_ref:
-                        prior=verify_candidate(host,q.previous_candidate_ref)['resolved_parameters']
-                        seed={str(i):dict(length_m=v['length_m'],young_pa=v['physics']['young_pa'],
-                            section_kind=v['sections'][0]['section']['kind'],section_dimensions=v['sections'][0]['section']['parameters'])
-                            for i,v in enumerate(prior['segments'])}
-                        point=initial(space,q,dict(segments=seed))
-                    changes=['family_defaults_and_authorized_ranges']
+                adaptive=q.method=='adaptive_joint_block_v1'
+                if adaptive:
+                    from tools.research.mixed_moves import adaptive_block_move
+                    if not rows:
+                        point=deepcopy(checkpoint['problem']['seed_request']);changes=['candidate_bound_baseline']
+                    else:
+                        base=best['point'] if best else checkpoint['problem']['seed_request']
+                        point,changes,_=adaptive_block_move(base,q,checkpoint['problem']['block_domains'],checkpoint['iteration'],
+                            checkpoint['step'],checkpoint['problem']['length_constraint'])
+                        checkpoint['iteration']+=1
+                    params=deepcopy(point)
                 else:
-                    base=best['point'] if best else initial(space,q)
-                    point,changes,checkpoint['step']=next_move(space,q,base,checkpoint['iteration'],q.step)
-                    checkpoint['iteration']+=1
-                    if point is None:
-                        checkpoint['termination']='no_active_coordinate_moves'
-                        break
+                    if not rows:
+                        point=initial(space,q)
+                        if q.previous_candidate_ref:
+                            prior=verify_candidate(host,q.previous_candidate_ref)['resolved_parameters']
+                            seed={str(i):dict(length_m=v['length_m'],young_pa=v['physics']['young_pa'],
+                                section_kind=v['sections'][0]['section']['kind'],section_dimensions=v['sections'][0]['section']['parameters'])
+                                for i,v in enumerate(prior['segments'])}
+                            point=initial(space,q,dict(segments=seed))
+                        changes=['family_defaults_and_authorized_ranges']
+                    else:
+                        base=best['point'] if best else initial(space,q)
+                        point,changes,checkpoint['step']=next_move(space,q,base,checkpoint['iteration'],q.step)
+                        checkpoint['iteration']+=1
+                        if point is None:
+                            checkpoint['termination']='no_active_coordinate_moves'
+                            break
+                    params=generation(space,q,point)
                 checkpoint['proposal_count']+=1
-                params=generation(space,q,point)
                 if any(row['parameters']==params for row in rows):
                     checkpoint.setdefault('skipped_moves',[]).append(dict(proposal=checkpoint['proposal_count'],
                         changed_paths=changes,reason='duplicate_or_clipped_no_change',additional_evaluations=0))
@@ -336,7 +378,8 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 evidence=([r['analysis'] for r in best['evidence']['conditions'].values() if r.get('analysis')]
                     if native and best else [best['evidence']['analysis']] if best and best['evidence'].get('analysis') else [plain(r) for r in q.evidence_used])
                 checkpoint['pending']=dict(parameters=params,point=point,latent=[],proposal_id=str(checkpoint['proposal_count']),
-                    feedback=parent,lineage=dict(version='search_lineage_v1',requesting_plan=requesting_plan,previous_candidate_ref=parent,evidence_used=evidence,
+                    feedback=parent,incumbent_rank=rank(best,q) if adaptive and best else None,
+                    radius_before=checkpoint['step'] if adaptive else None,lineage=dict(version='search_lineage_v1',requesting_plan=requesting_plan,previous_candidate_ref=parent,evidence_used=evidence,
                         variables_or_topology_changed=changes,search_method=q.method,origin='optimizer_internal',
                         proposal_id=str(checkpoint['proposal_count']),decision=('move from best finite-budget Native result' if native else 'move from best observed proxy') if best else 'initialize authorized family subspace'))
                 persist()
@@ -453,7 +496,19 @@ def run_search(host,query,key,*,guard,execute,capacity):
         checkpoint['pending']=None
         ranked=[r for r in rows if not mathematical or rank(r,q,limits)[0]==0]
         incumbent=min(ranked,key=lambda row:rank(row,q,limits)) if ranked else None
-        checkpoint['updates'].append(dict(candidate_id=c['candidate_id'],incumbent_after=incumbent['candidate_id'] if incumbent else None))
+        search_update=dict(candidate_id=c['candidate_id'],incumbent_after=incumbent['candidate_id'] if incumbent else None)
+        if mixed and q.method=='adaptive_joint_block_v1':
+            prior=proposal.get('incumbent_rank');current=rank(row,q)
+            if prior is None:decision='baseline' if current[0]==0 else 'unresolved'
+            elif current[0]!=0:decision='unresolved'
+            elif current[1]<prior[1]:
+                decision='accepted_improvement';checkpoint['step']=min(.5,checkpoint['step']*1.25)
+            else:
+                decision='rejected_no_improvement';checkpoint['step']/=2.
+            search_update.update(decision=decision,radius_before=proposal['radius_before'],radius_after=checkpoint['step'],
+                changed_paths=proposal['lineage']['variables_or_topology_changed'],
+                scope='Observed finite-score pattern search; no predicted improvement ratio or convergence certificate.')
+        checkpoint['updates'].append(search_update)
         if state(host).get('success_gate'):
             checkpoint['termination']='fresh_task_pass_requires_closeout'
         if mixed and q.stop_score is not None and rank(row,q)[0]==0:
