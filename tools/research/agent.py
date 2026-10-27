@@ -471,6 +471,29 @@ def error_feedback(host, use, exc, before):
         expected=expected,input_query=dict(reference=full,view='full',pointer='/tool_use/input'),
         scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
+def session_storage_path(path):
+    """Use Windows extended-length paths for durable SDK snapshot temp files."""
+    value=os.path.abspath(str(path))
+    if os.name!='nt' or value.startswith('\\\\?\\'):return value
+    if value.startswith('\\\\'):return '\\\\?\\UNC\\'+value[2:]
+    return '\\\\?\\'+value
+
+
+def session_storage(path):
+    from strands.storage import LocalFileStorage
+    class NormalizedStorage(LocalFileStorage):
+        # The SDK joins opaque slash-delimited keys without normalizing; the
+        # extended-length Windows path prefix requires native separators.
+        def _path_for(self,key):
+            return os.path.normpath(super()._path_for(key))
+        def namespace(self,prefix):
+            scoped=super().namespace(prefix)
+            result=NormalizedStorage(scoped.base_dir)
+            result._namespaced=scoped._namespaced
+            return result
+    return NormalizedStorage(session_storage_path(path))
+
+
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload
     s=state(host)
@@ -484,9 +507,12 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
     context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
+    storage=session_storage(session_directory)
+    from strands.session import SnapshotSessionManager
+    manager=SnapshotSessionManager(session_id or s['pilot']['framework_session_id'],storage=storage,save_latest_on='message')
     agent=create_harness(model=model,tools=research_tools,instructions=instructions,
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
-        context_manager=context,session=dict(id=session_id or s['pilot']['framework_session_id'],dir=str(session_directory)),
+        context_manager=context,session=manager,storage=storage,
         retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(configuration_path,dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=session_id or s['pilot']['framework_session_id'],
