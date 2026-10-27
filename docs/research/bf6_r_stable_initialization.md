@@ -31,4 +31,14 @@ XML 物理定义只读核对：payload 质量 0.020 kg，局部质心 `(0.007,0.
 
 稳定起点的操作性判据是原物理回放 completed、600 步/30 个完整 post-step 双信号样本、原 solver/力界/负载/采样组件通过、v2 的无接触组件通过、无缺失或来源问题。**位置/方向阈值可以尚未通过**，其原 evaluator 失败保留；“稳定起点”不是任务通过或稳定性理论证明。两个起点都不满足时立即停止，不扩大扫描或自动换结构。
 
-结果和费用将在这些冻结 Study 完成后追加。仅稳定后才另行冻结 B-R3 的 Native 搜索与独立验收额度；原 BF6 未使用额度始终不转移。
+### R2 实际结果
+
+实现冻结提交 `c29cdcb46621357131f75a00feb0fdb13349d65b`。G1 第一次即获得完整独立稳定起点：600/600 积分、30 个完整 post-step 样本、0 环境接触、0 solver error，真实质量/质心/惯量/site 编译绑定 matched；来源及 outcome 无缺失。G2 未运行。原任务保持 `valid_failure`，最大位置误差 97.558257 mm，最大方向误差 0.649156 rad（37.193884°），末点位置误差 12.114652 mm；没有 SELECT。
+
+该结果解决“此 P1/20 g/地面/冻结模型没有完整合法起点”的实验障碍，说明现阶段没有必要仅因旧冷起点失败就更换结构；它没有证明原扫描任务可行或不可行。完整独立验收绑定和费用见 [R2 receipt](../../evidence/bf6_r2_stability/summary.json)：1 replay、600 步、1 model build、61 forward、Store 全部数值费用 1.6259945 s（其中 replay 1.1502206 s）、driver 4.8035293 s。额度余量全部封存，不转移。
+
+## B-R3：稳定后另行冻结有限搜索
+
+[R3 新冻结](../../configs/research/bf6_r3_feasibility_freeze.json)及[新 Study](../../configs/research/study_bf6_r3_feasibility.json)只导入 R2 自己的 G1 原控制与相同父结构，通过原 initialize_control 重新绑定；物理状态仍全零，不继承验收。一个 research_analysis `mujoco_direct_control_v1` 请求，最多 151 次完整 Native callback、6 次 response 迭代，4 个原时间结点、0.02 N 差分、0.2 N 初始半径、±2 N 控制修正系数。再给最多 1 次完整独立 physical_replay，新增上限 91,200 积分调用尝试。沿用原 0.005 规划安全余量，原 12 mm/10° 硬阈值不动；实际无接触按 v2 每积分步验收。新协议在研究计算前提交。
+
+只回放正常返回的完整 best schedule 一次；若 Native 因探针接触或数值失败中止，则保留全部真实部分成本，不靠链路外算法取回私有“最好解”、不扩额度。首个独立完整通过立即 SELECT，否则 STOP，原任务结论保持未决。原 BF6、R2、R3 三份账本各自封存。

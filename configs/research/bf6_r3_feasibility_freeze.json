@@ -1,0 +1,55 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "contract": "bf6.r3.finite_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 explicit current-chat BF6-R B-R3 authorization: after independent complete contact-free stable G1 in R2, freeze a NEW finite Native response search for the unchanged BF6 task/P1/20 g load/floor/physics, from that BF6-R2 control only. New independent allowance: one Native request, at most 151 callbacks of 600 steps and 6 iterations, plus at most one independent full physical replay (91200 integration attempts). No BF5 successful control, inherited balances, model/goal/tolerance changes, extra starts or parameter scans. First complete independent original-task pass SELECTs and seals; otherwise STOP with actual partial/failure costs.",
+  "study_file": "configs/research/study_bf6_r3_feasibility.json",
+  "prior_summary": "runs/bf6-r2/summary.json",
+  "prior_summary_identity": "7f8ff08848b27929caed249dbb81f74eff58d8549ffefec171a5dd39e7dfee86",
+  "prior_store": "runs/bf6-r2/private-store",
+  "prior_independent_replay": {
+    "artifact_id": "b63d55b09ccccef42cdae029f2232e9fa8c33484bc6e688ab6a1f130f0f3c286",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "89fd5df9963789e13d3390a004e2ebf34cb2d27316356e8cffcf1285e494a3d3",
+    "media_type": "application/json"
+  },
+  "prior_stable_source": {
+    "artifact_id": "6b63f9ab034005043fec45fe81f8327959e10acf63b437c7226eb75c112f0c58",
+    "media_type": "application/json"
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "maximum_native_rollouts": 151,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 91200,
+  "stop": "One bounded native search. Replay returned complete best schedule once if and only if available. First full independent pass SELECTs immediately, otherwise STOP; do not salvage incomplete search with private algorithms or spend any sealed R2/original balance.",
+  "historical_costs": "Original BF6 and new R2 remain immutable separately; new R3 allowance is not a transfer. R2 accepted=false establishes only a stable control start."
+}
