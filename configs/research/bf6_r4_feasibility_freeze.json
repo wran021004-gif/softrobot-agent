@@ -1,0 +1,64 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 51,
+    "iterations": 2,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "contract": "bf6.r4.recentered_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 explicit current-chat user instruction: execute BF6-R4 after freezing new configuration and independent ledger, only from BF6-R3 own best independently replayed valid_failure control. Preserve original BF6 task/P1/zero initial physical state/real 20 g load/floor/all physics and original 30-sample 12 mm/10 deg acceptance with prospective v2 contact-free protocol. Use only existing research dispatch. New independent cap: one Native analysis request, at most 51 full callbacks, two response iterations, one independent replay and 31200 integration attempts. First complete independent pass SELECTs immediately; finite failure STOPs and retains all true costs. No inherited balances, BF5 controls, extra starts/scans/model or task relaxation. Autonomous commit and ordinary push explicitly authorized.",
+  "study_file": "configs/research/study_bf6_r4_feasibility.json",
+  "prior_summary": "runs/bf6-r3/summary.json",
+  "prior_summary_identity": "4909af3002becbba2e15ba7285827bb5f78d93013e20d79ecaa0fb1c9a3adc0f",
+  "prior_store": "runs/bf6-r3/private-store",
+  "prior_analysis": {
+    "artifact_id": "d14e6fdb2ade95c3c2527a52a86397728e70b3b91893c2c4d5f4efca7aaf4d41",
+    "media_type": "application/json"
+  },
+  "prior_independent_replay": {
+    "artifact_id": "42914077b8c3fddb3ec6c2c63eb3246d002d27282c71593dcce740d575f67321",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "5b164f3722d7bbec64eb4af8aae100548e11ad6656b3916a00afb6ed7376ebce",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "17860e68a54303cf7f5cf1c249bb51d18a3656fe0e4a0855c9d11a9e74178483",
+    "media_type": "application/json"
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "maximum_native_analysis_requests": 1,
+  "maximum_native_rollouts": 51,
+  "maximum_response_iterations": 2,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 31200,
+  "steps_per_full_sequence": 600,
+  "source_semantics": "Exact BF6-R3 best valid_failure control and same parent via original initialize_control. Reset correction coefficients to zero around that schedule, not physical state; do not hand-edit applied inputs or inherit acceptance. Preserve +/-2 N relative correction and 0..8 N physical bounds.",
+  "replay_policy": "Replay at most one complete returned schedule strictly better than fresh baseline in original native minimax/sum ranking and with a different sequence hash. If no new better complete control, STOP without duplicating original R3 replay.",
+  "stop": "First complete independent original-task pass SELECTs immediately; otherwise finite STOP. Native incomplete/contact/numerical failure retains every actual complete/partial cost and ends the batch; no extra starts or callbacks. No private salvage optimizer.",
+  "historical_costs": "Original BF6, R2 and R3 remain STOP and separately accounted. No unused balance transfer. Prior cumulative lower bound 92252 confirmed steps, 92253 attempts, 16.333539999992354 s Store numeric time retained."
+}

@@ -168,3 +168,15 @@ Native best 与最终独立回放保存的全部位置、轴分量逐元素差�
 物理依据是：保留已验证稳定的负载控制形状时序，同时让触及旧人工上界的方向重新获得有限正向调整空间，由原 response 联合协调负载支撑与工具倾角；不预设“多加张力一定更好”。两轮足以构成小额度方向诊断，但不保证可行；若仍失败，应根据新记录判断邻域限制或更弱的控制方向，而不在本提案中预先追加参数扫描。
 
 本次新增 model、forward、积分、Native、回放、注册 evaluator、Study 和余额均为 **0**。原累计保持 **≥92,252 个确认步 / 92,253 次积分尝试、16.333540 秒 Store 数值时间**；新一轮提案当前实际消耗为 0。本轮只新增此诊断文本及其保存数据摘要，不运行测试或更改任何研究实现、冻结配置和历史收据。
+
+## BF6-R4：新授权、冻结与执行
+
+2026-10-27 用户随后明确授权按上述方案执行 R4，可自主 commit/push。[新冻结](../../configs/research/bf6_r4_feasibility_freeze.json)和[新 Study](../../configs/research/study_bf6_r4_feasibility.json)在任何新科学执行前提交；本节是提案之后的新阶段，不修改上节只读诊断当时的零成本身份。
+
+R4 仅从 R3 自己的完整 best 失败控制开始：注册 schedule artifact `17860e68a54303cf7f5cf1c249bb51d18a3656fe0e4a0855c9d11a9e74178483`，与原 R3 独立 raw 的 source_reference 完全相同。该控制原验收 valid_failure、稳定门槛通过；R3 原 Study 已 STOP。通过既有 generate/initialize_control 以相同 P1、同一 source/parent 重新绑定，不手改控制、不继承验收、不读取 BF5 控制。
+
+新的独立账本 ID 为 `bf6-r4-recentered-feasibility-v1`，Store 位于本地 `runs/bf6-r4/private-store`。最多 1 个 Native analysis 请求、51 个完整 600 步回调、2 轮 response、1 次独立回放，总上限 31,200 积分调用尝试；4 knots、24 系数、±2 N 相对界、0.02 N 差分、0.2 N 初始半径、0.005 规划余量保持原样。原任务/P1/20 g 质量质心惯量/site/零初态/地面/积分物理/0..8 N/30 点/12 mm/10° 均不变，使用前瞻 v2 全部验收条件。
+
+公开监督入口 `tests/research/bf6_r4_feasibility.py` 只编排原 typed dispatch，不引入新优化器。仅对返回的完整新 best（原 minimax/sum 排序严格优于新 baseline 且 sequence hash 不同）做最多一次独立回放。首次完整独立通过立即 SELECT；失败或预算封顶 STOP，无更好新控制则不重复回放。全部实际成本及异常部分成本保留，原 BF6/R2/R3 余额不转移。
+
+实际结果在本阶段封存后追加。
