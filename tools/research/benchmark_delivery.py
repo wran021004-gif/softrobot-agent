@@ -22,6 +22,58 @@ def write_csv(path, rows):
     with path.open('w',encoding='utf8',newline='') as f:
         w=csv.DictWriter(f, fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
 
+def readme_text(dest, bench, condition, task, acceptance, force_execution):
+    goal=task['goal']['data']; family=task['family']; timing=task['timing']
+    if family=='task.reach':
+        description=f"让软臂末端在世界坐标系中到达 {goal['target_m']} m，并按原验收要求保持稳定。"
+    elif family=='task.position_tool_axis':
+        description=f"将末端移动到世界坐标 {goal['target_m']} m，同时使工具轴朝向世界系向量 {goal['target_axis_world']}。"
+    elif family in ('task.tracking','task.oriented_tracking'):
+        description=f"让末端按时依次经过世界坐标点 {goal['vertices_m']} m，对应时间为 {goal['times_s']} s，点间按原任务规则插值。"
+        if family=='task.oriented_tracking': description+=f" 同时让工具轴跟随方向 {goal['axis_vertices_world']}。"
+    else: description=f"执行冻结任务 {task.get('name',task['task_id'])}；目标见 task.json。"
+    forces=force_execution['forces']
+    if forces:
+        description+=' 外力条件：'+ '；'.join(f"在 {v['start_s']}–{v['end_s']} s 对 {v['entity']} 质心施加世界系力 {v['force_n']} N" for v in forces)+'。'
+    else: description+=' 本次执行没有额外时变外力。'
+    limits=[]
+    for key,label in [('evaluator:task_bound','任务误差'),('holding_position','保持位置误差'),('holding_speed','保持速度')]:
+        item=acceptance.get('components',{}).get(key,{})
+        if item.get('limit') is not None: limits.append(f"{label} ≤ {item['limit']} {item.get('unit') or ''}")
+    criteria='；'.join(limits) if limits else '详细评价指标及阈值见 acceptance.json'
+    return f'''# {bench} / {condition}
+
+## 当前任务
+
+{description} 执行时长 {timing['duration_s']} s，原始验收要求：{criteria}。完整任务配置和原始验收分别见 `task.json`、`acceptance.json`。
+
+## 从空白 Conda base 环境启动（Windows PowerShell）
+
+先打开已初始化 Conda 的 PowerShell，进入 base。首次使用时创建环境并安装经过本机无头验证的版本；已经创建过环境则跳过 `conda create` 和 `pip install`：
+
+```powershell
+conda activate base
+conda create -n softrobot-replay python=3.11 -y
+conda activate softrobot-replay
+python -m pip install mujoco==3.13.0 numpy==2.4.6
+cd "{dest}"
+python replay.py
+```
+
+以后打开终端只需 `conda activate softrobot-replay`，进入该目录后运行 `python replay.py`。上述绝对路径适用于生成交付包的这台机器；在其他机器上先进入下载后的本见证目录，再执行相同的 `python replay.py`。这台机器已有环境也可直接运行 `& D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe replay.py`。这里使用的 Python 是 Conda 环境内的 Python 3.11，回放本身仅依赖 MuJoCo 和 NumPy，不需要私有 Store。
+
+空格暂停/继续，鼠标调整视角；窗口关闭前保留末态。可选命令：
+
+```powershell
+python replay.py --speed 0.5
+python replay.py --repeat
+python replay.py --show-recorded-path
+python replay.py --headless
+```
+
+XML 是哈希匹配的原执行模型；控制使用每行对应时间区间的零阶保持。`external_forces.json` 记录世界系外力，按物理步施加在指定刚体质心。蓝点表示原始采样轨迹，绿点表示任务目标或路径顶点。回放使用物理积分，不构成新的独立科研验收；真机限制见 `hardware_notes.md`。
+'''
+
 def export_one(out, cfg, tr, raw, acc, xml, source, identity):
     from schemas.platform import SessionInput
     from extensions.tendon_family.backends import physics_for
@@ -89,8 +141,7 @@ def export_one(out, cfg, tr, raw, acc, xml, source, identity):
         evidence_acceptance='Original independent acceptance; engineering replay does not create a new acceptance.',
         files={})
     (dest/'hardware_notes.md').write_text('仿真采用理想肌腱张力，单位 N；正值表示拉力。通道顺序和驱动器映射见 manifest.json。串联 hinge 是连续体软臂的离散近似，不代表真机机械铰链。尚无电机映射、张力闭环、行程限制和标定，不能将张力直接当作 PWM、位置、脉冲或收缩量使用。\n',encoding='utf8')
-    goal=json.dumps(cfg['task']['goal']['data'],ensure_ascii=False)
-    (dest/'README.md').write_text(f"# {bench} / {condition}\n\n任务：{cfg['task'].get('name',taskid)}。目标及世界坐标（SI）：`{goal}`。完整冻结任务见 task.json；原始验收及指标见 acceptance.json。\n\n在此目录运行：`python replay.py`；无界面核对：`python replay.py --headless`；调速：`python replay.py --speed 0.5`；循环：`python replay.py --repeat`；显示原始采样轨迹：`python replay.py --show-recorded-path`。需要安装 MuJoCo 和 NumPy。空格暂停或继续，鼠标调整视角，窗口关闭前保持末态。\n\nXML 是哈希匹配的原执行模型，控制使用每行对应区间的零阶保持。外力为世界系、作用于指定刚体质心，按物理步区间施加。蓝点表示原始采样轨迹，绿点表示任务目标或路径顶点。\n",encoding='utf8')
+    (dest/'README.md').write_text(readme_text(dest,bench,condition,cfg['task'],acc,raw['external_force_execution']),encoding='utf8')
     manifest['files']={p.name:sha(p) for p in dest.iterdir() if p.is_file() and p.name!='manifest.json'}
     save(dest/'manifest.json',manifest)
     return dict(benchmark=bench,condition=condition,witness=identity,task=taskid,model=raw['model_identity'],design=tr['design_identity'],execution=source.get('execution_id'),control_source=str(source.get('control',source.get('archive'))),acceptance='accepted',duration=times[-1],timestep=dt,control_period_s=times[1]-times[0] if np.allclose(np.diff(times),times[1]-times[0],rtol=0,atol=1e-12) else 'irregular',channels=len(names),path=str(dest))
