@@ -28,6 +28,59 @@ class C3ReadinessTests(unittest.TestCase):
         self.assertIn('search',brief['research_intent_choices']['design_modification'])
         self.assertIn('stop',brief['research_intent_choices']['validation_or_stop'])
 
+    def test_v3_method_scope_is_explicit_and_preserves_legacy_restrictions(self):
+        from tools.research.search import request_guidance
+        from tools.research import config
+        path=ROOT/'configs/research/study_serial_v3_search_example.json'
+        spec=resolve(path)
+        self.assertEqual(spec['mathematical_method_scope'],'registered_applicable_v1')
+        self.assertEqual(spec['initial_structure_strategy'],'agent_choice')
+        self.assertEqual(spec['budgets']['mathematical_evaluations'],0)
+        self.assertIn('mujoco-nonlinear-task-capability-v1',spec['mathematical_methods'])
+        self.assertIn('sampled-affine-conic-minimax-v1',spec['mathematical_methods'])
+        guidance=request_guidance(spec)
+        self.assertNotIn('method',guidance['search'])
+        self.assertIn('adaptive_joint_block_v1',guidance['search']['available_methods'])
+        self.assertEqual(guidance['generate']['version'],'serial_family_generation_v3')
+        original=config.read
+        data=original(path);data['mathematical_methods']={'mujoco-nonlinear-task-capability-v1':'old explicit restriction'}
+        def reader(source):return deepcopy(data) if source==path else original(source)
+        with patch.object(config,'read',side_effect=reader),self.assertRaisesRegex(ValueError,'V3_AGENT_CHOICE_REGISTERED_METHOD_SCOPE_REQUIRED'):
+            resolve(path)
+        legacy=resolve(ROOT/'configs/research/study_family_mujoco_search.json')
+        self.assertNotIn('mathematical_method_scope',legacy)
+        self.assertNotIn('sampled-affine-conic-minimax-v1',legacy['mathematical_methods'])
+
+    def test_v3_compact_action_guidance_is_recoverable_on_demand(self):
+        from tools.research.research_context import agent_decision_brief
+        fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)
+        host=fixture.host;spec=deepcopy(state(host)['spec'])
+        v3=resolve(ROOT/'configs/research/study_serial_v3_search_example.json')
+        spec.update(initial_structure_strategy='agent_choice',family_space=v3['family_space'],
+            family_space_identity=v3['family_space_identity'],family_search=v3['family_search'])
+        anchor=save(host,spec['family_space'],'offline_v3_family_fixture')
+        update(host,spec=spec,family_space_reference=anchor)
+        brief=agent_decision_brief(host)
+        compact=brief['structure_actions']
+        self.assertNotIn('grant',compact)
+        self.assertEqual(compact['generate_version'],'serial_family_generation_v3')
+        detail=core.read_evidence(host,compact['detail_query'],record_read=False)
+        self.assertEqual(detail['generate']['version'],'serial_family_generation_v3')
+        self.assertIn('adaptive_joint_block_v1',detail['search']['available_methods'])
+        self.assertIn('generate',brief['actions']);self.assertIn('search',brief['actions'])
+
+    def test_stop_classification_requires_verified_exclusion(self):
+        fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)
+        host=fixture.host
+        request=mixed.plan(None);request.update(action='stop',stop_reason='scoped_mathematical_exclusion');request.pop('search')
+        with patch.object(core,'guard'),self.assertRaisesRegex(ValueError,'SCOPED_MATHEMATICAL_EXCLUSION_REQUIRES_REGISTERED_VERIFIED_CERTIFICATE'):
+            core.dispatch(host,request,'invalid-exclusion')
+        request['stop_reason']='budget_or_numerical_limit'
+        with patch.object(core,'guard'):
+            result=core.dispatch(host,request,'bounded-stop')['result']
+        self.assertEqual(result['stop_classification']['reason'],'budget_or_numerical_limit')
+        self.assertEqual(result['stop_classification']['task_status'],'no_independent_task_pass')
+
     def test_strict_generate_retries_and_releases_common_actions(self):
         from tools.research.research_context import agent_decision_brief
         fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)

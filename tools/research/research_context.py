@@ -1117,6 +1117,14 @@ def agent_decision_brief(host):
             if key in ws:
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
+    if (s['spec'].get('start_mode')=='family_space' and s['spec']['family_space']['version']=='serial_family_space_v3'
+            and s['spec'].get('initial_structure_strategy') in (None,'agent_choice') and brief.get('structure_actions')):
+        detail=brief['structure_actions']
+        brief['structure_actions']=dict(generate_version=detail['generate']['version'],
+            search_version=detail['search']['version'],available_search_methods=detail['search']['available_methods'],
+            native_budget=detail.get('native_budget'),
+            detail_query=dict(reference=s['family_space_reference'],view='working_set',pointer='/structure_actions'),
+            scope='Choose any currently admitted action; exact request templates and frozen grants are available at detail_query.')
     brief['route_review']=route_review(host,current,brief,trace)
     return compact_scientific_delivery(brief,decision_only=True)
 

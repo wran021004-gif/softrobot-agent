@@ -593,6 +593,7 @@ class Plan(Contract):
     decision: ResearchDecision | None = None
     control_search: ControlSearchRequest | None = None
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
+    stop_reason: Literal['budget_or_numerical_limit','user_or_engineering_stop','scoped_mathematical_exclusion'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
     expected_observation: str = Field(min_length=1)
@@ -622,12 +623,13 @@ class Plan(Contract):
         result=handler(self)
         if self.generation is None:
             result.pop('generation',None)
-        for key in ('decision','control_search','control_seed'):
+        for key in ('decision','control_search','control_seed','stop_reason'):
             if getattr(self,key) is None:result.pop(key,None)
         return result
 
     @model_validator(mode='after')
     def required(self):
+        if self.stop_reason is not None and self.action!='stop':raise ValueError('STOP_REASON_REQUIRES_STOP_ACTION')
         if isinstance(self.selected_execution,list) and (self.action!='select' or len(self.selected_execution) not in (2,3)):
             raise ValueError('JOINT_SELECT_REQUIRES_TWO_OR_THREE_RESULTS')
         if self.revise_selection and self.action not in ('confirm','select'):

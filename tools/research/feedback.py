@@ -103,7 +103,11 @@ def search_feedback(host, reference):
     return dict(reference=reference,status=result['status'],best_candidate=candidate,
         proxy_values=best.get('proxy_values'),final_materialization=materialization,
         lineage_pointer='/result/evaluated',task_acceptance='unmeasured',
-        **(dict(score_semantics=result['score_semantics'],conditions=best.get('evidence',{}).get('conditions',{}),
+        **(dict(score_semantics=result['score_semantics'],J_units='dimensionless signed normalized constraint violation',
+            conditions=best.get('evidence',{}).get('conditions',{}),
+            recent_outcomes=result['comparison_summary'][-2:],
+            resource_use=result.get('resource_use'),
+            unresolved_scope='A missing finite J or incomplete result cannot rank a candidate or establish structural infeasibility.',
             independent_validation='Read each condition result and independently replay its exact candidate and control source; every frozen condition must pass.')
             if result.get('comparison_summary') is not None else {}))
 

@@ -627,9 +627,9 @@ def scientific_status(value):
     j=native.get('J')
     finite_j=isinstance(j,(int,float)) and not isinstance(j,bool) and math.isfinite(j)
     if status=='computed': projected='computed'
-    elif status in ('not_applicable','not_comparable','unavailable') and boundary.get('worker_started') is not True:
-        projected='unsupported'
-    elif status in ('not_evaluated','not_run'): projected='not_evaluated'
+    elif status in ('not_applicable','not_comparable'): projected='unsupported'
+    elif status in ('not_evaluated','not_run') or status=='unavailable' and boundary.get('worker_started') is False:
+        projected='not_evaluated'
     else: projected='numerically_incomplete'
     return dict(status=projected,worker_started=boundary.get('worker_started'),
         native_cost=cost,complete=projected=='computed',failure_type=value.get('error') or value.get('reason'),

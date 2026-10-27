@@ -150,6 +150,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     fixed_structure=study.pop('fixed_structure_reference',None)
     family_sensitivity=study.pop('family_sensitivity_variables',None)
     methods=study.pop('mathematical_methods',None)
+    method_scope=study.pop('mathematical_method_scope',None)
     if methods is not None:
         if (not isinstance(methods,dict) or not methods or
                 set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1','mujoco-nonlinear-task-capability-v1','mujoco-reoptimized-structure-response-v1'} or
@@ -207,6 +208,16 @@ def resolve(path, profile=None, *, backend_profile=None):
             family_space=dict(path=str(family_source),sha256=digest(family_space)))
     elif study.get('start_mode', 'reference_candidate')!='reference_candidate':
         raise ValueError('UNKNOWN_RESEARCH_START_MODE')
+    if method_scope is not None:
+        if (method_scope!='registered_applicable_v1' or methods is not None or not family_mode or
+                family_space['version']!='serial_family_space_v3' or first_strategy not in (None,'agent_choice') or
+                'analysis' not in study['capabilities']):
+            raise ValueError('V3_AGENT_CHOICE_REGISTERED_METHOD_SCOPE_REQUIRED')
+        from tools.research.optimal_capability import CONIC,SENSITIVITY
+        from tools.research.nonlinear_capability import T1,T2
+        methods={key:'Frozen registered-applicable scope; resource, model and method prerequisites remain mandatory.'
+            for key in (CONIC,SENSITIVITY,T1,T2)}
+        study['mathematical_method_scope']=method_scope
     if first_strategy is not None:
         if not family_mode or first_strategy not in ('agent_choice','heuristic_generate','math_search','native_search'):
             raise ValueError('EXPLICIT_FAMILY_INITIAL_STRUCTURE_STRATEGY_REQUIRED')

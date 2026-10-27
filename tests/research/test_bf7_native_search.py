@@ -256,6 +256,13 @@ class NativeMixedSearchTests(unittest.TestCase):
         self.assertIsNone(out['best_native_candidate'])
         self.assertIsNone(out['best_observed'])
         self.assertTrue(all(u['incumbent_after'] is None for u in out['search_updates']))
+        from tools.research.feedback import search_feedback
+        ref=state(self.host)['search_results'][-1];feedback=search_feedback(self.host,ref)
+        self.assertEqual(feedback['J_units'],'dimensionless signed normalized constraint violation')
+        observed=feedback['recent_outcomes'][0]['conditions']['primary']
+        self.assertIsNone(observed['J'])
+        self.assertEqual(observed['scientific_computation']['status'],'numerically_incomplete')
+        self.assertEqual(observed['cost']['physics_steps'],10)
         self.assertTrue(search.initial_search_progress(self.host)['requirement_satisfied'])
         self.assertNotIn('best',out['evaluated'][1]['lineage']['decision'])
 

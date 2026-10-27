@@ -49,6 +49,7 @@ def decision_budget(host):
     """Derived counts only; the next Provider request is charged before its tools."""
     from tools.research.state import state
     s=state(host);remaining=host.store.remaining()['remaining'];b=s['spec']['budgets']
+    used=host.store.remaining()['used']
     total=remaining['model_calls'];reserve=b['protected_provider_requests']
     active=protected(host)
     from tools.research.reporter import current_reports
@@ -56,7 +57,14 @@ def decision_budget(host):
         for e in host.store.events(host.run_id))
     reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host))
     public_total=remaining['tool_calls'];public_reserve=b.get('protected_public_operations',0)
-    native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r)).get('requested_operation',{}).get('model_source')=='mujoco']
+    native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r)).get('requested_operation',{}).get('model_source')=='mujoco' and v.get('operation')!='tendon_force_capability_v1']
+    callback_records=[]
+    for ref,value in native:
+        if value.get('operation') not in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):continue
+        callbacks=(value.get('nonlinear_capability') or {}).get('callbacks')
+        if callbacks is None:
+            callbacks=(((value.get('native_dynamics') or {}).get('optimization') or {}).get('cost_feedback') or {}).get('evaluation_callbacks')
+        callback_records.append((ref,callbacks))
     native_costs=[]
     for r,v in native:
         for key in ('native_dynamics','nonlinear_response','native_progress','native_diagnostic'):
@@ -65,10 +73,10 @@ def decision_budget(host):
                 native_costs.append((r,cost,'/'+key+'/cost',
                     key in ('native_dynamics','nonlinear_response') and v.get('status') in ('computed','not_comparable')))
                 break
-    return dict(public_operation_budget=dict(remaining_total=public_total,reserved_for_closeout=public_reserve,
+    return dict(public_operation_budget=dict(charged_total=used.get('tool_calls'),remaining_total=public_total,reserved_for_closeout=public_reserve,
             available_for_exploration=max(0,public_total-public_reserve),
             scope='Shared ledger includes public requests and charged child operations; a scientific action may cost multiple operations.'),
-        provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
+        provider_budget=dict(charged_total=used.get('model_calls'),remaining_total=total,reserved_for_closeout=reserve,
         reporter_requests_used=reporter_used,pending_reporter_requests_upper_bound=reporter_pending,
         science_capable_main_requests=0 if active else max(0,total-reserve-1),
         science_capable_after_pending_reporters=0 if active else max(0,total-reserve-1-reporter_pending),
@@ -79,6 +87,7 @@ def decision_budget(host):
         exploration_after_additional_read_requests={str(n):max(0,total-reserve-1-n) for n in (1,3,5)}),
         science_budget=dict(remaining_physical=backend_capacity(host),
             owning_study=host.run_id,
+            recorded_numerical_s=s.get('numerical_s',0.),charged_independent_replay_launches=s.get('physical_replay_launches',0),
             charged_mathematical_evaluations=s.get('mathematical_evaluations',0),
             remaining_mathematical=max(0,b['mathematical_evaluations']-s.get('mathematical_evaluations',0)),
             remaining_full_replays=max(0,(s['spec'].get('physical_replay_limit') if s['spec'].get('physical_replay_limit') is not None else b['physical_launches'])-s.get('physical_replay_launches',0)),
@@ -89,6 +98,8 @@ def decision_budget(host):
                 scope='Frozen request cap, not remaining launches. Native analysis callbacks use native_control_limits and the mathematical allowance instead.'),
             native=dict(per_request_control_limits=s['spec'].get('native_control_limits'),
                 accounting_scope='Current Study registered analysis_results only; imported historical results and proposed actions are excluded.',
+                recorded_callbacks=sum(count for _,count in callback_records if count is not None),
+                callback_count_unavailable_for=sum(count is None for _,count in callback_records),
                 recorded_rollouts=sum(v['rollouts'] for _,v,_,_ in native_costs if v.get('rollouts') is not None),
                 recorded_physics_steps=sum(v['physics_steps'] for _,v,_,_ in native_costs if v.get('physics_steps') is not None),
                 latest_cost_query=dict(reference=native_costs[-1][0],view='full',pointer=native_costs[-1][2]) if native_costs else None,

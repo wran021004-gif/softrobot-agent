@@ -57,6 +57,10 @@ def read_evidence(host, query, *, record_read=True):
             from tools.research.evidence_views import result_card
             from tools.research.research_context import mathematical_decision_view
             derived=dict(mathematical_decision_view=mathematical_decision_view(plain(result_card(host,plain(q.reference)))))
+        elif q.pointer=='/structure_actions' or q.pointer.startswith('/structure_actions/'):
+            from tools.research.search import request_guidance
+            if not s['spec'].get('family_search'):raise ValueError('FROZEN_FAMILY_SEARCH_GRANT_REQUIRED')
+            derived=dict(structure_actions=request_guidance(s['spec']))
         elif q.pointer=='/controller_capabilities' or q.pointer.startswith('/controller_capabilities/'):
             from tools.research.research_context import controller_capabilities
             derived=dict(controller_capabilities=controller_capabilities(host))
@@ -511,6 +515,12 @@ def dispatch(host, value, request_id, origin='model'):
         host.store.artifact(r)
     from tools.research.experience import disposition_bindings
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
+    if plan.action=='stop' and plan.stop_reason=='scoped_mathematical_exclusion':
+        from tools.research.evidence_policy import summarize_evidence, registered_references
+        known=registered_references(host)
+        if not any(plain(r) in known and 'model_input_box_exclusion' in summarize_evidence(host.store.artifact(r),plain(r))['supported_inferences']
+                for r in plan.supporting_evidence):
+            raise ValueError('SCOPED_MATHEMATICAL_EXCLUSION_REQUIRES_REGISTERED_VERIFIED_CERTIFICATE')
     if plan.action=='stop':
         missing=[r for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('physical_replays',[]),*s.get('matched_state_results',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])] if r not in [plain(v) for v in plan.supporting_evidence]]
         if missing:
@@ -661,7 +671,10 @@ def dispatch(host, value, request_id, origin='model'):
                 update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
         else:
             update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
-            result=dict(accepted_stop=True,claims=claims(host))
+            result=dict(accepted_stop=True,claims=claims(host),stop_classification=dict(
+                task_status='independently_passed' if s.get('success_gate') else 'no_independent_task_pass',
+                selected=bool(s.get('selected')),reason=plan.stop_reason or 'unspecified',reason_source='plan_declared' if plan.stop_reason else 'unspecified',
+                scope='Scoped mathematical exclusion, if cited, applies only to the verified model and input box; finite numerical failures do not prove structural infeasibility.'))
         from tools.research.reporter import RESULT_KEYS
         after=state(host)
         scientific_results=[r for key in RESULT_KEYS for r in after.get(key,[]) if r not in s.get(key,[])]

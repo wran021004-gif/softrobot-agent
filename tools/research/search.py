@@ -143,7 +143,7 @@ def request_guidance(spec):
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
             version='serial_family_generation_v3' if spec['family_space'].get('version')=='serial_family_space_v3' else 'serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
         search=dict(tool='research_plan',action='search',payload='search',
-            version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant.get('method',grant.get('methods',[None])[0]),available_methods=grant.get('methods',[grant.get('method')]),
+            version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],available_methods=grant.get('methods',[grant.get('method')]),
             required=['variable_groups','segment_counts','tendon_counts','screening_fidelity','objective','operating_point','max_proposals','max_evaluations'],
             grant=grant,screening_fidelities=list(spec['fidelity_policy']['screening']),
             parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',
@@ -157,6 +157,7 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
+    if 'methods' not in grant:guidance['search']['method']=grant['method']
     if spec['family_space'].get('version') in ('serial_family_space_v2','serial_family_space_v3'):
         space=spec['family_space']; rule=space['serial_assembly']
         parts={p['id']:p for p in space['assembly']['components']}
@@ -261,7 +262,11 @@ def native_evaluation(host, query, proposal, operation, persist, guard):
             record['analysis']=out['reference'];persist()
         a=host.store.artifact(record['analysis']);t=a.get('nonlinear_capability',{})
         attributed=a.get('operation_key')==key+'-analysis'
-        record.update(candidate=seed['candidate'],status=a['status'],J=t.get('J'),initial_J=t.get('initial_J'),
+        from tools.research.analysis import scientific_status
+        computation=scientific_status(a)
+        record.update(scientific_computation=computation,candidate=seed['candidate'],status=a['status'],
+            J=t.get('J') if computation['reliable_finite_J'] else None,
+            initial_J=t.get('initial_J') if a['status']=='computed' else None,
             control_source=a.get('control_schedule_reference'),callbacks=t.get('callbacks'),
             stop_reason=t.get('stop_reason'),cost=a.get('native_dynamics',a.get('native_progress',{})).get('cost'),
             charged_analysis_evaluations=a.get('charged_analysis_evaluations',1) if attributed else 0,
@@ -535,7 +540,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             score_semantics=checkpoint['problem']['score_semantics'],task_acceptance='unmeasured',
             cost_scope='Original per-condition receipts attributed to this search; checkpoint/result reuse does not charge those receipts again.',
             comparison_summary=[dict(candidate=r.get('evidence',{}).get('candidate'),shared_J=r.get('proxy_values',{}).get('task_violation'),
-                conditions={cid:{k:v.get(k) for k in ('status','J','initial_J','callbacks','stop_reason','cost','analysis','control_source')}
+                conditions={cid:{k:v.get(k) for k in ('status','scientific_computation','J','initial_J','callbacks','stop_reason','cost','analysis','control_source')}
                     for cid,v in r.get('evidence',{}).get('conditions',{}).items()}) for r in rows])
     changed=None if mixed else sum(host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot'] for row in rows)
     ref=save(host,dict(result=result,structurally_changed_evaluations=changed,admission=fit),'design_search_result')

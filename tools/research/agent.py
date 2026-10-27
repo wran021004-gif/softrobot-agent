@@ -296,6 +296,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
     for field in set(payloads.values())-allowed:schema['properties'].pop(field,None)
     schema['properties']['action']={'type':'string','enum':actions}
+    if 'stop' not in actions:schema['properties'].pop('stop_reason',None)
     if decision_required:
         schema['required'].append('decision')
         schema['properties']['decision']={'$ref':'#/$defs/ResearchDecision'}
