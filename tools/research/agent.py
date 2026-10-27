@@ -668,7 +668,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
-            ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
+            ('evidence_read','Read a named missing fact or verify a relevant change using exact evidence and JSON pointer. Exact repeats add no information; delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
     if formal or rl_mode:
         actions=['propose','stop','diagnose','select','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
         if formal and state(host)['spec'].get('mode')!='rl_interface':

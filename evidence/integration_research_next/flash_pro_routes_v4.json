@@ -1,0 +1,480 @@
+{
+  "version": "provider_research_routes_v4",
+  "date": "2026-10-27",
+  "status": "completed",
+  "implementation": "a90aebb90",
+  "input_pair_equal_except_model": {
+    "fixed_control_stagnation": true,
+    "math_without_physics": true,
+    "bf5_failure_bf6_incomplete": true
+  },
+  "results": [
+    {
+      "case_id": "fixed_control_stagnation",
+      "model": "deepseek-flash",
+      "termination": "completed",
+      "first_request_input_identity": "1a8e583b1c94b4f09bd0001c27d3f66c020c1075f88865e83297723a802b333a",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 10922,
+        "completion_tokens": 3028,
+        "total_tokens": 13950,
+        "prompt_cache_hit_tokens": 7040,
+        "prompt_cache_miss_tokens": 3882,
+        "reasoning_tokens": 1509
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "struct-control-coupling-unmeasured",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "structural/control coupling diagnosis of sealed C closeout observations (descriptive only; no stencil, search, replay or solve executed)",
+            "selected_variables": [
+              "structural_topology_class",
+              "actuator_routing",
+              "control_gain_and_waypoint_parameters",
+              "terminal_error_m",
+              "holding_max_error_m",
+              "structural_searches",
+              "structural_sensitivity"
+            ]
+          },
+          "expected_observation": "若结构-控制耦合假设成立，下一步应能看到：对固定拓扑模板之外的结构变量做灵敏度/混合搜索的描述性结果显示保持期最大误差与终端误差对结构选择非零敏感（方向或量级即可）；或 Provider 明确报告合法固定拓扑模型模板未就绪、属可识别的工程阻塞而非科学结论。",
+          "fixed_conditions": "冻结证据（closeout 观测）与 C 封存状态不变，本比较无 C 重启授权；科学预算 0，不执行生成/初始化/求解/回放/SELECT/STOP；任务参数固定：tolerance_m=0.01、0.5 s 时长、control_period 0.01 s、seed 17、reach_free、目标 [0.29,-0.035,0.19]；remaining_at_closeout（数学 22、共享物理 7、独立回放 4、provider 17）仅为历史上下文，不作为本比较可花额度。",
+          "hypothesis": "观察到的停滞是“固定结构下的控制/参数停滞”，而非任务级或结构级的已证明极限：11 次 native 控制搜索、891 次内部 rollout 后终端误差 0.009716 m（在 0.01 m 容差内），但保持期最大误差 0.010310 m 已越界、保持期最大速度 0.02062 m/s；同时 structural_searches=0、structural_sensitivity=0，说明“结构自由度（拓扑/驱动布线）可改变可达性与保持期误差”这一备择解释从未被任何证据触碰，零假设（结构不敏感、误差只是固定结构控制参数空间的天花板）尚无支持材料。",
+          "interpretation": "本条诊断确立的是“证据缺口的位置”，不是新事实：固定结构控制已在高强度尝试下贴近但未过阈值（保持期 0.010310 m > 0.01 m，故不能宣称达标；终端 0.009716 m 达标也不构成任务成功），而结构侧完全空白，因此把停滞归因于结构-控制耦合是可检验且未被否证的。备选路线比较：(A) 结构方向——family_mixed_search_v1 已注册可在上次保存检查点使用，由 Agent 选块、范围与有限上限，属最低未知成本的合法下一步；(B) controlled_sensitivity 虽获授权但缺合法固定拓扑模型模板，属工程前置条件缺口，先补模板再谈灵敏度；(C) STOP 不成立——不属于预算耗尽、引擎不可用或已证结论，只属于“有限优化下的局部停滞 + 未测结构维度”。未知项仍包括：结构/控制全局权衡、跨结构收益的原因与量级、受保护 Provider closeout 后历史余额的真实可探索性；有限优化或不完整执行不能推出结构不可行或任务成功。",
+          "stopping_condition": "本次在提交这一条 diagnose 决定后即停：不启动结构搜索、不读重复证据。停止理由是“现有证据只足以给出诊断性下一步，不足以判定结论”，区别于四种情形：非预算耗尽（本比较 provider 请求上限 3，本次用 1；科学单位 0）、非工程阻塞已确认（engine_unavailable=false，family_mixed_search_v1 注册可用；仅 controlled_sensitivity 缺合法固定拓扑模板）、非局部停滞已证明（停滞只成立于固定结构控制维度）、非已证结论（未证结构-控制权衡或任务成功）。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "ddb992452ba35ae27786aa6682a4b99362de3ffd971088e53973b9e200155f29",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若结构灵敏度在已枚举结构内显示保持期误差基本不变，或结构路线被合法模板缺失/预算不可用硬性阻断，则该假设被削弱，固定结构局部停滞的解释获得支持；但即使如此也不能据此断言全局结构不可行或任务成功。"
+        }
+      ],
+      "final_answers": [
+        "已提交并记录 1 条 `diagnose` 决定（本 case 第 1/3 次 Provider 请求；证据读取 0 次，全部使用 inline 标量；科学单位 0）。拦截回执：schema_valid=true、contract=valid、scientific_admission=not_tested_zero_allowance、scientific_execution_started=false。\n\n**这条决定确立了什么**\n- 停滞的定位：11 次 native 控制搜索 / 891 次内部 rollout 后，终端误差 0.009716 m 已入 0.01 m 容差，但保持期最大误差 0.010310 m 越界、保持期最大速度 0.02062 m/s → 固定结构控制**未过关**，不能宣称任务成功。\n- 结构侧完全空白：`structural_searches=0`、`structural_sensitivity=0`，故“停滞源于结构-控制耦合”是未被否证的备择解释，而非已证结论。\n\n**路线比较（均为描述性，不执行）**\n- A 结构方向：`family_mixed_search_v1` 已在保存检查点注册可用（块/范围/有限上限由 Agent 定），是未知成本最低的合法下一步。\n- B `controlled_sensitivity`：已授权但缺合法固定拓扑模型模板 → 工程前置条件缺口，不是科学结论。\n- C STOP：**不成立**——engine_unavailable=false、结构维度未测、剩余额度（数学 22/共享物理 7/独立回放 4）仅为历史上下文且本比较不可花；既非预算耗尽，也非已证结论。\n\n**仍未测**：结构/控制全局权衡、跨结构收益的原因与量级、受保护 closeout 后历史余额的真实可探索性。任何结构实验都需独立正常准入。"
+      ],
+      "provider_receipt_wall_s": 21.312999999994645,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    },
+    {
+      "case_id": "fixed_control_stagnation",
+      "model": "deepseek-v4-pro",
+      "termination": "completed",
+      "first_request_input_identity": "1a8e583b1c94b4f09bd0001c27d3f66c020c1075f88865e83297723a802b333a",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 12684,
+        "completion_tokens": 4842,
+        "total_tokens": 17526,
+        "prompt_cache_hit_tokens": 8832,
+        "prompt_cache_miss_tokens": 3852,
+        "reasoning_tokens": 3641
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "diagnostic_interpretation",
+            "hypothesis_id": "fixed_control_stagnation",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "read_only_route_comparison",
+            "selected_variables": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "family_mixed_search_v1",
+              "controlled_sensitivity"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "若按 family_mixed_search_v1 注册的结构/控制联合搜索获得其自身的正常准入，将首次产生结构-控制权衡或跨结构收益的观测证据；在此之前只能确认固定结构停滞，不能确认任何结构改进。",
+          "fixed_conditions": "只读比较、密封的 C 观测证据、本隔离账本科学额度为 0；不接受恢复 C，任何未来实验需各自正常准入；本 diagnose 不执行结构/控制/联合优化、物理验证或 Reporter 调查。",
+          "hypothesis": "固定结构（fixed-topology）控制已停滞：最佳终点误差 0.009716 m 逼近 0.01 m 容差、保持段最大误差 0.010310 m 略超容差，而结构维度从未被探索（structural_searches=0、structural_sensitivity=0）。因此结构/控制联合搜索路线 family_mixed_search_v1 是唯一已注册且可用的合法下一步；controlled_sensitivity 虽已授权，但缺少合法固定拓扑模型模板，暂不可执行。",
+          "interpretation": "推荐 diagnose 而非 STOP：存在已注册可用的 family_mixed_search_v1 结构路线，controlled_sensitivity 缺少合法模板，且固定结构控制停滞。现有证据支持“固定结构控制停滞、结构数学未测、跨结构收益与停滞原因未测量”这一诊断，但不支持任何已证明的全局结构/控制结论，也不推断有限优化或未完成执行意味着结构不可行或任务成功。",
+          "stopping_condition": "比较出合法的下一路线并提交本诊断决策即完成本只读比较；仅当两条结构路线均不可注册/不可用且固定结构控制已停滞时才考虑 scoped STOP，并需区分预算耗尽、工程阻塞、局部停滞与已证明结论。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "ddb992452ba35ae27786aa6682a4b99362de3ffd971088e53973b9e200155f29",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若联合搜索在有限预算内未把 holding_max_error_m 降到容差以内，或结构变化未带来跨结构收益，则不能把停滞归因于结构约束，也不能宣称全局结构/控制权衡已被证明。"
+        }
+      ],
+      "final_answers": [
+        "## 决策已提交：diagnose（只读路线比较）\n\n**工具回执要点**：`research_plan` 校验通过（schema_valid=true，contract=valid），`scientific_execution_started=false`，`scientific_admission=not_tested_zero_allowance`——即本只读比较的隔离账本科学额度为 0，诊断未执行任何科学动作，仅记录决策。这是本案例的第 **1/3** 次 Provider 请求。\n\n**本决策确立了什么**\n- 依据可见标量证据：`terminal_error_m=0.009716` 逼近 0.01 m 容差、`holding_max_error_m=0.010310` 略超容差，结合 `structural_searches=0`、`structural_sensitivity=0`，支持“固定结构控制已停滞、结构维度从未被测试”的诊断。\n- 两条结构路线的合法性与就绪度不同：`family_mixed_search_v1` 已注册且在上次保存检查点可用，是唯一可立即走向正常准入的合法候选；`controlled_sensitivity` 虽授权，但“合法固定拓扑模型模板尚未准备”，暂不可执行。\n- 因此提交 **DIAGNOSE** 而非 STOP：不存在需要停机的“预算耗尽/工程阻塞”硬阻断，且结构/控制联合搜索这一合法路线尚未尝试。\n\n**仍未解决/未知**\n- 未证明任何全局结构/控制权衡；跨结构收益、停滞原因均未测量。\n- 关闭后剩余额度（数学单元 22、共享物理发射 7、独立固定重放 4）并非在受保护的 Provider 关闭后都必然可探索；这些历史额度只是上下文，本比较不可花费。\n- 本诊断不执行结构/控制/联合优化、物理验证或 Reporter 调查；family_mixed_search_v1 若要走通，仍需其自身的正常准入、授权与预算。\n\n**预算口径**：本案例 Provider 请求上限 3，已用 1（本最终答复请求）；科学额度 0；`requested_budget=0`（诊断声明请求上限，非实际成本或授权）。"
+      ],
+      "provider_receipt_wall_s": 78.75,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    },
+    {
+      "case_id": "math_without_physics",
+      "model": "deepseek-flash",
+      "termination": "completed",
+      "first_request_input_identity": "c7835ebd80350a3dc5f30d5d1f9a86c4acbd0a42e10226d1a180310143b382d7",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 13522,
+        "completion_tokens": 5596,
+        "total_tokens": 19118,
+        "prompt_cache_hit_tokens": 11648,
+        "prompt_cache_miss_tokens": 1874,
+        "reasoning_tokens": 3448
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "H-math-native-gap-01",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "read-only scoped diagnosis of affine scope vs Native prediction gap (no execution)",
+            "selected_variables": [
+              "affine.signed_sampled_violation",
+              "affine.strict_optimality",
+              "native_prediction.best_signed_maximum_excess",
+              "native_prediction.best_holding_error_m",
+              "native_prediction.best_terminal_error_m",
+              "native_prediction.stop_reason",
+              "task.evaluator.tolerance_m",
+              "independent_task_acceptance"
+            ]
+          },
+          "expected_observation": "只读诊断应确认：affine 记录的 scope 仅覆盖冻结局部模型与已分析样本，numerical_feasibility = sampled_feasible_witness，strict_optimality = unavailable —— 因此它不提供全局可行性、不可行性或最优性证书，也不能跨到 evaluator 的 tolerance 0.01 m 判据上；Native 侧 77 次内部 rollout / 77000 physics steps 是预测性内部集成，其成本与“独立 launch 次数”不可互换（unknowns 已声明二者不同），independent_task_acceptance 在此时间边界仍为 unmeasured。由此得到唯一可执行的后续顺序：先记录物理接受的前置条件（绑定 control seed/candidate 的 control 初始化、admission 准入、独立 replay 的授权与适用性），再谈独立 full physical_replay；在此之前任何“任务已通过”或“结构不可行”的表述都超出证据范围。",
+          "fixed_conditions": "冻结条件：task b3-reach-hold-050-draft v1.0.0（target [0.29, -0.035, 0.19] m、evaluator tolerance 0.01 m、duration 0.5 s、control_period 0.01 s、timestep 0.0005 s、seeds [17] development、initializer all_candidate_dofs_zero_v1、无 external_forces、重力 −9.81 z 且标注 Human-owned、mount z = 0.15 m）；temporal scope 仅到首个 affine 结果与首次 Native 优化、其独立 replay 之前，后续结果与 C 最终结论被扣留；本次为只读比较，科学预算 0，不执行 generation / initialization / analysis / solve / replay / SELECT / STOP。",
+          "hypothesis": "数学侧的改进只证明两件受限的事：(1) 在冻结的局部 affine 模型与被分析样本上存在一个被采样验证的可行见证（signed_sampled_violation = -0.19999999999872117），(2) 有界 Native 优化把预测超差从 baseline 2.8075 降到 best 0.1331，即大幅改善但仍未达标。用 inline 数值即可核对归一化口径：0.1331 = (best_holding_error 0.011331008980671447 − tolerance 0.01)/0.01，且 best_terminal_error 0.010698760524348743 > 0.01（超差约 6.98%），故 best_signed_maximum_excess = 0.1331 > 0 仍是违反状态的预测，不构成任务通过。stop_reason = iteration_limit（77 rollouts / 77000 physics steps）说明搜索被迭代上限截断，属局部停滞或预算边界，既不能推断结构性不可行，也不能推断物理成功。",
+          "interpretation": "四个备选按证据强度排序比较：(1) 独立 full physical_replay —— 这是物理成功的唯一合法闸门，但需要合法身份、授权、适用性与预算，本比较科学预算为 0 且不得执行，只能作为准入项登记；(2) 进一步有界控制/结构优化 —— 有假设依据（归一化超差仅 13.3%，且终止于 iteration_limit，可能是局部最优或 0.5 s 时域不足），但在无独立物理验证前对着同一 Native 模型继续优化有 model-relative 过拟合风险，且会消耗未到手的预算；(3) Reporter 对既有 math scope 的诊断 —— 成本最低，能澄清 affine→Native 的模型失配与单位口径，其中单位口径已由 inline 数值完成，故本次取此只读路径；(4) scoped STOP —— 不成立，因为既无“已证成功”也无“已证不可行”，把局部停滞/迭代上限记作已证结论是错误归类，历史 allowance 仅为上下文、本比较不可支用。因此选择 DIAGNOSE（只读），它描述而不执行物理验证、结构/控制/联合优化或 Reporter 调查。预算单位：requested_budget = 0（独立物理评估 0 次，Native 集成单位 0；0 独立评估不等于 0 Native 集成，实际成本未定）；Provider 请求：本决策 1 次 + 最终答复 1 次 = 3 次上限中的 2 次。",
+          "stopping_condition": "停止本次诊断的条件：(a) 超差单位与 affine scope 的一致性检查完成（0.1331 的归一化口径已由 inline 数值闭合），且 (b) 物理接受的准入前置（control_seed 绑定、admission、独立 replay 的授权/适用性/预算）已被明确列为下一步而非已执行项。到达 (a)(b) 即停，不升级为 SELECT 或物理成功结论；也不以本比较账本 0 科学预算去宣告“科学预算耗尽的历史结论”或“已证结束”。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "0a766ab2b158aa46ec22c7ef2e8e64bf6a202990ab6eee866f768514d0656b59",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若可见证据显示 affine 结果带有覆盖与 evaluator 同一约束集（同一 tolerance 0.01 m、同一目标与同一 0–0.5 s 窗口）且已登记的界或证书，则“数学结果不越界”被削弱；若出现已登记的独立物理 replay 使 holding_error 与 terminal_error 同时 ≤ 0.01 m，则“未获物理接受”被削弱；若识别出 0.1331 的归一化口径与我的复算不一致（说明超差单位另有定义），则“最佳 rollout 仍在违反”这一具体数值断言被削弱。反之，若证据只是同一批 inline 标量的重复投影，则以上三项均不被削弱，本假设维持。"
+        }
+      ],
+      "final_answers": [
+        "已提交并记录一条 DIAGNOSE 决策（schema_valid: true，contract: valid；仅 schema/reference/intent 检查通过，科学准入**未测**且零许可，无任何求解/回放/初始化被执行）。\n\n## 简短评估\n\n**这次数学改进确立了什么**\n- affine 侧只在冻结局部模型与已分析样本上给出一个*被采样验证的可行见证*（signed_sampled_violation = −0.20），`strict_optimality = unavailable`、scope 限于局部样本 ⇒ 不构成全局可行性/最优性证书，也不能跨到 evaluator 的 0.01 m 判据。\n- Native 侧把预测超差从 2.8075 降到 0.1331，是显著但**未达标**的改善。用 inline 数值可闭合归一化口径：0.1331 = (0.011331 − 0.01)/0.01，且 terminal 0.010699 m > 0.01 m（约 6.98% 超差）；即最佳 rollout 在其自身预测中仍违反。\n\n**为何不能宣称物理成功**\n- `independent_task_acceptance = unmeasured`，无独立物理 pass；temporal scope 明确止于首次 Native 优化、其独立 replay 之前。\n- `stop_reason = iteration_limit`（77 rollouts / 77 000 physics steps）说明搜索被迭代上限截断，属**局部停滞/预算边界**，不等于不可行（也不等于成功）；Native 集成成本 ≠ 独立 launch 次数。\n\n**判定与备选比较**（未选：独立 replay 需身份/授权/适用性/预算，本比较不可执行；进一步有界优化在未做物理验证前对同一 Native 模型有 model-relative 过拟合风险；scoped STOP 不成立，既无已证成功也无已证不可行）。故取成本最低、且单位口径已在 inline 数值上闭合的只读 Reporter 式 scope 诊断。\n\n**仍未知**：affine→Native 的模型失配来源、放宽迭代上限后 0.1331 是否收敛到 ≤0、0.5 s 时域是否本身不足、物理真机是否通过。\n\n**预算单位**：requested_budget = 0（独立物理评估 0 次；Native 集成单位 0，实际成本未定）；Provider 请求：决策 1 次 + 本答复 1 次 = 3 次上限中的 2 次（余 1 次）。"
+      ],
+      "provider_receipt_wall_s": 36.51600000000326,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    },
+    {
+      "case_id": "math_without_physics",
+      "model": "deepseek-v4-pro",
+      "termination": "completed",
+      "first_request_input_identity": "c7835ebd80350a3dc5f30d5d1f9a86c4acbd0a42e10226d1a180310143b382d7",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 13878,
+        "completion_tokens": 5585,
+        "total_tokens": 19463,
+        "prompt_cache_hit_tokens": 4736,
+        "prompt_cache_miss_tokens": 9142,
+        "reasoning_tokens": 4214
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "read_only_scope_diagnosis",
+            "hypothesis_id": "math_without_physics",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "Reporter diagnosis of existing math scope",
+            "selected_variables": [
+              "signed_sampled_violation",
+              "best_holding_error_m",
+              "best_terminal_error_m",
+              "independent_task_acceptance"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "证据将显示：仿射violation<0只是采样可行见证（非全局可行性、非严格最优）；best_holding_error_m=0.01133与best_terminal_error_m=0.01070均大于tolerance_m=0.01；independent_task_acceptance未测量；internal_rollouts=77/physics_steps=77000仅是内部积分，不是独立验收。",
+          "fixed_conditions": "冻结本地仿射模型与已分析样本；model.mujoco_native@1.0.0、0.5 s视界；evaluate.reach容差0.01 m；本案不提供C最终结果与独立重放；科学配额为0，历史配额仅作上下文。",
+          "hypothesis": "现有数学结果仅确立：冻结局部仿射模型在已分析样本上采样可行（signed_sampled_violation≈-0.20），且原生模型预测将基线最大超调由2.807降至0.133；它尚未确立物理验收成功——hold/terminal误差仍高于0.01 m容差、优化因iteration_limit截断、且无独立重放。",
+          "interpretation": "本诊断仅读现有证据、不执行方法。结论：数学改进确立了“受限采样可行 + 原生预测大幅改善但未达标且未收敛”；在无独立物理重放、误差仍略超容差、无全局/最优性证明时，合理下一步是Reporter范围诊断或后续受限优化，而非宣称物理成功。",
+          "stopping_condition": "完成对现有数学范围的诊断并明确未决项即止；不执行物理重放、控制/结构优化或数学分析。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "0a766ab2b158aa46ec22c7ef2e8e64bf6a202990ab6eee866f768514d0656b59",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若后续独立物理重放失败、或hold/terminal误差不能在合法验收中≤0.01 m、或全局可行性与最优性仍不可证明，则任何“物理成功”主张都被削弱；iteration_limit停止也表明尚未收敛。"
+        }
+      ],
+      "final_answers": [
+        "**决策已记录**：`action=diagnose`，`intent=DIAGNOSE`，`selected_method=\"Reporter diagnosis of existing math scope\"`，`requested_budget=0`。工具回执确认：`schema_valid=true`、`contract=valid`、`scientific_execution_started=false`（提案被拦截，未执行任何科学动作），`provider_request_number=1`。\n\n**简短评估**\n- 数学改进已确立：仿射层仅在冻结局部模型与已分析样本上得到采样可行见证（violation≈−0.20），不是全局/最优性证明；原生预测显著降低超调，但 hold 误差 0.0113 m、terminal 误差 0.0107 m 仍高于 0.01 m 容差，且以 `iteration_limit` 截断。\n- 物理成功尚不可主张：`independent_task_acceptance=unmeasured`，无独立物理重放、无全局可行性/最优性证明。\n- 下一步合理动作：先做范围诊断（本次已提交）或后续受限优化；STOP 不成立（无预算耗尽、工程阻塞或被证明结论的依据）。\n- 预算：本次共 **1 个 Provider 请求**（即本 decision 调用）；科学配额 0，独立物理评估 0 次；未调用 evidence_read，证据均来自已内联值。"
+      ],
+      "provider_receipt_wall_s": 94.54800000000978,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    },
+    {
+      "case_id": "bf5_failure_bf6_incomplete",
+      "model": "deepseek-flash",
+      "termination": "completed",
+      "first_request_input_identity": "0c5f90c540265e5a9b44eab113e192d3db2cf28c8d03d5c97ab8d000f95d7404",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 10116,
+        "completion_tokens": 3458,
+        "total_tokens": 13574,
+        "prompt_cache_hit_tokens": 8960,
+        "prompt_cache_miss_tokens": 1156,
+        "reasoning_tokens": 1443
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "H_bf6_incomplete_engineering_boundary_vs_bf5_valid_failure",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "diagnose / evidence-only read of existing BF5+BF6 receipts (no generation, initialization, analysis, solve, replay, SELECT or STOP; zero physics or optimization calls)",
+            "selected_variables": [
+              "bf6.status",
+              "bf6.native_complete_rollouts",
+              "bf6.native_callback_attempts",
+              "bf6.attempted_step_calls",
+              "bf6.completed_physics_steps_lower_bound",
+              "bf6.failed_call_internal_progress",
+              "bf6.independent_witness",
+              "bf6.integration_status",
+              "bf6.acceptance",
+              "bf6.task_success",
+              "bf5.acceptance_status",
+              "bf5.physics_steps",
+              "bf5.native_cost.optimization_iterations"
+            ]
+          },
+          "expected_observation": "诊断应能把 BF6 的缺口归类到以下可区分的四类之一并附可见证据：(a) 工程阻塞——回调次数上限(native_callback_attempts=1)或集成未在 A 注册(integration_status=not_registered_in_A)导致执行在 452/453 步界处被切断；(b) 预算耗尽——该回调与步进额度在当前设置下已被用尽且不可续；(c) 局部停滞——已完成的 452 步可复现但后续步无进展；(d) 已证结论——存在可比条件下的独立复现证明该跟踪设置在物理上不可行。若定位到 (a) 或 (b) 且残留工作量仅为补齐少数步数与一次完整 rollout，则支持「不完整≠不可行」的工程性中断假设。",
+          "fixed_conditions": "冻结证据保持原样：BF5 acceptance_status=valid_failure、physics_steps=1200(600 native + 600 independent)、forward_evaluations 62/61、optimization_iterations=1；BF6 status=incomplete、native_complete_rollouts=0、native_callback_attempts=1、attempted_step_calls=453、completed_physics_steps_lower_bound=452、failed_call_internal_progress=unknown、independent_witness=false、integration_status=not_registered_in_A、acceptance=null、task_success=null、compiled_load(mass 0.02 kg, com [0.007,0.001,-0.002], 无外力)。只读比较，科学预算 0，历史 allowance 仅作背景不得动用；不改变 candidate/control/Store 身份，不发起物理回放、NMPC、RL 或 control_search。",
+          "hypothesis": "BF6 的「不完整」(attempted_step_calls=453、completed_physics_steps_lower_bound=452、native_complete_rollouts=0、native_callback_attempts=1) 是回调/步进边界处的工程性中断与记账缺口，而不是 BF6 刚性传感器定向跟踪任务在物理上不可行；BF5 的 acceptance_status=valid_failure 只证明「一次受控搜索失败被独立复现并作为有效负结果接受」，不能外推为 BF6 或该任务族的结构性不可行，也不能外推为 BF6 成功。",
+          "interpretation": "BF5 与 BF6 不同类、不可直接比较。BF5 是「已接受的有效失败」：600 步原生 + 600 步独立复现、forward_evaluations 62/61、1 次优化迭代即结束，因此它的失败可作为有见证的负面对照，但 valid_failure 只说明该次实验被正确执行与接受，不说明任务族不可行，也不构成对任何候选的控制结论。BF6 是「执行不完整」：0 次完整 rollout、1 次回调尝试、452/453 步界、失败调用的内部进度未知，且无独立见证、未在 A 注册，acceptance 与 task_success 均为 null，因此既不能读作成功也不能读作不可行——它当前的科学信息量接近零，只是一个待补齐的执行事实。代价对比：BF6 仅消耗 forward_evaluations 25、physics_step_attempts 226、kernel_wall_s≈0.066，远低于 BF5 的 1200 物理步量级，说明其信息缺口来自中断位置而非评测强度。缺失事实明确为：BF6 第 453 次 step 调用的内部进度、回调/步进额度是否可续、独立见证与 A 侧集成注册状态。建议的下一步路线(仅描述、不执行)：先做只读的诊断归类(本决策)，再在获得正式 scope 与预算授权后补齐一次完整 rollout 并取得独立见证，之后才可谈 acceptance 或与 BF5 作同尺度比较。本次 Provider 预算单位为：3 次请求内、科学单位 0。",
+          "stopping_condition": "在 3 次 Provider 请求总额度(含本次决策与任何 tool 跟进)与 0 科学单位内停止：一旦缺口被归类为工程阻塞/预算耗尽/局部停滞/已证结论之一且能引用可见证据，或 Provider 额度用尽，即停止诊断并给出该归类与未解未知项；不因有限优化步数或不完整执行而宣称任务成功或结构性不可行。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "2fc87616c48eb649f7e600987e07a3254125e8f3f85a7e4971c9bc8068e641bc",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若已有收据显示该回调/授权额度在此设置下不可恢复地耗尽(无法在不改动 scope 的情况下补跑至一次完整 rollout)，或同一刚性传感器定向跟踪设置在可比条件下被独立见证复现为物理不可行，则「工程性中断可修复」假设被削弱，应转向重新范围化而非补跑；若发现 BF6 与 BF5 的失败源于同一结构性原因且已被证实，则也应削弱本假设。"
+        }
+      ],
+      "final_answers": [
+        "已提交并记录一个 typed diagnose 决策（`action=diagnose`，`research_intent=DIAGNOSE`，`requested_budget=0`，`selected_candidate=null`）。回执确认：`schema_valid=true`、`contract=valid`、`scientific_admission=not_tested_zero_allowance`、`scientific_execution_started=false`。\n\n**本次决策建立的内容**\n- 明确了两类结果不可直接比较：BF5 是**已接受的有效失败**（600 原生 + 600 独立物理步，forward_evaluations 62/61，1 次优化迭代即终止），可作有见证的负面对照；BF6 是**执行不完整**（0 次完整 rollout、1 次回调尝试、452/453 步界、失败调用内部进度未知、无独立见证、未在 A 注册、acceptance 与 task_success 均为 null），当前科学信息量接近零。\n- 代价对比（引用可见证据）：BF6 仅消耗 226 次物理步尝试、25 次前向评估、≈0.066 s 内核墙钟；BF5 为 1200 步量级。差距来自中断位置而非评测强度。\n- 因此 BF5 的 valid_failure 不外推为任务族结构性不可行，BF6 的不完整也不读作成功或不可行；有限优化与不完整执行都不是证明。\n\n**仍未知**\n- BF6 第 453 次 step 调用的内部进度；回调/步进额度是否可续；独立见证与 A 侧集成注册缺失的原因；失败根因只能归入四类（工程阻塞／预算耗尽／局部停滞／已证结论）之一，尚未定位。\n\n**预算与边界**\n- Provider 请求：已用 1／3（含任何 tool 跟进）；科学单位 0，历史 allowance 仅作背景、未动用。\n- 未做任何读取之外的执行：无生成、初始化、分析、求解、回放、SELECT 或 STOP。\n\n**建议的下一步路线（仅描述）**：若尚有额度，先做只读归类；在获得正式 scope 与预算后仅需补齐一次完整 rollout 并取独立见证，才可谈 acceptance 或与 BF5 作同尺度比较。若不获授权，则应在真实回执中标记为「预算/授权耗尽」，而非科学结论。"
+      ],
+      "provider_receipt_wall_s": 21.953999999997905,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    },
+    {
+      "case_id": "bf5_failure_bf6_incomplete",
+      "model": "deepseek-v4-pro",
+      "termination": "completed",
+      "first_request_input_identity": "0c5f90c540265e5a9b44eab113e192d3db2cf28c8d03d5c97ab8d000f95d7404",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 15042,
+        "completion_tokens": 8188,
+        "total_tokens": 23230,
+        "prompt_cache_hit_tokens": 14080,
+        "prompt_cache_miss_tokens": 962,
+        "reasoning_tokens": 6516
+      },
+      "money": null,
+      "read_attempts": 0,
+      "exact_repeat_reads": 0,
+      "inline_evidence_rereads": 0,
+      "tool_refusals": 0,
+      "partial_decisions": [
+        {
+          "action": "diagnose",
+          "decision": {
+            "claimed_inference": "diagnostic_read_only",
+            "hypothesis_id": "bf6_incomplete_execution_diagnosis",
+            "requested_budget": 0,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": null,
+            "selected_method": "Reporter investigation of BF6 failed step call and A registration",
+            "selected_variables": [
+              "acceptance",
+              "task_success",
+              "failed_call_internal_progress",
+              "integration_status",
+              "completed_physics_steps_lower_bound"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "Reporter 调查能说明第 453 次 step call 与 completed_physics_steps_lower_bound=452 之间的一步差额，并将 failed_call_internal_progress 从未知转为可记录；若完成 A 注册并取得 C 数据与独立见证，则 acceptance 不再是 null。",
+          "fixed_conditions": "只读诊断，不执行任何 generation/initialization/analysis/replay/SELECT/STOP；scientific_budget=0；仅使用 bf5_engineering 公共摘要与 BF6 的 committed_public_B_summary（source_commit e67d9d68e）。",
+          "hypothesis": "BF6 的 incomplete 是一次未完成的中断执行（native_complete_rollouts=0，callback_attempts=1，failed_call_internal_progress 未知），且未在 A 注册、acceptance/task_success 为 null，因此不能与 BF5 的 valid_failure（已独立复现的基线失败）等同；BF5 的失败结论已成立，BF6 的结果状态尚未成立。",
+          "interpretation": "BF5：valid_failure 表示失败已被独立见证且可复现（native 62 forward/600 步 vs independent 61/600 步一致），但 native_task_acceptance=unmeasured，未断言任务目标达成。BF6：incomplete 表示执行在完整 rollout 前中断（native 仅 226 步、0 完整 rollout），无独立见证且未注册在 A；其 25 forward/226 步只是部分成本，不能当作最终结果。下一步优先做 Reporter 诊断补齐失败点与注册缺口，而不是直接进入科学执行。",
+          "stopping_condition": "当 BF6 的失败原因被公共记录或确认不可恢复，且 acceptance 与 integration_status 有明确公共值（注册成功或明确拒绝）时停止诊断。",
+          "supporting_evidence": [
+            {
+              "artifact_id": "2fc87616c48eb649f7e600987e07a3254125e8f3f85a7e4971c9bc8068e641bc",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "若失败调用内部进度不可恢复（持续 unknown）、A 注册被拒绝、或缺少 candidate/control/Store 身份与 C 数据，则 BF6 只能维持 incomplete，无法升级为 valid_failure 或有效结果。"
+        }
+      ],
+      "final_answers": [
+        "**最终评估**\n\n已提交一个类型化 `diagnose` 决策（`research_intent = DIAGNOSE`，`selected_method = Reporter investigation of BF6 failed step call and A registration`），schema 校验通过、contract=valid；工具回执确认 `proposal_intercepted`、`scientific_admission = not_tested_zero_allowance`、`scientific_execution_started = false`——即**只登记决策，不执行任何科学动作**。\n\n- **确立的事实**：BF5 是已独立见证的失败基线（`valid_failure`，native 62/600 与 independent 61/600 一致），但任务达标性未测量（`native_task_acceptance = unmeasured`）；BF6 是未注册、未见证、0 完整 rollout 的中断执行（`acceptance/task_success = null`），二者不可互相替代。\n- **仍未知**：BF6 失败调用内部进度（`unknown`）、453 与 452 的一步差额、A 注册/C 数据/Store 身份、以及它最终能否成为有效结果或 valid_failure。\n- **预算**：Provider 请求 1/3（仅本次 `research_plan` 提交，未调用 `evidence_read`，因内联标量已足够）；`scientific_budget = 0`，零科学额度未被消耗，本比较不继承历史 allowance。\n\n结论：下一步应停留在只读 Reporter 诊断以补齐 BF6 的失败点与注册缺口，而非在零额度下进入科学执行。"
+      ],
+      "provider_receipt_wall_s": 134.57799999999406,
+      "science_used": {
+        "tool_calls": 0,
+        "worker_calls": 0,
+        "backend_solves": 0
+      }
+    }
+  ],
+  "actual_requests": 12,
+  "confirmed_responses": 12,
+  "usage": {
+    "prompt_tokens": 76164,
+    "completion_tokens": 30697,
+    "total_tokens": 106861,
+    "prompt_cache_hit_tokens": 55296,
+    "prompt_cache_miss_tokens": 20868,
+    "reasoning_tokens": 20771
+  },
+  "prior_invalid_input_requests": 5,
+  "cumulative_requests_including_invalid": 17,
+  "cumulative_request_ceiling": 24,
+  "money": null,
+  "cumulative_usage_status": "Corrected cohort usage is complete. Prior invalid cohort includes one unknown send: confirmed counters are only a lower bound; total currency unknown.",
+  "science_workers": 0,
+  "physics_steps": 0,
+  "reporter_requests": 0,
+  "formal_studies": 0,
+  "scientific_admission": "Descriptive Plan schema/reference/intent only; full scientific admission untested",
+  "raw_history_location": "runs/flash-pro-routes-v4 and runs/flash-pro-routes-v3 (retained, not committed)",
+  "by_model": {
+    "deepseek-flash": {
+      "actual_requests": 6,
+      "evidence_reads": 0,
+      "tool_refusals": 0,
+      "provider_receipt_wall_s": 79.78299999999581,
+      "usage": {
+        "prompt_tokens": 34560,
+        "completion_tokens": 12082,
+        "total_tokens": 46642,
+        "prompt_cache_hit_tokens": 27648,
+        "prompt_cache_miss_tokens": 6912,
+        "reasoning_tokens": 6400
+      }
+    },
+    "deepseek-v4-pro": {
+      "actual_requests": 6,
+      "evidence_reads": 0,
+      "tool_refusals": 0,
+      "provider_receipt_wall_s": 307.87600000000384,
+      "usage": {
+        "prompt_tokens": 41604,
+        "completion_tokens": 18615,
+        "total_tokens": 60219,
+        "prompt_cache_hit_tokens": 27648,
+        "prompt_cache_miss_tokens": 13956,
+        "reasoning_tokens": 14371
+      }
+    }
+  },
+  "manual_review": {
+    "method": "Qualitative review of submitted Plans and final answers against the frozen public facts; raw hidden reasoning was not used. Schema validity is reported separately.",
+    "cases": {
+      "fixed_control_stagnation": {
+        "common": "Both identify failed overall acceptance, untested structure mathematics and historical-only allowances; both propose diagnosis and discuss family_mixed_search_v1.",
+        "flash": "Correctly separates an untested structural explanation from proof, but calls structure search the lowest unknown-cost route without cost evidence and rejects legitimate scoped STOP too strongly.",
+        "pro": "Recognizes the missing sensitivity stencil, but calls mixed search the only legal next route and narrows STOP to route unavailability; continued control or other diagnosis can also be legal."
+      },
+      "math_without_physics": {
+        "common": "Both distinguish the local sampled affine witness from positive Native predicted excess and unmeasured independent acceptance. Both choose read-only scope diagnosis rather than a physical-success claim.",
+        "flash": "Quantifies predicted improvement, but treats iteration_limit as stagnation/budget-bound evidence, claims Reporter is cheapest without cost data, and says scoped STOP is invalid absent a proof.",
+        "pro": "Calls iteration_limit evidence of nonconvergence; the stop reason alone cannot establish that. Route comparison is thinner and STOP is again overrestricted."
+      },
+      "bf5_failure_bf6_incomplete": {
+        "common": "Both distinguish valid_failure from incomplete/null status in their Plans, but scientific interpretation and accounting remain unreliable.",
+        "flash": "Uses the 226-step single-stage cost against BF5 aggregate 1200, despite the 452 completed-step lower bound; invents a callback-limit cause from callback_attempts=1, calls incomplete scientific information nearly zero and assumes one completion would suffice.",
+        "pro": "Treats 452 lower-bound completed steps versus 453 attempted calls as a recoverable exact one-step discrepancy; asks for out-of-scope C data and overstates independent reproducibility. Final prose partly conflates unmeasured Native acceptance with the supplied independent BF5 valid failure."
+      }
+    },
+    "request_self_reports": "Five final answers report one request although the settled per-case total is two; only Flash math explicitly includes its final-answer request. Costs here come solely from receipts.",
+    "limitations": [
+      "Three paired descriptive cases, one sample per model/case, no scientific dispatch or full admission; these results do not establish actual structural/control research performance.",
+      "V4 includes the exact C4 TaskDefinition, but omits the separate full holding acceptance protocol (notably the speed threshold/window). Do not score omission of its exact numeric threshold as a model error or treat an inferred threshold as verified.",
+      "Zero evidence reads is observed under these inline inputs. Different cases and prompts prevent attributing a causal reduction versus previous cohorts or predicting a formal Study read rate.",
+      "Cache state, sequential timing and the earlier interrupted send are uncontrolled. Token usage is real; currency and general speed/price ratios are unknown.",
+      "An iteration limit is a recorded search boundary, not a convergence/stagnation proof. Scoped STOP does not require global infeasibility. Reporter diagnosis remains a proposal, not execution."
+    ],
+    "recommendation": "Keep the production deepseek-flash configuration for the next separately frozen math-first bounded Study. Pro showed no stable scientific-judgment advantage here and used more tokens. This is a conservative configuration recommendation, not a general model ranking or a guarantee of a physical solution."
+  }
+}

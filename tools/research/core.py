@@ -42,7 +42,8 @@ def read_evidence(host, query, *, record_read=True):
     # views and summaries (whose navigation can change) are recomputed normally.
     cacheable=q.view in ('full','fields','range')
     cache=getattr(host,'_evidence_query_cache',{})
-    cache_key=digest(dict(query=plain(q),content=value)) if cacheable else None
+    # Store.artifact already verified the content-addressed reference above.
+    cache_key=digest(plain(q)) if cacheable else None
     if cache_key in cache:
         return _record_evidence_read(host,q,s,deepcopy(cache[cache_key]),record_read)
     if q.view=='working_set':

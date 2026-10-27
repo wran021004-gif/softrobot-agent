@@ -66,8 +66,10 @@ class SelectedFeedbackTests(unittest.TestCase):
             self.assertEqual(core.read_evidence(host,q)['metrics']['J'],.125)
             self.assertEqual(core.read_evidence(host,{**q,'pointer':'/samples','view':'range','count':2})['items'],[0,1])
             self.assertEqual(core.read_evidence(host,{**q,'view':'fields','fields':['metrics']}),dict(metrics=value['metrics']))
-            values[reference['artifact_id']]=dict(metrics=dict(J=.25))  # changed-content fixture
-            self.assertEqual(core.read_evidence(host,q)['metrics']['J'],.25)
+            changed=dict(metrics=dict(J=.25));version=ref(changed);values[version['artifact_id']]=changed
+            self.assertEqual(core.read_evidence(host,{**q,'reference':version})['metrics']['J'],.25)
+            host.store.artifact.side_effect=ValueError('EVIDENCE_MISSING_OR_CHANGED')
+            with self.assertRaisesRegex(ValueError,'EVIDENCE_MISSING_OR_CHANGED'):core.read_evidence(host,q)
 
     def test_report_projection_preserves_unresolved_and_weakened_interpretations(self):
         from tools.research.research_context import compact_scientific_delivery

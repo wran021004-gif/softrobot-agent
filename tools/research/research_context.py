@@ -1127,13 +1127,17 @@ def route_review(host,current,brief,trace):
             previous=row['best_score'];delta=previous-score if row['observations'] else None
             row['consecutive_nonimprovements']=row['consecutive_nonimprovements']+1 if delta is not None and delta<=0 else 0
             row['best_score']=min(previous,score);row['observations']+=1
-            row['recent']=[*row['recent'][-1:],dict(reference=ref,pointer=pointer,score=score,improvement_over_previous_best=delta)]
+            basis=raw.get('native_analysis',{}).get('basis',{})
+            row['recent']=[*row['recent'][-1:],dict(reference=ref,pointer=pointer,score=score,improvement_over_previous_best=delta,
+                local_scope={k:basis[k] for k in ('model','state_time_s','window_s','search_dimension','sample_count') if k in basis},
+                scope_query=dict(reference=ref,view='fields',fields=[k for k in ('model','model_identity','analysis_applicability','requested_operation') if k in raw])
+                    if any(k in raw for k in ('model','model_identity','analysis_applicability','requested_operation')) else dict(reference=ref,view='full'))]
             groups[key]=groups.pop(key)
     rows=list(groups.values())[-4:]
     attempted={r['action'] for r in trace['recent'] if r['result_references']}
     methods=(brief.get('mathematical_capabilities') or {}).get('methods',{})
     used={r['method'] for r in trace['recent'] if r['result_references']}
-    return dict(required=any(r['consecutive_nonimprovements']>1 for r in rows),observed_routes=rows,
+    return dict(required=not current.get('task_accepted') and any(r['consecutive_nonimprovements']>1 for r in rows),observed_routes=rows,
         untried_actions=[a for a in ('search','generate','control_search','execute') if a in brief['actions'] and a not in attempted],
         untried_mathematical_methods=[k for k,v in methods.items() if k not in used and v.get('execution_status')!='blocked'],
         evidence_owner='best_valid, latest_reports, action_trace and budget retain exact facts, unresolved hypotheses and remaining units.',

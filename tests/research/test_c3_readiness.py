@@ -141,6 +141,7 @@ class C3ReadinessTests(unittest.TestCase):
         self.assertEqual(route['scope'],'native_finite_search');self.assertEqual(route['best_score'],.3)
         self.assertEqual(route['consecutive_nonimprovements'],2)
         self.assertNotIn('selected_method',review)
+        self.assertFalse(route_review(h,dict(task_accepted=True),brief,dict(recent=steps))['required'])
         # A real improvement releases the review trigger, without claiming a pass.
         values[steps[-1]['result_references'][0]['artifact_id']]['native_dynamics']['optimization']['best']['measure']['signed_maximum_excess']=.2
         self.assertFalse(route_review(h,{},brief,dict(recent=steps))['required'])

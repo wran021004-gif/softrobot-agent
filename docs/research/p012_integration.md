@@ -129,3 +129,67 @@ V4 uses the exact inherited C4 task via the existing config loader; its canonica
 task identity matches C's committed audit. Added a task/evidence horizon check.
 The remaining maximum 18 plus prior five is 23, below the overall 24 ceiling;
 freeze checks this cumulative cap. No raw private C artifact was imported.
+
+## Completed comparison and recommendation
+
+All six corrected runs completed with one valid descriptive Plan and final prose
+in two requests each. Initial wire inputs are equal within each pair except for
+model. Total: 12 actual/confirmed requests, zero evidence reads, exact repeat
+reads or tool refusals, and zero science/Reporter/physics/Study operations.
+Offline mock Harness coverage separately exercises an invalid wrapper and normal
+correction. Full scientific admission remains untested.
+
+| Model | Actual requests | Reads/refusals | Input tokens | Output tokens | Total tokens | Receipt wall time |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Flash | 6 | 0/0 | 34,560 | 12,082 | 46,642 | 79.783 s |
+| Pro | 6 | 0/0 | 41,604 | 18,615 | 60,219 | 307.876 s |
+
+Combined corrected usage: 106,861 tokens, including 20,771 reasoning tokens
+already counted in output; prompt cache hits/misses 55,296/20,868. Including the
+invalid cohort: 17 actual requests, 16 confirmed, at least 140,533 confirmed
+tokens and one unknown send. Currency is unknown; do not infer a currency price
+or general speed ratio from these uncontrolled cache/timing observations.
+
+Both models identify untested structure routes and distinguish model-only
+improvement from independent acceptance. Neither shows reliable stopping or
+causal judgment: both overrestrict legitimate scoped STOP. Flash claims routes
+are cheapest without cost evidence and mixes BF6 single-stage cost with aggregate
+BF5 cost; Pro calls a route uniquely legal, treats an iteration limit as proof of
+nonconvergence, and asks for out-of-scope C data in BF6 diagnosis. Pro's final BF5
+scope wording partly loses the supplied independent valid failure. Five of six
+final answers still undercount their own requests. Original receipts own costs.
+
+The comparison omits the separate full holding acceptance protocol, notably the
+speed threshold/window. Do not score missing exact threshold values as model
+error. It tests three descriptive decisions, not actual parameter selection or
+formal scientific performance. Zero reads is observed here; different scenarios
+and prompts do not establish a causal reduction from C's 135 historical attempts.
+The sanitized decisions, answers, receipts and per-case review are retained in
+`evidence/integration_research_next/flash_pro_routes_v4.json`; interrupted costs
+are separate in `flash_pro_routes_interrupted.json`. Original SDK reasoning is
+not included in the committed report.
+
+Recommendation: retain production `deepseek-flash` for the next separately frozen
+math-first bounded Study. Pro showed no stable scientific-judgment advantage here
+and used more tokens. This is not a general ranking or a promise of a solution.
+
+Final small refinements keep Store's existing content-address check as the cache
+version owner (no redundant full-content hash), advertise reading for a named
+missing fact/verification, attach exact local scope queries to route trends, and
+suppress route-change review after task acceptance. Five cache/handoff checks
+and the changed route-review check passed. Eight final affected start/SDK
+rotation/cache checks also passed (overlap with earlier checks; not additive).
+
+## Boundary before the next Study
+
+No further implementation blocker was found in the affected Reach/Hold path.
+The next Study still needs its own frozen task, full acceptance protocol,
+FamilySpace, finite allowances and ordinary readiness/admission checks, with
+`initial_structure_strategy=math_search`. These are preparation for a new Study,
+not permission to reopen C or inherit any prior budget. If BF5 position/tool-axis
+is chosen, existing affine/CONIC task-violation mathematics is explicitly
+not_applicable; its Native sequence tools do not by themselves make that initial
+mixed mathematical search legal. Resolve that task/method choice before launch,
+without silently weakening scientific admission. BF6 stays unready/unregistered.
+The stale legacy digest assertion is recorded separately and predates this work.
+P0/P1/P2 ends here; no P3 or formal Study is started.
