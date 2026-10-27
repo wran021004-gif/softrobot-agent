@@ -93,7 +93,7 @@ class FamilyMixedSearch(Contract):
     bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     screening_fidelity: str = Field(min_length=1)
     objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue','task_violation'] = Field(
-        description='task_violation selects CONIC reoptimization for current task conditions and requires its frozen grant. max_evaluations includes model builds and all internal solves. Static residual and Gramian remain explicit diagnostics.')
+        description='Default proxy task_violation retains single-task CONIC semantics and charges model builds/internal solves. Explicit mujoco_control instead reoptimizes each frozen condition with Native T1; max_evaluations counts condition analysis entries, control_settings caps callbacks per entry. Shared score is the worst best-found J, no global optimum or physical acceptance.')
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium']
     max_proposals: int = Field(ge=1, le=128, strict=True)
     max_evaluations: int = Field(ge=1, le=128, strict=True)
@@ -102,9 +102,28 @@ class FamilyMixedSearch(Contract):
     step: FiniteFloat = Field(default=.25, gt=0, le=.5)
     minimum_step: FiniteFloat = Field(default=.03125, gt=0, le=.5)
     stop_score: FiniteFloat | None = None
+    evaluation_mode: Literal['mathematical_proxy','mujoco_control'] = 'mathematical_proxy'
+    control_settings: 'LocalControlSearchSettings | None' = None
+    initial_tension_n: FiniteFloat | None = Field(default=None,ge=0)
+
+    @model_serializer(mode='wrap')
+    def preserve_proxy_requests(self,handler):
+        value=handler(self)
+        if self.evaluation_mode=='mathematical_proxy':
+            for key in ('evaluation_mode','control_settings','initial_tension_n'):value.pop(key,None)
+        return value
 
     @model_validator(mode='after')
     def selected_coordinates(self):
+        native=self.evaluation_mode=='mujoco_control'
+        if native:
+            settings=self.control_settings
+            if (self.objective!='task_violation' or self.operating_point!='standardized_initial_pretension'
+                    or settings is None or self.initial_tension_n is None or settings.version!='local_control_search_v2'
+                    or settings.correction_window_s is None or settings.correction_window_s[0]!=0):
+                raise ValueError('NATIVE_SEARCH_REQUIRES_TASK_VIOLATION_ZERO_STATE_FULL_WINDOW_AND_EXPLICIT_CONTROL_SETTINGS')
+        elif self.control_settings is not None or self.initial_tension_n is not None:
+            raise ValueError('NATIVE_CONTROL_FIELDS_REQUIRE_MUJOCO_CONTROL_MODE')
         for values in (self.variable_groups,self.segment_counts,self.tendon_counts,self.span_strategies,self.section_types):
             if len(values)!=len(set(values)):
                 raise ValueError('UNIQUE_SEARCH_CHOICES_REQUIRED')

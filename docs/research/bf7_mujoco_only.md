@@ -58,6 +58,26 @@ T1 六次均 computed。T2 三次逐条件请求均明确 not_comparable：原 S
 
 12 个原分析入口（6 T1 初筛、3 T2 聚合、3 T1 精化）；构建、初始化、兼容准备、Native kernel 和回放 kernel 时间在 `cost_summary.json` 分列，kernel 时间是 Store 数值时间的子集，不能再次相加。全部回调完整且无数值失败，积分尝试数等于完成步数。旧 v1/R1/R2 成本和失败仍在原历史报告/账本中，未抵扣本轮余额。工具冻结前两次干净工作区准入拒绝没有科学执行。
 
+全 BF7 历史费用若合并展示，旧 `evidence/bf7_final/summary.json` 的 266.417184 s 数值、至少 328.563434 s driver 与本轮相加，共 **343.673645 s 数值、至少 441.736242 s driver**；2351 次 Native 尝试（2350 完整）、23 次独立回放、1424072 个已记录积分步。旧 driver 缺失范围继续保留，不能编造精确合计。历史另有 15 GVS 模型和 15 CONIC，均不属于本轮调用或评分；新旧结果不混合做结构排名。研究工具没有货币计价，以上秒数不换算金额。
+
 `receipt_recovery.json` 验证原 `core.recover`、相同 Native 请求和相同回放 Plan 的收据重用，计数/数值时间/账本完全不变；分析 guard 若被触发会直接报错，实际未触发。原 `core.export` 保存两个 Study 的完整 artifacts archive、状态、原调用收据及 ledger，路径在 `evidence/bf7_native_v1/screen/` 和 `refinement/`。阶段二因此已验证合法结构生成、逐条件优化、独立评价、确定性比较和恢复，允许接入阶段三。
 
 本轮 MuJoCo-only 有限预算**没有新三目标可行见证**。此前 R2 已有同结构三目标分别独立通过的历史证据，但结构提案使用 CONIC、单目标预算上限 401，且当时联合 SELECT 被旧 fidelity gate 拒绝；它不作为本轮 MuJoCo-only 成功或公平结构收益。旧文件与旧拒绝保持原义。
+
+## 阶段三：原 Harness 的可选 Native 模式
+
+公共 `research_plan(action="search", search=...)` 的原 `family_mixed_search_v1` 新增显式 `evaluation_mode="mujoco_control"`。其余结构字段继续由原 FamilyMixedSearch/FamilySpace 校验；Agent 自行选择 `variable_groups`、counts、bounds、提案数和分析额度。Native 模式要求 `objective="task_violation"`、`operating_point="standardized_initial_pretension"`，并显式提供 `initial_tension_n` 和完整 v2 `control_settings`。没有把 B、任何已找到控制或固定实验顺序写入默认策略。
+
+原字段含义不变：`max_proposals` 限外层结构提案；Native 下 `max_evaluations` 是逐条件分析入口额度（三条件每结构至少 3），`control_settings.evaluation_requests` 是每条件完整 Native 回调上限。每提案重新生成合法结构、按冻结条件从相同显式张力初始化，再调用原 T1/Native worker；结构更改后一定重新优化控制。每条件的候选、schedule、初始/最好 J、回调、终止原因、模型/积分成本和原收据引用都保存在既有检查点/Store。共享 J 只在全部条件完整 computed 时给出。
+
+外层继续用原 mixed_moves 和有界 coordinate 提案，没有新增优化器、调度器、任务 Registry 或 Store。每条件检查点可恢复，已返回 worker 收据继续走原 analysis.dispatch 重用；保存结果的重复请求不再收费。输出 `best_native_candidate`、`comparison_summary` 和有限预算语义，明确 `task_acceptance="unmeasured"`。Agent 需原 `physical_replay` 和多条件 SELECT 验收；也可以继续控制优化或诊断，Native 搜索不自动启动物理回放。
+
+配置示例为 `configs/research/study_family_mujoco_search.json`：公开原 FamilySpace、BF7 三冻结任务、`initial_structure_strategy="agent_choice"`，仅授权 Native 模式，没有 CONIC grant。配置只给范围和预算上限，不替 Agent 选择研究子域、初始张力、控制设置或路线，不会自动启动 Study。旧默认 proxy 序列化不增加字段，`task_violation` 的旧单任务 CONIC 计数/意义、`math_search` 的 CONIC 准入均保留；不能靠 Native 请求满足旧 math_search 起始门槛。
+
+实际修改：`search.py`（逐条件 Native 适配、评分和检查点）、`contracts.py`（显式模式及控制设置）、`config.py`（冻结 grant）、`core.py`（原分析预算路由）、`research_context.py`（能力/预算投影）、`feedback.py`（候选与逐条件回放入口）。阶段二前另修 `design.py` 的冻结条件 fidelity 检查。原 Agent schema 由 Plan 自动生成，正式 Harness 能通过同一入口提交 Native 结构搜索，不要求每次执行。
+
+验证仅用无积分 fixture 和已有收据：6 项定向测试覆盖原公开 Plan schema、三条件分别优化/计数、Native 负 J 不冒充验收、中断恢复不重复初始化/分析、结果重用、旧 proxy 提案/检查点恢复和条件 fidelity。所有 synthetic 数值显式标注为 fixture，不是研究证据。旧 `test_search_contract_and_legacy_identities` 的固定配置 digest 断言存在基底差异：改动前 config 同样算出 `a6446a...` 而测试写死 `31af3e...`；没有改历史期望值。原请求的 proxy 序列化兼容另有定向断言。
+
+`harness_regression.json` 保存最后 6 项全部通过的输出；测试期间 `mujoco.mj_step` 被替换为抛错函数，确保没有科学积分。接入后再次读取两个原 Store，调用原 recover 并重用已有 T1/回放收据；`post_harness_receipt_recovery.json` 证明分析计数、数值时间和 ledger 不变，旧 freeze 未迁移，未重跑阶段二。历史 digest 差异也以改动前 `7e8acc4dd` 的 config 原文执行核对，改动前后实际值完全一致。
+
+工程与科学边界：公共新外层完成离线 dispatch/恢复测试，真实 Native 内层、独立回放和费用已由阶段二验证；遵照任务限制，接入后没有再跑整批科学积分，也没有正式 LLM Agent Study。T2 的本轮权限不适用已诚实保留，使用确定性逐条件对比。仅测试两种长度假设、单 seed、同 MuJoCo 模型和有限采样；材料/腱路收益、控制全局最优、连续时间、重复性、真实硬件与跨模型可靠性均未建立。完成后停止。

@@ -1,5 +1,7 @@
 # BF7：三目标共享结构探索
 
+本文件保存历史 v1/R1/R2（含 CONIC 提案）及其原成本。新的 BF7 MuJoCo-only 有限搜索、结果和公共 Harness 入口以 [MuJoCo-only 分阶段报告](bf7_mujoco_only.md) 为准；本文件的历史预算建议不是新入口的默认策略。
+
 基底为 2026-10-27 核对并 fetch 后一致的本地与远端 `integration/research-next`：`a1566b91a387316405bdb2fc79eb8a087ea20e8a`。独立分支 `research/bf7-shared-structure-benchmark`，独立 worktree `.worktrees/bf7-shared-structure-benchmark`。不修改基底，不从 B 历史研究分支派生，不读取或导入 BF4/BF5/BF6 成功设计、控制或私有 Store。
 
 Codex 组织有限研究，所有科学工作交给原 Study 工具；LLM Research Agent、Provider、PPO、NMPC、私有物理/数学搜索均为零。新增运行入口只编排原工具、保存与汇总现有结果。

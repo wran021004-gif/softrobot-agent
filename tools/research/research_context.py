@@ -996,6 +996,13 @@ def agent_decision_brief(host):
     if s['spec'].get('family_search'):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])
+        if 'mujoco_control' in s['spec']['family_search'].get('evaluation_modes',[]):
+            conditions=len(s['spec'].get('task_conditions',[])) or 1
+            remaining=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+            brief['structure_actions']['native_budget']=dict(remaining_analysis_entries=remaining,
+                analysis_entries_per_structure=conditions,complete_structures_at_most=remaining//conditions,
+                per_condition_control_limits=s['spec'].get('native_control_limits'),
+                scope='Projection of the original shared analysis allowance, not an extra pool. Agent chooses a smaller finite subset/range/budget. Independent replays need original backend allowance; scientific admission remains authoritative.')
         from tools.research.core import initial_structure_action
         from tools.research.search import initial_search_progress
         if s['spec'].get('initial_structure_strategy')=='math_search':

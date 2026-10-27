@@ -225,6 +225,9 @@ def resolve(path, profile=None, *, backend_profile=None):
                 any(not family_space['executable_tendon_count_bounds'][0]<=v<=family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
                 not all(type(grant[k]) is int and 1<=grant[k]<=128 for k in ('max_proposals','max_evaluations'))):
             raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
+        if grant and 'evaluation_modes' in grant and (not grant['evaluation_modes'] or
+                not set(grant['evaluation_modes'])<={'mathematical_proxy','mujoco_control'}):
+            raise ValueError('EXPLICIT_FAMILY_SEARCH_EVALUATION_MODES_REQUIRED')
         study.update(additions,fidelity_policy=policy)
     if 'extends' in study:
         source=(path.parent/study.pop('extends')).resolve()
@@ -445,6 +448,11 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
         study['tool_readiness']=dict(sorosim_matlab=report)
     if methods is not None:study['mathematical_methods']=methods
+    if 'mujoco_control' in study.get('family_search',{}).get('evaluation_modes',[]) and (
+            not {'analysis','search','control_correction'}<=set(study['capabilities']) or
+            'search' not in study.get('allowed_plan_actions',[]) or not native_limits or
+            'mujoco-nonlinear-task-capability-v1' not in study.get('mathematical_methods',{})):
+        raise ValueError('NATIVE_FAMILY_SEARCH_REQUIRES_ANALYSIS_CONTROL_T1_AND_LIMITS')
     if first_strategy=='math_search' and (not study.get('family_search') or
             not {'analysis','search'}<=set(study['capabilities']) or
             'search' not in study.get('allowed_plan_actions',[]) or

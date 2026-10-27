@@ -504,7 +504,8 @@ def dispatch(host, value, request_id, origin='model'):
     initial=initial_structure_action(host)
     if initial and plan.action not in ('stop','diagnose'):
         if plan.action!=initial:raise ValueError('FIRST_STRUCTURE_REQUIRES_'+initial.upper())
-        if initial=='search' and (getattr(plan.search,'version',None)!='family_mixed_search_v1' or plan.search.objective!='task_violation'):
+        if initial=='search' and (getattr(plan.search,'version',None)!='family_mixed_search_v1' or plan.search.objective!='task_violation'
+                or getattr(plan.search,'evaluation_mode','mathematical_proxy')!='mathematical_proxy'):
             raise ValueError('FIRST_STRUCTURE_REQUIRES_FAMILY_MIXED_TASK_VIOLATION_SEARCH')
     for r in plan.supporting_evidence:
         host.store.artifact(r)
@@ -552,7 +553,7 @@ def dispatch(host, value, request_id, origin='model'):
                 +json.dumps(scientific_preflight,sort_keys=True))
     if plan.action=='select':
         admission=dict(scope='selection without execution or numerical reservation')
-    elif plan.action=='search' and getattr(plan.search,'evaluation_mode','mathematical_proxy')=='mathematical_proxy':
+    elif plan.action=='search' and getattr(plan.search,'evaluation_mode','mathematical_proxy') in ('mathematical_proxy','mujoco_control'):
         from tools.research.analysis import admission as mathematical_admission
         admission=mathematical_admission(host,plan.search.max_evaluations)
     else:
