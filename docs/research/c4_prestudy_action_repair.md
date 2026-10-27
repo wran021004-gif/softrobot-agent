@@ -62,7 +62,40 @@ resolved_identity `c6c451a57c78b14e8837808be5d52d41c131c8c452f6b01ead4ddcf5e436b
 
 ## 验证与交付状态
 
-当前处于工程定向检查、同 Store 绑定和真实闭环执行准备阶段。
+十项直接相关检查通过：不支持推论的实验准入及正式收尾拒绝、伪造引用、任务/模型/设计范围、
+必需 decision、action/intent、动作 payload，以及旧精确查询/选定方法投影。投影最终调整后只重跑对应一项，
+没有全仓回归。另用已准备原 Store 零计算核验，L1 控制器 Schema 与原完整字段逐项相同，
+原任务/最佳失败项/候选来源/引用资格/授权/预算/Native 成本口径保持。
+同状态 packet 从 51475→44761 bytes、离线估计 14379→12669 Tokens（减少1710，约11.9%）；
+这是序列化估计，尚不能推断实际交互成本或理解改善。真实 usage 在闭环后独立报告。
+
+首次独立预检因未设置原冻结单线程变量而停止；显式采用原三个值后通过，没有更换依赖。
+首次跨 worktree bind 在事务前因代码根目录下缺原授权锚点失败，原状态和用量未变。
+没有复制授权索引或账本：保留原 C4 分支 `263b3ba51`，将原 grant 所属执行 checkout 临时置于
+已提交的 C4-R `e638546d6`（detached），通过原 bind 成功迁移。
+文档与代码开发仍在独立新分支；A/B 工作区不动。原科学 profile/config/候选/用量相同，
+新范围正式授权与 Handoff admission 已绑定，见 `loop_binding.json`。
+
+当前真实闭环正在执行，结果将在结算后追加。
 本轮准入条件是硬规则可靠及至少一次真实合法、反馈可用的闭环，不要求主观科学解释满分。
 科学错误、实际交互费用、反馈后的判断及正式 Cold-start 工程就绪结论将在真实执行后追加。
 原空候选池 Cold-start 配置仅做离线就绪核验，本轮不启动。
+
+## 首项真实执行后的具体入口修复
+
+首项 Native 请求经原工具返回 not_applicable：标准初态在0 s，请求却把校正窗设为[0.4,0.5]；
+没有新数学计算，additional_analysis_evaluations=0。随后一次 NMPC Plan 缺 hypothesis，
+生产精确反馈后 Agent 自己补齐，第四次请求的合法 Plan 启动真实 NMPC。
+该完整有效执行返回终点误差0.00314837 m、保持位置0.00603803 m，保持速度0.11137394 m/s：
+速度未过0.02 m/s，位置两项通过，没有通过任务。Reporter 与公开读取已交付；
+Agent 依据本次 NMPC 的真实输入提交 initialize_control，创建候选绑定的未测开放环序列。
+
+八次 Provider、303628 Tokens 后在原已结算 SupervisorReviewPause 边界复核，
+没有 pending、未知外发或未消费响应；仍有8次 Provider、原科学余量未重置。
+这期间两次相同 Native 模板叶节点读取暴露了入口缺口：该叶节点只给模板，必需的
+窗口/状态前提在相邻 required_parameters，模型未同时获取。
+因此调整原 `request_template_query` 的查询投影，改为同一方法的字段读取：
+candidate、operation、request_template、required_parameters、formal_execution_authorized、
+missing、可用 execution_limits 和 cost_scope，一次返回。原叶节点及全部旧指针仍可读，
+不增加工具/路由，不推断所选方法，不填控制源、参数或科学答案。
+这项修复基于本轮真实错误，在结算边界依原 bind 接续同一个 Study，不改旧冻结样本或评分。
