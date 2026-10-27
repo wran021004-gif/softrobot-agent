@@ -1,0 +1,99 @@
+{
+  "contract": "bf6.sensor_oriented_tracking_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 current-chat Task B supplementary instruction explicitly authorizes a new minimal non-contact timed position and tool-axis scanning task with real rigid-tool load, existing research tools, freeze-before-search, true independent feasibility execution, commits and ordinary push. One prespecified P1 structure and one fresh constant 0.2 N start; no BF4/BF5 successful controls or acceptance transfer. At most 151 full 600-step native callbacks, 6 response iterations, one independent full physical replay, 91200 integration steps. First complete independent pass stops and SELECTs; otherwise finite-search failure. No goal/tolerance relaxation, structure scan, Provider/NMPC/RL, contact, friction or writing.",
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "study_file": "configs/research/study_bf6_sensor_oriented_tracking.json",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "initial_tension_n": 0.2,
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "maximum_native_rollouts": 151,
+  "maximum_independent_replays": 1,
+  "maximum_physics_steps": 91200,
+  "steps_per_full_sequence": 600,
+  "rigid_tool": {
+    "body": "payload",
+    "mass_kg": 0.02,
+    "com_local_m": [
+      0.007,
+      0.001,
+      -0.002
+    ],
+    "inertia_com_local_kg_m2": [
+      [
+        1.2e-06,
+        2e-07,
+        0.0
+      ],
+      [
+        2e-07,
+        1.6e-06,
+        2e-07
+      ],
+      [
+        0.0,
+        2e-07,
+        1.8e-06
+      ]
+    ],
+    "tip_position_local_m": [
+      0.014,
+      0.0,
+      0.0
+    ]
+  },
+  "load_scope": "Real 20 g aggregate rigid-body mass, COM and full inertia in MuJoCo; original 10 g mount plus added coincident 10 g sensor, not a point-mass or COM-force approximation.",
+  "external_forces": [],
+  "position_semantics": "Original BF4 timed Tracking r(t) and inclusive post-step scoring semantics; new task owns its scan path. 30 scored samples from 0.02 to 0.6 s; max position error <=12 mm.",
+  "axis_semantics": "tip_site local +x; world reference is normalized-linear interpolation of explicit unit axes on the same node times; true directed arccos error <= pi/18 rad (10 deg) at all 30 scoring times; roll unconstrained.",
+  "scan_semantics": "Non-contact sensor center moves through a 40 mm lateral scan after approach; the scored corner/end are farther apart than twice 12 mm, excluding constant-position success.",
+  "acceptance_components": [
+    "evaluation_validity",
+    "execution_complete",
+    "task_evaluator",
+    "evaluator:tracking_max_error",
+    "evaluator:tool_axis_direction",
+    "solver_errors",
+    "force_bounds",
+    "tool_axis_sampling",
+    "rigid_tool_binding"
+  ],
+  "stop": "Use existing response safety margin 0.005 as planning target, with original hard acceptance thresholds unchanged. At the first native local target or finite cap, independently replay the complete best schedule once. First complete independent pass SELECTs and seals immediately; failure preserves all costs and remains unresolved, no scans or tolerance changes.",
+  "excluded": [
+    "real contact",
+    "friction/contact force control",
+    "writing",
+    "full 6D pose",
+    "independent axial torsion",
+    "Provider",
+    "NMPC",
+    "RL",
+    "large structural comparison",
+    "robustness repetitions"
+  ]
+}

@@ -80,6 +80,47 @@ class TrackingEvaluation(Contract):
     geometry_step_m: float = Field(gt=0)
 
 
+class RigidToolLoad(Contract):
+    body: str
+    mass_kg: FiniteFloat = Field(gt=0)
+    com_local_m: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+    inertia_com_local_kg_m2: tuple[tuple[FiniteFloat,FiniteFloat,FiniteFloat],tuple[FiniteFloat,FiniteFloat,FiniteFloat],tuple[FiniteFloat,FiniteFloat,FiniteFloat]]
+    tip_position_local_m: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+
+
+class OrientedTrackingGoal(TrackingGoal):
+    axis_local: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+    axis_vertices_world: list[tuple[FiniteFloat,FiniteFloat,FiniteFloat]] = Field(min_length=2,max_length=3)
+    axis_interpolation: Literal['normalized_linear'] = 'normalized_linear'
+    axis_frame: Literal['tip_site_local'] = 'tip_site_local'
+    rigid_tool: RigidToolLoad
+
+    @model_validator(mode='after')
+    def directed_timed_axes(self):
+        import math
+        if (self.time_requirement!='timed' or len(self.axis_vertices_world)!=len(self.vertices_m)
+                or any(abs(math.hypot(*v)-1)>1e-10 for v in [self.axis_local,*self.axis_vertices_world])
+                or any(sum(x*y for x,y in zip(a,b))<=-1+1e-10 for a,b in zip(self.axis_vertices_world,self.axis_vertices_world[1:]))):
+            raise ValueError('TIMED_UNIT_AXES_WITH_NONANTIPODAL_NODES_REQUIRED')
+        return self
+
+    def position_goal(self):
+        return TrackingGoal(**{k:getattr(self,k) for k in TrackingGoal.model_fields})
+
+    def axis_at_time(self,time_s):
+        from bisect import bisect_right
+        import math
+        if not 0<=time_s<=self.times_s[-1]:raise ValueError('AXIS_REFERENCE_TIME_OUTSIDE_HORIZON')
+        i=min(bisect_right(self.times_s,time_s)-1,len(self.times_s)-2)
+        alpha=(time_s-self.times_s[i])/(self.times_s[i+1]-self.times_s[i])
+        a,b=self.axis_vertices_world[i:i+2];v=[(1-alpha)*x+alpha*y for x,y in zip(a,b)];n=math.hypot(*v)
+        return [x/n for x in v]
+
+
+class OrientedTrackingEvaluation(TrackingEvaluation):
+    angle_tolerance_rad: FiniteFloat = Field(gt=0,lt=3.141592653589793)
+
+
 class HoldGoal(Contract):
     length_m: float = Field(gt=0)
 

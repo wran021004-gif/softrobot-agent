@@ -69,7 +69,10 @@ def tool_axis_samples(outputs,options):
     if np.any(indices>=len(times)) or not np.allclose(times[indices],scored,rtol=0,atol=1e-12):
         raise ValueError('ALL_SCORED_TOOL_AXIS_SAMPLES_REQUIRED')
     p=np.asarray(outputs['tip_positions_m'])[indices];axes=np.asarray(outputs['tip_tool_axes_world'])[indices]
-    angles=tool_axis_angles(axes,options['target_axis_world'])
+    if 'target_axes_world' in options:
+        from extensions.reference.implementation import timed_tool_axis_angles
+        angles=np.asarray(timed_tool_axis_angles(axes,options['target_axes_world']))
+    else:angles=tool_axis_angles(axes,options['target_axis_world'])
     return p,axes,angles
 
 
@@ -77,7 +80,7 @@ def task_measure(outputs, target=None, holding_start=None, position_limit=None, 
                  terminal_position_limit=None, tracking=None,tool_axis=None):
     if tool_axis is not None:
         p,axes,angles=tool_axis_samples(outputs,tool_axis)
-        position=np.linalg.norm(p-tool_axis['target_m'],axis=1)
+        position=np.linalg.norm(p-tool_axis.get('reference_m',tool_axis.get('target_m')),axis=1)
         ratios=np.r_[position/tool_axis['position_tolerance_m'],angles/tool_axis['angle_tolerance_rad']]
         excess=np.maximum(ratios-1,0)
         return dict(normalized_gap=float(max(excess)),sum_normalized_excess=float(sum(excess)),
@@ -178,8 +181,8 @@ def constraint_vectors(outputs, target=None, holding_start=None, position_limit=
     if tool_axis is not None:
         p,axes,_=tool_axis_samples(outputs,tool_axis)
         # For unit axes ||a-b||=2 sin(angle/2), so this cone is exactly equivalent.
-        return np.vstack([(p-tool_axis['target_m'])/tool_axis['position_tolerance_m'],
-            (axes-tool_axis['target_axis_world'])/(2*np.sin(tool_axis['angle_tolerance_rad']/2))])
+        return np.vstack([(p-tool_axis.get('reference_m',tool_axis.get('target_m')))/tool_axis['position_tolerance_m'],
+            (axes-tool_axis.get('target_axes_world',tool_axis.get('target_axis_world')))/(2*np.sin(tool_axis['angle_tolerance_rad']/2))])
     task_measure(outputs,target,holding_start,position_limit,speed_limit,terminal_position_limit)
     p=(np.asarray(outputs['tip_positions_m'])-target)/position_limit
     v=np.asarray(outputs['tip_velocities_m_s'])/speed_limit

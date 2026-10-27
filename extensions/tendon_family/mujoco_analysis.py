@@ -37,7 +37,11 @@ class NativeModel:
         self.aids=[m.actuator(n+'_direct_tension').id for n in self.tendons]
         self.tids=[m.tendon(n).id for n in self.tendons];self.tip=m.site('tip_site').id
         self.limits=m.actuator_ctrlrange[self.aids].copy()
-        self.tool_axis_local=(np.asarray(inp.task.goal.data['axis_local']) if inp.task.family=='task.position_tool_axis' else None)
+        self.tool_axis_local=(np.asarray(inp.task.goal.data['axis_local']) if inp.task.family in ('task.position_tool_axis','task.oriented_tracking') else None)
+        self.tool_load_binding=None
+        if inp.task.family=='task.oriented_tracking':
+            from .backends import check_rigid_tool_model
+            self.tool_load_binding=check_rigid_tool_model(inp,m)
         if m.nq!=len(self.order) or m.nv!=len(self.order) or m.na:
             raise ValueError('NATIVE_V1_REQUIRES_COMPLETE_NAMED_HINGE_STATE')
         self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,physics_step_attempts=0,rollouts=0,mechanics_evaluations=0)

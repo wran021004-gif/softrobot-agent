@@ -64,16 +64,18 @@ def task_gap(result):
         'evaluator:path_end','evaluator:path_progress_regression') if tracking else
         ('evaluator:task_bound','holding_position','holding_speed'))
     if acceptance.get('protocol_id')=='offline_timed_tracking_v1':scored=('evaluator:tracking_max_error',)
-    axis_task=acceptance.get('task_family')=='task.position_tool_axis'
+    axis_task=acceptance.get('task_family') in ('task.position_tool_axis','task.oriented_tracking')
     if axis_task:scored=('evaluator:tool_position','evaluator:tool_axis_direction')
+    if acceptance.get('task_family')=='task.oriented_tracking':scored=('evaluator:tracking_max_error','evaluator:tool_axis_direction')
     signed={name:row['value']/row['limit']-1 for name,row in components.items()
         if name in scored
         and isinstance(row.get('value'),(float,int)) and math.isfinite(row['value']) and row.get('limit',0)>0}
     ratios={name:max(0.,value) for name,value in signed.items()}
     metrics={name:dict(value=components[name]['value'],limit=components[name]['limit'],unit=components[name].get('unit'),
         source_pointer='/acceptance/components/'+name.replace('~','~0').replace('/','~1')) for name in signed}
-    valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True
-        for k in ('evaluation_validity','execution_complete','tool_axis_sampling' if axis_task else 'tracking_sampling' if tracking else 'holding_coverage','solver_errors','force_bounds')))
+    required=('evaluation_validity','execution_complete','tool_axis_sampling' if axis_task else 'tracking_sampling' if tracking else 'holding_coverage','solver_errors','force_bounds')
+    if acceptance.get('task_family')=='task.oriented_tracking':required=(*required,'rigid_tool_binding')
+    valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True for k in required))
     return dict(normalized_gap=max(ratios.values()) if len(ratios)==len(scored) else None,
         components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),
         dominant_constraints=_dominant_metrics(signed,metrics) if len(ratios)==len(scored) else [],

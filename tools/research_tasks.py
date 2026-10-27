@@ -342,7 +342,7 @@ def task_adapter(configuration):
     value = effective_input(configuration)
     if 'family' in value and 'goal' in value:
         value = dict(task=value)
-    if value['task']['family'] not in ('task.reach', 'task.tracking','task.position_tool_axis'):
+    if value['task']['family'] not in ('task.reach', 'task.tracking','task.position_tool_axis','task.oriented_tracking'):
         raise ValueError('RESEARCH_TASK_ADAPTER_REQUIRED: '+value['task']['family'])
     # Validate the registered task itself before extracting task-specific meanings.
     from tools.platform_tasks import check_definition
@@ -350,6 +350,9 @@ def task_adapter(configuration):
     if value['task']['family']=='task.position_tool_axis':
         from tools.research.tool_axis_task import ToolAxisTaskAdapter
         return ToolAxisTaskAdapter(value)
+    if value['task']['family']=='task.oriented_tracking':
+        from tools.research.tool_axis_task import OrientedTrackingTaskAdapter
+        return OrientedTrackingTaskAdapter(value)
     return ResearchTaskAdapter(value)
 
 
@@ -374,6 +377,8 @@ def _protocol_requirements(result):
         return common | {'tracking_sampling', 'evaluator:tracking_max_error'}
     if (protocol,family)==('offline_position_tool_axis_v1','task.position_tool_axis'):
         return common | {'tool_axis_sampling','evaluator:tool_position','evaluator:tool_axis_direction'}
+    if (protocol,family)==('offline_oriented_tracking_v1','task.oriented_tracking'):
+        return common | {'tool_axis_sampling','evaluator:tracking_max_error','evaluator:tool_axis_direction','rigid_tool_binding'}
     return None
 
 
@@ -386,7 +391,7 @@ def _outcome_issue(result):
         return 'PROTOCOL_REQUIRED_COMPONENT_MISSING_OR_UNKNOWN'
     # Invalidity and absent coverage are not ordinary physical failures.
     coverage = ('holding_coverage' if result['task_family']=='task.reach' else
-        'tool_axis_sampling' if result['task_family']=='task.position_tool_axis' else 'tracking_sampling')
+        'tool_axis_sampling' if result['task_family'] in ('task.position_tool_axis','task.oriented_tracking') else 'tracking_sampling')
     if any(components[n]['passed'] is not True for n in ('evaluation_validity', 'execution_complete', coverage)):
         return 'PROTOCOL_VALIDITY_OR_COVERAGE_UNRESOLVED'
     passed = all(c['passed'] for c in components.values())
@@ -419,7 +424,7 @@ def _source_issue(result, evidence=None):
             evaluation_binding.get('original_execution_id') not in (None,execution) or
             evaluation_binding.get('source') not in (None,evidence['simulation'])):
         return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
-    if result['protocol_id'] in ('offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1'):
+    if result['protocol_id'] in ('offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1','offline_oriented_tracking_v1'):
         for kind in ('evaluation', 'simulation', 'execution_id'):
             if not binding.get(kind):
                 return 'PROTOCOL_REQUIRED_SOURCE_MISSING:profile_' + kind
@@ -513,9 +518,12 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
             if settling.get('passed') is not calculated:
                 issues.append('PROFILE_HOLDING_OUTCOME_MISMATCH')
         metrics.update(holding_max_error_m=settling.get('max_error_m'), holding_max_speed_m_s=settling.get('max_speed_m_s'))
-    elif task['family']=='task.position_tool_axis':
+    elif task['family'] in ('task.position_tool_axis','task.oriented_tracking'):
         covered=report.get('tool_axis_sampling_complete')
         components['tool_axis_sampling']=_component(covered,covered,reason='Both real world position and unit tool-axis signals on the complete post-step grid')
+        if task['family']=='task.oriented_tracking':
+            bound=report.get('rigid_tool_binding')
+            components['rigid_tool_binding']=_component(bound,bound,reason='Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution')
     else:
         covered = report.get('tracking_sampling_complete')
         components['tracking_sampling'] = _component(covered, covered, reason=(
@@ -530,7 +538,7 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         status, accepted = ('invalid', None)
     elif validity == 'incomplete' or complete is False:
         status, accepted = ('incomplete', None)
-    elif missing or not components['holding_coverage' if task['family']=='task.reach' else 'tool_axis_sampling' if task['family']=='task.position_tool_axis' else 'tracking_sampling']['passed']:
+    elif missing or not components['holding_coverage' if task['family']=='task.reach' else 'tool_axis_sampling' if task['family'] in ('task.position_tool_axis','task.oriented_tracking') else 'tracking_sampling']['passed']:
         status, accepted = ('missing_evidence', None)
     else:
         accepted = all((c['passed'] for c in components.values()))

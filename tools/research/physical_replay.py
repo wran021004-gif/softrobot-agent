@@ -453,18 +453,21 @@ def playback_profile(inp,raw,evaluation):
         for v,hi in zip(row['actual_tension_n'],tendon_limits)),default=0.)
     profile=dict(complete=complete,task=plain(inp.task),official_task_success=evaluation.task_success,
         solver_error_count=0 if complete else 1,force_bound_violation_n=force_violation)
-    if inp.task.family in ('task.tracking','task.position_tool_axis'):
+    if inp.task.family in ('task.tracking','task.position_tool_axis','task.oriented_tracking'):
         # Motion is post-step; each sample's actual tension was applied during
         # the preceding interval. Verify both grids without scheduling the path.
         profile['tracking_sampling_complete']=bool(complete and
             all(abs(row['time_s']-k*timing.sample_period_s)<=1e-12 for k,row in enumerate(samples)) and
             all(np.asarray(row['actual_tension_n']).shape==(len(tendon_limits),) for row in samples[1:]))
-        if inp.task.family=='task.position_tool_axis':
+        if inp.task.family in ('task.position_tool_axis','task.oriented_tracking'):
             from extensions.reference.implementation import tool_axis_angles
             try:
-                tool_axis_angles([v['tip_tool_axis_world'] for v in samples],inp.task.goal.data['target_axis_world'])
+                tool_axis_angles([v['tip_tool_axis_world'] for v in samples],
+                    inp.task.goal.data['target_axis_world'] if inp.task.family=='task.position_tool_axis' else inp.task.goal.data['axis_vertices_world'][0])
                 profile['tool_axis_sampling_complete']=profile.pop('tracking_sampling_complete')
             except (KeyError,ValueError):profile['tool_axis_sampling_complete']=False
+        if inp.task.family=='task.oriented_tracking':
+            profile['rigid_tool_binding']=raw.get('rigid_tool_binding',{}).get('matched')
     else:
         limits=adapter.ranking_limits();settling=inp.policy.controller.parameters.data['settling']
         hold=[v for v in samples if v['time_s']>=adapter.holding_start_s()-1e-12]
@@ -487,7 +490,7 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
     samples=raw.get('samples',[])
     signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
     signals=[Signal(spec=signal,times_s=[v['time_s'] for v in samples[1:]],values=[v['tip_m'] for v in samples[1:]])]
-    if inp.task.family=='task.position_tool_axis' and all('tip_tool_axis_world' in v for v in samples[1:]):
+    if inp.task.family in ('task.position_tool_axis','task.oriented_tracking') and all('tip_tool_axis_world' in v for v in samples[1:]):
         axis=next(v for v in inp.task.observations if v.name=='tip_tool_axis')
         signals.append(Signal(spec=axis,times_s=[v['time_s'] for v in samples[1:]],values=[v['tip_tool_axis_world'] for v in samples[1:]]))
     result=BackendResult(solver_status='completed' if raw.get('status')=='completed' else 'failed',

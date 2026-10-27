@@ -27,8 +27,9 @@ def window_applicability(requirements, query, assessed, point, reasons):
         reasons.append('Nonlinear T1 requires the complete frozen task from 0 s.')
     coverage=[]
     tracking=requirements.binding.get('task_family')=='task.tracking'
-    axis_task=requirements.binding.get('task_family')=='task.position_tool_axis'
-    expected=({'tool_position':'tip_position','tool_axis_direction':'tip_tool_axis'} if axis_task else {'timed_tracking':'tip_position'} if tracking else
+    axis_task=requirements.binding.get('task_family') in ('task.position_tool_axis','task.oriented_tracking')
+    expected=({'timed_tracking':'tip_position','tool_axis_direction':'tip_tool_axis'} if requirements.binding.get('task_family')=='task.oriented_tracking' else
+        {'tool_position':'tip_position','tool_axis_direction':'tip_tool_axis'} if axis_task else {'timed_tracking':'tip_position'} if tracking else
         {'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'})
     if tracking and query.operation!='mujoco_direct_control_v1':
         reasons.append('Tracking nonlinear T1/T2 is not applicable; only direct sequence control is adapted.')
@@ -65,7 +66,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
     from schemas.platform import SessionInput
     started=time.perf_counter();q=query.control_optimization;settings=q.settings
     tracking=configuration['task']['family']=='task.tracking'
-    axis_task=configuration['task']['family']=='task.position_tool_axis'
+    axis_task=configuration['task']['family'] in ('task.position_tool_axis','task.oriented_tracking')
     if tracking and query.operation!='mujoco_direct_control_v1':
         raise ValueError('TRACKING_NONLINEAR_T1_T2_NOT_APPLICABLE')
     source=context['schedule'];tr=source['trajectory'];times=np.asarray(tr['times_s'])
@@ -151,6 +152,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
     if reused:cost['reused_native_callbacks']=len(reused)
     raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost,
         external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')))
+    if configuration['task']['family']=='task.oriented_tracking':raw['rigid_tool_binding']=native.tool_load_binding
     if peak_state is not None:
         peak_state.update(candidate=binding['candidate'],configuration_identity=binding['effective_configuration_identity'],
             provenance=dict(method='baseline_rollout_holding_speed_peak',source=context['source'],inherited_acceptance=False))

@@ -195,8 +195,8 @@ def checked_control(inp, *, execution=True):
                 control.recipe.terminal_tip_speed_weight, control.recipe.velocity_weight,
                 control.recipe.terminal_velocity_weight)):
             raise ValueError('TRACKING_HAS_NO_REACH_HOLDING_OR_ABSOLUTE_SPEED_COST')
-    elif inp.task.family=='task.position_tool_axis':
-        if (inp.policy.backend.version!='1.3.0' or inp.policy.controller.version!='12.0.0' or control.settling is not None):
+    elif inp.task.family in ('task.position_tool_axis','task.oriented_tracking'):
+        if (inp.policy.backend.version!=('1.4.0' if inp.task.family=='task.oriented_tracking' else '1.3.0') or inp.policy.controller.version!='12.0.0' or control.settling is not None):
             raise ValueError('TOOL_AXIS_REQUIRES_NATIVE_SEQUENCE_BACKEND_WITHOUT_REACH_SETTLING')
     elif control.settling is None:
         raise ValueError('REACH_SETTLING_REQUIRED')

@@ -1,0 +1,310 @@
+{
+  "version": "serial_family_space_v2",
+  "family_id": "bf6_serial_sensor_tool_20g_v1",
+  "executable_segment_counts": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "unsupported": [
+    "8-12 tendons: declared, not execution validated",
+    "polygon section domain not granted in this example",
+    "axial extension",
+    "shear",
+    "twist",
+    "friction",
+    "swept self-collision",
+    "High segment-count dynamics and controller compatibility require candidate-specific validation"
+  ],
+  "serial_assembly": {
+    "root_segment": "segment_0",
+    "repeated_segment": "segment_1",
+    "guide": "mid_guide",
+    "connector": "connector",
+    "payload": "payload",
+    "cell_count_bounds": [
+      1,
+      32
+    ],
+    "default_cells": 12
+  },
+  "base_space": "family_space_v1.json",
+  "assembly": {
+    "provenance": {
+      "source": "Frozen original serial prototypes with an additional 10 g rigid sensor coincident in COM and orientation with the original 10 g payload",
+      "load": "Aggregate 20 g rigid body; sum full COM tensors because component COMs coincide; fixed mounting, no external-force approximation",
+      "original_payload_mass_kg": 0.01,
+      "additional_sensor_mass_kg": 0.01
+    },
+    "components": [
+      {
+        "connection": {
+          "part": "fixed_base",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_0",
+        "interpolation": "step",
+        "kind": "flexible_segment",
+        "length_m": 0.16,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 7200000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "ellipse",
+              "outer_yz_m": [],
+              "parameters": {
+                "semi_y_m": 0.0095,
+                "semi_z_m": 0.0076
+              }
+            }
+          }
+        ]
+      },
+      {
+        "com_local_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "connection": {
+          "part": "segment_0",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 1.0
+        },
+        "envelope_halfsize_m": [
+          0.002,
+          0.025,
+          0.025
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0015,
+        "id": "mid_guide",
+        "inertia_com_local_kg_m2": [
+          [
+            4e-07,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2e-07,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            2e-07
+          ]
+        ],
+        "kind": "guide",
+        "mass_kg": 0.002
+      },
+      {
+        "com_local_m": [
+          0.006,
+          0.0,
+          0.0
+        ],
+        "connection": {
+          "part": "mid_guide",
+          "position_m": [
+            0.002,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "envelope_halfsize_m": [
+          0.006,
+          0.006,
+          0.006
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0,
+        "id": "connector",
+        "inertia_com_local_kg_m2": [
+          [
+            5e-08,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            7e-08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            7e-08
+          ]
+        ],
+        "kind": "rigid_connector",
+        "mass_kg": 0.003
+      },
+      {
+        "connection": {
+          "part": "connector",
+          "position_m": [
+            0.012,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_1",
+        "interpolation": "linear",
+        "kind": "flexible_segment",
+        "length_m": 0.11,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ],
+          "density_kg_m3": 1050.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 5400000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": -0.25,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            }
+          },
+          {
+            "s": 1.0,
+            "section": {
+              "angle_rad": 0.15000000000000002,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.008549999999999999,
+                "width_y_m": 0.0114
+              }
+            }
+          }
+        ]
+      },
+      {
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "connection": {
+          "part": "segment_1",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 1.0
+        },
+        "envelope_halfsize_m": [
+          0.009,
+          0.009,
+          0.008
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0,
+        "id": "payload",
+        "inertia_com_local_kg_m2": [
+          [
+            1.2e-06,
+            2e-07,
+            0.0
+          ],
+          [
+            2e-07,
+            1.6e-06,
+            2e-07
+          ],
+          [
+            0.0,
+            2e-07,
+            1.8e-06
+          ]
+        ],
+        "kind": "payload",
+        "mass_kg": 0.02
+      }
+    ]
+  }
+}

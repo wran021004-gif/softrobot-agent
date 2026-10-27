@@ -14,6 +14,35 @@ from .signals import export
 from .execution import resolve_execution
 
 
+def check_rigid_tool_definition(inp):
+    """Bind the task-owned inertial load to an actual rigid design component."""
+    expected=inp.task.goal.data['rigid_tool'];parts=inp.robot.structure.data['components']
+    tool=next((c for c in parts if c['id']==expected['body']),None);tip=inp.robot.structure.data['tip']
+    if (tool is None or tool['kind']!='payload' or tip['part']!=expected['body'] or tip['s']!=0
+            or tip['position_m']!=expected['tip_position_local_m'] or tip['quaternion_wxyz']!=[1.,0.,0.,0.]
+            or any(tool[k]!=expected[k] for k in ('mass_kg','com_local_m','inertia_com_local_kg_m2'))
+            or inp.task.environment.data.get('external_forces')):
+        raise ValueError('FROZEN_RIGID_TOOL_DEFINITION_MISMATCH_OR_EXTERNAL_FORCE_SUBSTITUTION')
+    return expected
+
+
+def check_rigid_tool_model(inp,model):
+    """Inspect compiled MuJoCo inertia; a COM force cannot satisfy this binding."""
+    import mujoco
+    expected=check_rigid_tool_definition(inp);bid=model.body(expected['body']).id;site=model.site('tip_site').id
+    rotation=np.empty(9);mujoco.mju_quat2Mat(rotation,model.body_iquat[bid]);rotation=rotation.reshape(3,3)
+    tensor=rotation@np.diag(model.body_inertia[bid])@rotation.T
+    matched=bool(model.body_jntnum[bid]==0 and model.site_bodyid[site]==bid
+        and abs(model.body_mass[bid]-expected['mass_kg'])<=1e-12
+        and np.allclose(model.body_ipos[bid],expected['com_local_m'],rtol=0,atol=1e-12)
+        and np.allclose(tensor,expected['inertia_com_local_kg_m2'],rtol=0,atol=1e-12)
+        and np.allclose(model.site_pos[site],expected['tip_position_local_m'],rtol=0,atol=1e-12))
+    if not matched:raise ValueError('COMPILED_MUJOCO_RIGID_TOOL_BINDING_MISMATCH')
+    return dict(matched=True,body=expected['body'],mass_kg=float(model.body_mass[bid]),com_local_m=model.body_ipos[bid].tolist(),
+        inertia_com_local_kg_m2=tensor.tolist(),tip_position_local_m=model.site_pos[site].tolist(),
+        semantics='Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation')
+
+
 def save_nmpc_progress(folder, observations):
     """Persist shared graph definitions once and tolerate brief Windows readers."""
     record=observations[-1].get('complete_update_record',{})
@@ -133,6 +162,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
     model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    tool_binding=check_rigid_tool_model(inp,model) if inp.task.family=='task.oriented_tracking' else None
     forces=_bind_mujoco_forces(model,scene)
     safety=MujocoFailureSnapshot(model,physics['identity'],folder)
     joints=[model.joint(name).id for name in physics['dofs']]
@@ -166,7 +196,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
         position=data.site_xpos[tip].copy();velocity=jac@data.qvel
         return dict(control_step=k,time_s=k*scene['control_period_s'],engine_time_s=float(data.time),
             **(dict(tip_tool_axis_world=(data.site_xmat[tip].reshape(3,3)@np.asarray(inp.task.goal.data['axis_local'])).tolist())
-                if inp.task.family=='task.position_tool_axis' else {}),
+                if inp.task.family in ('task.position_tool_axis','task.oriented_tracking') else {}),
             tip_m=position.tolist(),tip_velocity_m_s=velocity.tolist(),
             speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
             requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
@@ -188,6 +218,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
         rows.append(sample(k+1,command,-data.actuator_force[aids].copy()))
         atomic_json(folder/'samples.json',rows)
     return dict(status='completed' if failure is None and len(rows)==intervals+1 else 'incomplete',
+        **(dict(rigid_tool_binding=tool_binding) if tool_binding is not None else {}),
         failure=failure,samples=rows,physics_steps=steps,command_intervals=len(rows)-1,
         physics_step_attempts=safety.attempted_steps,
         cost=dict(model_builds=1,rollouts=1,physics_steps=steps,physics_step_attempts=safety.attempted_steps,
@@ -421,5 +452,10 @@ class MujocoBackend(SerialBackend):
 
 class NativeSequenceMujocoBackend(MujocoBackend):
     """Advertise the new observation only on the implemented explicit-schedule route."""
+    @classmethod
+    def check(cls,inp,parameters,control):
+        super().check(inp,parameters,control)
+        if inp.task.family=='task.oriented_tracking':check_rigid_tool_definition(inp)
+
     def solve(self,timeout_s):
         raise ValueError('TOOL_AXIS_REQUIRES_EXPLICIT_NATIVE_SEQUENCE_AND_PHYSICAL_REPLAY; NMPC orientation is not implemented')
