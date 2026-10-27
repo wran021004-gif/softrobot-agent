@@ -41,3 +41,16 @@ Provider=0、科学 worker=0、物理积分=0；fixture 不作为科研证据。
 独立开发工作区准备此修正，运行中的原执行 checkout 保持 `af5f5bca4`，不热覆盖或重写原实验。
 若在实际清洁恢复边界接入则走原 bind；否则仅作为研究结束后可选择性集成的工程补丁，
 不能把它的潜在收益归入此前已发生的研究。
+
+## 正式执行中发现的交接摘要缺失
+
+只读核对原 Store 的真实反馈与交接 preparation，发现部分较大的 `evidence_read`
+结果在原 3000-byte 摘要回退中仅保留 status/task_acceptance，丢失了本次已选子对象
+的 J、stop_reason、best_metrics 等字段；summary envelope 甚至可能只剩 reference。
+这与纠正错误反馈原样送达是两个不同问题，不能据后者断言所有读取交付完整。
+
+`session_handoff.py` 在原 `pending_feedback_delivery` 内保留已选对象的标量与能放入
+原体积限制的小字段，明确列出省略键；summary 查询仍标明原 preview 语义。
+原精确反馈分支、L0/L1/L2、工具 schema、配置、Store 原件、查询指针及 read credit 均不变。
+这不加入研究建议、候选参数或实验派发。2项新离线回归及1项原真实 SDK/模拟 HTTP
+交接与恢复检查通过；真实 Provider=0、科学 worker=0、物理积分=0。
