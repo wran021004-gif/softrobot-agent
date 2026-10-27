@@ -85,7 +85,7 @@ introduced here. No BF6 worker is launched by A.
 ## Flash / Pro decision comparison
 
 An independent bounded Provider-only comparison will reuse the production
-Harness, Plan/Analysis/Evidence schemas and LiveBoundary/Store accounting.
+Harness and Plan/Evidence schemas and LiveBoundary/Store accounting.
 It will not dispatch scientific requests or access the current C Study. Only
 fresh, labeled interface fixtures/public frozen task information are eligible
 inputs. Exact model IDs and common request settings are checked against the
@@ -116,15 +116,16 @@ for BF5 and Pro/Flash for BF6. Each has a separate existing Store grant/session
 with zero tool/backend/worker allowance, a fresh SDK session and the same frozen
 case input/schema. Credentials, raw responses and retained reasoning stay local.
 The original `build_harness`, `live_model_class`, `LiveBoundary` and production
-Plan/Analysis/Evidence contracts are reused. No alternative SDK, tools router or
+Plan/Evidence contracts are reused. No alternative SDK, tools router or
 scientific dispatcher is added. Only a test-side read/validation interceptor runs.
 
-BF5 input is this integration's fresh failed baseline and its frozen task;
-BF6 input is a filtered public B incomplete receipt/audit. No C evidence or B
+BF5 input is the committed sanitized baseline cost/status summary and public
+frozen TaskDefinition; BF6 input is a filtered committed public B scalar summary. No C evidence or B
 successful design/control is supplied. The evidence reference is content-identical
 between model arms. The production evidence reader handles static pointer/views;
-there is no synthetic scientific feedback. Provider tool proposals record schema,
-reference/intent checks and, where available, pure applicability. These partial
+there is no synthetic scientific feedback. Provider tool proposals record schema and
+reference/intent checks. Only diagnose/stop/select and static evidence reads are
+advertised, with all proposals intercepted. These partial
 checks do not claim full scientific admission; all science budgets are zero.
 
 One mock-HTTP end-to-end check passed using the real Harness/ledger with worker
@@ -135,3 +136,16 @@ receipts and actual usage/cache counters are retained in its own ignored Store.
 No uncertain or existing attempt is automatically resent. Hitting the two-request
 cap after a valid tool proposal may stop the Harness before a prose follow-up;
 that is distinct from invalid requests or absent evidence understanding.
+
+### Public-only outbound review
+
+The first live launch was rejected by automatic approval review before process
+creation: no Provider request was sent. Review cited the specific evidence
+payload and DeepSeek destination, despite the user's general model-call
+permission. The safer replacement uses only committed public task/scalar-summary
+content. It does not open a private research Store or send candidate/control
+identities, original receipts, trajectories, C data or Provider reasoning.
+The previous unsent freeze remains local; it is not repurposed or overwritten.
+The replacement has the same eight-request ceiling and zero scientific allowance.
+Its exact external destination, source files, case fields and exclusions are in
+`evidence/integration_research_next/provider_payload_review.json`.

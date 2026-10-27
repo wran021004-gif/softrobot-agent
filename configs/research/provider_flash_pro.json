@@ -1,7 +1,13 @@
 {
-  "version": "provider_decision_comparison_v1",
-  "models": ["deepseek-flash", "deepseek-v4-pro"],
-  "cases": ["bf5_failed_baseline", "bf6_incomplete"],
+  "version": "provider_decision_public_only_v1",
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "cases": [
+    "bf5_failed_baseline",
+    "bf6_incomplete"
+  ],
   "requests_per_case_model": 2,
   "max_tokens": 8192,
   "thinking": "enabled",
@@ -9,5 +15,6 @@
   "science_workers": 0,
   "reporter_requests": 0,
   "automatic_retries": 0,
-  "authorization": "User 2026-10-27: prepare an independent Flash/Pro Provider-only comparison; subsequently explicitly permits real model calls as needed, without further approval. Only public task information and necessary scoped numerical evidence; no current C Study or unrelated private data."
+  "authorization": "User 2026-10-27: prepare an independent Flash/Pro Provider-only comparison; subsequently explicitly permits real model calls as needed, without further approval. Only public task information and necessary scoped numerical evidence; no current C Study or unrelated private data.",
+  "payload_scope": "Only committed public TaskDefinition and sanitized public BF5/BF6 scalar summaries; no candidate, control, Store refs or raw research records."
 }

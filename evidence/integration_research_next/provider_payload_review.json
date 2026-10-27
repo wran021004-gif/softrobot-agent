@@ -1,0 +1,72 @@
+{
+  "destination": "https://api.deepseek.com/chat/completions",
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "request_ceiling": 8,
+  "output_token_ceiling_per_request": 8192,
+  "scientific_workers": 0,
+  "original_rejected_launch_provider_requests": 0,
+  "payload_sources": [
+    "tasks/bf5_position_tool_axis_v1.json",
+    "evidence/integration_research_next/bf5_engineering.json",
+    "research/bf4-cross-family-benchmark@e67d9d68e:evidence/bf6_sensor_oriented_tracking/summary.json"
+  ],
+  "case_payload_keys": {
+    "bf5_failed_baseline": {
+      "case_fields": [
+        "task",
+        "evidence"
+      ],
+      "evidence_fields": [
+        "kind",
+        "source",
+        "source_implementation",
+        "acceptance_status",
+        "selected",
+        "native_task_acceptance",
+        "native_cost",
+        "independent_cost",
+        "physics_steps",
+        "scope"
+      ]
+    },
+    "bf6_incomplete": {
+      "case_fields": [
+        "evidence"
+      ],
+      "evidence_fields": [
+        "stage",
+        "status",
+        "independent_witness",
+        "native_cost",
+        "native_complete_rollouts",
+        "native_callback_attempts",
+        "independent_status",
+        "kind",
+        "source_commit",
+        "acceptance",
+        "task_success",
+        "compiled_load",
+        "completed_physics_steps_lower_bound",
+        "attempted_step_calls",
+        "failed_call_internal_progress",
+        "integration_status",
+        "scope"
+      ]
+    }
+  },
+  "excluded": [
+    "C Study",
+    "candidate designs",
+    "control sequences",
+    "Store paths and original artifact refs",
+    "raw research receipts",
+    "historical successful witnesses",
+    "provider reasoning",
+    "credentials"
+  ],
+  "authorization": "User explicitly requested independent Flash/Pro Provider-only decisions and then explicitly allowed real models as needed without another approval request.",
+  "review_scope": "Public-only replacement after automatic review rejected the earlier research-evidence payload. No earlier attempt executed; no budget was reset."
+}
