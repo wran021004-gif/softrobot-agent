@@ -125,9 +125,28 @@ def extend_engineering_counts(spec, changes, authorization):
     return result
 
 
+def _reference(source, key, provenance):
+    value=read(source)
+    provenance['references'][key]=dict(path=str(source),sha256=digest(value))
+    if (key in ('task','control') or key.startswith('condition:')) and 'extends' in value:
+        base=(source.parent/value.pop('extends')).resolve()
+        original=read(base)
+        if base.parent!=source.parent or 'extends' in original:
+            kind='TASK' if key.startswith('condition:') else key.upper()
+            raise ValueError('SAME_DIRECTORY_SINGLE_'+kind+'_EXTENSION_REQUIRED')
+        value=patch(original,value)
+        provenance['references'][key+'_base']=dict(path=str(base),sha256=digest(original))
+    return value
+
+
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    conditions=study.pop('task_conditions',None)
+    if conditions is not None:
+        if (len(conditions) not in (2,3) or any(set(c)!={'condition_id','task'} or not c['condition_id'] for c in conditions)
+                or len({c['condition_id'] for c in conditions})!=len(conditions) or 'task' in study):
+            raise ValueError('TWO_OR_THREE_UNIQUE_TASK_CONDITIONS_REPLACE_ROOT_TASK')
     fixed_structure=study.pop('fixed_structure_reference',None)
     family_sensitivity=study.pop('family_sensitivity_variables',None)
     methods=study.pop('mathematical_methods',None)
@@ -224,27 +243,13 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('UNSUPPORTED_MATHEMATICAL_BACKEND_PROFILE: '+str(backend_profile))
         study['control']='control_sorosim.json'
         study['mathematical_backend_profile']=backend_profile
+    if conditions is not None:study['task']=conditions[0]['task']
     inputs = {}
     if family_mode:
         study.pop('robot', None)  # Historical compositions may name it; never read it.
     for key in (('task', 'control', 'runtime') if family_mode else ('robot', 'task', 'control', 'runtime')):
         source = (path.parent / study.pop(key)).resolve()
-        inputs[key] = read(source)
-        provenance['references'][key] = dict(path=str(source), sha256=digest(inputs[key]))
-        if key == 'control' and 'extends' in inputs[key]:
-            base = (source.parent / inputs[key].pop('extends')).resolve()
-            original = read(base)
-            if base.parent != source.parent or 'extends' in original:
-                raise ValueError('SAME_DIRECTORY_SINGLE_CONTROL_EXTENSION_REQUIRED')
-            inputs[key] = patch(original, inputs[key])
-            provenance['references']['control_base'] = dict(path=str(base), sha256=digest(original))
-        if key=='task' and 'extends' in inputs[key]:
-            base=(source.parent/inputs[key].pop('extends')).resolve()
-            original=read(base)
-            if base.parent!=source.parent or 'extends' in original:
-                raise ValueError('SAME_DIRECTORY_SINGLE_TASK_EXTENSION_REQUIRED')
-            inputs[key]=patch(original,inputs[key])
-            provenance['references']['task_base']=dict(path=str(base),sha256=digest(original))
+        inputs[key] = _reference(source,key,provenance)
     if profile:
         study = patch(study, study['validation_profiles'][profile])
         study['selected_validation_profile'] = profile
@@ -440,6 +445,23 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
         study['tool_readiness']=dict(sorosim_matlab=report)
     if methods is not None:study['mathematical_methods']=methods
+    if conditions is not None:
+        if not family_mode or study['confirmation']['fresh_independent_repetitions']:
+            raise ValueError('MULTI_CONDITION_REQUIRES_FAMILY_STUDY_WITHOUT_EXTRA_CONFIRMATIONS')
+        frozen=[]
+        from tools.platform_tasks import check_definition
+        from tools.platform_registry import registry
+        for index,condition in enumerate(conditions):
+            value=inputs['task'] if index==0 else _reference((path.parent/condition['task']).resolve(),
+                'condition:'+condition['condition_id'],provenance)
+            check_definition(value['task'],registry())
+            canonical=deepcopy(value['task'])
+            initial=canonical['initializer']['parameters']['data']
+            if initial.get('unspecified')=='zero' and all(v==0 for key in ('qpos_rad','qvel_rad_s') for v in initial.get(key,{}).values()):
+                canonical['initializer']['parameters']['data']=dict(rule=study['candidate_initialization'])
+            frozen.append(dict(condition_id=condition['condition_id'],task=canonical,seed=value['seed'],
+                settling=deepcopy(value['settling'])))
+        study['task_conditions']=frozen
     if fixed_structure is not None:study['fixed_structure_reference']=plain(EvidenceRef.model_validate(fixed_structure))
     study['resolved_identity'] = digest(study)
     return study

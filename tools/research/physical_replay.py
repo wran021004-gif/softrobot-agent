@@ -107,6 +107,11 @@ def seed_control(host, request, operation_key=None, plan=None):
     """Candidate-owned bounded inputs; explicit ZOH time/channel transfer or pretension."""
     started=time.perf_counter()
     try:
+        if request.condition_id is not None:
+            from schemas.platform import EvidenceRef
+            from tools.research.conditions import condition_candidate
+            candidate=condition_candidate(host,request.candidate,request.condition_id)
+            request=request.model_copy(update=dict(candidate=EvidenceRef.model_validate(candidate),condition_id=None))
         if request.method=='capability_sequence':return capability_seed(host,request,operation_key)
         if request.method!='baseline':return guided_seed(host,request,operation_key,plan)
         return _seed_control(host,request,operation_key)

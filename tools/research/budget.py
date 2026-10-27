@@ -215,6 +215,24 @@ def observe_pass(host, reference):
     if not final_fidelity_matches(s['spec'],host.store.artifact(result['candidate'])):
         return
     view = result_view(host, reference)
+    if s['spec'].get('task_conditions'):
+        from tools.research.conditions import joint_assessment
+        from tools.research.config import same_robot_structure
+        candidate=host.store.artifact(view['candidate'])
+        completed={}
+        for ref in s.get('physical_replays',[]):
+            result=host.store.artifact(ref);other=host.store.artifact(result['candidate'])
+            if (same_robot_structure(candidate['configuration'],other['configuration']) and
+                    candidate['configuration']['policy']['discretization']==other['configuration']['policy']['discretization'] and
+                    result_view(host,ref)['passed']):
+                key=other.get('condition_id',s['spec']['task_conditions'][0]['condition_id'])
+                completed[key]=ref
+        try:joint=joint_assessment(host,list(completed.values()),require_reads=False)
+        except (ValueError,KeyError):return
+        if not s.get('success_gate'):
+            update(host,success_gate=dict(evidence=joint['condition_results'],candidate=joint['candidate'],
+                observed_task_pass=True,model_selection_complete=False,engineering=s['spec'].get('mode')=='engineering_numerical'))
+        return
     if view['fresh_current_study'] and view['complete'] and view['passed']:
         import math
         from tools.research_tasks import task_adapter

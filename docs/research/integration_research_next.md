@@ -73,8 +73,69 @@ The summary records actual task acceptance and eligibility; a failed baseline
 is not selected. No BF4 S1 search is rerun. This does not claim autonomous
 Provider behavior or benchmark feasibility.
 
-## A-II / A-III
+A-I was committed and pushed as `fd4104ba9`. Its 57 focused tests passed.
+The real check completed 600 Native steps plus 600 independent steps, with
+`valid_failure` against the original task, truthful SELECT rejection and a
+verified `research.physical_replay` Store receipt/profile binding. Cumulative
+measured numerical cost was 3.0557587 s; Provider/NMPC/RL counts were zero.
+Only a sanitized count/cost summary is published; private artifacts stay local.
 
-Multi-condition joint selection and the Task Intake thin adaptation follow as
-separate commits. Benchmark execution always consumes the frozen TaskDefinition
-directly; Task Intake is not a benchmark prerequisite.
+## A-II: same-structure conditions
+
+`study_multicondition_public.json` uses the same resolver/defaults and imports
+only BF2's frozen zero/positive task definitions (negative is available for a
+third condition). No BF2 experiment branch, historical result or witness is
+merged. The leaf's `task_conditions=[{condition_id,task}, ...]` replaces its
+single root `task`; there are two or three unique conditions and one shared
+Study ledger. All condition TaskDefinitions, seeds and settling limits are
+frozen during preparation; resume reads saved state, never mutable sources.
+
+Generate once. For each condition, call `initialize_control` with the generated
+structure candidate and `control_seed.condition_id`; use its returned
+`candidate` and `source` for normal Native analysis/control_search and independent
+physical_replay. Condition candidates share the exact robot structure and mesh;
+only their frozen task/seed/settling binding differs. Initial states, external
+forces, versioned task, applied control and real execution IDs remain independent.
+Control initialization time, all internal Native attempts and independent
+replays retain the existing cumulative costs.
+
+`SELECT selected_execution=[result_ref, ...]` checks the ordinary eligibility
+of every child, public reads, owned complete physical_replay receipts, control
+binding, original acceptance, immutable profile sources, the exact condition
+set, and identical robot/mesh. Results are ordered canonically before saving
+one joint result in the existing Store and freezing the selected solution.
+Missing/duplicate/failed/incomplete conditions, changed structures, wrong
+controls or invented execution IDs cannot qualify. The success gate waits for
+all conditions, preserving partial/out-of-order completion and legal recovery.
+The exported design package includes the joint result and every condition ref.
+
+The only new production module, `conditions.py`, owns condition binding and
+aggregation. Existing `aggregate_acceptance` now recognizes real completed
+`research.physical_replay` receipts as well as `simulation.run`; no synthetic
+simulation receipt is manufactured. No optimizer, backend or Store was added.
+The existing per-request analysis protocol remains the method's time scope;
+BF2's frozen conditions share that grid. Joint selection currently requires
+independent fixed-tension replays, matching the B2/BF2 protocol, and zero extra
+confirmation repetitions; mixed protocol families and joint RL/NMPC selection
+are not implemented.
+
+A-II validation: the small two-condition fixture exercises different controls,
+partial-Store reopening, reverse result order, original evaluators and formal
+joint SELECT/export. Three-condition checks cover binding/reuse, missing and
+failed conditions, wrong source, forged execution ID and mixed structure.
+40 directly relevant tests passed. The additional family-space checks passed
+except two existing assertions for a fixed old digest and an outdated compact
+summary size. Direct comparison with the starting resolver confirmed the
+legacy Reach/Hold effective configuration is exactly unchanged; those historical
+assertions were not rewritten. Use the existing `.f3-prestudy-env` for tests
+requiring MATLAB Engine or CVXPY; neither dependency was newly installed.
+
+`python -m tests.research.integration_tracking_smoke conditions` is the one
+minimal real two-condition check after commit: one Native baseline and full
+independent replay per frozen condition; zero Provider/NMPC/RL and no structure
+search. The separate private Store records all actual outcomes and costs.
+
+## A-III
+
+The Task Intake thin adaptation follows separately. Benchmark execution always
+consumes the frozen TaskDefinition directly; Intake is not a prerequisite.

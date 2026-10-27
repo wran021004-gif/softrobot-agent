@@ -20,7 +20,7 @@ def update(host, **values):
         host.store.update_state(db, host.run_id, s)
 
 def readable_results(s, host=None):
-    linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))
+    linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))+list(s.get('joint_results',[]))
     linked += [r for e in s['spec'].get('research_decisions',{}).get('background',[]) for r in e.get('dependencies',[])]
     linked += [entry['reference'] for entry in s.get('stage_context',[])]
     linked += list(s.get('runtime_capabilities',{}).values())

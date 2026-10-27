@@ -204,6 +204,7 @@ def comparable_task(spec,task):
     if spec.get('start_mode')=='family_space':
         initial=task['initializer']['parameters']['data']
         if (initial.get('unspecified')!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial.get(key,{}).values())):
+            if any(task==c['task'] for c in spec.get('task_conditions',[])):return task
             raise ValueError('EVIDENCE_TASK_INITIAL_STATE_MISMATCH')
         task['initializer']['parameters']['data']=dict(rule=spec['candidate_initialization'])
     return task
@@ -217,6 +218,7 @@ def registered_references(host):
         *s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('scoped_context',[]),
         *s.get('control_search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
     known += list(s.get('candidates',{}).values())
+    known += list(s.get('joint_results',[]))
     known += [e[k] for e in s.get('control_initializations',[]) for k in ('candidate','source')]
     for entry in s.get('research_history',[]):
         known += [entry[k] for k in ('source','candidate','historical_candidate')]
@@ -268,10 +270,11 @@ def admit_decision(host,plan):
         if source_candidate:
             source_cfg=host.store.artifact(source_candidate)['configuration']
             task=comparable_task(s['spec'],source_cfg['task'])
-            expected=s['spec'].get('canonical_task',s['base_configuration']['task'])
+            expected=comparable_task(s['spec'],cfg['task']) if cfg else s['spec'].get('canonical_task',s['base_configuration']['task'])
             background=[e['reference'] for e in s['spec'].get('research_decisions',{}).get('background',[])]
             if task!=expected:
-                if plain(ref) not in background or (not experiment and d.claimed_inference!='empirical_search'):
+                condition_evidence=any(task==c['task'] for c in s['spec'].get('task_conditions',[]))
+                if (plain(ref) not in background and not condition_evidence) or (not experiment and d.claimed_inference!='empirical_search'):
                     raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
                 if d.claimed_inference!='empirical_search':claim_scope_issues.append('EVIDENCE_TASK_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:

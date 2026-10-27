@@ -16,14 +16,8 @@ from tools.state_io import read, atomic_json, digest
 from tests.research.test_cross_task_integration import plan
 
 
-def main():
-    folder=ROOT/'runs/integration-tracking-smoke'
-    summary=folder/'summary.json'
-    if summary.exists():
-        print(json.dumps(dict(status='already_completed',additional_physics_steps=0,summary=str(summary))))
-        return
-    folder.mkdir(parents=True,exist_ok=True)
-    source=ROOT/'configs/research/study_tracking_public.json'
+def prepare_smoke(leaf,folder):
+    source=ROOT/'configs/research'/leaf
     if not (folder/'study.json').exists():
         spec=read(source)
         defaults=read(source.parent/spec['defaults'])
@@ -31,14 +25,28 @@ def main():
             defaults[key]=str((source.parent/defaults[key]).resolve())
         atomic_json(folder/'defaults.json',defaults)
         for key in ('family_space','task','control'):
-            spec[key]=str((source.parent/spec[key]).resolve())
-        spec.update(defaults='defaults.json',study_id='integration-tracking-smoke',
-            authorization='Task A-I explicitly authorizes one minimal real public-route engineering execution: one native baseline and one independent replay, zero Provider, NMPC or RL.',
-            budgets=dict(physical_launches=1,mathematical_evaluations=1),
-            evidence_destination='runs/integration-tracking-smoke/private-store')
+            if key in spec:spec[key]=str((source.parent/spec[key]).resolve())
+        for condition in spec.get('task_conditions',[]):
+            condition['task']=str((source.parent/condition['task']).resolve())
+        count=len(spec.get('task_conditions',[])) or 1
+        spec.update(defaults='defaults.json',study_id=folder.name,
+            authorization='Task A authorizes this minimal real public-route engineering check: one native baseline and independent replay per condition, zero Provider, NMPC or RL.',
+            budgets=dict(physical_launches=count,mathematical_evaluations=count),
+            evidence_destination='runs/'+folder.name+'/private-store')
         atomic_json(folder/'study.json',spec)
     host=core.prepare(folder/'study.json',directory=folder/'private-store')
     if 'freeze' not in state(host):core.bind(host)
+    return host
+
+
+def main():
+    folder=ROOT/'runs/integration-tracking-smoke'
+    summary=folder/'summary.json'
+    if summary.exists():
+        print(json.dumps(dict(status='already_completed',additional_physics_steps=0,summary=str(summary))))
+        return
+    folder.mkdir(parents=True,exist_ok=True)
+    host=prepare_smoke('study_tracking_public.json',folder)
     spec=state(host)['spec']
     scope=dict(study_id=host.run_id,resolved_identity=spec['resolved_identity'],capabilities=spec['capabilities'])
     save(host,dict(user_approval='Task A-I minimal engineering route check only',scope=scope,
@@ -79,4 +87,49 @@ def main():
     print(json.dumps(summary_value))
 
 
-if __name__=='__main__':main()
+
+def conditions_main():
+    folder=ROOT/'runs/integration-conditions-smoke'
+    if (folder/'summary.json').exists():
+        print(json.dumps(dict(status='already_completed',additional_physics_steps=0)))
+        return
+    folder.mkdir(parents=True,exist_ok=True)
+    host=prepare_smoke('study_multicondition_public.json',folder)
+    spec=state(host)['spec']
+    request=dict(version='serial_family_generation_v2',family_space_identity=spec['family_space_identity'],segment_count=2,tendon_count=6)
+    candidate=core.dispatch(host,plan('generate',generation=request),'generate')['result']['candidate']
+    records=[];references=[]
+    for index,condition in enumerate(spec['task_conditions']):
+        key=condition['condition_id']
+        seed=core.dispatch(host,plan('initialize_control',candidate,control_seed=dict(candidate=candidate,
+            condition_id=key,tensions_n=[[.2+index*.1]*6])),'seed-'+key)['result']
+        duration=host.store.artifact(seed['candidate'])['configuration']['task']['timing']['duration_s']
+        period=host.store.artifact(seed['candidate'])['configuration']['task']['timing']['control_period_s']
+        query=dict(candidate=seed['candidate'],operation='mujoco_direct_control_v1',model_source='mujoco',
+            operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],
+            control_optimization=dict(source=seed['source'],settings=dict(version='local_control_search_v2',
+                correction_window_s=[0.,duration],knots_s=[0.,duration-period],evaluation_requests=1,iterations=1)))
+        output=analysis.dispatch(host,query,'native-'+key,guard=core.guard)
+        native=host.store.artifact(output['reference'])
+        result=core.dispatch(host,plan('physical_replay',seed['candidate'],physical_replay=dict(candidate=seed['candidate'],
+            source=native['control_schedule_reference'])),'replay-'+key)['result']
+        core.read_evidence(host,dict(reference=result['reference'],view='full'))
+        assert _source_issue(result['acceptance']) is None and _outcome_issue(result['acceptance']) is None
+        raw=host.store.artifact(result['raw_reference'])
+        references.append(result['reference'])
+        records.append(dict(condition_id=key,native=native['native_dynamics']['cost'],independent_replay=raw['cost'],
+            acceptance_status=result['acceptance']['status']))
+    choice=eligibility(host,references,selection=True)
+    if choice['eligible']:core.dispatch(host,plan('select',selected_execution=references),'select')
+    value=dict(implementation=state(host)['freeze'],conditions=records,provider_requests=0,nmpc_updates=0,rl_actions=0,
+        physics_steps=sum(r['native']['physics_steps']+r['independent_replay']['physics_steps'] for r in records),
+        selected=bool(state(host).get('selected')),joint_eligible=choice['eligible'],joint_reasons=choice['reasons'],
+        resource_use=core.resource_use(host),private_store='runs/integration-conditions-smoke/private-store',
+        interpretation='Two independent native baselines and full-condition physical replays; no scientific search or benchmark feasibility claim.')
+    atomic_json(folder/'summary.json',value)
+    print(json.dumps(value))
+
+if __name__=='__main__':
+    import sys
+    if sys.argv[1:]==['conditions']:conditions_main()
+    else:main()

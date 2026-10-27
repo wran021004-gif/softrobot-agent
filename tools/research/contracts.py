@@ -475,6 +475,7 @@ class ControlSearchRequest(ControlSearchStart):
 
 
 class ControlSeedRequest(Contract):
+    condition_id: str | None = Field(default=None,min_length=1,description='Optional frozen task condition. Returns a candidate bound to this condition on the identical structure; use the returned candidate for analysis, search and replay.')
     candidate: EvidenceRef = Field(description='Target candidate; decision.selected_candidate must equal control_seed.candidate.')
     source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
     parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
@@ -491,7 +492,7 @@ class ControlSeedRequest(Contract):
     @model_serializer(mode='wrap')
     def preserve_baseline(self,handler):
         result=handler(self)
-        for key in ('method','response_evidence','channels','difference_step_n','trust_radius_n','regularization','evaluation_requests'):
+        for key in ('condition_id','method','response_evidence','channels','difference_step_n','trust_radius_n','regularization','evaluation_requests'):
             if key not in self.model_fields_set:result.pop(key,None)
         return result
 
@@ -556,7 +557,7 @@ class Plan(Contract):
     generation: GenerationRequest | GenerationRequestV2 | None = None
     search: Search | FamilyMixedSearch | None = None
     candidate: EvidenceRef | None = Field(default=None,description='Required top-level candidate for action=execute only. For initialize_control or physical_replay use the nested action payload candidate instead.')
-    selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable publicly read passing NMPC, fixed-tension physical_replay or independent RL evaluation; freezes the complete solution')
+    selected_execution: EvidenceRef | list[EvidenceRef] | None = Field(default=None, description='Exact publicly read passing evaluation. A frozen multi-condition Study requires a list containing one independent physical_replay result per condition on the identical structure; order is irrelevant.')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
     mechanics: MechanicsRequest | None = None
@@ -580,6 +581,8 @@ class Plan(Contract):
 
     @model_validator(mode='after')
     def required(self):
+        if isinstance(self.selected_execution,list) and (self.action!='select' or len(self.selected_execution) not in (2,3)):
+            raise ValueError('JOINT_SELECT_REQUIRES_TWO_OR_THREE_RESULTS')
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         active = PLAN_PAYLOADS.get(self.action)

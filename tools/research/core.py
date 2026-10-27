@@ -52,6 +52,8 @@ def read_evidence(host, query, *, record_read=True):
         elif q.pointer=='/controller_capabilities' or q.pointer.startswith('/controller_capabilities/'):
             from tools.research.research_context import controller_capabilities
             derived=dict(controller_capabilities=controller_capabilities(host))
+        elif q.pointer=='/task_conditions' or q.pointer.startswith('/task_conditions/'):
+            derived=dict(task_conditions=s['spec'].get('task_conditions',[]))
         elif q.pointer=='/historical_execution_files' or q.pointer.startswith('/historical_execution_files/'):
             from tools.research.numerics import execution_source, archived
             entry=next((e for e in s['spec']['research_decisions'].get('background',[]) if e['reference']==plain(q.reference)),None)
@@ -605,6 +607,9 @@ def dispatch(host, value, request_id, origin='model'):
             choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)
             if not choice['eligible']:
                 raise ValueError('; '.join(choice['reasons']))
+            if isinstance(plan.selected_execution,list):
+                from tools.research.conditions import register_joint_result
+                plan=plan.model_copy(update=dict(selected_execution=register_joint_result(host,plan.selected_execution)))
             selected=result_view(host,plan.selected_execution)
             if plan.action=='confirm' and s.get('selected')!=plain(plan.selected_execution):
                 raise ValueError('CONFIRM_REQUIRES_PRIOR_FORMAL_SELECT')
@@ -787,7 +792,7 @@ def export(host, destination=None):
         disposition={key:s.get(key) for key in ('research_status','freeze','selected','selected_solution','success_gate','final_disposition','validation_extensions','closed_unix')}
         disposition.update(study_id=host.run_id,claims=claims(host),resource_use=current['resource_use'],
             stage_usage=(current.get('rl') or {}).get('allocation_feedback'),
-            evidence=dict(results=s['results'],physical_replays=s.get('physical_replays',[]),
+            evidence=dict(results=s['results'],physical_replays=s.get('physical_replays',[]),joint_results=s.get('joint_results',[]),
                 matched_state_results=s.get('matched_state_results',[]),
                 rl_evaluations=s.get('rl_evaluations',[]),analyses=s.get('analysis_results',[])))
         values=[('configuration',s['spec']),('disposition',disposition),('calls',calls),('ledger',host.store.remaining())]
@@ -799,8 +804,8 @@ def export(host, destination=None):
     if s['spec'].get('research_decisions',{}).get('context_limits'):
         from tools.research.feedback import task_gap
         from tools.research.candidate_portfolio import ranking_key
-        rows=[dict(reference=r,**host.store.artifact(r),task_gap=task_gap(host.store.artifact(r)))
-            for r in [*s['results'],*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]]
+        rows=[{**host.store.artifact(r),'reference':r,'task_gap':task_gap(host.store.artifact(r))}
+            for r in [*s['results'],*s.get('physical_replays',[]),*s.get('rl_evaluations',[]),*s.get('joint_results',[])]]
         valid=[r for r in rows if r['task_gap']['valid_complete']]
         best=next((r for r in valid if r['reference']==s.get('selected')),min(valid,key=ranking_key) if valid else None)
         package=dict(version='robot_design_delivery_v1',study_id=host.run_id,implementation=s.get('freeze'),
@@ -816,6 +821,9 @@ def export(host, destination=None):
                 evaluation=best['reference'],raw_reference=best.get('raw_reference'),
                 control=host.store.artifact(best['source_reference']) if best.get('source_reference') else None,
                 original_result=best,solution_identity=(s.get('success_gate') or {}).get('solution_identity'))
+        if best and best.get('kind')=='joint_condition_result_v1':
+            package.update(task_conditions=s['spec']['task_conditions'],condition_results=best['condition_results'],
+                aggregation=best['aggregation'],scope='All frozen conditions on the identical structure; optimality, hardware and repeatability unassessed')
         package['content_identity']=digest(package)
         atomic_json(out/'design_package.json',package)
     return dict(destination=str(out),results=len(state(host)['results']),claims=claims(host),resources=current['resource_use'])

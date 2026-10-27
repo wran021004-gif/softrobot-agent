@@ -256,7 +256,7 @@ def legacy_context(host):
             ('offline_nlp',spec['budgets']['offline_nlp'],s.get('offline_nlp',0)),('bdf_replays',spec['budgets']['bdf_replays'],s.get('bdf_replays',0)),
             ('nmpc',spec['nmpc_limits']['executions'],s.get('nmpc_launches',0)),('rl_stages',spec['rl_limits']['training_stages'],s.get('admitted_training_stages',0)))},
         rl_accounting=stage_usage(s),
-        control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Current optimizer supports registered reach-hold norm constraints only; other tasks return unsupported. Full original task always evaluated.')
+        control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Registered Reach/Hold and timed Tracking norm constraints are supported; other tasks return not_applicable. Full original task always evaluated.')
 
 
 def compact_evidence(value, reference, pointer='', *, facts_only=False):
@@ -976,6 +976,14 @@ def agent_decision_brief(host):
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
+    if s['spec'].get('task_conditions'):
+        brief['task_conditions']=dict(frozen=[dict(condition_id=c['condition_id'],
+            task={k:c['task'][k] for k in ('task_id','task_version','family','timing')},
+            query=dict(reference=s['family_space_reference'],view='working_set',pointer='/task_conditions/'+str(i)))
+            for i,c in enumerate(s['spec']['task_conditions'])],
+            initialization='initialize_control with control_seed.condition_id and the generated structure candidate; use the returned candidate and source for this condition.',
+            selection='SELECT selected_execution=[one publicly read passing independent physical_replay result per frozen condition]. Same structure and discretization required; order irrelevant. Partial results resume in this Store.',
+            completed_results=s.get('physical_replays',[]))
     brief['mathematics_authorization']=mathematics_authorization(host,s)
     if s.get('research_continuations'):
         ref=s['research_continuations'][-1];continuation=host.store.artifact(ref)

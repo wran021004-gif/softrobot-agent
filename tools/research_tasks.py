@@ -569,7 +569,8 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
         execution = receipt.get('execution_id')
         fresh = bool(not record.get('historical_reuse') and execution and execution not in seen and receipt.get('cache_hit') is False
                      and receipt.get('charged',{}).get('backend_solves')==1
-                     and receipt.get('tool_id')=='simulation.run'
+                     and receipt.get('tool_id') in ('simulation.run','research.physical_replay')
+                     and (receipt.get('tool_id')!='research.physical_replay' or receipt.get('execution_status')=='completed')
                      and receipt.get('original_execution_id') in (None,execution))
         if execution:
             seen.add(execution)
@@ -597,7 +598,7 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
             evidence_eligible=evidence_eligible, receipt=receipt,
             source_binding_issues=source_issues,
             source_evidence=dict(evaluation=record.get('evaluation'), profile=record.get('profile'),
-                simulation=receipt.get('output'), receipts=record.get('receipts', []),
+                simulation=record.get('simulation',receipt.get('output')), receipts=record.get('receipts', []),
                 evaluation_binding=(record.get('evaluation_data') or
                     (result or {}).get('evidence_binding', {}).get('evaluation_binding') or {}),
                 profile_binding={k:record.get('profile_summary', {}).get(k)

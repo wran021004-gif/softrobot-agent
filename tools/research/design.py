@@ -134,6 +134,16 @@ def verify_candidate(host,reference):
         return c
     if c['profile_identity']!=s['profile']['identity']:
         raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
+    if c.get('condition_id'):
+        from tools.research.conditions import configuration_for_condition
+        condition=next(v for v in s['spec']['task_conditions'] if v['condition_id']==c['condition_id'])
+        parent=verify_candidate(host,c['structure_candidate'])
+        if (c['configuration']!=configuration_for_condition(parent['configuration'],condition) or
+                host.store.artifact(c['configuration_reference'])!=c['configuration'] or
+                c['identity']!=family_candidate_identity(c['configuration'],s) or
+                c['task_identity']!=digest(condition['task']) or c['effective_task_identity']!=digest(c['configuration']['task'])):
+            raise ValueError('FROZEN_CONDITION_CANDIDATE_IDENTITY_MISMATCH')
+        return c
     if c.get('generation_version') in ('serial_family_generation_v1','serial_family_generation_v2'):
         if (host.store.artifact(c['configuration_reference'])!=c['configuration'] or
                 c['family_space_identity']!=s['spec']['family_space_identity'] or

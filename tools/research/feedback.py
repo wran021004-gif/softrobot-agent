@@ -40,6 +40,7 @@ def _dominant_metrics(signed, metrics):
 
 def task_gap(result):
     """Rank recorded physical metrics only; original acceptance owns validity."""
+    if result.get('kind')=='joint_condition_result_v1':return result['task_gap']
     acceptance=result.get('acceptance') or {}
     if 'independent_evaluation_executed' in result:
         episodes=result.get('episodes',[])
@@ -416,6 +417,9 @@ def result_view(host, reference):
     from tools.research.state import state
     from tools.research.design import full_science
     r=host.store.artifact(reference)
+    if r.get('kind')=='joint_condition_result_v1':
+        from tools.research.conditions import joint_view
+        return joint_view(host,reference)
     c=host.store.artifact(r['candidate'])
     # Historical reads stay valid after the active profile/selection changes.
     if c['scientific_configuration']!=full_science(c['configuration']):
@@ -476,14 +480,25 @@ def result_view(host, reference):
         fresh_current_study=fresh,solution_identity=identity,solution_identity_sha256=digest(identity))
 
 
-def eligibility(host, reference, *, revise_selection=False, selection=None, root_operation=True):
+def eligibility(host, reference, *, revise_selection=False, selection=None, root_operation=True, condition_member=False):
     from tools.research.state import state,capacity
     from tools.research.design import verify_candidate
     from tools.research.rl import evaluation_capacity
     s=state(host)
+    if isinstance(reference,list):
+        from tools.research.conditions import joint_assessment
+        try:
+            if revise_selection or s.get('selected'):raise ValueError('JOINT_SELECTION_ALREADY_FROZEN')
+            joint_assessment(host,reference)
+            reasons=[]
+        except (ValueError,KeyError) as exc:reasons=[str(exc)]
+        return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',
+            selected_execution=plain(reference),confirmation_reservation=dict(admitted=0,selection_without_execution=True))
     selection=(s['spec']['confirmation']['fresh_independent_repetitions']==0) if selection is None else selection
     ref=plain(reference)
     reasons=[]
+    if s['spec'].get('task_conditions') and not condition_member:
+        reasons.append('JOINT_SELECTION_REQUIRES_ALL_FROZEN_CONDITIONS')
     refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('physical_replays',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
