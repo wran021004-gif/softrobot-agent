@@ -12,11 +12,11 @@ class IncompleteAdmissionTests(unittest.TestCase):
         use={'toolUseId':'tool1','name':'research_plan','input':{'action':'generate'}}
         result={'toolUseId':'tool1','status':'success','content':[{'text':'fixture'}]}
         self.agent=SimpleNamespace(_session_manager=SimpleNamespace(session_id='old'),messages=[{'role':'assistant','content':[{'toolUse':use}]},{'role':'user','content':[{'toolResult':result}]}],context_manager=None)
-        self.wire={'messages':[{'role':'system','content':'fixture'},{'role':'user','content':'CURRENT_RESEARCH_PACKET\n{}'}]}
+        self.wire={'messages':[{'role':'system','content':'fixture'},{'role':'user','content':'CURRENT_RESEARCH_PACKET\n{\"implementation\":\"fixture\"}'}]}
         self.body={'choices':[{'finish_reason':'length','message':{'tool_calls':[{'id':'partial'}]}}],'usage':{'prompt_tokens':2}}
         self.rec={'body':{'artifact_id':'body'},'http_status':200,'usage':self.body['usage'],'finish_reasons':['length']}
-        self.events=[{'kind':'model_original_tool_feedback','sequence':1,'outputs':[{'artifact_id':'feedback'}]}, {'kind':'r3_request','request_id':'request','sequence':2,'outputs':[{'artifact_id':'meta'}]}]
-        self.objects={'feedback':{'tool_use':use,'result':result},'meta':{'purpose':'conversation','request':{'artifact_id':'wire'}},'wire':self.wire,'body':json.dumps(self.body).encode()}
+        self.events=[{'kind':'model_original_tool_feedback','sequence':1,'outputs':[{'artifact_id':'feedback'}]}, {'kind':'model_decision_packet','sequence':2,'outputs':[{'artifact_id':'packet'}]}, {'kind':'r3_request','request_id':'request','sequence':3,'outputs':[{'artifact_id':'meta'}]}]
+        self.objects={'packet':{'implementation':'fixture'},'feedback':{'tool_use':use,'result':result},'meta':{'purpose':'conversation','request':{'artifact_id':'wire'}},'wire':self.wire,'body':json.dumps(self.body).encode()}
         self.receipt={'request_id':'request','tool_id':'model.deepseek','execution_status':'completed','charged':{'model_calls':1}}
         self.row={'request_hash':digest(self.wire),'receipt':json.dumps(self.receipt),'execution_id':'exec'}
         self.h=MagicMock();self.h.run_id='fixture';self.h.store.events.side_effect=lambda _:self.events
@@ -41,5 +41,5 @@ class IncompleteAdmissionTests(unittest.TestCase):
         self.objects['feedback']=deepcopy(self.objects['feedback']);self.objects['feedback']['result']['content'][0]['text']='fixture'
         with self.assertRaisesRegex(ValueError,'SDK_OFFLOAD_ORIGINAL_REQUIRED'):self.inspect()
     def test_any_post_send_tool_event_refuses(self):
-        self.events.append({'kind':'model_original_tool_request','sequence':3,'outputs':[]})
+        self.events.append({'kind':'model_original_tool_request','sequence':4,'outputs':[]})
         with self.assertRaisesRegex(ValueError,'POST_TRUNCATION_TOOL_EXECUTION_NOT_EXCLUDED'):self.inspect()

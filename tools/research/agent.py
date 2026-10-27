@@ -115,11 +115,12 @@ class LiveBoundary(httpx.AsyncBaseTransport):
     decoding. An unconsumed confirmed response is replayed only for its exact
     request; uncertainty blocks further sends and retains its reservation.
     """
-    def __init__(self,host,transport=None,*,allow_truncated_response=False):
+    def __init__(self,host,transport=None,*,allow_truncated_response=False,max_model_calls=None):
         self.host=host
         self.inner=transport or httpx.AsyncHTTPTransport(retries=0)
         self.last_request=None
         self.allow_truncated_response=allow_truncated_response
+        self.max_model_calls=max_model_calls
 
     async def handle_async_request(self,request):
         host=self.host
@@ -151,6 +152,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         from tools.research.provider_context import capacity_estimate
         capacity=capacity_estimate(request.content,expected)
         def guard(db):
+            if self.max_model_calls is not None and store.remaining(db=db)['used']['model_calls']>=self.max_model_calls:
+                raise ValueError('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
         with store.transaction() as db:
@@ -544,7 +547,7 @@ async def wait_training(host):
             return
         await asyncio.sleep(2.)
 
-async def deliver_science_before_decision(host,agent,transport):
+async def deliver_science_before_decision(host,agent,transport,*,max_model_calls=None):
     """Settle L1 only after native results are paired and durably recoverable.
 
     This is an intra-invocation boundary, not session_handoff.safe_boundary.
@@ -575,7 +578,7 @@ async def deliver_science_before_decision(host,agent,transport):
     await agent._session_manager.save_snapshot(agent,is_latest=True)
     record(host,'science_delivery_boundary',dict(session_id=agent._session_manager.session_id,
         sdk_message_identity=digest(agent.messages),paired=True,receipts_settled=True))
-    await complete_reports(host,transport)
+    await complete_reports(host,transport,max_model_calls=max_model_calls)
     if pending(host) or state(host)['pilot'].get('unconsumed_response') or any(
             v['interpretation_status']=='deferred' for _,v in current_reports(host)):
         raise ValueError('SCIENCE_DELIVERY_INCOMPLETE_BLOCKS_DECISION')
@@ -597,9 +600,12 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False):
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None):
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
+    if max_new_provider_requests is not None and (type(max_new_provider_requests) is not int or max_new_provider_requests<1):
+        raise ValueError('POSITIVE_NEW_PROVIDER_REQUEST_LIMIT_REQUIRED')
+    max_model_calls=(host.store.remaining()['used']['model_calls']+max_new_provider_requests if max_new_provider_requests is not None else None)
     from tools.research.state import require_authorization
     require_authorization(host)
     if state(host)['spec'].get('initial_structure_strategy'):
@@ -661,7 +667,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         if advertised is None or not set(advertised)<=set(feedback_context_references()):
                             raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
             return await super().handle_async_request(request)
-    boundary=Boundary(host)
+    boundary=Boundary(host,max_model_calls=max_model_calls)
     def handler(kind):
         def run(use,**kwargs):
             before=state(host)
@@ -771,6 +777,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     agent=build_session()
     from tools.research.session_handoff import unmatched, recover_feedback, trusted_history, INVOCATION_PROMPT
     try:
+        if recover_incomplete:
+            from tools.research.session_handoff import recover_confirmed_incomplete
+            _,agent=await recover_confirmed_incomplete(host,agent,build_session,host.store.root/'framework_sessions')
         saved=state(host)['pilot'].get('unconsumed_response')
         reporter_saved=bool(saved and (received(host,saved) or {}).get('purpose')=='reporter')
         # An interrupted pre-decision Reporter owns a saved tool-result snapshot,
@@ -829,6 +838,10 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         agent.tool_registry.registry.pop('retrieve_context',None)
     async def before_model(event):
         s=state(host)
+        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls and not s['pilot'].get('unconsumed_response'):
+            if s.get('pending') or pending(host) or unmatched(agent.messages):raise ValueError('REQUEST_LIMIT_REQUIRES_SETTLED_FEEDBACK')
+            await agent._session_manager.save_snapshot(agent,is_latest=True)
+            raise SupervisorReviewPause('Bounded Provider request limit reached; no further send')
         if s['research_status']=='stopped':
             event.cancel='Accepted native STOP; no additional request'
             return
@@ -862,7 +875,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             return
         guard(host)
         if s['spec'].get('research_decisions'):
-            await deliver_science_before_decision(host,agent,boundary.inner)
+            await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
         for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
@@ -946,6 +959,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     try:
         completed_invocations=0
         while state(host)['research_status']!='stopped':
+            if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:
+                record(host,'supervisor_pause',dict(boundary='provider_request_limit',budgets_preserved=True,next_request_sent=False))
+                break
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
@@ -975,7 +991,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if state(host)['pending'] or pending(host):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
             if state(host)['spec'].get('research_decisions'):
-                await complete_reports(host,boundary.inner)
+                await complete_reports(host,boundary.inner,max_model_calls=max_model_calls)
             completed_invocations+=1
             if (pause_after_completed_invocations is not None and completed_invocations>=pause_after_completed_invocations
                     and state(host)['research_status']!='stopped' and not state(host).get('success_gate')):

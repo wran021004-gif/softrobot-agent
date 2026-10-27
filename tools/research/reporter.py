@@ -511,12 +511,12 @@ def _finish(host, boundary, wire, response):
     return ref
 
 
-async def complete_reports(host, transport, *, recover_only=False):
+async def complete_reports(host, transport, *, recover_only=False, max_model_calls=None):
     """One attempt per report, at settled pre-decision/outer boundaries. Unknown sends block."""
     from tools.research.agent import LiveBoundary, pending, received, record
     class ReporterBoundary(LiveBoundary):
         purpose='reporter'
-    boundary=ReporterBoundary(host,transport,allow_truncated_response=True)
+    boundary=ReporterBoundary(host,transport,allow_truncated_response=True,max_model_calls=max_model_calls)
     s=state(host);saved_response=s['pilot'].get('unconsumed_response')
     if saved_response:
         reception=received(host,saved_response)
@@ -533,6 +533,7 @@ async def complete_reports(host, transport, *, recover_only=False):
     reports=entries(host)
     finished={saved['interpretation_for']['artifact_id'] for _,saved in reports if saved['interpretation_for']}
     for ref,saved in reports:
+        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:return
         if saved['interpretation_status']!='deferred' or ref['artifact_id'] in finished:continue
         if ref['artifact_id'] in attempted:
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),

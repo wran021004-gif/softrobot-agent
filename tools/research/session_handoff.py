@@ -240,7 +240,8 @@ async def inspect_confirmed_incomplete(host,agent,directory):
     from tools.research.agent import DeepSeekModel,received,pending
     s=state(host);key=s['pilot'].get('unconsumed_response')
     if not key:raise ValueError('CONFIRMED_INCOMPLETE_RESPONSE_REQUIRED')
-    if s.get('pending') or pending(host):raise ValueError('UNKNOWN_PROVIDER_OR_SCIENTIFIC_WORKER')
+    if (s.get('pending') or pending(host) or any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True)
+            for e in s.get('rl_runs',{}).values())):raise ValueError('UNKNOWN_PROVIDER_OR_SCIENTIFIC_WORKER')
     if s['research_status']=='stopped' or s.get('success_gate'):raise ValueError('OPEN_NONPASS_STUDY_REQUIRED')
     if agent._session_manager.session_id!=s['pilot']['framework_session_id']:raise ValueError('OLD_SESSION_ID_MISMATCH')
     if unmatched(agent.messages):raise ValueError('MISSING_PRIOR_TOOL_FEEDBACK')
@@ -266,6 +267,18 @@ async def inspect_confirmed_incomplete(host,agent,directory):
         isinstance(wire[-1].get('content'),str) and wire[-1]['content'].startswith('CURRENT_RESEARCH_PACKET\n')) else wire
     if not wire or wire[0].get('role')!='system' or DeepSeekModel.format_request_messages(agent.messages,wire[0]['content'])!=prefix:
         raise ValueError('SAVED_REQUEST_AND_SDK_HISTORY_MISMATCH')
+    packets=[e for e in events if e['kind']=='model_decision_packet' and e['sequence']<send['sequence']]
+    if not packets or prefix is wire:raise ValueError('ORIGINAL_DECISION_PACKET_REQUIRED')
+    packet=host.store.artifact(packets[-1]['outputs'][0])
+    if json.loads(wire[-1]['content'].split('\n',1)[1])!=packet:raise ValueError('ORIGINAL_DECISION_PACKET_MISMATCH')
+    original_freeze=packet.get('implementation')
+    if not isinstance(original_freeze,str):raise ValueError('ORIGINAL_IMPLEMENTATION_IDENTITY_REQUIRED')
+    migrated=original_freeze
+    for repair in s.get('core_repairs',[]):
+        if repair['previous_commit']==migrated:
+            if repair.get('material_behavior_change'):raise ValueError('SCIENCE_CHANGING_MIGRATION_NOT_ADMITTED')
+            migrated=repair['commit']
+    if migrated!=s['freeze']:raise ValueError('IMPLEMENTATION_MIGRATION_CHAIN_REQUIRED')
     if not agent.messages or agent.messages[-1]['role']!='user':raise ValueError('PRIOR_TOOL_FEEDBACK_BOUNDARY_REQUIRED')
     uses={b['toolUse']['toolUseId']:b['toolUse'] for m in agent.messages for b in m['content'] if 'toolUse' in b}
     results={b['toolResult']['toolUseId']:b['toolResult'] for m in agent.messages for b in m['content'] if 'toolResult' in b}
@@ -282,14 +295,15 @@ async def inspect_confirmed_incomplete(host,agent,directory):
             for i,block in enumerate(original['result']['content']):
                 if await stash.retrieve(tool_id+'_'+str(i))!=block:raise ValueError('SDK_OFFLOAD_ORIGINAL_MISMATCH')
     post=[e for e in events if e['sequence']>send['sequence'] and e['kind'] in
-        ('model_original_tool_request','model_original_tool_feedback','original_research_plan','candidate_constructed',
+        ('r3_request','model_original_tool_request','model_original_tool_feedback','original_research_plan','candidate_constructed',
          'candidate_analysis','physical_replay','tool')]
     if post:raise ValueError('POST_TRUNCATION_TOOL_EXECUTION_NOT_EXCLUDED')
     last_ids=[b['toolResult']['toolUseId'] for b in agent.messages[-1]['content'] if 'toolResult' in b]
     if not last_ids or set(last_ids)-set(uses):raise ValueError('LAST_TRUSTED_FEEDBACK_REQUIRED')
     files=snapshot_files(directory,s['pilot']['framework_session_id'])
     return dict(version='confirmed_incomplete_provider_output_v1',study_id=host.run_id,
-        implementation=s['freeze'],request_id=key,request=meta['request'],response=reception['body'],
+        implementation=s['freeze'],original_request_implementation=original_freeze,original_decision_packet=packets[-1]['outputs'][0],
+        original_tool_schema_identity=digest(request.get('tools',[])),request_id=key,request=meta['request'],response=reception['body'],
         http_status=reception['http_status'],finish_reasons=['length'],usage=reception['usage'],
         receipt_execution_id=row['execution_id'],original_session=s['pilot']['framework_session_id'],
         sdk_message_identity=digest(agent.messages),old_snapshot_files=files,last_feedback_tool_ids=last_ids,
@@ -446,6 +460,90 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
         s['pilot'].update(framework_session_id=value['next_session'],handoff=preparation,handoff_verification=plain(verification))
         s['pilot'].pop('handoff_preparation',None)
         host.store.update_state(db,host.run_id,s)
+        host.store.event(db,host.run_id,'session_handoff','committed',outputs=[preparation,verification])
+    stage('committed')
+    return preparation,new
+
+
+async def recover_confirmed_incomplete(host,agent,build,directory,*,stage=lambda name:None):
+    """Atomically dispose only a verified truncated response and switch SDK sessions."""
+    from tools.research.state import guard
+    guard(host)
+    current=state(host);committed=current['pilot'].get('handoff')
+    if committed:
+        prior=host.store.artifact(committed)
+        if prior.get('version')=='research_session_handoff_incomplete_v1' and not current['pilot'].get('unconsumed_response'):
+            if agent._session_manager.session_id in (prior['previous_session'],prior['next_session']):
+                return committed,await validate_snapshot(host,committed,build,directory)
+    proof=await inspect_confirmed_incomplete(host,agent,directory)
+    # Reopen the original SDK snapshot independently, without rewriting it.
+    old=build(proof['original_session'])
+    if old.messages!=agent.messages or schemas(old)!=schemas(agent):raise ValueError('OLD_SDK_SNAPSHOT_OR_SCHEMA_MISMATCH')
+    old_files=snapshot_files(directory,proof['original_session'])
+    if old_files!=proof['old_snapshot_files']:raise ValueError('OLD_SDK_SNAPSHOT_CHANGED')
+    stage('before_prepare')
+    with host.store.transaction() as db:
+        s=host.store.session(host.run_id,db)['state']
+        if state_identity(s)!=proof['source_state_identity'] or host.store.remaining(db=db)!=proof['original_budget']:
+            raise ValueError('INCOMPLETE_SOURCE_STATE_OR_BUDGET_CHANGED')
+        prior=s['pilot'].get('handoff_preparation')
+        if prior:
+            value=host.store.artifact(prior)
+            if (value.get('version')!='research_session_handoff_incomplete_v1' or
+                    value.get('disposition_proof')!=proof):raise ValueError('PREPARATION_STATE_CHANGED_KEEP_OLD_SESSION')
+            preparation=prior
+        else:
+            text=('The preceding Provider response was confirmed truncated and charged. '
+                'Its tool fields were not executed and are not scientific evidence. '
+                'Use the current Study packet, retained candidate and verified last tool feedback. '
+                'Choose one next useful research action with a concise hypothesis, observation and stopping condition.')
+            initial=initial_messages(host.run_id)+[dict(role='user',content=[dict(text=text)])]
+            disposition=plain(host.store.put(db,proof))
+            value=dict(version='research_session_handoff_incomplete_v1',study_id=host.run_id,
+                implementation=s['freeze'],previous_session=proof['original_session'],
+                source_state_identity=proof['source_state_identity'],source_state=plain(host.store.put(db,s)),
+                boundary_identity=proof['sdk_message_identity'],disposition=disposition,disposition_proof=proof,
+                budget=proof['original_budget'],scientific_results=[r for k in
+                    ('results','mechanics_results','physical_replays','matched_state_results','rl_evaluations','analysis_results')
+                    for r in s.get(k,[])],tool_schemas=schemas(agent),initial_messages=initial,
+                pending_feedback_delivery=feedback_delivery(host,proof['last_feedback_tool_ids']),invocation_completed=False)
+            value['next_session']='rh-'+digest(value)[:24]
+            preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
+            host.store.update_state(db,host.run_id,s)
+            host.store.event(db,host.run_id,'incomplete_provider_disposition','prepared',outputs=[disposition,preparation])
+    stage('prepared')
+    new=build(value['next_session'])
+    if new.messages:new=await validate_snapshot(host,preparation,build,directory,initial=True)
+    else:
+        new.messages=deepcopy(value['initial_messages'])
+        new.state.set('research_handoff',dict(preparation=preparation,state_identity=value['source_state_identity']))
+        stage('writing_snapshot')
+        await new._session_manager.save_snapshot(new,is_latest=True)
+    snapshot_files(directory,value['next_session'],flush=True)
+    stage('snapshot_saved')
+    new=await validate_snapshot(host,preparation,build,directory,initial=True)
+    files=snapshot_files(directory,value['next_session']);stage('verified')
+    checked=await inspect_confirmed_incomplete(host,agent,directory)
+    if checked!=proof or schemas(agent)!=value['tool_schemas']:raise ValueError('INCOMPLETE_BOUNDARY_CHANGED')
+    with host.store.transaction() as db:
+        s=host.store.session(host.run_id,db)['state']
+        if s['pilot'].get('handoff')==preparation:return preparation,new
+        if (s['pilot'].get('handoff_preparation')!=preparation or state_identity(s)!=proof['source_state_identity'] or
+                s['pilot'].get('unconsumed_response')!=proof['request_id'] or s.get('pending') or
+                host.store.remaining(db=db)!=proof['original_budget'] or
+                db.execute('SELECT COUNT(*) FROM calls WHERE run_id=? AND receipt IS NULL',(host.run_id,)).fetchone()[0] or
+                files!=snapshot_files(directory,value['next_session'])):
+            raise ValueError('INCOMPLETE_COMMIT_STATE_CHANGED')
+        verification=host.store.put(db,dict(preparation=preparation,snapshot_files=files,independently_restored=True))
+        disposition=host.store.put(db,dict(version='confirmed_incomplete_provider_output_v1',
+            proof=value['disposition'],preparation=preparation,verification=plain(verification),
+            decision='archived_not_executed',new_session=value['next_session']))
+        s['pilot'].update(framework_session_id=value['next_session'],handoff=preparation,
+            handoff_verification=plain(verification),incomplete_provider_disposition=plain(disposition))
+        # Removal is inseparable from the audited disposition and verified pointer switch.
+        del s['pilot']['unconsumed_response'];del s['pilot']['handoff_preparation']
+        host.store.update_state(db,host.run_id,s)
+        host.store.event(db,host.run_id,'incomplete_provider_disposition','committed',outputs=[disposition,preparation,verification])
         host.store.event(db,host.run_id,'session_handoff','committed',outputs=[preparation,verification])
     stage('committed')
     return preparation,new
