@@ -32,3 +32,19 @@ class P2ExecutionGuardTests(TestCase):
             with patch('tools.research.state.state',return_value={'spec':spec}):
                 with self.assertRaisesRegex(ValueError,'INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED'):
                     require_authorization(h)
+
+    def test_optional_v3_conic_does_not_block_agent_but_legacy_remains_strict(self):
+        from tools.research.tool_readiness import execution_environment
+        from tools.research.optimal_capability import CONIC
+        import sys
+        spec=resolve(ROOT/'configs/research/study_p2_v3_agent_positive_high.json')
+        spec['runtime']['research_python']=sys.executable
+        spec['numerical_environment']={}
+        with patch('tools.research.optimal_capability.dependencies',return_value={'available':False,'reason':'fixture'}):
+            result=execution_environment(spec)
+            self.assertEqual(result['status'],'ready')
+            self.assertFalse(result['conic_required_before_agent'])
+            self.assertFalse(result['conic']['available'])
+            spec.pop('mathematical_method_scope')
+            self.assertEqual(execution_environment(spec)['status'],'not_ready')
+            self.assertIn(CONIC,spec['mathematical_methods'])

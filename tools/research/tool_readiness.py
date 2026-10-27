@@ -21,9 +21,17 @@ def execution_environment(spec):
     exact=Path(sys.executable).resolve()==expected
     conic=dependencies()
     threads={k:dict(expected=v,actual=os.environ.get(k)) for k,v in spec.get('numerical_environment',{}).items()}
-    ready=exact and all(v['actual']==v['expected'] for v in threads.values()) and (conic['available'] or not spec.get('mathematical_methods',{}).get(CONIC))
+    # V3 agent-choice studies explicitly permit independent native methods.
+    # Optional CONIC remains individually unavailable at discovery/admission;
+    # do not block the entire blank-pool Study before the agent chooses.
+    optional_conic=(spec.get('initial_structure_strategy')=='agent_choice' and
+        spec.get('mathematical_method_scope')=='registered_applicable_v1' and
+        spec.get('family_space',{}).get('version')=='serial_family_space_v3')
+    conic_required=bool(spec.get('mathematical_methods',{}).get(CONIC)) and not optional_conic
+    ready=exact and all(v['actual']==v['expected'] for v in threads.values()) and (conic['available'] or not conic_required)
     return dict(status='ready' if ready else 'not_ready',host_python=sys.executable,expected_research_python=str(expected),
-        exact_execution_interpreter=exact,mathematical_worker_python=sys.executable,conic=conic,threads=threads,
+        exact_execution_interpreter=exact,mathematical_worker_python=sys.executable,conic=conic,
+        conic_required_before_agent=conic_required,threads=threads,
         packages={k:version(k) for k in ('numpy','scipy','casadi','mujoco','pydantic','strands-agents','strands-harness')},
         scope='Imports and interpreter/thread admission only; no NMPC, PPO, physics or Provider request')
 
