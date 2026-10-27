@@ -1,0 +1,195 @@
+{
+  "contract": "bf4.tracking_s2_freeze",
+  "version": "1.0.0",
+  "stage": "S2",
+  "authorization": "2026-10-27 supplied Task B explicitly authorizes freeze, six-group fair structure/control comparison, true simulation, commits and ordinary push.",
+  "baseline_commit": "404184e4cd66752bf372959efe21f83f0158b7f1",
+  "task_file": "tasks/bf4_tracking_direction_change_v1.json",
+  "task_file_identity": "4d5488fe0d70c8ecf91dc3dbc9cb06d95d06415a2d0d8ac7e598d583b1b897b2",
+  "canonical_task_identity": "fbc2ec1ad6a11d2ec7a753cabbf269844bef64b6f8cc85a951d102475b7910d4",
+  "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+  "candidate_requests": {
+    "full_span": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.16,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.11,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 6,
+          "phase_rad": 0.0
+        }
+      ]
+    },
+    "split_span": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.16,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.11,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 0.0
+        },
+        {
+          "first_segment": 1,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 1.0471975511965976
+        }
+      ]
+    },
+    "redistributed_lengths": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "cc82734d7e15db9b46228054f63634954f850bf7eab02f201d81c162a99d9d7f",
+      "segment_count": 2,
+      "tendon_count": 6,
+      "segments": {
+        "0": {
+          "length_m": 0.135,
+          "cells": 12
+        },
+        "1": {
+          "length_m": 0.135,
+          "cells": 12
+        }
+      },
+      "control_weights": {
+        "holding_tip_speed_weight": 0.0,
+        "terminal_tip_speed_weight": 0.0
+      },
+      "spans": [
+        {
+          "first_segment": 0,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 0.0
+        },
+        {
+          "first_segment": 1,
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 1.0471975511965976
+        }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "group_id": "full_span-02",
+      "design": "full_span",
+      "initial_tension_n": 0.2,
+      "study_file": "configs/research/study_bf4_tracking_s2_full_span_02.json"
+    },
+    {
+      "group_id": "split_span-02",
+      "design": "split_span",
+      "initial_tension_n": 0.2,
+      "study_file": "configs/research/study_bf4_tracking_s2_split_span_02.json"
+    },
+    {
+      "group_id": "redistributed_lengths-02",
+      "design": "redistributed_lengths",
+      "initial_tension_n": 0.2,
+      "study_file": "configs/research/study_bf4_tracking_s2_redistributed_lengths_02.json"
+    },
+    {
+      "group_id": "full_span-06",
+      "design": "full_span",
+      "initial_tension_n": 0.6,
+      "study_file": "configs/research/study_bf4_tracking_s2_full_span_06.json"
+    },
+    {
+      "group_id": "split_span-06",
+      "design": "split_span",
+      "initial_tension_n": 0.6,
+      "study_file": "configs/research/study_bf4_tracking_s2_split_span_06.json"
+    },
+    {
+      "group_id": "redistributed_lengths-06",
+      "design": "redistributed_lengths",
+      "initial_tension_n": 0.6,
+      "study_file": "configs/research/study_bf4_tracking_s2_redistributed_lengths_06.json"
+    }
+  ],
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 101,
+    "iterations": 4,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.0
+  },
+  "physical_steps_per_rollout": 600,
+  "independent_replays_per_group": 3,
+  "maximum_native_rollouts": 606,
+  "maximum_independent_replays": 18,
+  "maximum_physics_steps": 374400,
+  "group_ownership": "Six separately bound child Studies, identical grants. A pass closes only its child; all six groups execute. No S1 controls, budgets or acceptance inherited.",
+  "early_stop": "Exact original 12 mm proxy line (signed_maximum_excess <= 0), no extra margin. Immediately independently replay the triggering complete sequence. A pass seals that group. A failed replay resumes the identical deterministic search using saved callbacks without reintegration or restarting; total callback ceiling 101 and total iteration ceiling 4. Previously rejected sequences cannot trigger another early validation. At most 3 validations per group; after third failed validation stop for finite validation budget. If search exhausts before a proxy pass, replay the best unvalidated complete sequence once within the same replay ceiling.",
+  "recovery": "Stable operation keys and Store receipts own recovery; never relaunch an unknown outcome. Replay deterministic saved callback prefix only if exact coefficients, labels and applied sequence hashes match. Divergence stops unresolved, with all charges retained.",
+  "ranking": {
+    "priority": [
+      "independent_task_acceptance",
+      "maximum_normalized_violation",
+      "callbacks_to_first_independent_pass",
+      "total_physics_steps",
+      "measured_numerical_wall_s"
+    ],
+    "fairness": "Same algorithm, knots, per-start callback ceiling, physical fidelity and initial tensions for every design. Include all failed callbacks and independent replays. Compare matched initialization strata; censor costs at first independent pass. Finite failures do not prove structural infeasibility."
+  },
+  "publication": "Raw candidates, successful design mapping, controls, execution IDs and artifact mappings remain in ignored runs/bf4-s2. Public report uses opaque structure labels consistently across starts; public receipts omit private answers.",
+  "excluded": [
+    "Provider",
+    "NMPC",
+    "RL",
+    "robustness repetitions",
+    "score polishing",
+    "task/model/evaluator changes"
+  ]
+}

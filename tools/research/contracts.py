@@ -190,6 +190,15 @@ class LocalControlSearchSettings(Contract):
 class NativeControlOptimization(Contract):
     source: EvidenceRef
     settings: LocalControlSearchSettings
+    resume_from: EvidenceRef | None = None
+    failed_replays: list[EvidenceRef] = Field(default_factory=list)
+
+    @model_serializer(mode='wrap')
+    def preserve_native_request(self,handler):
+        result=handler(self)
+        for key in ('resume_from','failed_replays'):
+            if key not in self.model_fields_set:result.pop(key,None)
+        return result
 
     @model_validator(mode="after")
     def bounded_native_window(self):

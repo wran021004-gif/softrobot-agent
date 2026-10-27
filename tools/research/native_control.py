@@ -79,9 +79,17 @@ def calculate(configuration, binding, query, point, requirements, context, check
         raise ValueError('NATIVE_CONTROL_V1_REQUIRES_MATCHED_SAMPLE_AND_CONTROL_GRIDS')
     initial=dict(id='native',schedule=source,limits=native.limits[:,1].tolist(),task_options=options)
     evaluations=[]
+    reused=context.get('resume',{}).get('candidates',[])
     peak_state=None
     def evaluate(_start, schedule, metadata):
         nonlocal peak_state
+        if len(evaluations)<len(reused):
+            row=reused[len(evaluations)]
+            if (row['sequence_hash']!=metadata['sequence_hash'] or row['label']!=metadata['label']
+                    or row['coefficients_n']!=metadata['coefficients_n']):
+                raise ValueError('NATIVE_CONTINUATION_DIVERGED_NO_RESTART')
+            evaluations.append(row['measure'])
+            return {k:row[k] for k in ('reference','outputs','measure','task_gap','cost_s','independent_evaluation_executed')}
         try:
             outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:],
                 **(dict(capture_speed_after_s=options['holding_start']) if not tracking and not evaluations else {}))
@@ -117,18 +125,24 @@ def calculate(configuration, binding, query, point, requirements, context, check
             cost_s=0.,independent_evaluation_executed=False)
     result=search([initial],evaluate,settings,evaluation_kind='native_short_rollout',
         rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
-        stop_when=lambda row:row['measure']['signed_maximum_excess']<=-settings.safety_margin_fraction)
+        stop_when=lambda row:(row['measure']['signed_maximum_excess']<=-settings.safety_margin_fraction
+            and row['sequence_hash'] not in context.get('rejected_sequences',[])))
     best=result['best'];optimized=deepcopy(source)
     if best is None:raise ValueError('NO_VALID_NATIVE_CONTROL_PREDICTION')
+    validation=(result['candidates'][-1] if result['stop_reason']=='local_target_reached' else
+        min((r for r in result['candidates'] if r['sequence_hash'] not in context.get('rejected_sequences',[])),
+            key=lambda r:(r['measure']['signed_maximum_excess'],r['measure']['sum_normalized_excess']),default=best))
+    if reused:result['proposed_validation']=validation['reference']
     from tools.research.control_correction import corrected_tensions
     optimized['trajectory']['tensions_n']=corrected_tensions(tr['tensions_n'],times[:-1],settings.knots_s,
-        best['coefficients_n'],native.limits[:,1],settings.correction_window_s).tolist()
+        validation['coefficients_n'],native.limits[:,1],settings.correction_window_s).tolist()
     optimized.update(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured')
     optimized['provenance']=dict(method=query.operation,source=context['source'],candidate=binding['candidate'],
         state_provenance=point.get('provenance'),settings=plain(settings),inherited_acceptance=False)
     cost=dict(**native.cost,optimization_iterations=result['iterations_started'],
         completed_response_steps=len(result['local_responses']),
         optimization_evaluations=len(evaluations),kernel_wall_s=time.perf_counter()-started)
+    if reused:cost['reused_native_callbacks']=len(reused)
     raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost,
         external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')))
     if peak_state is not None:
