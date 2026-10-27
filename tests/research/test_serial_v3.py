@@ -7,7 +7,7 @@ import numpy as np
 from schemas.platform import ProjectConfig, SessionInput
 from tools.research import core, design
 from tools.research.config import ROOT
-from tools.research.state import state
+from tools.research.state import state,update
 from tools.platform_store import plain
 from extensions.tendon_family.family_space import GenerationRequestV3
 
@@ -74,6 +74,51 @@ class V3RoutingTests(unittest.TestCase):
         with self.assertRaises(ValueError):GenerationRequestV3.model_validate(bad)
         bad=self.request();bad['routes'][0]['anchor_segment']=2
         with self.assertRaises(ValueError):GenerationRequestV3.model_validate(bad)
+
+    def test_force_support_uses_bound_geometry_and_native_channels(self):
+        import mujoco
+        from tools.research.contracts import AnalysisRequest
+        from tools.research.numerics import native_point
+        from tools.research.analysis import calculate
+        from tools.research.task_constraints import mathematical_method_view
+        from extensions.tendon_family.mujoco_analysis import NativeModel
+        result=design.generate_candidate(self.host,self.request(),dict(origin='offline_fixture'))
+        self.assertEqual(result['status'],'generated',result)
+        c=design.verify_candidate(self.host,result['candidate']);cfg=c['configuration']
+        nm=NativeModel(cfg);w=[0.]*len(nm.order);w[0]=1.
+        query=AnalysisRequest.model_validate(dict(candidate=result['candidate'],operation='tendon_force_capability_v1',
+            model_source='mujoco',operating_point='standardized_initial_pretension',
+            protocol=self.spec['analysis_protocol'],tendon_force_direction=w))
+        point=native_point(self.host,query,cfg)
+        binding=dict(candidate=result['candidate'],candidate_id=c['candidate_id'],configuration=c['configuration_reference'],
+            effective_configuration_identity=point['configuration_identity'],task_identity=c['effective_task_identity'],
+            tendon_order=nm.tendons,tension_limits_n=nm.limits[:,1].tolist(),tension_bounds_n=nm.limits.tolist(),
+            coordinate_order=nm.order,source_identity=c['source_identity'],evaluation_profile_identity=c['profile_identity'])
+        out=calculate(cfg,binding,plain(query),point)
+        self.assertEqual(out['status'],'computed');facts=out['tendon_force_capability']
+        d=mujoco.MjData(nm.model);d.qpos[nm.qi]=point['qpos_rad'];mujoco.mj_forward(nm.model,d)
+        jac=np.zeros((nm.model.ntendon,nm.model.nv));mujoco.mju_sparse2dense(jac,d.ten_J,nm.model.ten_J_rownnz,nm.model.ten_J_rowadr,nm.model.ten_J_colind)
+        np.testing.assert_allclose(facts['jacobian_m_rad'],jac[nm.tids][:,nm.vi],atol=1e-10,rtol=1e-8)
+        coeff=-jac[nm.tids][:,nm.vi]@np.asarray(w)
+        expected=np.maximum(coeff*nm.limits[:,0],coeff*nm.limits[:,1]).sum()
+        self.assertAlmostEqual(facts['directional_support_nm'],expected)
+        self.assertEqual(facts['tendon_order'],nm.tendons)
+        self.assertEqual(out['internal_calculations'][0]['physics_steps'],0)
+        view=mathematical_method_view(self.host,result['candidate'])
+        self.assertIn('tendon_force_capability_v1',view['methods'])
+        self.assertEqual(view['methods']['tendon_force_capability_v1']['request_template']['model_source'],'mujoco')
+        self.assertFalse(state(self.host).get('success_gate'))
+        # One real contained, accounted geometry analysis; no physics integration.
+        from tools.research import analysis
+        spec=deepcopy(state(self.host)['spec']);spec['budgets']['mathematical_evaluations']=1
+        update(self.host,spec=spec,freeze='offline-v3-force-fixture')
+        receipt=analysis.dispatch(self.host,plain(query),'v3-force',guard=lambda *args:None)
+        self.assertEqual(receipt['scientific_computation']['status'],'computed',receipt)
+        self.assertEqual(state(self.host)['mathematical_evaluations'],1)
+        self.assertAlmostEqual(receipt['tendon_force_capability']['directional_support_nm'],expected)
+        repeated=analysis.dispatch(self.host,plain(query),'v3-force',guard=lambda *args:None)
+        self.assertEqual(repeated['operation_reuse']['additional_analysis_evaluations'],0)
+        self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
 
     def test_legacy_v2_distal_start_is_not_reinterpreted(self):
         from tools.research.config import resolve

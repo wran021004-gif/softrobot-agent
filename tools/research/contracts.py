@@ -309,10 +309,11 @@ class NonlinearStructureResponse(Contract):
 
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned candidate; operation and model_source must match a registered mathematical_capabilities method.')
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','tendon_force_capability_v1']
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
     nonlinear_response: NonlinearStructureResponse | None = None
+    tendon_force_direction: list[FiniteFloat] | None = Field(default=None,min_length=1,description='Dimensionless generalized-coordinate direction in the exact candidate native DOF order; not a Cartesian force.')
     structure_response: NativeStructureResponse | None = None
     control_optimization: NativeControlOptimization | None = None
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
@@ -328,7 +329,11 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
-        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
+        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','tendon_force_capability_v1')
+        if (self.operation=='tendon_force_capability_v1') != (self.tendon_force_direction is not None):
+            raise ValueError('TENDON_FORCE_CAPABILITY_REQUIRES_GENERALIZED_DIRECTION')
+        if self.operation=='tendon_force_capability_v1' and (self.operating_point!='standardized_initial_pretension' or self.native!=NativeAnalysisOptions() or not any(self.tendon_force_direction)):
+            raise ValueError('TENDON_FORCE_REQUIRES_NONZERO_DIRECTION_AND_FROZEN_INITIAL_STATE')
         if (self.model_source=='mujoco')!=native_operation:
             raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
         if (self.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'))!=(self.control_optimization is not None):
@@ -379,7 +384,7 @@ class AnalysisRequest(Contract):
             if getattr(self,key) is None:value.pop(key,None)
         if self.model_source=='controller':value.pop('model_source',None)
         if self.model_source!='mujoco':value.pop('native',None)
-        for key in ('structure_response','control_optimization','nonlinear_response'):
+        for key in ('structure_response','control_optimization','nonlinear_response','tendon_force_direction'):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 

@@ -78,6 +78,10 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         if fit['status']=='not_applicable':
             return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,
                 protocol=plain(p),task_acceptance='unmeasured',proxy_values={}),requirements,fit,q)
+        if q.operation=='tendon_force_capability_v1':
+            from extensions.tendon_family.geometry import tendon_force_capability
+            result=tendon_force_capability(configuration,binding,exact_point,q.tendon_force_direction)
+            return scoped_result(result,requirements,fit,q)
         return native_calculate(configuration,binding,q,exact_point,requirements,design_context,checkpoint=checkpoint)
     sorosim=q.model_source=='sorosim' or (q.model_source=='controller' and inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc')
     if sorosim:
@@ -245,7 +249,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if result.get('native_dynamics'):
+        if result.get('tendon_force_capability'):
+            conclusion,verification,pointer='diagnostic','finite_box_support_checked','/tendon_force_capability'
+            interpretation='Instantaneous generalized tendon-force support at the recorded configuration; not global reachability or dynamic task feasibility.'
+        elif result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
             if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
@@ -417,6 +424,11 @@ def dispatch(host,query,key,*,guard,origin='model'):
         from tools.research.numerics import native_point
         point=native_point(host,q,cfg)
         binding['coordinate_order']=point['dof_order']
+        if q.operation=='tendon_force_capability_v1':
+            if c.get('generation_version')!='serial_family_generation_v3':
+                return dict(status='not_applicable',reason='V3_GENERATED_CANDIDATE_REQUIRED',task_acceptance='unmeasured')
+            if len(q.tendon_force_direction)!=len(point['dof_order']):
+                raise ValueError('GENERALIZED_FORCE_DIRECTION_MUST_MATCH_EXACT_NATIVE_DOF_ORDER')
         if q.control_optimization:
             from tools.research.physical_replay import binding as schedule_binding, explicit_control_source, numerically_verified_source
             source=host.store.artifact(q.control_optimization.source)
@@ -693,6 +705,10 @@ def compact_result(value, reference):
     from tools.research.capability import nonlinear_summary
     summary.update(nonlinear_summary(value,reference))
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
+    if value.get('tendon_force_capability'):
+        t=value['tendon_force_capability']
+        summary['tendon_force_capability']={k:t[k] for k in ('directional_support_nm','direction_norm','weak_tendon_indices','scope')}
+        summary['tendon_force_capability']['detail_query']=dict(reference=reference,view='full',pointer='/tendon_force_capability')
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
         summary['native_analysis']=decision_summary(value)

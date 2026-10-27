@@ -20,6 +20,7 @@ METHOD_MEANINGS = {
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
     'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold, timed Tracking, position/tool-axis or loaded oriented Tracking. Reuse local response/pattern search with cloned native rollouts covering every registered sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
+    'tendon_force_capability_v1': ('Instantaneous tendon force support', 'Box support of the actual geometric tendon Jacobian at the frozen initial hinge configuration; not task feasibility or a Cartesian force.'),
     'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.'),
     'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two input step sizes, optional bounded correction checked by native integration. Neither two FD sizes nor two integration timesteps prove numerical convergence or a regional bound; a failed local correction does not establish infeasibility.'),
     'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates at fixed input; this response is not reoptimized structural capability or an optimal-value gradient.'),
@@ -62,6 +63,8 @@ def mathematical_method_view(host, reference):
         purpose,meaning=METHOD_MEANINGS[key]
         kinds=row.get('constraint_kinds',['norm_bound','component_interval','path_bound'])
         reasons=[*row['reasons'],*([binding_error] if binding_error else [])]
+        if key=='tendon_force_capability_v1' and c.get('generation_version')!='serial_family_generation_v3':
+            reasons.append('V3_GENERATED_CANDIDATE_REQUIRED')
         if key==SENSITIVITY:
             reasons=[r for r in reasons if r!='candidate_variable_and_saved_model_stencil_validation_required']+readiness.get('reasons',[])
         authorized='analysis' in spec['capabilities'] and (not row.get('capability_method') or
@@ -74,10 +77,11 @@ def mathematical_method_view(host, reference):
             required.append('scoring_window_s from protocol.windows_s')
             if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
-        if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
+        if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','tendon_force_capability_v1'):
             request.update(model_source='mujoco',operating_point='standardized_initial_pretension')
-            required.append('Frozen initialization needs no saved source; optional saved_state OR execution + update_id uses operating_point=saved_state')
-            if key!='mujoco_direct_control_v1':required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
+            required.append('Frozen initialization only' if key=='tendon_force_capability_v1' else 'Frozen initialization needs no saved source; optional saved_state OR execution + update_id uses operating_point=saved_state')
+            if key not in ('mujoco_direct_control_v1','tendon_force_capability_v1'):required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
+            if key=='tendon_force_capability_v1':required.append('tendon_force_direction: nonzero vector in candidate native DOF order; initial state only')
         if key=='mujoco_direct_control_v1':
             required.append('control_optimization={source,settings}; v2 settings require explicit correction_window_s and knots_s. Window starts at the selected native state and ends at the frozen task deadline, covering all required samples.')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
@@ -86,7 +90,7 @@ def mathematical_method_view(host, reference):
         if key==SENSITIVITY:required.append('optimal_sensitivity={variable,steps,model_results baseline first}; validated stencil required')
         methods[key]=dict(operation=row['operation'],method=key,method_version=row.get('method_version',key),scientific_purpose=purpose,description=meaning,
             candidate=reference,task_identity=c.get('task_identity'),task_family=cfg['task']['family'],
-            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1') else
+            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','tendon_force_capability_v1') else
                 any(x.kind in kinds for x in requirements.constraints) and
                 all(x.kind in kinds or x.kind == 'unsupported' for x in requirements.constraints),
             model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
@@ -104,7 +108,7 @@ def mathematical_method_view(host, reference):
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+key),
             schema_query=dict(reference=reference,view='mathematical_capabilities',pointer='/analysis_request_schema'))
         methods[key]['planning_status']=('unauthorized' if not authorized or authorization['registered_study_scope_authorized'] is not True else
-            'unsupported' if binding_error or row.get('planning_status')=='unsupported' else
+            'unsupported' if binding_error or 'V3_GENERATED_CANDIDATE_REQUIRED' in reasons or row.get('planning_status')=='unsupported' else
             'insufficient_budget' if row.get('budget_allowed') is False else
             'blocked' if closed else row.get('planning_status','unsupported' if reasons else 'ready'))
         if key==SENSITIVITY:
@@ -116,6 +120,12 @@ def mathematical_method_view(host, reference):
             if not methods[key]['executable']:methods[key]['execution_status']='blocked'
             elif not reasons:methods[key]['planning_status']='ready'
             methods[key]['structural_proposal']='Optional research_plan(action=generate, generation=<copy current parameters with one bounded edit>, supporting_evidence=[T2 result], decision.claimed_inference=empirical_search). Choose direction and step from the evidence; unresolved permits contrasts or no edit. New candidate requires its own T1 control reoptimization (1 model + B solves); physical acceptance remains unmeasured.'
+        if key=='tendon_force_capability_v1':
+            methods[key]['cost_scope']='One mathematical entry and one model build; geometry-only support, no Native integration or independent replay. Actual time and worker status are recorded.'
+            from extensions.tendon_family.backends import physics_for
+            from schemas.platform import SessionInput
+            methods[key]['coordinate_order']=physics_for(SessionInput.model_validate(cfg))['dofs']
+            methods[key]['scope']='Initial state only; generalized direction in exact native DOF order. No Cartesian force, dynamic feasibility, or acceptance conclusion.'
         if key=='mujoco_direct_control_v1':
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
             from tools.research.native_control import window_facts
@@ -264,15 +274,16 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
         if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):continue
-        native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
+        native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','tendon_force_capability_v1')
         sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
         point='standardized_initial_pretension' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
-        if exact_point and not static:point='saved_state'
+        if exact_point and not static and operation!='tendon_force_capability_v1':point='saved_state'
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
             scoring_window_s=p.windows_s[0] if p.windows_s else None,
             native=NativeAnalysisOptions() if native else None,control_optimization=None)
         parameters=[]
+        if operation=='tendon_force_capability_v1':parameters=['tendon_force_direction: nonzero generalized direction in candidate native DOF order']
         if operation=='mujoco_direct_control_v1':
             # Probe only required coverage, not a fabricated executable source or search settings.
             start=(exact_point or {}).get('actual_time_s',0.)
