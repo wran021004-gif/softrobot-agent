@@ -14,6 +14,8 @@
 
 实际缺口：`search.py` 的 `family_mixed_search_v1` 默认 proxy，task_violation 调 CONIC 且只用主条件；`initial_structure_strategy=math_search` 的 config 准入明确要求 CONIC。仅配置切换不能构成 Native 结构搜索。先用上述原 dispatch 组织阶段二；阶段二完成且恢复合法后再最小扩展 FamilyMixedSearch 的显式 Native 模式，保留旧序列化和历史语义。
 
+历史 R2 收尾同时暴露 `final_fidelity_matches` 把第二、第三个正确冻结条件误判为非根任务的组合缺陷。阶段二之前修复该检查：有 condition_id 时只接受该冻结条件的 task digest；无条件仍要求根 identity，所有原 fidelity/backend/网格检查保留。定向无积分 fixture 覆盖正确条件、错任务、未冻结条件和错网格。此修复不更改 evaluator 或旧 Store，不把旧 R2 的拒绝改写为 SELECT。
+
 ## 阶段二：计算前冻结
 
 任务沿用 BF7 v1 三目标 `(0.285,0.035,0.185)`、`(0.275,-0.040,0.135)`、`(0.295,0,0.215)` m，seed17，同零关节位置/速度；0.6 s、1 ms 积分、20 ms 控制/采样；终点和末四样点位置 ≤10 mm、保持速度 ≤30 mm/s，原世界系、重力、安装、10 g 负载、实际 floor 掩码和 evaluator 全部不变。原 floor 可能与 payload 接触；Native 接触限制不豁免。

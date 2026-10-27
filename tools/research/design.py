@@ -195,11 +195,16 @@ def final_fidelity_matches(spec, candidate):
     if not policy:
         return True
     cfg=candidate['configuration'];final=policy['final_evaluation']
+    task_identity=spec['canonical_task_identity']
+    if candidate.get('condition_id'):
+        condition=next((c for c in spec.get('task_conditions',[]) if c['condition_id']==candidate['condition_id']),None)
+        if condition is None:return False
+        task_identity=digest(condition['task'])
     return (candidate.get('fidelity_policy_identity')==digest(policy) and
         candidate.get('final_evaluation_identity')==spec['final_evaluation_identity'] and
         cfg['policy']['backend']==spec['configuration']['policy']['backend'] and
         set(cfg['policy']['discretization']['data']['cells'].values())=={final['cells_per_segment']} and
-        candidate['task_identity']==spec['canonical_task_identity'])
+        candidate['task_identity']==task_identity)
 
 
 def final_generation_request(spec, candidate):
