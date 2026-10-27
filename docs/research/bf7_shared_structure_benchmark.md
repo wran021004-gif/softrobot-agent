@@ -82,3 +82,13 @@ R1 未找到完整共享可行见证。短臂只有 negative_low 独立通过；
 每结构每目标最多 **401 次 Native、32 response、1 次独立回放**；至多两个结构新增 2,406 回调、6 回放、1,447,200 步。两个新 Study 各独立授权，不转移旧余额。首先检验第一个新结构，首次三个目标完整独立通过即原联合 SELECT 并停止 R2 科学执行；否则才执行第二结构，无自动续算。不为凑成功更改原任务阈值。
 
 追加入口为 `python -m tests.research.bf7_shared_structure r2 prescreen` 和 `r2 physical best/peer`；入口仍只编排原 Study 工具，没有新增优化器、物理执行器或评分方法。
+
+## R2 三目标独立通过与联合 SELECT 边界
+
+R2 第 0 行结构的三个目标已分别在原 600 步完整独立回放中 accepted。Native 实际回调为 **79、131、222**；保持最大位置误差 **9.899976、9.856426、9.889967 mm**，保持最大速度 **29.700000、29.618745、29.700000 mm/s**，终点误差也分别低于原 10 mm。科学计算在第三个独立通过后停止，不执行 R2 第 1 行的物理搜索。
+
+真实联合 SELECT 揭示一个此前只读审计未覆盖的接口组合限制：启用 fidelity_policy 时，原 `design.final_fidelity_matches` 还要求每个候选的 task_identity 等于 Study **根任务** identity；正确绑定第二、第三冻结条件的候选因此返回 false。两者实际 backend、12-cell 网格、fidelity identity、物理结构和独立 acceptance 均正确。原接口确有联合 SELECT 实现，但在此组合下不能合法完成；此前对“接口足够联合选择”的推断在这一点上不成立。
+
+按用户允许的后备交付方式，保留三条独立验收及共同物理结构审计，**不宣称联合 SELECT**。不在看到通过后更改该准入门，不改原 evaluator、验收标准或旧结果。原拒绝、身份比较和处理方式见[联合选择限制](../../evidence/bf7_r2/joint_selection_limitation.json)。监督入口只增加原 eligibility 只读检查和诚实 STOP 分支，避免把合法独立结果的收尾失败当作需要重新求解的科学失败。
+
+最初的运行在 SELECT 抛错后未写完整 driver 总时长；每目标 driver、全部 Store 数值/物理费用及原事件时间戳仍完整保留。恢复只读取三条已保存结果、生成摘要并原 STOP，不再调用数学或物理内核；最终成本报告会区分这一项 driver 未知范围。

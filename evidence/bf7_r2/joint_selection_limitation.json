@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "observed_rejection": "result did not pass complete original task evaluation",
+  "location": "tools/research/design.py:final_fidelity_matches requires every candidate task_identity == root canonical_task_identity, excluding the other two correctly frozen task conditions when fidelity_policy is enabled.",
+  "all_three_independent_acceptances_passed": true,
+  "checks": {
+    "positive_high": {
+      "acceptance": "accepted",
+      "accepted": true,
+      "final_fidelity_matches": true,
+      "candidate_task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f",
+      "root_canonical_task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f",
+      "frozen_condition_identity": "bf7-shared-reach-v1-positive_high",
+      "backend_matches": true,
+      "cells": {
+        "segment_0": 12,
+        "segment_1": 12
+      },
+      "fidelity_policy_identity_matches": true,
+      "source_issue": null,
+      "outcome_issue": null
+    },
+    "negative_low": {
+      "acceptance": "accepted",
+      "accepted": true,
+      "final_fidelity_matches": false,
+      "candidate_task_identity": "46369b85d8ccbe1db59c548c67b5a4156a26ebe7ca94e1e25200c0acd05e1938",
+      "root_canonical_task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f",
+      "frozen_condition_identity": "bf7-shared-reach-v1-negative_low",
+      "backend_matches": true,
+      "cells": {
+        "segment_0": 12,
+        "segment_1": 12
+      },
+      "fidelity_policy_identity_matches": true,
+      "source_issue": null,
+      "outcome_issue": null
+    },
+    "central_high": {
+      "acceptance": "accepted",
+      "accepted": true,
+      "final_fidelity_matches": false,
+      "candidate_task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+      "root_canonical_task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f",
+      "frozen_condition_identity": "bf7-shared-reach-v1-central_high",
+      "backend_matches": true,
+      "cells": {
+        "segment_0": 12,
+        "segment_1": 12
+      },
+      "fidelity_policy_identity_matches": true,
+      "source_issue": null,
+      "outcome_issue": null
+    }
+  },
+  "resolution": "Use the user-authorized three independent acceptance results and audited common structure. Do not alter the gate after observing success, do not claim joint SELECT. Closeout via original STOP; no new scientific computation.",
+  "scientific_calls": 0
+}

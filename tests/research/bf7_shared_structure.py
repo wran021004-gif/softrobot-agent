@@ -10,6 +10,7 @@ from tools.research import core, analysis
 from tools.research.config import ROOT, same_robot_structure
 from tools.research.contracts import PLAN_RESEARCH_INTENTS
 from tools.research.state import state
+from tools.research.feedback import eligibility
 from tools.platform_store import Store
 from tools.research_tasks import _source_issue, _outcome_issue
 from tools.state_io import read, atomic_json
@@ -152,6 +153,10 @@ def physical(role, phase='initial'):
     if phase not in ('initial','continuation'):raise ValueError('UNKNOWN_FROZEN_PHASE')
     f=read(PROTOCOL);folder=RUNS/role;summary=folder/(phase+'.json')
     if phase=='continuation' and not f['physical'].get('allow_continuation',True):raise ValueError('NO_CONTINUATION_AUTHORIZED_IN_THIS_GRANT')
+    if RUNS.name=='bf7-r2' and role=='peer' and (RUNS/'best/initial.json').exists():
+        if read(RUNS/'best/initial.json')['all_independently_accepted']:
+            value=dict(status='not_started',reason='First R2 structure already independently passed all three tasks; frozen scientific stopping rule.',additional_scientific_calls=0)
+            print(json.dumps(value));return value
     if summary.exists():return read(summary)
     started=time.perf_counter();screen=read(RUNS/'math/summary.json')
     if not screen['selected']:raise ValueError('NO_TWO_COMPLETE_THREE_TARGET_MATHEMATICAL_CANDIDATES')
@@ -167,7 +172,7 @@ def physical(role, phase='initial'):
     root=dispatch(host,'generate','bf7-'+role+'-design',generation=original['parameters'])['candidate']
     actual=host.store.artifact(root)['configuration']
     assert same_robot_structure(actual,original['configuration']) and actual['policy']['discretization']==original['configuration']['policy']['discretization']
-    progress=folder/(phase+'-progress.json');rows=read(progress) if progress.exists() else {}
+    progress=folder/(phase+'-progress.json');recovering=progress.exists();rows=read(progress) if recovering else {}
     for condition in state(host)['spec']['task_conditions']:
         key=condition['condition_id']
         if key in rows:continue
@@ -196,14 +201,22 @@ def physical(role, phase='initial'):
             callbacks=rows[key].get('native_callbacks'),metrics=rows[key].get('acceptance',{}).get('metrics'),
             continuation_eligible=rows[key].get('continuation_eligible'))),flush=True)
     accepted=all(r['accepted'] for r in rows.values())
+    joint=None
     if accepted:
-        dispatch(host,'select','bf7-'+role+'-joint-select',selected_execution=[r['replay'] for r in rows.values()],supporting_evidence=[r['analysis'] for r in rows.values()])
+        references=[r['replay'] for r in rows.values()]
+        joint=eligibility(host,references,selection=True)
+        if joint['eligible']:
+            dispatch(host,'select','bf7-'+role+'-joint-select',selected_execution=references,supporting_evidence=[r['analysis'] for r in rows.values()])
     if accepted or phase=='continuation' or not f['physical'].get('allow_continuation',True) or not any(r.get('continuation_eligible') for r in rows.values()):stop(host,'bf7-'+role+'-stop')
     s=state(host)
     value=dict(role=role,phase=phase,screen_index=index,candidate=root,conditions=rows,all_independently_accepted=accepted,
         selected=s.get('selected'),research_status=s['research_status'],implementation=s['freeze'],
+        joint_selection_eligibility=joint,
         numerical_s=s['numerical_s'],mathematical_evaluations=s['mathematical_evaluations'],ledger=host.store.remaining(),
         compatibility_preparation_s=s['compatibility_preparation_s'],driver_elapsed_s=time.perf_counter()-started)
+    if recovering:
+        value.update(driver_scope='This closeout invocation only; original per-target driver times retained; full interrupted-invocation driver unavailable.',
+            prior_target_driver_s=sum(r['driver_elapsed_s'] for r in rows.values()),additional_scientific_calls_in_closeout=0)
     atomic_json(summary,value)
     return value
 
