@@ -2,9 +2,10 @@
 
 The active research implementation starts at `python -m tools.research`. See [the PowerShell runbook](docs/research/README.md) and [module and design-space reference](docs/research/modules.md).
 
-The recommended development baseline is `mainline/softarm-codesign`, integrating
-S137.1 task/configuration authority, S138 task-conditioned mathematics and S139
-physical execution on S135. See [integration results and current scientific limits](docs/research/softarm_codesign_mainline.md).
+The cross-task integration baseline is `integration/research-next`. See
+[the integration report and fresh Tracking/multi-condition configurations](docs/research/integration_research_next.md).
+The underlying task-conditioned mainline is documented in
+[the original integration results](docs/research/softarm_codesign_mainline.md).
 
 The research path is: reviewed task → structural candidate → mathematical
 analysis → Agent decision → control optimization → physical execution →

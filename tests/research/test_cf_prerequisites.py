@@ -1,0 +1,89 @@
+"""C-F directed checks: fixture facts only, no Provider or physical integration."""
+from copy import deepcopy
+import unittest
+from unittest.mock import patch
+from schemas.platform import SessionInput
+from tools.platform_store import plain
+from tools.research import analysis
+from tools.research.contracts import AnalysisRequest
+from tools.research.native_analysis import applicability, assessment
+from tools.research.budget import decision_budget
+from tools.research.research_context import tool_feedback
+from tests.research.test_task_analysis_contract import TaskAnalysisTests
+from tests.research.test_research_reporting import offline_host
+
+
+class PrerequisiteTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        TaskAnalysisTests.setUpClass()
+
+    def setUp(self):
+        self.f=TaskAnalysisTests();self.f.setUp()
+
+    def query(self,start=0.):
+        end=self.f.req.duration_s
+        return AnalysisRequest(candidate=self.f.ref,operation='mujoco_direct_control_v1',model_source='mujoco',
+            operating_point='standardized_initial_pretension',protocol=self.f.q.protocol,
+            control_optimization=dict(source=self.f.ref,settings=dict(version='local_control_search_v2',
+                correction_window_s=[start,end],knots_s=[start,end])))
+
+    def test_standard_initialization_covers_full_task_without_worker(self):
+        inp=SessionInput.model_validate(self.f.cfg)
+        fit=applicability(self.f.req,self.query(),assessment(inp,self.f.req),dict(phase='interval_start_native'))
+        self.assertEqual(fit['status'],'applicable')
+        self.assertEqual(fit['horizon']['legal_correction_window_s'],[0.,self.f.req.duration_s])
+        self.assertTrue(fit['horizon']['covers_required_samples'])
+
+    def test_late_window_does_not_manufacture_late_state(self):
+        with patch('extensions.tendon_family.mujoco_analysis.NativeModel',side_effect=AssertionError('NO_PHYSICS')):
+            result=analysis.calculate(self.f.cfg,self.f.binding,self.query(self.f.req.duration_s*.8),dict(actual_time_s=0.))
+        self.assertEqual(result['status'],'not_applicable')
+        host,_=offline_host({})
+        with patch('tools.research.research_context.save',return_value=self.f.ref),patch('tools.research.evidence_policy.registered_references',return_value=[]):
+            feedback=tool_feedback(host,result)['execution_feedback']
+        self.assertFalse(feedback['worker_started'])
+        self.assertIn('selected state time 0.0',str(feedback['reasons']))
+        self.assertEqual(feedback['horizon']['legal_correction_window_s'],[0.,self.f.req.duration_s])
+
+    def budget(self,shared,replays_used):
+        spec=deepcopy(self.f.spec);spec['mode']='engineering_numerical'
+        spec['budgets'].update(physical_launches=19,mathematical_evaluations=9)
+        spec.update(physical_replay_limit=13,native_control_limits=dict(evaluation_requests=73,iterations=3,knots_s=4))
+        host,s=offline_host({},spec=spec,analysis_results=[],physical_replay_launches=replays_used,mathematical_evaluations=2)
+        host.store.events.return_value=[]
+        host.store.session.side_effect=lambda *args:dict(state=s)
+        host.store.remaining.return_value=dict(remaining=dict(model_calls=40,tool_calls=100,backend_solves=shared))
+        return host,s,decision_budget(host)['science_budget']
+
+    def test_plan_and_native_callback_caps_have_distinct_units(self):
+        host,s,budget=self.budget(7,3)
+        self.assertEqual(budget['plan_control_search']['declared_callback_maximum'],20)
+        self.assertEqual(budget['native']['per_request_control_limits']['evaluation_requests'],73)
+        self.assertEqual(budget['remaining_mathematical'],7)
+        self.assertIn('full physical replay',budget['plan_control_search']['callback_unit'])
+        host.store.reserve.assert_not_called()
+
+    def test_replay_sublimit_does_not_add_to_shared_allowance(self):
+        _,_,budget=self.budget(2,3)
+        self.assertEqual(budget['remaining_full_replays'],10)
+        self.assertEqual(budget['remaining_physical'],2)
+        self.assertEqual(budget['available_full_replays'],2)
+
+    def test_failed_worker_preserves_cause_cost_and_start_observation(self):
+        value=dict(status='execution_incomplete',operation='mujoco_direct_control_v1',candidate=plain(self.f.q.candidate),
+            error='ValueError',reason='FIXTURE_NATIVE_PREFIX_MISMATCH',boundary=dict(worker_started=True),
+            charged_analysis_evaluations=1,charged_numerical_s=.125,
+            native_progress=dict(cost=dict(physics_steps=17,rollouts=1)))
+        feedback=analysis.compact_result(value,self.f.ref)['execution_feedback']
+        self.assertTrue(feedback['worker_started'])
+        self.assertEqual(feedback['reason'],'FIXTURE_NATIVE_PREFIX_MISMATCH')
+        self.assertEqual(feedback['charged_analysis_evaluations'],1)
+        self.assertEqual(feedback['native_cost']['physics_steps'],17)
+        del value['boundary'];del value['native_progress']
+        feedback=analysis.compact_result(value,self.f.ref)['execution_feedback']
+        self.assertIsNone(feedback['worker_started'])
+        self.assertIsNone(feedback['native_cost'])
+
+
+if __name__=='__main__':unittest.main()

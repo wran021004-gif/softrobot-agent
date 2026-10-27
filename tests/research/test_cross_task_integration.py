@@ -41,6 +41,7 @@ def fixture_directory():
 def fixture_host(folder, leaf='study_tracking_public.json'):
     spec=resolve(ROOT/'configs/research'/leaf)
     spec=deepcopy(spec)
+    spec['mode']='engineering_numerical'
     spec['study_id']='cross-task-fixture-'+uuid4().hex[:8]
     spec['configuration']['run_id']=spec['study_id']
     spec['budgets'].update(physical_launches=3, public_operations=100)

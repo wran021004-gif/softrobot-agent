@@ -500,12 +500,13 @@ def dispatch(host,query,key,*,guard,origin='model'):
     started=time.perf_counter()
     try:
         with (folder/'worker.log').open('w',encoding='utf8') as log:
-            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,None)
-        boundary=dict(termination_confirmed=True,returncode=done.returncode,timed_out=False)
+            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,None,
+                lifecycle_path=folder/'worker_lifecycle.json')
+        boundary=dict(termination_confirmed=True,returncode=done.returncode,timed_out=False,worker_started=True)
     except subprocess.TimeoutExpired as exc:
-        boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)
+        boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True,worker_started=True)
     except Exception as exc:
-        boundary=dict(termination_confirmed=False,error=str(exc))
+        boundary=dict(termination_confirmed=False,error=str(exc),worker_started=True if (folder/'worker_lifecycle.json').exists() else None)
     boundary['elapsed_s']=time.perf_counter()-started
     atomic_json(folder/'boundary.json',boundary)
     return recover(host)
@@ -591,6 +592,13 @@ def compact_result(value, reference):
         'status','candidate','operation','proxy_values','origin','owning_study','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
     summary['stored_result_keys']=list(value)
+    if value.get('status') not in ('computed','not_comparable'):
+        summary['execution_feedback']=dict(status=value.get('status'),error=value.get('error'),reason=value.get('reason'),
+            worker_started=(value.get('boundary') or {}).get('worker_started'),
+            charged_analysis_evaluations=value.get('charged_analysis_evaluations'),
+            charged_numerical_s=value.get('charged_numerical_s'),
+            native_cost=next(((value.get(k) or {}).get('cost') for k in ('native_dynamics','native_progress','native_diagnostic') if (value.get(k) or {}).get('cost')),None),
+            scope='Missing worker or native cost observations are unknown, not zero; original failure and reserved evaluation remain recorded.')
     summary['retrieval_note']='This is a tool summary, not the stored artifact layout. Read only the explicit stored pointers; oversized full results may be offloaded.'
     tensions=(value.get('construction') or {}).get('computed_tensions_n')
     if value.get('status')=='computed' and tensions is not None:

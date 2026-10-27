@@ -40,7 +40,9 @@ do not establish physical acceptance or global optimality.
 
 Use `python -m tools.research prepare --spec configs/research/study_tracking_public.json`,
 then the existing commit/bind/run workflow. The template has zero Provider and
-science budgets, empty historical evidence, and no experimental witness. Before
+science budgets, empty historical evidence, and no experimental witness. It uses
+`mode=formal_research` and the existing `PENDING_EXPLICIT_APPROVAL` boundary; a
+scoped formal authorization is still required before Provider/science dispatch. Before
 preparing a scientific Study, give the leaf a fresh ID, explicit authorization,
 finite Provider/public-operation/math/physical budgets, replay limit and Native
 callback/iteration/knot limits. Retain the frozen task/control references and
@@ -173,6 +175,27 @@ was corrected to `partial`: its terminal sample covers only part of the holding
 window, while full-task support remains false. Reach previews preserve their
 original effective configuration. Benchmark studies always read B's frozen
 TaskDefinition directly and never depend on Task Intake.
+
+A-III was committed as `e21a2d329`.
+
+## C-F prerequisite supplement
+
+While integration was in progress, C supplied `research/c4-prestudy-action-repair@af5f5bca4`.
+Only its seven public production-file differences since `c41350922` were
+selected: method action prerequisites, shared planning/admission window facts,
+standard initialization at 0 s, separate Plan and Native callback units, actually
+available shared replay capacity, and observed worker-start/failure/cost feedback.
+Both Reach/Hold and timed Tracking semantics remain in `task_constraints.py`
+and `native_control.py`; saved-evidence-only T2 does not inherit Native execution
+prerequisites. No C Store, configuration, grant, budget or executing checkout was
+modified. These facts use the existing method catalog, L0/L1 and ledger.
+
+The supplement passed 20 focused checks (five C-F prerequisite cases plus
+Native-control, timed Tracking and public/joint interface regressions), and the
+three precise C3.3 rejection-feedback cases. A final four checks verify the
+pending formal templates and their public/Intake routes. No extra real integration
+was run after the feedback-only supplement; the two original engineering
+receipts retain their actual bound implementation commits and costs.
 
 ## Remaining scope
 

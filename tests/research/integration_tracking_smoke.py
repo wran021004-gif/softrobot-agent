@@ -29,7 +29,7 @@ def prepare_smoke(leaf,folder):
         for condition in spec.get('task_conditions',[]):
             condition['task']=str((source.parent/condition['task']).resolve())
         count=len(spec.get('task_conditions',[])) or 1
-        spec.update(defaults='defaults.json',study_id=folder.name,
+        spec.update(defaults='defaults.json',study_id=folder.name,mode='engineering_numerical',
             authorization='Task A authorizes this minimal real public-route engineering check: one native baseline and independent replay per condition, zero Provider, NMPC or RL.',
             budgets=dict(physical_launches=count,mathematical_evaluations=count),
             evidence_destination='runs/'+folder.name+'/private-store')

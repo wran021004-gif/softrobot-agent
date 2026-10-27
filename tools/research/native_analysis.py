@@ -108,7 +108,8 @@ def applicability(requirements, query, assessed, point):
     reasons=[r for use in assessed['uses'].values() for r in use['reasons']]
     point=point or {};start=point.get('actual_time_s')
     initial=query.operating_point=='standardized_initial_pretension'
-    if initial:point=point or dict(actual_time_s=0.);start=0.
+    if initial:
+        point={**point,'actual_time_s':0.};start=0.
     if query.operation=='mujoco_reoptimized_structure_response_v1':
         return dict(status='not_applicable' if reasons else 'applicable',reasons=reasons,
             constraint_coverage=[],full_task_supported=False,execution_support='saved_evidence_only',model_assessment=assessed,
