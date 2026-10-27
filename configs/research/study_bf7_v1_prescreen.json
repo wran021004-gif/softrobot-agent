@@ -1,0 +1,79 @@
+{
+  "defaults": "bf7_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "study_id": "bf7-v1-prescreen",
+  "authorization": "BF7 v1: at most three Study-owned proposals scored on all three actual tasks; <=24 model/solve evaluation units. No physical integration or LLM/PPO.",
+  "evidence_destination": "runs/bf7-v1/math/private-store",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "stop"
+  ],
+  "budgets": {
+    "mathematical_evaluations": 24,
+    "physical_launches": 0
+  },
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "BF7 permits original sampled affine per-task CONIC reoptimization; max over three valid task scores is a deterministic read-only aggregate, not nonlinear acceptance."
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "lengths"
+    ],
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 6
+  }
+}

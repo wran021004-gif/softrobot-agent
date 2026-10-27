@@ -1,0 +1,70 @@
+{
+  "defaults": "bf7_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "study_id": "bf7-v1-peer",
+  "authorization": "BF7 v1 peer: same structure on three tasks. Initial <=101 callbacks/task and one replay/task. At most one separately committed evidence-conditioned continuation <=100 more callbacks and one more replay per failing task; total <=201/task. No old success controls or designs.",
+  "evidence_destination": "runs/bf7-v1/peer/private-store",
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "mathematical_evaluations": 6,
+    "physical_launches": 6
+  },
+  "physical_replay_limit": 6,
+  "native_control_limits": {
+    "evaluation_requests": 101,
+    "iterations": 4,
+    "knots_s": 4
+  }
+}

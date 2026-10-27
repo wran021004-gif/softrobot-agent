@@ -1,0 +1,135 @@
+{
+  "version": "1.0.0",
+  "benchmark": "BF7 Multi-Target Shared-Structure Reachability",
+  "base_commit": "a1566b91a387316405bdb2fc79eb8a087ea20e8a",
+  "branch": "research/bf7-shared-structure-benchmark",
+  "organizer": "Codex; no LLM Research Agent",
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "task_definition": {
+    "duration_s": 0.6,
+    "timestep_s": 0.001,
+    "control_period_s": 0.02,
+    "sample_period_s": 0.02,
+    "initial_state": "all_candidate_dofs_zero_v1",
+    "seed": 17,
+    "terminal_tolerance_m": 0.01,
+    "holding_window_s": [
+      0.54,
+      0.6
+    ],
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.03,
+    "frame": "world_base_x_forward_yz_cross_section",
+    "environment": "reach_hold.json original gravity, mount, non-contact floor and no external forces",
+    "payload": "Original family_space_v2/v1 rigid 0.01 kg payload, declared COM and full inertia, no payload modification"
+  },
+  "structure_domain": {
+    "family": "family_space_v2.json scoped to two segments and six tendons",
+    "vary": [
+      "segment lengths"
+    ],
+    "bounds_m": [
+      0.1,
+      0.16
+    ],
+    "fixed": "Original prototype materials, sections, distributed_consecutive six-tendon routing, all 12 cells/segment, backend.family_mujoco@1.2.0, model.serial_bending_cells@1.0.0, ideal unilateral 0..8 N tensions"
+  },
+  "prescreen": {
+    "study": "study_bf7_v1_prescreen.json",
+    "maximum_designs": 3,
+    "maximum_mathematical_units": 24,
+    "proposal_search": {
+      "version": "family_mixed_search_v1",
+      "method": "bounded_mixed_coordinate_v1",
+      "variable_groups": [
+        "lengths"
+      ],
+      "segment_counts": [
+        2
+      ],
+      "tendon_counts": [
+        6
+      ],
+      "span_strategies": [
+        "distributed_consecutive"
+      ],
+      "bounds": {
+        "length_m": [
+          0.1,
+          0.16
+        ]
+      },
+      "screening_fidelity": "standard",
+      "objective": "task_violation",
+      "operating_point": "standardized_initial_pretension",
+      "max_proposals": 8,
+      "max_evaluations": 6,
+      "step": 0.25,
+      "minimum_step": 0.03125
+    },
+    "coverage": "Search proposes/ranks on positive_high ONLY. Then each proposed structure is actually solved for all three tasks; no single-task score is presented as a shared score.",
+    "aggregate": "V_BF7 = max of three finite trajectory.replayed_violation values; all task-specific CONIC solves, valid affine replay and full norm/sample coverage required. Otherwise unresolved.",
+    "selection": "Best complete shared score, tie by proposal index. Peer is proposal zero if distinct; otherwise next ranked distinct proposal. No manual score override."
+  },
+  "physical": {
+    "studies": {
+      "best": "study_bf7_v1_best.json",
+      "peer": "study_bf7_v1_peer.json"
+    },
+    "initial_tension_n": 0.2,
+    "initial_settings": {
+      "version": "local_control_search_v2",
+      "method": "response",
+      "correction_window_s": [
+        0.0,
+        0.6
+      ],
+      "knots_s": [
+        0.0,
+        0.2,
+        0.4,
+        0.58
+      ],
+      "coefficient_limit_n": 8.0,
+      "difference_step_n": 0.02,
+      "initial_radius_n": 0.2,
+      "minimum_radius_n": 0.0001,
+      "safety_margin_fraction": 0.02,
+      "evaluation_requests": 101,
+      "iterations": 4
+    },
+    "initial_per_task": {
+      "native_callbacks": 101,
+      "response_iterations": 4,
+      "independent_replays": 1,
+      "physics_step_attempts": 61200
+    },
+    "cumulative_per_task": {
+      "native_callbacks": 201,
+      "independent_replays": 2,
+      "physics_step_attempts": 121800
+    },
+    "cumulative_two_structures": {
+      "native_callbacks": 1206,
+      "independent_replays": 12,
+      "physics_step_attempts": 730800
+    },
+    "continuation": "Freeze one new phase config after first real evidence, retain same Study ledger and original total ceiling. Only failed tasks with reliable full feedback and >=5% max normalized violation reduction from seed and continuing response improvement qualify. Passing tasks are not reoptimized. No condition/task/structure changes.",
+    "acceptance": "Original registered evaluate.reach and offline Reach/Hold acceptance on complete 600-step runs, terminal 10mm, four inclusive holding samples with 10mm/30mm_s bounds, force bounds and solver validity; joint SELECT only with three passing owned independent replays on identical structure/discretization.",
+    "stop": "Each Study SELECT at first joint independent pass, otherwise STOP after initial non-improvement or one finite continuation. Separate peer comparison remains authorized. No formal three-strategy benchmark."
+  },
+  "accounting": "All construction, invalid/failed models, internal solves, Native attempts, full replay and driver costs preserved. Store numeric and driver overlap and are separate. Historical B Stores/successful inputs are never read or imported."
+}

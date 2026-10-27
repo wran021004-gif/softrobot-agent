@@ -1,0 +1,52 @@
+{
+  "extends": "reach_hold.json",
+  "seed": 17,
+  "settling": {
+    "window_s": 0.06,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.03
+  },
+  "task": {
+    "task_id": "bf7-shared-reach-v1-negative_low",
+    "task_version": "1.0.0",
+    "name": "BF7 v1 shared-structure sensor positioning: negative_low",
+    "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+    "goal": {
+      "data": {
+        "target_m": [
+          0.275,
+          -0.04,
+          0.135
+        ]
+      }
+    },
+    "evaluator": {
+      "parameters": {
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "initializer": {
+      "parameters": {
+        "data": {
+          "qpos_rad": {},
+          "qvel_rad_s": {},
+          "unspecified": "zero"
+        }
+      }
+    },
+    "sampling": {
+      "window_s": [
+        0.0,
+        0.6
+      ]
+    },
+    "timing": {
+      "duration_s": 0.6,
+      "timestep_s": 0.001,
+      "control_period_s": 0.02,
+      "sample_period_s": 0.02
+    }
+  }
+}
