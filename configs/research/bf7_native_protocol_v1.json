@@ -1,0 +1,54 @@
+{
+  "version": "bf7_native_v1",
+  "study": "study_bf7_native_v1.json",
+  "historical_tasks": "BF7 v1 unchanged",
+  "structures": [
+    {
+      "id": "A",
+      "lengths_m": [
+        0.16,
+        0.12
+      ]
+    },
+    {
+      "id": "B",
+      "lengths_m": [
+        0.16,
+        0.14
+      ]
+    }
+  ],
+  "young_pa": [
+    12000000.0,
+    10000000.0
+  ],
+  "settings": {
+    "version": "local_control_search_v2",
+    "correction_window_s": [
+      0,
+      0.6
+    ],
+    "safety_margin_fraction": 0.02,
+    "method": "response",
+    "knots_s": [
+      0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "coefficient_limit_n": 8.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.2,
+    "minimum_radius_n": 0.0001,
+    "evaluation_requests": 51,
+    "iterations": 2
+  },
+  "initial_tension_n": 0.2,
+  "refinement_rule": "One independent frozen grant only: complete screen; >=5% J improvement from fresh baseline and continued best improvement after first completed response; select minimum complete shared J. At most 201 callbacks and one replay per condition.",
+  "caps": {
+    "native_callbacks": 306,
+    "independent_replays": 6,
+    "physics_step_attempts": 187200
+  },
+  "acceptance": "Original BF7 v1 evaluator and joint SELECT; no threshold/model relaxation; shared J is max of three finite-budget best found Native J, unresolved if any incomplete."
+}
