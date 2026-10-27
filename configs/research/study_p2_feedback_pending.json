@@ -1,0 +1,143 @@
+{
+  "defaults": "bf7_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v3.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "study_id": "p2-feedback-v3-pending",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: PENDING_P2_FEEDBACK_APPROVAL; no new Provider, science or import execution until separately approved and cumulative P2 budget is enforced.",
+  "evidence_destination": "runs/p2-feedback-v3-pending",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 0,
+    "protected_public_operations": 0,
+    "mathematical_evaluations": 0,
+    "physical_launches": 0
+  },
+  "physical_replay_limit": 0,
+  "native_control_limits": {
+    "evaluation_requests": 51,
+    "iterations": 1,
+    "knots_s": 4
+  },
+  "initial_structure_strategy": "agent_choice",
+  "family_search": {
+    "evaluation_modes": [
+      "mathematical_proxy",
+      "mujoco_control"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 2,
+    "methods": [
+      "adaptive_joint_block_v1"
+    ]
+  },
+  "mathematical_method_scope": "registered_applicable_v1",
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "routes.*.segments.*.radius_m",
+      "routes.*.segments.*.angle_rad"
+    ]
+  },
+  "task": "../../tasks/bf7_shared_reach_v1_positive_high.json",
+  "mode": "formal_research",
+  "numerical_execution_guard": {
+    "version": "bounded_worker_v1",
+    "limit_s": 300,
+    "worker_timeout_s": 180,
+    "margin_s": 30
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [
+      {
+        "folder": "runs/p2b-feedback-seed-20261028",
+        "candidate": {
+          "artifact_id": "ef2fbc71dc15f1e4fee75687e462e46f4d3d166702693be33d432f0969441a02",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "67395ed42e34265a501c1fb6d8ec6f0601a9d860733d1c1911ecc618d9131130",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "execution_instructions": "Pending approval only. Use the formally admitted candidate and control seed; select actions autonomously. Distinguish finite Native T1 from independent acceptance, and do not infer infeasibility from incomplete computation. No budget is active."
+}

@@ -287,6 +287,13 @@ def bind(host, reason=None, specification=None):
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise ValueError('COMMIT_BEFORE_BIND_OR_MIGRATION')
     s=state(host)
+    decisions=s['spec'].get('research_decisions',{})
+    if any(decisions.get(k) for k in ('history','mathematics','control_seeds')):
+        # Binding normally permits offline preparation. Importing declared
+        # scientific sources also materializes candidates, so pending studies
+        # must first satisfy the existing exact-scope authorization gate.
+        from tools.research.state import require_authorization
+        require_authorization(host)
     if s['pending']:
         raise ValueError('PENDING_OUTCOME_BLOCKS_MIGRATION')
     with host.store.connect(True) as db:

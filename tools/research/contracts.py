@@ -527,7 +527,7 @@ class ControlSeedRequest(Contract):
     source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
     parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
     channel_map: dict[str, str] | None = None
-    tensions_n: list[list[FiniteFloat]] | None = None
+    tensions_n: list[list[FiniteFloat]] | None = Field(default=None,description='Baseline: omit to use candidate pretension, or provide one bounded tendon-order row for a constant full-horizon zero-order hold. A complete interval-by-channel sequence is also allowed when a specific hypothesis or evidence supports it; control optimization can compute an adapted sequence.')
     method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = 'baseline'
     response_evidence: EvidenceRef | None = None
     channels: list[str] | None = Field(default=None,min_length=1)

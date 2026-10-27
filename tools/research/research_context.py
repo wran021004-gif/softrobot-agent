@@ -342,7 +342,7 @@ def context(host):
             one_coefficient_response_requests=3,remaining_backend_launches=remaining,
             full_two_knot_response_fits=remaining>=2*channels+2))
     current['control_start_domains']=domains
-    current['control_initialization_methods']=dict(baseline='Pretension, explicit tensions_n, or source+parent with optional channel_map',
+    current['control_initialization_methods']=dict(baseline='Omit tensions_n for candidate pretension, or supply one bounded tendon-order row to expand to a constant full-horizon ZOH sequence. Full explicit sequences remain available when supported by a specific hypothesis or evidence; Native control optimization can adapt the sequence. Alternatively use source+parent and optional channel_map.',
         measured_nmpc='Optional NMPC can control directly or supply a starting schedule for MuJoCo-direct. Use initialize_control method=baseline, candidate=current candidate, parent=same candidate, source=complete current-Study same-candidate NMPC result, without channel_map. Complete valid task failures remain useful. Only actually applied SI tensions are used, never unexecuted predictions or stitched incomplete traces. The new open-loop ZOH schedule is task_acceptance=unmeasured and needs full independent evaluation. NMPC is not a prerequisite for mathematics or control optimization.',
         capability_sequence='Current candidate-bound complete task_capability sequence via response_evidence; inherits no physical acceptance.',
         mathematical_response='response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization',

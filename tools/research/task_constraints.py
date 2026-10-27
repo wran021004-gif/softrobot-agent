@@ -160,7 +160,7 @@ def mathematical_method_view(host, reference):
             methods[key]['supported_task_families']=['task.reach','task.tracking:timed','task.position_tool_axis','task.oriented_tracking']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']
             methods[key]['kernel_supported']=row['planning_status']!='unsupported'
-            methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (pretension or explicit tensions), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
+            methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (omit tensions for pretension, or one bounded row expanded to full-horizon constant ZOH), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
             methods[key]['handoff']='physical_replay(candidate=same candidate, source=returned control_schedule_reference); independent acceptance and public evidence_read are required before SELECT.'
         if key=='short_input_response_v1':
             methods[key]['cost_scope']='One baseline + up to four FD rollouts per channel (two input sizes, central or one-sided) + optional one nonlinear candidate rollout. Required prefix reconstruction is already included in native cost.physics_steps; recorded rollouts/physics_steps own actual cost. Full independent physical_replay is additional if requested.'
