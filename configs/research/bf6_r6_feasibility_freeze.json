@@ -1,0 +1,64 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.3,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "steps_per_full_sequence": 600,
+  "contract": "bf6.r6.expanded_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 user explicitly said continue increasing budget after R5 finite independent failure was reported; prior user delegated go/no-go without requests. New separate R6 allowance: one Native analysis, at most 151 full callbacks, six response iterations, one independent replay, 91200 integration attempts. Only R5 own complete independently replayed best valid_failure controls, same P1/original BF6 task/zero physical state/real 20 g load/floor/physics/30 points/12 mm/10 deg and prospective v2 acceptance. Existing four-knot response and 0.3 N initial radius only. First full independent pass SELECTs immediately; otherwise finite STOP with all actual costs. No old balances, extra starts/scans, PPO, structure change, private optimizers or task relaxation. Commit/push authorized.",
+  "study_file": "configs/research/study_bf6_r6_feasibility.json",
+  "prior_summary": "runs/bf6-r5/summary.json",
+  "prior_summary_identity": "439df801116bd4a37f90dff36d94098483fd4ba484411d7b7837430f2ffd1ccc",
+  "prior_store": "runs/bf6-r5/private-store",
+  "prior_analysis": {
+    "artifact_id": "0e2a95b31634673eaf9a6a53be9ba8ac095759125decf3efb15e16c45555ad4d",
+    "media_type": "application/json"
+  },
+  "prior_independent_replay": {
+    "artifact_id": "0ce5eb3ca760fbf77f1335d2ec4b49c05635877fcbbd783d66cacc3a151492b5",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "2ea936fe89f830e1c8d6c799fc67a42a4e682751616ce07b95a444198be155b5",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "0adc162c5fd1e5dee3cdd2486c4d2469da249a841ca7e2a4d59bd6a3de3805c6",
+    "media_type": "application/json"
+  },
+  "maximum_native_analysis_requests": 1,
+  "maximum_native_rollouts": 151,
+  "maximum_response_iterations": 6,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 91200,
+  "source_semantics": "Exact R5 own best valid_failure schedule plus parent via existing initialize_control, correction coefficients recentered to zero, physical zero state preserved, no inherited acceptance or hand edits.",
+  "replay_policy": "Replay at most one complete returned schedule strictly better than fresh baseline in original native minimax/sum ranking and with a different sequence hash. If no new better complete control, STOP without duplicating original R5 replay.",
+  "stop": "Only one bounded batch. Stop Native on existing first margin target or frozen caps; validate at most one strictly better new complete schedule. Independent full pass SELECTs immediately, any incomplete/failed independent acceptance STOPs; no extra validation. Native contact/numerical/solver failure or no improved complete schedule STOPs with retained partial costs, no private salvage. Further batches are not preauthorized by this allocation.",
+  "historical_costs": "All earlier BF6 stages remain STOP. Retain original failed-step uncertainty and all costs. Prior total 184652 confirmed steps / 184653 attempts, 30.894124599988572 s Store numeric; no transferred balances."
+}

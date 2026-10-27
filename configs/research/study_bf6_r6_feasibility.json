@@ -1,0 +1,90 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_bf6_sensor_tool.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "bf6-r6-expanded-feasibility-v1",
+  "base_commit": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+  "authorization": "2026-10-27 user explicitly said continue increasing budget after R5 finite independent failure was reported; prior user delegated go/no-go without requests. New separate R6 allowance: one Native analysis, at most 151 full callbacks, six response iterations, one independent replay, 91200 integration attempts. Only R5 own complete independently replayed best valid_failure controls, same P1/original BF6 task/zero physical state/real 20 g load/floor/physics/30 points/12 mm/10 deg and prospective v2 acceptance. Existing four-knot response and 0.3 N initial radius only. First full independent pass SELECTs immediately; otherwise finite STOP with all actual costs. No old balances, extra starts/scans, PPO, structure change, private optimizers or task relaxation. Commit/push authorized.",
+  "task": "../../tasks/bf6_sensor_oriented_tracking_v1.json",
+  "control": "control_bf4_tracking.json",
+  "evidence_destination": "runs/bf6-r6/private-store",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.4.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "windows_s": [
+      0.1,
+      0.3,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ]
+  },
+  "scoring_window_s": 0.6,
+  "runtime": "runtime_bf4_engineering.json",
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "select",
+    "stop"
+  ],
+  "physical_replay_limit": 1,
+  "native_control_limits": {
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "knots_s": 4
+  },
+  "budgets": {
+    "physical_launches": 1,
+    "mathematical_evaluations": 1
+  }
+}
