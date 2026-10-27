@@ -84,9 +84,9 @@ introduced here. No BF6 worker is launched by A.
 
 ## Flash / Pro decision comparison
 
-An independent bounded Provider-only comparison will reuse the production
+An independent bounded Provider-only comparison reused the production
 Harness and Plan/Evidence schemas and LiveBoundary/Store accounting.
-It will not dispatch scientific requests or access the current C Study. Only
+It dispatched no scientific requests and did not access the current C Study. Only
 fresh, labeled interface fixtures/public frozen task information are eligible
 inputs. Exact model IDs and common request settings are checked against the
 [DeepSeek Chat API](https://api-docs.deepseek.com/api/create-chat-completion/)
@@ -111,8 +111,9 @@ explicitly fabricated; this baseline is not a new feasibility witness.
 
 `configs/research/provider_flash_pro.json` fixes `deepseek-flash` versus
 `deepseek-v4-pro`, thinking enabled/high, max_tokens=8,192, two cases and at most
-two Provider requests per case/model (eight total). Case/model order is Flash/Pro
-for BF5 and Pro/Flash for BF6. Each has a separate existing Store grant/session
+two Provider requests per case/model (eight total). Intended case/model order was
+Flash/Pro for BF5 and Pro/Flash for BF6; actual send order after the local storage
+repair is recorded below. Each has a separate existing Store grant/session
 with zero tool/backend/worker allowance, a fresh SDK session and the same frozen
 case input/schema. Credentials, raw responses and retained reasoning stay local.
 The original `build_harness`, `live_model_class`, `LiveBoundary` and production
@@ -124,8 +125,9 @@ frozen TaskDefinition; BF6 input is a filtered committed public B scalar summary
 successful design/control is supplied. The evidence reference is content-identical
 between model arms. The production evidence reader handles static pointer/views;
 there is no synthetic scientific feedback. Provider tool proposals record schema and
-reference/intent checks. Only diagnose/stop/select and static evidence reads are
-advertised, with all proposals intercepted. These partial
+reference/intent checks. Only diagnose/stop/select and evidence reads are
+offered, with all proposals intercepted. The live evidence schema exposed more
+views than the interceptor supported; this defect is recorded below. These partial
 checks do not claim full scientific admission; all science budgets are zero.
 
 One mock-HTTP end-to-end check passed using the real Harness/ledger with worker
@@ -149,3 +151,68 @@ The previous unsent freeze remains local; it is not repurposed or overwritten.
 The replacement has the same eight-request ceiling and zero scientific allowance.
 Its exact external destination, source files, case fields and exclusions are in
 `evidence/integration_research_next/provider_payload_review.json`.
+
+### Completed bounded cohort and actual cost
+
+The public-only replacement passed automatic review and completed eight real
+requests with eight confirmed HTTP 200 responses. Scientific worker, physics,
+Reporter and formal Study counts were all zero. Sanitized results and original
+ledger counters are in `evidence/integration_research_next/flash_pro_decisions.json`;
+raw request/response bytes and SDK state remain in ignored `runs/`.
+
+| Case | Model | Requests | Prompt | Completion | Total | Observed decision |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| BF5 failed baseline | Flash | 2 | 10,166 | 331 | 10,497 | No Plan within cap |
+| BF5 failed baseline | Pro | 2 | 10,474 | 4,363 | 14,837 | DIAGNOSE rejected: extra outer `plan` |
+| BF6 incomplete | Pro | 2 | 8,020 | 3,792 | 11,812 | DIAGNOSE passes partial contract |
+| BF6 incomplete | Flash | 2 | 8,309 | 725 | 9,034 | No Plan within cap |
+| Total | | 8 | 36,969 | 9,211 | 46,180 | |
+
+Flash used 19,531 total tokens and Pro 26,649. Provider-reported prompt cache hits
+were 21,120 tokens, misses 15,849; completion reasoning tokens were 6,859
+(included in completion totals, not added again). Billed currency was not
+returned and remains unknown, not zero. Cache state and actual order were not
+controlled, so these are observed costs rather than a normalized cost ranking.
+
+Three cases initially failed before sending because SDK snapshot paths exceeded
+Windows path limits. Their zero-send failures are retained as Store events. The
+local repair shortens SDK session paths and permits explicit recovery only for
+recorded zero-send outcomes, using the same grants without resetting budgets.
+The already sent BF6 Flash case was reused without another request. Actual send
+order was BF6 Flash, BF5 Flash, BF5 Pro, BF6 Pro. Frozen input and request ceilings
+were unchanged; there was no paid retry or unknown send.
+
+All four invocations subsequently attempted a third model request after tool
+feedback. The original ledger rejected it with `PROVIDER_COUNT_EXHAUSTED` and
+`sent=false`. The SDK surfaced `EventLoopException: Connection error.`; retained
+HTTP receipts establish that these were request-limit stops, not eight failed
+responses. No final prose follow-up was obtained. The runner now reports this
+stop separately while retaining the original Harness error.
+
+Legality and evidence review:
+
+- BF5 Flash made two valid evidence reads and one invalid `fields` query without
+  the required nonempty field list. No decision was observed, so evidence
+  understanding is unassessed.
+- BF5 Pro read the summary and described `valid_failure`, missing error magnitudes
+  and absent passing SELECT evidence. Its outer `plan` wrapper violated the
+  advertised production schema, so it is not a valid decision. The content also
+  overstates DIAGNOSE as the only available action, and its `empirical_search`
+  inference label does not describe a read-only review.
+- BF6 Pro made a valid full read and a Plan passing schema/reference/intent
+  checks. It explicitly treats incomplete/null acceptance as neither success nor
+  structural infeasibility and requests zero science budget. Full scientific
+  admission and detailed load/contact understanding are not established.
+- BF6 Flash made three valid static reads and a `capabilities` query that the
+  production EvidenceQuery schema allowed but this isolated probe rejected.
+  That rejection is a probe advertisement defect, not an Agent legality error.
+  No Plan was observed within the cap.
+
+The post-run correction restricts the advertised EvidenceQuery view enum to the
+four supported static views, reusing the same schema and reader. One mock-HTTP
+Harness/ledger regression passed after the short-path and schema corrections;
+it verifies zero scientific dispatch. No paid cohort was repeated. Published
+observations retain the original live schema defect and actual order, and do
+not support a model ranking. The scalar BF6 input also omits a complete frozen
+TaskDefinition and trajectories, so this comparison cannot establish full
+oriented Tracking or per-step no-contact reasoning capability.

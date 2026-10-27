@@ -94,27 +94,40 @@ def tools_for(host,case,reference,rows):
                 row.update(contract='rejected',error=str(exc));save(host,row,'probe_tool_check');rows.append(row)
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(row))])
         return run
+    evidence_schema=EvidenceQuery.model_json_schema()
+    evidence_schema['properties']['view']['enum']=['full','summary','fields','range']
     tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),handle(name))
-        for name,description,schema in [('evidence_read','Read the committed public summary with production pointer/view semantics',EvidenceQuery.model_json_schema()),
+        for name,description,schema in [('evidence_read','Read the committed public summary with production pointer/view semantics',evidence_schema),
             ('research_plan','Validate a read-only production decision; never execute',plan_schema(['diagnose','stop','select'],decision_required=True))]]
     return tools
 
 
 
-async def run_case(folder,frozen,case_id,model,transport=None):
+async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=False):
     destination=folder/(case_id+'-'+model)
-    if (destination/'summary.json').exists():return read(destination/'summary.json')
-    if (destination/'platform.sqlite').exists():raise ValueError('EXISTING_PROBE_REQUIRES_RECORDED_OUTCOME_RECOVERY_NO_AUTOMATIC_RESEND')
+    previous=read(destination/'summary.json') if (destination/'summary.json').exists() else None
+    if previous and (not recover_unsent or previous['actual_requests']):return previous
+    existing=(destination/'platform.sqlite').exists()
+    if existing and not (recover_unsent and previous and previous['actual_requests']==0):
+        raise ValueError('EXISTING_PROBE_REQUIRES_RECORDED_OUTCOME_RECOVERY_NO_AUTOMATIC_RESEND')
     protocol=frozen['protocol'];provider=deepcopy(frozen['provider'])
     provider.update(model=model,max_tokens=protocol['max_tokens'],thinking=protocol['thinking'],reasoning_effort=protocol['reasoning_effort'])
     host=SimpleNamespace(store=Store(destination),run_id='probe-'+folder.name+'-'+case_id+'-'+model)
+    short_session=case_id[:3]+('-p' if model.endswith('pro') else '-f')
     project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id,authorization_source=protocol['authorization'],
         budget=dict(model_calls=protocol['requests_per_case_model'],tool_calls=0,worker_calls=0,backend_solves=0,wall_s=None),
         exclusive_resources={'provider_request':1})
-    host.store.create(project)
-    host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='Provider-only comparison; no Study'))
-    update(host,spec=dict(mode='engineering_numerical',research_decisions=dict(context_limits={'evidence':3})),
-        pilot=dict(provider=provider,live_model_requests=0,framework_session_id=host.run_id))
+    if not existing:
+        host.store.create(project)
+        host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='Provider-only comparison; no Study'))
+        update(host,spec=dict(mode='engineering_numerical',research_decisions=dict(context_limits={'evidence':3})),
+            pilot=dict(provider=provider,live_model_requests=0,framework_session_id=short_session))
+    else:
+        current=state(host)
+        if host.store.remaining()['used']['model_calls'] or current['pilot'].get('unconsumed_response'):
+            raise ValueError('UNSENT_RECOVERY_REQUIRES_ZERO_ACTUAL_REQUESTS')
+        save(host,previous,'probe_pre_send_storage_failure_retained')
+        update(host,pilot={**current['pilot'],'framework_session_id':short_session})
     case=frozen['cases'][case_id];reference=save(host,case['evidence'],'probe_frozen_evidence');rows=[]
     packet=dict(case_id=case_id,evidence_reference=reference,task=case.get('task'),
         scientific_budget=0,scope='Read the frozen evidence, then submit a typed decision or proposal and explain its scope.')
@@ -123,20 +136,23 @@ async def run_case(folder,frozen,case_id,model,transport=None):
         agent=build_harness(host,transport=boundary,api_key='offline-fixture' if transport else os.environ['DEEPSEEK_API_KEY'],
             instructions=frozen['instructions'],model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),
             research_tools=tools_for(host,case,reference,rows),configuration_path=destination/'framework.json',
-            session_directory=destination/'sdk')
+            session_directory=folder/'sdk'/short_session,session_id=short_session)
         await agent.invoke_async(json.dumps(packet,ensure_ascii=False))
     except Exception as exc:error=type(exc).__name__+': '+str(exc)[:300]
     finally:await boundary.aclose()
     usage=provider_usage(host)
     assert not any(usage['provider_ledger']['used'][k] for k in ('backend_solves','worker_calls','tool_calls'))
-    summary=dict(case_id=case_id,model=model,tool_checks=rows,termination=error or 'completed',
+    rejections=[host.store.artifact(e['outputs'][0])['reason'] for e in host.store.events(host.run_id)
+        if e['kind']=='r3_send_rejected']
+    termination='request_limit_reached' if error and rejections and rejections[-1]=='PROVIDER_COUNT_EXHAUSTED' else error or 'completed'
+    summary=dict(case_id=case_id,model=model,tool_checks=rows,termination=termination,harness_error=error,
         scientific_workers=0,physics_steps=0,reporter_requests=0,formal_studies=0,
         scientific_admission='not_tested_zero_allowance',**usage)
     atomic_json(destination/'summary.json',summary)
     return summary
 
 
-async def main(live=False):
+async def main(live=False,recover_unsent=False):
     frozen=freeze()
     if not live:print(json.dumps(dict(status='frozen',request_ceiling=8,science_workers=0)));return
     load_credential(Path(frozen['credentials_reference']).expanduser())
@@ -144,7 +160,7 @@ async def main(live=False):
     for index,case in enumerate(frozen['protocol']['cases']):
         models=frozen['protocol']['models'][::1 if index==0 else -1]
         for model in models:
-            results.append(await run_case(OUT,frozen,case,model))
+            results.append(await run_case(OUT,frozen,case,model,recover_unsent=recover_unsent))
             atomic_json(OUT/'summary.json',dict(status='running',results=results))
     summary=dict(status='completed',results=results,science_workers=0,physics_steps=0,
         actual_requests=sum(r['actual_requests'] for r in results),
@@ -155,4 +171,5 @@ async def main(live=False):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--live',action='store_true')
-    asyncio.run(main(parser.parse_args().live))
+    parser.add_argument('--recover-unsent',action='store_true')
+    args=parser.parse_args();asyncio.run(main(args.live,args.recover_unsent))

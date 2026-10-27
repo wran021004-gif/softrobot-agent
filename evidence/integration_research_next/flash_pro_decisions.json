@@ -1,0 +1,332 @@
+{
+  "version": "provider_decision_public_only_v1",
+  "date": "2026-10-27",
+  "status": "bounded_cohort_finished",
+  "provider": "DeepSeek",
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "live_runner_base": "d1fa8c2cb",
+  "live_local_repair": "Short SDK paths and explicit zero-send recovery, retained in the follow-up commit.",
+  "actual_requests": 8,
+  "confirmed_responses": 8,
+  "usage": {
+    "prompt_tokens": 36969,
+    "completion_tokens": 9211,
+    "total_tokens": 46180,
+    "prompt_cache_hit_tokens": 21120,
+    "prompt_cache_miss_tokens": 15849,
+    "reasoning_tokens": 6859
+  },
+  "money": null,
+  "money_status": "Provider response supplies token/cache counters but no billed currency; unknown is not zero.",
+  "by_model": {
+    "deepseek-flash": {
+      "actual_requests": 4,
+      "confirmed_responses": 4,
+      "usage": {
+        "prompt_tokens": 18475,
+        "completion_tokens": 1056,
+        "total_tokens": 19531,
+        "prompt_cache_hit_tokens": 12032,
+        "prompt_cache_miss_tokens": 6443,
+        "reasoning_tokens": 225
+      },
+      "money": null
+    },
+    "deepseek-v4-pro": {
+      "actual_requests": 4,
+      "confirmed_responses": 4,
+      "usage": {
+        "prompt_tokens": 18494,
+        "completion_tokens": 8155,
+        "total_tokens": 26649,
+        "prompt_cache_hit_tokens": 9088,
+        "prompt_cache_miss_tokens": 9406,
+        "reasoning_tokens": 6634
+      },
+      "money": null
+    }
+  },
+  "results": [
+    {
+      "case_id": "bf5_failed_baseline",
+      "model": "deepseek-flash",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 10166,
+        "completion_tokens": 331,
+        "total_tokens": 10497,
+        "prompt_cache_hit_tokens": 8192,
+        "prompt_cache_miss_tokens": 1974,
+        "reasoning_tokens": 23
+      },
+      "money": null,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 3.3760000000038417
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "termination": "request_limit_reached",
+      "original_harness_error": "EventLoopException: Connection error.",
+      "blocked_additional_sends": 1,
+      "retained_pre_send_storage_failures": 1,
+      "tool_checks": {
+        "total": 3,
+        "valid": 2,
+        "rejected": 1
+      },
+      "review": {
+        "observed_decision": "none_within_two_requests",
+        "evidence_understanding": "not_assessable_without_a_decision",
+        "legality": "One fields read omitted the required nonempty fields; two reads passed."
+      }
+    },
+    {
+      "case_id": "bf5_failed_baseline",
+      "model": "deepseek-v4-pro",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 10474,
+        "completion_tokens": 4363,
+        "total_tokens": 14837,
+        "prompt_cache_hit_tokens": 5120,
+        "prompt_cache_miss_tokens": 5354,
+        "reasoning_tokens": 3638
+      },
+      "money": null,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 47.23399999999674
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "termination": "request_limit_reached",
+      "original_harness_error": "EventLoopException: Connection error.",
+      "blocked_additional_sends": 1,
+      "retained_pre_send_storage_failures": 1,
+      "tool_checks": {
+        "total": 2,
+        "valid": 1,
+        "rejected": 1
+      },
+      "review": {
+        "observed_decision": "diagnose_rejected_outer_plan_wrapper",
+        "evidence_understanding": "Content distinguishes valid_failure, missing error magnitudes and unavailable successful SELECT evidence. It does not establish structural infeasibility. Its claim that DIAGNOSE is the only permissible next action is too strong; STOP was also offered. claimed_inference=empirical_search does not describe the read-only review.",
+        "legality": "Evidence summary read passed; research_plan incorrectly wrapped the production Plan in a plan property. Not counted as a valid decision."
+      }
+    },
+    {
+      "case_id": "bf6_incomplete",
+      "model": "deepseek-v4-pro",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 8020,
+        "completion_tokens": 3792,
+        "total_tokens": 11812,
+        "prompt_cache_hit_tokens": 3968,
+        "prompt_cache_miss_tokens": 4052,
+        "reasoning_tokens": 2996
+      },
+      "money": null,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 40.375
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "termination": "request_limit_reached",
+      "original_harness_error": "EventLoopException: Connection error.",
+      "blocked_additional_sends": 1,
+      "retained_pre_send_storage_failures": 1,
+      "tool_checks": {
+        "total": 2,
+        "valid": 2,
+        "rejected": 0
+      },
+      "review": {
+        "observed_decision": "diagnose_valid_partial_contract",
+        "evidence_understanding": "Explicitly distinguishes incomplete/null acceptance from success or structural infeasibility, cites the visible evidence and requests zero science budget. Does not independently analyze the load/contact protocol.",
+        "legality": "Evidence full read and Plan schema/reference/intent checks passed. Full scientific admission was not tested."
+      }
+    },
+    {
+      "case_id": "bf6_incomplete",
+      "model": "deepseek-flash",
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 8309,
+        "completion_tokens": 725,
+        "total_tokens": 9034,
+        "prompt_cache_hit_tokens": 3840,
+        "prompt_cache_miss_tokens": 4469,
+        "reasoning_tokens": 202
+      },
+      "money": null,
+      "scientific_workers": 0,
+      "physics_steps": 0,
+      "reporter_requests": 0,
+      "formal_studies": 0,
+      "scientific_admission": "not_tested_zero_allowance",
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 4.3439999999973224
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "termination": "request_limit_reached",
+      "original_harness_error": "EventLoopException: Connection error.",
+      "blocked_additional_sends": 1,
+      "retained_pre_send_storage_failures": 0,
+      "tool_checks": {
+        "total": 4,
+        "valid": 3,
+        "rejected": 1
+      },
+      "review": {
+        "observed_decision": "none_within_two_requests",
+        "evidence_understanding": "not_assessable_without_a_decision",
+        "legality": "Three static evidence reads passed. A capabilities view was schema-valid but rejected by this probe; this is a probe advertisement defect, not an Agent contract error."
+      }
+    }
+  ],
+  "science_workers": 0,
+  "physics_steps": 0,
+  "reporter_requests": 0,
+  "current_C_Study_accessed": false,
+  "original_automatic_review_rejection": {
+    "process_created": false,
+    "provider_requests": 0
+  },
+  "public_only_replacement": "Approved by automatic review; original committed public inputs retained.",
+  "recovery": {
+    "pre_send_storage_failures": 3,
+    "provider_requests_in_those_failures": 0,
+    "same_original_grants": true,
+    "budget_reset": false,
+    "paid_attempt_resent": false
+  },
+  "limitations": [
+    "Two cases and two requests per case/model are insufficient for model ranking or scientific performance claims.",
+    "All four invocations exhausted their original request limit after tool feedback; no final prose follow-up was obtained. The SDK surfaced Connection error although each of eight requests has a confirmed HTTP 200 response; the additional send in each case was blocked before network I/O.",
+    "The live EvidenceQuery schema advertised dynamic views even though the probe only implemented static reads; BF6 Flash capabilities rejection is an interface confound. The subsequent code restricts the advertised enum; this cohort is not rerun or relabeled as having used the correction.",
+    "The BF6 public case contains scalar status/cost/load facts, without a complete frozen BF6 TaskDefinition or trajectories. It does not test full oriented-tracking or per-step contact understanding.",
+    "Validation intercepts proposals only. No scientific eligibility, generation, initialization, solve, replay, SELECT or STOP is executed.",
+    "No raw Provider reasoning, credentials, candidate/control or private research Store content is published."
+  ],
+  "actual_case_model_send_order": [
+    [
+      "bf6_incomplete",
+      "deepseek-flash"
+    ],
+    [
+      "bf5_failed_baseline",
+      "deepseek-flash"
+    ],
+    [
+      "bf5_failed_baseline",
+      "deepseek-v4-pro"
+    ],
+    [
+      "bf6_incomplete",
+      "deepseek-v4-pro"
+    ]
+  ],
+  "post_run_corrections": [
+    "Advertised EvidenceQuery enum restricted to supported static views; no paid rerun.",
+    "Request-limit termination classified from original sent=false ledger rejection, retaining Harness error."
+  ]
+}

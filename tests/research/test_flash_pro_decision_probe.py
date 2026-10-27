@@ -16,6 +16,8 @@ class ProviderProbeTests(unittest.TestCase):
         calls=[]
         def reply(request):
             wire=json.loads(request.content);calls.append(wire)
+            evidence=next(t['function']['parameters'] for t in wire['tools'] if t['function']['name']=='evidence_read')
+            self.assertEqual(set(evidence['properties']['view']['enum']),{'full','summary','fields','range'})
             message=dict(role='assistant',content='Incomplete does not establish a pass.')
             if len(calls)==1:
                 message.update(content=None,tool_calls=[dict(id='fixture-plan',type='function',
