@@ -133,9 +133,16 @@ class AdmissionTests(unittest.TestCase):
     def test_new_study_requires_typed_decision(self):
         with self.assertRaisesRegex(ValueError,'DECISION_REQUIRED'):admit_decision(self.host,plan())
 
-    def test_forged_reference_and_global_claim_rejected(self):
+    def test_forged_reference_rejected_and_unsupported_experiment_claim_annotated(self):
         with self.assertRaisesRegex(ValueError,'UNREGISTERED'):admit_decision(self.host,plan(decision=decision(),supporting_evidence=[self.ref]))
-        with self.assertRaisesRegex(ValueError,'INFERENCE_NOT_SUPPORTED'):admit_decision(self.host,plan(decision=decision(inference='structural_infeasibility')))
+        proposal=plan(decision=decision(inference='structural_infeasibility'))
+        result=admit_decision(self.host,proposal)
+        self.assertEqual(result['inference_status'],'unsupported_inference')
+        self.assertEqual(result['execution_basis'],'empirical_experiment')
+        self.assertEqual(proposal.decision.claimed_inference,'structural_infeasibility')
+        self.assertFalse(result['prospective_guarantee'])
+        with self.assertRaisesRegex(ValueError,'INFERENCE_NOT_SUPPORTED'):
+            admit_decision(self.host,plan('stop',decision=decision('STOP',inference='structural_infeasibility')))
         self.host.store.reserve.assert_not_called()
 
     def test_legal_exploration_needs_no_certificate(self):

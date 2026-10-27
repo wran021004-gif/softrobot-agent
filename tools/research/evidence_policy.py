@@ -276,7 +276,13 @@ def admit_decision(host,plan):
             if d.claimed_inference!='empirical_search' and cfg and any(source_cfg['policy'][k]!=cfg['policy'][k] for k in ('backend','discretization','dynamics_model')):
                 raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
         summaries.append(summary)
-    if d.claimed_inference!='empirical_search' and not any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries):
+    supported=d.claimed_inference=='empirical_search' or any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries)
+    if not supported and plan.action in ('select','confirm','stop'):
         raise ValueError('INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: '+d.claimed_inference)
-    return dict(version=d.version,claimed_inference=d.claimed_inference,
+    result=dict(version=d.version,claimed_inference=d.claimed_inference,
         resolved_evidence=[v['evidence_reference'] for v in summaries],prospective_guarantee=False)
+    if not supported:
+        result.update(inference_status='unsupported_inference',execution_basis='empirical_experiment',
+            scope='The original claim is retained as an unsupported hypothesis, not a scientific fact. '
+                'Its interpretation does not veto this experiment; all identity, authorization, applicability and resource checks still apply.')
+    return result

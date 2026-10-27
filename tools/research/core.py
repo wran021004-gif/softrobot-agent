@@ -49,6 +49,9 @@ def read_evidence(host, query, *, record_read=True):
             from tools.research.evidence_views import result_card
             from tools.research.research_context import mathematical_decision_view
             derived=dict(mathematical_decision_view=mathematical_decision_view(plain(result_card(host,plain(q.reference)))))
+        elif q.pointer=='/controller_capabilities' or q.pointer.startswith('/controller_capabilities/'):
+            from tools.research.research_context import controller_capabilities
+            derived=dict(controller_capabilities=controller_capabilities(host))
         elif q.pointer=='/historical_execution_files' or q.pointer.startswith('/historical_execution_files/'):
             from tools.research.numerics import execution_source, archived
             entry=next((e for e in s['spec']['research_decisions'].get('background',[]) if e['reference']==plain(q.reference)),None)
@@ -588,12 +591,15 @@ def dispatch(host, value, request_id, origin='model'):
                 result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
             result['execution_feedback']=dict(status='local_diagnostic_completed' if plan.diagnostic else 'read_only_diagnosis_completed',
                 new_scientific_computations=state(host).get('local_solves',0)-s.get('local_solves',0),
-                selected_method_status='intent_only; not dispatched by diagnose')
+                selected_method_status='intent_only; not dispatched by diagnose',
+                executable_request_submitted=plan.diagnostic is not None)
             candidate=plain(plan.decision.selected_candidate) if plan.decision else None
-            if candidate:
+            if not plan.diagnostic:
                 result['execution_feedback']['execution_entry']=dict(tool='research_analysis',
-                    methods_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/methods'),
-                    request='Use the chosen registered method request_template and required_parameters; normal admission and budget checks apply.')
+                    methods_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/methods') if candidate else None,
+                    candidate_required=candidate is None,
+                    request='To execute mathematics, choose an owned candidate and submit the registered method request_template with required_parameters. '
+                        'For other actions submit the matching research_plan payload. A method label or requested_budget alone starts no computation.')
         elif plan.action in ('select','confirm'):
             from tools.research.feedback import eligibility, result_view, confirmation_progress
             choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)
@@ -637,6 +643,8 @@ def dispatch(host, value, request_id, origin='model'):
         scientific_results=[r for key in RESULT_KEYS for r in after.get(key,[]) if r not in s.get(key,[])]
         output=dict(plan=ref,result=result,scientific_results=scientific_results,scientific_preflight=scientific_preflight,
             resource_use=resource_use(host))
+        if decision_admission and decision_admission.get('inference_status'):
+            output['inference_assessment']=decision_admission
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),output)
         return output
