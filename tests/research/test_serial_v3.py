@@ -122,10 +122,24 @@ class V3RoutingTests(unittest.TestCase):
         receipt=analysis.dispatch(self.host,plain(query),'v3-force',guard=lambda *args:None)
         self.assertEqual(receipt['scientific_computation']['status'],'computed',receipt)
         self.assertEqual(state(self.host)['mathematical_evaluations'],1)
+        print('V3_FORCE_FIXTURE_COST',dict(analysis_entries=receipt['charged_analysis_evaluations'],
+            numerical_s=receipt['charged_numerical_s'],worker_started=receipt['scientific_computation']['worker_started'],
+            physics_steps=0,independent_replays=0),flush=True)
         self.assertAlmostEqual(receipt['tendon_force_capability']['directional_support_nm'],expected)
         repeated=analysis.dispatch(self.host,plain(query),'v3-force',guard=lambda *args:None)
         self.assertEqual(repeated['operation_reuse']['additional_analysis_evaluations'],0)
         self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
+
+    def test_force_direction_order_is_recoverable_from_method_catalog(self):
+        from tools.research.task_constraints import mathematical_method_view
+        result=design.generate_candidate(self.host,self.request(),dict(origin='offline_fixture'))
+        self.assertEqual(result['status'],'generated',result)
+        view=mathematical_method_view(self.host,result['candidate'])['methods']['tendon_force_capability_v1']
+        prereq=view['action_prerequisites']
+        order=core.read_evidence(self.host,prereq['coordinate_order_query'],record_read=False)
+        self.assertEqual(order,view['coordinate_order'])
+        self.assertEqual(len(order),prereq['direction_dimension'])
+        self.assertEqual(view['request_template']['model_source'],'mujoco')
 
     def test_joint_block_projection_and_direction_bounds(self):
         from types import SimpleNamespace
@@ -144,6 +158,23 @@ class V3RoutingTests(unittest.TestCase):
         self.assertEqual(set(changed),set(paths))
         with self.assertRaisesRegex(ValueError,'EMPTY_COUPLED_LENGTH_DOMAIN'):
             adaptive_block_move(request,q,domains,0,.25,{'fixed_total_m':.5})
+
+    def test_v3_parameters_bind_to_existing_multivariable_direction_contract(self):
+        from tools.research.optimal_capability import family_parameters
+        from tools.research.contracts import NonlinearResponseDirection
+        result=design.generate_candidate(self.host,self.request(),dict(origin='offline_fixture'))
+        self.assertEqual(result['status'],'generated',result)
+        candidate=design.verify_candidate(self.host,result['candidate'])
+        spec=deepcopy(self.spec);spec['family_sensitivity_variables']={'version':'family_sensitivity_v2',
+            'variables':['segments.*.length_m','routes.*.segments.*.radius_m']}
+        paths=['segments.0.length_m','routes.1.segments.1.radius_m']
+        values=[family_parameters(spec,candidate,path)[1] for path in paths]
+        self.assertEqual([v['path'] for v in values],paths)
+        self.assertEqual([v['units'] for v in values],['m','m'])
+        refs=[{'artifact_id':ch*64,'media_type':'application/json'} for ch in 'abc']
+        direction=NonlinearResponseDirection(direction_id='fixture',variables={paths[0]:1.,paths[1]:-.1},
+            coordinate_unit='m',coordinates=[0.,-.001,.001],t1_results=refs)
+        self.assertEqual(len(direction.variables),2)
 
     def test_legacy_v2_distal_start_is_not_reinterpreted(self):
         from tools.research.config import resolve

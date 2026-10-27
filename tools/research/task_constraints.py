@@ -125,6 +125,9 @@ def mathematical_method_view(host, reference):
             from extensions.tendon_family.backends import physics_for
             from schemas.platform import SessionInput
             methods[key]['coordinate_order']=physics_for(SessionInput.model_validate(cfg))['dofs']
+            methods[key]['action_prerequisites']=dict(direction_dimension=len(methods[key]['coordinate_order']),
+                coordinate_order_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/tendon_force_capability_v1/coordinate_order'),
+                required_agent_fields=['tendon_force_direction'],unmet=['nonzero_generalized_direction_required'])
             methods[key]['scope']='Initial state only; generalized direction in exact native DOF order. No Cartesian force, dynamic feasibility, or acceptance conclusion.'
         if key=='mujoco_direct_control_v1':
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
