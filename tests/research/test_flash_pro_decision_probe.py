@@ -15,13 +15,14 @@ class ProviderProbeTests(unittest.TestCase):
         with fixture_directory() as folder:
             frozen=probe.freeze_routes(folder)
             protocol=frozen['protocol']
-            self.assertEqual(len(frozen['cases'])*len(protocol['models'])*protocol['requests_per_case_model'],24)
+            self.assertLessEqual(frozen['prior_actual_requests']+len(frozen['cases'])*len(protocol['models'])*protocol['requests_per_case_model'],24)
             self.assertEqual(protocol['science_workers'],0)
             c=probe.read(probe.ROOT/'evidence/integration_research_next/c4_closeout_review.json')
             case=frozen['cases']['fixed_control_stagnation']['evidence']
             self.assertEqual(case['best_metrics'],c['best_metrics'])
             self.assertEqual(case['attempted']['structural_searches'],0)
             math=frozen['cases']['math_without_physics']['evidence']
+            self.assertEqual(frozen['cases']['math_without_physics']['task']['timing']['duration_s'],math['native_prediction']['horizon_s'])
             self.assertGreater(math['native_prediction']['baseline_signed_maximum_excess'],math['native_prediction']['best_signed_maximum_excess'])
             self.assertIn('unmeasured',math['independent_task_acceptance'])
             wire=json.dumps(frozen['cases'])

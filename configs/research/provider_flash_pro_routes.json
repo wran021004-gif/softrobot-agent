@@ -1,8 +1,10 @@
 {
-  "version": "provider_research_routes_v3",
+  "version": "provider_research_routes_v4",
   "models": ["deepseek-flash", "deepseek-v4-pro"],
   "cases": ["fixed_control_stagnation", "math_without_physics", "bf5_failure_bf6_incomplete"],
-  "requests_per_case_model": 4,
+  "requests_per_case_model": 3,
+  "total_request_ceiling_including_invalid_cohort": 24,
+  "prior_invalid_cohort": "runs/flash-pro-routes-v3/interruption.json",
   "max_tokens": 8192,
   "thinking": "enabled",
   "reasoning_effort": "high",

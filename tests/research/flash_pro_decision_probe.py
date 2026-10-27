@@ -19,7 +19,7 @@ from strands.tools.executors import SequentialToolExecutor
 from schemas.platform import ProjectConfig
 from tools.platform_store import Store, plain
 from tools.research.agent import build_harness, LiveBoundary, live_model_class, load_credential, error_feedback
-from tools.research.config import ROOT, resolve
+from tools.research.config import ROOT, resolve, _reference
 from tools.research.contracts import EvidenceQuery, Plan, PLAN_RESEARCH_INTENTS
 from tools.research.core import read_evidence
 from tools.research.state import state, update, save
@@ -27,7 +27,7 @@ from tools.state_io import atomic_json, read
 from tests.research.agent_math_decision_probe import provider_usage, decision_schema
 
 OUT=ROOT/'runs/flash-pro-public-v2'
-ROUTE_OUT=ROOT/'runs/flash-pro-routes-v3'
+ROUTE_OUT=ROOT/'runs/flash-pro-routes-v4'
 INSTRUCTIONS=('You are the public Softrobot research decision Agent in an independent read-only comparison. '
     'Use the frozen task and visible evidence to choose the next decision, explain what it establishes and '
     'what remains unknown. Submit one typed diagnose/stop research_plan decision, then finish with a short assessment. '
@@ -74,7 +74,15 @@ def freeze_routes(folder=ROUTE_OUT):
     if (folder/'frozen.json').exists():return read(folder/'frozen.json')
     public=freeze();protocol=read(ROOT/'configs/research/provider_flash_pro_routes.json')
     evidence=read(ROOT/'tests/research/fixtures/research_route_public.json')
-    ctask=resolve(ROOT/'configs/research/study_c3_math_search_ab.json')['canonical_task']
+    source=evidence['c_task_source']
+    ctask=_reference(ROOT/source['file'],'task',dict(references={}))['task']
+    ctask['initializer']['parameters']['data']=dict(rule=source['candidate_initialization'])
+    if ctask['timing']['duration_s']!=evidence['math_without_physics']['native_prediction']['horizon_s']:
+        raise ValueError('FROZEN_EVIDENCE_TASK_HORIZON_MISMATCH')
+    prior=ROOT/protocol['prior_invalid_cohort']
+    prior_requests=read(prior)['actual_requests'] if prior.exists() else 0
+    if prior_requests+len(protocol['cases'])*len(protocol['models'])*protocol['requests_per_case_model']>protocol['total_request_ceiling_including_invalid_cohort']:
+        raise ValueError('CUMULATIVE_PROVIDER_PROBE_REQUEST_CEILING')
     cases={k:dict(task=ctask,evidence=evidence[k]) for k in ('fixed_control_stagnation','math_without_physics')}
     cases['bf5_failure_bf6_incomplete']=dict(evidence=dict(
         bf5=public['cases']['bf5_failed_baseline']['evidence'],bf6=public['cases']['bf6_incomplete']['evidence'],
@@ -87,7 +95,7 @@ def freeze_routes(folder=ROUTE_OUT):
         'Do not recount inline facts through repeated reads. Final assessment should be concise. '
         'Actual Provider requests and Token cost come only from receipts, including the request producing your final answer.')
     frozen=dict(protocol=protocol,provider=public['provider'],credentials_reference=public['credentials_reference'],
-        instructions=instructions,cases=cases)
+        instructions=instructions,cases=cases,prior_actual_requests=prior_requests)
     folder.mkdir(parents=True,exist_ok=True);atomic_json(folder/'frozen.json',frozen)
     return frozen
 

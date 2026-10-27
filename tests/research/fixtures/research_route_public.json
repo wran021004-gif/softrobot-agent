@@ -1,5 +1,6 @@
 {
   "version": "public_route_decision_evidence_v1",
+  "c_task_source": {"file": "tasks/reach_hold_b3_050.json", "candidate_initialization": "all_candidate_dofs_zero_v1", "source_commit": "da096fc0b", "source_configuration": "configs/research/study_c4_coldstart.json"},
   "fixed_control_stagnation": {
     "source": "evidence/integration_research_next/c4_closeout_review.json",
     "evidence_kind": "committed sanitized closeout observations",
@@ -21,7 +22,7 @@
     "temporal_scope": "Only the first affine result and first Native optimization, before its independent replay. Later results and C final outcome are withheld in this case.",
     "question": "What has the mathematical improvement established, and which next research action or diagnosis is justified before claiming physical success?",
     "affine": {"method": "sampled-affine-conic-minimax-v1", "signed_sampled_violation": -0.19999999999872117, "numerical_feasibility": "sampled_feasible_witness", "strict_optimality": "unavailable", "scope": "Frozen local affine model and analyzed samples only"},
-    "native_prediction": {"model": "model.mujoco_native@1.0.0", "baseline_signed_maximum_excess": 2.8074662612210153, "best_signed_maximum_excess": 0.13310089806714465, "best_holding_error_m": 0.011331008980671447, "best_holding_speed_m_s": 0.022221921080796632, "best_terminal_error_m": 0.010698760524348743, "stop_reason": "iteration_limit", "internal_rollouts": 77, "physics_steps": 77000},
+    "native_prediction": {"model": "model.mujoco_native@1.0.0", "horizon_s": 0.5, "baseline_signed_maximum_excess": 2.8074662612210153, "best_signed_maximum_excess": 0.13310089806714465, "best_holding_error_m": 0.011331008980671447, "best_holding_speed_m_s": 0.022221921080796632, "best_terminal_error_m": 0.010698760524348743, "stop_reason": "iteration_limit", "internal_rollouts": 77, "physics_steps": 77000},
     "independent_task_acceptance": "unmeasured at this temporal boundary",
     "available_proposals": ["independent full physical_replay after bound control initialization/admission", "further bounded control or structure optimization with a stated hypothesis", "Reporter diagnosis of existing math scope", "scoped STOP with rationale"],
     "unknowns": ["No independent physical pass", "No proof of global feasibility, infeasibility or optimality", "Native integration costs are distinct from independent launch counts"]

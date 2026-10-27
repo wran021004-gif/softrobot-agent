@@ -93,13 +93,13 @@ fixed expected configuration digest: the P1 baseline produces the same current
 value (`a6446a...`) as P2, rather than the historical `31af3e...`. Recorded only;
 no unrelated identity semantics or test expectation is changed.
 
-## Flash/Pro v3 protocol
+## Flash/Pro corrected v4 protocol
 
 Reuse `tests/research/flash_pro_decision_probe.py --routes`, production Harness,
 Plan projection, error feedback and settled Provider ledger. New independent
-output is `runs/flash-pro-routes-v3`; v1/v2 inputs, receipts and costs stay sealed.
-`provider_flash_pro_routes.json` bounds six case/model runs to four requests each,
-including corrections and final prose (24 total). Sequential order alternates
+output is `runs/flash-pro-routes-v4`; prior inputs, receipts and costs stay sealed.
+`provider_flash_pro_routes.json` bounds six case/model runs to three requests each,
+including corrections and final prose (18 new maximum). Sequential order alternates
 Flash/Pro, Pro/Flash, Flash/Pro. Zero science/Reporter allowance; handlers intercept
 every proposal, and full scientific admission is explicitly untested.
 
@@ -118,3 +118,14 @@ attempted calls. Compare justified alternatives, unsupported causes/conclusions,
 repeat reads, legality/correction, settled requests and actual Token/cache counts.
 No preferred model, currency estimate, or formal-study performance inference is
 specified in advance.
+
+An initial v3 launch used C3's 0.35 s task beside C4's 0.5 s observations. This
+was an integration-input preparation error, not a model result. Stopped the owned
+Provider process, retained all original Stores/SDK histories, and excluded that
+cohort from ranking. It incurred five actual requests: four confirmed responses
+and one interrupted/unknown request. Known response usage is only a lower bound;
+the unknown send is counted and is not blindly retried or silently refunded.
+V4 uses the exact inherited C4 task via the existing config loader; its canonical
+task identity matches C's committed audit. Added a task/evidence horizon check.
+The remaining maximum 18 plus prior five is 23, below the overall 24 ceiling;
+freeze checks this cumulative cap. No raw private C artifact was imported.
