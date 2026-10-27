@@ -1,0 +1,729 @@
+{
+  "scope": "Original saved Provider wire and model tool submissions only; no new requests, workers or integrations.",
+  "initial_structure_strategy": "heuristic_generate",
+  "initial_scope": "Frozen heuristic_generate requires the first legal structure to be generated. After that candidate, mathematical structure search is discoverable and authorized.",
+  "family_search": {
+    "max_evaluations": 12,
+    "max_proposals": 16,
+    "method": "bounded_mixed_coordinate_v1",
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ]
+  },
+  "family_sensitivity_variables": {
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "segments.2.length_m",
+      "segments.2.young_pa",
+      "segments.3.length_m",
+      "segments.3.young_pa",
+      "segments.4.length_m",
+      "segments.4.young_pa",
+      "segments.5.length_m",
+      "segments.5.young_pa",
+      "segments.6.length_m",
+      "segments.6.young_pa",
+      "segments.7.length_m",
+      "segments.7.young_pa",
+      "segments.8.length_m",
+      "segments.8.young_pa"
+    ],
+    "version": "family_sensitivity_v1"
+  },
+  "action_counts": {
+    "generate": 3,
+    "initialize_control": 6,
+    "execute": 1,
+    "physical_replay": 3,
+    "control_search": 1,
+    "stop": 2
+  },
+  "analysis_operation_counts": {
+    "task_capability": 2,
+    "mujoco_direct_control_v1": 2,
+    "mujoco_nonlinear_task_capability_v1": 14,
+    "equilibrium": 1
+  },
+  "discovery_checkpoints": [
+    {
+      "request_id": "r3-request-8e8d49c516284680bf49e8c349252d6f",
+      "facts": {
+        "structure_actions": {
+          "generate": {
+            "tool": "research_plan",
+            "action": "generate",
+            "payload": "generation",
+            "version": "serial_family_generation_v2",
+            "required": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count"
+            ]
+          },
+          "analysis": {
+            "tool": "research_analysis",
+            "operation": "task_capability",
+            "candidate": "existing owned candidate required",
+            "capability_method": "sampled-affine-conic-minimax-v1",
+            "protocol": "exact frozen analysis_protocol"
+          },
+          "scope": "All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.",
+          "first_structure_requirement": {
+            "action": "generate",
+            "objective": null,
+            "release": "After first legal generate / supported mathematical search candidate"
+          }
+        }
+      }
+    },
+    {
+      "request_id": "r3-request-62b476cc8dd441738f1b6454a1431c5c",
+      "facts": {
+        "structure_actions": {
+          "generate": {
+            "tool": "research_plan",
+            "action": "generate",
+            "payload": "generation",
+            "version": "serial_family_generation_v2",
+            "required": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count"
+            ]
+          },
+          "search": {
+            "tool": "research_plan",
+            "action": "search",
+            "payload": "search",
+            "version": "family_mixed_search_v1",
+            "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+            "method": "bounded_mixed_coordinate_v1",
+            "required": [
+              "variable_groups",
+              "segment_counts",
+              "tendon_counts",
+              "screening_fidelity",
+              "objective",
+              "operating_point",
+              "max_proposals",
+              "max_evaluations"
+            ],
+            "grant": {
+              "max_evaluations": 12,
+              "max_proposals": 16,
+              "method": "bounded_mixed_coordinate_v1",
+              "segment_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "tendon_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "variable_groups": [
+                "segment_count",
+                "tendon_count",
+                "spans",
+                "lengths",
+                "materials",
+                "sections",
+                "routing"
+              ]
+            },
+            "screening_fidelities": [
+              "coarse",
+              "standard"
+            ],
+            "parameter_blocks": {
+              "lengths": "Segment length in m",
+              "materials": "Young modulus in Pa",
+              "sections": "Section type/dimensions in m",
+              "routing": "Span phase, station, channel angle and radius",
+              "spans": "Consecutive span strategy",
+              "segment_count": "Discrete number of segments",
+              "tendon_count": "Discrete number of channels"
+            },
+            "block_selection": "Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.",
+            "objectives": {
+              "task_violation": "CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged",
+              "target_equilibrium_residual": "Static proxy only; target_equilibrium required",
+              "held_position_min_eigenvalue": "Local held-input drive proxy only; controller_start_input or standardized_initial_pretension"
+            },
+            "omit_legacy_fields": [
+              "variables",
+              "fixed",
+              "evaluation_mode",
+              "protocol",
+              "scoring_window_s"
+            ]
+          },
+          "analysis": {
+            "tool": "research_analysis",
+            "operation": "task_capability",
+            "candidate": "existing owned candidate required",
+            "capability_method": "sampled-affine-conic-minimax-v1",
+            "protocol": "exact frozen analysis_protocol"
+          },
+          "scope": "All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance."
+        },
+        "controlled-capability-sensitivity-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": true,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_parameters",
+          "missing": [
+            "missing_validated_model_stencil"
+          ],
+          "preparation_query": {
+            "reference": {
+              "artifact_id": "add6a2114ea007d90e3679ca2a520cf6b4f0dec4dc84d3159d80842f3a2a3625",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/controlled-capability-sensitivity-v1/readiness"
+          },
+          "preparation_hint": "Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply."
+        },
+        "mujoco-reoptimized-structure-response-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": false,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_comparable_t1_results",
+          "missing": [
+            "three comparable completed T1 results"
+          ]
+        }
+      }
+    },
+    {
+      "request_id": "r3-request-8a5b16c6c7da4303b5cc0061d1258886",
+      "facts": {
+        "structure_actions": {
+          "generate": {
+            "tool": "research_plan",
+            "action": "generate",
+            "payload": "generation",
+            "version": "serial_family_generation_v2",
+            "required": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count"
+            ]
+          },
+          "search": {
+            "tool": "research_plan",
+            "action": "search",
+            "payload": "search",
+            "version": "family_mixed_search_v1",
+            "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+            "method": "bounded_mixed_coordinate_v1",
+            "required": [
+              "variable_groups",
+              "segment_counts",
+              "tendon_counts",
+              "screening_fidelity",
+              "objective",
+              "operating_point",
+              "max_proposals",
+              "max_evaluations"
+            ],
+            "grant": {
+              "max_evaluations": 12,
+              "max_proposals": 16,
+              "method": "bounded_mixed_coordinate_v1",
+              "segment_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "tendon_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "variable_groups": [
+                "segment_count",
+                "tendon_count",
+                "spans",
+                "lengths",
+                "materials",
+                "sections",
+                "routing"
+              ]
+            },
+            "screening_fidelities": [
+              "coarse",
+              "standard"
+            ],
+            "parameter_blocks": {
+              "lengths": "Segment length in m",
+              "materials": "Young modulus in Pa",
+              "sections": "Section type/dimensions in m",
+              "routing": "Span phase, station, channel angle and radius",
+              "spans": "Consecutive span strategy",
+              "segment_count": "Discrete number of segments",
+              "tendon_count": "Discrete number of channels"
+            },
+            "block_selection": "Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.",
+            "objectives": {
+              "task_violation": "CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged",
+              "target_equilibrium_residual": "Static proxy only; target_equilibrium required",
+              "held_position_min_eigenvalue": "Local held-input drive proxy only; controller_start_input or standardized_initial_pretension"
+            },
+            "omit_legacy_fields": [
+              "variables",
+              "fixed",
+              "evaluation_mode",
+              "protocol",
+              "scoring_window_s"
+            ]
+          },
+          "analysis": {
+            "tool": "research_analysis",
+            "operation": "task_capability",
+            "candidate": "existing owned candidate required",
+            "capability_method": "sampled-affine-conic-minimax-v1",
+            "protocol": "exact frozen analysis_protocol"
+          },
+          "scope": "All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance."
+        },
+        "controlled-capability-sensitivity-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": true,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_parameters",
+          "missing": [
+            "missing_validated_model_stencil"
+          ],
+          "preparation_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/controlled-capability-sensitivity-v1/readiness"
+          },
+          "preparation_hint": "Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply."
+        },
+        "mujoco-reoptimized-structure-response-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": false,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_comparable_t1_results",
+          "missing": [
+            "three comparable completed T1 results"
+          ],
+          "request_template_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/mujoco-reoptimized-structure-response-v1",
+            "fields": [
+              "candidate",
+              "operation",
+              "request_template",
+              "required_parameters",
+              "formal_execution_authorized",
+              "missing",
+              "cost_scope",
+              "action_prerequisites"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request_id": "r3-request-e2d33ff5b9a14ee19f58f7e3ed8360cd",
+      "facts": {
+        "structure_actions": {
+          "generate": {
+            "tool": "research_plan",
+            "action": "generate",
+            "payload": "generation",
+            "version": "serial_family_generation_v2",
+            "required": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count"
+            ]
+          },
+          "search": {
+            "tool": "research_plan",
+            "action": "search",
+            "payload": "search",
+            "version": "family_mixed_search_v1",
+            "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+            "method": "bounded_mixed_coordinate_v1",
+            "required": [
+              "variable_groups",
+              "segment_counts",
+              "tendon_counts",
+              "screening_fidelity",
+              "objective",
+              "operating_point",
+              "max_proposals",
+              "max_evaluations"
+            ],
+            "grant": {
+              "max_evaluations": 12,
+              "max_proposals": 16,
+              "method": "bounded_mixed_coordinate_v1",
+              "segment_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "tendon_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "variable_groups": [
+                "segment_count",
+                "tendon_count",
+                "spans",
+                "lengths",
+                "materials",
+                "sections",
+                "routing"
+              ]
+            },
+            "screening_fidelities": [
+              "coarse",
+              "standard"
+            ],
+            "parameter_blocks": {
+              "lengths": "Segment length in m",
+              "materials": "Young modulus in Pa",
+              "sections": "Section type/dimensions in m",
+              "routing": "Span phase, station, channel angle and radius",
+              "spans": "Consecutive span strategy",
+              "segment_count": "Discrete number of segments",
+              "tendon_count": "Discrete number of channels"
+            },
+            "block_selection": "Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.",
+            "objectives": {
+              "task_violation": "CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged",
+              "target_equilibrium_residual": "Static proxy only; target_equilibrium required",
+              "held_position_min_eigenvalue": "Local held-input drive proxy only; controller_start_input or standardized_initial_pretension"
+            },
+            "omit_legacy_fields": [
+              "variables",
+              "fixed",
+              "evaluation_mode",
+              "protocol",
+              "scoring_window_s"
+            ]
+          },
+          "analysis": {
+            "tool": "research_analysis",
+            "operation": "task_capability",
+            "candidate": "existing owned candidate required",
+            "capability_method": "sampled-affine-conic-minimax-v1",
+            "protocol": "exact frozen analysis_protocol"
+          },
+          "scope": "All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance."
+        },
+        "controlled-capability-sensitivity-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": true,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_parameters",
+          "missing": [
+            "missing_validated_model_stencil"
+          ],
+          "preparation_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/controlled-capability-sensitivity-v1/readiness"
+          },
+          "preparation_hint": "Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply."
+        },
+        "mujoco-reoptimized-structure-response-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": false,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_comparable_t1_results",
+          "missing": [
+            "three comparable completed T1 results"
+          ],
+          "request_template_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/mujoco-reoptimized-structure-response-v1",
+            "fields": [
+              "candidate",
+              "operation",
+              "request_template",
+              "required_parameters",
+              "formal_execution_authorized",
+              "missing",
+              "cost_scope",
+              "action_prerequisites"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request_id": "r3-request-d25cd1e6da694e33a761c4c979529533",
+      "facts": {
+        "structure_actions": {
+          "generate": {
+            "tool": "research_plan",
+            "action": "generate",
+            "payload": "generation",
+            "version": "serial_family_generation_v2",
+            "required": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count"
+            ]
+          },
+          "search": {
+            "tool": "research_plan",
+            "action": "search",
+            "payload": "search",
+            "version": "family_mixed_search_v1",
+            "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+            "method": "bounded_mixed_coordinate_v1",
+            "required": [
+              "variable_groups",
+              "segment_counts",
+              "tendon_counts",
+              "screening_fidelity",
+              "objective",
+              "operating_point",
+              "max_proposals",
+              "max_evaluations"
+            ],
+            "grant": {
+              "max_evaluations": 12,
+              "max_proposals": 16,
+              "method": "bounded_mixed_coordinate_v1",
+              "segment_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ],
+              "tendon_counts": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "variable_groups": [
+                "segment_count",
+                "tendon_count",
+                "spans",
+                "lengths",
+                "materials",
+                "sections",
+                "routing"
+              ]
+            },
+            "screening_fidelities": [
+              "coarse",
+              "standard"
+            ],
+            "parameter_blocks": {
+              "lengths": "Segment length in m",
+              "materials": "Young modulus in Pa",
+              "sections": "Section type/dimensions in m",
+              "routing": "Span phase, station, channel angle and radius",
+              "spans": "Consecutive span strategy",
+              "segment_count": "Discrete number of segments",
+              "tendon_count": "Discrete number of channels"
+            },
+            "block_selection": "Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.",
+            "objectives": {
+              "task_violation": "CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged",
+              "target_equilibrium_residual": "Static proxy only; target_equilibrium required",
+              "held_position_min_eigenvalue": "Local held-input drive proxy only; controller_start_input or standardized_initial_pretension"
+            },
+            "omit_legacy_fields": [
+              "variables",
+              "fixed",
+              "evaluation_mode",
+              "protocol",
+              "scoring_window_s"
+            ]
+          },
+          "analysis": {
+            "tool": "research_analysis",
+            "operation": "task_capability",
+            "candidate": "existing owned candidate required",
+            "capability_method": "sampled-affine-conic-minimax-v1",
+            "protocol": "exact frozen analysis_protocol"
+          },
+          "scope": "All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance."
+        },
+        "controlled-capability-sensitivity-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": true,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_parameters",
+          "missing": [
+            "missing_validated_model_stencil"
+          ],
+          "preparation_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/controlled-capability-sensitivity-v1/readiness"
+          },
+          "preparation_hint": "Authorized; model group not prepared. Read allowed variables, bounded h / h/2, generation/model requests and estimated math cost here; other missing items still apply."
+        },
+        "mujoco-reoptimized-structure-response-v1": {
+          "registered": true,
+          "authorized": true,
+          "applicable": false,
+          "executable": false,
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_comparable_t1_results",
+          "missing": [
+            "three comparable completed T1 results"
+          ],
+          "request_template_query": {
+            "reference": {
+              "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods/mujoco-reoptimized-structure-response-v1",
+            "fields": [
+              "candidate",
+              "operation",
+              "request_template",
+              "required_parameters",
+              "formal_execution_authorized",
+              "missing",
+              "cost_scope",
+              "action_prerequisites"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "final_stop": {
+    "decision": {
+      "claimed_inference": "empirical_search",
+      "hypothesis_id": "c4-closeout-frontier-and-damping-limited-failure",
+      "requested_budget": 0,
+      "research_intent": "STOP",
+      "selected_candidate": {
+        "artifact_id": "829a9acff8a85810b31de1dbf0a41b8c58900504ee20f5496f1fb75cde5556cf",
+        "media_type": "application/json"
+      },
+      "selected_method": "stop_with_remaining_scientific_uncertainty",
+      "selected_variables": [],
+      "version": "research_decision_v1"
+    },
+    "stopping_condition": "Study closed. Exploration terminated without a passing execution because no complete fresh independent final-fidelity evaluation of any candidate-bound source satisfied both original holding limits, and no remaining authorized mechanism offered a materially different route to the boundary within the frozen grants and remaining budget. The original task acceptance remains unmeasured and unpassed; no further confirmations, retries, transfers, resets or extensions are requested.",
+    "interpretation": "Outcome: no pass, no selection, study closed without claiming structural or global infeasibility. All 22 fresh results are cited in supporting_evidence and explained here. Physical final-fidelity evaluations: 668abfa3 (0.010425378 m, 0.020842103 m/s); 5130395b (position 0.009283115 m passes, speed 0.031142964 m/s fails); 9d622680 (0.011125787 m, 0.027283306 m/s, terminal 0.010907002 m fails); b2526dcb (0.010417454 m, 0.024756923 m/s); ecba8d8e (best valid: 0.010309570 m and 0.020624822 m/s, both violated; samples at 0.45 s give error 0.010309570 m with speed 0.014201694 m/s, at 0.47 s speed 0.020624822 m/s, at 0.50 s speed 0.020616766 m/s). Feedback execution: 8a5e746f (NMPC closed loop: holding position 0.004339182 m passes, terminal 0.003301097 m passes, speed 0.076149325 m/s fails, 5 deadline misses, real-time not demonstrated). Search receipts: d8aa43b3 (physical response search, predicted improvement 0.011657 against realized 0.011297). Mathematical results: 29574ad1 (sampled-affine-conic-minimax task capability), 437cad5d, c5dbcc8f, b8855273 (native sequence predictions), f199adb2 (native search from fff39986: initial_J equals J equals 0.0312410769054432, improvement 0.0, 101 callbacks, 101000 physics steps, worst holding_max_speed 0.020624821538108865 at 0.47 s), 82b8a363 (bounded static target input [0.5499,4.9780,0.0429,0.1896,0.0218,4.4785] N with residual 8.96e-10 m), 210d92ae (authored smoothstep hold: native window speed 0.222192789 m/s at 0.5 s, 11x limit, improvement 0.062457 from initial_J 10.172096606), 0b34f8b7 (anchored monotone-unload variant: native window speed 0.047081736 m/s, initial_J 1.441805167 to J 1.354086807). Supporting bookkeeping artifacts ab17dcd6, efe12762, 67c00865, a672542a, f1f237dd, 29e48919, e4ea0c5c are also cited. No training was run, so no RL summary exists; the RL routes were judged unusable at 32768 total actions for a task whose best hand-engineered schedule misses by 3 percent. Remaining scientific uncertainty, stated rather than resolved: a different structure, the controller-only weights holding_tip_speed_weight and terminal_tip_speed_weight that would require a new candidate identity, the exhausted offline NLP allowance, and any parameterization or solver outside the frozen grants remain untested; finite search failure is not structural infeasibility, fixed-control sensitivity is not reoptimized capability, and no hardware, robustness, repeatability, optimality or cross-task claim follows from this study."
+  },
+  "observation": "No submitted structural search or structural sensitivity analysis. Remaining scientific allowances are positive; finite fixed-structure failures do not eliminate structural alternatives."
+}
