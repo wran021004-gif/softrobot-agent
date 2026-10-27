@@ -1,0 +1,332 @@
+{
+  "stage": "BF6-R3",
+  "analysis": {
+    "artifact_id": "d14e6fdb2ade95c3c2527a52a86397728e70b3b91893c2c4d5f4efca7aaf4d41",
+    "media_type": "application/json"
+  },
+  "analysis_status": "computed",
+  "prior_stable_replay": {
+    "artifact_id": "b63d55b09ccccef42cdae029f2232e9fa8c33484bc6e688ab6a1f130f0f3c286",
+    "media_type": "application/json"
+  },
+  "native_cost": {
+    "completed_response_steps": 6,
+    "forward_evaluations": 9212,
+    "kernel_wall_s": 8.710307300003478,
+    "mechanics_evaluations": 0,
+    "model_builds": 1,
+    "optimization_evaluations": 151,
+    "optimization_iterations": 6,
+    "physics_step_attempts": 90600,
+    "physics_steps": 90600,
+    "rollouts": 151
+  },
+  "callbacks": 151,
+  "baseline_measure": {
+    "component_signed_excess": {
+      "position": 7.129854789664503,
+      "tool_axis": 2.719388330165369
+    },
+    "max_position_error_m": 0.09755825747597403,
+    "max_tool_axis_angle_error_rad": 0.6491557252163962,
+    "normalized_gap": 7.129854789664503,
+    "signed_maximum_excess": 7.129854789664503,
+    "sum_normalized_excess": 126.85956927653434
+  },
+  "best_measure": {
+    "component_signed_excess": {
+      "position": 0.8957115588773419,
+      "tool_axis": 0.883477745371507
+    },
+    "max_position_error_m": 0.022748538706528102,
+    "max_tool_axis_angle_error_rad": 0.32872888044772186,
+    "normalized_gap": 0.8957115588773419,
+    "signed_maximum_excess": 0.8957115588773419,
+    "sum_normalized_excess": 36.897793020353475
+  },
+  "search_stop": "iteration_limit",
+  "native_tool_binding": {
+    "body": "payload",
+    "com_local_m": [
+      0.007,
+      0.001,
+      -0.002
+    ],
+    "inertia_com_local_kg_m2": [
+      [
+        1.1999999962042225e-06,
+        1.999999975322546e-07,
+        2.4446717878240944e-15
+      ],
+      [
+        1.999999975322546e-07,
+        1.600000003078915e-06,
+        1.9999999831351787e-07
+      ],
+      [
+        2.444671847524381e-15,
+        1.9999999831351793e-07,
+        1.8000000007169023e-06
+      ]
+    ],
+    "mass_kg": 0.02,
+    "matched": true,
+    "semantics": "Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation",
+    "tip_position_local_m": [
+      0.014,
+      0.0,
+      0.0
+    ]
+  },
+  "first_proxy_callback": null,
+  "replay": {
+    "artifact_id": "42914077b8c3fddb3ec6c2c63eb3246d002d27282c71593dcce740d575f67321",
+    "media_type": "application/json"
+  },
+  "execution_id": "ed8cad038f434672be6095661c8bbb93",
+  "raw_reference": {
+    "artifact_id": "e91fce67e44573d003dd217c99b8d329ec6f2c3befef41babd2aa61f20295975",
+    "media_type": "application/json"
+  },
+  "evaluation_reference": {
+    "artifact_id": "5b164f3722d7bbec64eb4af8aae100548e11ad6656b3916a00afb6ed7376ebce",
+    "media_type": "application/json"
+  },
+  "acceptance": {
+    "contract": "research.task_acceptance",
+    "version": "1.0.0",
+    "protocol_id": "offline_oriented_tracking_v2",
+    "task_family": "task.oriented_tracking",
+    "task_identity": "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45",
+    "status": "valid_failure",
+    "accepted": false,
+    "components": {
+      "evaluation_validity": {
+        "value": "valid",
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "execution_complete": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "task_evaluator": {
+        "value": false,
+        "passed": false,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "evaluator:tracking_max_error": {
+        "value": 0.022748538706528102,
+        "passed": false,
+        "unit": "m",
+        "limit": 0.012,
+        "reason": null
+      },
+      "evaluator:tool_axis_direction": {
+        "value": 0.32872888044772186,
+        "passed": false,
+        "unit": "rad",
+        "limit": 0.17453292519943295,
+        "reason": null
+      },
+      "solver_errors": {
+        "value": 0,
+        "passed": true,
+        "unit": "count",
+        "limit": 0,
+        "reason": null
+      },
+      "force_bounds": {
+        "value": 0.0,
+        "passed": true,
+        "unit": "N",
+        "limit": 1e-08,
+        "reason": null
+      },
+      "tool_axis_sampling": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Both real world position and unit tool-axis signals on the complete post-step grid"
+      },
+      "rigid_tool_binding": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution"
+      },
+      "no_environment_contact": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Every independent physics step checked for environment contact; the frozen task does not permit contact"
+      }
+    },
+    "metrics": {
+      "max_position_error": 0.022748538706528102,
+      "rms_position_error": 0.018716163338409836,
+      "terminal_position_error": 0.022748538706528102,
+      "max_tool_axis_angle_error": 0.32872888044772186
+    },
+    "missing": [],
+    "issues": [],
+    "execution_id": "ed8cad038f434672be6095661c8bbb93",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "5b164f3722d7bbec64eb4af8aae100548e11ad6656b3916a00afb6ed7376ebce",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "21175974f48e9d104f13a015bb50c6b05ab21fb682e5406a9ea7c2d5cdc5cc23",
+        "media_type": "application/json"
+      }
+    },
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "5b164f3722d7bbec64eb4af8aae100548e11ad6656b3916a00afb6ed7376ebce",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "21175974f48e9d104f13a015bb50c6b05ab21fb682e5406a9ea7c2d5cdc5cc23",
+        "media_type": "application/json"
+      },
+      "simulation": {
+        "artifact_id": "e91fce67e44573d003dd217c99b8d329ec6f2c3befef41babd2aa61f20295975",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "source": {
+          "artifact_id": "e91fce67e44573d003dd217c99b8d329ec6f2c3befef41babd2aa61f20295975",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null,
+        "original_execution_id": null
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "5b164f3722d7bbec64eb4af8aae100548e11ad6656b3916a00afb6ed7376ebce",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "e91fce67e44573d003dd217c99b8d329ec6f2c3befef41babd2aa61f20295975",
+          "media_type": "application/json"
+        },
+        "execution_id": "ed8cad038f434672be6095661c8bbb93"
+      }
+    },
+    "evaluator_tension_channels": null,
+    "timing": {
+      "control_period_s": 0.02,
+      "duration_s": 0.6,
+      "sample_period_s": 0.02,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.001,
+      "real_time_required": false,
+      "real_time_demonstrated": null,
+      "deadline_misses": null,
+      "mean_update_s": null,
+      "simulation_wall_s": null
+    },
+    "continuous_time_guarantee": false
+  },
+  "replay_cost": {
+    "forward_evaluations": 61,
+    "kernel_wall_s": 0.15831129999423865,
+    "model_builds": 1,
+    "physics_step_attempts": 600,
+    "physics_steps": 600,
+    "rollouts": 1
+  },
+  "independent_tool_binding": {
+    "body": "payload",
+    "com_local_m": [
+      0.007,
+      0.001,
+      -0.002
+    ],
+    "inertia_com_local_kg_m2": [
+      [
+        1.1999999962042225e-06,
+        1.999999975322546e-07,
+        2.4446717878240944e-15
+      ],
+      [
+        1.999999975322546e-07,
+        1.600000003078915e-06,
+        1.9999999831351787e-07
+      ],
+      [
+        2.444671847524381e-15,
+        1.9999999831351793e-07,
+        1.8000000007169023e-06
+      ]
+    ],
+    "mass_kg": 0.02,
+    "matched": true,
+    "semantics": "Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation",
+    "tip_position_local_m": [
+      0.014,
+      0.0,
+      0.0
+    ]
+  },
+  "environment_contact": {
+    "checked_physics_steps": 600,
+    "contact_free": true,
+    "contact_steps": 0,
+    "first_contact_time_s": null,
+    "maximum_contacts": 0
+  },
+  "stable_start": true,
+  "source_issue": null,
+  "outcome_issue": null,
+  "implementation": "bf6b7b7594839a69bfb1f54a52c29f2bbbd5d485",
+  "protocol_identity": "10d61cc494d76c626e595d28f321fca240674bf191f92af0336fcaad06f9f30d",
+  "resolved_identity": "03f965cd90fee222a5524398d75792ebea4b5190ff7862a68331499dddc4a315",
+  "task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "accepted": false,
+  "selected": null,
+  "ledger": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 5,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 11.034833799989428
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 35,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_s": 11.557438199990429,
+  "driver_elapsed_s": 15.404568500001915,
+  "status": "stable_original_task_valid_failure",
+  "threshold_relaxation": false,
+  "external_force_approximation": false,
+  "interpretation": "Stable complete independent replay; original position and directed-axis constraints fail. Finite search is not an infeasibility proof."
+}
