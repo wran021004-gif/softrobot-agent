@@ -335,7 +335,14 @@ def binding(configuration, trajectory, *, mathematical_outputs=None):
             not np.isfinite(trajectory['times_s']).all() or
             any(abs(t-k*timing.control_period_s)>1e-12 for k,t in enumerate(trajectory['times_s']))
             or scene['control']['tension_execution_mode']!='ideal_tension'):
-        raise ValueError('PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH')
+        raise ValueError('PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH: '+json.dumps(dict(
+            expected_tension_shape=[count,len(order)],received_tension_shape=list(u.shape),
+            expected_time_points=count+1,received_time_points=len(trajectory['times_s']),
+            tendon_order_matches=trajectory['tendon_order']==order,
+            identity_matches={key:trajectory[key]==expected for key,expected in (
+                ('model_identity',spec['identity']),('design_identity',spec['design_identity']),
+                ('task_identity',digest(plain(inp.task))))},
+            scope='Binding dimensions and identity facts; original bounds, timing and execution-mode checks still apply.'),separators=(',',':')))
     if mathematical_outputs is not None:
         outputs=mathematical_outputs
         if (outputs['model_identity']!=trajectory['model_identity'] or

@@ -123,5 +123,31 @@ class PrerequisiteTests(unittest.TestCase):
             host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
         finally:archive.archive.close()
 
+    def test_source_shape_refusal_preserves_actual_reason_without_worker(self):
+        import json
+        from tools.state_io import digest
+        from tools.research.physical_replay import binding
+        from tools.research.agent import error_feedback
+        inp=SessionInput.model_validate(self.f.cfg)
+        order=[t['id'] for t in self.f.cfg['robot']['structure']['data']['tendons']]
+        count=round(inp.task.timing.duration_s/inp.task.timing.control_period_s)
+        trajectory=dict(tensions_n=[[0.]*len(order)]*(count+1),
+            times_s=[i*inp.task.timing.control_period_s for i in range(count+1)],
+            tendon_order=order,model_identity='fixture-model',design_identity='fixture-design',task_identity=digest(plain(inp.task)))
+        model=(inp,dict(tendons=[dict(entity=k) for k in order]),dict(control=dict(tension_execution_mode='ideal_tension')),
+            dict(identity='fixture-model',design_identity='fixture-design'))
+        with patch('tools.research.physical_replay.model_context',return_value=model):
+            with self.assertRaisesRegex(ValueError,'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH') as caught:
+                binding(self.f.cfg,trajectory)
+        facts=json.loads(str(caught.exception).split(': ',1)[1])
+        self.assertEqual(facts['received_tension_shape'],[count+1,len(order)])
+        self.assertEqual(facts['expected_tension_shape'],[count,len(order)])
+        host,s=offline_host({})
+        with patch('tools.research.agent.record',return_value=self.f.ref):
+            feedback=error_feedback(host,dict(name='research_plan',input=dict(action='initialize_control')),caught.exception,s)
+        self.assertEqual(feedback['reason'],str(caught.exception))
+        self.assertFalse(feedback['worker_started'])
+        self.assertTrue(all(v==0 for v in feedback['charged_method_counts'].values()))
+
 
 if __name__=='__main__':unittest.main()
