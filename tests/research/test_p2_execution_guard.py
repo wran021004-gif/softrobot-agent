@@ -66,3 +66,14 @@ class P2ExecutionGuardTests(TestCase):
         finally:
             if folder.resolve().parent!=(ROOT/'runs').resolve():raise ValueError('WORKSPACE_FIXTURE_REQUIRED')
             shutil.rmtree(session_storage_path(folder))
+
+    def test_v3_generation_schema_hides_unsupported_legacy_routes(self):
+        from tools.research.agent import plan_schema
+        v3=plan_schema(['generate','stop'],decision_required=True,family_version='serial_family_space_v3')
+        fields=v3['$defs']['GenerationRequestV3']['properties']
+        self.assertNotIn('spans',fields)
+        self.assertNotIn('route_overrides',fields)
+        self.assertIn('routes',fields)
+        self.assertIn('exactly the number of stations',v3['$defs']['SegmentChoiceV2']['properties']['sections']['description'])
+        v2=plan_schema(['generate','stop'],family_version='serial_family_space_v2')
+        self.assertIn('spans',v2['$defs']['GenerationRequestV2']['properties'])

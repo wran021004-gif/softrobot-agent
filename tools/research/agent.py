@@ -292,6 +292,15 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
         generation={'serial_family_space_v3':'GenerationRequestV3','serial_family_space_v2':'GenerationRequestV2'}.get(family_version,'GenerationRequest')
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
         if family_version=='serial_family_space_v3':
+            # V3 inherits legacy fields in Pydantic for serialization, but any
+            # nonempty spans/route_overrides are rejected by its validator.
+            generation_properties=schema['$defs']['GenerationRequestV3']['properties']
+            for legacy in ('spans','route_overrides','strategy'):
+                generation_properties.pop(legacy,None)
+            schema['$defs']['SegmentChoiceV2']['properties']['sections']['description']=(
+                'Optional: omit to inherit the segment prototype sections. If supplied, '
+                'the list must have exactly the number of stations in that specific prototype; '
+                'query the frozen family-space assembly before editing sections.')
             method=schema['$defs']['FamilyMixedSearch']['properties']['method']
             method['enum']=['adaptive_joint_block_v1'];method.pop('default',None)
             schema['$defs']['FamilyMixedSearch']['required'].append('method')
