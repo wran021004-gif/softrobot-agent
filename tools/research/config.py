@@ -445,6 +445,11 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
         study['tool_readiness']=dict(sorosim_matlab=report)
     if methods is not None:study['mathematical_methods']=methods
+    if first_strategy=='math_search' and (not study.get('family_search') or
+            not {'analysis','search'}<=set(study['capabilities']) or
+            'search' not in study.get('allowed_plan_actions',[]) or
+            'sampled-affine-conic-minimax-v1' not in study.get('mathematical_methods',{})):
+        raise ValueError('INITIAL_MATH_SEARCH_REQUIRES_FAMILY_SEARCH_ANALYSIS_AND_CONIC_GRANTS')
     if conditions is not None:
         if not family_mode or study['confirmation']['fresh_independent_repetitions']:
             raise ValueError('MULTI_CONDITION_REQUIRES_FAMILY_STUDY_WITHOUT_EXTRA_CONFIRMATIONS')

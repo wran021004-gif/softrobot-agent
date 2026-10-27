@@ -11,6 +11,24 @@ from tests.research.test_cross_task_integration import fixture_directory, plan
 
 
 class ProviderProbeTests(unittest.TestCase):
+    def test_route_freeze_reuses_public_scalar_owners_and_twentyfour_request_cap(self):
+        with fixture_directory() as folder:
+            frozen=probe.freeze_routes(folder)
+            protocol=frozen['protocol']
+            self.assertEqual(len(frozen['cases'])*len(protocol['models'])*protocol['requests_per_case_model'],24)
+            self.assertEqual(protocol['science_workers'],0)
+            c=probe.read(probe.ROOT/'evidence/integration_research_next/c4_closeout_review.json')
+            case=frozen['cases']['fixed_control_stagnation']['evidence']
+            self.assertEqual(case['best_metrics'],c['best_metrics'])
+            self.assertEqual(case['attempted']['structural_searches'],0)
+            math=frozen['cases']['math_without_physics']['evidence']
+            self.assertGreater(math['native_prediction']['baseline_signed_maximum_excess'],math['native_prediction']['best_signed_maximum_excess'])
+            self.assertIn('unmeasured',math['independent_task_acceptance'])
+            wire=json.dumps(frozen['cases'])
+            for private in ('owner_store','control_schedule_reference','tensions_n','DEEPSEEK_API_KEY'):
+                self.assertNotIn(private,wire)
+            self.assertEqual(probe.freeze_routes(folder),frozen)
+
     def test_original_harness_schema_and_ledger_never_dispatch_science(self):
         frozen=probe.freeze()
         calls=[]

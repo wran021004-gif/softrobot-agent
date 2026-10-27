@@ -464,7 +464,9 @@ def initial_structure_action(host):
     """One existing-state gate, shared by execution, L0 and the advertised Schema."""
     s=state(host);strategy=s['spec'].get('initial_structure_strategy')
     if strategy=='heuristic_generate' and not s.get('candidates'):return 'generate'
-    if strategy=='math_search' and not any(host.store.artifact(r).get('result',{}).get('best_mathematical_candidate') for r in s.get('search_results',[])):return 'search'
+    if strategy=='math_search':
+        from tools.research.search import initial_search_progress
+        if not initial_search_progress(host)['requirement_satisfied']:return 'search'
 
 
 def dispatch(host, value, request_id, origin='model'):

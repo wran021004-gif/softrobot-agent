@@ -974,7 +974,8 @@ def agent_decision_brief(host):
     current=context(host);brief=decision_brief(current)
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
-    brief['action_trace']=compact_action_trace(research_action_trace(host,limit=None))
+    trace=research_action_trace(host,limit=None)
+    brief['action_trace']=compact_action_trace(trace)
     from tools.research.session_handoff import pending_feedback_delivery
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
@@ -996,13 +997,16 @@ def agent_decision_brief(host):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])
         from tools.research.core import initial_structure_action
+        from tools.research.search import initial_search_progress
+        if s['spec'].get('initial_structure_strategy')=='math_search':
+            brief['structure_actions']['initial_search_progress']=initial_search_progress(host)
         initial=initial_structure_action(host)
         if initial:
             brief['actions']=[a for a in brief['actions'] if a in (initial,'diagnose','stop')]
             brief['available_research_actions']=[r for r in brief['available_research_actions'] if r['action'] in brief['actions']]
             brief['structure_actions'].pop('search' if initial=='generate' else 'generate',None)
             brief['structure_actions']['first_structure_requirement']=dict(action=initial,
-                objective='task_violation' if initial=='search' else None,release='After first legal generate / supported mathematical search candidate')
+                objective='task_violation' if initial=='search' else None,release='After first legal generate / completed finite mathematical search, including unresolved results')
     if s.get('engineering_feedback_correction'):
         ref=s['engineering_feedback_correction']
         brief['recorded_evidence_corrections']=current_evidence_corrections(host.store.artifact(ref),ref)
@@ -1092,7 +1096,52 @@ def agent_decision_brief(host):
             if key in ws:
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
+    brief['route_review']=route_review(host,current,brief,trace)
     return compact_scientific_delivery(brief,decision_only=True)
+
+
+def route_review(host,current,brief,trace):
+    """Small evidence projection, not a route selector or convergence test."""
+    import math
+    groups={};seen=set();s=state(host)
+    for step in trace['recent']:
+        for ref in step['result_references']:
+            if ref['artifact_id'] in seen:continue
+            seen.add(ref['artifact_id']);raw=host.store.artifact(ref)
+            candidate=raw.get('candidate',raw.get('design_candidate'))
+            if not candidate:continue
+            independent=ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+            gap=task_gap(raw) if independent else {}
+            pointer='/acceptance';scope='independent_task';score=gap.get('normalized_gap') if gap.get('valid_complete') else None
+            if not independent:
+                score=(raw.get('native_dynamics',{}).get('optimization',{}).get('best') or {}).get('measure',{}).get('signed_maximum_excess')
+                pointer='/native_dynamics/optimization/best/measure/signed_maximum_excess';scope='native_finite_search'
+                if score is None:
+                    score=(raw.get('trajectory') or {}).get('replayed_violation')
+                    pointer='/trajectory/replayed_violation';scope='sampled_mathematical_model'
+            if not isinstance(score,(int,float)) or not math.isfinite(score):continue
+            domain={k:raw.get(k) for k in ('model_identity','model','analysis_applicability','task_analysis')}
+            key=(step['method'],candidate['artifact_id'],scope,digest(domain))
+            row=groups.setdefault(key,dict(method=step['method'],candidate=candidate,scope=scope,
+                best_score=score,consecutive_nonimprovements=0,observations=0,recent=[]))
+            previous=row['best_score'];delta=previous-score if row['observations'] else None
+            row['consecutive_nonimprovements']=row['consecutive_nonimprovements']+1 if delta is not None and delta<=0 else 0
+            row['best_score']=min(previous,score);row['observations']+=1
+            row['recent']=[*row['recent'][-1:],dict(reference=ref,pointer=pointer,score=score,improvement_over_previous_best=delta)]
+            groups[key]=groups.pop(key)
+    rows=list(groups.values())[-4:]
+    attempted={r['action'] for r in trace['recent'] if r['result_references']}
+    methods=(brief.get('mathematical_capabilities') or {}).get('methods',{})
+    used={r['method'] for r in trace['recent'] if r['result_references']}
+    return dict(required=any(r['consecutive_nonimprovements']>1 for r in rows),observed_routes=rows,
+        untried_actions=[a for a in ('search','generate','control_search','execute') if a in brief['actions'] and a not in attempted],
+        untried_mathematical_methods=[k for k,v in methods.items() if k not in used and v.get('execution_status')!='blocked'],
+        evidence_owner='best_valid, latest_reports, action_trace and budget retain exact facts, unresolved hypotheses and remaining units.',
+        decision_obligation='After repeated non-improvement, compare continuing control, changing structure, joint optimization and Reporter diagnosis in interpretation. '
+            'Name legal prerequisites, expected new information and a weakening observation. Choose freely; an untried route is not automatically admissible. '
+            'A STOP must distinguish exhausted budget, engineering unavailability, scoped local stagnation and a verified scientific conclusion, and acknowledge untried routes.',
+        scope='Lower scores improve only within the identical candidate/method/model/task scope shown. Exact repeated scores are observations, '
+            'not a convergence or infeasibility proof. Mathematical improvement needs independent physics; no parameter or route is selected here.')
 
 
 def compact_scientific_delivery(brief,*,decision_only=False):
@@ -1150,7 +1199,7 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         extra=brief.get('additional_mathematical_evidence',[])[-1:]
         latest=(brief.get('latest_scientific_feedback') or {}).get('reference')
         brief['additional_mathematical_evidence']=extra if not reported_math or any(r['reference']==latest for r in extra) else []
-        math_views=[(r['mathematics'],r['reference']) for r in brief.get('additional_mathematical_evidence',[])]
+        math_views=[(r['mathematics'],r['reference']) for r in brief.get('additional_mathematical_evidence',[]) if r.get('mathematics')]
         math_views += [(f['mathematics'],f['result']['reference']) for r in brief.get('latest_reports',[])
             for f in r.get('findings',[]) if f.get('mathematics')]
         for math,ref in math_views:

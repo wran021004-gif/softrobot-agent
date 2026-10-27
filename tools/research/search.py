@@ -61,6 +61,29 @@ def parse_search(query):
     return (FamilyMixedSearch if raw.get('version')=='family_mixed_search_v1' else Search).model_validate(raw)
 
 
+def initial_search_progress(host):
+    """Project the existing search receipts; unresolved is never infeasible."""
+    s=state(host);attempts=[]
+    for checkpoint in s.get('searches',{}).values():
+        query=checkpoint['problem']['query']
+        if query.get('version')!='family_mixed_search_v1' or query['objective']!='task_violation':continue
+        ref=checkpoint.get('result_reference')
+        result=host.store.artifact(ref)['result'] if ref else {}
+        used=result.get('resource_use',{}).get('actual_mathematical_evaluations',0)
+        evaluated_math=any(row.get('evidence',{}).get('analysis') in s.get('analysis_results',[])
+            for row in result.get('evaluated',[]))
+        complete=bool(ref and evaluated_math and result.get('termination_reason')!='analysis_not_admitted')
+        attempts.append(dict(reference=ref,status='candidate_found' if complete and result.get('best_mathematical_candidate')
+            else 'completed_unresolved' if complete else 'incomplete',
+            mathematical_evaluations=used,termination=result.get('termination_reason',checkpoint.get('termination'))))
+    completed=[r for r in attempts if r['status'] in ('candidate_found','completed_unresolved')]
+    return dict(status=('candidate_found' if any(r['status']=='candidate_found' for r in completed) else 'completed_unresolved')
+        if completed else 'incomplete' if attempts else 'not_executed',attempts=attempts[-2:],
+        requirement_satisfied=bool(completed),
+        scope='A completed finite mathematical attempt releases the initial route gate, even without a ranked candidate. '
+            'Unresolved math establishes neither structural infeasibility nor physical acceptance; interrupted/unadmitted work does not satisfy the start requirement.')
+
+
 def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
     grant=spec['family_search']

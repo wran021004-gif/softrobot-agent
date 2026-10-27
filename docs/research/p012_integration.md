@@ -60,3 +60,61 @@ five handoff/cache/projection checks (six passed). The earlier mainline environm
 lacks MATLAB Engine, preventing legacy session fixtures from preparing; F3 has
 the dependency and the original SDK request-boundary rotation passed without
 starting MATLAB. Reporter tests use mock HTTP only. No live research execution.
+
+## P2 bounded start and route review
+
+`search.py` derives initial-search progress from existing checkpoints and actual
+current-Study mathematical evidence. States distinguish not executed, incomplete,
+completed unresolved, and candidate found. `core.py` releases the initial route
+gate after a completed finite attempt even without a ranked candidate. Admission
+rejection or an unfinished checkpoint cannot satisfy it; exact same-Study reuse
+does not need another scientific charge. STOP/diagnose and all scientific scope
+checks retain their original semantics. `config.py` rejects a math-search start
+without the existing FamilySpace search, analysis and CONIC grants.
+
+`research_context.py` adds a small L0 route review from original action receipts
+and quantified results, grouped by candidate, method, model/task scope and evidence
+kind. It reports recent scores, improvement over the previous best and consecutive
+non-improvements. Repeated non-improvement asks for comparison of continuing,
+structure/control or joint changes, and Reporter diagnosis using existing Plan
+interpretation/hypothesis fields. It does not select a route or parameters, impose
+a two-failures structural switch, prove convergence, or prevent a justified STOP.
+Untried routes and STOP categories remain explicit. Unscoped/failed mathematical
+results with no mathematical card no longer crash the compact projection.
+
+The next Study must explicitly freeze `initial_structure_strategy=math_search`
+with its own task/domain/budgets and normal authorization. Existing pending C3
+math-start configuration verifies the interface; no sealed configuration or
+production model is changed, and no new Study is prepared or started here.
+
+Pre-live validation: 14 selected start-gate, route, BF5, shared-template and mock
+Harness checks passed. A separately checked legacy mixed-search test has a stale
+fixed expected configuration digest: the P1 baseline produces the same current
+value (`a6446a...`) as P2, rather than the historical `31af3e...`. Recorded only;
+no unrelated identity semantics or test expectation is changed.
+
+## Flash/Pro v3 protocol
+
+Reuse `tests/research/flash_pro_decision_probe.py --routes`, production Harness,
+Plan projection, error feedback and settled Provider ledger. New independent
+output is `runs/flash-pro-routes-v3`; v1/v2 inputs, receipts and costs stay sealed.
+`provider_flash_pro_routes.json` bounds six case/model runs to four requests each,
+including corrections and final prose (24 total). Sequential order alternates
+Flash/Pro, Pro/Flash, Flash/Pro. Zero science/Reporter allowance; handlers intercept
+every proposal, and full scientific admission is explicitly untested.
+
+Both models receive the same three frozen scalar cases and legal descriptive
+actions. `research_route_public.json` supplies C closeout and temporally bounded
+first affine/Native mathematical observations, with precise committed source
+pointers. It includes no private candidate/control/Store, trajectory or raw SDK
+reasoning. BF5/BF6 reuse the previously reviewed public summaries. C remains
+sealed; its historical unused allowances cannot be spent by this probe.
+
+Review scientific accuracy separately from format: C's remaining holding error
+and speed failures and untested structural routes; model-only affine witness and
+Native improvement with unmeasured independent acceptance; BF5 valid failure
+versus BF6 incomplete/null status and 452 completed-step lower bound versus 453
+attempted calls. Compare justified alternatives, unsupported causes/conclusions,
+repeat reads, legality/correction, settled requests and actual Token/cache counts.
+No preferred model, currency estimate, or formal-study performance inference is
+specified in advance.

@@ -95,6 +95,56 @@ class C3ReadinessTests(unittest.TestCase):
         update(host,freeze='explicit-offline-conic-fixture')
         self.assertIn('generate',agent_decision_brief(host)['actions'])
 
+    def test_completed_unresolved_math_start_releases_routes_without_claiming_infeasibility(self):
+        from tools.research.research_context import agent_decision_brief
+        fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)
+        host=fixture.host;spec=deepcopy(state(host)['spec']);spec['initial_structure_strategy']='math_search'
+        spec['mathematical_methods']={'sampled-affine-conic-minimax-v1':'explicit engineering fixture'}
+        update(host,spec=spec)
+        self.assertEqual(search.initial_search_progress(host)['status'],'not_executed')
+        q=mixed.request(spec);q.update(objective='task_violation',operating_point='controller_start_input',max_evaluations=2)
+        def unresolved(h,query,key,**kwargs):
+            raw=dict(status='failed',candidate=query['candidate'],requested_operation=plain(
+                __import__('tools.research.contracts',fromlist=['AnalysisRequest']).AnalysisRequest.model_validate(query)),
+                charged_analysis_evaluations=2,charged_numerical_s=0.,proxy_values={},fixture=True)
+            ref=save(h,raw,'explicit_unresolved_math_fixture')
+            update(h,analysis_results=[ref],mathematical_evaluations=2)
+            return dict(reference=ref)
+        with patch.object(core,'guard'),patch.object(analysis,'dispatch',side_effect=unresolved):
+            result=core.dispatch(host,mixed.plan(q),'unresolved-first-math')['result']['result']
+        self.assertIsNone(result['best_mathematical_candidate'])
+        self.assertEqual(search.initial_search_progress(host)['status'],'completed_unresolved')
+        self.assertIsNone(core.initial_structure_action(host))
+        update(host,freeze='explicit-unresolved-fixture')
+        brief=agent_decision_brief(host)
+        self.assertIn('generate',brief['actions']);self.assertIn('search',brief['actions'])
+        self.assertFalse(brief['task_accepted'])
+        saved=deepcopy(state(host)['searches'])
+        checkpoint=next(iter(saved.values()));checkpoint.pop('result_reference')
+        update(host,searches=saved)
+        self.assertEqual(search.initial_search_progress(host)['status'],'incomplete')
+        self.assertEqual(core.initial_structure_action(host),'search')
+
+    def test_local_stagnation_reviews_routes_without_selecting_parameters(self):
+        from tools.research.research_context import route_review
+        from tests.research.test_research_reporting import offline_host,ref
+        candidate=ref(dict(fixture='candidate'));values={};steps=[]
+        for i,score in enumerate((.3,.3,.4)):
+            raw=dict(candidate=candidate,native_dynamics=dict(optimization=dict(best=dict(measure=dict(signed_maximum_excess=score)))))
+            evidence=ref(dict(raw,index=i));values[evidence['artifact_id']]=raw
+            steps.append(dict(action='research_analysis',method='mujoco_direct_control_v1',result_references=[evidence]))
+        h,_=offline_host(values)
+        brief=dict(actions=['search','generate','control_search','stop'],mathematical_capabilities=dict(methods={}))
+        review=route_review(h,{},brief,dict(recent=steps))
+        self.assertTrue(review['required']);self.assertIn('search',review['untried_actions'])
+        route=review['observed_routes'][0]
+        self.assertEqual(route['scope'],'native_finite_search');self.assertEqual(route['best_score'],.3)
+        self.assertEqual(route['consecutive_nonimprovements'],2)
+        self.assertNotIn('selected_method',review)
+        # A real improvement releases the review trigger, without claiming a pass.
+        values[steps[-1]['result_references'][0]['artifact_id']]['native_dynamics']['optimization']['best']['measure']['signed_maximum_excess']=.2
+        self.assertFalse(route_review(h,{},brief,dict(recent=steps))['required'])
+
     def test_failure_snapshot_is_pre_call_and_worker_persists_unknown_progress(self):
         from extensions.tendon_family.backends import MujocoFailureSnapshot
         from tools.research import execution_worker

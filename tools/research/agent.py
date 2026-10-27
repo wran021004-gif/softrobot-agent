@@ -20,6 +20,7 @@ PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_repla
     'Diagnose reads existing evidence; selected_method does not execute a mathematical/native worker '
     '(use research_analysis with its registered template). Only an explicit diagnostic payload requests local solves. '
     'Control sources and optional NMPC handoff are described in control_initialization_methods. '
+    'When route_review.required, use interpretation to compare continuation, structure/control changes and diagnosis with evidence and remaining budget; no route is prescribed. '
     'Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. '
     'Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.')
 class DeepSeekModel(OpenAIModel):

@@ -27,6 +27,7 @@ from tools.state_io import atomic_json, read
 from tests.research.agent_math_decision_probe import provider_usage, decision_schema
 
 OUT=ROOT/'runs/flash-pro-public-v2'
+ROUTE_OUT=ROOT/'runs/flash-pro-routes-v3'
 INSTRUCTIONS=('You are the public Softrobot research decision Agent in an independent read-only comparison. '
     'Use the frozen task and visible evidence to choose the next decision, explain what it establishes and '
     'what remains unknown. Submit one typed diagnose/stop research_plan decision, then finish with a short assessment. '
@@ -64,6 +65,29 @@ def freeze(folder=OUT):
         credentials_reference=spec['runtime']['credentials_reference'],instructions=INSTRUCTIONS.format(requests=protocol['requests_per_case_model']),
         cases=dict(bf5_failed_baseline=dict(task=read(ROOT/'tasks/bf5_position_tool_axis_v1.json')['task'],evidence=bf5),
             bf6_incomplete=dict(evidence=bf6)))
+    folder.mkdir(parents=True,exist_ok=True);atomic_json(folder/'frozen.json',frozen)
+    return frozen
+
+
+def freeze_routes(folder=ROUTE_OUT):
+    """New independent cohort; previous frozen inputs and receipts stay sealed."""
+    if (folder/'frozen.json').exists():return read(folder/'frozen.json')
+    public=freeze();protocol=read(ROOT/'configs/research/provider_flash_pro_routes.json')
+    evidence=read(ROOT/'tests/research/fixtures/research_route_public.json')
+    ctask=resolve(ROOT/'configs/research/study_c3_math_search_ab.json')['canonical_task']
+    cases={k:dict(task=ctask,evidence=evidence[k]) for k in ('fixed_control_stagnation','math_without_physics')}
+    cases['bf5_failure_bf6_incomplete']=dict(evidence=dict(
+        bf5=public['cases']['bf5_failed_baseline']['evidence'],bf6=public['cases']['bf6_incomplete']['evidence'],
+        question='Compare BF5 valid independent failure with BF6 incomplete execution; explain acceptance, costs, missing facts and a justified next route.'))
+    instructions=INSTRUCTIONS.format(requests=protocol['requests_per_case_model'])+(
+        ' Diagnose may describe structure/control/joint optimization, physical validation or Reporter investigation; '
+        'it does not execute those methods. Compare alternatives in interpretation using the existing hypothesis fields. '
+        'A STOP must distinguish budget exhaustion, engineering blockage, local stagnation and proved conclusions. '
+        'Historical allowance is context only; this comparison cannot spend it. '
+        'Do not recount inline facts through repeated reads. Final assessment should be concise. '
+        'Actual Provider requests and Token cost come only from receipts, including the request producing your final answer.')
+    frozen=dict(protocol=protocol,provider=public['provider'],credentials_reference=public['credentials_reference'],
+        instructions=instructions,cases=cases)
     folder.mkdir(parents=True,exist_ok=True);atomic_json(folder/'frozen.json',frozen)
     return frozen
 
@@ -165,24 +189,26 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
     return summary
 
 
-async def main(live=False,recover_unsent=False):
-    frozen=freeze()
+async def main(live=False,recover_unsent=False,routes=False):
+    folder=ROUTE_OUT if routes else OUT
+    frozen=freeze_routes(folder) if routes else freeze(folder)
     if not live:print(json.dumps(dict(status='frozen',request_ceiling=len(frozen['cases'])*len(frozen['protocol']['models'])*frozen['protocol']['requests_per_case_model'],science_workers=0)));return
     load_credential(Path(frozen['credentials_reference']).expanduser())
     results=[]
     for index,case in enumerate(frozen['protocol']['cases']):
-        models=frozen['protocol']['models'][::1 if index==0 else -1]
+        models=frozen['protocol']['models'][::1 if index%2==0 else -1]
         for model in models:
-            results.append(await run_case(OUT,frozen,case,model,recover_unsent=recover_unsent))
-            atomic_json(OUT/'summary.json',dict(status='running',results=results))
+            results.append(await run_case(folder,frozen,case,model,recover_unsent=recover_unsent))
+            atomic_json(folder/'summary.json',dict(status='running',results=results))
     summary=dict(status='completed',results=results,science_workers=0,physics_steps=0,
         actual_requests=sum(r['actual_requests'] for r in results),
         usage={k:sum(r['usage'][k] for r in results) if all(r['usage'][k] is not None for r in results) else None
             for k in results[0]['usage']})
-    atomic_json(OUT/'summary.json',summary);print(json.dumps(summary,ensure_ascii=False))
+    atomic_json(folder/'summary.json',summary);print(json.dumps(summary,ensure_ascii=False))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--live',action='store_true')
     parser.add_argument('--recover-unsent',action='store_true')
-    args=parser.parse_args();asyncio.run(main(args.live,args.recover_unsent))
+    parser.add_argument('--routes',action='store_true',help='Independent three-case P2 route comparison, 24 requests maximum')
+    args=parser.parse_args();asyncio.run(main(args.live,args.recover_unsent,args.routes))
