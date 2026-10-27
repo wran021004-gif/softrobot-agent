@@ -227,3 +227,17 @@ including the original hyphenated T1/T2 keys. The existing generic query still
 uses shared fields only. Both the new fixture and that generic-query regression
 passed offline. No tools/configuration, scientific admission, C Study, Provider
 request or physical execution changed.
+
+## C follow-up: control sequence refusal facts
+
+Selectively applied C's `b715df920`: the existing replay/control binding refusal
+now reports expected/received tension shape, time-point counts and channel/
+identity match facts from the frozen contract. Its rejection conditions are
+unchanged; N control intervals still require N tension rows and N+1 time points.
+The common Agent error summary carries the original reason, bounded to 1,000
+characters, alongside the existing error code and correction hint. Integration
+removes the old citation-only reason owner to avoid a duplicate keyword when
+that branch expands into the common summary. Two directed offline checks passed:
+actual sequence-shape refusal with no worker/science charge, and the pre-existing
+citation refusal with one bounded reason. No sequence correction, relaxed
+admission, configuration change, C Study access, Provider request or physics run.

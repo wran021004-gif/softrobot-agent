@@ -440,13 +440,14 @@ def error_feedback(host, use, exc, before):
         known=registered_references(host)
         refs=[r for r in use['input'].get('supporting_evidence',[]) if r not in known]
         anchor=next(iter(known),s.get('family_space_reference'))
-        citation=dict(rejected_references=refs,reason=message[:300],registered_count=len({r['artifact_id'] for r in known}),
+        citation=dict(rejected_references=refs,registered_count=len({r['artifact_id'] for r in known}),
             recent_registered=citation_inventory(host)[-3:],
             inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
             missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
     new_analysis=[host.store.artifact(r) for r in s.get('analysis_results',[]) if r not in before.get('analysis_results',[])]
     worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
+        reason=message[:1000],
         worker_started=worker_started,
         charged_method_counts={k:s.get(k,0)-before.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations')},
         evidence_navigation=getattr(exc,'evidence_navigation',None),
