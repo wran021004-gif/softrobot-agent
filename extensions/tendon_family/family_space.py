@@ -469,7 +469,7 @@ def search_domains(space, query, grant):
     from tools.state_io import digest
     if query.family_space_identity!=digest(space):
         raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
-    if query.method!=grant['method'] or not set(query.variable_groups)<=set(grant['variable_groups']):
+    if query.method not in grant.get('methods',[grant.get('method')]) or not set(query.variable_groups)<=set(grant['variable_groups']):
         raise ValueError('UNAUTHORIZED_FAMILY_SEARCH_METHOD_OR_GROUP')
     if (not set(query.segment_counts)<=set(grant['segment_counts']) or
             not set(query.tendon_counts)<=set(grant['tendon_counts']) or

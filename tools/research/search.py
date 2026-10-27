@@ -30,6 +30,8 @@ def search_problem(host,query,count):
         fit=next(r for r in rows if r.get('capability_method')==CONIC and not r.get('submode'))
         if fit['status']=='not_applicable':raise ValueError('TASK_VIOLATION_SEARCH_NOT_ADMITTED: '+str(fit['reasons']))
     if isinstance(q,FamilyMixedSearch):
+        if q.method=='normalized_joint_block_v1' and s['spec'].get('length_constraint'):
+            raise ValueError('JOINT_BLOCK_LENGTH_COUPLING_NOT_SUPPORTED: choose another registered search or a family without an aggregate length constraint')
         from extensions.tendon_family.family_space import search_domains
         grant=s['spec'].get('family_search')
         if not grant or q.screening_fidelity not in s['spec']['fidelity_policy']['screening']:
@@ -115,7 +117,7 @@ def request_guidance(spec):
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
             version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
         search=dict(tool='research_plan',action='search',payload='search',
-            version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant['method'],
+            version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant.get('method',grant.get('methods',[None])[0]),available_methods=grant.get('methods',[grant.get('method')]),
             required=['variable_groups','segment_counts','tendon_counts','screening_fidelity','objective','operating_point','max_proposals','max_evaluations'],
             grant=grant,screening_fidelities=list(spec['fidelity_policy']['screening']),
             parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',

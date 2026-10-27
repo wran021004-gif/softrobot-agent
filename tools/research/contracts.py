@@ -84,7 +84,7 @@ class FidelityPolicy(Contract):
 class FamilyMixedSearch(Contract):
     version: Literal['family_mixed_search_v1']
     family_space_identity: str = Field(min_length=1)
-    method: Literal['bounded_mixed_coordinate_v1'] = 'bounded_mixed_coordinate_v1'
+    method: Literal['bounded_mixed_coordinate_v1','normalized_joint_block_v1'] = 'bounded_mixed_coordinate_v1'
     variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
     segment_counts: list[int] = Field(min_length=1)
     tendon_counts: list[int] = Field(min_length=1)

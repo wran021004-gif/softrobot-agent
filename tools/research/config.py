@@ -220,7 +220,8 @@ def resolve(path, profile=None, *, backend_profile=None):
         if any(not cells[0]<=level['cells_per_segment']<=cells[1] for level in [*policy['screening'].values(),policy['final_evaluation']]):
             raise ValueError('FIDELITY_OUTSIDE_FROZEN_MESH_DOMAIN')
         grant=additions.get('family_search')
-        if grant and (grant['method']!='bounded_mixed_coordinate_v1' or
+        if grant and (not set(grant.get('methods',[grant.get('method')])) or
+                not set(grant.get('methods',[grant.get('method')])) <= {'bounded_mixed_coordinate_v1','normalized_joint_block_v1'} or
                 not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
                 any(not family_space['executable_tendon_count_bounds'][0]<=v<=family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
                 not all(type(grant[k]) is int and 1<=grant[k]<=128 for k in ('max_proposals','max_evaluations'))):

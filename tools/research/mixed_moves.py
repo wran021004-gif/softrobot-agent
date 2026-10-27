@@ -91,6 +91,27 @@ def next_move(space, query, best, cursor, step):
             groups['routing'].append(('radii_m.'+str(j),('routing.radius_m',space['routing_domains']['radius_m'])))
     moves=[v for row in zip_longest(*groups.values()) for v in row if v is not None]
     if not moves:return None,[],step
+    if query.method=='normalized_joint_block_v1':
+        # A deterministic direction in dimensionless coordinates. Blocked axes
+        # are omitted, then a single scale respects every remaining bound.
+        cycle=cursor//2; effective=step/(2**(cycle//2))
+        sign=1 if cursor%2==0 else -1
+        active=[]
+        for index,(path,domain) in enumerate(moves):
+            if domain is None:continue
+            parent=p;parts=path.split('.')
+            for key in parts[:-1]:parent=parent[int(key)] if isinstance(parent,list) else parent[key]
+            key=int(parts[-1]) if isinstance(parent,list) else parts[-1]
+            name,d=domain;lo,hi=interval(query,name,d)
+            direction=sign*(1 if (index+cycle)%2==0 else -1)
+            room=(hi-parent[key])/(hi-lo) if direction>0 else (parent[key]-lo)/(hi-lo)
+            if room>1e-12:active.append((path,parent,key,lo,hi,direction,room))
+        if active:
+            component=effective/math.sqrt(len(active))
+            component=min(component,min(v[-1] for v in active))
+            for _,parent,key,lo,hi,direction,_ in active:
+                parent[key]+=direction*component*(hi-lo)
+            return p,[v[0] for v in active],effective
     axis=cursor%len(moves);cycle=cursor//len(moves)
     direction=1 if cycle%2==0 else -1
     effective=step/(2**(cycle//2))

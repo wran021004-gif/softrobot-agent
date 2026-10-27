@@ -118,6 +118,38 @@ class MixedSearchTests(unittest.TestCase):
         self.assertEqual(state(self.host)['mathematical_evaluations'],used)
         self.assertIsNone(state(self.host)['pending'])
 
+    def test_joint_block_is_normalized_and_search_uses_existing_evaluator(self):
+        from tools.research.mixed_moves import initial,next_move
+        spec=deepcopy(self.spec)
+        spec['family_search']['methods']=['bounded_mixed_coordinate_v1','normalized_joint_block_v1']
+        spec['family_search']['variable_groups']=list(set(spec['family_search']['variable_groups']) | {'materials'})
+        update(self.host,spec=spec)
+        q=request(spec);q.update(method='normalized_joint_block_v1',variable_groups=['lengths','materials'],
+            segment_counts=[2],tendon_counts=[3],span_strategies=['whole_chain'],max_proposals=2,max_evaluations=2)
+        parsed=FamilyMixedSearch.model_validate(q)
+        search.search_problem(self.host,parsed,2)
+        constrained=deepcopy(spec);constrained['length_constraint']={'fixed_total_m':.25}
+        update(self.host,spec=constrained)
+        with self.assertRaisesRegex(ValueError,'JOINT_BLOCK_LENGTH_COUPLING_NOT_SUPPORTED'):
+            search.search_problem(self.host,parsed,2)
+        update(self.host,spec=spec)
+        space=spec['family_space'];first=initial(space,parsed)
+        moved,paths,radius=next_move(space,parsed,first,0,parsed.step)
+        self.assertGreaterEqual(len(paths),2)
+        norm=0.
+        for path in paths:
+            _,index,key=path.split('.')
+            domain=space['segment_domains'].get(index,space['segment_domain'])[key]
+            delta=(moved['segments'][index][key]-first['segments'][index][key])/(domain['maximum']-domain['minimum'])
+            norm+=delta*delta
+        self.assertLessEqual(norm**.5,radius+1e-12)
+        out=self.run_scored(q=q,key='joint-block-fixture')['result']['result']
+        self.assertEqual(len(out['evaluated']),2)
+        self.assertGreaterEqual(len(out['evaluated'][1]['lineage']['variables_or_topology_changed']),2)
+        self.assertTrue(out['evaluated'][1]['candidate_id'])
+        self.assertEqual(out['resource_use']['actual_mathematical_evaluations'],2)
+        self.assertFalse(state(self.host).get('success_gate'))
+
     def test_proposal_changes_when_feedback_changes(self):
         from tools.research.mixed_moves import initial,next_move
         q=FamilyMixedSearch.model_validate(request(self.spec));space=self.spec['family_space']
