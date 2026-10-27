@@ -167,6 +167,10 @@ class NativeMixedSearchTests(unittest.TestCase):
         self.assertEqual(seed['status'],'generated',seed)
         total=sum(x['length_m'] for x in seed['resolved']['segments'])
         spec['length_constraint']={'fixed_total_m':total};update(self.host,spec=spec)
+        for method in ('bounded_mixed_coordinate_v1','normalized_joint_block_v1'):
+            invalid=self.query();invalid.update(family_space_identity=spec['family_space_identity'],method=method)
+            with self.assertRaisesRegex(ValueError,'V3_SEARCH_METHOD_UNSUPPORTED'):
+                search.search_problem(self.host,invalid,4)
         q=self.query();q.update(family_space_identity=spec['family_space_identity'],method='adaptive_joint_block_v1',
             previous_candidate_ref=seed['candidate'],span_strategies=['whole_chain'],
             max_proposals=4,max_evaluations=4,variable_groups=['lengths','routing'],

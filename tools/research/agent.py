@@ -291,6 +291,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation={'serial_family_space_v3':'GenerationRequestV3','serial_family_space_v2':'GenerationRequestV2'}.get(family_version,'GenerationRequest')
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
+        if family_version=='serial_family_space_v3':
+            method=schema['$defs']['FamilyMixedSearch']['properties']['method']
+            method['enum']=['adaptive_joint_block_v1'];method.pop('default',None)
+            schema['$defs']['FamilyMixedSearch']['required'].append('method')
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))

@@ -64,6 +64,12 @@ class C3ReadinessTests(unittest.TestCase):
         compact=brief['structure_actions']
         self.assertNotIn('grant',compact)
         self.assertEqual(compact['generate_version'],'serial_family_generation_v3')
+        self.assertEqual(compact['available_search_methods'],['adaptive_joint_block_v1'])
+        self.assertIn('previous_candidate_ref',compact['search_prerequisites']['adaptive_joint_block_v1'])
+        from tools.research.agent import plan_schema
+        schema=plan_schema(['generate','search'],family_version='serial_family_space_v3')
+        self.assertEqual(schema['$defs']['FamilyMixedSearch']['properties']['method']['enum'],['adaptive_joint_block_v1'])
+        self.assertIn('method',schema['$defs']['FamilyMixedSearch']['required'])
         detail=core.read_evidence(host,compact['detail_query'],record_read=False)
         self.assertEqual(detail['generate']['version'],'serial_family_generation_v3')
         self.assertIn('adaptive_joint_block_v1',detail['search']['available_methods'])

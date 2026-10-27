@@ -1120,8 +1120,12 @@ def agent_decision_brief(host):
     if (s['spec'].get('start_mode')=='family_space' and s['spec']['family_space']['version']=='serial_family_space_v3'
             and s['spec'].get('initial_structure_strategy') in (None,'agent_choice') and brief.get('structure_actions')):
         detail=brief['structure_actions']
+        if not detail['search']['available_methods']:
+            brief['actions']=[a for a in brief['actions'] if a!='search']
+            brief['available_research_actions']=[a for a in brief['available_research_actions'] if a['action']!='search']
         brief['structure_actions']=dict(generate_version=detail['generate']['version'],
             search_version=detail['search']['version'],available_search_methods=detail['search']['available_methods'],
+            search_prerequisites=detail['search'].get('method_prerequisites'),
             native_budget=detail.get('native_budget'),
             detail_query=dict(reference=s['family_space_reference'],view='working_set',pointer='/structure_actions'),
             scope='Choose any currently admitted action; exact request templates and frozen grants are available at detail_query.')

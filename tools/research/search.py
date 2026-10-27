@@ -30,6 +30,8 @@ def search_problem(host,query,count):
         fit=next(r for r in rows if r.get('capability_method')==CONIC and not r.get('submode'))
         if fit['status']=='not_applicable':raise ValueError('TASK_VIOLATION_SEARCH_NOT_ADMITTED: '+str(fit['reasons']))
     if isinstance(q,FamilyMixedSearch):
+        if s['spec']['family_space'].get('version')=='serial_family_space_v3' and q.method!='adaptive_joint_block_v1':
+            raise ValueError('V3_SEARCH_METHOD_UNSUPPORTED: use generate for an initial candidate or adaptive_joint_block_v1 with a V3 candidate')
         if q.method=='normalized_joint_block_v1' and s['spec'].get('length_constraint'):
             raise ValueError('JOINT_BLOCK_LENGTH_COUPLING_NOT_SUPPORTED: choose another registered search or a family without an aggregate length constraint')
         from extensions.tendon_family.family_space import search_domains
@@ -157,7 +159,12 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
-    if 'methods' not in grant:guidance['search']['method']=grant['method']
+    if spec['family_space'].get('version')=='serial_family_space_v3':
+        guidance['search']['available_methods']=[m for m in guidance['search']['available_methods'] if m=='adaptive_joint_block_v1']
+        guidance['search']['method_prerequisites']={'adaptive_joint_block_v1':'Requires an owned generated V3 previous_candidate_ref and concrete effective parameter paths; unavailable from an empty pool.'}
+        guidance['search']['unsupported_methods']=['bounded_mixed_coordinate_v1','normalized_joint_block_v1']
+        guidance['generate']['empty_pool_start']='Generation is available without a prior candidate; choose a legal V3 request.'
+    elif 'methods' not in grant:guidance['search']['method']=grant['method']
     if spec['family_space'].get('version') in ('serial_family_space_v2','serial_family_space_v3'):
         space=spec['family_space']; rule=space['serial_assembly']
         parts={p['id']:p for p in space['assembly']['components']}
