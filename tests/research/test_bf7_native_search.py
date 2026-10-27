@@ -118,7 +118,9 @@ class NativeMixedSearchTests(unittest.TestCase):
         with patch('tools.research.task_constraints.analysis_capabilities',side_effect=AssertionError('CONIC must not be consulted')):
             problem=search.search_problem(self.host,q,6)
         self.assertEqual(problem['analyses_per_structure'],3)
-        self.assertIn('native_mode',search.request_guidance(self.spec)['search'])
+        guidance=search.request_guidance(self.spec)
+        self.assertIn('native_mode',guidance['search'])
+        self.assertEqual(guidance['generate']['segment_section_format']['required_section_counts'],{'first':1,'subsequent':2})
         with self.assertRaisesRegex(ValueError,'ALL_CONDITIONS'):
             search.search_problem(self.host,q,2)
         with self.assertRaisesRegex(ValueError,'STUDY_NATIVE_CONTROL_LIMIT'):

@@ -58,6 +58,19 @@ class ExecutionFeedbackTests(unittest.TestCase):
         self.assertIn('NATIVE_SEARCH_REQUIRES',feedback['expected'])
         self.assertFalse(feedback['scientific_execution_started'])
 
+    def test_v2_generation_error_does_not_recommend_v1(self):
+        host,current=offline_host({});reference=dict(artifact_id='d'*64,media_type='application/json')
+        value=dict(action='generate',hypothesis='Fixture',expected_observation='Fixture',weakening_observation='Fixture',
+            fixed_conditions='Fixture',stopping_condition='Fixture',interpretation='Fixture',
+            generation=dict(version='serial_family_generation_v2',family_space_identity='fixture',segment_count=1,
+                tendon_count=3,segments={'segment_0':dict(length_m=.1)}))
+        with self.assertRaises(ValueError) as caught:Plan.model_validate(value)
+        with patch('tools.research.agent.record',return_value=reference):
+            feedback=error_feedback(host,dict(name='research_plan',input=value),caught.exception,current)
+        self.assertIn('GenerationRequestV2',feedback['field'])
+        self.assertNotIn('serial_family_generation_v1',feedback['expected'])
+        self.assertIn('integer',feedback['expected'])
+
     def test_unrelated_unknown_parameter_keeps_its_original_error(self):
         host,current=offline_host({});reference=dict(artifact_id='b'*64,media_type='application/json')
         with self.assertRaises(ValueError) as caught:LocalControlSearchSettings.model_validate(dict(other_field=1))

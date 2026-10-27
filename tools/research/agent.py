@@ -354,6 +354,10 @@ def error_feedback(host, use, exc, before):
         if isinstance(search,dict) and search.get('version')=='family_mixed_search_v1':
             matching=[e for e in errors if any('FamilyMixedSearch' in str(part) for part in e['loc'])]
             if matching:errors=matching
+        generation=use.get('input',{}).get('generation')
+        if isinstance(generation,dict) and generation.get('version')=='serial_family_generation_v2':
+            matching=[e for e in errors if any('GenerationRequestV2' in str(part) for part in e['loc'])]
+            if matching:errors=matching
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']

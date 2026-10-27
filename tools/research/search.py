@@ -129,6 +129,15 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
+    if spec['family_space'].get('version')=='serial_family_space_v2':
+        space=spec['family_space']; rule=space['serial_assembly']
+        parts={p['id']:p for p in space['assembly']['components']}
+        guidance['generate']['segment_section_format']=dict(
+            segment_keys='Integer indices; JSON keys are numeric strings such as \"0\", not segment_0.',
+            sections='When supplied, use Section objects without station s; replace each inherited station in order. Omit to inherit.',
+            required_section_counts=dict(first=len(parts[rule['root_segment']]['sections']),
+                subsequent=len(parts[rule['repeated_segment']]['sections'])),
+            scope='Counts derive from frozen prototypes; station positions remain prototype-owned.')
     if 'mujoco_control' in grant.get('evaluation_modes',[]):
         guidance['search']['native_mode']=dict(evaluation_mode='mujoco_control',objective='task_violation',
             inner_analysis='mujoco_nonlinear_task_capability_v1',
