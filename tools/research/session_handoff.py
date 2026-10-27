@@ -258,6 +258,9 @@ async def inspect_confirmed_incomplete(host,agent,directory):
             receipt['execution_status']!='completed' or receipt['charged']['model_calls']!=1 or
             digest(request)!=row['request_hash'] or not reception or reception['http_status']!=200):
         raise ValueError('ORIGINAL_REQUEST_RESPONSE_RECEIPT_MISMATCH')
+    settled=host.store.artifact(receipt['output'])
+    if any(settled.get(k)!=reception.get(k) for k in ('body','http_status','usage','finish_reasons')):
+        raise ValueError('SETTLED_RECEIPT_RESPONSE_MISMATCH')
     body=json.loads(host.store.artifact(reception['body'],raw=True));choices=body.get('choices',[])
     if len(choices)!=1 or choices[0].get('finish_reason')!='length':
         raise ValueError('EXPLICIT_LENGTH_TRUNCATION_REQUIRED')
@@ -532,7 +535,8 @@ async def recover_confirmed_incomplete(host,agent,build,directory,*,stage=lambda
                 s['pilot'].get('unconsumed_response')!=proof['request_id'] or s.get('pending') or
                 host.store.remaining(db=db)!=proof['original_budget'] or
                 db.execute('SELECT COUNT(*) FROM calls WHERE run_id=? AND receipt IS NULL',(host.run_id,)).fetchone()[0] or
-                files!=snapshot_files(directory,value['next_session'])):
+                files!=snapshot_files(directory,value['next_session']) or
+                proof['old_snapshot_files']!=snapshot_files(directory,proof['original_session'])):
             raise ValueError('INCOMPLETE_COMMIT_STATE_CHANGED')
         verification=host.store.put(db,dict(preparation=preparation,snapshot_files=files,independently_restored=True))
         disposition=host.store.put(db,dict(version='confirmed_incomplete_provider_output_v1',

@@ -101,6 +101,7 @@ class IncompleteSessionRecoveryTests(unittest.TestCase):
         self.assertEqual(len(self.sent),3)
         self.assertEqual(self.h.store.remaining()['used']['model_calls'],3)
         self.assertTrue(any(e['kind']=='supervisor_pause' for e in self.h.store.events(self.h.run_id)))
+        self.assertTrue(any(e['kind']=='request_feedback_boundary' for e in self.h.store.events(self.h.run_id)))
         self.assertFalse(state(self.h)['pilot'].get('unconsumed_response'))
         self.assertEqual(state(self.h)['research_status'],'ready')
 

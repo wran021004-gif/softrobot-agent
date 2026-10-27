@@ -52,14 +52,19 @@ class P2ExecutionGuardTests(TestCase):
     def test_windows_session_storage_handles_long_snapshot_path(self):
         import asyncio,shutil,uuid
         from tools.research.agent import session_storage,session_storage_path
+        from tools.research.session_handoff import snapshot_files
         folder=ROOT/'runs'/('p2-path-fixture-'+uuid.uuid4().hex[:8])
         try:
             folder.mkdir(parents=True)
             root=folder/('a'*70)/'framework_sessions'
-            key='session/p2-v3-positive-high-agent-remaining-20261028/scopes/agent/default/snapshots/p2-check-'+uuid.uuid4().hex+'.json'
+            session_id='p2-v3-positive-high-agent-remaining-20261028'
+            key='session/'+session_id+'/scopes/agent/default/snapshots/snapshot_latest.json'
             storage=session_storage(root)
             asyncio.run(storage.write(key,b'verified'))
             self.assertEqual(asyncio.run(storage.read(key)),b'verified')
+            first=snapshot_files(root,session_id,flush=True)
+            self.assertEqual(first,snapshot_files(root,session_id))
+            self.assertEqual(len(first),1)
             scoped=storage.namespace('context')
             asyncio.run(scoped.write(key,b'context'))
             self.assertEqual(asyncio.run(scoped.read(key)),b'context')

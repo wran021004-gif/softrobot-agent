@@ -16,8 +16,8 @@ class IncompleteAdmissionTests(unittest.TestCase):
         self.body={'choices':[{'finish_reason':'length','message':{'tool_calls':[{'id':'partial'}]}}],'usage':{'prompt_tokens':2}}
         self.rec={'body':{'artifact_id':'body'},'http_status':200,'usage':self.body['usage'],'finish_reasons':['length']}
         self.events=[{'kind':'model_original_tool_feedback','sequence':1,'outputs':[{'artifact_id':'feedback'}]}, {'kind':'model_decision_packet','sequence':2,'outputs':[{'artifact_id':'packet'}]}, {'kind':'r3_request','request_id':'request','sequence':3,'outputs':[{'artifact_id':'meta'}]}]
-        self.objects={'packet':{'implementation':'fixture'},'feedback':{'tool_use':use,'result':result},'meta':{'purpose':'conversation','request':{'artifact_id':'wire'}},'wire':self.wire,'body':json.dumps(self.body).encode()}
-        self.receipt={'request_id':'request','tool_id':'model.deepseek','execution_status':'completed','charged':{'model_calls':1}}
+        self.objects={'packet':{'implementation':'fixture'},'feedback':{'tool_use':use,'result':result},'meta':{'purpose':'conversation','request':{'artifact_id':'wire'}},'wire':self.wire,'body':json.dumps(self.body).encode(),'settled':self.rec}
+        self.receipt={'request_id':'request','tool_id':'model.deepseek','execution_status':'completed','charged':{'model_calls':1},'output':{'artifact_id':'settled'}}
         self.row={'request_hash':digest(self.wire),'receipt':json.dumps(self.receipt),'execution_id':'exec'}
         self.h=MagicMock();self.h.run_id='fixture';self.h.store.events.side_effect=lambda _:self.events
         self.h.store.artifact.side_effect=lambda r,**kwargs:self.objects[r['artifact_id']]

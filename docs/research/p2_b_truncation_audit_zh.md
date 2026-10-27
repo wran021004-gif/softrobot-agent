@@ -7,3 +7,5 @@
 第四请求分字段的 UTF-8 紧凑 JSON 测量：tools 47,337 bytes；system message 838 bytes；L0 尾消息 52,934 bytes；三轮历史 reasoning 内容合计 70,152 bytes；四条工具结果消息合计 10,334 bytes。各分类口径为所测字段/消息，不应简单相加作为 Provider token 数。实际 Provider 请求字节 196,007，输入 tokens 52,386。第四响应花费 189.344 s；旧会话完整保留 DeepSeek thinking-mode 工具历史的 reasoning_content。原 Handoff 没有启用实时请求反馈边界，且未消费响应本就不能通过正常安全边界；不是普通已完成轮次。模型实际因何长推理未知。
 
 DeepSeek 官方文档说明 thinking 模式含 tools 的后续请求需传回全部之前轮次 reasoning_content；支持 low/high/max effort，但低 effort 对本任务的实际效果尚未验证。冻结 P2-B 不改变模型参数。新会话可在合法边界不复制旧历史，但权威证据仍在原 Store，实际效果须单独测试。
+
+更新：2026-10-28 用户授权的狭窄恢复已完成，实际恢复和一次真实后续请求见 `p2_b_recovery_result_zh.md`。这段文件前面的四次请求审计保留为恢复前事实，不能据此推断原响应仍未处置。

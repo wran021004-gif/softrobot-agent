@@ -847,6 +847,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls and not s['pilot'].get('unconsumed_response'):
             if s.get('pending') or pending(host) or unmatched(agent.messages):raise ValueError('REQUEST_LIMIT_REQUIRES_SETTLED_FEEDBACK')
             await agent._session_manager.save_snapshot(agent,is_latest=True)
+            if agent.messages and agent.messages[-1]['role']=='user' and any('toolResult' in b for b in agent.messages[-1]['content']):
+                from tools.research.session_handoff import request_feedback_boundary
+                from tools.research.reporter import current_reports
+                if not any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+                    await request_feedback_boundary(host,agent)
             raise SupervisorReviewPause('Bounded Provider request limit reached; no further send')
         if s['research_status']=='stopped':
             event.cancel='Accepted native STOP; no additional request'
@@ -980,7 +985,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                     seen.add(id(cause));cause=cause.__cause__
                 if not isinstance(cause,RequestBoundaryHandoff):raise
                 if isinstance(cause,SupervisorReviewPause):
-                    record(host,'supervisor_pause',dict(boundary='request_feedback',session_id=agent._session_manager.session_id,
+                    record(host,'supervisor_pause',dict(boundary='provider_request_limit' if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls else 'request_feedback',session_id=agent._session_manager.session_id,
                         sdk_message_identity=digest(agent.messages),budgets_preserved=True,next_request_sent=False,
                         budget=decision_packet(host)['research']['budget']))
                     break
