@@ -100,14 +100,19 @@ def freeze_routes(folder=ROUTE_OUT):
     return frozen
 
 
-def tools_for(host,case,reference,rows):
+def tools_for(host,case,reference,rows,*,experience_enabled=False):
     def handle(name):
         def run(use,**kwargs):
             value=use['input'];before=deepcopy(state(host))
             row=dict(tool=name,input=value,scientific_execution_started=False,
                 provider_request_number=host.store.remaining()['used']['model_calls'])
             try:
-                if name=='evidence_read':
+                if name=='experience_retrieve':
+                    from tools.research.experience import retrieve
+                    output=retrieve(host,value)
+                    row.update(contract='valid',operation=value.get('operation','search'),
+                        exact_keys=[r['exact_key'] for r in output['results']])
+                elif name=='evidence_read':
                     query=EvidenceQuery.model_validate(value);row['schema_valid']=True
                     if plain(query.reference)!=reference:raise ValueError('ONLY_FROZEN_CASE_EVIDENCE_IS_READABLE')
                     if query.view not in ('full','summary','fields','range'):raise ValueError('NO_DYNAMIC_STUDY_VIEW_IN_THIS_PROBE')
@@ -115,6 +120,8 @@ def tools_for(host,case,reference,rows):
                     row.update(contract='valid',scope='frozen_read')
                 elif name=='research_plan':
                     plan=Plan.model_validate(value);row['schema_valid']=True
+                    from tools.research.experience import disposition_bindings
+                    disposition_bindings(host,plan.experience_disposition)
                     if plan.action not in ('diagnose','stop'):raise ValueError('OUTSIDE_READ_ONLY_DECISION_SCOPE')
                     if plan.decision is None or plan.decision.research_intent!=PLAN_RESEARCH_INTENTS[plan.action]:
                         raise ValueError('ACTION_DECISION_INTENT_MISMATCH')
@@ -138,11 +145,16 @@ def tools_for(host,case,reference,rows):
     tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),handle(name))
         for name,description,schema in [('evidence_read','Read the committed public summary with production pointer/view semantics',evidence_schema),
             ('research_plan','Validate the descriptive production Plan directly, without an outer plan property; never execute',decision_schema())]]
+    if experience_enabled:
+        from tools.research.contracts import ExperienceQuery
+        tools.append(PythonAgentTool('experience_retrieve',dict(name='experience_retrieve',
+            description='Read-only curated diagnostic search, then exact read; historical guidance is not current scientific evidence.',
+            inputSchema={'json':ExperienceQuery.model_json_schema()}),handle('experience_retrieve')))
     return tools
 
 
 
-async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=False):
+async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=False,experience_enabled=False):
     destination=folder/(case_id+'-'+model)
     previous=read(destination/'summary.json') if (destination/'summary.json').exists() else None
     if previous and (not recover_unsent or previous['actual_requests']):return previous
@@ -161,6 +173,7 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
         host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='Provider-only comparison; no Study'))
         update(host,spec=dict(mode='engineering_numerical',research_decisions=dict(context_limits={'evidence':3})),
             pilot=dict(provider=provider,live_model_requests=0,framework_session_id=short_session))
+        update(host,retrievals=[])
     else:
         current=state(host)
         if host.store.remaining()['used']['model_calls'] or current['pilot'].get('unconsumed_response'):
@@ -171,11 +184,15 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
     packet=dict(case_id=case_id,evidence_reference=reference,evidence=case['evidence'],task=case.get('task'),
         evidence_delivery='Exact public scalar projection; no scientific registration, complete-result read credit or inherited acceptance.',
         scientific_budget=0,scope='Read the frozen evidence, then submit a typed decision or proposal and explain its scope.')
+    if experience_enabled:
+        from tools.research.experience import retrieval_hint
+        update(host,spec={**state(host)['spec'],'capabilities':['analysis'],'canonical_task':dict(family='task.oriented_tracking')})
+        packet['experience_guidance']=retrieval_hint(host)
     boundary=LiveBoundary(host,transport);error=None;final_text=''
     try:
         agent=build_harness(host,transport=boundary,api_key='offline-fixture' if transport else os.environ['DEEPSEEK_API_KEY'],
             instructions=frozen['instructions'],model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),
-            research_tools=tools_for(host,case,reference,rows),configuration_path=destination/'framework.json',
+            research_tools=tools_for(host,case,reference,rows,experience_enabled=experience_enabled),configuration_path=destination/'framework.json',
             session_directory=folder/'sdk'/short_session,session_id=short_session)
         await agent.invoke_async(json.dumps(packet,ensure_ascii=False))
         final_text=''.join(b.get('text','') for b in agent.messages[-1]['content'])

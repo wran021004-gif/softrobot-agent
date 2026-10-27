@@ -51,6 +51,7 @@ class ToolAxisTaskAdapter(ResearchTaskAdapter):
             selected_bindings={k:{f:self.configuration['policy'][k][f] for f in ('extension_id','version')}
                 for k in ('controller','backend','dynamics_model') if complete},
             unsupported_control_methods=['nmpc','ppo'],
+            ppo=self.ppo_applicability(),
             applicability='Native fixed-sequence execution only; independent evaluator requires both position and directed axis signals')
 
     def analysis_requirements(self,binding):

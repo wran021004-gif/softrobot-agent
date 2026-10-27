@@ -20,14 +20,15 @@ def prepare_input(host, request):
     from extensions.tendon_family.mjcf import compile_xml
     c=verify_candidate(host,request.candidate)
     inp=SessionInput.model_validate(c['configuration'])
+    from tools.research_tasks import task_adapter
+    if not task_adapter(inp).ppo_applicability()['supported']:
+        raise ValueError('RL_TASK_UNSUPPORTED: timed Tracking and directed-axis/load/contact tasks require explicit environment and independent-evaluation adaptation')
     p=physics_for(inp)
     scene=assemble(inp,p)
     if scene['control']['tension_execution_mode']!='ideal_tension':
         raise ValueError('Candidate uses length-servo; establish ideal_tension before construction')
     if scene['forces']:
         raise ValueError('RL external-force task semantics are unsupported')
-    if inp.task.family not in ('task.reach','task.tracking'):
-        raise ValueError('RL_TASK_UNSUPPORTED')
     folder=host.store.root/'rl_inputs'/c['identity']
     folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(p,scene,host.reg.parse(inp.policy.backend.parameters),folder/'candidate.xml').read_text(encoding='utf8')

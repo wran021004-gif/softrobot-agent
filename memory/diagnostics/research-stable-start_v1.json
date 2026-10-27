@@ -1,0 +1,44 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-stable-start",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "unstable_initialization",
+  "trigger": "Loaded oriented Tracking lacks a complete stable control starting point.",
+  "procedure": [
+    "成功经验：对携带真实刚性负载的定向 Tracking，先找到能完整运行的合法控制起点，往往比急于判断结构优劣更有信息价值。B 的 BF6 从绳路与重力力矩方向分析得到一个起点，独立执行完整、无接触，但位置和轴方向仍失败；这为后续控制优化打开了入口。",
+    "为什么有效：它把“无法完整执行”和“任务残差较大”分开了。前者可能来自不合适的冷控制、数值问题或模型/接触条件；后者才允许讨论完整时域的形状与工具轴耦合。旧起点失败并不能证明必须换结构。",
+    "失败时的分析：静态牵引方向只是有依据的假设，不能证明动态稳定。辨别它是否有帮助，应关注完整时域、真实惯量绑定、接触、solver 与张力合法性，而不是只看一个末端位置或几个小速度样本。",
+    "边界与反例：完整稳定的失败结果可以支持继续分析，但不获得 SELECT 资格；若有限验证仍不能完整执行，仍需保留其他解释并停止超出授权的尝试。这不是适用于任意软体机器人的稳定性定理。",
+    "Actual historical cost: R2: 1 replay, 600 steps, 1 model build, 61 forward, 1.6259945 s Store numerical, 4.8035293 s driver; second planned start unused, no transferred balance."
+  ],
+  "bindings": {
+    "task": "oriented_tracking",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": true,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/bf6_r2_stability/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "a991d246f59d5de5986bad5d2ec3c80e8aa6102766b3f50edf48a9667c18f33e",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "docs/research/bf6_r_stable_initialization.md",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "429b7b76a479e0775297cd15bcadb041323392e06ca8d7b04a2ec9344da46c70",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Same frozen physics with known tendon routing; no general stability theorem.",
+    "Requires independent full horizon, actual load binding, force/solver/sampling and per-step contact evidence."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

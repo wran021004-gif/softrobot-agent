@@ -1,0 +1,50 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-strict-near-tolerance",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "near_tolerance",
+  "trigger": "Position/tool-axis control is close to a joint threshold; position alone may pass.",
+  "procedure": [
+    "成功经验：BF5 位置—工具轴任务通过 Native 联合约束控制和独立双信号评价获得成功。首次完整失败已经满足位置，但工具轴略超限；对真实、未舍入残差的分析支持在另行授权后进行短续算，最终有限差分探针产生独立通过的控制。成功不一定发生在一个完整 response proposal 结束时。",
+    "为什么需要联合分析：位置改善可能以方向变差为代价。单位工具轴的 chord 界可用于 Native 搜索，而独立验收仍依据真实有向轴的 arccos 角与位置范数，在原评分时刻同时满足。位置通过不能代表整个任务通过。",
+    "失败触发的分析：接近容限可能是有限搜索残差、局部预测误差或数值余量问题，不能直接认定评价器错误或结构不可行。未舍入误差、单位、完整评分网格与独立来源，是辨别这些解释的基础。",
+    "反例与判断：BF6 R7 的方向已通过，位置仍超限 0.034913020 mm，尽管局部预测进入容限，仍是严格失败并 STOP。近似程度不能替代原验收；BF5 的历史成功也不保证同类新任务会成功。工具轴方向不等于完整姿态或轴向 roll。",
+    "Actual historical cost: BF5 failed precheck:51 Native+1 replay/31,200 steps/5.672948 s. Continuation:3 Native+1 replay/2,400 steps/2.893614 s. Total first independent pass:54 Native+2 replay/33,600 steps/8.566562 s Store numerical; 16.311400 s driver, kinematic audit separate."
+  ],
+  "bindings": {
+    "task": "position_tool_axis",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": true,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/bf5_tool_axis_preparation/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "405b5c9eabfe541450ff73f0405aa8720d4db5024cd20b7b32bf00729cf19081",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf5_tool_axis_continuation/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "a26eb8f20d166e8a2ee05c2862c76655326ec942b9363211497f3b1e2c560c04",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r7_feasibility/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "5059554fd32171de31e3c30e3b63a7e4d831e6689b3142d12ef3855ca91ca7da",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Conjunctive sampled position/directed-axis tasks, including oriented tracking.",
+    "Directed tool axis is two orientation degrees of freedom; this does not cover full pose or axial roll."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

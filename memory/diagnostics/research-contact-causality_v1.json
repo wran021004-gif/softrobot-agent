@@ -1,0 +1,44 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-contact-causality",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "contact_numerical_failure",
+  "trigger": "A loaded rollout stops near floor contact and later reports numerical failure.",
+  "procedure": [
+    "经验：接触与数值失稳同时出现时，时间上的先后关联还不等于因果。B 的 BF6 旧冷起点在记录接触后才出现 QVEL warning，但失败调用前的状态已经极端；较早的稀疏样本看起来平稳，也不能补足最后几毫秒的证据。",
+    "诊断思路：至少保留接触响应触发失稳、失稳导致接触、二者耦合三种解释。warning 未出现不能排除状态已不可信；位于地面上方的测量 site 也不能代表偏置、旋转后的整个负载有间隙。",
+    "辨别性观察：已存 pre-step 状态、引擎时间、接触几何体、warning 和信号采样相位能约束解释。缺少逐步加速度及实际 contact pos/frame 时，应明确因果未决；稀疏差分加速度只是代理，不能冒充瞬时 qacc。",
+    "后续选择：优先弄清记录支持什么，再判断是否值得另行验证稳定起点或数值假设。地面、负载、容差的改变会改变问题本身，不能作为原任务通过的依据。",
+    "Actual historical cost: R1: 0 builds/forward/steps/evaluations. Original failed B run: 452 confirmed completed steps, 453 attempted calls, failed-call progress unknown, 3.1501073 s Store numerical; complete historical driver and currency unknown."
+  ],
+  "bindings": {
+    "task": "oriented_tracking",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/bf6_r1_diagnosis/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "a35d6487611f8253b493d66986156550b0dbdff3b4225cbbb22ad0420a893a75",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "docs/research/bf6_r_stable_initialization.md",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "429b7b76a479e0775297cd15bcadb041323392e06ca8d7b04a2ec9344da46c70",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Loaded tendon MuJoCo with recorded contacts; causal diagnosis remains unresolved.",
+    "Independent replay must check contact at every physics step when required; sample-time zeros are insufficient."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

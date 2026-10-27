@@ -1,0 +1,50 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-witness-and-cost",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "acceptance_accounting",
+  "trigger": "A complete Native control schedule appears successful and needs an independent outcome and cost audit.",
+  "procedure": [
+    "成功经验：BF5 位置—工具轴和 BF6 真实负载定向 Tracking 的共同路线，是 Native 联合控制优化提供候选控制，新的独立物理执行与注册评价建立原任务通过，再据此 SELECT 并停止。数学预测、Native 回调和独立验收承担不同角色，不能互相借用资格。",
+    "分析重点：独立执行身份、完整位置/轴时间网格、原联合验收、真实惯量绑定、每物理步接触要求和来源一致性，决定成功结论的可信范围。这里的独立是同一 MuJoCo 模型下的新执行，不是硬件、不同动力学模型或鲁棒性验证。",
+    "费用经验：R8 的硬阈值代理在第 26 次回调满足，冻结的内部规划余量在第 76 次满足，之后才有独立通过。短的最后续段不代表从头获得成功的总成本；所有失败、未知失败调用进度以及不同费用口径都影响判断。",
+    "反例与停止判断：外层回放收据、嵌入的 evaluator 和 profile 不是额外 rollout；确认完成步数的下界不能被写成精确总步数。首个完整独立通过后继续追分会改变研究目标。B 的路线与额度由 Codex/固定监督脚本编排，数值结果由工具计算，Provider 调用为零。",
+    "Actual historical cost: R8:76 Native+1 replay/46,200 steps/7.0940742 s Store numerical/11.4023622 s driver. BF6 total:682 Native attempts(681 complete),8 replay attempts(7 complete),>=413,252 confirmed steps/413,253 calls,15 science builds,61.3966554 s Store numerical. Historical full driver and currency unknown; Provider/PPO/NMPC zero."
+  ],
+  "bindings": {
+    "task": "oriented_tracking",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/bf6_r8_feasibility/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "257f42e4ac66aa256c710508f6c2977c6726dbaa41258bf43bce9655a912aa1e",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r8_feasibility/audit.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "13c96717b063719dc6c3907214161b1d26218b5a951912f81ded6ce9294c2325",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "docs/research/bf5_witness_tool_audit.md",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "2a72d85af1658440f3f5153013936cc8c9693bb454025981be48f572f1c7fcd3",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Nominal sampled MuJoCo witnesses only, no hardware/global/robustness proof.",
+    "Codex and fixed supervisors chose routes and budgets; deterministic tools calculated candidates/responses/evaluation. Provider calls in B were zero; no LLM autonomous discovery claim."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

@@ -660,8 +660,8 @@ def action_feedback(host,current):
                 status='not_applicable' if 'ppo' in unsupported else 'unavailable' if closed or 'rl' not in s['spec']['capabilities']
                     or rl_budget['remaining_stages']==0 or rl_budget['remaining_allocatable_actions']==0
                     else 'blocked' if missing else 'prerequisites_only',
-                reason=execution['applicability'] if 'ppo' in unsupported else missing or None,references=available if mode=='residual' else [],budget=rl_budget,
-                remaining_checks=['full_RLRequest','ideal_tension_reach_environment','aligned_allocation','training_capacity'],
+                reason=execution.get('ppo',{}).get('reason',execution['applicability']) if 'ppo' in unsupported else missing or None,references=available if mode=='residual' else [],budget=rl_budget,
+                remaining_checks=['full_RLRequest','ideal_tension_task_environment','aligned_allocation','training_capacity'],
                 scope='Training/checkpoint is not task acceptance; direct PPO needs no reference'))
         rows.append(dict(action='initialize_control',method='baseline',candidate=candidate,
             status='preflight_eligible' if not closed and 'initialize_control' in current['actions'] else 'unavailable',
@@ -966,6 +966,7 @@ def controller_capabilities(host):
     return dict(recipe_defaults=controller['parameters']['data']['recipe'],
         frozen_replan_period_s=spec.get('nmpc_replan_period_s'),
         task_reference=task_adapter(spec['configuration']).control_reference(),
+        ppo=task_adapter(spec['configuration']).ppo_applicability(),
         parameter_schema=host.reg.get(controller['extension_id'],controller['version'],'controller').input_schema.model_json_schema(),
         solver_defaults=controller['parameters']['data'].get('solver'),
         patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned')
@@ -983,6 +984,9 @@ def agent_decision_brief(host):
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
+    from tools.research.experience import retrieval_hint
+    hint=retrieval_hint(host)
+    if hint:brief['experience_guidance']=hint
     if s['spec'].get('task_conditions'):
         brief['task_conditions']=dict(frozen=[dict(condition_id=c['condition_id'],
             task={k:c['task'][k] for k in ('task_id','task_version','family','timing')},

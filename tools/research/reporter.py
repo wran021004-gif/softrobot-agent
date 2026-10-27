@@ -14,7 +14,7 @@ from schemas.research_reporting import (EvidenceLocation, EvidenceRelation,
     RecordedField, ReportedMetric, ReporterInterpretation, ScientificReport)
 from tools.platform_store import plain
 from tools.research.core import read_evidence
-from tools.research.contracts import EvidenceQuery
+from tools.research.contracts import EvidenceQuery, ExperienceQuery
 from tools.research.evidence_views import result_card,recorded_math_summary,recorded_control_diagnostics,recorded_static_summary
 from tools.research.evidence_policy import paired_evidence
 from tools.research.state import state, protected
@@ -27,6 +27,8 @@ class InvestigationRequest(Contract):
     constraints: list[str] = Field(default_factory=lambda: ['Use existing evidence only'])
     reads: list[EvidenceQuery] = Field(default_factory=list,
         description='Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit')
+    experience_queries: list[ExperienceQuery] = Field(default_factory=list,max_length=8,
+        description='Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.')
 
 
 class InterpretationResponse(Contract):
@@ -202,7 +204,10 @@ def investigate(host, request):
         if query not in q.reads:q.reads.append(query)
     # Validate explicit reads now; only selected subnodes enter the Reporter input.
     for query in q.reads:read_evidence(host,plain(query),record_read=False)
-    ref=_save(host,report,request=q)
+    from tools.research.experience import retrieve
+    request=plain(q)
+    request['experience_receipts']=[retrieve(host,plain(query),reader='reporter')['reference'] for query in q.experience_queries]
+    ref=_save(host,report,request=request)
     return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
         report_reference=ref,question=q.question,result_count=len(report.results),
         interpretation_status='deferred',
@@ -408,6 +413,7 @@ def _source_catalog(host, report, queries):
 def _wire(host, reference, saved):
     provider=state(host)['pilot']['provider']
     q=saved.get('request') or {};reads=[]
+    guidance=[host.store.artifact(ref) for ref in q.get('experience_receipts',[])]
     for query in q.get('reads',[]):
         reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
     report=ScientificReport.model_validate(saved['report'])
@@ -433,9 +439,11 @@ def _wire(host, reference, saved):
             'identify causes. Do not choose experiments or parameters for the main Agent. '
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
             'State uncertainty when evidence is insufficient. '
+            'Historical procedural_guidance is advisory only; it is excluded from source_catalog. '
+            'Ground every interpretation in this Study evidence; advice grants no scientific evidence or permission. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=saved['report'],request=q,selected_reads=reads,source_catalog=catalog,
+                report=saved['report'],request=q,selected_reads=reads,source_catalog=catalog,procedural_guidance=guidance,
                 score_comparisons=comparisons),separators=(',',':')))])
 
 

@@ -1,0 +1,57 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-bounded-continuation",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "local_residual",
+  "trigger": "Stable loaded oriented Tracking still fails the coupled position/axis limits after finite Native response search.",
+  "procedure": [
+    "成功经验：BF6 的真实负载定向 Tracking 最终沿同一合法结构上的 Native 完整控制序列优化取得独立通过。路线使用已有局部有限差分响应与受约束 minimax 更新；批次间分析全时域位置/轴残差、边界和实际/预测改善，帮助判断是否值得有限精化。没有靠结构搜索或 PPO，也没有 Provider 自主发现路线。",
+    "关键分析：位置偏低、工具轴却上仰，提示不同段曲率分配的耦合；不是简单的整体滞后，也不支持所有同侧绳统一加力。若 Native 与独立回放信号一致，剩余任务残差本身并不是模型迁移误差。",
+    "失败触发的竞争解释：预算耗尽、相对控制系数界、信赖域步长、非负张力下界、真实执行器上界以及局部模型误差是不同原因。R3 的人工系数触界不等于物理张力耗尽；后续未触该界仍有残差，说明不能用一个原因解释所有阶段。",
+    "辨别性观察：误差发生在哪些时刻、实际张力是否跟随请求、究竟哪种界活跃、末轮是否仍改善以及 stop reason，比单一最终分数更能区分解释。退步 proposal、最后 proposal 和工具返回的 best 也不能混为一谈；秩和条件数不证明任务可达。",
+    "后续判断：持续改善且仍有合法调整空间，可以支持提出新的有界验证；停滞、失稳或证据不足会削弱这一选择。历史成功不保证继续就会成功，不授权自动续算；兼容控制能转移为起点，物理初态、通过身份和余额不能随之继承。",
+    "Actual historical cost: R3:151 callbacks+1 replay/91,200 steps/11.5574382 s; R4:51+1/31,200/5.6956721 s; R5:101+1/61,200/8.8649125 s; R6:151+1/91,200/11.7691171 s; R7:151+1/91,200/11.6393395 s Store numerical. Read-only diagnosis added zero scientific calls."
+  ],
+  "bindings": {
+    "task": "oriented_tracking",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": true,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/bf6_r3_read_only_diagnosis/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "1b381c580e0dcac3581d8474a12c1fcf3613090d37485d7f8ce0e1b3f5520102",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r4_read_only_diagnosis/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "0c3fc82f64f2c08ff8a717893e8452b910f0745e4b2b0046d06ba426bac70051",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r6_feasibility/audit.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "42e2e237b1cfc5383eda8563ec97974a919fd2a3577fe6af056eba04fb4609aa",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r7_feasibility/audit.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "9094b6dd7dda25e88af8f54a6565f1f8d6250e9154da4e815c56e7f06282c8b5",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Local response search with compatible owned schedules; no automatic continuation and no promised feasibility.",
+    "When Native and replay agree, remaining residual is not evidence of model-transfer error."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

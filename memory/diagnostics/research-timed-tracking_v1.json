@@ -1,0 +1,57 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-timed-tracking",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "finite_tracking_failure",
+  "trigger": "Timed position Tracking completes but fails intermediate samples or a finite local-search limit.",
+  "procedure": [
+    "成功经验：BF4 定时位置 Tracking 沿固定候选上的 Native 完整控制序列优化获得可行见证，原评分覆盖全部定时点，再由新的独立物理执行确认。S1 的有限失败后，S1b 从该组自己的失败控制继续优化，最终通过。它说明控制重新优化可以消除残差，不说明某个结构天然更优。",
+    "关键分析：Tracking 是整个时间网格的问题，末点接近不代表中途跟得上。原失败中曾有末点满足而中途最大误差仍失败；看完整误差时序，才知道应怀疑定时运动过程还是终端定位。",
+    "失败触发的竞争解释：冷起点不合适、局部优化机会不足、局部裕量/停止规则以及结构与控制的耦合都可能留下残差。末轮仍改善而因 iteration_limit 停止，与真正停滞不同；单次有限失败不证明不可达。",
+    "辨别性观察与反例：比较同一组的初始/优化后全时域误差、回调进展、内部目标与独立通过时刻。S1b 额外获得优化机会，不能与其他组的短预算直接比较结构收益；后续公平 S2 的六组有限失败仍不能证明结构不可行。内部裕量使代理达硬界后继续计算，额外真实费用仍需保留。",
+    "后续判断：证据可支持优先分析控制充分性、时间网格或停止条件，再考虑其他解释；路线由 Agent 结合当前任务决定。历史见证只覆盖同模型的名义定时位置任务，不覆盖方向、真实负载、无接触、硬件或鲁棒性。",
+    "Actual historical cost: BF4 S1:228 Native+3 replay/138,600 steps/20.423402 s Store numerical; S1b:101+1/61,200/8.206989 s. Total:329+4/199,800/28.630391 s Store numerical,42.457162 s driver. S0 separately1,200 steps/2.651406 s; S2 separately606+6/367,200/51.497991 s Store numerical,87.084570 s driver. Provider/PPO/NMPC zero; S1 thread settings were unset, so no normalized single-thread timing claim."
+  ],
+  "bindings": {
+    "task": "tracking",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": true,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "docs/research/bf4_tracking_s1.md",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "0752e229ea1555dd811b349f3f89798afff1280f71f56a355b1ba1b541c7b37e",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "docs/research/bf4_tracking_s2.md",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "94dd9a3dd40f2426c78d635e23e44938fed5bfb6f5247d1dcdfc7c8a32b0d562",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf4_tracking_s1/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "6b34f7c5bfca8eb3aba0ad4bf565ad989482c742ffe9f45af7ab1fd7a3f90a55",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf4_tracking_s2/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "3345de38624929ebcaafcf95d1ae652308652c6e715a8b5d8d3dfc0798dfa813",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "applicability": [
+    "Nominal timed position Tracking with complete registered sampling; not endpoint-only Reach or full oriented/load/contact tasks.",
+    "Control initialization and optimization opportunity must match before interpreting structural differences."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets."
+}

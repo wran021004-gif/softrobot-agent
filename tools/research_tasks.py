@@ -86,6 +86,15 @@ class ResearchTaskAdapter:
             authority='registered evaluator plus frozen acceptance protocol; this derived view grants no approval',
             continuous_time_guarantee=False)
 
+    def ppo_applicability(self):
+        """Task semantics supported by the current PPO environment, not a grant."""
+        family=self.task['family']
+        supported=family=='task.reach' or (family=='task.tracking' and self.control_reference()['kind']=='free_progress')
+        return dict(status='conditional' if supported else 'not_applicable',
+            supported=supported,
+            reason='Reach/Hold and untimed geometric Tracking only; BF4 timed reference, BF5 axis and BF6 axis/load/contact evaluation are not adapted.',
+            scope='Task semantics only; actual ideal tension, scene forces, frozen candidate, environment, independent evaluation, authorization and budget still require admission.')
+
     def execution_requirements(self):
         """Required signals/registered capabilities, not a claim of executability."""
         task = self.task
@@ -120,6 +129,8 @@ class ResearchTaskAdapter:
             physical_inputs=self._physical_inputs() if complete else None,
             configuration_available=complete,
             missing=missing,
+            ppo=self.ppo_applicability(),
+            unsupported_control_methods=[] if self.ppo_applicability()['supported'] else ['ppo'],
             applicability='protocol_id selects a known template only. Configuration presence is not validation. '
                 'This view does not run admission checks; known_blockers is not exhaustive. Use check_compatibility(), '
                 'compile_input(), Registry and route hooks for actual capability; frozen Study grants and budgets still govern execution')

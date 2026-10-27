@@ -639,7 +639,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 original=value
-                if kind not in ('evidence','investigate') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                if kind not in ('evidence','investigate','experience') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
                     from tools.research.research_context import tool_feedback
                     value=tool_feedback(host,value)
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
@@ -667,7 +667,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     instructions=state(host)['spec']['execution_instructions']
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
-            ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
+            ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
             ('evidence_read','Read a named missing fact or verify a relevant change using exact evidence and JSON pointer. Exact repeats add no information; delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
     if formal or rl_mode:
         actions=['propose','stop','diagnose','select','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
@@ -692,8 +692,6 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         native.append(PythonAgentTool('research_investigate',dict(name='research_investigate',
             description='Submit a read-only investigation of saved results and optional exact reads. Returns a saved report reference; formal interpretation arrives before the next research decision. No new scientific computation; internal reads give no SELECT/STOP credit.',
             inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
-    if formal:
-        native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
     agent=None
     def build_session(session_id=None):
         restored=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
@@ -819,7 +817,6 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
         current=decision_packet(host)
-        if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None)}}
@@ -872,8 +869,6 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     def before_tool(event):
         if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
-        if formal and event.tool_use['name']=='experience_retrieve':
-            event.cancel_tool='Use only scoped milestone evidence; unrelated workspace retrieval is unauthorized.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
         if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context'):
             event.cancel_tool='Protected closeout permits only existing work, evidence and STOP.'
