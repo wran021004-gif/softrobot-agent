@@ -1,0 +1,2871 @@
+{
+  "bf7-v1": [
+    {
+      "index": 0,
+      "candidate": {
+        "artifact_id": "597615002613a822980c02e00e4386a158410ebb632423d3e454ebc67f2516c7",
+        "media_type": "application/json"
+      },
+      "structure_summary": {
+        "0": {
+          "length_m": 0.16,
+          "young_pa": 7200000.0
+        },
+        "1": {
+          "length_m": 0.11,
+          "young_pa": 5400000.0
+        }
+      },
+      "shared_score": 1.3000000000012655,
+      "conditions": {
+        "positive_high": {
+          "reference": {
+            "artifact_id": "ae02a18a19c8bb9b1792381873fb0d4f10b92d29752ccfb7ba96e68f31970e1e",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 0.3000000000000095,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 10,
+            "name": "CVXPY/CLARABEL",
+            "objective": 0.30000000000021804,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0022868,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.013733600004343316
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.0030000000000000946,
+            "max_normalized_violation": 0.3000000000000095,
+            "minimum_tension_margin_n": 2.5611596180030833,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.6,
+              "constraint_id": "terminal_error_m",
+              "control_step": 30,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.0030000000000000946
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 0.3000000000000095,
+              "output": [
+                0.29799999999999993,
+                0.03500000018486765,
+                0.18500000190130333
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.285,
+                0.035,
+                0.185
+              ],
+              "residual": [
+                0.012999999999999956,
+                1.848676489668577e-10,
+                1.90130333699301e-09
+              ],
+              "sample_index": 30,
+              "signal": "tip_position",
+              "signed_excesses": [
+                0.3000000000000095
+              ],
+              "signed_violation": 0.3000000000000095,
+              "units": "m",
+              "upper": null,
+              "value": 0.013000000000000095,
+              "violation": 0.0030000000000000946
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "3631c47766478f8cd2ec16b01f926e257f5c2f4f9d3f43519a0c3432d755fb92",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "48d9ff0a6950b63c6c522149d3c857c2578277c567344a3ea74af0d6c5d95464",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.271468299994012,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "negative_low": {
+          "reference": {
+            "artifact_id": "503b8eede345e820d7e6bcc4f98c90ac71994105a89c4a9136381b038048ef1b",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 1.3000000000012655,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 10,
+            "name": "CVXPY/CLARABEL",
+            "objective": 1.3000000000074812,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0017483,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.01454280001053121
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.013000000000012656,
+            "max_normalized_violation": 1.3000000000012655,
+            "minimum_tension_margin_n": 2.8859761851583885,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.54,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 27,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.013000000000012656
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 1.3000000000012655,
+              "output": [
+                0.29799999999999993,
+                -0.03999998353217145,
+                0.13499998224768156
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.275,
+                -0.04,
+                0.135
+              ],
+              "residual": [
+                0.02299999999999991,
+                1.646782855219131e-08,
+                -1.7752318448582827e-08
+              ],
+              "sample_index": 27,
+              "signal": "tip_position",
+              "signed_excesses": [
+                1.3000000000012655
+              ],
+              "signed_violation": 1.3000000000012655,
+              "units": "m",
+              "upper": null,
+              "value": 0.023000000000012656,
+              "violation": 0.013000000000012656
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "3631c47766478f8cd2ec16b01f926e257f5c2f4f9d3f43519a0c3432d755fb92",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "48d9ff0a6950b63c6c522149d3c857c2578277c567344a3ea74af0d6c5d95464",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.864012399993953,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "central_high": {
+          "reference": {
+            "artifact_id": "cb0153972cd6bd61f5dd91edff5c5c9f5e274f04576ef244f11eac5c34430283",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": -0.699999999999463,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 13,
+            "name": "CVXPY/CLARABEL",
+            "objective": -0.6999999999973787,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0023723,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.014920200002961792
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.0,
+            "max_normalized_violation": 0.0,
+            "minimum_tension_margin_n": 2.124757661384769,
+            "status": "feasible_witness",
+            "worst_violation": null
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "3631c47766478f8cd2ec16b01f926e257f5c2f4f9d3f43519a0c3432d755fb92",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "48d9ff0a6950b63c6c522149d3c857c2578277c567344a3ea74af0d6c5d95464",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.957167700005812,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        }
+      }
+    },
+    {
+      "index": 1,
+      "candidate": {
+        "artifact_id": "74a977187083def25dbcd5875b11c9955ac8870700a487a405d237dfb67b7390",
+        "media_type": "application/json"
+      },
+      "structure_summary": {
+        "0": {
+          "length_m": 0.16,
+          "young_pa": 7200000.0
+        },
+        "1": {
+          "length_m": 0.125,
+          "young_pa": 5400000.0
+        }
+      },
+      "shared_score": 2.800000000001413,
+      "conditions": {
+        "positive_high": {
+          "reference": {
+            "artifact_id": "c09e2830057d4e8c98d694c21e2233a64fa93cec1050e2b45a05293bb3c984fb",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 1.8000000000002347,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 10,
+            "name": "CVXPY/CLARABEL",
+            "objective": 1.800000000006363,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0017416,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.012259299997822382
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.018000000000002347,
+            "max_normalized_violation": 1.8000000000002347,
+            "minimum_tension_margin_n": 2.852049512869482,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.54,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 27,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.018000000000002347
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 1.8000000000002347,
+              "output": [
+                0.31299999999999994,
+                0.03500000254193797,
+                0.18500001125370524
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.285,
+                0.035,
+                0.185
+              ],
+              "residual": [
+                0.02799999999999997,
+                2.5419379656721475e-09,
+                1.1253705245461987e-08
+              ],
+              "sample_index": 27,
+              "signal": "tip_position",
+              "signed_excesses": [
+                1.8000000000002347
+              ],
+              "signed_violation": 1.8000000000002347,
+              "units": "m",
+              "upper": null,
+              "value": 0.028000000000002346,
+              "violation": 0.018000000000002347
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "4bb2513a279a58248640ef4c76f30c3e8c02b36f16eb3c48e8d36e14317116c0",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "2a7c0f632dfbc4079fec8d65bfb6139722ada904cca827f26e77b864b12573f1",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.132314800008317,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "negative_low": {
+          "reference": {
+            "artifact_id": "8c809882d6ff719716930dee29631850edc8bf042c767c72e1206f1c7cda8b16",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 2.800000000001413,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 9,
+            "name": "CVXPY/CLARABEL",
+            "objective": 2.80000000005304,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0016499,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.012990899995202199
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.02800000000001413,
+            "max_normalized_violation": 2.800000000001413,
+            "minimum_tension_margin_n": 3.1287111658207554,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.02800000000001413
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 2.800000000001413,
+              "output": [
+                0.31299999999999994,
+                -0.0399999842009354,
+                0.1349999711841643
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.275,
+                -0.04,
+                0.135
+              ],
+              "residual": [
+                0.03799999999999992,
+                1.5799064598254198e-08,
+                -2.8815835717566074e-08
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                2.800000000001413
+              ],
+              "signed_violation": 2.800000000001413,
+              "units": "m",
+              "upper": null,
+              "value": 0.038000000000014134,
+              "violation": 0.02800000000001413
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "4bb2513a279a58248640ef4c76f30c3e8c02b36f16eb3c48e8d36e14317116c0",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "2a7c0f632dfbc4079fec8d65bfb6139722ada904cca827f26e77b864b12573f1",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.863297199990484,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "central_high": {
+          "reference": {
+            "artifact_id": "ce261b667a847e48cd119c082772da85751ace6762de8565adfc0facb03f4664",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 0.8000000000014164,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 12,
+            "name": "CVXPY/CLARABEL",
+            "objective": 0.8000000000078984,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0019753,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.01234630000544712
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.008000000000014164,
+            "max_normalized_violation": 0.8000000000014164,
+            "minimum_tension_margin_n": 2.632553551463949,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.6,
+              "constraint_id": "terminal_error_m",
+              "control_step": 30,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.008000000000014164
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 0.8000000000014164,
+              "output": [
+                0.31299999999999994,
+                -9.461929784820855e-09,
+                0.21500002053738
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.295,
+                0.0,
+                0.215
+              ],
+              "residual": [
+                0.01799999999999996,
+                -9.461929784820855e-09,
+                2.0537379991081295e-08
+              ],
+              "sample_index": 30,
+              "signal": "tip_position",
+              "signed_excesses": [
+                0.8000000000014164
+              ],
+              "signed_violation": 0.8000000000014164,
+              "units": "m",
+              "upper": null,
+              "value": 0.018000000000014164,
+              "violation": 0.008000000000014164
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "4bb2513a279a58248640ef4c76f30c3e8c02b36f16eb3c48e8d36e14317116c0",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "2a7c0f632dfbc4079fec8d65bfb6139722ada904cca827f26e77b864b12573f1",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.906524599995464,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        }
+      }
+    },
+    {
+      "index": 2,
+      "candidate": {
+        "artifact_id": "e6585c9b7face5f3004c19641a6f359b597d4d9433aa01c4311b5358ae5f87fb",
+        "media_type": "application/json"
+      },
+      "structure_summary": {
+        "0": {
+          "length_m": 0.14500000000000002,
+          "young_pa": 7200000.0
+        },
+        "1": {
+          "length_m": 0.11,
+          "young_pa": 5400000.0
+        }
+      },
+      "shared_score": 0.2000000000002059,
+      "conditions": {
+        "positive_high": {
+          "reference": {
+            "artifact_id": "5e724bd7b614bae29b4aa2f0b03eb531b24ec9e85f145888305a3f89320d993e",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": -0.7999999999987745,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 13,
+            "name": "CVXPY/CLARABEL",
+            "objective": -0.7999999999748016,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0020814,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.012815199996111915
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.0,
+            "max_normalized_violation": 0.0,
+            "minimum_tension_margin_n": 2.3269278347855753,
+            "status": "feasible_witness",
+            "worst_violation": null
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "94f33c7e9a403591c7ef537e09d71b80920bbdb50daa99c2235f34d90ccad682",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "02f8d64adc82249426f6ab1edb5da0dfb4c2f19754e9add03eec3676833b2d6b",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.054582600001595,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "negative_low": {
+          "reference": {
+            "artifact_id": "12f898870e912d3ead658488d998748ec0f4f69cbf0d33b1d63a6ac5947e4909",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": -0.19999999999992957,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 11,
+            "name": "CVXPY/CLARABEL",
+            "objective": -0.19999999999869936,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0018427,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.012425399996573105
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.0,
+            "max_normalized_violation": 0.0,
+            "minimum_tension_margin_n": 2.718851745089262,
+            "status": "feasible_witness",
+            "worst_violation": null
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "94f33c7e9a403591c7ef537e09d71b80920bbdb50daa99c2235f34d90ccad682",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "02f8d64adc82249426f6ab1edb5da0dfb4c2f19754e9add03eec3676833b2d6b",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.977344800005085,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "central_high": {
+          "reference": {
+            "artifact_id": "b725987aca0682409b656a4fbd92aa14a242c814258c0279a07f6b8a0708d02a",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 0.2000000000002059,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 10,
+            "name": "CVXPY/CLARABEL",
+            "objective": 0.20000000000207216,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0017227,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.014216600000509061
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.002000000000002059,
+            "max_normalized_violation": 0.2000000000002059,
+            "minimum_tension_margin_n": 2.4430266603733637,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.6,
+              "constraint_id": "terminal_error_m",
+              "control_step": 30,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.002000000000002059
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 0.2000000000002059,
+              "output": [
+                0.28300000000000003,
+                -1.4574357148650768e-09,
+                0.21500000695581428
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.295,
+                0.0,
+                0.215
+              ],
+              "residual": [
+                -0.011999999999999955,
+                -1.4574357148650768e-09,
+                6.955814285669604e-09
+              ],
+              "sample_index": 30,
+              "signal": "tip_position",
+              "signed_excesses": [
+                0.2000000000002059
+              ],
+              "signed_violation": 0.2000000000002059,
+              "units": "m",
+              "upper": null,
+              "value": 0.01200000000000206,
+              "violation": 0.002000000000002059
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "94f33c7e9a403591c7ef537e09d71b80920bbdb50daa99c2235f34d90ccad682",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "02f8d64adc82249426f6ab1edb5da0dfb4c2f19754e9add03eec3676833b2d6b",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.371852500000386,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        }
+      }
+    }
+  ],
+  "bf7-r2": [
+    {
+      "index": 0,
+      "candidate": {
+        "artifact_id": "e1dcf9f645ed6c33abc52a5e5193ad647a8910221920ec5562cdae9f8a1c6757",
+        "media_type": "application/json"
+      },
+      "structure_summary": {
+        "0": {
+          "length_m": 0.16,
+          "young_pa": 12000000.0
+        },
+        "1": {
+          "length_m": 0.12,
+          "young_pa": 10000000.0
+        }
+      },
+      "shared_score": 2.300000000000048,
+      "conditions": {
+        "positive_high": {
+          "reference": {
+            "artifact_id": "89947d1e47af2f8c4a26d1cd4258a375410b21cbe2dc5559b66168bb75c62281",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 1.3000000000004068,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 11,
+            "name": "CVXPY/CLARABEL",
+            "objective": 1.3000000000039629,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0018281,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.013013100004172884
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.013000000000004069,
+            "max_normalized_violation": 1.3000000000004068,
+            "minimum_tension_margin_n": 2.3536944727717577,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.013000000000004069
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 1.3000000000004068,
+              "output": [
+                0.308,
+                0.03500001164284486,
+                0.18500000712645887
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.285,
+                0.035,
+                0.185
+              ],
+              "residual": [
+                0.02300000000000002,
+                1.1642844854886647e-08,
+                7.1264588674679885e-09
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                1.3000000000004068
+              ],
+              "signed_violation": 1.3000000000004068,
+              "units": "m",
+              "upper": null,
+              "value": 0.02300000000000407,
+              "violation": 0.013000000000004069
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "17254e7c2c862ade5c089443d04f07bdb4814c1c8179ea25e05231519d1c76ce",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.948460300001898,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "negative_low": {
+          "reference": {
+            "artifact_id": "84dfd400f92303880cef74b4528555eeca16df2b377a58fabebac2daedb53aee",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 2.300000000000048,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 10,
+            "name": "CVXPY/CLARABEL",
+            "objective": 2.3000000000008494,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0019851,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.01245589999598451
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.02300000000000048,
+            "max_normalized_violation": 2.300000000000048,
+            "minimum_tension_margin_n": 2.718776035299734,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.02300000000000048
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 2.300000000000048,
+              "output": [
+                0.308,
+                -0.04000000260548664,
+                0.1350000051929949
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.275,
+                -0.04,
+                0.135
+              ],
+              "residual": [
+                0.032999999999999974,
+                -2.6054866389402243e-09,
+                5.192994895208969e-09
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                2.300000000000048
+              ],
+              "signed_violation": 2.300000000000048,
+              "units": "m",
+              "upper": null,
+              "value": 0.03300000000000048,
+              "violation": 0.02300000000000048
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "17254e7c2c862ade5c089443d04f07bdb4814c1c8179ea25e05231519d1c76ce",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.983229400007986,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "central_high": {
+          "reference": {
+            "artifact_id": "0105f2d04f6dab4861fa769d1862f45d628d96cb718aabddf7f379811496b3bf",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 0.3000000000000693,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 11,
+            "name": "CVXPY/CLARABEL",
+            "objective": 0.30000000000117216,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.002033,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.013175799991586246
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.003000000000000693,
+            "max_normalized_violation": 0.3000000000000693,
+            "minimum_tension_margin_n": 2.1547646206151123,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.003000000000000693
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 0.3000000000000693,
+              "output": [
+                0.308,
+                -5.778933926444546e-10,
+                0.21500000416752701
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.295,
+                0.0,
+                0.215
+              ],
+              "residual": [
+                0.013000000000000012,
+                -5.778933926444546e-10,
+                4.167527017928663e-09
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                0.3000000000000693
+              ],
+              "signed_violation": 0.3000000000000693,
+              "units": "m",
+              "upper": null,
+              "value": 0.013000000000000693,
+              "violation": 0.003000000000000693
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "17254e7c2c862ade5c089443d04f07bdb4814c1c8179ea25e05231519d1c76ce",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.949524299998302,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        }
+      }
+    },
+    {
+      "index": 1,
+      "candidate": {
+        "artifact_id": "886604e858b80b6ef7ae9397536fef1c3adf781b1f7a14c0baaa9b4af0bff111",
+        "media_type": "application/json"
+      },
+      "structure_summary": {
+        "0": {
+          "length_m": 0.16,
+          "young_pa": 13750000.0
+        },
+        "1": {
+          "length_m": 0.12,
+          "young_pa": 10000000.0
+        }
+      },
+      "shared_score": 2.300000000000607,
+      "conditions": {
+        "positive_high": {
+          "reference": {
+            "artifact_id": "708bf2251b90f10c9c25d2f406330ba795674d7efafb4872b68a429a7b8b4b54",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 1.3000000000002538,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 11,
+            "name": "CVXPY/CLARABEL",
+            "objective": 1.3000000000027823,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0018178,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.012407900008838624
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.013000000000002539,
+            "max_normalized_violation": 1.3000000000002538,
+            "minimum_tension_margin_n": 2.2871571778489876,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.013000000000002539
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 1.3000000000002538,
+              "output": [
+                0.308,
+                0.03500000881969252,
+                0.18500000617947296
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.285,
+                0.035,
+                0.185
+              ],
+              "residual": [
+                0.02300000000000002,
+                8.819692517980648e-09,
+                6.1794729611097665e-09
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                1.3000000000002538
+              ],
+              "signed_violation": 1.3000000000002538,
+              "units": "m",
+              "upper": null,
+              "value": 0.02300000000000254,
+              "violation": 0.013000000000002539
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "ef69acc3460b5a045e4f8934764b3ecd63e6f47623f84c8de4844c63719973cf",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 8.815771900000982,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "negative_low": {
+          "reference": {
+            "artifact_id": "8a6032492437c93f43a8223806573dddf851e16ab41935be8d8775bddfaa30f4",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 2.300000000000607,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 9,
+            "name": "CVXPY/CLARABEL",
+            "objective": 2.3000000000110035,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0022076,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.013157199995475821
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.02300000000000607,
+            "max_normalized_violation": 2.300000000000607,
+            "minimum_tension_margin_n": 2.6948093645636684,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.54,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 27,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.02300000000000607
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 2.300000000000607,
+              "output": [
+                0.308,
+                -0.04000001949254874,
+                0.1350000047654292
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.275,
+                -0.04,
+                0.135
+              ],
+              "residual": [
+                0.032999999999999974,
+                -1.9492548741784077e-08,
+                4.765429190145554e-09
+              ],
+              "sample_index": 27,
+              "signal": "tip_position",
+              "signed_excesses": [
+                2.300000000000607
+              ],
+              "signed_violation": 2.300000000000607,
+              "units": "m",
+              "upper": null,
+              "value": 0.03300000000000607,
+              "violation": 0.02300000000000607
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "ef69acc3460b5a045e4f8934764b3ecd63e6f47623f84c8de4844c63719973cf",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.349653700002818,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        },
+        "central_high": {
+          "reference": {
+            "artifact_id": "26c1c4446758b08e345b9a377169a77a9082e5c0910df3ca76ec65ccb23ea825",
+            "media_type": "application/json"
+          },
+          "status": "computed",
+          "valid_shared_score_component": true,
+          "signed_normalized_violation": 0.30000000000005855,
+          "coverage": [
+            {
+              "analyzed_indices": [
+                30
+              ],
+              "checked_indices": [
+                30
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "checked_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                27,
+                28,
+                29,
+                30
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "full_task_supported": true,
+          "optimality_status": "numerically_checked",
+          "solver": {
+            "error": null,
+            "extra_stats_available": false,
+            "iterations": 11,
+            "name": "CVXPY/CLARABEL",
+            "objective": 0.3000000000008241,
+            "reported_dual_objective": null,
+            "reported_dual_residual": null,
+            "reported_primal_residual": null,
+            "setup_time_s": null,
+            "solve_time_s": 0.0017558,
+            "status": "optimal",
+            "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+            "wall_s": 0.013042599995969795
+          },
+          "local_model_constraints": {
+            "max_absolute_violation": 0.0030000000000005855,
+            "max_normalized_violation": 0.30000000000005855,
+            "minimum_tension_margin_n": 2.1290717084029085,
+            "status": "inconclusive",
+            "worst_violation": {
+              "absolute_time_s": 0.58,
+              "constraint_id": "holding_max_error_m",
+              "control_step": 29,
+              "frame": "world",
+              "lower": null,
+              "margins": [
+                -0.0030000000000005855
+              ],
+              "normalization_scale": 0.01,
+              "normalized_violation": 0.30000000000005855,
+              "output": [
+                0.308,
+                -3.483893973007038e-10,
+                0.21500000384702744
+              ],
+              "passed": false,
+              "radius": 0.01,
+              "reference": [
+                0.295,
+                0.0,
+                0.215
+              ],
+              "residual": [
+                0.013000000000000012,
+                -3.483893973007038e-10,
+                3.847027446601814e-09
+              ],
+              "sample_index": 29,
+              "signal": "tip_position",
+              "signed_excesses": [
+                0.30000000000005855
+              ],
+              "signed_violation": 0.30000000000005855,
+              "units": "m",
+              "upper": null,
+              "value": 0.013000000000000586,
+              "violation": 0.0030000000000005855
+            }
+          },
+          "model_assessment": {
+            "design_id": "serial_family_candidate",
+            "design_identity": "ef69acc3460b5a045e4f8934764b3ecd63e6f47623f84c8de4844c63719973cf",
+            "generalized_coordinate_dimension": 12,
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "8fee5eece95d4c562b251b74f12177c5bffaaf8e1099e827beaa561d2d52eac3",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "state_dimension": 24,
+            "unsupported_requested_physics": [],
+            "uses": {
+              "linearization": {
+                "evidence": [],
+                "reasons": [
+                  "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                ],
+                "status": "WARN",
+                "validation": "unavailable"
+              }
+            }
+          },
+          "actual_mathematical_calls": {
+            "capability_kernel_calls": 1,
+            "dual_face_solve_attempts": 0,
+            "internal_conic_solves": 1,
+            "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+          },
+          "recorded_attempt_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "recorded_return_boundaries": {
+            "capability": 1,
+            "dual_face": 0,
+            "model_build": 1
+          },
+          "charged_analysis_evaluations": 2,
+          "charged_numerical_s": 9.10072040000523,
+          "task_acceptance": "unmeasured",
+          "limitations": [
+            "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+            "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+            "Numerical agreement is implementation verification, not physical model validation.",
+            "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+            "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+          ]
+        }
+      }
+    }
+  ]
+}

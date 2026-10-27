@@ -1,0 +1,543 @@
+{
+  "benchmark_id": "bf7-shared-reach-nominal-v1",
+  "version": "1.0.0",
+  "status": "frozen_nominal_independently_feasible_candidate",
+  "task_protocol": "bf7_protocol_v1.json",
+  "design_and_control_protocol": "bf7_r2_protocol.json",
+  "family_space": "family_space_bf7_r2.json",
+  "explored_design_domain": {
+    "segment_count": 2,
+    "tendon_count": 6,
+    "length_bounds_m": [
+      0.1,
+      0.16
+    ],
+    "young_bounds_pa": [
+      8000000.0,
+      15000000.0
+    ],
+    "fixed": "Original sections, routing, 12 cells/segment, mass/inertia/payload and backend/model."
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "seed": 17,
+      "settling": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.03,
+        "window_s": 0.06
+      },
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.285,
+              0.035,
+              0.185
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "rule": "all_candidate_dofs_zero_v1"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "BF7 v1 shared-structure sensor positioning: positive_high",
+        "objectives": [
+          {
+            "direction": "minimize",
+            "metric": "position_error",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.0,
+            0.6
+          ]
+        },
+        "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+        "status": "development_valid",
+        "task_id": "bf7-shared-reach-v1-positive_high",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001
+        }
+      }
+    },
+    {
+      "condition_id": "negative_low",
+      "seed": 17,
+      "settling": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.03,
+        "window_s": 0.06
+      },
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.275,
+              -0.04,
+              0.135
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "rule": "all_candidate_dofs_zero_v1"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "BF7 v1 shared-structure sensor positioning: negative_low",
+        "objectives": [
+          {
+            "direction": "minimize",
+            "metric": "position_error",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.0,
+            0.6
+          ]
+        },
+        "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+        "status": "development_valid",
+        "task_id": "bf7-shared-reach-v1-negative_low",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001
+        }
+      }
+    },
+    {
+      "condition_id": "central_high",
+      "seed": 17,
+      "settling": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.03,
+        "window_s": 0.06
+      },
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.295,
+              0.0,
+              0.215
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "rule": "all_candidate_dofs_zero_v1"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "BF7 v1 shared-structure sensor positioning: central_high",
+        "objectives": [
+          {
+            "direction": "minimize",
+            "metric": "position_error",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.0,
+            0.6
+          ]
+        },
+        "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+        "status": "development_valid",
+        "task_id": "bf7-shared-reach-v1-central_high",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001
+        }
+      }
+    }
+  ],
+  "physical_limits": {
+    "duration_s": 0.6,
+    "timestep_s": 0.001,
+    "control_period_s": 0.02,
+    "sample_period_s": 0.02,
+    "force_bounds_n": [
+      0.0,
+      8.0
+    ],
+    "payload_kg": 0.01,
+    "seed": 17
+  },
+  "independent_witness": "../../evidence/bf7_final/independent_witness.json",
+  "common_structure_verified": true,
+  "joint_select": false,
+  "structural_advantage_established": false,
+  "formal_comparison_status": "Not executed. A matched cold-start control comparison on the same new parameterization is still required; R2 changed structure, initial control and active basis together.",
+  "future_nominal_per_strategy_per_seed_budget": {
+    "structure_math_units": 24,
+    "native_callbacks_per_target": 401,
+    "independent_replays": 3,
+    "physics_step_attempts": 723600
+  },
+  "prerequisites_for_formal_benchmark": [
+    "Version and validate exact frozen-condition fidelity admission; do not silently change these original records.",
+    "Freeze identical fresh control initialization/parameterization and total construction/search/replay costs across strategies; no archived witness input as an Agent seed.",
+    "Confirm a meaningful structure effect under matched control budgets; one finite failed optimization is not structural infeasibility."
+  ]
+}

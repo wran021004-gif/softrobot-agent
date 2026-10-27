@@ -1,0 +1,92 @@
+{
+  "contract": "bf7.exploration_summary",
+  "version": "1.0.0",
+  "base_commit": "a1566b91a387316405bdb2fc79eb8a087ea20e8a",
+  "branch": "research/bf7-shared-structure-benchmark",
+  "complete_shared_independent_witness": true,
+  "joint_select": false,
+  "formal_agent_comparison_executed": false,
+  "physical_structure": {
+    "0": {
+      "length_m": 0.16,
+      "young_pa": 12000000.0
+    },
+    "1": {
+      "length_m": 0.12,
+      "young_pa": 10000000.0
+    }
+  },
+  "shared_physical_model_identity": "ceb243fc41181b466b705bd518de771b90a1ae086931276787d3bf0433cb51b2",
+  "witness_results": {
+    "positive_high": {
+      "native_callbacks": 79,
+      "metrics": {
+        "terminal_error_m": 0.009887816310117117,
+        "holding_max_error_m": 0.00989997613427199,
+        "holding_max_speed_m_s": 0.029699999936957905
+      },
+      "accepted": true,
+      "passed_components": 9,
+      "execution_id": "228ce3255b02493c90b2450755fbebc2"
+    },
+    "negative_low": {
+      "native_callbacks": 131,
+      "metrics": {
+        "terminal_error_m": 0.00914483369964433,
+        "holding_max_error_m": 0.009856425957688776,
+        "holding_max_speed_m_s": 0.029618745340579164
+      },
+      "accepted": true,
+      "passed_components": 9,
+      "execution_id": "df60f00079094bba89fdb5ece6eef33d"
+    },
+    "central_high": {
+      "native_callbacks": 222,
+      "metrics": {
+        "terminal_error_m": 0.009889966765926473,
+        "holding_max_error_m": 0.009889966765926473,
+        "holding_max_speed_m_s": 0.02969999999999994
+      },
+      "accepted": true,
+      "passed_components": 9,
+      "execution_id": "b9c36d27c44f46cab68d7fce823d27b2"
+    }
+  },
+  "mathematical_shared_scores": {
+    "bf7-v1": [
+      1.3000000000012655,
+      2.800000000001413,
+      0.2000000000002059
+    ],
+    "bf7-r2": [
+      2.300000000000048,
+      2.300000000000607
+    ]
+  },
+  "totals": {
+    "mathematical_evaluation_units": 45,
+    "conic_solves": 15,
+    "gvs_model_builds": 15,
+    "native_analysis_entries": 15,
+    "native_callback_attempts": 1499,
+    "native_complete_rollouts": 1498,
+    "native_physics_steps": 899072,
+    "native_worker_model_builds": 15,
+    "independent_replays": 14,
+    "independent_replay_physics_steps": 8400,
+    "independent_replay_model_builds": 14,
+    "independently_accepted_replays": 4,
+    "numerical_s": 266.4171844001394,
+    "driver_recorded_lower_bound_s": 328.5634337000083,
+    "compatibility_preparation_s": 2.764879699985613,
+    "provider_requests": 0,
+    "total_physics_steps": 907472,
+    "driver_total_exact_s": null,
+    "driver_limitation": "R2 best original invocation threw after its third pass at joint SELECT. Its complete entry duration was not persisted; per-target times plus closeout are retained. Total is a measured lower bound, not a fabricated exact driver time.",
+    "model_build_count_scope": "GVS model events, Native worker cost and replay worker cost; source-binding/host compatibility preparation is separately measured in seconds.",
+    "monetary_cost": null
+  },
+  "unstarted_r2_peer": "Not materialized or executed after the first full shared independent witness.",
+  "additional_scientific_calls_during_audit": 0,
+  "interpretation": "Actual three-target feasibility on one structure established. Global optimality, structural causal advantage, a general speedup and hardware/repeatability are not established."
+}

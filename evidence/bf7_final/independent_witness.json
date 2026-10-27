@@ -1,0 +1,805 @@
+{
+  "contract": "bf7.independent_shared_structure_witness",
+  "version": "1.0.0",
+  "accepted_all_three": true,
+  "joint_select": false,
+  "implementation": "8deb8c5e4d907c3a7486707947d1ed7f2557baf3",
+  "structure_candidate": {
+    "artifact_id": "b40392cf842a980e57d2507512fa6549a6cc361eb12447d9f2148575c6702e38",
+    "media_type": "application/json"
+  },
+  "physical_design_identity": "17254e7c2c862ade5c089443d04f07bdb4814c1c8179ea25e05231519d1c76ce",
+  "discretization": {
+    "contract": "family.discretization",
+    "data": {
+      "cells": {
+        "segment_0": 12,
+        "segment_1": 12
+      },
+      "coordinates": "two_principal_bending_angles_per_cell",
+      "model": "serial_bending_cells_v1",
+      "version": "serial_bending_discretization_v1"
+    },
+    "version": "1.0.0"
+  },
+  "backend": {
+    "extension_id": "backend.family_mujoco",
+    "parameters": {
+      "contract": "family.mujoco_parameters",
+      "data": {
+        "contact_model": "mujoco_convex_native",
+        "friction": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "integrator": "implicitfast",
+        "timestep_source": "task.timing.timestep_s"
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.2.0"
+  },
+  "dynamics_model": {
+    "extension_id": "model.serial_bending_cells",
+    "parameters": {
+      "contract": "family.dynamics_model",
+      "data": {},
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "payload": [
+    {
+      "com_local_m": [
+        0.007,
+        0.001,
+        -0.002
+      ],
+      "connection": {
+        "part": "segment_1",
+        "position_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "s": 1.0
+      },
+      "envelope_halfsize_m": [
+        0.009,
+        0.009,
+        0.008
+      ],
+      "guide_holes": {},
+      "hole_radius_m": 0.0,
+      "id": "payload",
+      "inertia_com_local_kg_m2": [
+        [
+          6e-07,
+          1e-07,
+          0.0
+        ],
+        [
+          1e-07,
+          8e-07,
+          1e-07
+        ],
+        [
+          0.0,
+          1e-07,
+          9e-07
+        ]
+      ],
+      "kind": "payload",
+      "mass_kg": 0.01
+    }
+  ],
+  "conditions": {
+    "positive_high": {
+      "candidate": {
+        "artifact_id": "b40392cf842a980e57d2507512fa6549a6cc361eb12447d9f2148575c6702e38",
+        "media_type": "application/json"
+      },
+      "analysis": {
+        "artifact_id": "90004d11246e889172782a29c4701e8b2334c0cf2c305a2b098ee0f395d15b34",
+        "media_type": "application/json"
+      },
+      "replay": {
+        "artifact_id": "2642cce5df860a7c4f1300012507efe20970f5675ac377757e21988e2389f3e6",
+        "media_type": "application/json"
+      },
+      "raw": {
+        "artifact_id": "c972f5e5c1bf000cb17f661d38301e3385eeb7d57edbf29fd92f1bcb4b008285",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "424d9fb18a9b4e12e9e92c0b0bde53ff78eca5eabbcc92958c6e1559210dd75a",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "c9330c72401579aaadbe350475097fd196d51b4d32db5e01ea9b0bfdd30a0794",
+        "media_type": "application/json"
+      },
+      "execution_id": "228ce3255b02493c90b2450755fbebc2",
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "bba6b2817da1feb38893287e811964f0ff935c68f6a005456e852bb63c38c8fc",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.009887816310117117,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 4,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.00989997613427199,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.029699999936957905,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.03,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.009887816310117117,
+          "holding_max_error_m": 0.00989997613427199,
+          "holding_max_speed_m_s": 0.029699999936957905
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "228ce3255b02493c90b2450755fbebc2",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "424d9fb18a9b4e12e9e92c0b0bde53ff78eca5eabbcc92958c6e1559210dd75a",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c9330c72401579aaadbe350475097fd196d51b4d32db5e01ea9b0bfdd30a0794",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "424d9fb18a9b4e12e9e92c0b0bde53ff78eca5eabbcc92958c6e1559210dd75a",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c9330c72401579aaadbe350475097fd196d51b4d32db5e01ea9b0bfdd30a0794",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "c972f5e5c1bf000cb17f661d38301e3385eeb7d57edbf29fd92f1bcb4b008285",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "c972f5e5c1bf000cb17f661d38301e3385eeb7d57edbf29fd92f1bcb4b008285",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "424d9fb18a9b4e12e9e92c0b0bde53ff78eca5eabbcc92958c6e1559210dd75a",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "c972f5e5c1bf000cb17f661d38301e3385eeb7d57edbf29fd92f1bcb4b008285",
+              "media_type": "application/json"
+            },
+            "execution_id": "228ce3255b02493c90b2450755fbebc2"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "native_cost": {
+        "completed_response_steps": 6,
+        "forward_evaluations": 4820,
+        "kernel_wall_s": 4.54190739999467,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 79,
+        "optimization_iterations": 6,
+        "physics_step_attempts": 47400,
+        "physics_steps": 47400,
+        "rollouts": 79
+      },
+      "replay_cost": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.13752039999235421,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "control_source": {
+        "artifact_id": "4c79e994feef30b85af67b0816729492a7538698537368428d1a5766285e180b",
+        "media_type": "application/json"
+      },
+      "initial_seed": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "c9105c800c12177a6eec85a6f2fcbab981928ab8707c26ce479170adcdd876b8",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "320d1f413265070deff7fc4126eddd5df89c07632cd6c5747c23522af68bd5d0",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "6fc30001723115a238855bed66be8a2a99e7d9c18a768de2477e80515e741838",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      },
+      "fixed_transferred_control_measure": {
+        "holding_max_position_error_m": 0.04640592213355948,
+        "holding_max_speed_m_s": 0.12045004739658374,
+        "normalized_gap": 3.640592213355948,
+        "returned_array_gap_interval": [
+          3.640592213355944,
+          3.640592213355951
+        ],
+        "signed_maximum_excess": 3.640592213355948,
+        "sum_normalized_excess": 10.29618600659802,
+        "terminal_position_error_m": 0.04640592213355948,
+        "worst_constraint": {
+          "kind": "terminal_position",
+          "normalized_signed_excess": 3.640592213355948,
+          "time_s": 0.6000000000000004
+        }
+      },
+      "fresh_zero_state": true,
+      "exact_failed_control_transfer_verified": true
+    },
+    "negative_low": {
+      "candidate": {
+        "artifact_id": "f6dd41a2b4702b8d914788becf0e6889ab802099b936f9689a509b124e45475d",
+        "media_type": "application/json"
+      },
+      "analysis": {
+        "artifact_id": "818462350d2567421e4dcf46cdb4f2a0adc6c761e204f9fcf848f38b9d11967d",
+        "media_type": "application/json"
+      },
+      "replay": {
+        "artifact_id": "076b9136a3a3da36359c6c130c0457e6ee0c981d069dbe6d8140ea687769d2ac",
+        "media_type": "application/json"
+      },
+      "raw": {
+        "artifact_id": "c4683eba7b854ea648c8718034842e5221583691823315631a8c2df8c3b28d47",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "977876d84164d5dbaabd2859d061bb913ecce825dcc21eb76cf4dbcda3d80a52",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "640ec2261092cf151a9289b8ef0580ac4f35eea823b82f151fcfdeb0ee18586d",
+        "media_type": "application/json"
+      },
+      "execution_id": "df60f00079094bba89fdb5ece6eef33d",
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "b64cd99d153b358b038b7d88f09a79dd52f231580d1dc10675715f1dcbcea09e",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.00914483369964433,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 4,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.009856425957688776,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.029618745340579164,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.03,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.00914483369964433,
+          "holding_max_error_m": 0.009856425957688776,
+          "holding_max_speed_m_s": 0.029618745340579164
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "df60f00079094bba89fdb5ece6eef33d",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "977876d84164d5dbaabd2859d061bb913ecce825dcc21eb76cf4dbcda3d80a52",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "640ec2261092cf151a9289b8ef0580ac4f35eea823b82f151fcfdeb0ee18586d",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "977876d84164d5dbaabd2859d061bb913ecce825dcc21eb76cf4dbcda3d80a52",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "640ec2261092cf151a9289b8ef0580ac4f35eea823b82f151fcfdeb0ee18586d",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "c4683eba7b854ea648c8718034842e5221583691823315631a8c2df8c3b28d47",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "c4683eba7b854ea648c8718034842e5221583691823315631a8c2df8c3b28d47",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "977876d84164d5dbaabd2859d061bb913ecce825dcc21eb76cf4dbcda3d80a52",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "c4683eba7b854ea648c8718034842e5221583691823315631a8c2df8c3b28d47",
+              "media_type": "application/json"
+            },
+            "execution_id": "df60f00079094bba89fdb5ece6eef33d"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "native_cost": {
+        "completed_response_steps": 10,
+        "forward_evaluations": 7992,
+        "kernel_wall_s": 7.6466712999972515,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 131,
+        "optimization_iterations": 10,
+        "physics_step_attempts": 78600,
+        "physics_steps": 78600,
+        "rollouts": 131
+      },
+      "replay_cost": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.13885020000452641,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "control_source": {
+        "artifact_id": "1f7c2ce01995803429d97d540d7030d89f784a5e6dd6d79a76fe335f9009b793",
+        "media_type": "application/json"
+      },
+      "initial_seed": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "1202de360b5769bbf51b06577c6bade721cc93c577fbf88cc11d6ca6dfd9c02c",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "9371ec2d447fc0a9806b3240b6093cca4d8fcf859b7f8ae8db05eff11890c34b",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "845b09dacb4a9f73db3501bc5dbf7ad33b40f31a2e82b9e5347f949f158cd94d",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      },
+      "fixed_transferred_control_measure": {
+        "holding_max_position_error_m": 0.034995285087425686,
+        "holding_max_speed_m_s": 0.09091992161277285,
+        "normalized_gap": 2.4995285087425687,
+        "returned_array_gap_interval": [
+          2.4995285087425656,
+          2.4995285087425714
+        ],
+        "signed_maximum_excess": 2.4995285087425687,
+        "sum_normalized_excess": 7.029721071244232,
+        "terminal_position_error_m": 0.034995285087425686,
+        "worst_constraint": {
+          "kind": "terminal_position",
+          "normalized_signed_excess": 2.4995285087425687,
+          "time_s": 0.6000000000000004
+        }
+      },
+      "fresh_zero_state": true,
+      "exact_failed_control_transfer_verified": true
+    },
+    "central_high": {
+      "candidate": {
+        "artifact_id": "2fd7f95bb61c7d4e4938830ef6ea4c64b32fedfbdeb35ce63f938c7fc9e098f2",
+        "media_type": "application/json"
+      },
+      "analysis": {
+        "artifact_id": "18d890731ca985194670d94ec668e0949c0f356f886a8f7a5582743f24319666",
+        "media_type": "application/json"
+      },
+      "replay": {
+        "artifact_id": "1e61d21179e814932da9192775ca7adcda23c0aaa4cf6dbd116628646d0626bf",
+        "media_type": "application/json"
+      },
+      "raw": {
+        "artifact_id": "7869589e95b2eef13bf5ae3d4ed8a66723db6392456933fadfd22f08a4dc7e10",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "e0880de2a6c539ada25709df2bdba70d4207ed0f85c30abebe1887b37276792e",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "da9abcd59ba24d2c2a6228735cb92f0b4eb81b85dd631ec67e1f56eb1db0e1f9",
+        "media_type": "application/json"
+      },
+      "execution_id": "b9c36d27c44f46cab68d7fce823d27b2",
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.009889966765926473,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 4,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.009889966765926473,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.02969999999999994,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.03,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.009889966765926473,
+          "holding_max_error_m": 0.009889966765926473,
+          "holding_max_speed_m_s": 0.02969999999999994
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "b9c36d27c44f46cab68d7fce823d27b2",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "e0880de2a6c539ada25709df2bdba70d4207ed0f85c30abebe1887b37276792e",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "da9abcd59ba24d2c2a6228735cb92f0b4eb81b85dd631ec67e1f56eb1db0e1f9",
+            "media_type": "application/json"
+          }
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "e0880de2a6c539ada25709df2bdba70d4207ed0f85c30abebe1887b37276792e",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "da9abcd59ba24d2c2a6228735cb92f0b4eb81b85dd631ec67e1f56eb1db0e1f9",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "7869589e95b2eef13bf5ae3d4ed8a66723db6392456933fadfd22f08a4dc7e10",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "7869589e95b2eef13bf5ae3d4ed8a66723db6392456933fadfd22f08a4dc7e10",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "e0880de2a6c539ada25709df2bdba70d4207ed0f85c30abebe1887b37276792e",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "7869589e95b2eef13bf5ae3d4ed8a66723db6392456933fadfd22f08a4dc7e10",
+              "media_type": "application/json"
+            },
+            "execution_id": "b9c36d27c44f46cab68d7fce823d27b2"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "native_cost": {
+        "completed_response_steps": 17,
+        "forward_evaluations": 13543,
+        "kernel_wall_s": 12.95874209998874,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 222,
+        "optimization_iterations": 17,
+        "physics_step_attempts": 133200,
+        "physics_steps": 133200,
+        "rollouts": 222
+      },
+      "replay_cost": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.14339779999863822,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "control_source": {
+        "artifact_id": "7d699b73ecdd8e5085efe3659f55e4f2df986c508792cc8d5299a106f8fdb89d",
+        "media_type": "application/json"
+      },
+      "initial_seed": {
+        "store": "runs/bf7-v1/peer/private-store",
+        "source_analysis": {
+          "artifact_id": "ca333ffaceaa336a8ca5814989832546c2d828349d73dcb83a8c897632b12e59",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "ec6d7c425d52cab97c2d12b563d68c639bd819d35be1fd4070f63d7d18690399",
+          "media_type": "application/json"
+        },
+        "independent_replay": {
+          "artifact_id": "be83a9631deccf9dd43698b7fbe1db0549192c46f96a003d6256faf28b61b15a",
+          "media_type": "application/json"
+        },
+        "source_status": "valid_failure",
+        "transfer": "Exact original SI rows, same target/six channels/20ms grid; initialized through Study, no inherited acceptance."
+      },
+      "fixed_transferred_control_measure": {
+        "holding_max_position_error_m": 0.057966032550563755,
+        "holding_max_speed_m_s": 0.21105997647834107,
+        "normalized_gap": 6.035332549278036,
+        "returned_array_gap_interval": [
+          6.035332549278031,
+          6.035332549278041
+        ],
+        "signed_maximum_excess": 6.035332549278036,
+        "sum_normalized_excess": 15.628539059390786,
+        "terminal_position_error_m": 0.057966032550563755,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": 6.035332549278036,
+          "time_s": 0.6000000000000004
+        }
+      },
+      "fresh_zero_state": true,
+      "exact_failed_control_transfer_verified": true
+    }
+  },
+  "shared_physical_model_identity": "ceb243fc41181b466b705bd518de771b90a1ae086931276787d3bf0433cb51b2",
+  "joint_selection_limitation": "../bf7_r2/joint_selection_limitation.json",
+  "structure_summary": {
+    "0": {
+      "length_m": 0.16,
+      "young_pa": 12000000.0
+    },
+    "1": {
+      "length_m": 0.12,
+      "young_pa": 10000000.0
+    }
+  },
+  "complete_private_witness": "runs/bf7-r2/independent_witness_private.json (local, excluded from Git and future Agent seeds)"
+}
