@@ -1,0 +1,64 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 101,
+    "iterations": 4,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.3,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "steps_per_full_sequence": 600,
+  "contract": "bf6.r5.expanded_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 current-chat user first delegated read-only R4 diagnosis and direct go/no-go approval without asking, then explicitly approved increasing budget to find a feasible solution. Evidence supports one new bounded R5 batch. New separate allocation: one existing Native analysis request, at most 101 full callbacks, four response iterations, one independent full replay and 61200 integration attempts. Only R4 own complete independently replayed best valid_failure source; preserve original BF6 task/P1/zero physical state/real 20 g load/floor/physics and original 30-sample 12 mm/10 deg v2 acceptance. Initial trust radius 0.3 N is R4 last observed effective radius; all other four-knot response settings unchanged. No BF5 controls, PPO/structure changes/private optimizers/extra starts or automatic batch. First full independent pass SELECTs, otherwise STOP with all actual complete/partial costs. Commit and ordinary push remain authorized.",
+  "study_file": "configs/research/study_bf6_r5_feasibility.json",
+  "prior_summary": "runs/bf6-r4/summary.json",
+  "prior_summary_identity": "8969c307930725aa6ca8406b924236c7b280478bd9a670666f46d93ff2b26b49",
+  "prior_store": "runs/bf6-r4/private-store",
+  "prior_analysis": {
+    "artifact_id": "c22a91d78f9ee39a0b03ec7fbeba7722d59e72ca11bfc51e9a826a61024f46e4",
+    "media_type": "application/json"
+  },
+  "prior_independent_replay": {
+    "artifact_id": "98d4e067038e87f395df3b3348498074abd7e7636515c33fdf0a3d3e18d4b8f7",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "80328d1c7fee62f39c30723ac7a775f576525c4f7647e456029ffd4e7943617c",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "3e9aa3be7fdd798c5f2a8d1949830d0d491498a06ea2a2d5409effafc0d0f183",
+    "media_type": "application/json"
+  },
+  "maximum_native_analysis_requests": 1,
+  "maximum_native_rollouts": 101,
+  "maximum_response_iterations": 4,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 61200,
+  "source_semantics": "Exact R4 own best valid_failure schedule plus parent via existing initialize_control, correction coefficients recentered to zero, physical zero state preserved, no inherited acceptance or hand edits.",
+  "replay_policy": "Replay at most one complete returned schedule strictly better than fresh baseline in original native minimax/sum ranking and with a different sequence hash. If no new better complete control, STOP without duplicating original R4 replay.",
+  "stop": "Only one bounded batch. Stop Native on existing first margin target or frozen caps; validate at most one strictly better new complete schedule. Independent full pass SELECTs immediately, any incomplete/failed independent acceptance STOPs; no extra validation. Native contact/numerical/solver failure or no improved complete schedule STOPs with retained partial costs, no private salvage. Further batches are not preauthorized by this allocation.",
+  "historical_costs": "All original BF6/R2/R3/R4 studies remain STOP; retained cumulative lower bound 123452 confirmed steps, 123453 attempts, 22.029212099994766 s Store numeric time. No balance transfer."
+}
