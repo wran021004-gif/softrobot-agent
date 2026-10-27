@@ -85,5 +85,21 @@ class PrerequisiteTests(unittest.TestCase):
         self.assertIsNone(feedback['worker_started'])
         self.assertIsNone(feedback['native_cost'])
 
+    def test_generic_template_query_uses_only_shared_fields(self):
+        from tests.research.test_c1_method_context import C1Archive
+        from tools.research.task_constraints import mathematical_method_view,mathematical_catalog
+        from tools.research.research_context import compact_scientific_delivery
+        archive=C1Archive()
+        try:
+            host,s=archive.host();view=mathematical_method_view(host,s['reference_candidate'])
+            brief=compact_scientific_delivery(dict(mathematical_capabilities=mathematical_catalog(view)),decision_only=True)
+            catalog=brief['mathematical_capabilities'];fields=catalog['request_template_query_format']['fields']
+            for key,row in view['methods'].items():
+                self.assertTrue(set(fields)<=set(row),key)
+            self.assertNotIn('action_prerequisites',fields)
+            self.assertIn('action_prerequisites',catalog['methods']['mujoco_direct_control_v1']['request_template_query']['fields'])
+            host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
+        finally:archive.archive.close()
+
 
 if __name__=='__main__':unittest.main()

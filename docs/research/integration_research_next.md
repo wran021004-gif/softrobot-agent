@@ -197,6 +197,13 @@ pending formal templates and their public/Intake routes. No extra real integrati
 was run after the feedback-only supplement; the two original engineering
 receipts retain their actual bound implementation commits and costs.
 
+C-F's subsequent `2677c700a` corrects the generic template-query example:
+only fields shared by every method are listed there. `action_prerequisites`
+remains in Native's own exact combined query. The one directed saved-evidence
+regression passed, with zero Provider calls, workers or integration steps.
+This repairs interface expression and does not reinterpret the already executed
+C Study or attribute later patch effects to it.
+
 ## Remaining scope
 
 No autonomous Provider Study was launched by this integration. Positive SELECT

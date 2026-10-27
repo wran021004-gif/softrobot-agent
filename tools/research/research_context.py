@@ -1114,7 +1114,7 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         if catalog.get('methods'):
             catalog['request_template_query_format']=dict(reference=catalog['candidate'],view='mathematical_capabilities',
                 pointer='/methods/<exact method key>',fields=['candidate','operation','request_template',
-                    'required_parameters','formal_execution_authorized','missing','cost_scope','action_prerequisites'])
+                    'required_parameters','formal_execution_authorized','missing','cost_scope'])
         for method,row in catalog.get('methods',{}).items():
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
