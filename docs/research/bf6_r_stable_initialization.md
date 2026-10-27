@@ -272,4 +272,16 @@ R6 新增 11.7691171 s Store 数值、15.6798663 s driver、2 model builds。含
 
 用户此前明确授予“值得续算就直接批准”的 go/no-go 权限，并两次授权增加预算。依据上述末段正改善，代理在这一权限内另行批准**最后一个 R7 批次**，已明确告知用户，不把 R6 上限或余额直接延长。执行前提交 [R7 冻结](../../configs/research/bf6_r7_feasibility_freeze.json)、[R7 配置](../../configs/research/study_bf6_r7_feasibility.json)，独立 Study `bf6-r7-finite-feasibility-v1`、本地 Store `runs/bf6-r7/private-store`。
 
-R7 仅导入 R6 自身完整失败 best 控制 `37bd111300c1ab057ba9691f512c4eb4cab5fee81f52cc7252532dd4920443e8`，原任务、P1、20 g 真实负载、全部物理与验收不变；原 response 四 knot 设置不变，初始半径取 R6 后段已用的 0.15 N。新上限 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**，首个完整独立通过即 SELECT。若仍失败，R7 STOP 后结束本次续算，不自动开 R8、不扩大扫描；任何部分失败也计成本。R7 结果封存后追加。
+R7 仅导入 R6 自身完整失败 best 控制 `37bd111300c1ab057ba9691f512c4eb4cab5fee81f52cc7252532dd4920443e8`，原任务、P1、20 g 真实负载、全部物理与验收不变；原 response 四 knot 设置不变，初始半径取 R6 后段已用的 0.15 N。新上限 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**，首个完整独立通过即 SELECT。若仍失败，R7 STOP 后结束本次续算，不自动开 R8、不扩大扫描；任何部分失败也计成本。
+
+### R7 严格失败封存及用户新增 R8 授权
+
+R7 在冻结提交 `d55fd2b9b` 后用满 151 个 Native 回调、6 response、一次独立回放，91,200 步，结果见 [R7 原验收摘要](../../evidence/bf6_r7_feasibility/summary.json)、[R7 完整审计](../../evidence/bf6_r7_feasibility/audit.json)。独立执行 `f872bd251ec54250a7bc85616e9e0c09` 正常完成 600 步，无接触/solver error、力界及真实 20 g 绑定通过，30 个评分点完整；方向最大 **9.954195911°** 已通过，但 0.60 s 的唯一位置失败点为 **12.034913020 mm**，超原界 **0.034913020 mm**。8 个协议组件通过，task evaluator 和位置这 2 个组件失败，accepted=false、selected=null。未按接近程度舍入为通过；原注册评价引用 `46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586` 保留。
+
+R7 首个 proposal 退步，原算法将半径从 0.15 减至 0.075 N，随后持续改善；最后局部模型预测进入界内，实际独立位置仍有上述正残差，说明局部模型误差不能替代独立验收。R7 已按声明 STOP，没有在旧账本继续追加。
+
+R7 新增数值时间 **11.6393395 s**、driver **15.6206751 s**、2 model builds。R5/R6/R7 合计新增 403 个完整 Native、3 次完整独立回放、243,600 步、32.2733691 s Store 数值、44.0951936 s driver。BF6 含原失败累计 **≥367,052 确认步 / 367,053 次调用尝试、54.3025812 s Store 数值**；Native 尝试/完整 606/605、独立回放 7/6、科学 model builds 13。原失败内部进度和历史 driver 未知均保留，不混入 BF4/BF5 成本。
+
+用户得知 R7 仍严格失败后，再次明确“几乎快要通过了，请提高预算，找到可行解”。因此新增 R8 授权，而非自动绕过原 R7 STOP：[新 R8 冻结](../../configs/research/bf6_r8_feasibility_freeze.json)、[新 Study](../../configs/research/study_bf6_r8_feasibility.json)，`bf6-r8-finite-feasibility-v1`，本地 Store `runs/bf6-r8/private-store`。只导入 R7 自身完整失败控制与 parent，保持原任务/P1/20 g 真实惯量/地面/初态/物理/30 点/12 mm/10° 不变，原工具四 knot response 设置不变，初始半径采用 R7 后段已实际使用的 **0.075 N**。
+
+R8 新上限仍为 **151 Native、6 response、1 独立回放、91,200 积分调用尝试**；先提交冻结，再绑定新账本，首个完整独立通过即 SELECT 停止。若有限失败则 STOP，不自动加批次或回放，保留全部实际成本，原余额不转移。结果封存后追加。

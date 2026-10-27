@@ -1,0 +1,338 @@
+{
+  "stage": "BF6-R7",
+  "analysis": {
+    "artifact_id": "24ba7597caedefb207f2f5bbee254aa96202b24c7bbd62ba93c59c7e5642af1c",
+    "media_type": "application/json"
+  },
+  "analysis_status": "computed",
+  "prior_independent_replay": {
+    "artifact_id": "894e8cf5912efed55032e093218e232644e4677b8ae8aae8c74e6be7b600a06a",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "37bd111300c1ab057ba9691f512c4eb4cab5fee81f52cc7252532dd4920443e8",
+    "media_type": "application/json"
+  },
+  "native_cost": {
+    "completed_response_steps": 6,
+    "forward_evaluations": 9212,
+    "kernel_wall_s": 8.798744200001238,
+    "mechanics_evaluations": 0,
+    "model_builds": 1,
+    "optimization_evaluations": 151,
+    "optimization_iterations": 6,
+    "physics_step_attempts": 90600,
+    "physics_steps": 90600,
+    "rollouts": 151
+  },
+  "callbacks": 151,
+  "baseline_measure": {
+    "component_signed_excess": {
+      "position": 0.04818090580036083,
+      "tool_axis": 0.04252215026587014
+    },
+    "max_position_error_m": 0.01257817086960433,
+    "max_tool_axis_angle_error_rad": 0.18195444047110512,
+    "normalized_gap": 0.04818090580036083,
+    "signed_maximum_excess": 0.04818090580036083,
+    "sum_normalized_excess": 0.8029455250677004
+  },
+  "best_measure": {
+    "component_signed_excess": {
+      "position": 0.0029094183114368732,
+      "tool_axis": -0.004580408893764432
+    },
+    "max_position_error_m": 0.012034913019737243,
+    "max_tool_axis_angle_error_rad": 0.17373349303659474,
+    "normalized_gap": 0.0029094183114368732,
+    "signed_maximum_excess": 0.0029094183114368732,
+    "sum_normalized_excess": 0.0029094183114368732
+  },
+  "search_stop": "iteration_limit",
+  "native_tool_binding": {
+    "body": "payload",
+    "com_local_m": [
+      0.007,
+      0.001,
+      -0.002
+    ],
+    "inertia_com_local_kg_m2": [
+      [
+        1.1999999962042225e-06,
+        1.999999975322546e-07,
+        2.4446717878240944e-15
+      ],
+      [
+        1.999999975322546e-07,
+        1.600000003078915e-06,
+        1.9999999831351787e-07
+      ],
+      [
+        2.444671847524381e-15,
+        1.9999999831351793e-07,
+        1.8000000007169023e-06
+      ]
+    ],
+    "mass_kg": 0.02,
+    "matched": true,
+    "semantics": "Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation",
+    "tip_position_local_m": [
+      0.014,
+      0.0,
+      0.0
+    ]
+  },
+  "new_complete_better_control": true,
+  "first_proxy_callback": null,
+  "replay": {
+    "artifact_id": "3230ec1ee605cf92a9fb41d696ea3cc7bff473d762d1ae0447866cc3b8a38920",
+    "media_type": "application/json"
+  },
+  "execution_id": "f872bd251ec54250a7bc85616e9e0c09",
+  "raw_reference": {
+    "artifact_id": "3b40dac5d510bec4b8f6855900ade5424da877741b8c0fbfb6c539cc69370486",
+    "media_type": "application/json"
+  },
+  "evaluation_reference": {
+    "artifact_id": "46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586",
+    "media_type": "application/json"
+  },
+  "acceptance": {
+    "contract": "research.task_acceptance",
+    "version": "1.0.0",
+    "protocol_id": "offline_oriented_tracking_v2",
+    "task_family": "task.oriented_tracking",
+    "task_identity": "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45",
+    "status": "valid_failure",
+    "accepted": false,
+    "components": {
+      "evaluation_validity": {
+        "value": "valid",
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "execution_complete": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "task_evaluator": {
+        "value": false,
+        "passed": false,
+        "unit": null,
+        "limit": null,
+        "reason": null
+      },
+      "evaluator:tracking_max_error": {
+        "value": 0.012034913019737243,
+        "passed": false,
+        "unit": "m",
+        "limit": 0.012,
+        "reason": null
+      },
+      "evaluator:tool_axis_direction": {
+        "value": 0.17373349303659474,
+        "passed": true,
+        "unit": "rad",
+        "limit": 0.17453292519943295,
+        "reason": null
+      },
+      "solver_errors": {
+        "value": 0,
+        "passed": true,
+        "unit": "count",
+        "limit": 0,
+        "reason": null
+      },
+      "force_bounds": {
+        "value": 0.0,
+        "passed": true,
+        "unit": "N",
+        "limit": 1e-08,
+        "reason": null
+      },
+      "tool_axis_sampling": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Both real world position and unit tool-axis signals on the complete post-step grid"
+      },
+      "rigid_tool_binding": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution"
+      },
+      "no_environment_contact": {
+        "value": true,
+        "passed": true,
+        "unit": null,
+        "limit": null,
+        "reason": "Every independent physics step checked for environment contact; the frozen task does not permit contact"
+      }
+    },
+    "metrics": {
+      "max_position_error": 0.012034913019737243,
+      "rms_position_error": 0.00992983004755001,
+      "terminal_position_error": 0.012034913019737243,
+      "max_tool_axis_angle_error": 0.17373349303659474
+    },
+    "missing": [],
+    "issues": [],
+    "execution_id": "f872bd251ec54250a7bc85616e9e0c09",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "a795c7710b876adbc3abc08e500641191bd5bfd3f59b2c029f49214f1d32a1c4",
+        "media_type": "application/json"
+      }
+    },
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "a795c7710b876adbc3abc08e500641191bd5bfd3f59b2c029f49214f1d32a1c4",
+        "media_type": "application/json"
+      },
+      "simulation": {
+        "artifact_id": "3b40dac5d510bec4b8f6855900ade5424da877741b8c0fbfb6c539cc69370486",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "source": {
+          "artifact_id": "3b40dac5d510bec4b8f6855900ade5424da877741b8c0fbfb6c539cc69370486",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null,
+        "original_execution_id": null
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "3b40dac5d510bec4b8f6855900ade5424da877741b8c0fbfb6c539cc69370486",
+          "media_type": "application/json"
+        },
+        "execution_id": "f872bd251ec54250a7bc85616e9e0c09"
+      }
+    },
+    "evaluator_tension_channels": null,
+    "timing": {
+      "control_period_s": 0.02,
+      "duration_s": 0.6,
+      "sample_period_s": 0.02,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.001,
+      "real_time_required": false,
+      "real_time_demonstrated": null,
+      "deadline_misses": null,
+      "mean_update_s": null,
+      "simulation_wall_s": null
+    },
+    "continuous_time_guarantee": false
+  },
+  "replay_cost": {
+    "forward_evaluations": 61,
+    "kernel_wall_s": 0.142287300011958,
+    "model_builds": 1,
+    "physics_step_attempts": 600,
+    "physics_steps": 600,
+    "rollouts": 1
+  },
+  "independent_tool_binding": {
+    "body": "payload",
+    "com_local_m": [
+      0.007,
+      0.001,
+      -0.002
+    ],
+    "inertia_com_local_kg_m2": [
+      [
+        1.1999999962042225e-06,
+        1.999999975322546e-07,
+        2.4446717878240944e-15
+      ],
+      [
+        1.999999975322546e-07,
+        1.600000003078915e-06,
+        1.9999999831351787e-07
+      ],
+      [
+        2.444671847524381e-15,
+        1.9999999831351793e-07,
+        1.8000000007169023e-06
+      ]
+    ],
+    "mass_kg": 0.02,
+    "matched": true,
+    "semantics": "Fixed rigid inertial tool, including gravity, translational/rotational inertia and coupling; no external-force approximation",
+    "tip_position_local_m": [
+      0.014,
+      0.0,
+      0.0
+    ]
+  },
+  "environment_contact": {
+    "checked_physics_steps": 600,
+    "contact_free": true,
+    "contact_steps": 0,
+    "first_contact_time_s": null,
+    "maximum_contacts": 0
+  },
+  "stable_start": true,
+  "source_issue": null,
+  "outcome_issue": null,
+  "implementation": "d55fd2b9bad4bad78f02a792abef3dc5cd8e240b",
+  "protocol_identity": "6c98b59a08ffeebb9a94dc779e235687104a760002a944c1fb43bb5e48332544",
+  "resolved_identity": "37eceb295a7b693bbed5767c1e142186f8c9a5f3cb1ee06c045eadf8a45ce69b",
+  "task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "accepted": false,
+  "selected": null,
+  "ledger": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 5,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 11.108729799991124
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 35,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_s": 11.639339499990456,
+  "driver_elapsed_s": 15.620675099999062,
+  "status": "stable_position_valid_failure_axis_pass",
+  "threshold_relaxation": false,
+  "external_force_approximation": false,
+  "source_import_exact": true,
+  "final_stop": "Final bounded batch STOP; no automatic R8. Original position threshold remains failed."
+}

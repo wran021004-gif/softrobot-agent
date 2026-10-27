@@ -1,0 +1,64 @@
+{
+  "task_file": "tasks/bf6_sensor_oriented_tracking_v1.json",
+  "task_file_identity": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca",
+  "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+  "family_space_identity": "4edb1d07f40594af29339dae628bf84001920d8b8b30997803447bc4d2ce1854",
+  "private_generation": "runs/bf6-oriented-tracking/private-generation.json",
+  "private_generation_identity": "d1ee298d3e2e5da303754e6d4298cb778deb40776ae87001ad466220a06363eb",
+  "candidate_label": "P1",
+  "search_settings": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.6
+    ],
+    "knots_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ],
+    "evaluation_requests": 151,
+    "iterations": 6,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.075,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.005
+  },
+  "acceptance_protocol": "offline_oriented_tracking_v2",
+  "steps_per_full_sequence": 600,
+  "contract": "bf6.r8.finite_feasibility_freeze",
+  "version": "1.0.0",
+  "authorization": "2026-10-27 user explicitly newly authorized: almost passing, please increase budget and find a feasible solution, after R7 was reported STOP. This is NEW R8 authorization, not an automatic extension of sealed R7. One separate bounded batch: Native request at most151 full callbacks/six response iterations/one independent replay/91200 integration attempts. Only R7 own complete independently replayed best valid_failure control, same original BF6 task/P1/20 g real rigid load/floor/zero physical state/physics and original 30-sample 12 mm/10 deg v2 acceptance. Initial radius0.075 N is R7 recorded effective radius; other response settings unchanged. First full independent pass SELECTs and seals immediately; finite failure STOP with all costs. No threshold/model/structure changes, old balances, PPO or private optimizer. Commits and ordinary push authorized.",
+  "study_file": "configs/research/study_bf6_r8_feasibility.json",
+  "prior_summary": "runs/bf6-r7/summary.json",
+  "prior_summary_identity": "6cb9a02da20c0e589ffac0b0b1dea7d0c66b78e93ed51b49e4f1997241b45eb6",
+  "prior_store": "runs/bf6-r7/private-store",
+  "prior_analysis": {
+    "artifact_id": "24ba7597caedefb207f2f5bbee254aa96202b24c7bbd62ba93c59c7e5642af1c",
+    "media_type": "application/json"
+  },
+  "prior_independent_replay": {
+    "artifact_id": "3230ec1ee605cf92a9fb41d696ea3cc7bff473d762d1ae0447866cc3b8a38920",
+    "media_type": "application/json"
+  },
+  "prior_evaluation": {
+    "artifact_id": "46e7157a8f9c2d4764efb0a9b43182c97faec82bfd8774690f834b7c5fd16586",
+    "media_type": "application/json"
+  },
+  "prior_control_source": {
+    "artifact_id": "e96837bd38134b36d6c5c77a92f9507912fa4641912b4d9603aab8e47adcaa08",
+    "media_type": "application/json"
+  },
+  "maximum_native_analysis_requests": 1,
+  "maximum_native_rollouts": 151,
+  "maximum_response_iterations": 6,
+  "maximum_independent_replays": 1,
+  "maximum_physics_step_attempts": 91200,
+  "source_semantics": "Exact R7 own best valid_failure schedule plus parent via existing initialize_control, correction coefficients recentered to zero, physical zero state preserved, no inherited acceptance or hand edits.",
+  "replay_policy": "Replay at most one complete returned schedule strictly better than fresh baseline in original native minimax/sum ranking and with a different sequence hash. If no new better complete control, STOP without duplicating original R7 replay.",
+  "stop": "One new authorized bounded batch only. Native stops on existing margin target or cap; independently replay at most one strictly better complete schedule. First full independent pass SELECTs immediately. Otherwise STOP with all true partial/complete costs, no extra starts or private salvage. No automatic subsequent batch. Original R7 stop and costs stay sealed.",
+  "historical_costs": "All earlier BF6 stages STOP. Prior 367052 confirmed steps / 367053 attempts, 54.30258119998325 s Store numeric; original failed-step internal progress unknown; no balance transfer."
+}
