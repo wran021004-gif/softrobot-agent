@@ -96,3 +96,42 @@ legality checks, evidence-interpretation review and actual usage counters.
 No population/model ranking or scientific performance claim follows from this
 small comparison. Actual execution configuration and results are recorded in
 the follow-up below.
+
+## Recorded BF5 engineering execution
+
+Production commit `3eb1f408e` was pushed before the Provider work. Its one fresh
+Native baseline and independent replay completed 600+600=1,200 steps, with
+`offline_position_tool_axis_v1`, real Store/profile binding and a `valid_failure`
+outcome. SELECT correctly refused the failing result. Store cumulative numerical
+cost was 5.6372076 s, including 5.1245592 s in independently settled worker
+receipts. Provider/NMPC/RL counts were zero. The successful SELECT fixture remains
+explicitly fabricated; this baseline is not a new feasibility witness.
+
+## Frozen small model comparison protocol
+
+`configs/research/provider_flash_pro.json` fixes `deepseek-flash` versus
+`deepseek-v4-pro`, thinking enabled/high, max_tokens=8,192, two cases and at most
+two Provider requests per case/model (eight total). Case/model order is Flash/Pro
+for BF5 and Pro/Flash for BF6. Each has a separate existing Store grant/session
+with zero tool/backend/worker allowance, a fresh SDK session and the same frozen
+case input/schema. Credentials, raw responses and retained reasoning stay local.
+The original `build_harness`, `live_model_class`, `LiveBoundary` and production
+Plan/Analysis/Evidence contracts are reused. No alternative SDK, tools router or
+scientific dispatcher is added. Only a test-side read/validation interceptor runs.
+
+BF5 input is this integration's fresh failed baseline and its frozen task;
+BF6 input is a filtered public B incomplete receipt/audit. No C evidence or B
+successful design/control is supplied. The evidence reference is content-identical
+between model arms. The production evidence reader handles static pointer/views;
+there is no synthetic scientific feedback. Provider tool proposals record schema,
+reference/intent checks and, where available, pure applicability. These partial
+checks do not claim full scientific admission; all science budgets are zero.
+
+One mock-HTTP end-to-end check passed using the real Harness/ledger with worker
+and science dispatch replaced by failing sentinels. Synthetic usage in that unit
+test is not reported as real cost. The live runner is
+`python -m tests.research.flash_pro_decision_probe --live`. Request IDs, response
+receipts and actual usage/cache counters are retained in its own ignored Store.
+No uncertain or existing attempt is automatically resent. Hitting the two-request
+cap after a valid tool proposal may stop the Harness before a prose follow-up;
+that is distinct from invalid requests or absent evidence understanding.
