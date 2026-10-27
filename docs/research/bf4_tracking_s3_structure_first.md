@@ -24,4 +24,14 @@
 
 仅当两臂均取得新独立可行见证时，计算本次名义总成本比。若一臂在预算内失败，该臂真实首次通过成本未知，不编造精确加速倍数。若工具最优仍为 S0，如实报告没有找出结构改进。一个确定性配对只用于此实例观察，不证明普遍或统计提速，也不证明全局最优。
 
-结果将在执行后追加；本轮不修改原 TaskDefinition，不扩建新任务类别。
+## 首轮配置拒绝与独立 R1 修正
+
+首轮冻结提交 `a2ff85cdb` 后，原混合搜索提出 8 次、跳过 2 个重复/截断移动，6 次生成均被原 BF4 校验以 `TRACKING_HAS_NO_REACH_HOLDING_OR_ABSOLUTE_SPEED_COST` 拒绝。通用族域的 holding/terminal speed-weight 默认值均为 0.1，原混合搜索会把它们写入 generation；而 BF4 原 Tracking 控制契约要求这两个权重为 0。没有生成合法结构，因此按预定第 0 行基线规则，没有替换一个后来候选，也没有运行两路控制。
+
+该轮已 STOP，数学模型、CONIC、Native、物理步和回放均为 0；真实生成/编排成本为 **0.4500102 s Store 数值、4.0838841 s driver**，见 [原失败摘要](../../evidence/bf4_s3_initial_failure/summary.json)。它是冻结接口默认值不匹配，不是结构不可行或数学模型表现差。原配置/账本保留，不重置。
+
+执行必要的 R1 配置修正：新[族域包装](../../configs/research/family_space_bf4_s3_tracking.json)仍单层组合原物理 prototype，只将两项 control-domain 默认值设为原 BF4 要求的 0；控制域边界、物理 prototype、结构参数域和原任务不变。不是修改 evaluator 或删验收条件，也没有修改混合搜索/数值工具代码。
+
+[R1 冻结](../../configs/research/bf4_tracking_s3r1_freeze.json)及三个 `study_bf4_s3r1_*` 配置重新提交后才执行。新独立账本保持原 8 proposals/10 数学单位及每臂 201 Native/8 response/1 replay/121,200 步上限；不是借用旧余额。公开编排入口 `tests/research/bf4_tracking_s3r1.py` 仍仅调用原 Study 工具，且**将首轮全部失败开销纳入结构优先总成本**。后续比较既不会删除该失败，也不会把其耗时分摊给直接控制对照。
+
+结果将在 R1 执行后追加；本轮不修改原 TaskDefinition，不扩建新任务类别。

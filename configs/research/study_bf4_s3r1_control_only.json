@@ -1,0 +1,106 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_bf4_s3_tracking.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "bf4-s3r1-control-only-v1",
+  "base_commit": "d7b0f91f966ef96fa17b181ead99dff9a2d457cc",
+  "authorization": "2026-10-27 explicit current-chat user instruction: choose a previously independently feasible task, perform structure search/optimization first and then control solving entirely through existing Study tools, test whether total time-to-first-independent-pass improves. Choose unchanged BF4 timed Tracking task/seed17/original payload/floor/physics/30 points/12 mm. New prespecified nominal A/B study: S0 is exactly the first original family-search candidate independent of score; Sstar is the tool-ranked best mathematical candidate. Structure search via research_plan.search family_mixed_search_v1/task_violation, fixed two segments/six tendons/routing/material/sections/fidelity, only two lengths allowed 0.10..0.16 m, at most8 proposals and10 math evaluation units (up to5 model builds+5 SOCP solves). Each independent control arm uses same fresh constant0.2 N, original Native response, at most201 callbacks/eight iterations/one independent replay/121200 integration attempts. No historical successful controls or mathematical control witness transfer. Include ALL search/construction/failure/control/validation costs in structure-first route; no advantage claim unless fresh comparable outcomes establish it. First independent pass SELECTs within each separately authorized arm; other arm is a separate benchmark comparison. Finite failure STOP with all partial costs, no extra scans. Engineering commits/ordinary push remain authorized. Necessary Study configuration correction R1: preserve stopped invalid S3 and all its costs; freeze a new family wrapper with original BF4-required zero holding/terminal speed-weight defaults, no physical prototype/domain bounds or task/evaluator change. New independent R1 ledgers, same structural/control caps; original failed generation overhead is INCLUDED in final structure-first total, not erased. All actual numerical work only original Study tools.",
+  "task": "../../tasks/bf4_tracking_direction_change_v1.json",
+  "control": "control_bf4_tracking.json",
+  "evidence_destination": "runs/bf4-s3r1/control_only/private-store",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.2.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "windows_s": [
+      0.1,
+      0.3,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ]
+  },
+  "scoring_window_s": 0.6,
+  "runtime": "runtime_bf4_engineering.json",
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "select",
+    "stop"
+  ],
+  "physical_replay_limit": 1,
+  "native_control_limits": {
+    "evaluation_requests": 201,
+    "iterations": 8,
+    "knots_s": 4
+  },
+  "budgets": {
+    "physical_launches": 1,
+    "mathematical_evaluations": 1
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  }
+}
