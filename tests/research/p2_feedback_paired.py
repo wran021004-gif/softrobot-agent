@@ -11,7 +11,7 @@ import json
 import subprocess
 import sys
 from tools.platform_host import Host
-from tools.platform_store import encode,plain
+from tools.platform_store import encode,plain,zero
 from tools.research import core,analysis
 from tools.research.agent import pending
 from tools.research.config import ROOT
@@ -111,9 +111,30 @@ def shared_t1(h):
     return analysis.dispatch(h,query,T1_KEY,guard=core.guard,origin='user_authorized_shared_t1')
 
 
+def account_t1_public(h):
+    """Append the missing outer public charge without editing the real T1 receipt.
+
+    The direct supervisor call bypasses the Agent's outer public-tool hook.
+    Its mathematical and worker cost was already charged by analysis.dispatch.
+    """
+    key=T1_KEY+'-public-accounting';attempt=h.store.lookup(RUN,T1_KEY+'-analysis')
+    if not attempt or not attempt['receipt']:raise ValueError('SETTLED_T1_REQUIRED')
+    if h.store.lookup(RUN,key):raise ValueError('T1_PUBLIC_ACCOUNTING_ALREADY_RECORDED')
+    evidence=dict(version='p2_supervised_t1_public_accounting_v1',analysis_request=attempt['request_id'],
+        analysis_execution=attempt['execution_id'],reason='One direct supervisor research_analysis invocation bypassed the Agent outer public-tool reservation; immutable scientific receipt retained.',
+        additional_public_calls=1,additional_mathematical_evaluations=0,additional_workers=0)
+    def admissible(db):
+        if h.store.lookup(RUN,key,db):raise ValueError('T1_PUBLIC_ACCOUNTING_ALREADY_RECORDED')
+        if h.store.remaining(db=db)['remaining']['tool_calls']<=3:raise ValueError('PROTECTED_PUBLIC_CAPACITY')
+    row,_=h.store.reserve(RUN,key,digest(evidence),h.actor,{**zero(),'tool_calls':1},kind='public_accounting',guard=admissible)
+    h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
+        tool_id='research.public_accounting',tool_version='1.0.0',execution_status='completed',charged=zero()),evidence,kind='public_accounting')
+    return dict(request_id=key,ledger=h.store.remaining())
+
+
 def main():
-    if sys.argv[1:] not in (['authorize'],['t1']):raise ValueError('EXPLICIT_COMMAND_REQUIRED: authorize or t1')
-    value=authorize(host()) if sys.argv[1]=='authorize' else shared_t1(host())
+    if sys.argv[1:] not in (['authorize'],['t1'],['account-t1']):raise ValueError('EXPLICIT_COMMAND_REQUIRED: authorize, t1, or account-t1')
+    value={'authorize':authorize,'t1':shared_t1,'account-t1':account_t1_public}[sys.argv[1]](host())
     print(json.dumps(value,ensure_ascii=True))
 
 
