@@ -21,12 +21,12 @@ from tools.research.feedback import eligibility
 from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[1]
-OWNER = ROOT/'runs/base-only-owner-20261028-r1'
+OWNER = ROOT/'runs/base-only-owner-20261028-r2'
 CONFIG = ROOT/'configs/research'
 CAPS = {'M4':2000000,'M2':8000000,'M1':8000000,'M3':4000000,'M5':3000000,'M6':5000000}
 # Formal Study ceilings alone fit each task grant, even if every callback fails.
-LIMITS = {'M4':(6,500,20),'M2':(28,800,100),'M1':(16,800,100),
-          'M3':(9,800,20),'M5':(6,800,20),'M6':(10,800,20)}
+LIMITS = {'M4':(6,500,20),'M2':(14,800,100),'M1':(16,800,100),
+          'M3':(4,800,20),'M5':(6,800,20),'M6':(10,800,20)}
 
 def plan(action, candidate=None, reason='Frozen Base-only feasibility discovery', **payload):
     return dict(action=action,hypothesis=reason,expected_observation='Original registered evidence',
@@ -78,7 +78,7 @@ def bootstrap():
         private_evidence='runs/base-only-owner-20261028; excluded from future Agent checkout and context'))
 
 def host_for(key):
-    host=core.prepare(CONFIG/('study_base_only_'+key.lower()+'_v2.json'),directory=OWNER/key/'private-store')
+    host=core.prepare(CONFIG/('study_base_only_'+key.lower()+'_v3.json'),directory=OWNER/key/'private-store')
     if 'freeze' not in state(host):core.bind(host)
     return host
 
