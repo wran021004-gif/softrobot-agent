@@ -5,7 +5,7 @@ from .phs2d import host,request,candidate,build,ROOT
 from .state import state,save,update
 from extensions.tendon_family.compiler import resolve
 from extensions.tendon_family.passive_equilibrium import solve,consistency
-from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity,matching
+from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity,task_design_sensitivity,matching
 from extensions.tendon_family.route_validation import validate_routes
 from .phs2d_evaluation import evaluate
 
@@ -174,9 +174,10 @@ def optimize_matching(prefix,**parameters):
     v=state(h)['phs'];v.setdefault('route_optimizations',[]).append(ref);update(h,phs=v);return best
 
 
-def sensitivity(label,minus_label,plus_label,source,parameter,step=.001):
+def sensitivity(label,minus_label,plus_label,source,parameter,step=.001,baseline_source=None):
     h,p,ar,a=setup(label);_,_,am,minus=setup(minus_label);_,_,ap,plus=setup(plus_label);eq=h.store.artifact(source)
     def run(_):
         natives=[build(h,p,x['candidate'],payout_lengths_m=x['payout_lengths_m']) for x in (a,minus,plus)]
+        if baseline_source:return task_design_sensitivity(natives[0],eq['equilibrium'],h.store.artifact(baseline_source)['equilibrium'],natives[1],natives[2],parameter,step,eq['s'],eq['force_n'])
         return design_sensitivity(natives[0],eq['equilibrium'],natives[1],natives[2],parameter,step,eq['s'],eq['force_n'])
-    return request(h,p,dict(kind='passive_design_sensitivity_v1',assembly=ar,minus=am,plus=ap,source=source,parameter=parameter,normalized_step=step),run,math=1)
+    return request(h,p,dict(kind='passive_design_sensitivity_v1',assembly=ar,minus=am,plus=ap,source=source,baseline_source=baseline_source,parameter=parameter,normalized_step=step),run,math=1)

@@ -10,7 +10,7 @@ from extensions.tendon_family.generated_serial import generate_family
 from extensions.tendon_family.inverse_routing import generation
 from extensions.tendon_family.passive import PassiveModel
 from extensions.tendon_family.passive_equilibrium import solve,consistency
-from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity
+from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity,task_design_sensitivity
 from extensions.tendon_family.route_validation import validate_routes,interval,intersections
 
 
@@ -66,6 +66,17 @@ class InverseTests(unittest.TestCase):
         out=design_sensitivity(n,loaded['equilibrium'],model(6.4e6-13000),model(6.4e6+13000),'normalized_E',.001,.5,.1)
         self.assertEqual(out['status'],'regular_implicit_gradient');self.assertTrue(out['gradient_trustworthy'])
         self.assertLess(out['gradient_relative_error'],.01)
+
+    def test_task_gradient_includes_design_dependent_unloaded_baseline(self):
+        def model(E):return self.native(generation(young=[E],cells=8,radii=(.20,.008)))
+        n=model(6.4e6);base=solve(n);loaded=solve(n,.5,.1,base['equilibrium']['qpos'])
+        out=task_design_sensitivity(n,loaded['equilibrium'],base['equilibrium'],model(6.4e6-13000),model(6.4e6+13000),'normalized_E',.001,.5,.1)
+        self.assertIn('baseline_response',out);self.assertLess(out['task_resolved_directional_derivatives']['point_dx_m'],0.)
+        if out['task_derivative_status']=='regular_implicit_gradient':self.assertLess(max(out['task_gradient_relative_errors'].values()),.01)
+
+    def test_actual_baseline_configuration_identity_is_preserved(self):
+        from tools.state_io import digest
+        self.assertEqual(digest(resolve('configs/research/study.json')['configuration']),'a6446a271e68c152df9c684f792a140b3245a9ab8439817830b09b41d0087dc0')
 
 
 if __name__=='__main__':unittest.main()

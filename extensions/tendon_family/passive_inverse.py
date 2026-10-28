@@ -43,6 +43,7 @@ def modal_target(native,equilibrium,locations):
     q=np.array(equilibrium['qpos']);p=StaticProblem(native);d=p.at(q)
     Jtip=native.point(d,native.physics['tip'])[1];Jl=p.jacobian(q)
     H=np.array(equilibrium['H']);active=np.array(equilibrium['active']);positive=np.array(equilibrium['positive'])
+    Jy=np.vstack([native.point(d,material_point(native.physics,s))[1][1] for s in native.protocol['monitor_s']])
     # A: ideal zero-tip kinematic directions, independent of actual cable feasibility.
     Z=null_space(Jtip[:2]);K=Z.T@H@Z;ideal=[]
     for s in locations:
@@ -52,10 +53,12 @@ def modal_target(native,equilibrium,locations):
         v=Z@np.linalg.solve(K,Z.T@j);scale=max(abs(j@v),1e-15);v=v/scale*.01
         ideal.append(dict(s=s,dq_for_10mm=v.tolist(),tip_xy_m=float(np.linalg.norm(Jtip[:2]@v)),
             elastic_lagrangian_energy_j=float(.5*v@H@v),
+            out_of_plane_m=float(np.max(abs(Jy@v))),
             positive_length_changes_m=(Jl[positive]@v).tolist(),boundary_length_changes_m=(Jl[active&~positive]@v).tolist(),
             unilateral_direction_feasible=bool(np.max(abs(Jl[positive]@v),initial=0)<1e-8 and np.max(Jl[active&~positive]@v,initial=0)<=1e-8)))
     # B/C: actual one-sided active cone and actual material-point generalized force.
     response=tangent(native,equilibrium,.5,0.,locations)
+    for prediction in response['predictions']:prediction['out_of_plane_m']=float(np.max(abs(Jy@prediction['dq'])))
     return dict(method='passive_modal_target_v1',model='native_3d_bending_cells',
         A_ideal_tip_null_modes=ideal,B_C_unilateral_force_response=response,
         matching_all=row_match(Jl,Jtip),matching_positive=row_match(Jl[positive],Jtip),
@@ -68,10 +71,11 @@ def modal_target(native,equilibrium,locations):
 
 def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
     """Normalized parameter u, supplied models at u +/- step, fixed topology."""
-    if any(n.model.nv!=native.model.nv or n.model.ntendon!=native.model.ntendon for n in (minus,plus)):
+    if any(n.model.nv!=native.model.nv or n.model.ntendon!=native.model.ntendon or n.physics['dofs']!=native.physics['dofs'] for n in (minus,plus)):
         return dict(method='passive_design_sensitivity_v1',status='not_applicable',reason='discrete_topology_change',parameter=parameter)
     q=np.array(equilibrium['qpos']);lam=np.array(equilibrium['tensions_n']);a=np.array(equilibrium['active'])
-    regular=equilibrium['status']=='qualified_local_minimum' and equilibrium['LICQ'] and equilibrium['strict_complementarity']
+    binding_switch=any(material_point(n.physics,s)['body']!=material_point(native.physics,s)['body'] for n in (minus,plus))
+    regular=equilibrium['status']=='qualified_local_minimum' and equilibrium['LICQ'] and equilibrium['strict_complementarity'] and not binding_switch
     pm=StaticProblem(minus,s,force);pp=StaticProblem(plus,s,force)
     fm=pm.gradient(q)+pm.jacobian(q).T@lam;fp=pp.gradient(q)+pp.jacobian(q).T@lam
     dc=(pp.constraint(q)-pm.constraint(q))/(2*step)
@@ -81,7 +85,7 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
     result=dict(method='passive_design_sensitivity_v1',parameter=parameter,coordinate='dimensionless normalized parameter u',
         active=a.tolist(),LICQ=equilibrium['LICQ'],strict_complementarity=equilibrium['strict_complementarity'],KKT_condition=condition if np.isfinite(condition) else None,
         step=step,force_n=force,s=s,status='regular_implicit_gradient' if regular else 'not_applicable',
-        reason=None if regular else 'LICQ, strict complementarity or KKT regularity failed; use resolved finite differences')
+        reason=None if regular else 'material_point_binding_switch' if binding_switch else 'LICQ, strict complementarity or KKT regularity failed; use resolved finite differences')
     if regular:
         z=np.linalg.solve(M,-np.r_[(fp-fm)/(2*step),dc[a]])
         p=StaticProblem(native,s,force);d=p.at(q);rows={}
@@ -100,6 +104,7 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
     rm=solve(minus,s,force,q);rp=solve(plus,s,force,q)
     same=rm['equilibrium']['active']==equilibrium['active']==rp['equilibrium']['active']
     result['resolved_comparison']=dict(minus_status=rm['status'],plus_status=rp['status'],same_active_set=same,
+        minus_positions=rm['equilibrium']['positions'],plus_positions=rp['equilibrium']['positions'],
         dq_du=((np.array(rp['equilibrium']['qpos'])-rm['equilibrium']['qpos'])/(2*step)).tolist(),
         dpositions_du=((np.array(rp['equilibrium']['positions'])-rm['equilibrium']['positions'])/(2*step)).tolist())
     if regular:
@@ -107,6 +112,36 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
         result['gradient_relative_error']=error
         result['gradient_trustworthy']=bool(same and rm['status']==rp['status']=='qualified_local_minimum' and error<.05)
     result['numerical_cost']={k:pm.cost[k]+pp.cost[k]+rm['numerical_cost'][k]+rp['numerical_cost'][k] for k in pm.cost}
+    return result
+
+
+def task_design_sensitivity(native,loaded,baseline,minus,plus,parameter,step,s,force):
+    """Differentiate task displacement relative to the design-dependent baseline."""
+    result=design_sensitivity(native,loaded,minus,plus,parameter,step,s,force)
+    if 'resolved_comparison' not in result:
+        result.update(task_derivative_status='not_applicable',task_gradient_trustworthy=False);return result
+    base=design_sensitivity(native,baseline,minus,plus,parameter,step,s,0.)
+    result.update(task_metric_revision=2,baseline_response=base)
+    fd=[]
+    for side in ('minus','plus'):
+        fd.append(multicase_metrics(native.protocol,dict(positions=base['resolved_comparison'][side+'_positions']),
+            dict(positions=result['resolved_comparison'][side+'_positions']),s))
+    result['task_resolved_directional_derivatives']={key:(fd[1][key]-fd[0][key])/(2*step) for key in ('point_dx_m','tip_xy_m','ratio','out_of_plane_m')}
+    regular=result['status']==base['status']=='regular_implicit_gradient'
+    delta=np.array(loaded['positions'])-baseline['positions'];point=delta[native.protocol['monitor_s'].index(s),0];tip=delta[-1,:2]
+    if regular and abs(point)>1e-9 and np.linalg.norm(tip)>1e-9:
+        dp=np.array(result['dposition_du']['point'])-base['dposition_du']['point']
+        dt=np.array(result['dposition_du']['tip'])-base['dposition_du']['tip']
+        dpoint=float(np.sign(point)*dp[0]);dtip=float(tip@dt[:2]/np.linalg.norm(tip))
+        derivatives=dict(point_dx_m=dpoint,tip_xy_m=dtip,ratio=dtip/abs(point)-np.linalg.norm(tip)*dpoint/point**2)
+        errors={k:abs(v-result['task_resolved_directional_derivatives'][k])/max(abs(v),abs(result['task_resolved_directional_derivatives'][k]),1e-8) for k,v in derivatives.items()}
+        result.update(task_derivative_status='regular_implicit_gradient',task_derivatives_du=derivatives,task_gradient_relative_errors=errors,
+            task_gradient_trustworthy=bool(result.get('gradient_trustworthy') and base.get('gradient_trustworthy') and max(errors.values())<.05))
+    else:
+        result.update(task_derivative_status='not_applicable',task_gradient_trustworthy=False,
+            task_derivative_reason='Baseline/loaded regularity or differentiability of displacement norm failed; resolved directional comparison only.')
+    result['out_of_plane_derivative_scope']='Resolved directional difference of maximum absolute monitor y; no ordinary max-norm gradient claim.'
+    result['numerical_cost']={k:result['numerical_cost'][k]+base['numerical_cost'][k] for k in result['numerical_cost']}
     return result
 
 
