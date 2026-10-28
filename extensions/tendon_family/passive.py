@@ -75,7 +75,16 @@ class PassiveModel:
         static=mujoco.MjData(self.model);mujoco.mj_copyData(static,self.model,d)
         static.qvel[:]=0.;self.apply_force(static,s,force);mujoco.mj_forward(self.model,static)
         static_balance=static.qfrc_passive+static.qfrc_applied-static.qfrc_bias+static.qfrc_constraint
-        return dict(time_s=float(d.time),qpos=d.qpos.tolist(),qvel=d.qvel.tolist(),
+        extra={}
+        if self.protocol.get('diagnostic_recording'):
+            cold=mujoco.MjData(self.model);cold.qpos[:]=d.qpos;mujoco.mj_forward(self.model,cold)
+            self.apply_force(cold,s,force);mujoco.mj_forward(self.model,cold)
+            cold_balance=cold.qfrc_passive+cold.qfrc_applied-cold.qfrc_bias+cold.qfrc_constraint
+            extra=dict(qacc=d.qacc.tolist(),dynamic_balance_nm=balance.tolist(),static_balance_nm=static_balance.tolist(),
+                cold_static_balance_nm=cold_balance.tolist(),cold_static_balance_inf_nm=float(np.max(abs(cold_balance))),
+                passive_force_nm=d.qfrc_passive.tolist(),bias_force_nm=d.qfrc_bias.tolist(),applied_force_nm=d.qfrc_applied.tolist(),
+                constraint_force_nm=d.qfrc_constraint.tolist(),qacc_warmstart=d.qacc_warmstart.tolist())
+        return dict(**extra,time_s=float(d.time),qpos=d.qpos.tolist(),qvel=d.qvel.tolist(),
             positions=[p.tolist() for p,_,_ in items],speeds=[float(np.linalg.norm(J@d.qvel)) for _,J,_ in items],
             force_point=pF.tolist(),force_n=float(force),tendon_lengths=d.ten_length.tolist(),
             length_change=(d.ten_length-self.payout).tolist(),tensions_n=tensions.tolist(),constraint_rows=rows,
