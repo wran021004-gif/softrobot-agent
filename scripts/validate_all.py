@@ -2,10 +2,21 @@
 import argparse
 import json
 from pathlib import Path
-from phs2d_io import read,write,require,forbid_integration,TASK_DIR
+from phs2d_io import read,write,require,sha,forbid_integration,TASK_DIR
 import validate_package
 import validate_phs2d
 from portable_xml import portable_xml_loading
+
+
+def preserved_legacy_files(root,baseline):
+    # The original manifest already defines portable files and excludes bytecode.
+    # The broader before-export snapshot also records local caches, which must
+    # remain untouched in place but are not prerequisites after extracting ZIP.
+    preserved={name:sha(root/name)==baseline['files'][name]
+               for name in baseline['original_manifest']['files']
+               if name not in baseline['mutable_root_files']}
+    require(all(preserved.values()),'LEGACY_IMMUTABLE_FILE_HASH_CHANGED')
+    return preserved
 
 
 def validate(root):
@@ -17,10 +28,7 @@ def validate(root):
             entries[0]['benchmark'] == TASK_DIR, 'EXPLICIT_PASSIVE_DISPATCH')
     passive = validate_phs2d.validate(root)
     baseline = read(root/TASK_DIR/'evidence/legacy_hash_snapshot.json')
-    from phs2d_io import sha
-    preserved = {name:sha(root/name)==identity for name,identity in baseline['files'].items()
-                 if name not in baseline['mutable_root_files']}
-    require(all(preserved.values()), 'LEGACY_IMMUTABLE_FILE_HASH_CHANGED')
+    preserved=preserved_legacy_files(root,baseline)
     return dict(status='passed' if active['status']==passive['status']=='passed' else 'failed',
         active=active, passive=passive, legacy_preserved_files=len(preserved),
         all_legacy_immutable_hashes_preserved=True, physics_steps=0)

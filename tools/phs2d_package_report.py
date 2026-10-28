@@ -24,6 +24,7 @@ def generate(package,validation_path):
     test_count=int(re.search(r'Ran (\d+) tests?',test_run.stderr).group(1))
     baseline=read(base/'evidence/legacy_hash_snapshot.json')
     immutable={name:identity for name,identity in baseline['files'].items() if name not in baseline['mutable_root_files']}
+    portable_immutable={name:identity for name,identity in immutable.items() if name in baseline['original_manifest']['files']}
     require(all(sha(package/name)==identity for name,identity in immutable.items()),'LEGACY_PRESERVATION')
     report=dict(version='phs2d_package_delivery_v1',status='validated_for_publication',
         package_directory='.',phs_directory=TASK_DIR,source_research_commit=RESEARCH_SHA,
@@ -37,6 +38,8 @@ def generate(package,validation_path):
         total_npz_bytes=sum(e['npz_bytes'] for e in dataset['trajectories']),
         validation=validation,viewer_validation=viewer,all_legacy_immutable_hashes_preserved=True,
         original_files_snapshotted=len(baseline['files']),immutable_original_files_preserved=len(immutable),
+        portable_original_files_preserved=len(portable_immutable),
+        original_local_cache_files_not_required=len(immutable)-len(portable_immutable),
         tests=dict(focused_tests_passed=test_count,physical_integration_executed=False,suites=suites,
                    runner_output=test_run.stderr.strip()),
         actual_new_physics_steps=0,scientific_store_access='SQLite mode=ro&immutable=1, readonly blob reads only',
@@ -96,6 +99,8 @@ CSV 总大小 {report['total_csv_bytes']} bytes，NPZ 总大小 {report['total_n
 
 原 M1–M6 的 10 条轨迹通过原 validate_package.py 完整校验；PHS 11 条通过新增逐帧校验。
 原 {len(baseline['files'])} 个文件有导出前哈希快照；其中 {len(immutable)} 个不可变文件逐字节保留。
+其中 {len(portable_immutable)} 个属于原完整性清单的可移植文件；原电脑的 Python 字节码缓存仍保留在原目录，
+不作为 ZIP 解压后的依赖。新根校验与旧清单使用相同的可移植文件范围。
 根 README、清单、来源索引和验证/交付报告按增量 v2 更新，原根报告内容在 JSON 的 legacy 中保留。
 原 manifest.trajectories 仍只有十条主动任务；PHS 以 passive_benchmarks 单独类型化组织。
 

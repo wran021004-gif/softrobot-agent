@@ -16,6 +16,7 @@ from view_phs2d import playback_key
 from validate_phs2d import validate_case_label
 from portable_xml import load_xml,portable_xml_loading
 from tests.research.test_base_only_export import fixture_directory
+from validate_all import preserved_legacy_files
 
 
 class PortablePHSTests(unittest.TestCase):
@@ -123,6 +124,16 @@ class PortablePHSTests(unittest.TestCase):
             path=Path(folder)/'external.xml'
             path.write_text('<mujoco><asset><mesh file="missing.obj"/></asset></mujoco>',encoding='utf8')
             with self.assertRaisesRegex(ValueError,'SELF_CONTAINED_XML'):load_xml(path)
+
+    def test_legacy_portability_uses_original_manifest_not_local_bytecode(self):
+        with fixture_directory() as folder:
+            path=folder/'robot.xml';path.write_bytes(b'fabricated immutable fixture')
+            identity=io.sha(path)
+            baseline=dict(files={'robot.xml':identity,'__pycache__/local.pyc':'not-shipped'},
+                          original_manifest=dict(files={'robot.xml':identity}),mutable_root_files=[])
+            self.assertEqual(preserved_legacy_files(folder,baseline),{'robot.xml':True})
+            path.write_bytes(b'changed fixture')
+            with self.assertRaises(ValueError):preserved_legacy_files(folder,baseline)
 
 
 if __name__=='__main__':unittest.main()
