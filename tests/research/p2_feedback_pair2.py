@@ -176,8 +176,38 @@ async def pair(h):
         if result['http_status']!=200:break
 
 
+def record_math_authorization(h):
+    """Bind the already approved, unchanged math scope to the current identity.
+
+    This repairs discovery metadata after the addendum. It creates no budget,
+    executes no method, and leaves earlier decision packets immutable.
+    """
+    from tools.research.research_context import mathematics_authorization
+    s=state(h);ledger=h.store.remaining();current=mathematics_authorization(h,s)
+    if current['registered_study_scope_authorized'] is True:raise ValueError('CURRENT_MATH_AUTHORIZATION_ALREADY_RECORDED')
+    if (ledger['limit']['model_calls']!=15 or ledger['used']['model_calls']!=10
+            or s['mathematical_evaluations']!=1 or s['spec']['budgets']['mathematical_evaluations']!=2
+            or s.get('physical_replay_launches')!=1 or s['spec']['physical_replay_limit']!=1 or s.get('pending')):
+        raise ValueError('EXACT_APPROVED_SCIENTIFIC_BUDGET_REQUIRED')
+    additions=s['spec'].get('authorization_addenda',[])
+    if not additions or h.store.artifact(additions[-1]).get('version')!='p2_paired_feedback_cap15_v1':
+        raise ValueError('CURRENT_USER_ADDENDUM_REQUIRED')
+    scope=dict(study_id=RUN,resolved_identity=s['spec']['resolved_identity'],execution_scopes=['registered mathematics'],
+        capabilities=['analysis'],mathematical_methods=s['spec']['mathematical_methods'],
+        budgets=s['spec']['budgets'],physical_replay_limit=s['spec']['physical_replay_limit'],
+        authorization_addendum=additions[-1],science_limits_unchanged=True,
+        p3='PENDING_EXPLICIT_P3_APPROVAL')
+    ref=record(h,'formal_study_authorization',dict(user_approval=True,scope=scope,scope_identity=digest(scope),
+        source='Explicit user-approved P2 feedback continuation and current cap-15 addendum; no additional science authorization.',
+        purpose='Make existing current-study math scope visible to discovery; earlier packets are preserved.'))
+    if mathematics_authorization(h,state(h))['registered_study_scope_authorized'] is not True:
+        raise ValueError('AUTHORIZATION_DISCOVERY_MISMATCH')
+    return ref
+
+
 if __name__=='__main__':
     import sys
     if sys.argv[1:] == ['authorize']:print(json.dumps(authorize(host())))
     elif sys.argv[1:] == ['pair']:asyncio.run(pair(host()))
-    else:raise ValueError('EXPLICIT_COMMAND_REQUIRED: authorize or pair')
+    elif sys.argv[1:] == ['record-math-authorization']:print(json.dumps(record_math_authorization(host())))
+    else:raise ValueError('EXPLICIT_COMMAND_REQUIRED: authorize, pair, or record-math-authorization')

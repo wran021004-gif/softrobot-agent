@@ -22,6 +22,7 @@ class Pair2Tests(unittest.TestCase):
             t1=self.h.store.put(db,{'synthetic':'t1'}).model_dump(mode='json')
             replay=self.h.store.put(db,{'synthetic':'replay'}).model_dump(mode='json')
         current=state(self.h);spec=deepcopy(current['spec']);spec.update(resolved_identity='round1',physical_replay_limit=1,
+            mathematical_methods={'fixture-method':'authorized fixture'},
             numerical_execution_guard={'limit_s':300},family_space={'version':'serial_family_space_v3'})
         spec['budgets']['mathematical_evaluations']=2
         provider=dict(base_url='https://api.deepseek.com',model='deepseek-flash',thinking='enabled',reasoning_effort='high',
@@ -64,5 +65,10 @@ class Pair2Tests(unittest.TestCase):
         a,b=deepcopy(sent[0]),deepcopy(sent[1]);a.pop('thinking');a.pop('reasoning_effort');b.pop('thinking')
         self.assertEqual(a,b);self.assertEqual(self.h.store.remaining()['remaining']['model_calls'],5)
         self.assertEqual(state(self.h)['mathematical_evaluations'],1);self.assertEqual(state(self.h)['physical_replay_launches'],1)
+        before=self.h.store.remaining()['used'];second.record_math_authorization(self.h)
+        from tools.research.research_context import mathematics_authorization
+        self.assertTrue(mathematics_authorization(self.h,state(self.h))['registered_study_scope_authorized'])
+        self.assertEqual(self.h.store.remaining()['used'],before)
+        with self.assertRaisesRegex(ValueError,'ALREADY_RECORDED'):second.record_math_authorization(self.h)
         with self.assertRaisesRegex(ValueError,'NO_RETRY'):
             asyncio.run(second.send_arm(self.h,bundle,'on','fixture-secret',transport=httpx.MockTransport(respond)))
