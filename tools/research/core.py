@@ -482,6 +482,8 @@ def initial_structure_action(host):
 
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
+    from tools.research.evidence_policy import require_english
+    require_english(value,state(host)['spec'],source='new research Plan')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         origin='engineering'
     plan=Plan.model_validate(value)

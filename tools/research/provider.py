@@ -1,12 +1,105 @@
 """Accounted model transport and exact response recovery over the existing Store."""
 from copy import deepcopy
 import json, os, time
+from pathlib import Path
 from uuid import uuid4
 import httpx
 from strands.models.openai import OpenAIModel
 from tools.platform_store import plain, zero
 from tools.state_io import digest
 CALLER = 'research-provider'
+
+
+def model_type(provider):
+    return DeepSeekModel if provider['adapter']=='deepseek' else OpenAIModel
+
+
+def model_messages(host, messages, system_prompt=None):
+    wire=model_type(pilot(host)['provider']).format_request_messages(messages,system_prompt)
+    return gateway_history(host,wire) if pilot(host)['provider']['adapter']=='chatgpt_gateway' else wire
+
+
+def gateway_history(host, messages):
+    """Reattach opaque completed output from original receipts by tool call IDs."""
+    wanted={tuple(c['id'] for c in m.get('tool_calls',[])):m for m in messages if m.get('tool_calls')}
+    if not wanted:return messages
+    for event in host.store.events(host.run_id):
+        if event['kind']!='r3_response' or event['status']!='metadata_saved':continue
+        reception=host.store.artifact(event['outputs'][0])
+        if reception['http_status']!=200:continue
+        raw=json.loads(host.store.artifact(reception['body'],raw=True))
+        for choice in raw.get('choices',[]):
+            original=choice.get('message',{})
+            key=tuple(c['id'] for c in original.get('tool_calls',[]))
+            if key in wanted and original.get('provider_output') is not None:
+                wanted[key]['provider_output']=original['provider_output']
+    return messages
+
+
+def request_settings(provider):
+    """One wire contract for Main, Reporter, validation and offline probes."""
+    adapter=provider['adapter']
+    if adapter not in ('deepseek','chatgpt_gateway'):
+        raise ValueError('UNSUPPORTED_RESEARCH_PROVIDER')
+    result=dict(model=provider['model'],stream=False)
+    reasoning=provider.get('reasoning')
+    if reasoning is not None:
+        if reasoning not in ('none','medium'):raise ValueError('REASONING_MUST_BE_NONE_OR_MEDIUM')
+        if adapter=='deepseek':
+            # DeepSeek has no medium wire value. Its enabled/high profile is
+            # explicitly the Provider-specific mapping, not an OpenAI enum.
+            result.update(thinking=dict(type='disabled' if reasoning=='none' else 'enabled'),
+                reasoning_effort='none' if reasoning=='none' else 'high')
+        else:
+            caps=provider.get('model_capabilities') or {}
+            if reasoning not in caps.get('reasoning',[]):raise ValueError('MODEL_REASONING_NOT_VERIFIED')
+            result['reasoning_effort']=reasoning
+    elif adapter=='deepseek':
+        result.update(thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'])
+    else:
+        raise ValueError('GATEWAY_REQUIRES_EXPLICIT_REASONING_PROFILE')
+    if provider.get('max_tokens') is not None:
+        if adapter=='chatgpt_gateway':raise ValueError('GATEWAY_OUTPUT_CAP_UNSUPPORTED')
+        result['max_tokens']=provider['max_tokens']
+    return result
+
+
+def validate_provider(provider):
+    request_settings(provider)
+    if provider['adapter']=='chatgpt_gateway':
+        caps=provider.get('model_capabilities') or {}
+        if not provider.get('model') or caps.get('model')!=provider['model'] or not caps.get('tools') or not caps.get('catalog_source'):
+            raise ValueError('EXPLICIT_ACCOUNT_MODEL_AND_TOOL_CAPABILITIES_REQUIRED')
+        if caps.get('verification') not in ('offline_contract','account_verified'):
+            raise ValueError('MODEL_CAPABILITY_VERIFICATION_REQUIRED')
+        if not provider.get('context_guard') or not caps.get('max_request_bytes'):
+            raise ValueError('EXPLICIT_GATEWAY_CAPACITY_REQUIRED')
+
+
+def credential(provider, path):
+    """Secrets stay outside frozen configuration, Store and framework snapshots."""
+    if provider['adapter']=='deepseek':
+        load_credential(Path(path).expanduser())
+        return os.environ['DEEPSEEK_API_KEY']
+    config=json.loads(Path(path).expanduser().read_text(encoding='utf-8-sig'))
+    configured=config['base_url'].rstrip('/')
+    target=provider['base_url'].rstrip('/')
+    if target not in (configured,configured+'/v1'):
+        raise ValueError('GATEWAY_CREDENTIAL_ENDPOINT_MISMATCH')
+    if config.get('model') and provider.get('model') and config['model']!=provider['model']:
+        raise ValueError('GATEWAY_CREDENTIAL_MODEL_MISMATCH')
+    return config['api_key']
+
+
+async def discover_models(provider, api_key, *, transport=None):
+    """Explicit caller operation; never invoked by config resolution or prepare.
+
+    Catalog availability does not verify tool support or establish price order.
+    """
+    async with httpx.AsyncClient(transport=transport,follow_redirects=False,timeout=provider['timeout_s']) as client:
+        response=await client.get(provider['base_url'].rstrip('/')+'/models',headers={'Authorization':'Bearer '+api_key})
+        response.raise_for_status()
+        return dict(models=response.json()['data'],pricing='unknown',tool_support='requires_separate_verification')
 
 class DeepSeekModel(OpenAIModel):
     """Public provider extension: retain DeepSeek reasoning on the next request.
@@ -50,7 +143,7 @@ def received(host,request_id):
 def settle(host,row,reception):
     status='completed' if 200<=reception['http_status']<300 else 'failed'
     return host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=CALLER,
-        tool_id='model.deepseek',tool_version='1.0.0',execution_status=status,charged=zero()),
+        tool_id='model.'+pilot(host)['provider']['adapter'],tool_version='1.0.0',execution_status=status,charged=zero()),
         reception,elapsed=reception['elapsed_s'],kind='r3_model')
 
 
@@ -119,12 +212,18 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
         from tools.research.config import role_provider
         expected=role_provider(host.store.session(run)['state']['spec'],pilot(host)['provider'],purpose)
+        from tools.research.evidence_policy import require_english
+        require_english(wire,host.store.session(run)['state']['spec'],source='model request')
+        settings=request_settings(expected)
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
-            or wire.get('model')!=expected['model'] or wire.get('thinking')!={'type':expected['thinking']}
-            or wire.get('reasoning_effort')!=expected['reasoning_effort']
-            or (('max_tokens' in wire) if expected.get('max_tokens') is None else wire.get('max_tokens')!=expected['max_tokens'])
-            or wire.get('stream') is not False or wire.get('tool_choice','auto')!='auto'):
+            or any(wire.get(k)!=v for k,v in settings.items())
+            or any(k in wire and k not in settings for k in ('thinking','reasoning_effort','max_tokens'))
+            or wire.get('tool_choice','auto')!='auto'):
             raise ValueError('R3_PROVIDER_CONFIGURATION_MISMATCH')
+        if expected['adapter']=='chatgpt_gateway':
+            caps=expected['model_capabilities']
+            if caps.get('verification')!='account_verified' and not isinstance(self.inner,httpx.MockTransport):
+                raise ValueError('GATEWAY_MODEL_NOT_ACCOUNT_VERIFIED')
         saved=pilot(host).get('unconsumed_response')
         if saved:
             row=store.lookup(run,saved)
@@ -226,9 +325,11 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         await self.inner.aclose()
 
 def live_model_class(boundary):
-    class AccountedDeepSeekModel(DeepSeekModel):
+    class AccountedModel(model_type(pilot(boundary.host)['provider'])):
         def format_request(self,*args,**kwargs):
             request=super().format_request(*args,**kwargs)
+            if pilot(boundary.host)['provider']['adapter']=='chatgpt_gateway':
+                request['messages']=gateway_history(boundary.host,request['messages'])
             saved=pilot(boundary.host).get('unconsumed_response')
             if saved:
                 event=next(e for e in boundary.host.store.events(boundary.host.run_id)
@@ -256,7 +357,7 @@ def live_model_class(boundary):
                 except IncompleteModelOutput as confirmed:raise confirmed from exc
                 raise
             boundary.consumed()  # Failed conversion leaves the saved response available.
-    return AccountedDeepSeekModel
+    return AccountedModel
 
 def load_credential(path):
     if not os.environ.get('DEEPSEEK_API_KEY') and path.is_file():

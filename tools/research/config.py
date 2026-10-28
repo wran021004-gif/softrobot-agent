@@ -21,7 +21,7 @@ def tool_schema_policy(spec):
 def validate_conversation_policy(decisions):
     tools=decisions.get('tool_schema_policy')
     if tools is not None and (tools not in ({'version':'on_demand_tools_v1'},{'version':'on_demand_tools_v2'})
-            or decisions.get('architecture')!='english_decision_v1'
+            or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')
             or not decisions.get('conversation_policy')):
         raise ValueError('VERSIONED_ON_DEMAND_TOOLS_REQUIRES_RECENT_ROUND_POLICY')
     policy=decisions.get('conversation_policy')
@@ -29,12 +29,20 @@ def validate_conversation_policy(decisions):
     if (not isinstance(policy,dict) or set(policy)!={'version','trace_limit'}
             or policy['version']!='recent_round_trace_v1'
             or type(policy['trace_limit']) is not int or not 6<=policy['trace_limit']<=10
-            or decisions.get('architecture')!='english_decision_v1'):
+            or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')):
         raise ValueError('VERSIONED_RECENT_ROUND_TRACE_POLICY_REQUIRED')
 
 
 def validate_role_policy(policy):
     """Validate frozen role versions without reinterpreting v1 Studies."""
+    if isinstance(policy,dict) and policy.get('version')=='research_roles_v3':
+        if set(policy)!={'version','main','reporter'}:raise ValueError('VERSIONED_RESEARCH_ROLE_POLICY_REQUIRED')
+        for role in ('main','reporter'):
+            profile=policy[role]
+            if (not isinstance(profile,dict) or set(profile)-{'model','reasoning','model_capabilities'}
+                    or profile.get('reasoning') not in ('none','medium')):
+                raise ValueError('INVALID_RESEARCH_ROLE_PROFILE: '+role)
+        return
     if not isinstance(policy, dict) or set(policy) != {'version', 'main', 'reporter'} or policy['version'] not in ('research_roles_v1', 'research_roles_v2'):
         raise ValueError('VERSIONED_RESEARCH_ROLE_POLICY_REQUIRED')
     for role, thinking, effort in (('main', 'disabled', 'none'), ('reporter', 'enabled', 'low')):
@@ -59,6 +67,9 @@ def role_provider(spec, provider, purpose):
         return provider
     profile = policy['reporter' if purpose == 'reporter' else 'main']
     result = {**provider, **profile}
+    if policy['version']=='research_roles_v3':
+        result['max_tokens']=None
+        return result
     if policy['version'] == 'research_roles_v2':
         result['max_tokens'] = None
         result['output_context_reserve_tokens'] = 32768
@@ -399,9 +410,13 @@ def resolve(path, profile=None, *, backend_profile=None):
         # Freeze the main role into the existing provider configuration. The
         # reporter role remains in the same frozen Study policy.
         provider.update(role_policy['main'])
-        if role_policy['version'] == 'research_roles_v2':
+        if role_policy['version'] in ('research_roles_v2','research_roles_v3'):
             provider['max_tokens'] = None
             provider['output_context_reserve_tokens'] = 32768
+        if role_policy['version']=='research_roles_v3':
+            from tools.research.provider import validate_provider
+            for purpose in ('conversation','reporter'):
+                validate_provider(role_provider(dict(research_decisions=dict(role_policy=role_policy)),provider,purpose))
     if not provider.get('base_url') or not provider.get('model'):
         raise ValueError('EXPLICIT_PROVIDER_REQUIRED')
     controller = deepcopy(control['controller_defaults'])
@@ -512,19 +527,24 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy','language_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         validate_conversation_policy(decisions)
         if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2')
-                or decisions.get('architecture')!='english_decision_v1'):
+                or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')):
             raise ValueError('VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
                 raise ValueError('BOUNDED_RESEARCH_CONTEXT_LIMIT_REQUIRED')
         architecture=decisions.get('architecture')
-        if architecture is not None and architecture!='english_decision_v1':
+        if architecture is not None and architecture not in ('english_decision_v1','english_decision_v2'):
             raise ValueError('UNKNOWN_RESEARCH_ARCHITECTURE')
         if architecture:
+            if architecture=='english_decision_v2':
+                if decisions.get('language_policy')!=dict(version='english_sources_v1',authored_language='en'):
+                    raise ValueError('EXPLICIT_ENGLISH_SOURCE_POLICY_REQUIRED')
+                from tools.research.evidence_policy import require_english
+                require_english(study.get('execution_instructions',''),dict(research_decisions=decisions),source='authored instructions')
             if not decisions.get('role_policy'):
                 raise ValueError('ENGLISH_STUDY_REQUIRES_VERSIONED_ROLES')
             handoff=decisions.setdefault('handoff_policy',dict(version='token_handoff_v1',input_tokens=38000))

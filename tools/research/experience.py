@@ -79,6 +79,18 @@ def retrieve(host,query,*,reader='agent'):
             continue
         body=source.read_bytes()
         content=read(ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
+        from tools.research.evidence_policy import english_sources, require_english
+        if q.operation=='read' and english_sources(state(host)['spec']):
+            # No silent translation or claim that historical prose is a fresh
+            # observation. The owner supplies a reviewed, referenced view.
+            if entry.get('authored_language')!='en':
+                raise ValueError('EXPERIENCE_REQUIRES_REVIEWED_ENGLISH_SOURCE: '+canonical)
+            origin=entry.get('language_origin') or {}
+            if origin.get('kind') not in ('authored_english','reviewed_translation'):
+                raise ValueError('EXPERIENCE_ENGLISH_ORIGIN_REQUIRED: '+canonical)
+            if origin['kind']=='reviewed_translation' and (not origin.get('original_reference') or not origin.get('reviewed_by')):
+                raise ValueError('REVIEWED_ENGLISH_DERIVATION_REQUIRED')
+            require_english(content,state(host)['spec'],source='experience '+canonical)
         refs=[]
         def walk(value):
             if isinstance(value,dict):

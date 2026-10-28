@@ -1,8 +1,9 @@
-# Softrobot-Agent research mainline
+# Softrobot-Agent research Harness V2
 
 The active research implementation starts at `python -m tools.research`. See [the PowerShell runbook](docs/research/README.md) and [module and design-space reference](docs/research/modules.md).
 
-The cross-task integration baseline is `integration/research-next`. See
+The development baseline is `mainline/research-harness-v2`, based on the exact R2 Harness commit. See [ownership, staged changes and offline validation](docs/research/harness_v2.md).
+The historical cross-task integration baseline is `integration/research-next`. See
 [the integration report and fresh Tracking/multi-condition configurations](docs/research/integration_research_next.md).
 The underlying task-conditioned mainline is documented in
 [the original integration results](docs/research/softarm_codesign_mainline.md).

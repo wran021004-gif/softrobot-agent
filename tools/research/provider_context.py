@@ -24,6 +24,8 @@ def capacity_estimate(content,provider):
     This is an offline estimate, not a Provider-reported prompt-token count.
     """
     context=provider['context_guard']
+    maximum=(provider.get('model_capabilities') or {}).get('max_request_bytes')
+    if maximum and len(content)>maximum:raise ValueError('GATEWAY_REQUEST_BODY_TOO_LARGE')
     # A v2 reserve is a context-planning margin, not an output generation cap.
     output_reserve=provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 32768
     reserved=output_reserve+context['framing_headroom_tokens']
@@ -44,6 +46,8 @@ def capacity_estimate(content,provider):
 
 def handoff_input_estimate(content, provider):
     """Estimate the complete serialized request for the soft handoff heuristic."""
+    if provider['adapter']=='chatgpt_gateway':
+        return capacity_estimate(content,provider)
     if provider['adapter'] != 'deepseek' or provider['model'] not in ('deepseek-flash','deepseek-v4-pro'):
         raise ValueError('TOKEN_HANDOFF_REQUIRES_PINNED_DEEPSEEK_TOKENIZER')
     tokens=len(official_tokenizer().encode(content.decode('utf-8'),add_special_tokens=False).ids)

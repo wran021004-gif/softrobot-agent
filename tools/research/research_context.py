@@ -831,7 +831,9 @@ def tool_continuation(host):
             if selection and use['name']==selection['tool']:
                 selection={**selection,'status':'tool_feedback_recorded','feedback':event['outputs'][0]}
             entry=dict(tool=use['name'],tool_use_id=use['toolUseId'],status=result['status'],source=event['outputs'][0])
-            if use['name']=='evidence_read':entry['query']=use['input']
+            if use['name']=='evidence_read':
+                if len(json.dumps(use['input']).encode())<=700:entry['query']=use['input']
+                else:entry['original_input_query']=dict(reference=event['outputs'][0],view='full',pointer='/tool_use/input')
             if result['status']=='error':
                 try:detail=json.loads(''.join(b.get('text','') for b in result['content']))
                 except ValueError:detail={}

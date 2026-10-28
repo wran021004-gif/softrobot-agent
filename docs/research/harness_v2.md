@@ -67,3 +67,48 @@ it excludes private cards. Four new real-SDK MockTransport checks pass, includin
 one legal generation, feedback, precise restore, and zero scientific execution.
 Nine existing recent-round routing/recovery checks also pass. Scripted model
 outputs establish protocol operation, not autonomous research improvement.
+
+## P2 Provider and language boundary
+
+provider.request_settings owns Main/Reporter wire construction. research_roles_v3
+allows independent explicit models and none/medium reasoning. None is the new
+configuration default for both roles. DeepSeek medium maps explicitly to its
+Thinking enabled/high wire profile; Gateway medium maps to Responses reasoning
+medium. Legacy role versions and serialized snapshots retain their old values.
+Credentials, model discovery and context capacities stay out of scientific facts.
+Gateway model capabilities bind the exact configured model and catalog source;
+offline-only fixtures are refused by the live transport. No model/price ranking is
+inferred. `python -m tools.research models --runtime <file>` is a separate explicit
+network operation; preparation/config resolution never discovers models.
+
+The gateway owns only its HTTP layer and Responses conversion. Its pinned external
+DevKit remains ignored, with license/notices and one explicit authenticated
+inference callback patch. OAuth, protected storage, consent and quota errors stay
+in the existing DevKit. Function IDs, structured text, results and completed opaque
+reasoning survive replay. Partial streams never admit tool execution; unknown
+usage remains unknown. Actual account/model/tool/reasoning support is NOT verified.
+
+english_decision_v2 requires english_sources_v1 with authored_language=en. Stable
+instructions and generated Plan/Reporter prose originate in English. The Provider
+checks the actual decoded packet, including JSON-escaped text. The Unicode script
+check is a bypass detector, not a language classifier. Source ownership matters:
+experience reads need declared English origin, and reviewed translations need an
+original reference and reviewer. Historical Chinese bytes remain unchanged; they
+are refused until an explicitly reviewed English view is supplied. Scientific
+observations and historical translated guidance never share evidence status.
+
+`study_harness_v2.json` is a parsed pending configuration, not a prepared Study or
+execution grant. It preserves the M5 task/evaluator, exposes the new routing and
+English-source policy, and limits a future request to eight Provider calls.
+`runtime_chatgpt_gateway.example.json` is deliberately incomplete: the owner must
+supply a real account model, verified capabilities and context capacity. No slug,
+price or real account capability was invented.
+
+P2 verification: 15 combined Provider/F1/recent-round checks passed; five Provider
+checks also cover uncertain sends, no retry and incomplete responses. The Gateway
+suite exercised 106 cases: two missing-script packaging failures were fixed by
+including the owned dpapi.ps1 and both passed targeted reruns (alongside the
+unavailable-storage guard). Forty request/HTTP/conversion tests passed independently.
+A fresh ignored dependency preparation was also checked against the pinned source.
+Full final-suite results are recorded below at P3. No actual account, model catalog,
+OAuth consent, inference or scientific execution occurred.

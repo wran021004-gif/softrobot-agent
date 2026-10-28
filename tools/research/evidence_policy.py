@@ -17,7 +17,38 @@ FORBIDDEN=['global_nonlinear_feasibility','global_nonlinear_infeasibility',
 
 def english_native(spec):
     """The opt-in Study contract; historical Studies keep their original behavior."""
-    return spec.get('research_decisions', {}).get('architecture') == 'english_decision_v1'
+    return spec.get('research_decisions', {}).get('architecture') in ('english_decision_v1','english_decision_v2')
+
+
+def english_sources(spec):
+    return spec.get('research_decisions',{}).get('language_policy')==dict(version='english_sources_v1',authored_language='en')
+
+
+def require_english(value, spec, *, source):
+    """Check controlled English origins and reject untranslated script content.
+
+    This is not an English classifier: reviewed source declarations, English
+    authoring prompts and explicit derived-view provenance own language origin.
+    Unicode script checks catch accidental bypasses; units such as µ/Δ remain.
+    """
+    if not english_sources(spec):return
+    import json
+    import unicodedata
+    if isinstance(value,dict):
+        if value.get('view_kind')=='english_derivation':
+            if not value.get('original_reference') or value.get('authored_language')!='en' or not value.get('reviewed_by'):
+                raise ValueError('REVIEWED_ENGLISH_DERIVATION_REQUIRED')
+        for item in value.values():require_english(item,spec,source=source)
+    elif isinstance(value,list):
+        for item in value:require_english(item,spec,source=source)
+    elif isinstance(value,str):
+        prohibited=('CJK','HIRAGANA','KATAKANA','HANGUL','CYRILLIC','ARABIC','DEVANAGARI','THAI','HEBREW')
+        if any(any(script in unicodedata.name(ch,'') for script in prohibited) for ch in value):
+            raise ValueError('ENGLISH_SOURCE_OR_REFERENCED_DERIVATION_REQUIRED: '+source)
+        encoded=value.split('\n',1)[1] if value.startswith('CURRENT_RESEARCH_PACKET\n') else value
+        try:decoded=json.loads(encoded)
+        except (ValueError,TypeError):return
+        if isinstance(decoded,(dict,list)):require_english(decoded,spec,source=source)
 
 
 

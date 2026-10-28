@@ -9,7 +9,8 @@ from tools.state_io import read
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['environment','readiness','run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
+    parser.add_argument('command',choices=['models','environment','readiness','run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
+    parser.add_argument('--runtime',type=Path,help='Explicit model-directory operation; contacts the configured Provider only when models is requested')
     parser.add_argument('--spec',type=Path,default=DEFAULT_SPEC)
     parser.add_argument('--plan',type=Path)
     parser.add_argument('--run-id')
@@ -26,6 +27,12 @@ def main():
     parser.add_argument('--pause-exploration-remaining',type=int,help='Supervisor pause at admitted paired-feedback boundary before remaining science-capable main requests reach this count')
     parser.add_argument('--pause-after-completed-invocations',type=int,help='Supervisor pause after complete SDK invocation and Reporter delivery')
     args=parser.parse_args()
+    if args.command=='models':
+        if args.runtime is None:parser.error('models requires an explicit --runtime; no Study is created')
+        from tools.research.provider import credential,discover_models
+        runtime=read(args.runtime)
+        print(json.dumps(asyncio.run(discover_models(runtime['provider'],credential(runtime['provider'],runtime['credentials_reference'])))))
+        return
     if args.command=='environment':
         from tools.research.config import resolve
         from tools.research.tool_readiness import execution_environment

@@ -14,7 +14,8 @@ from tools.research.state import (state, update, save, guard, enabled, protected
 from tools.research.budget import engineering_closeout
 from tools.research.provider import (DeepSeekModel, LiveBoundary, IncompleteModelOutput,
     RequestBoundaryHandoff, CompletedBoundaryHandoff, SupervisorReviewPause,
-    pilot, record, pending, received, settle, provider_outcome, live_model_class, load_credential)
+    pilot, record, pending, received, settle, provider_outcome, live_model_class, load_credential,
+    request_settings, credential)
 PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_replay/diagnose. '
     'Tool arguments are the Plan object itself, without an outer plan property. '
     'control_search uses physical replay callbacks; Native mathematical sequence optimization uses research_analysis, not a selected_method label. '
@@ -583,8 +584,8 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
         timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=transport,follow_redirects=False))
     model=model_class(model_id=provider['model'],stream=False,
         context_window_limit=provider['context_guard']['context_limit_tokens'],
-        params=dict(**(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),reasoning_effort=provider['reasoning_effort'],
-            extra_body=dict(thinking=dict(type=provider['thinking']))),client=client)
+        params={**{k:v for k,v in request_settings(provider).items() if k not in ('model','stream','thinking')},
+            **(dict(extra_body=dict(thinking=request_settings(provider)['thinking'])) if provider['adapter']=='deepseek' else {})},client=client)
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
     context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
@@ -717,7 +718,12 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     guard(host)
     if pending(host):
         raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
-    load_credential(Path(state(host)['spec']['runtime']['credentials_reference']).expanduser())
+    provider=state(host)['pilot']['provider']
+    credential_path=Path(state(host)['spec']['runtime']['credentials_reference']).expanduser()
+    if provider['adapter']=='deepseek':
+        load_credential(credential_path)
+        api_key=os.environ['DEEPSEEK_API_KEY']
+    else:api_key=credential(provider,credential_path)
     class Boundary(LiveBoundary):
         async def handle_async_request(self,request):
             s=state(host)
@@ -746,6 +752,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         def run(use,**kwargs):
             before=state(host)
             try:
+                from tools.research.evidence_policy import require_english
+                if kind!='plan':require_english(use['input'],before['spec'],source='new Main tool arguments')
                 if on_demand and kind!='route':
                     from jsonschema import Draft202012Validator
                     Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
@@ -856,7 +864,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
     agent=None
     def build_session(session_id=None):
-        restored=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
+        restored=build_harness(host,transport=boundary,api_key=api_key,instructions=instructions,
             model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
             configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions',session_id=session_id)
         # Dynamic schemas and removed tools are part of the verified boundary.
@@ -1014,7 +1022,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research'],
                 complete_interpretations=s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2'))
         else:delivered=current
-        record(host,'model_decision_packet',delivered)
+        if not on_demand:record(host,'model_decision_packet',delivered)
         agent.system_prompt=instructions
         boundary.research_packet=deepcopy(delivered)
         if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
@@ -1046,7 +1054,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
-                tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switching consumes another model request. No selection grants execution authority.')
+                tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')

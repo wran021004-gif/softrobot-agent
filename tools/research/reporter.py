@@ -444,9 +444,8 @@ def _wire(host, reference, saved):
     comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
         for card in report.results if 'task_capability' in card.deterministic_summary]
-    return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
-        reasoning_effort=provider['reasoning_effort'],stream=False,
-        **(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),
+    from tools.research.provider import request_settings
+    return dict(**request_settings(provider),
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
             'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
@@ -517,6 +516,8 @@ def _finish(host, boundary, wire, response):
         from tools.research.evidence_policy import english_native
         if english_native(state(host)['spec']) and not interpretations:
             raise ValueError('REPORTER_INTERPRETATION_REQUIRED')
+        from tools.research.evidence_policy import require_english
+        require_english([plain(item) for item in interpretations],state(host)['spec'],source='new Reporter interpretation')
         # The model is allowed to fill only the interpretation field.
         report=report.model_copy(update=dict(interpretations=interpretations))
     except Exception as exc:
@@ -541,7 +542,7 @@ def _finish(host, boundary, wire, response):
 
 async def complete_reports(host, transport, *, recover_only=False, max_model_calls=None):
     """One attempt per report, at settled pre-decision/outer boundaries. Unknown sends block."""
-    from tools.research.provider import LiveBoundary, pending, received, record
+    from tools.research.provider import LiveBoundary, pending, received, record, credential
     class ReporterBoundary(LiveBoundary):
         purpose='reporter'
     boundary=ReporterBoundary(host,transport,allow_truncated_response=True,max_model_calls=max_model_calls)
@@ -587,7 +588,7 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
             record(host,'reporter_attempt',dict(base_report=ref['artifact_id']))
             attempted.add(ref['artifact_id'])
             request=httpx.Request('POST',s['pilot']['provider']['base_url'].rstrip('/')+'/chat/completions',
-                headers={'Authorization':'Bearer '+os.environ.get('DEEPSEEK_API_KEY','')},json=wire,
+                headers={'Authorization':'Bearer '+credential(s['pilot']['provider'],s['spec']['runtime']['credentials_reference'])},json=wire,
                 extensions={'timeout':{k:s['pilot']['provider']['timeout_s'] for k in ('connect','read','write','pool')}})
             response=await boundary.handle_async_request(request)
             _finish(host,boundary,wire,response)

@@ -1,0 +1,32 @@
+{
+  "name": "local-chatgpt-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    ".devkit/packages/local"
+  ],
+  "scripts": {
+    "build": "npm run build -w @siwc/local",
+    "test": "npm run build && node --test test/*.test.mjs .devkit/packages/local/test/*.test.mjs",
+    "login": "node src/cli.mjs login",
+    "logout": "node src/cli.mjs logout",
+    "status": "node src/cli.mjs status",
+    "profiles": "node src/cli.mjs profiles",
+    "select": "node src/cli.mjs select",
+    "key": "node src/cli.mjs key",
+    "start": "node src/cli.mjs serve",
+    "smoke": "node src/cli.mjs smoke"
+  },
+  "dependencies": {
+    "@siwc/local": "0.1.0",
+    "proper-lockfile": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2"
+  }
+}

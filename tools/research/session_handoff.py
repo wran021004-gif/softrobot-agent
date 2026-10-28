@@ -227,7 +227,7 @@ def safe_boundary(host,current,db,messages,*,boundary='completed_invocation'):
 
 async def request_feedback_boundary(host,agent):
     """Anchor a real response and its paired feedback; no invocation completion."""
-    from tools.research.provider import DeepSeekModel, received, record
+    from tools.research.provider import model_messages, received, record
     from tools.research.reporter import current_reports
     s=state(host);messages=agent.messages
     with host.store.connect(True) as db:settled_boundary(s,db,messages)
@@ -249,7 +249,7 @@ async def request_feedback_boundary(host,agent):
     index=max(i for i,m in enumerate(messages) if m['role']=='assistant')
     prefix=wire['messages']
     if prefix[-1]['role']=='user' and str(prefix[-1].get('content','')).startswith('CURRENT_RESEARCH_PACKET\n'):prefix=prefix[:-1]
-    if DeepSeekModel.format_request_messages(messages[:index],wire['messages'][0]['content'])!=prefix:
+    if model_messages(host,messages[:index],wire['messages'][0]['content'])!=prefix:
         raise ValueError('REQUEST_BOUNDARY_ORIGINAL_WIRE_PREFIX_MISMATCH')
     def assistant(value):
         content=value.get('content')
@@ -259,7 +259,7 @@ async def request_feedback_boundary(host,agent):
         return dict(content=content or None,reasoning=value.get('reasoning_content',''),
             tools=[dict(id=t['id'],name=t['function']['name'],arguments=json.loads(t['function']['arguments']))
                 for t in value.get('tool_calls',[])])
-    actual=DeepSeekModel.format_request_messages([messages[index]])
+    actual=model_messages(host,[messages[index]])
     if len(actual)!=1 or assistant(actual[0])!=assistant(choice['message']):
         raise ValueError('REQUEST_BOUNDARY_ORIGINAL_RESPONSE_MISMATCH')
     uses={b['toolUse']['toolUseId']:b['toolUse'] for b in messages[index]['content'] if 'toolUse' in b}
@@ -303,7 +303,7 @@ async def inspect_confirmed_incomplete(host,agent,directory):
     This read-only assessment never disposes a response, mutates messages, or
     authorizes a worker. Unknown outcomes and any post-send action fail closed.
     """
-    from tools.research.provider import DeepSeekModel,received,pending
+    from tools.research.provider import model_messages,received,pending
     s=state(host);key=s['pilot'].get('unconsumed_response')
     if not key:raise ValueError('CONFIRMED_INCOMPLETE_RESPONSE_REQUIRED')
     if (s.get('pending') or pending(host) or any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True)
@@ -320,7 +320,7 @@ async def inspect_confirmed_incomplete(host,agent,directory):
     send=sends[0];meta=host.store.artifact(send['outputs'][0]);row=host.store.lookup(host.run_id,key)
     if meta['purpose']!='conversation' or not row or not row['receipt']:raise ValueError('SETTLED_MAIN_PROVIDER_RECEIPT_REQUIRED')
     receipt=json.loads(row['receipt']);request=host.store.artifact(meta['request']);reception=received(host,key)
-    if (receipt['request_id']!=key or receipt['tool_id']!='model.deepseek' or
+    if (receipt['request_id']!=key or receipt['tool_id']!='model.'+s['pilot']['provider']['adapter'] or
             receipt['execution_status']!='completed' or receipt['charged']['model_calls']!=1 or
             digest(request)!=row['request_hash'] or not reception or reception['http_status']!=200):
         raise ValueError('ORIGINAL_REQUEST_RESPONSE_RECEIPT_MISMATCH')
@@ -331,7 +331,7 @@ async def inspect_confirmed_incomplete(host,agent,directory):
         raise ValueError('ORIGINAL_RESPONSE_METADATA_MISMATCH')
     wire=request['messages'];prefix=wire[:-1] if (wire and wire[-1].get('role')=='user' and
         isinstance(wire[-1].get('content'),str) and wire[-1]['content'].startswith('CURRENT_RESEARCH_PACKET\n')) else wire
-    if not wire or wire[0].get('role')!='system' or DeepSeekModel.format_request_messages(agent.messages,wire[0]['content'])!=prefix:
+    if not wire or wire[0].get('role')!='system' or model_messages(host,agent.messages,wire[0]['content'])!=prefix:
         raise ValueError('SAVED_REQUEST_AND_SDK_HISTORY_MISMATCH')
     packets=[e for e in events if e['kind']=='model_decision_packet' and e['sequence']<send['sequence']]
     if not packets or prefix is wire:raise ValueError('ORIGINAL_DECISION_PACKET_REQUIRED')
