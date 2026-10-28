@@ -26,7 +26,7 @@ def centerline(physics,g):
 
 
 def plots():
-    package=json.loads((OUT/'solution/design.json').read_text());summary=json.loads((OUT/'summary.json').read_text());physics=package['physics'];rows=sorted(package['cases'],key=lambda r:(r['s'],-r['force_n']))
+    package=json.loads((OUT/'solution/design.json').read_text(encoding='utf8'));summary=json.loads((OUT/'summary.json').read_text(encoding='utf8'));physics=package['physics'];rows=sorted(package['cases'],key=lambda r:(r['s'],-r['force_n']))
     protocol=package['protocol'];mount=dict(position_m=protocol['mount_position'],quaternion_wxyz=[2**-.5,0,2**-.5,0])
     base=geometry(physics,package['baseline']['qpos'],mount);bc,bs,bk=centerline(physics,base)
     chosen=next(r for r in rows if r['s']==.5 and r['force_n']>0);g=geometry(physics,chosen['qpos'],mount);line,arc,k=centerline(physics,g)

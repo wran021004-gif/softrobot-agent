@@ -50,8 +50,8 @@ def report():
 
 ## 冻结物理结构
 
-- 九段柔性骨架，每段 0.28/9 m，总柔性材料长度严格 0.28 m；每段八个单元，共 72 个单元、144 个三维双弯曲铰链坐标。
-- 各段圆截面半径 3 mm，Young 模量 8 MPa、密度 1050 kg/m³；EI=E*pi*r^4/4，两个主方向均约 0.000508938 N·m²。自然曲率零。
+- 九段柔性骨架，每段 0.28/9 m，总柔性材料长度严格 0.28 m；每段八个单元，共 72 个单元、144 个弯曲自由度（每单元两个，保留完整三维运动）。
+- 各段圆截面半径 3 mm，Young 模量 8 MPa；近基座第一段密度 1100 kg/m³，其余八段为 1050 kg/m³，保持原材料原型；EI=E*pi*r^4/4，两个主方向均约 0.000508938 N·m²。自然曲率零。
 - 固定物理弯曲黏性为每主方向 0.00006 N·m²·s。它是新材料分布设计输入，并非改变积分器阻尼。该值未做真实材料标定。
 - 八块原 2 g 导向板、八个原 3 g 连接件、原 10 g 偏心 payload，其质心和完整惯性张量全部保留。总物理质量 {design['total_physical_mass_kg']:.9f} kg。
 - 柔性材料长度不含刚性间隔；包含八个 14 mm 边界间隔和 14 mm Tip 站点偏移的无变形 Base–Tip 轴向距离是 0.406 m。Base 仍在 z=0.5 m，重力仍为 [0,0,-9.81] m/s²。
@@ -144,7 +144,7 @@ This package contains a ten-condition passive Base-only numerical witness, indep
 - `study_v1.json`, `study_v2.json`: all structures, screens, dynamic sets, failure records and audited costs.
 - `store_v1`, `store_v2`: original core Store exports, receipts, immutable content-addressed artifacts and reconstruction manifests. Raw Store databases remain private under the isolated worktree's ignored runs directories.
 - `experiment_journal.json`: hypotheses, variables, mathematical predictions, observations and cumulative budgets.
-- `environment.json`: actual Python/platform/package versions; no environment secrets.
+- `environment.json`: actual scientific Python/platform/package versions; `visualization_environment.json` records the separately installed plotting environment. No environment secrets.
 - `curvature_evidence.json`, `numerical_comparison.json`, PNG/SVG figures: derived checks and visualizations.
 
 ## Verify without executing physics
@@ -173,6 +173,8 @@ python -m tools.phs2d_round3_reproduce --execute
 ```
 
 It writes `runs/phs2d-isolated-reproduction/result.json` and seals its own Store. Repeating that command reads the sealed result; it never resets that ledger or reopens either research Store. A further execution requires a separately authorized, newly identified Study. The original in-study independent/convergence harness is `tools.phs2d_round3_validate`; its completed requests are archived, and its sealed Study is intentionally not runnable again.
+
+The actual frozen mesh is owned by `generation` and compiled `physics.discretization`: eight cells per segment, 144 coordinates. The inherited protocol cells-per-segment default is not used to reconstruct a candidate.
 
 No active motor/control input, extra world anchor or Tip spring is present. Mass, density, payload and physical installation assumptions are explicit in the design. Limitations include bending-cell idealization, frictionless cables, no axial/shear/torsion/self-collision model and sampled cable-solid checks rather than a continuous collision engine.
 '''
