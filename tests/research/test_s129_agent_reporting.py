@@ -143,23 +143,17 @@ class AgentReportingTests(unittest.TestCase):
         self.assertEqual(spec['research_decisions']['role_policy']['reporter']['reasoning_effort'],'low')
         self.assertTrue(spec['authorization'].startswith('PENDING_EXPLICIT_APPROVAL:'))
 
-    def test_english_boundary_withholds_legacy_without_formal_read(self):
-        from tools.research.evidence_policy import incompatible_text
-        self.assertFalse(incompatible_text('Displacement 0.4 μm; angle θ ≤ 2π.'))
-        self.assertTrue(incompatible_text('历史记录'))
+    def test_legacy_text_read_preserves_original_and_formal_read_rules(self):
         ref=self.physical();raw=self.h.store.artifact(ref);raw['legacy_note']='历史记录'
         legacy=save(self.h,raw,'legacy_fixture');spec=deepcopy(state(self.h)['spec'])
         spec['research_decisions']={'architecture':'english_decision_v1'}
         update(self.h,spec=spec,physical_replays=[legacy],evaluation_reads=[])
         original=deepcopy(self.h.store.artifact(legacy))
-        value=read_evidence(self.h,dict(reference=legacy,view='full'))
-        self.assertEqual(value['status'],'legacy_text_unavailable')
-        self.assertEqual(value['reference'],legacy)
+        self.assertEqual(read_evidence(self.h,dict(reference=legacy,view='fields',fields=['legacy_note'])),{'legacy_note':'历史记录'})
         self.assertEqual(state(self.h)['evaluation_reads'],[])
+        self.assertEqual(read_evidence(self.h,dict(reference=legacy,view='full')),original)
+        self.assertIn(legacy,state(self.h)['evaluation_reads'])
         self.assertEqual(self.h.store.artifact(legacy),original)
-        spec['research_decisions']={}
-        update(self.h,spec=spec)
-        self.assertEqual(read_evidence(self.h,dict(reference=legacy,view='full'))['legacy_note'],'历史记录')
 
     def test_english_selection_requires_full_read_not_summary(self):
         reference=self.physical();spec=deepcopy(state(self.h)['spec'])
@@ -170,7 +164,7 @@ class AgentReportingTests(unittest.TestCase):
         read_evidence(self.h,dict(reference=reference,view='full'))
         self.assertIn(reference,state(self.h)['evaluation_reads'])
 
-    def test_non_english_main_response_is_preserved_but_not_consumed(self):
+    def test_non_english_main_response_is_preserved_and_consumed(self):
         spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'architecture':'english_decision_v1'}
         update(self.h,spec=spec);provider=state(self.h)['pilot']['provider']
         wire=dict(model=provider['model'],thinking={'type':provider['thinking']},
@@ -180,17 +174,14 @@ class AgentReportingTests(unittest.TestCase):
             choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='非英文'))])
         boundary=LiveBoundary(self.h,httpx.MockTransport(lambda r:httpx.Response(200,json=body)))
         async def run():
-            with self.assertRaisesRegex(ValueError,'MAIN_ENGLISH_OUTPUT_REQUIRED'):
-                await boundary.handle_async_request(httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire))
-            self.assertEqual(state(self.h)['pilot']['unconsumed_response'],boundary.last_request)
-            from tools.research.agent import received
-            raw=self.h.store.artifact(received(self.h,boundary.last_request)['body'],raw=True)
-            self.assertEqual(json.loads(raw),body)
+            response=await boundary.handle_async_request(httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire))
+            self.assertEqual(response.json(),body)
+            boundary.consumed()
+            self.assertFalse(state(self.h)['pilot'].get('unconsumed_response'))
             await boundary.aclose()
         asyncio.run(run())
 
-    def test_new_reporter_incomplete_novelty_and_english_rejection(self):
-        from tools.research.evidence_policy import incompatible_text
+    def test_new_reporter_incomplete_novelty_and_unicode_acceptance(self):
         reference=self.physical();report=plain(reporter.assemble(self.h,[reference]))
         card=report['results'][0];card['deterministic_summary']['task_gap']['valid_complete']=False
         self.assertEqual(reporter.interpretation_priority(report,[],decision_v3=True),'new_incomplete_task_result')
@@ -208,10 +199,8 @@ class AgentReportingTests(unittest.TestCase):
         body['choices'][0]['message']['content']=json.dumps(output)
         saved=reporter._finish(self.h,SimpleNamespace(last_request='offline-non-english'),wire,httpx.Response(200,json=body))
         result=self.h.store.artifact(saved)
-        self.assertEqual(result['interpretation_status'],'unavailable')
-        self.assertEqual(result['error'],'REPORTER_ENGLISH_OUTPUT_REQUIRED')
-        self.assertEqual(result['report']['interpretations'],[])
-        self.assertFalse(incompatible_text(result['report']))
+        self.assertEqual(result['interpretation_status'],'available')
+        self.assertEqual(result['report']['interpretations'][0]['text'],'中文报告')
 
     def test_unchanged_scientific_feedback_does_not_repeat_reporter_call(self):
         ref=self.physical();first=reporter.scientific_feedback(self.h,dict(reference=ref),{})

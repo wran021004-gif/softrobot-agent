@@ -33,8 +33,8 @@
   configuration sources to reinterpret their tasks or candidates.
 - Preserve purpose-specific model profiles and the shared accounted provider
   ledger when working with a Study that freezes `research_roles_v1`.
-- For `english_decision_v1`, produce new research text directly in English;
-  withhold incompatible legacy text without translating or altering evidence.
+- Author new research text directly in English. Preserve historical text and
+  evidence exactly; do not introduce translation or language-based rejection.
 - Keep selected-method schemas, Main-Agent full-read credit, and token handoff
   tied to the existing Store, admission, receipts, and verified SDK boundaries.
 

@@ -443,9 +443,6 @@ def _wire(host, reference, saved):
     comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
         for card in report.results if 'task_capability' in card.deterministic_summary]
-    from tools.research.evidence_policy import english_native, incompatible_text
-    if english_native(s['spec']) and incompatible_text([saved['report'], q, reads, guidance]):
-        raise ValueError('REPORTER_SOURCE_TEXT_UNAVAILABLE_UNDER_ENGLISH_CONTRACT')
     return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
         reasoning_effort=provider['reasoning_effort'],stream=False,
         **(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),
@@ -509,18 +506,14 @@ def _finish(host, boundary, wire, response):
                     rejection=dict(code='REPORTER_SOURCE_OUTSIDE_SCOPE',interpretation_index=index,invalid_locations=[plain(source)])
                     raise ValueError('REPORTER_SOURCE_OUTSIDE_SCOPE')
                 try:
-                    source_value=read_evidence(host,plain(source),record_read=False)
-                    if isinstance(source_value,dict) and source_value.get('status')=='legacy_text_unavailable':
-                        raise ValueError('REPORTER_SOURCE_TEXT_UNAVAILABLE_UNDER_ENGLISH_CONTRACT')
+                    read_evidence(host,plain(source),record_read=False)
                 except Exception as exc:
                     rejection=dict(code='REPORTER_SOURCE_READ_INVALID',interpretation_index=index,
                         invalid_locations=[plain(source)],navigation=getattr(exc,'evidence_navigation',None))
                     raise
-        from tools.research.evidence_policy import english_native, incompatible_text
+        from tools.research.evidence_policy import english_native
         if english_native(state(host)['spec']) and not interpretations:
             raise ValueError('REPORTER_INTERPRETATION_REQUIRED')
-        if english_native(state(host)['spec']) and incompatible_text([plain(item) for item in interpretations]):
-            raise ValueError('REPORTER_ENGLISH_OUTPUT_REQUIRED')
         # The model is allowed to fill only the interpretation field.
         report=report.model_copy(update=dict(interpretations=interpretations))
     except Exception as exc:

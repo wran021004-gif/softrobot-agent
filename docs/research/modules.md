@@ -1,6 +1,6 @@
 # Runtime and module ownership
 
-The optional frozen `research_roles_v1` policy is owned by `config.py`; `agent.py` validates each accounted wire against its purpose and `reporter.py` selects its Reporter profile. See [implementation status](english_native_decision_architecture.md). The opt-in `english_decision_v1` contract adds source checks and bounded decision delivery; legacy frozen Studies retain their prior semantics.
+The optional frozen `research_roles_v1` policy is owned by `config.py`; `agent.py` validates each accounted wire against its purpose and `reporter.py` selects its Reporter profile. See [implementation status](english_native_decision_architecture.md). The opt-in `english_decision_v1` contract adds English source instructions and bounded decision delivery; legacy frozen Studies retain their prior semantics.
 
 ## Codesign integration (2026-10-23)
 

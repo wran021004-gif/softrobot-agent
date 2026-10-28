@@ -233,21 +233,6 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             and diagnostic['model_output']=='confirmed_incomplete'):
             raise IncompleteModelOutput(diagnostic)
 
-        from tools.research.evidence_policy import english_native, incompatible_text
-        if english_native(state(self.host)['spec']) and diagnostic.get('http_status',0) in range(200,300):
-            reception=received(self.host,self.last_request)
-            body=json.loads(self.host.store.artifact(reception['body'],raw=True))
-            for choice in body.get('choices',[]):
-                message=choice.get('message') or {}
-                texts=[message.get('content')]
-                for call in message.get('tool_calls') or []:
-                    arguments=(call.get('function') or {}).get('arguments','')
-                    try:arguments=json.loads(arguments)
-                    except (ValueError,TypeError):pass
-                    texts.append(arguments)
-                if incompatible_text(texts):
-                    raise ValueError('MAIN_ENGLISH_OUTPUT_REQUIRED_RESPONSE_PRESERVED')
-
     def consumed(self):
         self.require_complete()
         with self.host.store.transaction() as db:
@@ -777,9 +762,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         def run(use,**kwargs):
             before=state(host)
             try:
-                from tools.research.evidence_policy import english_native, incompatible_text
-                if english_native(before['spec']) and incompatible_text(use['input']):
-                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error='ENGLISH_TOOL_INPUT_REQUIRED',message='Use English for research decisions and tool arguments.')))])
+                from tools.research.evidence_policy import english_native
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='analysis':
@@ -820,22 +803,14 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 if result.get('execution_feedback'):value['execution_feedback']=result['execution_feedback']
                 if isinstance(original,dict) and original.get('inference_assessment'):
                     value['inference_assessment']=original['inference_assessment']
-                if english_native(state(host)['spec']) and incompatible_text(value):
-                    value=dict(status='source_text_unavailable', explanation='This result contains text unavailable under the English-native Study contract. The original record is unchanged.',
-                        reference=(value.get('reference') or value.get('scientific_result_reference') or value.get('report_reference')) if isinstance(value,dict) else None)
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
-                from tools.research.evidence_policy import english_native, incompatible_text
-                unavailable=english_native(state(host)['spec']) and incompatible_text(str(exc))
-                message='NON_ENGLISH_DIAGNOSTIC_UNAVAILABLE' if unavailable else str(exc)
                 key='native-'+use['toolUseId']
                 reserved=host.store.lookup(host.run_id,key)
                 if reserved and not reserved['receipt']:
                     host.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=host.actor,
-                        tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=message,charged=zero()),dict(error=message))
+                        tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
                 from tools.research.feedback import facts
-                if unavailable:
-                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error='NON_ENGLISH_DIAGNOSTIC_UNAVAILABLE',message='The operation failed; its original diagnostic is retained in the Store.')))])
                 if state(host)['spec'].get('research_decisions'):
                     return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(error_feedback(host,use,exc,before)))])
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
@@ -1011,9 +986,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
         current=decision_packet(host)
-        from tools.research.evidence_policy import english_native, incompatible_text
-        if english_native(s['spec']) and incompatible_text([instructions,current]):
-            raise ValueError('ENGLISH_DECISION_SOURCE_UNAVAILABLE')
+        from tools.research.evidence_policy import english_native
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,

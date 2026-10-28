@@ -197,10 +197,7 @@ def read_evidence(host, query, *, record_read=True):
 
 def _record_evidence_read(host,q,s,value,record_read):
     """Cache hits retain the same public read markers; internal reads grant none."""
-    from tools.research.evidence_policy import english_native, incompatible_text
-    if english_native(s['spec']) and incompatible_text(value):
-        return dict(status='legacy_text_unavailable', reference=plain(q.reference), pointer=q.pointer,
-            explanation='This source contains text unavailable under the English-native Study contract. The original source is unchanged; this is not a formal evidence read.')
+    from tools.research.evidence_policy import english_native
     if q.view=='working_set' or not record_read:return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
