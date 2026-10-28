@@ -232,12 +232,12 @@ def main():
     agent.load_credential(Path('~/.codex/.env').expanduser())
     if args.continue_once:
         h=Host(DEST,PROBE_ID,actor='probe-only');usage=reporter.provider_usage(h)
-        if (usage.get('conversation',{}).get('requests')!=3 or usage.get('reporter',{}).get('requests',0)!=0
+        if (usage.get('conversation',{}).get('requests')!=6 or usage.get('reporter',{}).get('requests',0)!=1
                 or agent.pending(h) or state(h)['pilot'].get('unconsumed_response')
                 or any(e['kind']=='probe_continuation' for e in h.store.events(h.run_id))):
             raise ValueError('PROBE_CONTINUATION_REQUIRES_EXACT_SETTLED_FIRST_INVOCATION')
-        agent.record(h,'probe_continuation',dict(reason='One further ordinary decision after saved read feedback; no repair, method direction or worker execution.',max_new_requests=3))
-        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0),max_requests=3))
+        agent.record(h,'probe_continuation',dict(reason='One further ordinary decision after saved method-detail feedback; no repair, method direction or worker execution.',max_new_requests=1))
+        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0),max_requests=1))
     else:
         h=prepare();counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     print(json.dumps(dict(probe=PROBE_ID,store=str(DEST),requests=counts,usage=reporter.provider_usage(h),

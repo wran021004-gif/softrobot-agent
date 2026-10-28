@@ -305,7 +305,7 @@ def read_tool_evidence(host,query):
     value=read_evidence(host,query,record_read=False)
     body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
     if q.view!='working_set' or q.pointer:
-        if len(body)<=6144:
+        if len(body)<=4096:
             return read_evidence(host,query)
     # Summary projections may contain derived paths: navigate the original
     # value instead, so every advertised pointer addresses real source data.
@@ -334,7 +334,7 @@ def read_tool_evidence(host,query):
             if view=='full':entry['range_query']=dict(reference=plain(q.reference),view='range',pointer=pointer,start=0,count=min(10,max(1,len(item))))
         elif isinstance(item,dict):entry['available_fields']=list(item)[:12]
         index['entries'].append(entry)
-        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>6144:
+        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
             index['entries'].pop();break
     index['remaining_entries']=len(entries)-len(index['entries'])
     return index
@@ -489,6 +489,22 @@ def selected_analysis(host, brief):
             or (detail.get('registered') and detail.get('executable') is False)):
         return None
     return method,detail
+
+
+def validate_selected_analysis_payload(payload, schema, detail):
+    """Explain selected-schema binding failures without changing the request."""
+    problems=[]
+    extra=sorted(set(payload)-set(schema['properties']))
+    if extra:problems.append('unsupported fields: '+', '.join(extra))
+    if payload.get('operation')!=detail['operation']:
+        problems.append('operation must equal '+detail['operation'])
+    for key,definition in schema['properties'].items():
+        if 'const' not in definition or payload.get(key)==definition['const'] or key=='operation':continue
+        if isinstance(definition['const'],dict) and not isinstance(payload.get(key),dict):
+            problems.append(key+' must be a JSON object matching the selected schema constant, not a string or null')
+        else:
+            problems.append(key+' must match the exact selected schema constant')
+    if problems:raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH: '+'; '.join(problems))
 
 
 def error_feedback(host, use, exc, before):
@@ -814,9 +830,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         selection=selected_analysis(host,None)
                         if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
                         method,detail=selection;schema=selected_analysis_schema(method,detail);payload=use['input']
-                        if (set(payload)-set(schema['properties']) or payload.get('operation')!=detail['operation']
-                                or any(payload.get(k)!=v['const'] for k,v in schema['properties'].items() if 'const' in v)):
-                            raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH')
+                        validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
                     value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':

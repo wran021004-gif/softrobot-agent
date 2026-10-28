@@ -106,7 +106,7 @@ class AgentReportingTests(unittest.TestCase):
         reference=save(self.h,dict(metric={'speed_m_s':0.043009681835387996,'unit':'m/s'},trajectory=list(range(10000))),'v2_test')
         update(self.h,spec=spec,physical_replays=[reference],evaluation_reads=[])
         summary=read_tool_evidence(self.h,dict(reference=reference,view='fields',fields=['trajectory']))
-        self.assertEqual(summary['policy'],'main_evidence_navigation_v1');self.assertLessEqual(byte_size(summary),6144)
+        self.assertEqual(summary['policy'],'main_evidence_navigation_v1');self.assertLessEqual(byte_size(summary),4096)
         self.assertEqual(read_tool_evidence(self.h,dict(reference=reference,view='full',pointer='/metric/speed_m_s')),0.043009681835387996)
         self.assertNotIn(reference,state(self.h)['evaluation_reads'])
         from tools.research.core import read_evidence
@@ -114,6 +114,21 @@ class AgentReportingTests(unittest.TestCase):
         self.assertNotIn(reference,state(self.h)['evaluation_reads'])
         self.assertEqual(read_tool_evidence(self.h,dict(reference=reference,view='full')),self.h.store.artifact(reference))
         self.assertIn(reference,state(self.h)['evaluation_reads'])
+
+    def test_selected_schema_mismatch_explains_object_types(self):
+        from tools.research.agent import validate_selected_analysis_payload,error_feedback
+        candidate={'artifact_id':'a'*64,'media_type':'application/json'};protocol={'protocol_id':'fixture'}
+        schema={'properties':{'candidate':{'const':candidate},'protocol':{'const':protocol},
+            'operation':{'const':'braking'}}};detail={'operation':'braking'}
+        payload={'candidate':'a'*64,'protocol':json.dumps(protocol),'operation':'braking'}
+        with self.assertRaises(ValueError) as caught:
+            validate_selected_analysis_payload(payload,schema,detail)
+        response=error_feedback(self.h,dict(name='research_analysis',input=payload,toolUseId='fixture'),caught.exception,state(self.h))
+        self.assertEqual(response['error_code'],'SELECTED_ANALYSIS_SCHEMA_MISMATCH')
+        self.assertIn('candidate must be a JSON object',response['expected'])
+        self.assertIn('protocol must be a JSON object',response['expected'])
+        self.assertEqual(payload['candidate'],'a'*64)
+        validate_selected_analysis_payload({'candidate':candidate,'protocol':protocol,'operation':'braking'},schema,detail)
 
     def test_role_policy_freezes_new_study_without_reinterpreting_old_study(self):
         from tools.research.config import resolve, ROOT
