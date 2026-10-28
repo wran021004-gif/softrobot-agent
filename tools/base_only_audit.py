@@ -109,6 +109,7 @@ def main():
                     assert s.get('mathematical_evaluations',0)==0
                     preparations.append(dict(study_id=run_id,store_identity=digest(str(path.relative_to(ROOT))),
                         status='stopped',physics_step_attempts=0,mathematical_evaluations=0,
+                        generated_candidates=len(s.get('candidates',{})),
                         numerical_s=s['numerical_s'],reason='Pre-integration preparation only; original admission/preflight failures preserved'))
     total=sum(r['physics_step_attempts_upper'] for r in results)
     assert total<=sum(CAPS.values())
