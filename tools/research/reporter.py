@@ -366,7 +366,8 @@ def reporter_handoff_summary(host, reference, saved):
         (not q.get('pointer') or q['pointer']==c['pointer']) and q.get('view','full')=='full' for q in reads)]
     if pending:interpretations=[]
     # The full revision remains readable; hypotheses retain their original kind.
-    interpretations=interpretations[:3]
+    if state(host)['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')!='research_roles_v2':
+        interpretations=interpretations[:3]
     return dict(delivery_version='scientific_handoff_v1',report_reference=reference,
         result_references=[c['identity']['result']['reference'] for c in report['results']],
         mode=report['mode'],question=report['question'],reporter_status=saved['interpretation_status'],
@@ -450,8 +451,10 @@ def _wire(host, reference, saved):
             'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
             'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
             '. Every item requires source_ids selected only from source_catalog. '
-            'Give concise scientific conclusions with supporting values, sources, uncertainty and discriminating observations. '
-            'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
+            + ('Give concise scientific conclusions with supporting values, sources, uncertainty and discriminating observations. '
+                if s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2' else
+                'For a substantive interpretation target approximately 200–400 English words in total; expand only when needed. Return 1-3 important interpretations; more only for an explicitly complex investigation. ')
+            +             'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
             'Explain quantitative new information with exact values, units and valid comparison scope. '
             'Use selected diagnostic_relations to assess possible failure mechanisms and observations '
             'that support or weaken them; explicitly state what cannot be concluded. '

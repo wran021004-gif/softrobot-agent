@@ -1132,7 +1132,8 @@ def agent_decision_brief(host):
             detail_query=dict(reference=s['family_space_reference'],view='working_set',pointer='/structure_actions'),
             scope='Choose any currently admitted action; exact request templates and frozen grants are available at detail_query.')
     brief['route_review']=route_review(host,current,brief,trace)
-    return compact_scientific_delivery(brief,decision_only=True)
+    return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
+        s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
 
 
@@ -1173,7 +1174,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
     interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
-        for i in (report.get('interpretations') or [])[:3]] if complete_interpretations else
+        for i in (report.get('interpretations') or [])] if complete_interpretations else
         [dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
         for i in (report.get('interpretations') or [])[:3]])
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
@@ -1248,7 +1249,7 @@ def route_review(host,current,brief,trace):
             'not a convergence or infeasibility proof. Mathematical improvement needs independent physics; no parameter or route is selected here.')
 
 
-def compact_scientific_delivery(brief,*,decision_only=False):
+def compact_scientific_delivery(brief,*,decision_only=False,complete_interpretations=False):
     """Pure L0 projection; exact reports and immutable SDK history stay intact."""
     brief=deepcopy(brief)
     for report in brief.get('latest_reports',[]):
@@ -1321,8 +1322,9 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                     preferred_parameter_direction=t2['preferred_parameter_direction'],physical_acceptance='unmeasured'),
                     detail_query=dict(reference=ref,view='working_set',pointer='/mathematical_decision_view/optimal_sensitivity'))
         for report in brief.get('latest_reports',[]):
-            report['interpretations']=[{k:i[k] for k in ('kind','text','sources')}
-                for i in report.get('interpretations',[])[:3]]
+            interpretations=report.get('interpretations',[])
+            if not complete_interpretations:interpretations=interpretations[:3]
+            report['interpretations']=[{k:i[k] for k in ('kind','text','sources')} for i in interpretations]
             for finding in report.get('findings',[]):
                 finding['metrics']=finding.get('metrics',[])[:3]
                 best=brief.get('best_valid')

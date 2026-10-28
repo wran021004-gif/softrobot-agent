@@ -86,9 +86,13 @@ class AgentReportingTests(unittest.TestCase):
         main=dict(model=pilot['provider']['model'],thinking={'type':'disabled'},reasoning_effort='none',stream=False,
             messages=[dict(role='user',content='fixture')],tools=[])
         boundary=LiveBoundary(self.h,httpx.MockTransport(lambda r:httpx.Response(200,json=reply('stop'))))
+        aux=LiveBoundary(self.h,httpx.MockTransport(lambda r:httpx.Response(200,json=reply('stop'))));aux.purpose='reporter'
         async def run():
-            await boundary.handle_async_request(httpx.Request('POST',pilot['provider']['base_url']+'/chat/completions',json=main))
-            boundary.consumed();await boundary.aclose()
+            url=pilot['provider']['base_url']+'/chat/completions'
+            await boundary.handle_async_request(httpx.Request('POST',url,json=main))
+            boundary.consumed()
+            await aux.handle_async_request(httpx.Request('POST',url,json=wire))
+            aux.consumed();await boundary.aclose();await aux.aclose()
         asyncio.run(run())
         self.assertNotIn('max_tokens',main)
         with self.assertRaisesRegex(ValueError,'INVALID_RESEARCH_ROLE_PROFILE'):

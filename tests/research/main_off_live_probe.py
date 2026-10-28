@@ -26,7 +26,7 @@ DEST=ROOT/'runs/research'/PROBE_ID
 POLICY={'version':'research_roles_v2',
     'main':{'thinking':'disabled','reasoning_effort':'none'},
     'reporter':{'thinking':'enabled','reasoning_effort':'low'}}
-SOURCE_DB=Path('D:/softrobot-agent/.worktrees/b3-r0-decision-efficiency/runs/research/b3-r1-history-assisted-050/platform.sqlite')
+SOURCE_DB=ROOT.parent/'b3-r0-decision-efficiency/runs/research/b3-r1-history-assisted-050/platform.sqlite'
 INSTRUCTIONS=('You are the research decision Agent. Use the frozen task and saved observations to choose a scientific direction freely. '
     'Distinguish independent measurements, mathematical predictions and unresolved hypotheses. Cite sources and state what would support or weaken your hypothesis. '
     'This is a read-only probe using a historical case, not a new Study. Mathematical method availability is hypothetical probe-only eligibility. '
@@ -52,6 +52,9 @@ def copy_ownership(host, source):
             if not metadata:raise ValueError('ORIGINAL_EXECUTION_OWNERSHIP_MISSING')
             events=list(db.execute('SELECT body FROM events WHERE run_id=? ORDER BY seq',(owner,)))
             calls=[dict(r) for r in db.execute('SELECT * FROM calls WHERE run_id=?',(owner,))]
+            boundary=next(e for e in source.snapshot['events'] if e['sequence']==425)['timestamp']
+            if any(json.loads(e['body'])['timestamp']>boundary for e in events):
+                raise ValueError('ORIGINAL_EXECUTION_EVENT_AFTER_FROZEN_BOUNDARY')
             simulations=[json.loads(e['body']) for e in events if json.loads(e['body']).get('kind')=='simulation' and json.loads(e['body']).get('execution_id')==execution]
             if not simulations or result['owning_study']!=source.preparation['study_id']:
                 raise ValueError('ORIGINAL_EXECUTION_PROVENANCE_MISMATCH')
