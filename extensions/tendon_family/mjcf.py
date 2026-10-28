@@ -60,14 +60,24 @@ def compile_xml(physics, scene, config, path):
     ET.SubElement(parent,'site',name='tip_site',pos=fmt(tip['position_m']),size='.002',rgba='0 1 0 1')
     tendons=ET.SubElement(root,'tendon'); actuators=ET.SubElement(root,'actuator')
     execution_mode=scene['control'].get('tension_execution_mode','actuator_realistic')
+    passive=execution_mode=='passive_fixed_payout_v1'
+    if passive:
+        payout=scene['control']['payout_lengths_m']
+        if set(payout)!={t['entity'] for t in p['tendons']} or any(not np.isfinite(v) or v<=0 for v in payout.values()):
+            raise ValueError('PASSIVE_REQUIRES_EXACT_POSITIVE_PAYOUTS')
     for t in p['tendons']:
         route=ET.SubElement(tendons,'spatial',name=t['entity'],width=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
+        if passive:
+            route.attrib.update(limited='true',range=fmt([0,payout[t['entity']]]),margin='0',
+                solreflimit=fmt(scene['control']['solreflimit']),solimplimit=fmt(scene['control']['solimplimit']))
         for j,point in enumerate(t['points']):
             parent=base if point['body']<0 else bodies[point['body']]
             name=f"{t['entity']}_point_{j}"
             ET.SubElement(parent,'site',name=name,pos=fmt(point['position_m']),size=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
             ET.SubElement(route,'site',site=name)
-        if execution_mode=='ideal_tension':
+        if passive:
+            continue  # No actuator, servo, spring or controller on a passive rope.
+        elif execution_mode=='ideal_tension':
             # Positive controller tension maps to MuJoCo's negative tendon force.
             ET.SubElement(actuators,'general',name=t['entity']+'_direct_tension',tendon=t['entity'],
                 gainprm='-1',ctrllimited='true',ctrlrange=fmt([0,t['force_limit_n']]),
