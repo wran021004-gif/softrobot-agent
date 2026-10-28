@@ -215,7 +215,7 @@ def safe_boundary(host,current,db,messages,*,boundary='completed_invocation'):
 
 async def request_feedback_boundary(host,agent):
     """Anchor a real response and its paired feedback; no invocation completion."""
-    from tools.research.agent import DeepSeekModel, received, record
+    from tools.research.provider import DeepSeekModel, received, record
     from tools.research.reporter import current_reports
     s=state(host);messages=agent.messages
     with host.store.connect(True) as db:settled_boundary(s,db,messages)
@@ -291,7 +291,7 @@ async def inspect_confirmed_incomplete(host,agent,directory):
     This read-only assessment never disposes a response, mutates messages, or
     authorizes a worker. Unknown outcomes and any post-send action fail closed.
     """
-    from tools.research.agent import DeepSeekModel,received,pending
+    from tools.research.provider import DeepSeekModel,received,pending
     s=state(host);key=s['pilot'].get('unconsumed_response')
     if not key:raise ValueError('CONFIRMED_INCOMPLETE_RESPONSE_REQUIRED')
     if (s.get('pending') or pending(host) or any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True)
@@ -606,7 +606,7 @@ async def recover_confirmed_incomplete(host,agent,build,directory,*,stage=lambda
 
 async def recover_feedback(host,agent):
     """Pair only saved original results in the old SDK; never execute a tool here."""
-    from tools.research.agent import record, pending
+    from tools.research.provider import record, pending
     from tools.research.research_context import tool_feedback
     s=state(host)
     if s.get('pending') or pending(host) or s['pilot'].get('unconsumed_response'):raise ValueError('SETTLE_ORIGINAL_OUTCOME_FIRST')

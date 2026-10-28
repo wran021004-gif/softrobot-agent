@@ -30,7 +30,7 @@ class SavedS56FeedbackTests(unittest.TestCase):
         self.assertTrue(packet['mathematical_reliability']['fixed_input_static_sensitivity']['verification']['passed'])
 
     def test_both_feedback_versions_are_readable_without_a_live_agent(self):
-        from tools.research.sorosim_s55_feedback import scoped_feedback
+        from tools.research.diagnostic_relations import scoped_feedback
         packets=[read(ROOT/'evidence/sorosim_s55/agent_feedback_packet.json'),
             read(ROOT/'evidence/sorosim_s56/agent_feedback_packet.json')]
         host=SimpleNamespace(store=SimpleNamespace(artifact=lambda reference:packets[reference]))

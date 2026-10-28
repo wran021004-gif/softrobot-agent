@@ -541,7 +541,7 @@ def _finish(host, boundary, wire, response):
 
 async def complete_reports(host, transport, *, recover_only=False, max_model_calls=None):
     """One attempt per report, at settled pre-decision/outer boundaries. Unknown sends block."""
-    from tools.research.agent import LiveBoundary, pending, received, record
+    from tools.research.provider import LiveBoundary, pending, received, record
     class ReporterBoundary(LiveBoundary):
         purpose='reporter'
     boundary=ReporterBoundary(host,transport,allow_truncated_response=True,max_model_calls=max_model_calls)

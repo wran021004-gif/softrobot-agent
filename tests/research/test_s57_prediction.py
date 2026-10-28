@@ -90,7 +90,7 @@ class ArchivedPredictionTests(unittest.TestCase):
                 diagnostic.admitted_case(host,query,dict(robot={},task={},seed=0,policy={k:{} for k in self.index['scientific_configuration']['policy']}))
 
     def test_scientific_identity_excludes_archive_labels_and_feedback_is_versioned(self):
-        from tools.research.sorosim_s55_feedback import scoped_feedback
+        from tools.research.diagnostic_relations import scoped_feedback
         relabeled=dict(self.index,source_study='different label')
         self.assertEqual(diagnostic.interval_identity(self.index,self.index['cases'][0]),
             diagnostic.interval_identity(relabeled,self.index['cases'][0]))
