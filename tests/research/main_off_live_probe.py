@@ -81,7 +81,7 @@ def prepare(directory=DEST, run_id=PROBE_ID):
 
 
 class CappedTransport(httpx.AsyncBaseTransport):
-    def __init__(self,inner):self.inner=inner;self.counts={'conversation':0,'reporter':0}
+    def __init__(self,inner,counts=None):self.inner=inner;self.counts=counts or {'conversation':0,'reporter':0}
     async def handle_async_request(self,request):
         wire=json.loads(request.content);role='conversation' if wire.get('tools') else 'reporter'
         if self.counts[role]>={'conversation':6,'reporter':2}[role] or sum(self.counts.values())>=8:
@@ -133,7 +133,9 @@ def intercepts(host):
 
 
 async def run(host,inner,*,max_requests=6):
-    plan,math=intercepts(host);transport=CappedTransport(inner)
+    previous=reporter.provider_usage(host)
+    counts={role:previous.get(role,{}).get('requests',0) for role in ('conversation','reporter')}
+    plan,math=intercepts(host);transport=CappedTransport(inner,counts)
     # Probe-only patch scope: all scientific Plan and analysis dispatch is
     # intercepted, and the shared ledger has zero worker/backend capacity.
     with (patch('tools.research.core.guard',safe_guard),patch('tools.research.agent.guard',safe_guard),
@@ -148,10 +150,19 @@ async def run(host,inner,*,max_requests=6):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true');parser.add_argument('--continue-once',action='store_true');args=parser.parse_args()
     if not args.live:raise SystemExit('Use --live only after offline boundary validation; no automatic resend.')
     agent.load_credential(Path('~/.codex/.env').expanduser())
-    h=prepare();counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
+    if args.continue_once:
+        h=Host(DEST,PROBE_ID,actor='probe-only');usage=reporter.provider_usage(h)
+        if (usage.get('conversation',{}).get('requests')!=3 or usage.get('reporter',{}).get('requests',0)!=0
+                or agent.pending(h) or state(h)['pilot'].get('unconsumed_response')
+                or any(e['kind']=='probe_continuation' for e in h.store.events(h.run_id))):
+            raise ValueError('PROBE_CONTINUATION_REQUIRES_EXACT_SETTLED_FIRST_INVOCATION')
+        agent.record(h,'probe_continuation',dict(reason='One further ordinary decision after saved read feedback; no repair, method direction or worker execution.',max_new_requests=3))
+        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0),max_requests=3))
+    else:
+        h=prepare();counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     print(json.dumps(dict(probe=PROBE_ID,store=str(DEST),requests=counts,usage=reporter.provider_usage(h),
         ledger=h.store.remaining(),scientific_workers=0,physical_launches=0),ensure_ascii=False))
 
