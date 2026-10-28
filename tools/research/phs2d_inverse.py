@@ -23,6 +23,7 @@ def assemble(label,generation,reason,offsets=None,category='guided'):
         old=h.store.artifact(v['assemblies'][label])
         if old['generation']!=generation or old['offsets_m']!=(offsets or [0.]*generation['tendon_count']):raise ValueError('IMMUTABLE_LABEL')
         return v['assemblies'][label]
+    if v.get('ten_case_witness'):raise ValueError('TEN_CASE_WITNESS_SEARCH_STOPPED_VALIDATION_ONLY')
     ref=candidate(h,p,label,generation,reason);cfg=h.store.artifact(ref)['configuration']
     physics=resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data'])
     offsets=offsets or [0.]*len(physics['tendons'])
@@ -138,6 +139,8 @@ def dynamic_set(label,holdout=False,phase='P1',timestep=None,perturbation=0.,rec
         all_valid=len(rows)==(4 if holdout else 6) and all(r['valid'] for r in rows),all_pass=len(rows)==(4 if holdout else 6) and all(r['status']=='development_pass' for r in rows))
     rr=save(h,out,'phs_inverse_dynamic_set');v=state(h)['phs'];v.setdefault('dynamic_sets',[])
     if rr not in v['dynamic_sets']:v['dynamic_sets'].append(rr)
+    if holdout and out['all_pass'] and not v.get('ten_case_witness'):
+        v['ten_case_witness']=dict(label=label,holdout=rr,assembly=ar,search=[r for r in v['dynamic_sets'] if h.store.artifact(r)['label']==label and h.store.artifact(r)['all_pass'] and not h.store.artifact(r)['holdout']],search_stopped=True)
     update(h,phs=v);return out
 
 
@@ -150,7 +153,9 @@ def admit(label):
         and geo['status']=='legal_at_checked_poses' and sem['full_3d_coordinates'] and sem['no_actuators'] and sem['vertical_down']
         and sem['fixed_unilateral_payout'] and sem['objective_gradient_error']<1e-7 and sem['tendon_gradient_error']<1e-7 and sem['force_consistency_error']<1e-9)
     ref=save(h,dict(passed=passed,static=sr,dynamic=dr,semantics=cr,geometry=gr),'phs_inverse_P0')
-    v=state(h)['phs'];v.update(p0_pass=passed,p0_report=ref);update(h,phs=v);return dict(passed=passed,static=static['status'],dynamic=raw['status'],checks=raw.get('checks'))
+    v=state(h)['phs']
+    if v.get('p0_report') and v['p0_report']!=ref:v.setdefault('p0_report_history',[]).append(v['p0_report'])
+    v.update(p0_pass=passed,p0_report=ref);update(h,phs=v);return dict(passed=passed,static=static['status'],dynamic=raw['status'],checks=raw.get('checks'))
 
 
 def optimize_matching(prefix,**parameters):
