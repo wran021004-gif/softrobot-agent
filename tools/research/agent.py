@@ -289,11 +289,55 @@ def load_credential(path):
 
 
 def read_tool_evidence(host,query):
-    """Apply compact defaults without replacing an explicit retrieval view."""
+    """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
     from tools.research.core import read_evidence
-    if state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+    from tools.research.contracts import EvidenceQuery
+    spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
+    if decisions.get('context_limits'):
         query={'view':'summary',**query}
-    return read_evidence(host,query)
+    if decisions.get('role_policy',{}).get('version')!='research_roles_v2':
+        return read_evidence(host,query)
+    q=EvidenceQuery.model_validate(query)
+    # A complete root full read is the explicit SELECT interface. Existing
+    # delivery coverage checks still require the actual whole result on wire.
+    if q.view=='full' and not q.pointer:
+        return read_evidence(host,query)
+    value=read_evidence(host,query,record_read=False)
+    body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+    if q.view!='working_set' or q.pointer:
+        if len(body)<=6144:
+            return read_evidence(host,query)
+    # Summary projections may contain derived paths: navigate the original
+    # value instead, so every advertised pointer addresses real source data.
+    node=value
+    if q.view=='summary':
+        node=read_evidence(host,dict(reference=plain(q.reference),view='full',pointer=q.pointer),record_read=False)
+    view=q.view if q.view in ('working_set','mathematical_capabilities') else 'full'
+    index=dict(policy='main_evidence_navigation_v1',reference=plain(q.reference),
+        requested_view=q.view,pointer=q.pointer,original_response_bytes=len(body),
+        notice='Large result retained unchanged. Use exact pointers or bounded ranges; delegate complex interpretation to research_investigate.',
+        entries=[])
+    if isinstance(node,dict):entries=list(node.items())
+    elif isinstance(node,list):entries=list(enumerate(node))
+    else:entries=[]
+    if q.view=='range' and isinstance(value,dict) and isinstance(value.get('items'),list):
+        entries=[(q.start+i,v) for i,v in enumerate(value['items'])]
+    for key,item in entries:
+        token=str(key).replace('~','~0').replace('/','~1')
+        pointer=q.pointer+'/'+token
+        query_item=dict(reference=plain(q.reference),view=view,pointer=pointer)
+        entry=dict(field=str(key),query=query_item,type=type(item).__name__)
+        if isinstance(item,(str,int,float,bool)) or item is None:
+            if len(json.dumps(item,ensure_ascii=False).encode('utf-8'))<=256:entry['value']=item
+        elif isinstance(item,list):
+            entry['length']=len(item)
+            if view=='full':entry['range_query']=dict(reference=plain(q.reference),view='range',pointer=pointer,start=0,count=min(10,max(1,len(item))))
+        elif isinstance(item,dict):entry['available_fields']=list(item)[:12]
+        index['entries'].append(entry)
+        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>6144:
+            index['entries'].pop();break
+    index['remaining_entries']=len(entries)-len(index['entries'])
+    return index
 
 
 def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None):
@@ -1006,7 +1050,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
         if english_native(s['spec']):
             from tools.research.research_context import research_decision_brief_v3
-            delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research']))
+            delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research'],
+                complete_interpretations=s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2'))
         else:delivered=current
         record(host,'model_decision_packet',delivered)
         agent.system_prompt=instructions
@@ -1064,7 +1109,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
-            if handoff_before_next_request or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
+            if handoff_before_next_request or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')

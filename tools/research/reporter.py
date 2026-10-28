@@ -450,7 +450,7 @@ def _wire(host, reference, saved):
             'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
             'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
             '. Every item requires source_ids selected only from source_catalog. '
-            'For a substantive interpretation target approximately 200–400 English words in total; expand only when needed. Return 1-3 important interpretations; more only for an explicitly complex investigation. '
+            'Give concise scientific conclusions with supporting values, sources, uncertainty and discriminating observations. '
             'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
             'Explain quantitative new information with exact values, units and valid comparison scope. '
             'Use selected diagnostic_relations to assess possible failure mechanisms and observations '

@@ -10,24 +10,35 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def validate_role_policy(policy):
-    """Validate the optional versioned policy without changing legacy Studies."""
-    if not isinstance(policy, dict) or set(policy) != {'version', 'main', 'reporter'} or policy['version'] != 'research_roles_v1':
+    """Validate frozen role versions without reinterpreting v1 Studies."""
+    if not isinstance(policy, dict) or set(policy) != {'version', 'main', 'reporter'} or policy['version'] not in ('research_roles_v1', 'research_roles_v2'):
         raise ValueError('VERSIONED_RESEARCH_ROLE_POLICY_REQUIRED')
     for role, thinking, effort in (('main', 'disabled', 'none'), ('reporter', 'enabled', 'low')):
         profile = policy[role]
-        if (not isinstance(profile, dict) or set(profile) != {'thinking', 'reasoning_effort', 'max_tokens'}
-                or profile['thinking'] != thinking or profile['reasoning_effort'] != effort
-                or type(profile['max_tokens']) is not int or not 1 <= profile['max_tokens'] <= 32768):
+        if not isinstance(profile, dict) or set(profile) - {'thinking', 'reasoning_effort', 'max_tokens'} or not {'thinking', 'reasoning_effort'} <= set(profile) or profile['thinking'] != thinking or profile['reasoning_effort'] != effort:
+            raise ValueError('INVALID_RESEARCH_ROLE_PROFILE: ' + role)
+        cap = profile.get('max_tokens')
+        if policy['version'] == 'research_roles_v1':
+            if type(cap) is not int or not 1 <= cap <= 32768:
+                raise ValueError('INVALID_RESEARCH_ROLE_PROFILE: ' + role)
+        elif cap is not None:
             raise ValueError('INVALID_RESEARCH_ROLE_PROFILE: ' + role)
 
 
 def role_provider(spec, provider, purpose):
-    """Select only inference options; endpoint and model remain shared and frozen."""
+    """Select the frozen role without inheriting the other role's output cap."""
     policy = spec.get('research_decisions', {}).get('role_policy')
-    if policy is None or purpose != 'reporter':
+    if policy is None:
         return provider
     validate_role_policy(policy)
-    return {**provider, **policy['reporter']}
+    if policy['version'] == 'research_roles_v1' and purpose != 'reporter':
+        return provider
+    profile = policy['reporter' if purpose == 'reporter' else 'main']
+    result = {**provider, **profile}
+    if policy['version'] == 'research_roles_v2':
+        result['max_tokens'] = None
+        result['output_context_reserve_tokens'] = 32768
+    return result
 
 
 def same_robot_structure(left, right):
@@ -374,6 +385,9 @@ def resolve(path, profile=None, *, backend_profile=None):
         # Freeze the main role into the existing provider configuration. The
         # reporter role remains in the same frozen Study policy.
         provider.update(role_policy['main'])
+        if role_policy['version'] == 'research_roles_v2':
+            provider['max_tokens'] = None
+            provider['output_context_reserve_tokens'] = 32768
     if not provider.get('base_url') or not provider.get('model'):
         raise ValueError('EXPLICIT_PROVIDER_REQUIRED')
     controller = deepcopy(control['controller_defaults'])
@@ -499,7 +513,7 @@ def resolve(path, profile=None, *, backend_profile=None):
             if (not isinstance(handoff,dict) or set(handoff)!={'version','input_tokens'}
                     or handoff['version']!='token_handoff_v1' or type(handoff['input_tokens']) is not int
                     or handoff['input_tokens']<1
-                    or handoff['input_tokens']+provider['max_tokens']+provider['context_guard']['framing_headroom_tokens']>provider['context_guard']['context_limit_tokens']):
+                    or handoff['input_tokens']+(provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 0)+provider['context_guard']['framing_headroom_tokens']>provider['context_guard']['context_limit_tokens']):
                 raise ValueError('INVALID_TOKEN_HANDOFF_POLICY')
         study['research_decisions']=decisions
     if readiness is not None:

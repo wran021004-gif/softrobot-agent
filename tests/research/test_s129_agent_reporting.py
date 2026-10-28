@@ -69,6 +69,48 @@ class AgentReportingTests(unittest.TestCase):
     def physical(self):
         ref=self.put(self.f.physical_result());update(self.h,physical_replays=[ref]);return ref
 
+    def test_v2_uncapped_roles_wire_and_context_reserve(self):
+        from tools.research.config import role_provider,validate_role_policy
+        from tools.research.provider_context import capacity_estimate
+        from tests.research.test_s127_provider_output import reply
+        policy=dict(version='research_roles_v2',main=dict(thinking='disabled',reasoning_effort='none'),
+            reporter=dict(thinking='enabled',reasoning_effort='low',max_tokens=None))
+        validate_role_policy(policy)
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'role_policy':policy}
+        pilot=deepcopy(state(self.h)['pilot']);pilot['provider'].update(policy['main']);pilot['provider']['max_tokens']=None
+        pilot['provider']['output_context_reserve_tokens']=32768;update(self.h,spec=spec,pilot=pilot)
+        ref=self.physical();delivery=reporter.scientific_feedback(self.h,dict(reference=ref))
+        wire=reporter._wire(self.h,delivery['report_reference'],self.h.store.artifact(delivery['report_reference']))
+        self.assertNotIn('max_tokens',wire);self.assertEqual(wire['reasoning_effort'],'low')
+        self.assertEqual(capacity_estimate(b'{}',role_provider(spec,pilot['provider'],'reporter'))['reserved_output_tokens'],32768)
+        main=dict(model=pilot['provider']['model'],thinking={'type':'disabled'},reasoning_effort='none',stream=False,
+            messages=[dict(role='user',content='fixture')],tools=[])
+        boundary=LiveBoundary(self.h,httpx.MockTransport(lambda r:httpx.Response(200,json=reply('stop'))))
+        async def run():
+            await boundary.handle_async_request(httpx.Request('POST',pilot['provider']['base_url']+'/chat/completions',json=main))
+            boundary.consumed();await boundary.aclose()
+        asyncio.run(run())
+        self.assertNotIn('max_tokens',main)
+        with self.assertRaisesRegex(ValueError,'INVALID_RESEARCH_ROLE_PROFILE'):
+            validate_role_policy({**policy,'main':{**policy['main'],'max_tokens':4096}})
+
+    def test_v2_bounded_evidence_preserves_precise_and_formal_reads(self):
+        from tools.research.agent import read_tool_evidence
+        policy=dict(version='research_roles_v2',main=dict(thinking='disabled',reasoning_effort='none'),
+            reporter=dict(thinking='enabled',reasoning_effort='low'))
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'architecture':'english_decision_v1','role_policy':policy}
+        reference=save(self.h,dict(metric={'speed_m_s':0.043009681835387996,'unit':'m/s'},trajectory=list(range(10000))),'v2_test')
+        update(self.h,spec=spec,physical_replays=[reference],evaluation_reads=[])
+        summary=read_tool_evidence(self.h,dict(reference=reference,view='fields',fields=['trajectory']))
+        self.assertEqual(summary['policy'],'main_evidence_navigation_v1');self.assertLessEqual(byte_size(summary),6144)
+        self.assertEqual(read_tool_evidence(self.h,dict(reference=reference,view='full',pointer='/metric/speed_m_s')),0.043009681835387996)
+        self.assertNotIn(reference,state(self.h)['evaluation_reads'])
+        from tools.research.core import read_evidence
+        read_evidence(self.h,dict(reference=reference,view='full'),record_read=False)
+        self.assertNotIn(reference,state(self.h)['evaluation_reads'])
+        self.assertEqual(read_tool_evidence(self.h,dict(reference=reference,view='full')),self.h.store.artifact(reference))
+        self.assertIn(reference,state(self.h)['evaluation_reads'])
+
     def test_role_policy_freezes_new_study_without_reinterpreting_old_study(self):
         from tools.research.config import resolve, ROOT
         from tempfile import NamedTemporaryFile

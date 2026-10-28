@@ -220,6 +220,8 @@ class ModelConfig(Contract):
     readonly_batch_limit: int | None = Field(default=None, ge=2, le=3)
     max_tokens: int | None = Field(default=2000,ge=1,
         description='Explicit output cap; null omits max_tokens and uses the Provider default.')
+    output_context_reserve_tokens: int | None = Field(default=None, ge=1,
+        description='Context-planning output headroom; not a Provider generation cap.')
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
     supports_images: bool = False
@@ -234,7 +236,7 @@ class ModelConfig(Contract):
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit','context_guard'):
+        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit','context_guard','output_context_reserve_tokens'):
             if data.get(key) is None: data.pop(key,None)
         return data
 

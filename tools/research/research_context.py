@@ -1136,7 +1136,7 @@ def agent_decision_brief(host):
 
 
 
-def research_decision_brief_v3(brief):
+def research_decision_brief_v3(brief, *, complete_interpretations=False):
     """Bounded presentation of existing deterministic state; no action admission."""
     task=brief.get('task') or {}
     best=brief.get('best_valid') or {}
@@ -1172,8 +1172,10 @@ def research_decision_brief_v3(brief):
             reason=('Protected closeout or no mathematical allowance.' if blocked else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
-    interpretation=[dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
-        for i in (report.get('interpretations') or [])[:3]]
+    interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
+        for i in (report.get('interpretations') or [])[:3]] if complete_interpretations else
+        [dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
+        for i in (report.get('interpretations') or [])[:3]])
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
     return dict(version='research_decision_brief_v3',
         research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics') if k in task},
@@ -1184,7 +1186,7 @@ def research_decision_brief_v3(brief):
         verified_facts=facts[:8],
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
-            excerpt_scope='First 240 characters of each cited interpretation; read the report for the complete text.',
+            excerpt_scope=('Complete source-grounded final conclusions; Reporter internal reasoning and reads are excluded.' if complete_interpretations else 'First 240 characters of each cited interpretation; read the report for the complete text.'),
             unresolved=report.get('unresolved',[])[:3]),
         action_menu=actions,
         evidence_access=dict(working_set=brief.get('evidence_access'),
