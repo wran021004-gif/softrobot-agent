@@ -10,7 +10,7 @@ from extensions.tendon_family.generated_serial import generate_family
 from extensions.tendon_family.inverse_routing import generation
 from extensions.tendon_family.passive import PassiveModel
 from extensions.tendon_family.passive_equilibrium import solve,consistency
-from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics
+from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity
 from extensions.tendon_family.route_validation import validate_routes,interval,intersections
 
 
@@ -59,6 +59,13 @@ class InverseTests(unittest.TestCase):
         for i in range(100):
             scalar=interval(a[i],b[i],planes,r[i]);self.assertEqual(scalar is not None,bool(hit[i]))
             if scalar is not None:np.testing.assert_allclose(scalar,[lo[i],hi[i]],atol=1e-12)
+
+    def test_regular_normalized_implicit_gradient_matches_resolved_branch(self):
+        def model(E):return self.native(generation(young=[E],cells=8,radii=(.20,.008)))
+        n=model(6.4e6);base=solve(n);loaded=solve(n,.5,.1,base['equilibrium']['qpos'])
+        out=design_sensitivity(n,loaded['equilibrium'],model(6.4e6-13000),model(6.4e6+13000),'normalized_E',.001,.5,.1)
+        self.assertEqual(out['status'],'regular_implicit_gradient');self.assertTrue(out['gradient_trustworthy'])
+        self.assertLess(out['gradient_relative_error'],.01)
 
 
 if __name__=='__main__':unittest.main()

@@ -86,7 +86,9 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
         z=np.linalg.solve(M,-np.r_[(fp-fm)/(2*step),dc[a]])
         p=StaticProblem(native,s,force);d=p.at(q);rows={}
         for name,b in [('tip',native.physics['tip']),('point',material_point(native.physics,s))]:
-            explicit=(plus.point(pp.at(q),b)[0]-minus.point(pm.at(q),b)[0])/(2*step)
+            bp=plus.physics['tip'] if name=='tip' else material_point(plus.physics,s)
+            bm=minus.physics['tip'] if name=='tip' else material_point(minus.physics,s)
+            explicit=(plus.point(pp.at(q),bp)[0]-minus.point(pm.at(q),bm)[0])/(2*step)
             rows[name]=(native.point(d,b)[1]@z[:len(q)]+explicit).tolist()
         result.update(dq_du=z[:len(q)].tolist(),dtension_du=z[len(q):].tolist(),dposition_du=rows,
             dlength_slack_du=(np.array(equilibrium['Jlength'])@z[:len(q)]+dc).tolist())
