@@ -45,11 +45,16 @@ def reshape(space, query, point, previous=None):
 
 
 def generation(space, query, point):
+    from extensions.tendon_family.family_space import span_strategies
     p=point;n=p['segment_count'];t=p['tendon_count'];r=p['routing']
+    if p['span_strategy'] not in span_strategies(space):
+        raise ValueError('SPAN_STRATEGY_NOT_APPLICABLE_TO_FROZEN_FAMILY_RULE')
     if p['span_strategy']=='whole_chain':
         groups=[(0,n-1,1,j) for j in range(t)]
     elif p['span_strategy']=='distal':
         groups=[(n-1,n-1,1,j) for j in range(t)]
+    elif p['span_strategy']=='base_to_distributed_anchors':
+        groups=[(0,j%n,1,j) for j in range(t)]
     else:
         groups=[(j%n,min(n-1,j%n+max(1,n//2)),1,j) for j in range(t)]
     spans=[]

@@ -79,7 +79,8 @@ class FamilySpace(Contract):
     control_domains: dict[str, Domain]
     assembly: Assembly
     actuator_defaults: ActuationDefaults
-    conditional_rules: Literal['selected_segments_and_consecutive_spans_v1'] = 'selected_segments_and_consecutive_spans_v1'
+    conditional_rules: Literal['selected_segments_and_consecutive_spans_v1',
+        'base_only_consecutive_spans_v1'] = 'selected_segments_and_consecutive_spans_v1'
     unsupported: list[str]
 
     @model_validator(mode='after')
@@ -256,6 +257,9 @@ def validate_request(space, request):
     from tools.platform_store import plain
     if request.family_space_identity != digest(plain(space)):
         raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
+    if space.conditional_rules == 'base_only_consecutive_spans_v1' and any(
+            span.first_segment != 0 for span in request.spans):
+        raise ValueError('BASE_ONLY_REQUIRES_FIRST_SEGMENT_ZERO')
     for value, bounds, name in ((request.segment_count, space.segment_count_bounds, 'segment_count'),
                                 (request.tendon_count, space.tendon_count_bounds, 'tendon_count')):
         if not bounds[0] <= value <= bounds[1]:
@@ -329,6 +333,10 @@ def decision_summary(value, evidence, operations):
             if not space.executable_tendon_count_bounds[0]<=i<=space.executable_tendon_count_bounds[1]],
         reason='Outside registered execution bounds; retained in declared domain, no scientific infeasibility claim')
     result['domain_detail_query']=dict(reference=evidence,view='full')
+    if space.conditional_rules == 'base_only_consecutive_spans_v1':
+        result['span_semantics']='first_segment == 0; last_segment selects the anchor segment; counts sum to tendon_count'
+        result['attachment_constraints']['start']='Exactly one start on fixed_base, then guides, then one anchor; overrides obey the same rule'
+        result['applicable_span_strategies']=span_strategies(frozen)
     return result
 
 
@@ -464,11 +472,20 @@ def parameter_capabilities(value, request):
     return rows
 
 
+def span_strategies(space):
+    """Strategy names preserve their physical meanings in each frozen space."""
+    return (['whole_chain', 'base_to_distributed_anchors']
+        if space['conditional_rules'] == 'base_only_consecutive_spans_v1'
+        else ['whole_chain', 'distributed_consecutive', 'distal'])
+
+
 def search_domains(space, query, grant):
     """Authorize the small mixed-search subspace; mesh is deliberately absent."""
     from tools.state_io import digest
     if query.family_space_identity!=digest(space):
         raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
+    if not set(query.span_strategies) <= set(span_strategies(space)):
+        raise ValueError('SPAN_STRATEGY_NOT_APPLICABLE_TO_FROZEN_FAMILY_RULE')
     if query.method!=grant['method'] or not set(query.variable_groups)<=set(grant['variable_groups']):
         raise ValueError('UNAUTHORIZED_FAMILY_SEARCH_METHOD_OR_GROUP')
     if (not set(query.segment_counts)<=set(grant['segment_counts']) or

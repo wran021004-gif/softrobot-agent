@@ -1,0 +1,46 @@
+{
+  "version": "serial_family_space_v2",
+  "family_id": "serial_external_tendons_base_only_v1",
+  "conditional_rules": "base_only_consecutive_spans_v1",
+  "executable_segment_counts": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "unsupported": [
+    "8-12 tendons: declared, not execution validated",
+    "polygon section domain not granted in this example",
+    "axial extension",
+    "shear",
+    "twist",
+    "friction",
+    "swept self-collision",
+    "High segment-count dynamics and controller compatibility require candidate-specific validation"
+  ],
+  "serial_assembly": {
+    "root_segment": "segment_0",
+    "repeated_segment": "segment_1",
+    "guide": "mid_guide",
+    "connector": "connector",
+    "payload": "payload",
+    "cell_count_bounds": [
+      1,
+      32
+    ],
+    "default_cells": 12
+  },
+  "base_space": "family_space_v1.json",
+  "assembly": {
+    "provenance": {
+      "source": "Stage 0 Base-only space; unchanged public SI serial-family prototypes",
+      "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+      "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics"
+    }
+  }
+}

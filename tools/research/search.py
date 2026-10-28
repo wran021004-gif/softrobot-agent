@@ -111,6 +111,7 @@ def initial_search_progress(host):
 
 def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
+    from extensions.tendon_family.family_space import span_strategies
     grant=spec['family_search']
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
             version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
@@ -121,6 +122,7 @@ def request_guidance(spec):
             parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',
                 sections='Section type/dimensions in m',routing='Span phase, station, channel angle and radius',
                 spans='Consecutive span strategy',segment_count='Discrete number of segments',tendon_count='Discrete number of channels'),
+            applicable_span_strategies=span_strategies(spec['family_space']),
             block_selection='Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.',
             objectives=dict(task_violation='CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged',
                 target_equilibrium_residual='Static proxy only; target_equilibrium required',

@@ -88,7 +88,8 @@ class FamilyMixedSearch(Contract):
     variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
     segment_counts: list[int] = Field(min_length=1)
     tendon_counts: list[int] = Field(min_length=1)
-    span_strategies: list[Literal['whole_chain','distributed_consecutive','distal']] = Field(default_factory=lambda:['whole_chain'])
+    span_strategies: list[Literal['whole_chain','distributed_consecutive','distal',
+        'base_to_distributed_anchors']] = Field(default_factory=lambda:['whole_chain'])
     section_types: list[Literal['circle','tube','rectangle','ellipse']] = Field(default_factory=list)
     bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     screening_fidelity: str = Field(min_length=1)

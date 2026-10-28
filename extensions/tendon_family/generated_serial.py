@@ -314,6 +314,12 @@ def generate_family(value):
                 for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
             route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
             if index in r.route_overrides:route=[plain(p) for p in r.route_overrides[index]]
+            if space.conditional_rules == 'base_only_consecutive_spans_v1':
+                if (len(route)<2 or route[0]['attachment']['part']!='fixed_base'
+                        or route[0].get('hole') or route[0]['role']!='start'
+                        or route[-1]['role']!='anchor'
+                        or any(p['role']!='guide' for p in route[1:-1])):
+                    raise ValueError('BASE_START_GUIDES_ANCHOR_REQUIRED')
             # Explicit overrides retain span ownership, local radial and station bounds.
             order=[]
             for p in route:
@@ -409,5 +415,5 @@ def family_declarations():
 
 def serial_declarations():
     return dict(contract='serial_family_space_v2',execution='declared serial segment and tendon domains subject to physical checks',
-        routing='consecutive spans; independent angular offsets and typed route overrides',
+        routing='Frozen conditional_rules select legacy consecutive spans or base_only_consecutive_spans_v1; independent angular offsets and typed overrides obey that rule',
         numerical='candidate-specific compatibility; no task-feasibility claim')
