@@ -818,18 +818,22 @@ def diagnostic_brief(value):
 
 def tool_continuation(host):
     """Reconstruct navigation intent from existing events, separately from science."""
-    recent=[];selection=None;plan_action=None
+    recent=[];selection=None;plan_action=None;plan_selection=None
     for event in host.store.events(host.run_id):
         if event['kind']=='research_tool_route':
             route=host.store.artifact(event['outputs'][0])
             selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],
                 source=event['outputs'][0],status='selected_not_submitted')
-            if route['tool']=='research_plan':plan_action=route['action']
+            if route['tool']=='research_plan':
+                plan_action=route['action'];plan_selection=deepcopy(selection)
         elif event['kind']=='model_original_tool_feedback':
             value=host.store.artifact(event['outputs'][0]);use=value['tool_use'];result=value['result']
             if use['name']=='research_route':continue
             if selection and use['name']==selection['tool']:
                 selection={**selection,'status':'tool_feedback_recorded','feedback':event['outputs'][0]}
+            if plan_selection and use['name']=='research_plan' and use['input'].get('action')==plan_action:
+                plan_selection={**plan_selection,'status':'submission_feedback_recorded',
+                    'feedback_status':result['status'],'feedback':event['outputs'][0]}
             entry=dict(tool=use['name'],tool_use_id=use['toolUseId'],status=result['status'],source=event['outputs'][0])
             if use['name']=='evidence_read':
                 if len(json.dumps(use['input']).encode())<=700:entry['query']=use['input']
@@ -839,7 +843,7 @@ def tool_continuation(host):
                 except ValueError:detail={}
                 entry.update({k:detail[k] for k in ('error_code','expected') if k in detail})
             recent.append(entry);recent=recent[-4:]
-    return dict(selection=selection,plan_action=plan_action,recent=recent,
+    return dict(selection=selection,plan_action=plan_action,plan_selection=plan_selection,recent=recent,
         scope='Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.')
 
 
@@ -932,7 +936,7 @@ def bounded_action_trace(trace, limit=8):
 def research_recall(host, query):
     """Navigate existing trace/source readers; never award formal evidence credit."""
     from tools.research.contracts import ResearchRecallQuery
-    from tools.research.agent import read_tool_evidence
+    from tools.research.core import read_tool_evidence
     q=ResearchRecallQuery.model_validate(query);trace=research_action_trace(host,limit=None)
     rows=trace['recent']
     if q.step is None:

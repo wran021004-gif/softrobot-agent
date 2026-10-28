@@ -1,6 +1,7 @@
 # Research mainline
 
-The recommended common baseline is `mainline/softarm-codesign`; see its
+The development baseline is `mainline/research-harness-v2`; see [the staged ownership and offline validation](harness_v2.md). The default pending configuration uses no reasoning.
+The historical common baseline is `mainline/softarm-codesign`; see its
 [integration, validation and next-Study guidance](softarm_codesign_mainline.md).
 The historical runs below retain their frozen configurations and evidence.
 The engineering validation in that report did not start a formal Study.

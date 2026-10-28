@@ -122,7 +122,7 @@ class FormalAdmissionTests(unittest.TestCase):
                             arguments=json.dumps(dict(reference=state(h)['public_prior_manifest'],view='full'))))]))]))
             self.assertTrue(any(m['role']=='tool' for m in wire['messages']))
             return response(request)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
             asyncio.run(converse(h,pause_after_completed_invocations=1))

@@ -171,7 +171,7 @@ class PreflightTests(unittest.TestCase):
         from tools.research.state import guard,require_authorization
         h=fixture();s=state(h);spec=deepcopy(s['spec'])
         spec['authorization']=read(SPEC)['authorization'];update(h,spec=spec)
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('No credentials')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('No credentials')):
             with self.assertRaisesRegex(ValueError,'APPROVAL_REQUIRED'):asyncio.run(converse(h))
         with self.assertRaisesRegex(ValueError,'APPROVAL_REQUIRED'):guard(h,expensive=True)
         wrong=provider_scope(spec);wrong['study_id']='old-s127-study'
@@ -189,7 +189,7 @@ class PreflightTests(unittest.TestCase):
         def capture(request):
             wires.append(request.content);update(h,research_status='stopped')
             return response(request)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(capture)):
             asyncio.run(converse(h))
@@ -296,7 +296,7 @@ class PreflightTests(unittest.TestCase):
             self.assertFalse(state(h)['pilot'].get('session_handoff_live_admitted',False))
             await boundary.aclose()
         asyncio.run(exercise())
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('No credentials')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('No credentials')):
             with self.assertRaisesRegex(ValueError,'HANDOFF_NOT_ADMITTED'):asyncio.run(converse(h,session_handoff=True))
         atomic_json(OUT/'session_admission.json',dict(production_handoff_admitted=False,
             actual_provider_requests=0,synthetic_http_responses=1,scientific_workers=0,

@@ -167,7 +167,7 @@ class SessionRecoveryTests(unittest.TestCase):
         edited['data']['messages'][0]['content'][0]['text']+=' inconsistent prefix';atomic_json(latest,edited)
         before=state(h);events=h.store.events(h.run_id);ledger=h.store.remaining()
         def forbidden(request):raise AssertionError('No Provider send')
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)),\
                 patch('tools.research.agent.build_harness',side_effect=lambda *a,**kw:build(kw.get('session_id'))),\
@@ -184,7 +184,7 @@ class SessionRecoveryTests(unittest.TestCase):
             sent.append(request)
             if len(sent)==2:update(h,research_status='stopped')
             return response(request)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
              patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
              patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)),\
              patch('tools.research.session_handoff.handoff',side_effect=ValueError('Offline checkpoint failure')):
@@ -197,7 +197,7 @@ class SessionRecoveryTests(unittest.TestCase):
         from tools.research.agent import converse
         from unittest.mock import patch
         h=cold_host()
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('No credential access')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('No credential access')):
             with self.assertRaisesRegex(ValueError,'LIVE_PROVIDER_CONTINUATION_UNVERIFIED'):
                 asyncio.run(converse(h,session_handoff=True))
 

@@ -23,7 +23,58 @@ from tools.platform_store import plain, zero
 from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SPEC = ROOT/'configs/research/study.json'
+DEFAULT_SPEC = ROOT/'configs/research/study_harness_v2.json'
+def read_tool_evidence(host,query,*,record_read=True):
+    """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
+    from tools.research.contracts import EvidenceQuery
+    spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
+    if decisions.get('context_limits'):
+        query={'view':'summary',**query}
+    if decisions.get('role_policy',{}).get('version') not in ('research_roles_v2','research_roles_v3') and record_read:
+        return read_evidence(host,query,record_read=record_read)
+    q=EvidenceQuery.model_validate(query)
+    # A complete root full read is the explicit SELECT interface. Existing
+    # delivery coverage checks still require the actual whole result on wire.
+    if q.view=='full' and not q.pointer:
+        return read_evidence(host,query,record_read=record_read)
+    value=read_evidence(host,query,record_read=False)
+    body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+    if q.view!='working_set' or q.pointer:
+        if len(body)<=4096:
+            return read_evidence(host,query,record_read=record_read)
+    # Summary projections may contain derived paths: navigate the original
+    # value instead, so every advertised pointer addresses real source data.
+    node=value
+    if q.view=='summary':
+        node=read_evidence(host,dict(reference=plain(q.reference),view='full',pointer=q.pointer),record_read=False)
+    view=q.view if q.view in ('working_set','mathematical_capabilities') else 'full'
+    index=dict(policy='main_evidence_navigation_v1',reference=plain(q.reference),
+        requested_view=q.view,pointer=q.pointer,original_response_bytes=len(body),
+        notice='Large result retained unchanged. Use exact pointers or bounded ranges; delegate complex interpretation to research_investigate.',
+        entries=[])
+    if isinstance(node,dict):entries=list(node.items())
+    elif isinstance(node,list):entries=list(enumerate(node))
+    else:entries=[]
+    if q.view=='range' and isinstance(value,dict) and isinstance(value.get('items'),list):
+        entries=[(q.start+i,v) for i,v in enumerate(value['items'])]
+    for key,item in entries:
+        token=str(key).replace('~','~0').replace('/','~1')
+        pointer=q.pointer+'/'+token
+        query_item=dict(reference=plain(q.reference),view=view,pointer=pointer)
+        entry=dict(field=str(key),query=query_item,type=type(item).__name__)
+        if isinstance(item,(str,int,float,bool)) or item is None:
+            if len(json.dumps(item,ensure_ascii=False).encode('utf-8'))<=256:entry['value']=item
+        elif isinstance(item,list):
+            entry['length']=len(item)
+            if view=='full':entry['range_query']=dict(reference=plain(q.reference),view='range',pointer=pointer,start=0,count=min(10,max(1,len(item))))
+        elif isinstance(item,dict):entry['available_fields']=list(item)[:12]
+        index['entries'].append(entry)
+        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
+            index['entries'].pop();break
+    index['remaining_entries']=len(entries)-len(index['entries'])
+    return index
+
+
 def read_evidence(host, query, *, record_read=True):
     """Use the existing evidence boundary; internal reads may omit read markers."""
     q = EvidenceQuery.model_validate(query)
@@ -702,7 +753,7 @@ def recover(host):
     if (state(host).get('pending') or {}).get('kind') == 'local_diagnostic':
         from tools.research.diagnostic import recover_local
         return recover_local(host)
-    from tools.research.agent import pending as provider_pending, received, settle
+    from tools.research.provider import pending as provider_pending, received, settle
     for row in provider_pending(host):
         response=received(host,row['request_id'])
         if response:

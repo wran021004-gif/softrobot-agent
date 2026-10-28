@@ -124,7 +124,7 @@ class S125ContractTests(unittest.TestCase):
         packet=dict(research=decision_brief(context(h)),implementation='isolated_wire_fixture')
         with patch('tools.research.agent.LiveBoundary',Boundary),patch('tools.research.core.guard'),\
              patch('tools.research.agent.decision_packet',return_value=packet),\
-             patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'synthetic-fixture'}):
+             patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'synthetic-fixture'}):
             with self.assertRaises(Captured):asyncio.run(converse(h))
         schema=next(t['function']['parameters'] for t in captured['tools'] if t['function']['name']=='research_plan')
         def constraints(v):

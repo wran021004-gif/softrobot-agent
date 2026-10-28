@@ -112,3 +112,89 @@ unavailable-storage guard). Forty request/HTTP/conversion tests passed independe
 A fresh ignored dependency preparation was also checked against the pinned source.
 Full final-suite results are recorded below at P3. No actual account, model catalog,
 OAuth consent, inference or scientific execution occurred.
+
+## P3 final engineering acceptance
+
+The public CLI remains python -m tools.research; its default is the pending V2
+configuration with none reasoning for both roles. Historical --spec paths and
+frozen Store commands remain separate. Provider client construction and credential
+selection now have one owner. Bounded evidence navigation lives in core; SDK
+storage/path handling lives in session_handoff. Reporter and recovery import the
+Provider directly. A static top-level import graph has no cycles.
+
+The 92-case final Python matrix passed (122.424 s), covering R2-derived routing,
+legal generation/feedback, no-send restore, unknown outcomes, exact response replay,
+Provider roles and Reporter interpretation, task/runtime contracts, family routing,
+legacy configuration identity and immutable evidence/read gates. Three acceptance
+checks verify the CLI, pending configuration and callable science entries. One
+additional targeted latest-L0 check passes after adding explicit generation-domain
+access and selected-versus-submitted route status. No numerical kernel/rollout was
+used as a new scientific experiment.
+
+Gateway final npm test: 107 cases, 106 passed, 0 failed, 1 upstream Unix-specific
+case skipped on Windows (12.486 s). This includes mocked OAuth/inference, complete
+HTTP tool/result continuation, opaque reasoning preservation, interruptions, usage,
+real temporary Windows DPAPI, CLI, and authenticated unsigned-account rejection.
+No real login, account catalog, inference or scientific Worker was run.
+
+Five baseline fixture failures were reproduced in the untouched exact baseline:
+context output reserve versus generation cap, historical C3 versus current frozen
+evaluator identity, incomplete synthetic execution environment/interpreter,
+boolean research_decisions fixture, and a pre-R2 configuration-hash literal. Tests
+now express current frozen semantics and the recorded baseline identity. Production
+scientific guards, old acceptance conditions and historical artifacts were not
+changed to make these fixtures pass.
+
+R2 still has 469 events, 51 settled calls and zero unresolved reservations. No
+harness-v2-m5-pending/platform.sqlite exists. Git reports no changes to historical
+evidence, tasks, extensions, MATLAB, Store, Host or Registry against the baseline.
+No new Harness, Store, memory, planner, evaluator or task registry was introduced.
+The only new Python production module, provider.py, has direct CLI, Main, Reporter,
+configuration and handoff callers.
+
+## Actual simplification
+
+agent.py decreased from 1474 to 1164 lines before final import cleanup, through
+responsibility moves and removal of embedded Provider construction. The unused
+317-line S5.5 preparation runner was removed after caller inspection. Active scoped
+feedback was renamed, not duplicated. Across tools/research the implementation is
+smaller than the baseline despite the new Provider capability boundary. On-demand
+requests save only the final decision packet, removing the duplicate pre-routing
+packet/event. Necessary scientific hashes, idempotent request identities and exact
+response bytes remain; no alternative SHA or persistence mechanism was added.
+
+## Passive capability migration preparation
+
+Do not merge the passive branch. Reusable array/numerical functions belong at
+extensions/tendon_family/passive_equilibrium and passive_inverse once a real task
+caller exists. Typed generation additions bind in family_space/ generate_family;
+passive_fixed_payout input belongs at the existing scene/backend boundary. A formal
+PHS task adapter must own material-s semantics, unloaded baseline, force cases,
+monitor grid and acceptance; analysis.calculate/check_analysis_applicability and
+physical_replay.dispatch are the existing admission points. The independent
+phs2d development evaluator cannot satisfy formal SELECT. No dormant passive
+production module, known winning parameters or development Store was imported.
+
+## Remaining real validation
+
+Account OAuth, actual catalog models, per-model function/none/medium capability,
+context capacity and price information are unknown until separately authorized.
+Gateway .devkit must be prepared from the pinned licensed source; it is not
+committed. Configure an explicit verified account model; no cheapest slug is chosen.
+Language checks combine controlled English authoring and source/translation
+provenance with Unicode bypass detection, not an automatic English classifier.
+Unreviewed historical guidance is refused rather than silently translated.
+
+A future at-most-eight-call test should share one ledger across Main/Reporter,
+use none reasoning initially, allow no retries, stop after the first independently
+accepted and fully read/selected result, and preserve failures. Observe generation,
+control initialization, one bounded admitted method, independent evaluation,
+feedback, then truthful SELECT/STOP. Budget is a ceiling, not a guarantee that the
+science chain fits. Real network/model capability validation must precede that
+Study under a separate explicit authorization. This implementation stops at P3.
+
+Additional final checks: seven Provider cases pass after receipt-based opaque
+reasoning and credential-isolation assertions; three targeted DeepSeek Reporter
+cases pass for independent accounting, incomplete interpretation and saved-response
+recovery. Four latest acceptance/L0 cases pass. These overlap the main matrix and
+are not added as unique scientific trials. All reported fixtures are synthetic.

@@ -122,7 +122,10 @@ class AgentFeedbackTests(unittest.TestCase):
         self.assertEqual(c['physical_design_identity'],original['physical_design_identity'])
         self.assertNotEqual(c['numerical_model_identity'],original['numerical_model_identity'])
         self.assertTrue(design.final_fidelity_matches(self.spec,c))
-        self.assertEqual(c['final_evaluation_identity'],historical['final_evaluation_identity'])
+        self.assertEqual(c['final_evaluation_identity'],self.spec['final_evaluation_identity'])
+        # Imported evidence retains its historical protocol; new candidates bind
+        # the current frozen evaluator, rather than copying a historical hash.
+        self.assertEqual(archived(folder,source),original)
         self.assertEqual(c['resolved_parameters']['dimensions'],dict(physical_dofs=48,gvs_coordinates=12,state=24,inputs=4))
         self.assertEqual(set(c['effective_discretization']['data']['cells'].values()),{12})
         self.assertEqual(c['configuration']['robot']['structure'],original['configuration']['robot']['structure'])
@@ -277,7 +280,9 @@ class AgentFeedbackTests(unittest.TestCase):
             variable_groups=['segment_count'],segment_counts=[1,2],tendon_counts=[4],
             screening_fidelity='coarse',objective='target_equilibrium_residual',operating_point='target_equilibrium',
             max_proposals=2,max_evaluations=2)
-        with patch('tools.service_execution._run_contained',side_effect=worker), \
+        with patch.dict(os.environ,self.spec['numerical_environment']), \
+             patch('tools.research.execution.sys.executable',self.spec['runtime']['research_python']), \
+             patch('tools.service_execution._run_contained',side_effect=worker), \
              patch('tools.research.runtime_capability.capability',return_value=dict(status='runtime_available',fixture=True)):
             searched=core.dispatch(self.host,self.plan('search',search=query),'workflow-search')
             rows=searched['result']['result']['evaluated']

@@ -128,7 +128,7 @@ class StudyPrivateExperienceTests(unittest.TestCase):
         self.assertFalse(state(h)['analysis_results']);self.assertFalse(state(h)['physical_replays'])
         from tools.research.agent import converse
         before=h.store.remaining()
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
             asyncio.run(converse(h,restore_only=True))
         self.assertEqual(h.store.remaining(),before)

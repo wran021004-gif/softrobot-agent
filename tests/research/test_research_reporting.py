@@ -245,7 +245,7 @@ class ReportingTests(unittest.TestCase):
 
     def test_report_interpretation_is_never_registered_or_promoted_to_evidence(self):
         reference=self.put(self.math_result('inconclusive'));host,current=offline_host(self.values,analysis_results=[reference])
-        current['spec']['research_decisions']=True
+        current['spec']['research_decisions']={'version':'research_decision_v1'}
         card=result_card(host,reference);before=registered_references(host)
         report=ScientificReport(mode='result_summary',results=[card],interpretations=[
             ReporterInterpretation(kind='hypothesis',text='Fixture text claiming an optimal structure')])

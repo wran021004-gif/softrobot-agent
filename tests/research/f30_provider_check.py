@@ -249,7 +249,7 @@ async def run(live=False, *, approved_commit=None):
         stack.enter_context(patch('tools.research.agent.LiveBoundary',CappedBoundary))
         if not live:
             stack.enter_context(patch('httpx.AsyncHTTPTransport',return_value=mock_http(refs)))
-            stack.enter_context(patch('tools.research.agent.load_credential'))
+            stack.enter_context(patch('tools.research.provider.load_credential'))
             stack.enter_context(patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}))
         try:await agent.converse(h)
         except Exception as exc:

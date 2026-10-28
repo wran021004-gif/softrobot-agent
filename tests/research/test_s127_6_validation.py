@@ -42,12 +42,12 @@ class NewValidationTests(unittest.TestCase):
     def test_old_approval_is_rejected_before_credentials_or_grant_creation(self):
         path=ROOT/'runs/s127_6_old_authorization_fixture.json'
         atomic_json(path,dict(stage='S12.7.4A',user_approval='Old fixture authorization',request_ceiling=18))
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIALS')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('NO_CREDENTIALS')):
             with self.assertRaisesRegex(ValueError,'INDEPENDENT_S127_6A'):
                 asyncio.run(probe.live(path))
         from tests.research.s127_6_sdk_continuation import SPEC,OUT
         from tests.research.s127_4_sdk_continuation import run
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIALS')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('NO_CREDENTIALS')):
             with self.assertRaisesRegex(ValueError,'TRANSFER_AUTHORIZATION_REQUIRED'):
                 asyncio.run(run(path,spec_path=SPEC,out=OUT,stage='S12.7.6B'))
 

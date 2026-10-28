@@ -44,7 +44,7 @@ class G1ProtocolTests(unittest.TestCase):
                 model=wire['model'], usage=dict(prompt_tokens=10, completion_tokens=4, total_tokens=14),
                 choices=[dict(index=0, finish_reason='tool_calls' if len(sent)==1 else 'stop', message=message)]))
 
-        with patch('tools.research.agent.load_credential'), patch.dict(os.environ, {'DEEPSEEK_API_KEY':'offline'}), \
+        with patch('tools.research.provider.load_credential'), patch.dict(os.environ, {'DEEPSEEK_API_KEY':'offline'}), \
                 patch('tools.research.core.guard'), patch('tools.research.agent.guard'), \
                 patch('httpx.AsyncHTTPTransport', return_value=httpx.MockTransport(respond)):
             asyncio.run(converse(h, session_handoff=True, handoff_before_next_request=True,

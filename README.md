@@ -16,7 +16,7 @@ formal Study permission. RL reward does not determine task acceptance.
 
 This branch contains the active research chain, required shared physical/numerical/execution kernels and focused tests. Retired executable workflows are preserved on `refactor/research-chain` at `5cf08f8ef9323e4309dbc7206366c728ee59b3fd` and in Git history, rather than archive directories or compatibility entrypoints.
 
-The source-relative entry remains `configs/research/study.json`.
+The default pending V2 configuration is `configs/research/study_harness_v2.json`; historical configurations remain available through explicit `--spec`.
 [Family-space-first preparation](docs/research/family_space.md) can start from a
 frozen task and declared family. M3-C2's v2 generator constructs named serial
 prototypes within declared segment/tendon domains; actual execution still

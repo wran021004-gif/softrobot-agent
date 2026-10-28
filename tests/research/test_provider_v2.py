@@ -24,6 +24,46 @@ def gateway(h):
 
 
 class ProviderV2Tests(unittest.TestCase):
+    def test_gateway_completed_reasoning_reuses_original_receipt(self):
+        h=v2_host();p=deepcopy(state(h)['pilot']);p['provider']=gateway(h);update(h,pilot=p)
+        calls=[dict(id='opaque-call',type='function',function=dict(name='evidence_read',arguments='{}'))]
+        output=[dict(type='reasoning',summary=[],encrypted_content='opaque-fixture'),
+            dict(type='function_call',namespace='research',name='evidence_read',arguments='{}',call_id='opaque-call',status='completed')]
+        with h.store.transaction() as db:
+            body=h.store.put(db,json.dumps(dict(choices=[dict(message=dict(role='assistant',tool_calls=calls,provider_output=output))])).encode(),media='application/octet-stream')
+            meta=h.store.put(db,dict(http_status=200,body=body.model_dump(mode='json')))
+            h.store.event(db,h.run_id,'r3_response','metadata_saved',outputs=[meta])
+        messages=[dict(role='assistant',content=[dict(toolUse=dict(toolUseId='opaque-call',name='evidence_read',input={}))])]
+        before=h.store.remaining();wire=model_messages(h,messages)
+        self.assertEqual(wire[0]['provider_output'],output)
+        self.assertNotIn('reasoning_content',wire[0]);self.assertEqual(h.store.remaining(),before)
+    def test_reporter_uses_independent_gateway_model_and_english_sources(self):
+        from tests.research.test_s129_agent_reporting import AgentReportingTests,reporter_response
+        from tools.research import reporter
+        AgentReportingTests.setUpClass();case=AgentReportingTests();case.setUp()
+        self.addCleanup(case.doCleanups)
+        h=case.h;g=gateway(h);s=state(h);spec=deepcopy(s['spec']);p=deepcopy(s['pilot'])
+        path=h.store.root/'reporter-credential-fixture.json'
+        path.write_text(json.dumps(dict(base_url='http://127.0.0.1:8787',api_key='synthetic-key',model=None)))
+        spec['runtime']['credentials_reference']=str(path)
+        spec['research_decisions']=dict(architecture='english_decision_v2',
+            language_policy=dict(version='english_sources_v1',authored_language='en'),
+            role_policy=dict(version='research_roles_v3',main=dict(reasoning='none'),
+                reporter=dict(model='synthetic-reporter-model',reasoning='medium',
+                    model_capabilities={**g['model_capabilities'],'model':'synthetic-reporter-model'})))
+        p['provider']=g;update(h,spec=spec,pilot=p)
+        ref=case.physical();reporter.investigate(h,dict(question='Explain this saved fixture with uncertainty.',references=[ref]))
+        original=h.store.artifact(ref);wires=[]
+        def reply(request):
+            wires.append(json.loads(request.content));return reporter_response(request)
+        asyncio.run(reporter.complete_reports(h,httpx.MockTransport(reply)))
+        self.assertEqual(wires[0]['model'],'synthetic-reporter-model')
+        self.assertEqual(wires[0]['reasoning_effort'],'medium');self.assertNotIn('thinking',wires[0])
+        self.assertIn('Write directly in English',wires[0]['messages'][0]['content'])
+        self.assertEqual(reporter.entries(h)[-1][1]['interpretation_status'],'available')
+        self.assertEqual(h.store.artifact(ref),original)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_gateway_unknown_send_blocks_retry_and_truncation_executes_nothing(self):
         for failure in ('unknown','truncated'):
             h=v2_host();p=deepcopy(state(h)['pilot']);p['provider']=gateway(h);update(h,pilot=p)
@@ -98,6 +138,7 @@ class ProviderV2Tests(unittest.TestCase):
             before=h.store.remaining()['used']
             asyncio.run(agent.converse(h,restore_only=True))
         self.assertEqual(len(wires),2);self.assertEqual(before,h.store.remaining()['used'])
+        self.assertNotIn('synthetic-key',(h.store.root/'framework_configuration.json').read_text(encoding='utf8'))
         self.assertTrue(all('thinking' not in w and 'max_tokens' not in w for w in wires))
         self.assertTrue(all(w['reasoning_effort']=='none' for w in wires))
         self.assertTrue(all('reasoning_content' not in m for w in wires for m in w['messages']))

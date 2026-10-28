@@ -40,7 +40,7 @@ def run_fixture(h, responses, *, limit=None):
         return httpx.Response(200,json=dict(id='offline-response-'+str(n),object='chat.completion',created=1,
             model=wire['model'],choices=[dict(index=0,finish_reason='tool_calls' if use else 'stop',message=message)],
             usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
-    with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+    with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
             patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
             patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
         asyncio.run(agent.converse(h,max_new_provider_requests=limit,pause_after_completed_invocations=1))
@@ -74,7 +74,7 @@ class RecentRoundToolTests(unittest.TestCase):
         self.assertEqual(sum(e['kind']=='research_tool_route' for e in events),2)
         self.assertEqual(sum(e['kind']=='session_handoff' and e['status']=='committed' for e in events),4)
         # Exact registry and snapshot recovery needs no additional request.
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
             asyncio.run(agent.converse(h,restore_only=True))
         self.assertEqual(h.store.remaining()['used']['model_calls'],5)

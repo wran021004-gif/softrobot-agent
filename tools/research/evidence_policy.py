@@ -48,7 +48,8 @@ def require_english(value, spec, *, source):
         encoded=value.split('\n',1)[1] if value.startswith('CURRENT_RESEARCH_PACKET\n') else value
         try:decoded=json.loads(encoded)
         except (ValueError,TypeError):return
-        if isinstance(decoded,(dict,list)):require_english(decoded,spec,source=source)
+        if isinstance(decoded,(dict,list)) or (isinstance(decoded,str) and decoded!=value):
+            require_english(decoded,spec,source=source)
 
 
 

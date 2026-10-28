@@ -218,7 +218,8 @@ class FamilySpaceTests(unittest.TestCase):
 
     def test_legacy_configuration_identity(self):
         old=resolve(ROOT/'configs/research/study.json');cfg=old['configuration']
-        self.assertEqual(digest(cfg),'31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e')
+        baseline=read(ROOT/'tests/research/fixtures/r2_harness_boundary.json')['baseline_configuration_identity']
+        self.assertEqual(digest(cfg),baseline['resolved_sha256'])
         self.assertEqual(design.resolved_configuration(cfg,cfg,old['reference_parameters'],old['study_id']),cfg)
         legacy=plan(self.request(tendon_count=1));legacy.pop('generation');legacy.update(action='propose',parameters=old['reference_parameters'])
         self.assertNotIn('generation',plain(Plan.model_validate(legacy)))

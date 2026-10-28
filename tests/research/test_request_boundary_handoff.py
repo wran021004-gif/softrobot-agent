@@ -36,7 +36,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
 
     def test_rotation_precedes_next_send_without_fabricated_completed_invocation(self):
         h=self.provision();original=state(h)['pilot']['framework_session_id'];sent=[]
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
@@ -61,7 +61,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         from tools.research.session_handoff import pending_feedback_delivery
         self.assertIsNone(pending_feedback_delivery(h))
         self.assertEqual(len([e for e in events if e['kind']=='model_original_tool_request']),1)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,restore_only=True))
@@ -74,7 +74,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         spec['research_decisions']['architecture']='english_decision_v1'
         spec['research_decisions']['handoff_policy']=dict(version='token_handoff_v1',input_tokens=1)
         update(h,spec=spec);sent=[]
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
@@ -107,7 +107,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             return httpx.Response(200,json=dict(id='fixture',object='chat.completion',created=1,model=wire['model'],
                 choices=[dict(index=0,finish_reason='tool_calls' if len(sent)==1 else 'stop',message=message)],
                 usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
             asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
@@ -121,7 +121,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         detail=dict(operation='mujoco_nonlinear_task_capability_v1',
             request_template=dict(model_source='mujoco'),required_parameters=['control_optimization source and bounded settings'])
         with patch('tools.research.agent.selected_analysis',return_value=('mujoco-nonlinear-task-capability-v1',detail)),\
-                patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
@@ -142,7 +142,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             return httpx.Response(200,json=dict(id='completed-fixture',object='chat.completion',created=1,model=wire['model'],
                 choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='Fixture decision complete.'))],
                 usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
             asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=2))
@@ -161,7 +161,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             last=next(m for m in reversed(agent.messages) if m['role']=='assistant')
             next(b for b in last['content'] if 'reasoningContent' in b)['reasoningContent']['reasoningText']['text']='Tampered fixture'
             return await request_feedback_boundary(host,agent)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('tools.research.session_handoff.request_feedback_boundary',side_effect=changed),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
@@ -177,7 +177,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             reasoning=next(b for b in last['content'] if 'reasoningContent' in b)
             reasoning['reasoningContent']['reasoningText']['text']='Tampered explicit offline fixture'
             return await request_feedback_boundary(host,agent)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))),\
                 patch('tools.research.session_handoff.request_feedback_boundary',side_effect=changed):
@@ -189,7 +189,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
 
     def test_request_timing_requires_separate_live_admission(self):
         h=cold_host()
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIAL_OR_SEND')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('NO_CREDENTIAL_OR_SEND')):
             with self.assertRaisesRegex(ValueError,'REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED'):
                 asyncio.run(converse(h,handoff_before_next_request=True))
 
@@ -201,7 +201,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             return result
         def migration_guard(host,*args,**kwargs):
             if state(host).get('validation_extension_pending_binding'):raise ValueError('fixture migration pause')
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard',side_effect=migration_guard),patch('tools.research.agent.guard'),\
                 patch('tools.research.session_handoff.handoff',side_effect=pause_after_commit),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
@@ -214,7 +214,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         snapshot=json.loads(original);snapshot['data']['messages'][-1]['content'][0]['text']='untrusted changed prompt'
         path.write_text(json.dumps(snapshot),encoding='utf8')
         def forbidden(request):raise AssertionError('No new request')
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
             with self.assertRaisesRegex(ValueError,'SDK_INITIAL_CONTEXT_MISMATCH'):
@@ -238,11 +238,11 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         with patch.object(EvidenceQuery,'model_json_schema',return_value=old),\
                 patch('tools.research.agent.plan_schema',side_effect=old_plan_schema),\
                 patch('tools.research.agent.PLAN_TOOL_DESCRIPTION','Explicit synthetic older Plan description'),\
-                patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
@@ -264,7 +264,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
     def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
         h=self.provision();sent=[];update(h,count_closeout=True)
         transport=httpx.MockTransport(self.responder(h,sent))
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=transport):
             asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
@@ -282,14 +282,14 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         def interrupted_update(host,**values):
             if 'pending_authorized_continuation' in values:raise RuntimeError('fixture after committed continuation handoff')
             return update(host,**values)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('tools.research.agent.update',side_effect=interrupted_update),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
             with self.assertRaisesRegex(RuntimeError,'after committed continuation'):
                 asyncio.run(converse(h,session_handoff=True,restore_only=True))
         for _ in range(2):
-            with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+            with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                     patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                     patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)):
                 asyncio.run(converse(h,session_handoff=True,restore_only=True))
@@ -306,7 +306,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
 
     def test_budget_review_pauses_at_verified_feedback_before_second_send(self):
         h=self.provision();sent=[];original=state(h)['pilot']['framework_session_id']
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
             asyncio.run(converse(h,session_handoff=True,pause_exploration_remaining=100))
@@ -325,7 +325,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             def stage(name):
                 if name=='snapshot_saved':raise RuntimeError('EXPLICIT_OFFLINE_SNAPSHOT_INTERRUPTION')
             return await handoff(*args,**kwargs,stage=stage)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))),\
                 patch('tools.research.session_handoff.handoff',side_effect=interrupted):

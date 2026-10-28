@@ -9,6 +9,29 @@ from tools.research.state import state
 
 INVOCATION_PROMPT='Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.'
 
+def session_storage_path(path):
+    """Use Windows extended-length paths for durable SDK snapshot temp files."""
+    value=os.path.abspath(str(path))
+    if os.name!='nt' or value.startswith('\\\\?\\'):return value
+    if value.startswith('\\\\'):return '\\\\?\\UNC\\'+value[2:]
+    return '\\\\?\\'+value
+
+
+def session_storage(path):
+    from strands.storage import LocalFileStorage
+    class NormalizedStorage(LocalFileStorage):
+        # The SDK joins opaque slash-delimited keys without normalizing; the
+        # extended-length Windows path prefix requires native separators.
+        def _path_for(self,key):
+            return os.path.normpath(super()._path_for(key))
+        def namespace(self,prefix):
+            scoped=super().namespace(prefix)
+            result=NormalizedStorage(scoped.base_dir)
+            result._namespaced=scoped._namespaced
+            return result
+    return NormalizedStorage(session_storage_path(path))
+
+
 def state_identity(value):
     value=deepcopy(value);value['pilot'].pop('handoff_preparation',None)
     return digest(value)
@@ -285,7 +308,6 @@ async def request_feedback_boundary(host,agent):
 
 
 def snapshot_files(directory,session_id,*,flush=False):
-    from tools.research.agent import session_storage_path
     root=Path(session_storage_path(Path(directory).resolve()))/'session'/session_id
     files=sorted(root.rglob('*.json'));result={}
     if not any(p.name=='snapshot_latest.json' for p in files):raise ValueError('SDK_SNAPSHOT_MISSING')
@@ -413,7 +435,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
                     or any(m!=dict(role='user',content=[dict(text=INVOCATION_PROMPT)]) for m in suffix)
                     or not unsent or verification.get('preparation')!=preparation or not verification.get('independently_restored')):
                 raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
-            from tools.research.agent import record
+            from tools.research.provider import record
             record(host,'sdk_unsent_invocation_verified',dict(preparation=preparation,session_id=session_id,
                 sdk_message_identity=digest(agent.messages),messages=agent.messages,snapshot_files=files,
                 next_request_sent=False,invocation_completed=False))

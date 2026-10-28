@@ -1,21 +1,22 @@
 """Production Strands harness, accounted provider transport and persisted conversation."""
 import asyncio
 from copy import deepcopy
-import json, os, time
+import json, time
 from pathlib import Path
 from uuid import uuid4
 import httpx
-from openai import AsyncOpenAI
 from strands_harness import create_harness
 from tools.platform_store import plain,zero,encode
-from tools.state_io import atomic_json,digest,read
+from tools.state_io import atomic_json,digest
 from tools.research.state import (state, update, save, guard, enabled, protected,
     closeout_operations, admit_closeout, readable_results)
 from tools.research.budget import engineering_closeout
+from tools.research.core import read_tool_evidence
+from tools.research.session_handoff import session_storage, session_storage_path
 from tools.research.provider import (DeepSeekModel, LiveBoundary, IncompleteModelOutput,
     RequestBoundaryHandoff, CompletedBoundaryHandoff, SupervisorReviewPause,
-    pilot, record, pending, received, settle, provider_outcome, live_model_class, load_credential,
-    request_settings, credential)
+    pilot, record, pending, received, provider_outcome, live_model_class, load_credential,
+    credential, build_model)
 PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_replay/diagnose. '
     'Tool arguments are the Plan object itself, without an outer plan property. '
     'control_search uses physical replay callbacks; Native mathematical sequence optimization uses research_analysis, not a selected_method label. '
@@ -30,58 +31,6 @@ DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed dec
     'use research_analysis when offered and obtain exact method details through evidence_read. '
     'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
     'For STOP, retrieve and cite the complete new result index.')
-def read_tool_evidence(host,query,*,record_read=True):
-    """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
-    from tools.research.core import read_evidence
-    from tools.research.contracts import EvidenceQuery
-    spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
-    if decisions.get('context_limits'):
-        query={'view':'summary',**query}
-    if decisions.get('role_policy',{}).get('version')!='research_roles_v2' and record_read:
-        return read_evidence(host,query,record_read=record_read)
-    q=EvidenceQuery.model_validate(query)
-    # A complete root full read is the explicit SELECT interface. Existing
-    # delivery coverage checks still require the actual whole result on wire.
-    if q.view=='full' and not q.pointer:
-        return read_evidence(host,query,record_read=record_read)
-    value=read_evidence(host,query,record_read=False)
-    body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
-    if q.view!='working_set' or q.pointer:
-        if len(body)<=4096:
-            return read_evidence(host,query,record_read=record_read)
-    # Summary projections may contain derived paths: navigate the original
-    # value instead, so every advertised pointer addresses real source data.
-    node=value
-    if q.view=='summary':
-        node=read_evidence(host,dict(reference=plain(q.reference),view='full',pointer=q.pointer),record_read=False)
-    view=q.view if q.view in ('working_set','mathematical_capabilities') else 'full'
-    index=dict(policy='main_evidence_navigation_v1',reference=plain(q.reference),
-        requested_view=q.view,pointer=q.pointer,original_response_bytes=len(body),
-        notice='Large result retained unchanged. Use exact pointers or bounded ranges; delegate complex interpretation to research_investigate.',
-        entries=[])
-    if isinstance(node,dict):entries=list(node.items())
-    elif isinstance(node,list):entries=list(enumerate(node))
-    else:entries=[]
-    if q.view=='range' and isinstance(value,dict) and isinstance(value.get('items'),list):
-        entries=[(q.start+i,v) for i,v in enumerate(value['items'])]
-    for key,item in entries:
-        token=str(key).replace('~','~0').replace('/','~1')
-        pointer=q.pointer+'/'+token
-        query_item=dict(reference=plain(q.reference),view=view,pointer=pointer)
-        entry=dict(field=str(key),query=query_item,type=type(item).__name__)
-        if isinstance(item,(str,int,float,bool)) or item is None:
-            if len(json.dumps(item,ensure_ascii=False).encode('utf-8'))<=256:entry['value']=item
-        elif isinstance(item,list):
-            entry['length']=len(item)
-            if view=='full':entry['range_query']=dict(reference=plain(q.reference),view='range',pointer=pointer,start=0,count=min(10,max(1,len(item))))
-        elif isinstance(item,dict):entry['available_fields']=list(item)[:12]
-        index['entries'].append(entry)
-        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
-            index['entries'].pop();break
-    index['remaining_entries']=len(entries)-len(index['entries'])
-    return index
-
-
 def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False,focused=False):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
@@ -553,39 +502,11 @@ def error_feedback(host, use, exc, before):
         expected=expected,input_query=dict(reference=full,view='full',pointer='/tool_use/input'),
         scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
-def session_storage_path(path):
-    """Use Windows extended-length paths for durable SDK snapshot temp files."""
-    value=os.path.abspath(str(path))
-    if os.name!='nt' or value.startswith('\\\\?\\'):return value
-    if value.startswith('\\\\'):return '\\\\?\\UNC\\'+value[2:]
-    return '\\\\?\\'+value
-
-
-def session_storage(path):
-    from strands.storage import LocalFileStorage
-    class NormalizedStorage(LocalFileStorage):
-        # The SDK joins opaque slash-delimited keys without normalizing; the
-        # extended-length Windows path prefix requires native separators.
-        def _path_for(self,key):
-            return os.path.normpath(super()._path_for(key))
-        def namespace(self,prefix):
-            scoped=super().namespace(prefix)
-            result=NormalizedStorage(scoped.base_dir)
-            result._namespaced=scoped._namespaced
-            return result
-    return NormalizedStorage(session_storage_path(path))
-
-
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload
     s=state(host)
     provider=s['pilot']['provider']
-    client=AsyncOpenAI(api_key=api_key,base_url=provider['base_url'],max_retries=0,
-        timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=transport,follow_redirects=False))
-    model=model_class(model_id=provider['model'],stream=False,
-        context_window_limit=provider['context_guard']['context_limit_tokens'],
-        params={**{k:v for k,v in request_settings(provider).items() if k not in ('model','stream','thinking')},
-            **(dict(extra_body=dict(thinking=request_settings(provider)['thinking'])) if provider['adapter']=='deepseek' else {})},client=client)
+    model=build_model(provider,api_key=api_key,transport=transport,model_class=model_class)
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
     context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
@@ -720,10 +641,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
     provider=state(host)['pilot']['provider']
     credential_path=Path(state(host)['spec']['runtime']['credentials_reference']).expanduser()
-    if provider['adapter']=='deepseek':
-        load_credential(credential_path)
-        api_key=os.environ['DEEPSEEK_API_KEY']
-    else:api_key=credential(provider,credential_path)
+    api_key=credential(provider,credential_path)
     class Boundary(LiveBoundary):
         async def handle_async_request(self,request):
             s=state(host)
@@ -1055,6 +973,12 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
                 tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
+            if tool_schema_policy(s['spec'])==dict(version='on_demand_tools_v2') and s.get('family_space_reference'):
+                boundary.research_packet['research']['generation_contract']=dict(
+                    family_space_identity=s['spec']['family_space_identity'],
+                    version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
+                    domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
+                    scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')

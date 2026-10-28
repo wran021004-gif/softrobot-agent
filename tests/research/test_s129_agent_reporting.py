@@ -46,6 +46,9 @@ class AgentReportingTests(unittest.TestCase):
     def setUpClass(cls):f0.ReportingTests.setUpClass()
 
     def setUp(self):
+        # Synthetic HTTP must never load an owner's real credential file.
+        credential_env=patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-reporter-fixture'})
+        credential_env.start();self.addCleanup(credential_env.stop)
         self.case=mainline.MainlineTests()
         with patch.object(mainline,'ProjectConfig',side_effect=lambda **kw:ProjectConfig(
                 **{**kw,'exclusive_resources':{**kw.get('exclusive_resources',{}),'provider_request':1}})):
@@ -397,7 +400,7 @@ class ReportingSessionTests(unittest.TestCase):
                 self.assertIn('available',wire['messages'][-1]['content'])
                 update(h,research_status='stopped')
             return response(request)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
             asyncio.run(converse(h,session_handoff=True))
@@ -478,7 +481,7 @@ class ReportingSessionTests(unittest.TestCase):
                     self.assertEqual(latest['findings'][0]['mathematics']['capability']['score_comparisons']['comparisons'][0]['computed_score_direction'],'worse')
                     update(h,research_status='stopped');return response(request)
                 original=[digest(h.store.artifact(r)) for r in refs]
-                with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                         patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                         patch('tools.research.analysis.dispatch',side_effect=execute),\
                         patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
@@ -570,7 +573,7 @@ class ReportingSessionTests(unittest.TestCase):
             self.assertIn('research_investigate',[t['function']['name'] for t in wire['tools']])
             if len(sent)==3:update(h,research_status='stopped')
             return response(request)
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
             asyncio.run(converse(h,session_handoff=True))

@@ -19,7 +19,8 @@ class ProviderContextTests(unittest.TestCase):
         provider=deepcopy(state(cold_host())['pilot']['provider'])
         provider['max_tokens']=None
         estimate=capacity_estimate(b'{}',provider)
-        self.assertIsNone(estimate['reserved_output_tokens'])
+        self.assertEqual(estimate['reserved_output_tokens'],provider.get('output_context_reserve_tokens') or 32768)
+        self.assertIsNone(provider['max_tokens'])  # A context margin is not a generation cap.
         provider['context_guard']['context_limit_tokens']=provider['context_guard']['framing_headroom_tokens']
         with self.assertRaisesRegex(ValueError,'CONTEXT_CAPACITY'):capacity_estimate(b'{}',provider)
 

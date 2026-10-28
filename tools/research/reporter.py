@@ -5,7 +5,6 @@ registered evidence. Model interpretation runs at settled pre-decision boundarie
 """
 from copy import deepcopy
 import json
-import os
 import httpx
 from pydantic import Field
 from schemas.common import Contract
@@ -185,7 +184,7 @@ def assemble(host, references, *, question=None):
 
 
 def _save(host, report, *, request=None, status='deferred', interpretation_for=None, error=None,rejection_details=None):
-    from tools.research.agent import record
+    from tools.research.provider import record
     return record(host,'research_report',dict(report=plain(report),request=plain(request),
         interpretation_status=status,interpretation_for=interpretation_for,error=error,rejection_details=rejection_details))
 
@@ -216,7 +215,7 @@ def investigate(host, request):
 
 def scientific_feedback(host, value, before=None, *, receipt=None):
     """Deliver a saved deterministic report without jeopardizing completed science."""
-    from tools.research.agent import record
+    from tools.research.provider import record
     s=state(host);result=value.get('result',value)
     reference=result.get('reference') if isinstance(result,dict) else None
     known=[r for key in RESULT_KEYS for r in s.get(key,[])]
@@ -472,7 +471,7 @@ def _wire(host, reference, saved):
 
 
 def _finish(host, boundary, wire, response):
-    from tools.research.agent import record
+    from tools.research.provider import record
     payload=json.loads(wire['messages'][-1]['content']);base=payload['report_reference']
     saved=host.store.artifact(base);report=ScientificReport.model_validate(saved['report'])
     status='available';error=None;rejection=None
@@ -524,7 +523,7 @@ def _finish(host, boundary, wire, response):
         status='unavailable';error=str(exc)
         rejection=dict(rejection or dict(code=str(exc)),exception_type=type(exc).__name__,
             catalog=payload.get('source_catalog'),provider_request=boundary.last_request)
-        from tools.research.agent import received
+        from tools.research.provider import received
         reception=received(host,boundary.last_request)
         rejection['raw_response_reference']=(reception or {}).get('body')
     ref=_save(host,report,request=saved.get('request'),status=status,interpretation_for=base,error=error,rejection_details=rejection)

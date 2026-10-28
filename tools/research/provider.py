@@ -5,6 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 import httpx
 from strands.models.openai import OpenAIModel
+from openai import AsyncOpenAI
 from tools.platform_store import plain, zero
 from tools.state_io import digest
 CALLER = 'research-provider'
@@ -62,6 +63,16 @@ def request_settings(provider):
         if adapter=='chatgpt_gateway':raise ValueError('GATEWAY_OUTPUT_CAP_UNSUPPORTED')
         result['max_tokens']=provider['max_tokens']
     return result
+
+
+def build_model(provider, *, api_key, transport, model_class):
+    settings=request_settings(provider)
+    params={k:v for k,v in settings.items() if k not in ('model','stream','thinking')}
+    if 'thinking' in settings:params['extra_body']=dict(thinking=settings['thinking'])
+    client=AsyncOpenAI(api_key=api_key,base_url=provider['base_url'],max_retries=0,
+        timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=transport,follow_redirects=False))
+    return model_class(model_id=provider['model'],stream=False,
+        context_window_limit=provider['context_guard']['context_limit_tokens'],params=params,client=client)
 
 
 def validate_provider(provider):

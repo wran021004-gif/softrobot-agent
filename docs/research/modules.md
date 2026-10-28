@@ -1,5 +1,12 @@
 # Runtime and module ownership
 
+Current V2 ownership and final engineering checks are in [harness_v2.md](harness_v2.md).
+Provider transport/credentials belong to provider.py; bounded evidence reads belong
+to core.py; SDK storage and snapshot paths belong to session_handoff.py. The CLI
+default is the pending no-reasoning V2 configuration. Older entries below describe
+their historical frozen versions.
+
+
 ## Codesign integration (2026-10-23)
 
 The current baseline is [mainline/softarm-codesign](softarm_codesign_mainline.md).

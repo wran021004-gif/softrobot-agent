@@ -119,7 +119,7 @@ class LayeredContextTests(unittest.TestCase):
         from tests.research.s126_decision_probe import live_s127
         path=ROOT/'runs/s127_4_old_authorization_fixture.json'
         atomic_json(path,dict(endpoint='https://api.deepseek.com',probe_request_ceiling=20,user_approval='OLD FIXTURE'))
-        with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIAL_READ')):
+        with patch('tools.research.provider.load_credential',side_effect=AssertionError('NO_CREDENTIAL_READ')):
             with self.assertRaisesRegex(ValueError,'INDEPENDENT_S127_4A'):
                 asyncio.run(live_s127(path))
 

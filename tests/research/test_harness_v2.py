@@ -52,10 +52,13 @@ class HarnessV2Tests(unittest.TestCase):
             schema=next(t['function']['parameters'] for t in wire['tools'] if t['function']['name']=='research_plan')
             self.assertIn('generate',schema['properties']['action']['enum'])
         packet=json.loads(wires[2]['messages'][-1]['content'].split('\n',1)[1])['research']
+        self.assertEqual(packet['generation_contract']['family_space_identity'],plan['generation']['family_space_identity'])
         self.assertEqual(packet['tool_continuation']['plan_action'],'generate')
+        self.assertEqual(packet['tool_continuation']['plan_selection']['status'],'selected_not_submitted')
         self.assertIn('No Plan submission',packet['tool_continuation']['scope'])
         final=json.loads(wires[4]['messages'][-1]['content'].split('\n',1)[1])['research']
         self.assertEqual(final['research_state']['pending_feedback']['items'][0]['tool'],'research_plan')
+        self.assertEqual(final['tool_continuation']['plan_selection']['status'],'submission_feedback_recorded')
         self.assertEqual(len(state(h)['candidates']),1)
         self.assertEqual(len(state(h)['plans']),1)
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
@@ -63,7 +66,7 @@ class HarnessV2Tests(unittest.TestCase):
         self.assertFalse(state(h)['analysis_results'])
         self.assertFalse(state(h)['physical_replays'])
         before=h.store.remaining()
-        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
             asyncio.run(agent.converse(h,restore_only=True))
         self.assertEqual(h.store.remaining()['used'],before['used'])
