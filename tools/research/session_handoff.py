@@ -67,10 +67,18 @@ def feedback_delivery(host, tool_ids, *, compact=False):
         default_view='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
         whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success'
             and query.get('view',default_view)=='full' and not query.get('pointer'))
+        short_experience=False
+        if value['tool_use']['name']=='experience_retrieve' and result['status']=='success' and query.get('operation')=='read':
+            parsed=json.loads(''.join(b.get('text','') for b in result['content']))
+            entries=parsed.get('results',[])
+            short_experience=(len(entries)==1 and isinstance(entries[0].get('content'),str)
+                and entries[0].get('status')!='source_unavailable' and size<=8192)
         # A deliberate whole-result read is the formal SELECT interface. It is
         # delivered exactly even when large; the unchanged hard context guard
         # still applies to the actual complete request. Ordinary reads stay small.
-        if whole_read or size<=min(2000 if compact else 6000,remaining):
+        # One explicitly requested short card survives rotation exactly. Search,
+        # unavailable sources and large guidance retain ordinary bounded delivery.
+        if whole_read or short_experience or size<=min(2000 if compact else 6000,remaining):
             row.update(delivery='exact_feedback',result=result);remaining-=size
         else:
             try:parsed=json.loads(''.join(b.get('text','') for b in result['content']))

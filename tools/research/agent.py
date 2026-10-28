@@ -701,6 +701,11 @@ def error_feedback(host, use, exc, before):
         'ENGINEERING_TOOL_UNAVAILABLE':('action','Choose an available operation from current packet; engine failure is not scientific infeasibility')}
     for marker,(f,hint) in hints.items():
         if marker in message:code=marker;field=f;expected=hint
+    if code=='TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE':
+        entry=next((r for r in s['pilot'].get('tool_directory',[]) if r['tool']==use['input'].get('tool')),None)
+        field='action'
+        expected=('Supply action from '+json.dumps(entry['actions'])+' for '+entry['tool']+'.'
+            if entry and entry.get('actions') else 'Omit action for tools without actions in tool_directory.')
     if 'ACTION_REQUIRES_ONLY_' in message:
         from tools.research.contracts import PLAN_PAYLOADS
         field=PLAN_PAYLOADS.get(use['input'].get('action'),'action')

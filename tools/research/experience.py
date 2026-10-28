@@ -4,6 +4,7 @@ from tools.research.state import save,update,state,protected
 from tools.state_io import read
 ROOT=Path(__file__).resolve().parents[2]
 import hashlib
+import json
 from tools.research.contracts import ExperienceQuery
 from tools.platform_store import plain
 
@@ -111,3 +112,28 @@ def disposition_bindings(host,dispositions):
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding
     if set(dispositions)-set(reads):raise ValueError('DISPOSITION_REQUIRES_EXACT_ACTUAL_READ; SEARCH_OR_STARTUP_TEXT_IS_INSUFFICIENT')
     return [dict(**reads[key],disposition=value) for key,value in dispositions.items()]
+
+
+def read_progress(host):
+    """Deduplicate Main's existing receipts; confirm exact delivery from saved wires."""
+    from tools.research.research_context import confirmed_tool_deliveries
+    receipts={}
+    for ref in state(host)['retrievals']:
+        receipt=host.store.artifact(ref)
+        if (receipt.get('reader','agent')!='agent' or receipt['query']['operation']!='read'
+                or len(receipt['results'])!=1):continue
+        row=receipt['results'][0]
+        if row.get('status')=='source_unavailable':continue
+        receipts[(row['entry_id'],row['revision'])]=(ref,receipt)
+    if not receipts:return None
+    deliveries,_=confirmed_tool_deliveries(host);provided={}
+    for contents in deliveries.values():
+        for content in contents:
+            try:value=json.loads(content)
+            except (ValueError,TypeError):continue
+            if isinstance(value,dict) and isinstance(value.get('reference'),dict) and value.get('query',{}).get('operation')=='read':
+                provided[value['reference']['artifact_id']]=value
+    return dict(reads=[dict(entry_id=key[0],revision=key[1],read_receipt=ref,
+        tool_read_completed=True,body_delivered=provided.get(ref['artifact_id'])==dict(reference=ref,**receipt))
+        for key,(ref,receipt) in receipts.items()],
+        scope='Main read receipts only; body_delivered requires exact feedback in a confirmed Provider request. No card bodies preloaded here; delivery proves neither understanding, adoption nor scientific evidence.')

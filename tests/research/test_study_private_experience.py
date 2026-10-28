@@ -28,7 +28,9 @@ class StudyPrivateExperienceTests(unittest.TestCase):
         self.rows=[]
         for i in range(1,7):
             card=self.folder/f'M{i}.md'
-            card.write_text(f'Task: synthetic M{i}\nTrace: fixture only\nSpecial: unmeasured\nKnow-how: fixture\n',encoding='utf8')
+            text=f'Task: synthetic M{i}\nTrace: fixture only\nSpecial: unmeasured\nKnow-how: fixture\n'
+            if i==5:text+='离线合成经验：完整读取仍不授予科学证据。'*12
+            card.write_text(text,encoding='utf8')
             self.rows.append(dict(entry_id=f'fixture-m{i}',revision='1',kind='case',
                 path=card.relative_to(ROOT).as_posix(),task=f'fixture_task_{i}',structure='fixture',
                 failure_type='fixture',version='1',status=PRIVATE_STATUS,study_id=self.study_id))
@@ -98,7 +100,8 @@ class StudyPrivateExperienceTests(unittest.TestCase):
             core.dispatch(h,diagnose,'offline-method-directory')
         wires=run_fixture(h,[('research_route',dict(tool='experience_retrieve')),
             ('experience_retrieve',dict(operation='search')),
-            ('experience_retrieve',dict(operation='read',entry_id='fixture-m5',revision='1')),None])
+            ('experience_retrieve',dict(operation='read',entry_id='fixture-m5',revision='1')),
+            ('research_route',dict(tool='research_plan',action='generate')),None])
         research=json.loads(wires[0]['messages'][-1]['content'].split('\n',1)[1])['research']
         self.assertEqual(len(research['experience_guidance']['study_private_entries']),6)
         self.assertNotIn('Task: synthetic',json.dumps(wires[0]))
@@ -109,6 +112,19 @@ class StudyPrivateExperienceTests(unittest.TestCase):
         receipts=[h.store.artifact(r) for r in state(h)['retrievals']]
         self.assertEqual([r['query']['operation'] for r in receipts],['search','read'])
         self.assertEqual(receipts[-1]['results'][0]['entry_id'],'fixture-m5')
+        packet=lambda wire:json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']
+        delivered=packet(wires[3])['research_state']['pending_feedback']['items'][0]
+        self.assertEqual(delivered['delivery'],'exact_feedback')
+        result=delivered['result']
+        self.assertGreater(len(json.dumps(result,separators=(',',':')).encode()),2000)
+        parsed=json.loads(''.join(b.get('text','') for b in result['content']))
+        self.assertEqual(parsed['results'][0]['content'],receipts[-1]['results'][0]['content'])
+        self.assertFalse(packet(wires[3])['experience_read_progress']['reads'][0]['body_delivered'])
+        progress=packet(wires[4])['experience_read_progress']['reads']
+        self.assertEqual(len(progress),1);self.assertEqual(progress[0]['entry_id'],'fixture-m5')
+        self.assertTrue(progress[0]['tool_read_completed']);self.assertTrue(progress[0]['body_delivered'])
+        self.assertNotIn('离线合成经验',json.dumps(wires[4],ensure_ascii=False))
+        self.assertEqual(packet(wires[4])['loaded_tool'],dict(tool='research_plan',action='generate'))
         self.assertFalse(state(h)['analysis_results']);self.assertFalse(state(h)['physical_replays'])
         from tools.research.agent import converse
         before=h.store.remaining()
@@ -116,3 +132,36 @@ class StudyPrivateExperienceTests(unittest.TestCase):
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
             asyncio.run(converse(h,restore_only=True))
         self.assertEqual(h.store.remaining(),before)
+        resumed=run_fixture(h,[None])
+        self.assertEqual(packet(resumed[0])['loaded_tool'],dict(tool='research_plan',action='generate'))
+        self.assertTrue(packet(resumed[0])['experience_read_progress']['reads'][0]['body_delivered'])
+        schema=next(t['function']['parameters'] for t in resumed[0]['tools'] if t['function']['name']=='research_plan')
+        self.assertEqual(schema['properties']['action']['enum'],['generate'])
+
+    def test_large_card_keeps_bounded_delivery_and_no_false_body_credit_on_wire(self):
+        (self.folder/'M5.md').write_text('Large synthetic guidance. '*500,encoding='utf8')
+        h=self.host()
+        wires=run_fixture(h,[('research_route',dict(tool='experience_retrieve')),
+            ('experience_retrieve',dict(operation='read',entry_id='fixture-m5',revision='1')),None])
+        research=json.loads(wires[-1]['messages'][-1]['content'].split('\n',1)[1])['research']
+        self.assertEqual(research['research_state']['pending_feedback']['items'][0]['delivery'],'summary_only')
+        self.assertFalse(research['experience_read_progress']['reads'][0]['body_delivered'])
+        self.assertNotIn('Large synthetic guidance. '*500,json.dumps(wires[-1]))
+
+    def test_route_fields_and_view_corrections_survive_in_actual_wire(self):
+        h=self.host();ref=state(h)['family_space_reference']
+        wires=run_fixture(h,[('research_route',dict(tool='research_plan')),
+            ('research_route',dict(tool='evidence_read')),
+            ('evidence_read',dict(reference=ref,view='fields')),
+            ('evidence_read',dict(reference=ref,view='fields',fields=['candidate_index'])),
+            ('evidence_read',dict(reference=ref,view='working_set',pointer='/candidate_index')),None])
+        def error(index):
+            research=json.loads(wires[index]['messages'][-1]['content'].split('\n',1)[1])['research']
+            row=research['research_state']['pending_feedback']['items'][0]
+            return (json.loads(row['result']['content'][0]['text']) if row['delivery']=='exact_feedback' else row['facts'])
+        self.assertEqual(error(1)['field'],'action');self.assertIn('generate',error(1)['expected'])
+        self.assertEqual(error(3)['field'],'fields');self.assertEqual(error(3)['error_code'],'TOOL_SCHEMA_REQUIRED')
+        self.assertEqual(error(4)['error_code'],'EVIDENCE_VIEW_MISMATCH')
+        self.assertIn('working_set',error(4)['expected']);self.assertIn('/candidate_index',error(4)['expected'])
+        last=json.loads(wires[-1]['messages'][-1]['content'].split('\n',1)[1])['research']
+        self.assertEqual(last['research_state']['pending_feedback']['items'][0]['status'],'success')

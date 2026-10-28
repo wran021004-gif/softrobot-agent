@@ -400,11 +400,10 @@ def context(host):
     return current
 
 
-def read_coverage(host):
-    """Only paired successful feedback counts as delivery; summary is never full."""
+def confirmed_tool_deliveries(host):
+    """Reuse confirmed Provider wires for exact tool feedback and summary markers."""
     import json
-    from tools.research.contracts import EvidenceQuery
-    rows=[];events=host.store.events(host.run_id);deliveries={};summaries=set()
+    events=host.store.events(host.run_id);deliveries={};summaries=set()
     confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
     for event in events:
         if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
@@ -420,6 +419,15 @@ def read_coverage(host):
                     if item['delivery']=='exact_feedback':
                         deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
                     else:summaries.add(item['tool_id'])
+    return deliveries,summaries
+
+
+def read_coverage(host):
+    """Only paired successful feedback counts as delivery; summary is never full."""
+    import json
+    from tools.research.contracts import EvidenceQuery
+    rows=[];events=host.store.events(host.run_id)
+    deliveries,summaries=confirmed_tool_deliveries(host)
     for event in events:
         if event['kind']!='model_original_tool_feedback':continue
         saved=host.store.artifact(event['outputs'][0]);use=saved['tool_use'];result=saved['result']
@@ -1069,9 +1077,11 @@ def agent_decision_brief(host):
             'diagnosis':[a for a in actions if a in ('diagnose','mechanics','nmpc_prediction_diagnostic')]+(['research_analysis'] if 'analysis' in s['spec'].get('capabilities',[]) else []),
             'validation_or_stop':[a for a in actions if a in ('physical_replay','replay','cross_replay','refine','select','stop')],
             'scope':'Choose freely among currently admitted actions; method details and resource admission remain available on request.'}
-    from tools.research.experience import retrieval_hint
+    from tools.research.experience import retrieval_hint,read_progress
     hint=retrieval_hint(host)
     if hint:brief['experience_guidance']=hint
+    progress=read_progress(host)
+    if progress:brief['experience_read_progress']=progress
     if s['spec'].get('task_conditions'):
         brief['task_conditions']=dict(frozen=[dict(condition_id=c['condition_id'],
             task={k:c['task'][k] for k in ('task_id','task_version','family','timing')},
@@ -1263,6 +1273,8 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             closeout=budget.get('closeout')))
     if brief.get('experience_guidance'):
         result['experience_guidance']=brief['experience_guidance']
+    if brief.get('experience_read_progress'):
+        result['experience_read_progress']=brief['experience_read_progress']
     if 'recent_round' in brief:
         recent=deepcopy(brief['recent_round'])
         if recent and recent['feedback']==brief.get('pending_feedback_delivery'):
