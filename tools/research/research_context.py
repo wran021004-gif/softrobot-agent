@@ -867,23 +867,92 @@ def compact_action_trace(trace):
     return value
 
 
+def trace_entry(row):
+    """One short factual line; original hypotheses and receipts stay in Store."""
+    outcome=row['outcome'];execution=outcome.get('execution_feedback') or {}
+    status=execution.get('status') or outcome.get('status') or row['execution_status']
+    return dict(step=row['step'],action=row['action'],
+        text='#'+str(row['step'])+' '+row['action']+((': '+row['method']) if row.get('method') else '')+'; '+str(status),
+        execution_status=row['execution_status'],execution_kind=row['execution_kind'],
+        scientific_result=bool(row['result_references']),
+        scientific_execution=('not_started' if execution.get('scientific_execution_started') is False
+            or outcome.get('scientific_execution_started') is False
+            or row['execution_status']=='rejected' or row['execution_kind']=='read_only_diagnosis' else
+            'result_recorded' if row['result_references'] else 'unknown; inspect original receipt'),
+        unresolved=not bool(row['result_references']) or row['execution_status'] in ('failed','rejected','pending')
+            or outcome.get('task_passed') is False or status in ('failed','unsupported','inconclusive','unresolved'))
+
+
+def bounded_action_trace(trace, limit=8):
+    rows=trace['recent'];recent=rows[-limit:];steps={r['step'] for r in recent}
+    unresolved=[r for r in rows[:-limit] if r['execution_status'] in ('failed','rejected','pending')][-2:]
+    return dict(version='research_trace_v1',total=trace['total'],recent=[trace_entry(r) for r in recent],
+        unresolved=[trace_entry(r) for r in unresolved if r['step'] not in steps],
+        page_query=dict(view='summary',offset=max(0,len(rows)-limit),limit=limit),
+        recall='research_recall(step=<stable step>, view="summary" or "details"); omit step for paginated history.',
+        scope='Recorded actions and actual statuses only. Request acceptance, computation, verification and physical acceptance are distinct.')
+
+
+def research_recall(host, query):
+    """Navigate existing trace/source readers; never award formal evidence credit."""
+    from tools.research.contracts import ResearchRecallQuery
+    from tools.research.agent import read_tool_evidence
+    q=ResearchRecallQuery.model_validate(query);trace=research_action_trace(host,limit=None)
+    rows=trace['recent']
+    if q.step is None:
+        page=rows[q.offset:q.offset+q.limit]
+        return dict(total=len(rows),items=[trace_entry(r) for r in page],
+            next_offset=q.offset+q.limit if q.offset+q.limit<len(rows) else None,formal_read_credit=False)
+    row=next((r for r in rows if r['step']==q.step),None)
+    if row is None:raise ValueError('RESEARCH_STEP_NOT_FOUND: use research_recall without step to list saved steps')
+    source=row.get('feedback_source') or row['source']
+    result=dict(**trace_entry(row),candidate=row.get('candidate'),source=source,
+        receipt_output=row['receipt_output'],scientific_results=row['result_references'],formal_read_credit=False,
+        detail_query=dict(step=q.step,view='details'),
+        original_read_query=dict(reference=source['reference'],view='full',pointer=source['pointer']),
+        scope='History navigation only. SELECT requires an explicit original whole-result evidence_read; STOP retains original admission.')
+    if row['outcome'].get('error'):result['failure_excerpt']=str(row['outcome']['error'])[:400]
+    if q.view=='details':
+        if q.pointer and not q.pointer.startswith('/'):raise ValueError('JSON_POINTER_REQUIRED')
+        original=(dict(reference=row['result_references'][0],pointer='') if row['result_references'] else source)
+        read=dict(reference=original['reference'],view='full',pointer=original['pointer']+q.pointer)
+        result['detail_source']=original
+        if q.fields:read['fields']=q.fields;read['view']='fields'
+        result['details']=read_tool_evidence(host,read,record_read=False)
+    return result
+
+
 def research_action_trace(host, limit=5):
     """Project original plans/receipts and rejected native actions; never infer causes."""
     import json
     from tools.research.reporter import RESULT_KEYS
     s=state(host);events=host.store.events(host.run_id);rows={}
     positions={r['artifact_id']:i for i,e in enumerate(events) for r in e['outputs']}
+    requests={};feedback={}
+    for event in events:
+        if event['kind'] not in ('model_original_tool_request','model_original_tool_feedback'):continue
+        value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
+        key='native-'+use['toolUseId']+('-analysis' if use['name']=='research_analysis' else '')
+        if event['kind']=='model_original_tool_request':requests[key]=event['sequence']
+        else:feedback[key]=dict(reference=event['outputs'][0],pointer='/result')
     known=[r for key in RESULT_KEYS for r in s.get(key,[])]
     def item(request_id,plan,source,position):
         row=host.store.lookup(host.run_id,request_id)
+        if row is None and request_id.endswith('-analysis'):
+            row=host.store.lookup(host.run_id,request_id.removesuffix('-analysis'))
         receipt=json.loads(row['receipt']) if row and row['receipt'] else None
         output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
+        if 'toolUseId' in output and 'content' in output:
+            try:output=json.loads(''.join(b.get('text','') for b in output['content']))
+            except ValueError:output={}
         result=output.get('result',output)
         refs=output.get('scientific_results',[])
         if not refs and result.get('reference') in known:refs=[result['reference']]
         if not refs and receipt and receipt.get('output') in known:refs=[receipt['output']]
         decision=plan.get('decision') or {}
-        return dict(request_id=request_id,action=plan.get('action',plan.get('operation')),
+        return dict(request_id=request_id,step=requests.get(request_id,events[position]['sequence']),
+            **(dict(feedback_source=feedback[request_id]) if request_id in feedback else {}),
+            action=plan.get('action',plan.get('operation')),
             method=decision.get('selected_method',('controlled-capability-sensitivity-v1' if plan.get('optimal_sensitivity') else plan.get('capability_method')) or plan.get('operation')),
             candidate=plan_candidate(plan) or result.get('candidate'),task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
             agent_hypothesis={k:plan[k] for k in ('hypothesis','decision','expected_observation',
@@ -891,7 +960,7 @@ def research_action_trace(host, limit=5):
             execution_status=receipt['execution_status'] if receipt else 'pending',
             result_references=refs,receipt_output=receipt.get('output') if receipt else None,
             execution_id=receipt['execution_id'] if receipt else None,
-            outcome={**{k:result[k] for k in ('status','task_passed','stop_reason','error','execution_feedback') if k in result},
+            outcome={**{k:result[k] for k in ('status','task_passed','stop_reason','error','execution_feedback','scientific_execution_started','worker_started','error_code') if k in result},
                 **(dict(local_diagnostic_completed=True) if result.get('local_comparison') else {})},
             source=source,_position=position)
     for ref in s.get('plans',[]):
@@ -916,7 +985,7 @@ def research_action_trace(host, limit=5):
             if event['kind']=='tool_request_error' and 'message' in value:
                 rows[key]['outcome']['error']=value['message'][:1000]
                 rows[key]['outcome']['error_reference']=event['outputs'][0]
-    ordered=sorted(rows.values(),key=lambda r:r['_position'])
+    ordered=sorted(rows.values(),key=lambda r:r['step'])
     for row in ordered:
         row.pop('_position')
         row['execution_kind']=('request_rejected_before_science' if row['execution_status']=='rejected' else
@@ -980,8 +1049,14 @@ def agent_decision_brief(host):
     current=context(host);brief=decision_brief(current)
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
+    if state(host).get('probe_lifecycle'):brief['probe_lifecycle']=state(host)['probe_lifecycle']
     trace=research_action_trace(host,limit=None)
-    brief['action_trace']=compact_action_trace(trace)
+    from tools.research.config import conversation_policy
+    policy=conversation_policy(state(host)['spec'])
+    brief['action_trace']=bounded_action_trace(trace,policy['trace_limit']) if policy else compact_action_trace(trace)
+    if policy:
+        from tools.research.session_handoff import recent_round
+        brief['recent_round']=recent_round(host)
     from tools.research.session_handoff import pending_feedback_delivery
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
@@ -1178,7 +1253,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         [dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
         for i in (report.get('interpretations') or [])[:3]])
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
-    return dict(version='research_decision_brief_v3',
+    result=dict(version='research_decision_brief_v3',
         research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics') if k in task},
             task_conditions=(brief.get('task_conditions') or {}).get('frozen',[]),
             candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
@@ -1199,6 +1274,15 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             public_operations=public.get('remaining_total'),public_closeout_reserve=public.get('reserved_for_closeout'),
             physical= science.get('remaining_physical'),mathematical=science.get('remaining_mathematical'),
             closeout=budget.get('closeout')))
+    if 'recent_round' in brief:
+        recent=deepcopy(brief['recent_round'])
+        if recent and recent['feedback']==brief.get('pending_feedback_delivery'):
+            recent.pop('feedback');recent['feedback_at']='research_state.pending_feedback'
+        result.update(recent_round=recent,history_trace=brief['action_trace'],
+            current_intent=brief.get('research_intent',{}).get('latest_decision'),
+            current_control=brief.get('current_candidate'),
+            lifecycle=brief.get('probe_lifecycle'))
+    return result
 
 
 def route_review(host,current,brief,trace):

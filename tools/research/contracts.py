@@ -739,6 +739,20 @@ class RLReference(Contract):
     control_period_s: FiniteFloat = Field(gt=0)
 
 
+class ResearchRecallQuery(Contract):
+    step: StrictInt | None = Field(default=None,ge=1,description='Stable Store step number. Omit to page through the trace.')
+    view: Literal['summary','details'] = 'summary'
+    offset: StrictInt = Field(default=0,ge=0)
+    limit: StrictInt = Field(default=8,ge=1,le=10)
+    pointer: str = Field(default='',description='JSON Pointer relative to the original Plan or tool feedback result; details only.')
+    fields: list[str] | None = None
+
+
+class ResearchRouteQuery(Contract):
+    tool: Literal['research_plan','evidence_read','research_recall','research_investigate','experience_retrieve','research_analysis','research_rl']
+    action: str | None = Field(default=None,description='Exact Plan action or RL operation from the directory; omit for other tools.')
+
+
 class RLRequest(Contract):
     operation: Literal['start','continue','status','stop','resume','evaluate','diagnose']
     candidate: EvidenceRef | None = None

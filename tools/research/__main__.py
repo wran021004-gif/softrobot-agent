@@ -16,7 +16,8 @@ def main():
     parser.add_argument('--profile')
     parser.add_argument('--request-id')
     parser.add_argument('--reason')
-    parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
+    parser.add_argument('--session-handoff',action=argparse.BooleanOptionalAction,default=None,
+        help='Override automatic frozen conversation-policy handoff; still requires separate live continuation admission')
     parser.add_argument('--restore-only',action='store_true',help='Reopen and verify original SDK/Store recovery without a new Provider request')
     parser.add_argument('--recover-incomplete',action='store_true',help='Dispose a verified settled truncated response via an audited clean-session boundary')
     parser.add_argument('--max-new-provider-requests',type=int,help='Pause after this many new requests including Reporter calls')

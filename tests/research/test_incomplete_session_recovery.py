@@ -22,6 +22,11 @@ class IncompleteSessionRecoveryTests(unittest.TestCase):
         for name in ('tools.research.core.guard','tools.research.agent.guard','tools.research.state.guard'):
             p=patch(name);p.start();self.addCleanup(p.stop)
         p=patch('tools.research.agent.load_credential');p.start();self.addCleanup(p.stop)
+        # This recovery fixture never launches a scientific worker. Its frozen
+        # host preflight must be explicit so dependency availability cannot mask
+        # the SDK crash/restore behavior being tested.
+        p=patch('tools.research.tool_readiness.execution_environment',return_value={'status':'ready'})
+        p.start();self.addCleanup(p.stop)
         p=patch('httpx.AsyncHTTPTransport',side_effect=lambda **_:httpx.MockTransport(self.respond));p.start();self.addCleanup(p.stop)
         self.addCleanup(self.cleanup)
     def cleanup(self):

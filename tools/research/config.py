@@ -9,6 +9,30 @@ from tools.state_io import read, digest, effective_input
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def conversation_policy(spec):
+    """Read only the frozen opt-in; never upgrade an existing Study."""
+    return spec.get('research_decisions',{}).get('conversation_policy')
+
+
+def tool_schema_policy(spec):
+    return spec.get('research_decisions',{}).get('tool_schema_policy')
+
+
+def validate_conversation_policy(decisions):
+    tools=decisions.get('tool_schema_policy')
+    if tools is not None and (tools!={'version':'on_demand_tools_v1'}
+            or decisions.get('architecture')!='english_decision_v1'
+            or not decisions.get('conversation_policy')):
+        raise ValueError('VERSIONED_ON_DEMAND_TOOLS_REQUIRES_RECENT_ROUND_POLICY')
+    policy=decisions.get('conversation_policy')
+    if policy is None:return
+    if (not isinstance(policy,dict) or set(policy)!={'version','trace_limit'}
+            or policy['version']!='recent_round_trace_v1'
+            or type(policy['trace_limit']) is not int or not 6<=policy['trace_limit']<=10
+            or decisions.get('architecture')!='english_decision_v1'):
+        raise ValueError('VERSIONED_RECENT_ROUND_TRACE_POLICY_REQUIRED')
+
+
 def validate_role_policy(policy):
     """Validate frozen role versions without reinterpreting v1 Studies."""
     if not isinstance(policy, dict) or set(policy) != {'version', 'main', 'reporter'} or policy['version'] not in ('research_roles_v1', 'research_roles_v2'):
@@ -498,8 +522,9 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
+        validate_conversation_policy(decisions)
         if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2')
                 or decisions.get('architecture')!='english_decision_v1'):
             raise ValueError('VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED')

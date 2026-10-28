@@ -42,10 +42,10 @@ def selected_evidence_facts(parsed, query, limit):
     return facts
 
 
-def feedback_delivery(host, tool_ids):
+def feedback_delivery(host, tool_ids, *, compact=False):
     """Project the verified last tool round, without synthesizing SDK messages."""
     from tools.research.research_context import compact_evidence
-    rows=[];remaining=16000
+    rows=[];remaining=6000 if compact else 16000
     originals={}
     for event in host.store.events(host.run_id):
         if event['kind']=='model_original_tool_feedback':
@@ -56,8 +56,21 @@ def feedback_delivery(host, tool_ids):
         row=dict(tool_id=key,tool=value['tool_use']['name'],query=value['tool_use']['input'],
             status=result['status'],feedback_reference=reference,
             original_result_query=dict(reference=reference,view='full',pointer='/result'))
+        if compact and len(json.dumps(row['query']).encode())>1000:
+            query=row.pop('query')
+            row['query_summary']={k:query[k] for k in ('action','operation','model_source','operating_point') if k in query}
+            row['original_input_query']=dict(reference=reference,view='full',pointer='/tool_use/input')
+        if compact and len(json.dumps(rows+[row]).encode())>10000:
+            break
         size=len(json.dumps(result,separators=(',',':')).encode())
-        if size<=min(6000,remaining):
+        query=value['tool_use']['input']
+        default_view='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
+        whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success'
+            and query.get('view',default_view)=='full' and not query.get('pointer'))
+        # A deliberate whole-result read is the formal SELECT interface. It is
+        # delivered exactly even when large; the unchanged hard context guard
+        # still applies to the actual complete request. Ordinary reads stay small.
+        if whole_read or size<=min(2000 if compact else 6000,remaining):
             row.update(delivery='exact_feedback',result=result);remaining-=size
         else:
             try:parsed=json.loads(''.join(b.get('text','') for b in result['content']))
@@ -87,7 +100,38 @@ def feedback_delivery(host, tool_ids):
             row.update(delivery='summary_only',facts=facts);remaining-=len(json.dumps(facts).encode())
         rows.append(row)
     return dict(version='pending_feedback_delivery_v1',items=rows,
+        **(dict(total_tools=len(tool_ids),omitted_tools=len(tool_ids)-len(rows)) if compact else {}),
         scope='Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.')
+
+
+def recent_round(host):
+    """One response and its settled feedback, grouped by durable request identity."""
+    from tools.research.config import conversation_policy
+    if not conversation_policy(state(host)['spec']):return None
+    events=host.store.events(host.run_id);feedback=[];request=None;settled=None
+    for event in events:
+        if event['kind']=='r3_request':
+            meta=host.store.artifact(event['outputs'][0])
+            if meta.get('purpose')=='conversation':request=event;feedback=[]
+        elif event['kind']=='model_original_tool_feedback' and request:
+            feedback.append(host.store.artifact(event['outputs'][0])['tool_use']['toolUseId'])
+            settled=(request,list(feedback))
+    if settled is None:return None
+    request,feedback=settled
+    return dict(version='recent_research_round_v1',request_id=request['request_id'],
+        request_reference=request['outputs'][0],feedback=feedback_delivery(host,feedback,compact=True),
+        scope='Latest settled response/tool unit, not a fixed SDK message count. Intent is not a scientific result.')
+
+
+def rotation_ready(host, messages):
+    """Defer automatic rotation for live work; retain identity/pairing failures."""
+    with host.store.connect(True) as db:
+        try:settled_boundary(state(host),db,messages)
+        except ValueError as exc:
+            if str(exc) in ('PENDING_FEEDBACK_OR_EXECUTION','UNSETTLED_OUTCOME','WORKER_RECOVERY_REQUIRED','SELECT_REQUIRED','STOPPED'):
+                return False
+            raise
+    return True
 
 
 def pending_feedback_delivery(host):
@@ -433,7 +477,8 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
                 value['invocation_completed']=False
                 anchor=next(host.store.artifact(e['outputs'][0]) for e in reversed(host.store.events(host.run_id))
                     if e['kind']=='request_feedback_boundary')
-                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'])
+                from tools.research.config import conversation_policy
+                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'],compact=bool(conversation_policy(s['spec'])))
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
             host.store.update_state(db,host.run_id,s)
@@ -587,13 +632,13 @@ async def recover_feedback(host,agent):
                 # Recover the frozen request; a newer admission contract must not reinterpret it.
                 query=value['requested_operation']
                 if row['request_hash']!=digest(query) or any(query.get(k)!=v for k,v in use['input'].items()):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
-            elif use['name']=='research_investigate':
+            elif use['name'] in ('research_investigate','research_route','research_recall'):
                 if row['request_hash']!=digest(use['input']):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             else:raise ValueError('SDK_RECOVERY_REQUIRES_SAVED_FEEDBACK_FOR_THIS_TOOL')
             if use['name']=='research_analysis':
                 from tools.research.analysis import compact_result
                 value=compact_result(value,receipt['output'])
-            if use['name']!='research_investigate' and s['spec'].get('research_decisions',{}).get('context_limits'):value=tool_feedback(host,value)
+            if use['name'] not in ('research_investigate','research_route','research_recall') and s['spec'].get('research_decisions',{}).get('context_limits'):value=tool_feedback(host,value)
             if use['name'] in ('research_plan','research_analysis') and s['spec'].get('research_decisions'):
                 from tools.research.reporter import scientific_feedback
                 report=scientific_feedback(host,host.store.artifact(receipt['output']),receipt=receipt)

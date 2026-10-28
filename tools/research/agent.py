@@ -288,25 +288,25 @@ def load_credential(path):
         raise ValueError('MODEL_KEY_MISSING')
 
 
-def read_tool_evidence(host,query):
+def read_tool_evidence(host,query,*,record_read=True):
     """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
     from tools.research.core import read_evidence
     from tools.research.contracts import EvidenceQuery
     spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
     if decisions.get('context_limits'):
         query={'view':'summary',**query}
-    if decisions.get('role_policy',{}).get('version')!='research_roles_v2':
-        return read_evidence(host,query)
+    if decisions.get('role_policy',{}).get('version')!='research_roles_v2' and record_read:
+        return read_evidence(host,query,record_read=record_read)
     q=EvidenceQuery.model_validate(query)
     # A complete root full read is the explicit SELECT interface. Existing
     # delivery coverage checks still require the actual whole result on wire.
     if q.view=='full' and not q.pointer:
-        return read_evidence(host,query)
+        return read_evidence(host,query,record_read=record_read)
     value=read_evidence(host,query,record_read=False)
     body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
     if q.view!='working_set' or q.pointer:
         if len(body)<=4096:
-            return read_evidence(host,query)
+            return read_evidence(host,query,record_read=record_read)
     # Summary projections may contain derived paths: navigate the original
     # value instead, so every advertised pointer addresses real source data.
     node=value
@@ -340,7 +340,7 @@ def read_tool_evidence(host,query):
     return index
 
 
-def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False):
+def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False,focused=False):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -408,6 +408,17 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
                 'properties':{'selected_method':{'enum':registered_analysis_method_names()}},'required':['selected_method']}},'required':['action','decision']},
                 'then':{'properties':{'decision':{'required':['selected_candidate'],
                     'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
+    if focused:
+        if len(actions)!=1:raise ValueError('FOCUSED_PLAN_REQUIRES_ONE_ACTION')
+        common=set(schema['required'])|{'supporting_evidence','experience_disposition','next_step'}
+        keep=common|allowed
+        if actions[0]=='stop':keep.add('stop_reason')
+        if actions[0] in ('select','confirm'):keep.add('revise_selection')
+        schema['properties']={k:v for k,v in schema['properties'].items() if k in keep}
+        # All branches now describe one action; dropping references to removed
+        # optional fields also removes their irrelevant parameter definitions.
+        schema['allOf']=[b for b in schema['allOf'] if not any(k in json.dumps(b) for k in ('"revise_selection"',))]
+        schema['description']='Submit the selected '+actions[0]+' action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.'
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -421,6 +432,76 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
     visit(schema['properties'])
     schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
     return schema
+
+
+def tool_directory(host, registry):
+    """Describe the currently admitted native tools without parameter schemas."""
+    resources={'research_plan':'Action-specific original budgets and scientific admission.',
+        'research_analysis':'Shared mathematical allowance; selected method and original execution admission.',
+        'research_rl':'Existing RL stage/worker budgets and owned run identities.',
+        'research_investigate':'Accounted Reporter requests when interpretation is needed; no scientific worker.',
+        'evidence_read':'One public operation; original full-read rules.',
+        'research_recall':'One public operation; Store navigation, no formal evidence credit.',
+        'experience_retrieve':'One public operation; procedural guidance only.'}
+    rows=[]
+    for name,tool in registry.items():
+        if name not in resources:continue
+        row=dict(tool=name,purpose=tool.tool_spec.get('description','').split('.')[0],
+            status='available_for_request_validation',resources=resources[name])
+        if name in ('research_plan','research_rl'):
+            field='action' if name=='research_plan' else 'operation'
+            row['actions']=tool.tool_spec['inputSchema']['json']['properties'][field].get('enum',[])
+        rows.append(row)
+    return rows
+
+
+def select_tool_route(host, payload, use_id):
+    """Persist Main's selection only; never dispatch or infer a research action."""
+    from tools.research.contracts import ResearchRouteQuery
+    q=ResearchRouteQuery.model_validate(payload);s=state(host)
+    directory=s['pilot'].get('tool_directory',[])
+    entry=next((r for r in directory if r['tool']==q.tool),None)
+    if entry is None:raise ValueError('TOOL_ROUTE_UNAVAILABLE: choose from the current tool directory')
+    if (entry.get('actions') and q.action not in entry['actions']) or (not entry.get('actions') and q.action is not None):
+        raise ValueError('TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE')
+    value=dict(version='selected_tool_route_v1',tool=q.tool,action=q.action,tool_use_id=use_id,
+        scientific_execution_started=False,formal_read_credit=False)
+    ref=record(host,'research_tool_route',value)
+    pilot=deepcopy(s['pilot']);pilot['tool_route']=ref;update(host,pilot=pilot)
+    return dict(**value,scope='Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply.')
+
+
+def load_selected_tool_schema(host, registry, directory):
+    """Reuse Strands' registry, keeping only the route and one selected tool."""
+    from tools.research.contracts import ResearchRouteQuery
+    s=state(host);route_ref=s['pilot'].get('tool_route')
+    route=host.store.artifact(route_ref) if route_ref else {};name=route.get('tool')
+    # Main already chose the mathematical method in the completed diagnosis.
+    # Loading its existing scientific-variable tool needs no redundant route.
+    if name=='research_plan' and route.get('action')=='diagnose' and 'research_analysis' in registry:
+        name='research_analysis'
+    selected=registry.get(name)
+    if selected and name=='research_plan':
+        action=route.get('action');entry=next(r for r in directory if r['tool']==name)
+        if action not in entry['actions']:selected=None
+        else:
+            spec=s['spec']
+            selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
+                family_version=spec.get('family_space',{}).get('version'),family_space=spec.get('family_space'),
+                diagnose_candidate_required=spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',focused=True)}}
+    elif selected and name=='research_rl':
+        schema=deepcopy(selected.tool_spec['inputSchema']['json']);actions=schema['properties']['operation']['enum']
+        if route.get('action') not in actions:selected=None
+        else:
+            schema['properties']['operation']['enum']=[route['action']]
+            selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':schema}}
+    router=registry['research_route'];schema=ResearchRouteQuery.model_json_schema()
+    schema['properties']['tool']['enum']=[r['tool'] for r in directory]
+    schema['description']='Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.'
+    router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
+    for key in list(registry):
+        if key!='research_route' and (not selected or key!=name):registry.pop(key)
+    return dict(tool=name if selected else None,action=route.get('action') if selected else None)
 
 
 
@@ -835,7 +916,11 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None):
+async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None):
+    from tools.research.config import conversation_policy, tool_schema_policy
+    recent_policy=conversation_policy(state(host)['spec'])
+    on_demand=bool(tool_schema_policy(state(host)['spec']))
+    if session_handoff is None:session_handoff=bool(recent_policy)
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     if max_new_provider_requests is not None and (type(max_new_provider_requests) is not int or max_new_provider_requests<1):
@@ -856,7 +941,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         raise ValueError('POSITIVE_HANDOFF_REQUEST_BYTES_REQUIRED')
     if pause_exploration_remaining is not None and (type(pause_exploration_remaining) is not int or pause_exploration_remaining<0):
         raise ValueError('NONNEGATIVE_EXPLORATION_REVIEW_THRESHOLD_REQUIRED')
-    if (handoff_before_next_request or handoff_request_bytes is not None or pause_exploration_remaining is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
+    if (bool(recent_policy and session_handoff) or handoff_before_next_request or handoff_request_bytes is not None or pause_exploration_remaining is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
         raise ValueError('REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
@@ -891,10 +976,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                     definitions={t['function']['name']:t['function'] for t in wire.get('tools',[])}
                     action=definitions.get('research_plan',{}).get('parameters',{}).get('properties',{}).get('action',{})
                     permitted=closeout_operations(host)
-                    if action.get('enum')!=permitted['research_plan'] or set(definitions)-{'research_plan','research_rl','evidence_read','retrieve_context'}:
+                    plan_valid=(not action or (bool(action.get('enum')) and set(action['enum'])<=set(permitted['research_plan']))) if on_demand else action.get('enum')==permitted['research_plan']
+                    if not plan_valid or set(definitions)-({'research_plan','research_rl','evidence_read','research_route'} if on_demand else {'research_plan','research_rl','evidence_read','retrieve_context'}):
                         raise ValueError('PROTECTED_SEND_REQUIRES_CLOSEOUT_NATIVE_SCHEMA')
                     rl=definitions.get('research_rl')
-                    if rl and rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']:
+                    if rl and (not set(rl['parameters']['properties']['operation'].get('enum',[]))<=set(permitted['research_rl']) if on_demand else rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']):
                         raise ValueError('PROTECTED_RL_SEND_REQUIRES_EXISTING_WORK')
                     retrieval=definitions.get('retrieve_context')
                     if retrieval:
@@ -907,6 +993,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         def run(use,**kwargs):
             before=state(host)
             try:
+                if on_demand and kind!='route':
+                    from jsonschema import Draft202012Validator
+                    Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
                 from tools.research.evidence_policy import english_native
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -936,12 +1025,17 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                             value=experience(host,use['input'])
                         elif kind=='investigate':
                             value=investigate(host,use['input'])
+                        elif kind=='recall':
+                            from tools.research.research_context import research_recall
+                            value=research_recall(host,use['input'])
+                        elif kind=='route':
+                            value=select_tool_route(host,use['input'],use['toolUseId'])
                         else:
                             value=read_tool_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 original=value
-                if kind not in ('evidence','investigate','experience') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                if kind not in ('evidence','investigate','experience','recall','route') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
                     from tools.research.research_context import tool_feedback
                     value=tool_feedback(host,value)
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
@@ -974,6 +1068,15 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
             ('evidence_read','Read a named missing fact or verify a relevant change using exact evidence and JSON pointer. Exact repeats add no information; delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
+    if recent_policy:
+        from tools.research.contracts import ResearchRecallQuery
+        native.append(PythonAgentTool('research_recall',dict(name='research_recall',
+            description='Recall saved research by stable step number, or page through history. Details support precise JSON Pointers. Navigation grants no formal SELECT/STOP evidence credit.',
+            inputSchema={'json':ResearchRecallQuery.model_json_schema()}),handler('recall')))
+    if on_demand:
+        from tools.research.contracts import ResearchRouteQuery
+        native.append(PythonAgentTool('research_route',dict(name='research_route',description='Select a tool and action; load its Schema on the next request. No scientific execution or evidence credit.',
+            inputSchema={'json':ResearchRouteQuery.model_json_schema()}),handler('route')))
     if formal or rl_mode:
         actions=['propose','stop','diagnose','select','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
         if formal and state(host)['spec'].get('mode')!='rl_interface':
@@ -1132,6 +1235,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         guard(host)
         if s['spec'].get('research_decisions'):
             await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
+        if on_demand:
+            for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
+            agent.tool_registry.registry.pop('retrieve_context',None)
         for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
@@ -1176,6 +1282,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
                 rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('research_investigate',None)
+            if on_demand:agent.tool_registry.registry.pop('research_recall',None)
             schema=EvidenceQuery.model_json_schema()
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
@@ -1186,12 +1293,22 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
             boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
+        if on_demand:
+            registry=agent.tool_registry.registry;directory=tool_directory(host,registry)
+            pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
+            loaded=load_selected_tool_schema(host,registry,directory)
+            boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
+                tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switching consumes another model request. No selection grants execution authority.')
+            # Record the actual L0 after dynamic tool selection; no extra model call.
+            record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
         paired=bool(agent.messages and agent.messages[-1]['role']=='user'
             and any('toolResult' in b for b in agent.messages[-1]['content']))
-        completed=bool(token_policy and len(agent.messages)>=2 and agent.messages[-1]['role']=='user'
+        completed=bool((token_policy or recent_policy) and len(agent.messages)>=2 and agent.messages[-1]['role']=='user'
             and agent.messages[-1]['content']==[dict(text=INVOCATION_PROMPT)] and agent.messages[-2]['role']=='assistant')
         if session_handoff and (paired or completed):
+            from tools.research.session_handoff import rotation_ready
+            if recent_policy and not rotation_ready(host,agent.messages[:-1] if completed else agent.messages):return
             wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
             content=httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content
             size=len(content)
@@ -1201,7 +1318,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 from tools.research.provider_context import handoff_input_estimate
                 estimate=handoff_input_estimate(content,provider)
                 token_due=estimate['input_estimate']>=token_policy['input_tokens']
-            if completed and token_due:
+            if completed and (token_due or recent_policy):
                 # The just-added invocation prompt has not been sent. The preceding
                 # assistant turn is the durable completed boundary.
                 with host.store.connect(True) as db:
@@ -1216,15 +1333,15 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
-            if handoff_before_next_request or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
+            if handoff_before_next_request or recent_policy or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
     def before_tool(event):
-        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
+        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read',*(['research_route'] if on_demand else [])):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
-        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context'):
+        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context',*(['research_route'] if on_demand else [])):
             event.cancel_tool='Protected closeout permits only existing work, evidence and STOP.'
         try:
             admit_closeout(host,event.tool_use['name'],event.tool_use['input'])
@@ -1257,7 +1374,13 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
             try:
-                result=await agent.invoke_async(INVOCATION_PROMPT)
+                # Public SDK continuation resumes the durable unsent prompt or
+                # paired feedback. Adding another prompt would change a saved
+                # request's hash and prevent exact response replay.
+                resume=bool(state(host)['pilot'].get('unconsumed_response') or (agent.messages
+                    and agent.messages[-1]['role']=='user'
+                    and any('toolResult' in b for b in agent.messages[-1]['content'])))
+                result=await agent.invoke_async(None if resume else INVOCATION_PROMPT)
             except Exception as exc:
                 cause=exc;seen=set()
                 while cause is not None and id(cause) not in seen and not isinstance(cause,RequestBoundaryHandoff):

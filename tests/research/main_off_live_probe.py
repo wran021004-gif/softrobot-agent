@@ -30,7 +30,9 @@ SOURCE_DB=ROOT.parent/'b3-r0-decision-efficiency/runs/research/b3-r1-history-ass
 INSTRUCTIONS=('You are the research decision Agent. Use the frozen task and saved observations to choose a scientific direction freely. '
     'Distinguish independent measurements, mathematical predictions and unresolved hypotheses. Cite sources and state what would support or weaken your hypothesis. '
     'This is a read-only probe using a historical case, not a new Study. Mathematical method availability is hypothetical probe-only eligibility. '
-    'All proposed scientific workers and physical operations are intercepted; no new scientific result is produced. Use English.')
+    'All proposed scientific workers and physical operations are intercepted; no new scientific result is produced. '
+    'The harness ends the probe when its test allowance is consumed; do not issue a scientific STOP to end the probe. '
+    'A dependency problem or unexecuted request is not a weakened scientific hypothesis. Formal STOP retains every Plan and evidence requirement. Use English.')
 
 
 def copy_ownership(host, source):
@@ -94,7 +96,7 @@ def copy_ownership(host, source):
     return ownership
 
 
-def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None, analysis_interface='bound_scientific_variables_v1'):
+def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None, analysis_interface='bound_scientific_variables_v1',conversation_policy=None,tool_schema_policy=None):
     if analysis_interface not in ('bound_scientific_variables_v1','bound_scientific_variables_v2'):
         raise ValueError('VERSIONED_ANALYSIS_INTERFACE_REQUIRED')
     if directory.exists():raise ValueError('PROBE_DIRECTORY_EXISTS_NO_RESET_OR_RETRY')
@@ -107,9 +109,17 @@ def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None, analysis_int
     s['spec']['authorization']=authorization or 'OFFLINE_FIXTURE_ONLY_NO_LIVE_PROVIDER_AUTHORIZATION'
     s['spec']['research_decisions'].update(architecture='english_decision_v1',role_policy=deepcopy(POLICY),
         analysis_interface=analysis_interface)
+    if conversation_policy:s['spec']['research_decisions']['conversation_policy']=deepcopy(conversation_policy)
+    if tool_schema_policy:s['spec']['research_decisions']['tool_schema_policy']=deepcopy(tool_schema_policy)
+    from tools.research.config import validate_conversation_policy
+    validate_conversation_policy(s['spec']['research_decisions'])
     s['spec']['runtime']['provider']=deepcopy(provider)
     s['plans']=[];s['pending']=None;s['research_status']='ready';s['success_gate']=None;s['selected']=None
     s['pilot']=dict(provider=provider,live_model_requests=0,framework_session_id=run_id,request_deadline_unix=None)
+    if conversation_policy:
+        s['pilot'].update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback')
+    s['probe_lifecycle']=dict(status='probe_running',owner='test_harness',scientific_stop=False,
+        rule='The harness controls probe completion. Probe request limits and unavailable dependencies are not formal scientific STOP reasons.')
     snap=deepcopy(source.snapshot['session']['snapshot']);snap['input']['run_id']=run_id
     budget=dict(model_calls=8,tool_calls=30,backend_solves=0,worker_calls=0,wall_s=None)
     snap['input']['policy']['budget']=budget
@@ -254,7 +264,15 @@ async def run(host,inner,*,max_requests=8):
              'registered_study_scope_authorized':True,'methods':[],
              'method_preconditions':'Probe-only eligibility; no scientific execution authorized.'}),
          patch('httpx.AsyncHTTPTransport',return_value=transport)):
-        await agent.converse(host,max_new_provider_requests=max_requests,pause_after_completed_invocations=1)
+        try:
+            await agent.converse(host,max_new_provider_requests=max_requests,pause_after_completed_invocations=1)
+        finally:
+            completed=any(e['kind']=='probe_analysis_feedback_delivery' for e in host.store.events(host.run_id))
+            exhausted=counts['conversation']>=8
+            status='probe_completed' if completed else 'probe_budget_exhausted' if exhausted else 'probe_inconclusive'
+            lifecycle=dict(status=status,owner='test_harness',scientific_stop=False,
+                analysis_feedback_delivered=completed,budget_exhausted=exhausted)
+            update(host,probe_lifecycle=lifecycle);agent.record(host,'probe_lifecycle',lifecycle)
     return transport.counts
 
 
@@ -263,6 +281,8 @@ def main():
     parser.add_argument('--authorization',help='Exact separately granted provider-only authorization, up to 8 Main requests, zero workers.')
     parser.add_argument('--probe-id',default=PROBE_ID,help='New independent Store/ledger identity; existing directories are never reset.')
     parser.add_argument('--analysis-interface',choices=('bound_scientific_variables_v1','bound_scientific_variables_v2'),default='bound_scientific_variables_v1')
+    parser.add_argument('--conversation-policy',choices=('recent_round_trace_v1',))
+    parser.add_argument('--tool-schema-policy',choices=('on_demand_tools_v1',))
     args=parser.parse_args()
     if not args.live or not args.authorization:raise SystemExit('A new explicit independent provider-only authorization and --live are required; prior v1-v3 grants are exhausted.')
     import re
@@ -274,13 +294,17 @@ def main():
         if (usage.get('conversation',{}).get('requests',0)>6 or usage.get('reporter',{}).get('requests',0)!=0
                 or state(h)['spec']['authorization']!=args.authorization
                 or state(h)['spec']['research_decisions']['analysis_interface']!=args.analysis_interface
+                or state(h)['spec']['research_decisions'].get('conversation_policy')!=(dict(version=args.conversation_policy,trace_limit=8) if args.conversation_policy else None)
+                or state(h)['spec']['research_decisions'].get('tool_schema_policy')!=(dict(version=args.tool_schema_policy) if args.tool_schema_policy else None)
                 or agent.pending(h) or state(h)['pilot'].get('unconsumed_response')
                 or any(e['kind']=='probe_continuation' for e in h.store.events(h.run_id))):
             raise ValueError('PROBE_CONTINUATION_REQUIRES_SETTLED_INVOCATION_AND_FEEDBACK_RESERVE')
         agent.record(h,'probe_continuation',dict(reason='Ordinary continuation; no repair, method direction or worker execution.',max_new_requests=8-usage.get('conversation',{}).get('requests',0)))
         counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     else:
-        h=prepare(destination,args.probe_id,authorization=args.authorization,analysis_interface=args.analysis_interface)
+        h=prepare(destination,args.probe_id,authorization=args.authorization,analysis_interface=args.analysis_interface,
+            conversation_policy=dict(version=args.conversation_policy,trace_limit=8) if args.conversation_policy else None,
+            tool_schema_policy=dict(version=args.tool_schema_policy) if args.tool_schema_policy else None)
         counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     print(json.dumps(dict(probe=args.probe_id,store=str(destination),requests=counts,usage=reporter.provider_usage(h),
         ledger=h.store.remaining(),scientific_workers=0,physical_launches=0),ensure_ascii=False))

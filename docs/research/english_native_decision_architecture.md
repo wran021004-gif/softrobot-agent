@@ -1,5 +1,7 @@
 # English-native research decision architecture
 
+The opt-in [recent-round Trace and on-demand tool extension](recent_round_trace_and_tools.md) documents automatic verified handoff, stable Store Recall, route-selected Schemas, full-read safety and offline whole-workflow measurements.
+
 The integration base is `91573147e7a2bdf0044cf9621fbf4929568d9377` on `codex/agent-guided-codesign`. The opt-in `english_decision_v1` Study contract uses the existing Store, Strands session, evidence admission and evaluator. Historical Studies keep their frozen behavior. The original implementation milestone used no live Provider request, scientific worker, physical rollout, NMPC or training. The later bounded provider-only decision probe is documented below.
 
 ## Ownership and roles

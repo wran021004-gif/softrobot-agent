@@ -58,6 +58,7 @@ class BoundAnalysisTests(unittest.TestCase):
         self.assertEqual(full['protocol'],state(self.h)['spec']['analysis_protocol'])
         self.assertEqual(full['model_source'],'mujoco')
         Draft202012Validator(AnalysisRequest.model_json_schema()).validate(full)
+
         self.assertEqual(AnalysisRequest.model_validate(full).operation,method)
         event=next(e for e in reversed(self.h.store.events(self.h.run_id)) if e['kind']=='analysis_request_binding')
         audit=self.h.store.artifact(event['outputs'][0])
@@ -67,6 +68,16 @@ class BoundAnalysisTests(unittest.TestCase):
         self.assertEqual(set(new['$defs']['NativeAnalysisOptions']['properties']),{'tensions_n'})
         sizes={name:len(json.dumps(schema,separators=(',',':')).encode()) for name,schema in [('legacy',old),('bound',new)]}
         agent.record(self.h,'offline_schema_measurement',dict(method=method,bytes=sizes,scope='Schema bytes only; no live cost comparison.'))
+
+    def test_registered_static_scope_does_not_claim_dynamic_acceptance(self):
+        method,detail=self.select('equilibrium')
+        self.assertEqual(method,'equilibrium')
+        scope=detail['scientific_scope']
+        self.assertEqual(scope['task_quantities'],detail['coverage'])
+        self.assertFalse(scope['full_task_supported'])
+        self.assertTrue(scope['requires_mathematical_execution'])
+        self.assertIn('holding-window maximum speed',scope['computes'])
+        self.assertEqual(detail['operating_point_guidance']['scientific_scope'],scope)
 
     def test_invalid_science_frozen_overrides_and_no_candidate_guess(self):
         self.select()

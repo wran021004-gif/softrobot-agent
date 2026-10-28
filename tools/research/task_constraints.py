@@ -16,7 +16,7 @@ SCIENTIFIC_INTERPRETATION = dict(
 METHOD_MEANINGS = {
     'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
     'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
-    'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
+    'equilibrium': ('Static input construction', 'Bounded local static target construction. Static balance cannot establish holding-window maximum speed or identify a structure-versus-dynamic-control cause. Solver failure is not structural infeasibility; matched dynamic execution and independent evaluation remain necessary.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
     'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold, timed Tracking, position/tool-axis or loaded oriented Tracking. Reuse local response/pattern search with cloned native rollouts covering every registered sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
@@ -98,7 +98,7 @@ def selected_operating_point_guidance(host, reference, method, detail):
     return dict(method=method,scientific_purpose=detail['scientific_purpose'],operating_points=points,
         available_source_references=sources,unavailable_sources=unavailable,
         saved_state_requirements='Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.',
-        coverage=detail['coverage'],limitations=[detail['description'],*detail['limitations']],
+        coverage=detail['coverage'],scientific_scope=detail.get('scientific_scope'),limitations=[detail['description'],*detail['limitations']],
         deterministic_method_applicability=detail['applicability']['status'],execution_status=detail['execution_status'],
         admission='Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.')
 
@@ -297,6 +297,14 @@ def mathematical_method_view(host, reference):
             item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
+    for method,item in methods.items():
+        item['scientific_scope']=dict(computes=item['description'],
+            model_sources=item.get('model_sources'),operating_points=analysis_operating_points(method,item['operation']),
+            legal_sources='Exact owned candidate, model, physical input bounds, state provenance and frozen task/protocol; source admission remains mandatory.',
+            task_quantities=item.get('coverage',[]),full_task_supported=item.get('full_task_supported',False),
+            inference='Model-scoped mathematical evidence only after actual computation and validation. An intent or accepted request establishes no scientific result.',
+            missing_evidence=item.get('missing',[]),requires_mathematical_execution=True,
+            physical_acceptance='Independent registered task evaluation is required; no static, local or optimizer result substitutes for it.')
     if spec.get('research_decisions',{}).get('analysis_interface') in ('bound_scientific_variables_v1','bound_scientific_variables_v2'):
         from tools.research.research_context import research_intent
         intent=research_intent(host)['latest_decision'] or {}
