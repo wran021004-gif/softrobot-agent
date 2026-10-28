@@ -43,7 +43,7 @@ def analysis(label,kind='modal',source=None,phase='P1'):
             return v
         if kind=='matching':return matching(n,np.zeros(n.model.nv))
         return modal_target(n,h.store.artifact(source)['equilibrium'],p['search_s'])
-    b,r=request(h,p,dict(kind={'modal':'passive_modal_target_v1','matching':'tendon_jacobian_matching_v1','geometry':'route_geometry_validation_v1','consistency':'inverse_native_consistency_v1'}[kind],assembly=ar,source=source),run,math=1,phase=phase)
+    b,r=request(h,p,dict(kind={'modal':'passive_modal_target_v1','matching':'tendon_jacobian_matching_v1','geometry':'route_geometry_validation_v1','consistency':'inverse_native_consistency_v1'}[kind],native_build_revision=2,assembly=ar,source=source),run,math=1,phase=phase)
     v=state(h)['phs'];v.setdefault(kind,{})[label]=r;update(h,phs=v);return b,r
 
 

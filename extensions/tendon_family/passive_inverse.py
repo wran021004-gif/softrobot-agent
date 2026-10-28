@@ -90,8 +90,12 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force):
             bm=minus.physics['tip'] if name=='tip' else material_point(minus.physics,s)
             explicit=(plus.point(pp.at(q),bp)[0]-minus.point(pm.at(q),bm)[0])/(2*step)
             rows[name]=(native.point(d,b)[1]@z[:len(q)]+explicit).tolist()
-        result.update(dq_du=z[:len(q)].tolist(),dtension_du=z[len(q):].tolist(),dposition_du=rows,
-            dlength_slack_du=(np.array(equilibrium['Jlength'])@z[:len(q)]+dc).tolist())
+        residual_derivative=np.array(equilibrium['Jlength'])@z[:len(q)]+dc
+        dtension=np.zeros(native.model.ntendon);dtension[a]=z[len(q):]
+        result.update(dq_du=z[:len(q)].tolist(),dtension_du=dtension.tolist(),dposition_du=rows,
+            dlength_residual_du=residual_derivative.tolist(),dslack_margin_du=(-residual_derivative).tolist(),
+            tension_margin_n=[t['force_limit_n']-v for t,v in zip(native.physics['tendons'],lam)],
+            dtension_margin_du=(-dtension).tolist())
     # Actual re-equilibrium directional check is kept even on nonsmooth branches.
     rm=solve(minus,s,force,q);rp=solve(plus,s,force,q)
     same=rm['equilibrium']['active']==equilibrium['active']==rp['equilibrium']['active']

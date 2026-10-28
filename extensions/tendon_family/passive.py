@@ -5,6 +5,27 @@ import mujoco
 from .mjcf import compile_xml
 
 
+def load_passive_model(path,large_stack=False):
+    """Windows native XML compilation needs more stack for long serial trees.
+
+    Only the inverse study opts in. XML, model options and physical inputs are
+    unchanged. The ordinary legacy load path remains direct.
+    """
+    if not large_stack:return mujoco.MjModel.from_xml_path(str(path))
+    import threading
+    result=[];errors=[]
+    def load():
+        try:result.append(mujoco.MjModel.from_xml_path(str(path)))
+        except BaseException as exc:errors.append(exc)
+    previous=threading.stack_size()
+    try:
+        threading.stack_size(max(previous,32*1024*1024));worker=threading.Thread(target=load);worker.start()
+    finally:threading.stack_size(previous)
+    worker.join()
+    if errors:raise errors[0]
+    return result[0]
+
+
 def material_point(physics, s):
     """Use compiler attachment convention; s excludes rigid connector lengths."""
     if not 0 <= s <= 1:
@@ -28,7 +49,7 @@ class PassiveModel:
                 solreflimit=protocol['solreflimit'],solimplimit=protocol['solimplimit']))
         folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
         path=compile_xml(physics,self.scene,None,folder/'model.xml')
-        self.model=m=mujoco.MjModel.from_xml_path(str(path))
+        self.model=m=load_passive_model(path,protocol['version'].startswith('phs2d_passive_inverse_'))
         m.opt.iterations=100; m.opt.tolerance=1e-10
         if unrestricted:m.tendon_limited[:]=False
         self.unrestricted=unrestricted
