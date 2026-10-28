@@ -11,6 +11,7 @@ from tools.platform_store import Store,zero
 from tools.research.state import update
 from tests.research import p2_feedback_paired as paired
 from tests.research import p2_feedback_modes as modes
+from tests.research import p2_feedback_execute as execution
 from tools.state_io import digest
 import httpx
 
@@ -91,3 +92,16 @@ class PairedAuthorizationTests(unittest.TestCase):
         self.assertEqual(self.h.store.remaining()['remaining']['model_calls'],5)
         self.assertEqual(self.h.store.remaining('p2-fixture')['remaining']['model_calls'],5)
         self.assertEqual(self.h.store.remaining()['used']['tool_calls'],0)
+
+    def test_rejected_read_is_charged_once_and_preserves_tool_feedback(self):
+        self.h.store.create_session(dict(input=dict(run_id='off',policy=dict(budget=dict(
+            model_calls=1,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None)))))
+        child=SimpleNamespace(store=self.h.store,run_id='off')
+        call={'id':'fixture-call','function':{'name':'evidence_read','arguments':json.dumps({'pointer':'/bad'})}}
+        with patch.object(execution,'RUN','p2-fixture'),patch.object(execution,'read_tool_evidence',side_effect=ValueError('invalid fixture')),\
+                patch.object(execution,'error_feedback',return_value={'status':'rejected','reason':'invalid fixture'}):
+            result=execution.execute_one(self.h,child,call)
+            self.assertEqual(result['status'],'error')
+            self.assertEqual(self.h.store.remaining()['used']['tool_calls'],1)
+            self.assertEqual(self.h.store.artifact(result['feedback_reference'])['result']['status'],'error')
+            with self.assertRaisesRegex(ValueError,'NO_RETRY'):execution.execute_one(self.h,child,call)
