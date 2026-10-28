@@ -96,6 +96,41 @@ def admit_p0(label):
     return dict(passed=a_ok and b_ok,reference=rr)
 
 
+def screen(label,nonlinear=False):
+    h,p,ar,a=setup(label)
+    b,br=static(label,phase='P1')
+    lateral=float(np.max(np.linalg.norm(np.array(b['equilibrium']['positions'])[:,:2],axis=1)))
+    result=dict(label=label,assembly=ar,baseline=br,baseline_status=b['status'],initial_lateral_m=lateral)
+    if b['status']=='qualified_local_minimum' and lateral<=p['initial_lateral_limit_m']:
+        t,tr=local(label);rows=t['predictions'];result.update(tangent=tr,tangent_status=t['status'],
+            min_point_m=min(x['point_dx_m'] for x in rows),max_tip_m=max(x['tip_xy_m'] for x in rows),max_ratio=max(x['ratio'] for x in rows))
+        if nonlinear:
+            solved=[]
+            for loc in p['search_s']:
+                for force in (p['force_n'],-p['force_n']):
+                    loaded,lr=static(label,loc,force,phase='P1',source=br);eq=loaded['equilibrium']
+                    delta=np.array(eq['positions'])-b['equilibrium']['positions'];dx=abs(delta[p['monitor_s'].index(loc),0]);tip=float(np.linalg.norm(delta[-1,:2]));y=float(np.max(abs(delta[:,1])))
+                    solved.append(dict(s=loc,force_n=force,reference=lr,status=loaded['status'],point_dx_m=float(dx),tip_xy_m=tip,ratio=tip/max(float(dx),1e-15),out_of_plane_m=y))
+            result['nonlinear_static']=solved
+    rr=save(h,result,'phs_mathematical_screen');v=state(h)['phs'];v.setdefault('screens',{})[label]=rr;update(h,phs=v)
+    return result
+
+
+def dynamic_six(label,numerics=None):
+    h,p,ar,a=setup(label);base,br=dynamics(label,phase='P1',numerics=numerics)
+    summary=dict(label=label,baseline=br,baseline_status=base['status'],rows=[])
+    if base['status']=='stable':
+        for loc in p['search_s']:
+            for force in (.1,-.1):
+                raw,rr=dynamics(label,loc,force,phase='P1',baseline=br,numerics=numerics)
+                e=evaluate(p,base,raw,loc)
+                summary['rows'].append(dict(s=loc,force_n=force,reference=rr,**{k:e[k] for k in ('status','valid','tip_xy_m','point_dx_m','ratio','out_of_plane_m','worst_violation')}))
+    summary['all_valid']=len(summary['rows'])==6 and all(r['valid'] for r in summary['rows'])
+    summary['all_pass']=len(summary['rows'])==6 and all(r['status']=='development_pass' for r in summary['rows'])
+    ref=save(h,summary,'phs_six_condition_result');v=state(h)['phs'];v.setdefault('dynamic_sets',[]).append(ref);update(h,phs=v)
+    return summary
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('action',choices=['reference','static','local','dynamics','consistency']);parser.add_argument('--label',default='A_two_full');args=parser.parse_args()
     if args.action=='reference':result=prepare(args.label,generation(),'','Original full-span symmetric reference')
