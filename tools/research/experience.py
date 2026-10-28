@@ -8,6 +8,31 @@ from tools.research.contracts import ExperienceQuery
 from tools.platform_store import plain
 
 PUBLIC_STATUS='public_procedural_guidance; generalization_unverified'
+PRIVATE_STATUS='private_owner_authorized; generalization_unverified'
+
+
+def freeze_study_entries(spec, index):
+    """Opt-in local manifest, confined to this Study's experience directory."""
+    scope=(ROOT/'runs/research'/spec['study_id']/'experience').resolve()
+    source=(ROOT/index).resolve()
+    if source.parent!=scope or source.name!='index.json':
+        raise ValueError('STUDY_EXPERIENCE_INDEX_OUTSIDE_OWNED_SCOPE')
+    manifest=read(source)
+    if manifest.get('study_id')!=spec['study_id'] or manifest.get('schema')!='study_private_experience_v1':
+        raise ValueError('STUDY_PRIVATE_EXPERIENCE_MANIFEST_REQUIRED')
+    rows=manifest['entries']
+    for row in rows:
+        target=(ROOT/row['path']).resolve()
+        if (target.parent!=scope or target.suffix!='.md' or not target.is_file()
+                or row['status']!=PRIVATE_STATUS or row['kind']!='case'
+                or row['study_id']!=spec['study_id']):
+            raise ValueError('STUDY_PRIVATE_EXPERIENCE_ENTRY_OUTSIDE_OWNED_SCOPE')
+        for field in ('entry_id','revision','task','structure','failure_type','version'):
+            if not isinstance(row[field],str) or not row[field]:
+                raise ValueError('STUDY_PRIVATE_EXPERIENCE_METADATA_REQUIRED')
+    if len({(r['entry_id'],r['revision']) for r in rows})!=len(rows):
+        raise ValueError('DUPLICATE_STUDY_EXPERIENCE_ENTRY')
+    return rows
 
 
 def entries(host):
@@ -15,6 +40,9 @@ def entries(host):
     rows=read(path).get('entries',[]) if path.is_file() else []
     if state(host)['spec'].get('capabilities'):
         rows=[r for r in rows if r['kind']=='procedure' and r['status']==PUBLIC_STATUS]
+    spec=state(host)['spec']
+    rows += [r for r in spec.get('study_experience_entries',[])
+        if r['study_id']==spec['study_id'] and r['status']==PRIVATE_STATUS]
     return rows
 
 
@@ -27,6 +55,9 @@ def retrieval_hint(host):
     available=sorted({r['task'] for r in entries(host)})
     if not available:return None
     return dict(query=dict(operation='search',task=name) if name in available else dict(operation='search'), available_historical_tasks=available,
+        study_private_entries=[dict(entry_id=r['entry_id'],revision=r['revision'],task=r['task'],
+            read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision']))
+            for r in entries(host) if r['status']==PRIVATE_STATUS],
         scope='Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.')
 
 

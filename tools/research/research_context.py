@@ -1261,6 +1261,8 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             public_operations=public.get('remaining_total'),public_closeout_reserve=public.get('reserved_for_closeout'),
             physical= science.get('remaining_physical'),mathematical=science.get('remaining_mathematical'),
             closeout=budget.get('closeout')))
+    if brief.get('experience_guidance'):
+        result['experience_guidance']=brief['experience_guidance']
     if 'recent_round' in brief:
         recent=deepcopy(brief['recent_round'])
         if recent and recent['feedback']==brief.get('pending_feedback_delivery'):

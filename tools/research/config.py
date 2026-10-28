@@ -198,6 +198,9 @@ def _reference(source, key, provenance):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    if 'study_experience_entries' in study:
+        raise ValueError('STUDY_EXPERIENCE_REQUIRES_SCOPED_LOCAL_INDEX')
+    experience_index=study.pop('study_experience_index',None)
     conditions=study.pop('task_conditions',None)
     if conditions is not None:
         if (len(conditions) not in (2,3) or any(set(c)!={'condition_id','task'} or not c['condition_id'] for c in conditions)
@@ -250,13 +253,18 @@ def resolve(path, profile=None, *, backend_profile=None):
         study=patch(original,study)
         if scope:
             counts=scope.get('segment_counts',[]);tendons=scope.get('tendon_counts',[])
-            if (set(scope)!={'segment_counts','tendon_counts'} or not counts or not tendons
+            if (set(scope)-{'segment_counts','tendon_counts','cells_per_segment'} or not counts or not tendons
                     or any(type(v) is not int for v in [*counts,*tendons]) or counts!=sorted(set(counts))
                     or not set(counts)<=set(family_space['executable_segment_counts'])
                     or tendons!=list(range(min(tendons),max(tendons)+1))
                     or not family_space['executable_tendon_count_bounds'][0]<=min(tendons)<=max(tendons)<=family_space['executable_tendon_count_bounds'][1]):
                 raise ValueError('EXECUTABLE_COMMON_FAMILY_SUBDOMAIN_REQUIRED')
             family_space.update(executable_segment_counts=counts,executable_tendon_count_bounds=[min(tendons),max(tendons)])
+            if 'cells_per_segment' in scope:
+                cells=scope['cells_per_segment'];assembly=family_space['serial_assembly']
+                if type(cells) is not int or not assembly['cell_count_bounds'][0]<=cells<=assembly['cell_count_bounds'][1]:
+                    raise ValueError('EXECUTABLE_FAMILY_MESH_SUBDOMAIN_REQUIRED')
+                assembly.update(cell_count_bounds=[cells,cells],default_cells=cells)
         study.update(start_mode='family_space',family_space=family_space,
             family_space_identity=digest(family_space),candidate_initialization=initialization)
         provenance['references'].update(defaults=dict(path=str(source),sha256=digest(original)),
@@ -267,6 +275,9 @@ def resolve(path, profile=None, *, backend_profile=None):
         if not family_mode or first_strategy not in ('agent_choice','heuristic_generate','math_search','native_search'):
             raise ValueError('EXPLICIT_FAMILY_INITIAL_STRUCTURE_STRATEGY_REQUIRED')
         study['initial_structure_strategy']=first_strategy
+    if experience_index is not None:
+        from tools.research.experience import freeze_study_entries
+        study['study_experience_entries']=freeze_study_entries(study,experience_index)
     if additions:
         if not family_mode:
             raise ValueError('NEW_FIDELITY_SEARCH_POLICY_REQUIRES_FAMILY_STUDY')
