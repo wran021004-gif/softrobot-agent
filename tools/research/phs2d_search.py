@@ -82,6 +82,20 @@ def semantic_check(label):
         lambda _:consistency(build(h,p,a['candidate'],payout_lengths_m=a['payout_lengths_m'])),math=1,phase='P0')
 
 
+def admit_p0(label):
+    h,p,ar,a=setup(label);v=state(h)['phs'];sr=v['static_baselines'][label];dr=v['dynamic_baselines'][label]
+    static_result=h.store.artifact(sr);dynamic=h.store.artifact(dr)
+    sem,semref=semantic_check(label)
+    a_ok=bool(sem['objective_gradient_error']<1e-7 and sem['tendon_gradient_error']<1e-7 and sem['force_consistency_error']<1e-9
+        and dynamic.get('checks',{}).get('rope_direction') and dynamic.get('checks',{}).get('rope_excess'))
+    b_ok=bool(static_result['status']=='qualified_local_minimum' and static_result['multistart_same_branch'] and dynamic['status']=='stable'
+        and max(np.linalg.norm(np.array(r)[:2]) for r in dynamic['samples'][-1]['positions'])<=p['initial_lateral_limit_m'])
+    rr=save(h,dict(version='P0_split_v1',P0A=a_ok,P0B=b_ok,assembly=ar,static=sr,dynamic=dr,semantics=semref,
+        old_P0_verdict='unchanged_failed',loaded_task_pass_required=False),'phs_round2_P0_gate')
+    v=state(h)['phs'];v.update(p0_pass=a_ok and b_ok,p0_report=rr);update(h,phs=v)
+    return dict(passed=a_ok and b_ok,reference=rr)
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('action',choices=['reference','static','local','dynamics','consistency']);parser.add_argument('--label',default='A_two_full');args=parser.parse_args()
     if args.action=='reference':result=prepare(args.label,generation(),'','Original full-span symmetric reference')
