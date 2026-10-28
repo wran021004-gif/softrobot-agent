@@ -1,0 +1,1502 @@
+{
+  "version": "main_off_binding_v4_offline_evidence_v1",
+  "scope": "Explicit scripted Mock HTTP fixtures, not live Main decisions or scientific results.",
+  "source_store": "runs\\research\\bound-analysis-offline-0badf1e7f4",
+  "live_provider_requests": 0,
+  "scientific_workers": 0,
+  "physical_launches": 0,
+  "schema_measurements": [
+    {
+      "reference": {
+        "artifact_id": "48f6dc9a94a9af3deb1b052614cd3663b754d12eafab2e9a01376ad6c835f981",
+        "media_type": "application/json"
+      },
+      "value": {
+        "bytes": {
+          "bound": 4507,
+          "legacy": 3791
+        },
+        "method": "native_dynamics_v1",
+        "scope": "Schema bytes only; no live cost comparison."
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "reference": {
+        "artifact_id": "2735a2e9afae638495ab725b639926f979693f0263b66fa95fcf98b05cd269eb",
+        "media_type": "application/json"
+      },
+      "value": {
+        "field_sources": {
+          "candidate": {
+            "pointer": "/original_plan/decision/selected_candidate",
+            "reference": {
+              "artifact_id": "a3acb78e93e78424e532bac54008d6dd8c6d01588f835659ad33985899a4c4bb",
+              "media_type": "application/json"
+            }
+          },
+          "model_source": {
+            "pointer": "/request_template/model_source",
+            "source": {
+              "pointer": "/methods/native_dynamics_v1",
+              "reference": {
+                "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities"
+            }
+          },
+          "operating_point": {
+            "pointer": "/operating_point",
+            "source": "Main tool request",
+            "tool_use_id": "offline-analysis-1"
+          },
+          "operation": {
+            "pointer": "/operation",
+            "source": {
+              "pointer": "/methods/native_dynamics_v1",
+              "reference": {
+                "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities"
+            }
+          },
+          "protocol": {
+            "freeze": "7283d07d652d2a382e16e2ba33e9b99533572414",
+            "pointer": "/spec/analysis_protocol",
+            "source": "frozen Study",
+            "study_id": "b3-r1-history-assisted-050"
+          }
+        },
+        "full_request": {
+          "candidate": {
+            "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+            "media_type": "application/json"
+          },
+          "model_source": "mujoco",
+          "operating_point": "fixed_input_equilibrium",
+          "operation": "native_dynamics_v1",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.5,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.01,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.1,
+              0.3,
+              0.45,
+              0.49
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.05,
+              0.1,
+              0.5
+            ]
+          }
+        },
+        "method": "native_dynamics_v1",
+        "provider_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "NativeAnalysisOptions": {
+              "additionalProperties": false,
+              "properties": {
+                "tensions_n": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "number"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Tensions N"
+                }
+              },
+              "title": "NativeAnalysisOptions",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "execution": {
+                    "type": "null"
+                  },
+                  "saved_state": {
+                    "type": "null"
+                  },
+                  "update_id": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "operating_point": {
+                    "const": "saved_state"
+                  }
+                },
+                "required": [
+                  "operating_point"
+                ]
+              },
+              "then": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "execution": {
+                        "type": "null"
+                      },
+                      "saved_state": {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      "update_id": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "saved_state"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "execution": {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      "saved_state": {
+                        "type": "null"
+                      },
+                      "update_id": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "execution",
+                      "update_id"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "Selected method native_dynamics_v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"native_dynamics_v1\",\"scientific_purpose\":\"Native MuJoCo mechanics\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"},{\"operating_point\":\"saved_state\",\"readiness\":\"source_selection_required\",\"required_sources\":[\"saved_state OR execution + update_id\"],\"coverage\":\"Exact selected instant/prefix and remaining horizon only.\"}],\"available_source_references\":[{\"execution\":{\"artifact_id\":\"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\",\"media_type\":\"application/json\"},\"verified_update_id\":0,\"actual_time_s\":0.0,\"trajectory\":{\"artifact_id\":\"dc2757c649ea6d00786720a1b41c0713a1a17241f4cb7471e9eefa81169c4495\",\"media_type\":\"application/octet-stream\"},\"model_source\":\"mujoco\",\"readiness\":\"verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed\"}],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"limitations\":[\"Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.\",\"Model-scoped calculation; independent physical acceptance required.\",\"Final admission checks candidate, exact state, numerical time budget and constructed outputs.\"],\"deterministic_method_applicability\":\"applicable\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+          "properties": {
+            "execution": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "native": {
+              "$ref": "#/$defs/NativeAnalysisOptions"
+            },
+            "operating_point": {
+              "enum": [
+                "standardized_initial_pretension",
+                "saved_state"
+              ],
+              "title": "Operating Point",
+              "type": "string"
+            },
+            "saved_state": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "update_id": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Update Id"
+            }
+          },
+          "required": [
+            "operating_point"
+          ],
+          "title": "AnalysisRequest",
+          "type": "object"
+        },
+        "raw_main_input": {
+          "operating_point": "fixed_input_equilibrium"
+        },
+        "tool_use_id": "offline-analysis-1",
+        "version": "bound_scientific_variables_v1"
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "c679ae7a877314674aa1e72645e380b7826630e49339810a1f05456421bc0462",
+        "media_type": "application/json"
+      },
+      "value": {
+        "field_sources": {
+          "candidate": {
+            "pointer": "/original_plan/decision/selected_candidate",
+            "reference": {
+              "artifact_id": "a3acb78e93e78424e532bac54008d6dd8c6d01588f835659ad33985899a4c4bb",
+              "media_type": "application/json"
+            }
+          },
+          "model_source": {
+            "pointer": "/request_template/model_source",
+            "source": {
+              "pointer": "/methods/native_dynamics_v1",
+              "reference": {
+                "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities"
+            }
+          },
+          "operating_point": {
+            "pointer": "/operating_point",
+            "source": "Main tool request",
+            "tool_use_id": "offline-analysis-2"
+          },
+          "operation": {
+            "pointer": "/operation",
+            "source": {
+              "pointer": "/methods/native_dynamics_v1",
+              "reference": {
+                "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities"
+            }
+          },
+          "protocol": {
+            "freeze": "7283d07d652d2a382e16e2ba33e9b99533572414",
+            "pointer": "/spec/analysis_protocol",
+            "source": "frozen Study",
+            "study_id": "b3-r1-history-assisted-050"
+          }
+        },
+        "full_request": {
+          "candidate": {
+            "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+            "media_type": "application/json"
+          },
+          "model_source": "mujoco",
+          "operating_point": "standardized_initial_pretension",
+          "operation": "native_dynamics_v1",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.5,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.01,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.1,
+              0.3,
+              0.45,
+              0.49
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.05,
+              0.1,
+              0.5
+            ]
+          }
+        },
+        "method": "native_dynamics_v1",
+        "provider_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "NativeAnalysisOptions": {
+              "additionalProperties": false,
+              "properties": {
+                "tensions_n": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "number"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Tensions N"
+                }
+              },
+              "title": "NativeAnalysisOptions",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "execution": {
+                    "type": "null"
+                  },
+                  "saved_state": {
+                    "type": "null"
+                  },
+                  "update_id": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "operating_point": {
+                    "const": "saved_state"
+                  }
+                },
+                "required": [
+                  "operating_point"
+                ]
+              },
+              "then": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "execution": {
+                        "type": "null"
+                      },
+                      "saved_state": {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      "update_id": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "saved_state"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "execution": {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      "saved_state": {
+                        "type": "null"
+                      },
+                      "update_id": {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "execution",
+                      "update_id"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "Selected method native_dynamics_v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"native_dynamics_v1\",\"scientific_purpose\":\"Native MuJoCo mechanics\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"},{\"operating_point\":\"saved_state\",\"readiness\":\"source_selection_required\",\"required_sources\":[\"saved_state OR execution + update_id\"],\"coverage\":\"Exact selected instant/prefix and remaining horizon only.\"}],\"available_source_references\":[{\"execution\":{\"artifact_id\":\"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\",\"media_type\":\"application/json\"},\"verified_update_id\":0,\"actual_time_s\":0.0,\"trajectory\":{\"artifact_id\":\"dc2757c649ea6d00786720a1b41c0713a1a17241f4cb7471e9eefa81169c4495\",\"media_type\":\"application/octet-stream\"},\"model_source\":\"mujoco\",\"readiness\":\"verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed\"}],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"limitations\":[\"Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.\",\"Model-scoped calculation; independent physical acceptance required.\",\"Final admission checks candidate, exact state, numerical time budget and constructed outputs.\"],\"deterministic_method_applicability\":\"applicable\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+          "properties": {
+            "execution": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "native": {
+              "$ref": "#/$defs/NativeAnalysisOptions"
+            },
+            "operating_point": {
+              "enum": [
+                "standardized_initial_pretension",
+                "saved_state"
+              ],
+              "title": "Operating Point",
+              "type": "string"
+            },
+            "saved_state": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "update_id": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Update Id"
+            }
+          },
+          "required": [
+            "operating_point"
+          ],
+          "title": "AnalysisRequest",
+          "type": "object"
+        },
+        "raw_main_input": {
+          "operating_point": "standardized_initial_pretension"
+        },
+        "tool_use_id": "offline-analysis-2",
+        "version": "bound_scientific_variables_v1"
+      }
+    }
+  ],
+  "feedback": [
+    {
+      "reference": {
+        "artifact_id": "25914bd5a988456002583dc4c25de3e9e2b03db8145c9a04168b4ecc7cc90335",
+        "media_type": "application/json"
+      },
+      "value": {
+        "result": {
+          "content": [
+            {
+              "text": "{\"status\": \"rejected\", \"error_code\": \"NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION\", \"field\": \"operating_point\", \"reason\": \"1 validation error for AnalysisRequest\\n  Value error, NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION [type=value_error, input_value={'operating_point': 'fixe...model_source': 'mujoco'}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error\", \"worker_started\": false, \"charged_method_counts\": {\"physical_replay_launches\": 0, \"nmpc_launches\": 0, \"mathematical_evaluations\": 0}, \"evidence_navigation\": null, \"expected\": \"Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.\", \"input_query\": {\"reference\": {\"artifact_id\": \"1fa43145921e1b64f659de4beadadb1eb48d2df5d0de4a84966c7f39692bad06\", \"media_type\": \"application/json\"}, \"view\": \"full\", \"pointer\": \"/tool_use/input\"}, \"scientific_execution_started\": false, \"relevant_references\": [], \"full_error_reference\": {\"artifact_id\": \"1fa43145921e1b64f659de4beadadb1eb48d2df5d0de4a84966c7f39692bad06\", \"media_type\": \"application/json\"}}"
+            }
+          ],
+          "status": "error",
+          "toolUseId": "offline-analysis-1"
+        },
+        "tool_use": {
+          "input": {
+            "operating_point": "fixed_input_equilibrium"
+          },
+          "name": "research_analysis",
+          "toolUseId": "offline-analysis-1"
+        }
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "8395bb0dc2973a125f0013b200d43b9634f4a033bdd9ccfbc39060eda8787d80",
+        "media_type": "application/json"
+      },
+      "value": {
+        "result": {
+          "content": [
+            {
+              "text": "{\"wrapper_reference\":{\"artifact_id\":\"e05417caa0992439fed339eda122796a9b6e79728c470c44812a887af5585dca\",\"media_type\":\"application/json\"},\"wrapper_role\":\"Retrieval only; not supporting_evidence\",\"execution_feedback\":{\"status\":\"probe_only_not_executed\",\"worker_started\":false,\"scientific_execution_started\":false,\"reason\":\"No worker launched and no scientific result or task acceptance was produced.\"},\"scientific_reference\":null,\"new_facts\":{\"reference\":{\"artifact_id\":\"e05417caa0992439fed339eda122796a9b6e79728c470c44812a887af5585dca\",\"media_type\":\"application/json\"},\"pointer\":\"/result\",\"view\":\"deterministic_summary\",\"available_keys\":[\"status\",\"method\",\"operation\",\"schema_valid\",\"typed_request_valid\",\"candidate_binding_valid\",\"protocol_matches\",\"model_source\",\"task_identity\",\"deterministic_applicability\",\"original_guard\",\"exact_source_validation\",\"full_scientific_preflight\",\"execution_feedback\"],\"summary\":{},\"read_queries\":[{\"reference\":{\"artifact_id\":\"e05417caa0992439fed339eda122796a9b6e79728c470c44812a887af5585dca\",\"media_type\":\"application/json\"},\"pointer\":\"/result/deterministic_applicability\",\"view\":\"summary\"},{\"reference\":{\"artifact_id\":\"e05417caa0992439fed339eda122796a9b6e79728c470c44812a887af5585dca\",\"media_type\":\"application/json\"},\"pointer\":\"/result/execution_feedback\",\"view\":\"summary\"}],\"retrieval\":\"Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.\",\"value\":{\"status\":\"probe_only_not_executed\",\"method\":\"native_dynamics_v1\",\"operation\":\"native_dynamics_v1\",\"schema_valid\":true,\"typed_request_valid\":true,\"candidate_binding_valid\":true,\"protocol_matches\":true,\"model_source\":\"mujoco\",\"task_identity\":\"062de8ca2fd2acaebdbf856ba8fc3420d88c8d3943cfa789c5c9e6f06e486c6b\",\"deterministic_applicability\":{\"status\":\"applicable\",\"reasons\":[],\"constraint_coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"full_task_supported\":false,\"execution_support\":\"not_assessed\",\"model_assessment\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"representation_id\":\"native_named_hinges_v1\",\"relevant_assumptions\":{\"total\":4,\"read_pointer\":\"/result/deterministic_applicability/model_assessment/relevant_assumptions\",\"item_keys\":null,\"preview\":[\"MuJoCo compiled family model; no GVS projection; ideal absolute tensions.\",\"Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.\",\"Contact-free, unconstrained hinges without activation dynamics; runtime checked.\"]},\"uses\":{\"native_numerics\":{\"status\":\"ACCEPT\",\"reasons\":[]}}},\"horizon\":{\"task_duration_s\":0.5,\"origin\":0.0,\"remaining_task_s\":0.5,\"analysis_horizon_s\":0.0,\"period_s\":0.01,\"interpretation\":\"Native instant or fixed-input short endpoint; no frozen full-task acceptance.\"}},\"original_guard\":\"DEPENDENCIES_CHANGED_COMMIT_AND_MIGRATE_WITHOUT_RESETTING_COSTS\",\"exact_source_validation\":\"native_point_validated_without_worker_reconstruction\",\"full_scientific_preflight\":\"not_run_historical_dependencies_changed\",\"execution_feedback\":{\"status\":\"probe_only_not_executed\",\"worker_started\":false,\"scientific_execution_started\":false,\"reason\":\"No worker launched and no scientific result or task acceptance was produced.\"}}}}"
+            }
+          ],
+          "status": "success",
+          "toolUseId": "offline-analysis-2"
+        },
+        "tool_use": {
+          "input": {
+            "operating_point": "standardized_initial_pretension"
+          },
+          "name": "research_analysis",
+          "toolUseId": "offline-analysis-2"
+        }
+      }
+    }
+  ],
+  "intercepts": [
+    {
+      "reference": {
+        "artifact_id": "e90528e8d140a1c0189b8d8abc2fdec1379a22180f30f50c58d32a1ad85ec674",
+        "media_type": "application/json"
+      },
+      "value": {
+        "outcome": {
+          "candidate_binding_valid": true,
+          "deterministic_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+                "status": "diagnostic"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.0,
+              "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+              "origin": 0.0,
+              "period_s": 0.01,
+              "remaining_task_s": 0.5,
+              "task_duration_s": 0.5
+            },
+            "model_assessment": {
+              "model_id": "model.mujoco_native",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+                "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+                "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+                "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+              ],
+              "representation_id": "native_named_hinges_v1",
+              "uses": {
+                "native_numerics": {
+                  "reasons": [],
+                  "status": "ACCEPT"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "exact_source_validation": "native_point_validated_without_worker_reconstruction",
+          "execution_feedback": {
+            "reason": "No worker launched and no scientific result or task acceptance was produced.",
+            "scientific_execution_started": false,
+            "status": "probe_only_not_executed",
+            "worker_started": false
+          },
+          "full_scientific_preflight": "not_run_historical_dependencies_changed",
+          "method": "native_dynamics_v1",
+          "model_source": "mujoco",
+          "operation": "native_dynamics_v1",
+          "original_guard": "DEPENDENCIES_CHANGED_COMMIT_AND_MIGRATE_WITHOUT_RESETTING_COSTS",
+          "protocol_matches": true,
+          "schema_valid": true,
+          "status": "probe_only_not_executed",
+          "task_identity": "062de8ca2fd2acaebdbf856ba8fc3420d88c8d3943cfa789c5c9e6f06e486c6b",
+          "typed_request_valid": true
+        },
+        "request": {
+          "candidate": {
+            "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+            "media_type": "application/json"
+          },
+          "execution": null,
+          "model_source": "mujoco",
+          "native": {
+            "correction_radius_n": 0.0,
+            "difference_step_n": 0.02,
+            "horizon_s": 0.01,
+            "tensions_n": null
+          },
+          "operating_point": "standardized_initial_pretension",
+          "operation": "native_dynamics_v1",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.5,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.01,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.1,
+              0.3,
+              0.45,
+              0.49
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.05,
+              0.1,
+              0.5
+            ]
+          },
+          "saved_state": null,
+          "scoring_window_s": null,
+          "update_id": null
+        }
+      }
+    }
+  ],
+  "mock_provider_turns": [
+    {
+      "request_id": "r3-request-1a3afe2b27f74cfe8675b037bf539c02",
+      "wire_reference": {
+        "artifact_id": "9e13cfbfd52e054a6c5e3d45f6dacebd583a3ca5396ac880c40dffd3b1881bb2",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "c1e631063c3c386661c032a0d9c35900bc9587d7f57c51193a09f37ed171ebd0",
+        "media_type": "application/octet-stream"
+      },
+      "request_bytes": 45355,
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 10,
+        "total_tokens": 15
+      },
+      "finish_reasons": [
+        "tool_calls"
+      ],
+      "response": {
+        "id": "offline-response",
+        "object": "chat.completion",
+        "created": 1,
+        "model": "deepseek-flash",
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 5,
+          "total_tokens": 15
+        },
+        "choices": [
+          {
+            "index": 0,
+            "finish_reason": "tool_calls",
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "offline-analysis-1",
+                  "type": "function",
+                  "function": {
+                    "name": "research_analysis",
+                    "arguments": "{\"operating_point\": \"fixed_input_equilibrium\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "tool_schema": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          },
+          "NativeAnalysisOptions": {
+            "additionalProperties": false,
+            "properties": {
+              "tensions_n": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Tensions N"
+              }
+            },
+            "title": "NativeAnalysisOptions",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "execution": {
+                  "type": "null"
+                },
+                "saved_state": {
+                  "type": "null"
+                },
+                "update_id": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "operating_point": {
+                  "const": "saved_state"
+                }
+              },
+              "required": [
+                "operating_point"
+              ]
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "execution": {
+                      "type": "null"
+                    },
+                    "saved_state": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "update_id": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "saved_state"
+                  ]
+                },
+                {
+                  "properties": {
+                    "execution": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "saved_state": {
+                      "type": "null"
+                    },
+                    "update_id": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "execution",
+                    "update_id"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "description": "Selected method native_dynamics_v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"native_dynamics_v1\",\"scientific_purpose\":\"Native MuJoCo mechanics\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"},{\"operating_point\":\"saved_state\",\"readiness\":\"source_selection_required\",\"required_sources\":[\"saved_state OR execution + update_id\"],\"coverage\":\"Exact selected instant/prefix and remaining horizon only.\"}],\"available_source_references\":[{\"execution\":{\"artifact_id\":\"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\",\"media_type\":\"application/json\"},\"verified_update_id\":0,\"actual_time_s\":0.0,\"trajectory\":{\"artifact_id\":\"dc2757c649ea6d00786720a1b41c0713a1a17241f4cb7471e9eefa81169c4495\",\"media_type\":\"application/octet-stream\"},\"model_source\":\"mujoco\",\"readiness\":\"verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed\"}],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"limitations\":[\"Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.\",\"Model-scoped calculation; independent physical acceptance required.\",\"Final admission checks candidate, exact state, numerical time budget and constructed outputs.\"],\"deterministic_method_applicability\":\"applicable\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+        "properties": {
+          "execution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property execution"
+          },
+          "native": {
+            "$ref": "#/$defs/NativeAnalysisOptions"
+          },
+          "operating_point": {
+            "description": "Property operating_point",
+            "enum": [
+              "standardized_initial_pretension",
+              "saved_state"
+            ],
+            "title": "Operating Point",
+            "type": "string"
+          },
+          "saved_state": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property saved_state"
+          },
+          "update_id": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property update_id",
+            "title": "Update Id"
+          }
+        },
+        "required": [
+          "operating_point"
+        ],
+        "title": "AnalysisRequest",
+        "type": "object"
+      }
+    },
+    {
+      "request_id": "r3-request-668254b09b734aa29b0c5727e97f5d97",
+      "wire_reference": {
+        "artifact_id": "3fecb0d19a2b1114ca3ab27c78ab2da03b28f3fbe4d06d04b0ed3f6b5f8e9a90",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "21aec9ca5d8d93fd97d6de4f764b448a917453ad798db1210f3e5e79bbb4e408",
+        "media_type": "application/octet-stream"
+      },
+      "request_bytes": 46956,
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 10,
+        "total_tokens": 15
+      },
+      "finish_reasons": [
+        "tool_calls"
+      ],
+      "response": {
+        "id": "offline-response",
+        "object": "chat.completion",
+        "created": 1,
+        "model": "deepseek-flash",
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 5,
+          "total_tokens": 15
+        },
+        "choices": [
+          {
+            "index": 0,
+            "finish_reason": "tool_calls",
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "offline-analysis-2",
+                  "type": "function",
+                  "function": {
+                    "name": "research_analysis",
+                    "arguments": "{\"operating_point\": \"standardized_initial_pretension\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "tool_schema": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          },
+          "NativeAnalysisOptions": {
+            "additionalProperties": false,
+            "properties": {
+              "tensions_n": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Tensions N"
+              }
+            },
+            "title": "NativeAnalysisOptions",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "execution": {
+                  "type": "null"
+                },
+                "saved_state": {
+                  "type": "null"
+                },
+                "update_id": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "operating_point": {
+                  "const": "saved_state"
+                }
+              },
+              "required": [
+                "operating_point"
+              ]
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "execution": {
+                      "type": "null"
+                    },
+                    "saved_state": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "update_id": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "saved_state"
+                  ]
+                },
+                {
+                  "properties": {
+                    "execution": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "saved_state": {
+                      "type": "null"
+                    },
+                    "update_id": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "execution",
+                    "update_id"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "description": "Selected method native_dynamics_v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"native_dynamics_v1\",\"scientific_purpose\":\"Native MuJoCo mechanics\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"},{\"operating_point\":\"saved_state\",\"readiness\":\"source_selection_required\",\"required_sources\":[\"saved_state OR execution + update_id\"],\"coverage\":\"Exact selected instant/prefix and remaining horizon only.\"}],\"available_source_references\":[{\"execution\":{\"artifact_id\":\"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\",\"media_type\":\"application/json\"},\"verified_update_id\":0,\"actual_time_s\":0.0,\"trajectory\":{\"artifact_id\":\"dc2757c649ea6d00786720a1b41c0713a1a17241f4cb7471e9eefa81169c4495\",\"media_type\":\"application/octet-stream\"},\"model_source\":\"mujoco\",\"readiness\":\"verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed\"}],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"limitations\":[\"Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.\",\"Model-scoped calculation; independent physical acceptance required.\",\"Final admission checks candidate, exact state, numerical time budget and constructed outputs.\"],\"deterministic_method_applicability\":\"applicable\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+        "properties": {
+          "execution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property execution"
+          },
+          "native": {
+            "$ref": "#/$defs/NativeAnalysisOptions"
+          },
+          "operating_point": {
+            "description": "Property operating_point",
+            "enum": [
+              "standardized_initial_pretension",
+              "saved_state"
+            ],
+            "title": "Operating Point",
+            "type": "string"
+          },
+          "saved_state": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property saved_state"
+          },
+          "update_id": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property update_id",
+            "title": "Update Id"
+          }
+        },
+        "required": [
+          "operating_point"
+        ],
+        "title": "AnalysisRequest",
+        "type": "object"
+      }
+    },
+    {
+      "request_id": "r3-request-c9c4a19edb4540e59e700919bf499be4",
+      "wire_reference": {
+        "artifact_id": "6b4ef022e128500aea427f73af8db89aa5fd6c97e3699948b6f9bcc3c0f1fc46",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "5d8cbacbcf455edd5ce0e5ac1de86d8beddcd47dd9a31b47161a1e9fa4eb36a8",
+        "media_type": "application/octet-stream"
+      },
+      "request_bytes": 51369,
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 10,
+        "total_tokens": 15
+      },
+      "finish_reasons": [
+        "stop"
+      ],
+      "response": {
+        "id": "offline-response",
+        "object": "chat.completion",
+        "created": 1,
+        "model": "deepseek-flash",
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 5,
+          "total_tokens": 15
+        },
+        "choices": [
+          {
+            "index": 0,
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "Offline fixture: probe did not execute mathematics; no result or acceptance exists."
+            }
+          }
+        ]
+      },
+      "tool_schema": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          },
+          "NativeAnalysisOptions": {
+            "additionalProperties": false,
+            "properties": {
+              "tensions_n": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Tensions N"
+              }
+            },
+            "title": "NativeAnalysisOptions",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "execution": {
+                  "type": "null"
+                },
+                "saved_state": {
+                  "type": "null"
+                },
+                "update_id": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "operating_point": {
+                  "const": "saved_state"
+                }
+              },
+              "required": [
+                "operating_point"
+              ]
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "execution": {
+                      "type": "null"
+                    },
+                    "saved_state": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "update_id": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "saved_state"
+                  ]
+                },
+                {
+                  "properties": {
+                    "execution": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "saved_state": {
+                      "type": "null"
+                    },
+                    "update_id": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "execution",
+                    "update_id"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "description": "Selected method native_dynamics_v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"native_dynamics_v1\",\"scientific_purpose\":\"Native MuJoCo mechanics\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"},{\"operating_point\":\"saved_state\",\"readiness\":\"source_selection_required\",\"required_sources\":[\"saved_state OR execution + update_id\"],\"coverage\":\"Exact selected instant/prefix and remaining horizon only.\"}],\"available_source_references\":[{\"execution\":{\"artifact_id\":\"629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f\",\"media_type\":\"application/json\"},\"verified_update_id\":0,\"actual_time_s\":0.0,\"trajectory\":{\"artifact_id\":\"dc2757c649ea6d00786720a1b41c0713a1a17241f4cb7471e9eefa81169c4495\",\"media_type\":\"application/octet-stream\"},\"model_source\":\"mujoco\",\"readiness\":\"verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed\"}],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[],\"reason\":\"Only matched short endpoint proxies; no full task or optimized structural capability.\"}],\"limitations\":[\"Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.\",\"Model-scoped calculation; independent physical acceptance required.\",\"Final admission checks candidate, exact state, numerical time budget and constructed outputs.\"],\"deterministic_method_applicability\":\"applicable\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+        "properties": {
+          "execution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property execution"
+          },
+          "native": {
+            "$ref": "#/$defs/NativeAnalysisOptions"
+          },
+          "operating_point": {
+            "description": "Property operating_point",
+            "enum": [
+              "standardized_initial_pretension",
+              "saved_state"
+            ],
+            "title": "Operating Point",
+            "type": "string"
+          },
+          "saved_state": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property saved_state"
+          },
+          "update_id": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property update_id",
+            "title": "Update Id"
+          }
+        },
+        "required": [
+          "operating_point"
+        ],
+        "title": "AnalysisRequest",
+        "type": "object"
+      }
+    }
+  ],
+  "mock_ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 8,
+      "tool_calls": 30,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 6,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.09399999998277053
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 5,
+      "tool_calls": 24,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "mock_usage": {
+    "conversation": {
+      "requests": 3,
+      "usage_missing": 0,
+      "prompt_tokens": 30,
+      "completion_tokens": 15,
+      "total_tokens": 45,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        45355,
+        46956,
+        51369
+      ]
+    }
+  }
+}

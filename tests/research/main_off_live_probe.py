@@ -21,7 +21,7 @@ from tools.research.state import state, update, science_hashes
 from tools.state_io import digest
 from tests.research.c3_readiness_audit import FrozenDecisionBoundary
 
-PROBE_ID='main-off-saved-c3-v3-20261028'
+PROBE_ID='main-off-saved-c3-v4-20261028'
 DEST=ROOT/'runs/research'/PROBE_ID
 POLICY={'version':'research_roles_v2',
     'main':{'thinking':'disabled','reasoning_effort':'none'},
@@ -94,7 +94,7 @@ def copy_ownership(host, source):
     return ownership
 
 
-def prepare(directory=DEST, run_id=PROBE_ID):
+def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None):
     if directory.exists():raise ValueError('PROBE_DIRECTORY_EXISTS_NO_RESET_OR_RETRY')
     source=FrozenDecisionBoundary(ROOT,'A');s=deepcopy(source.saved_state)
     provider=deepcopy(s['pilot']['provider']);provider.update(POLICY['main']);provider.update(max_tokens=None,output_context_reserve_tokens=32768)
@@ -102,8 +102,9 @@ def prepare(directory=DEST, run_id=PROBE_ID):
     s['spec']['physical_replay_limit']=0;s['spec']['nmpc_limits']['executions']=0
     s['spec'].pop('initial_structure_strategy',None)  # Existing candidate; no launch readiness claim.
     s['spec']['execution_instructions']=INSTRUCTIONS
-    s['spec']['authorization']='User authorized this bounded provider-only decision probe; no scientific worker execution.'
-    s['spec']['research_decisions'].update(architecture='english_decision_v1',role_policy=deepcopy(POLICY))
+    s['spec']['authorization']=authorization or 'OFFLINE_FIXTURE_ONLY_NO_LIVE_PROVIDER_AUTHORIZATION'
+    s['spec']['research_decisions'].update(architecture='english_decision_v1',role_policy=deepcopy(POLICY),
+        analysis_interface='bound_scientific_variables_v1')
     s['spec']['runtime']['provider']=deepcopy(provider)
     s['plans']=[];s['pending']=None;s['research_status']='ready';s['success_gate']=None;s['selected']=None
     s['pilot']=dict(provider=provider,live_model_requests=0,framework_session_id=run_id,request_deadline_unix=None)
@@ -112,7 +113,7 @@ def prepare(directory=DEST, run_id=PROBE_ID):
     snap['input']['policy']['budget']=budget
     h=Host(directory,run_id,actor='probe-only')
     h.store.create(ProjectConfig(project_id=run_id,grant_id=run_id+'-provider-only',
-        authorization_source='User authorized up to 8 real Provider requests and zero scientific workers.',
+        authorization_source=s['spec']['authorization'],
         budget=budget,exclusive_resources={'provider_request':1}))
     h.store.create_session(snap)
     # Copy only artifacts already reachable at the frozen boundary. Their original
@@ -137,7 +138,8 @@ def prepare(directory=DEST, run_id=PROBE_ID):
     diff=[k for k,v in s['profile']['science_hashes'].items() if science_hashes().get(k)!=v]
     agent.record(h,'probe_scope',dict(source_study=source.preparation['study_id'],
         source_state=source.preparation['source_state'],archive=source.folder,source_boundary_sequence=425,
-        maximum_main=7,maximum_reporter=1,maximum_total=8,backend_solves=0,worker_calls=0,
+        maximum_main=8,maximum_reporter=0,maximum_total=8,backend_solves=0,worker_calls=0,
+        first_analysis_feedback_turn_reserved=True,live_authorization=authorization,
         original_ownership=ownership,
         hypothetical_mathematical_eligibility=True,historical_scientific_code_changes=diff,
         no_scientific_dispatch=True,automatic_retries=0))
@@ -146,11 +148,24 @@ def prepare(directory=DEST, run_id=PROBE_ID):
 
 
 class CappedTransport(httpx.AsyncBaseTransport):
-    def __init__(self,inner,counts=None):self.inner=inner;self.counts=counts or {'conversation':0,'reporter':0}
-    async def handle_async_request(self,request):
-        wire=json.loads(request.content);role='conversation' if wire.get('tools') else 'reporter'
-        if self.counts[role]>={'conversation':7,'reporter':1}[role] or sum(self.counts.values())>=8:
+    def __init__(self,inner,counts=None,*,host):
+        self.inner=inner;self.counts=counts or {'conversation':0,'reporter':0};self.host=host
+    def admit(self,wire):
+        role='conversation' if wire.get('tools') else 'reporter'
+        if self.counts[role]>={'conversation':8,'reporter':0}[role] or sum(self.counts.values())>=8:
             raise ValueError('PROBE_LIVE_ROLE_CAP_NO_SEND')
+        feedback=any(e['kind']=='model_original_tool_feedback' and
+            self.host.store.artifact(e['outputs'][0])['tool_use']['name']=='research_analysis'
+            for e in self.host.store.events(self.host.run_id))
+        if self.counts['conversation']>=7 and not feedback:
+            agent.record(self.host,'probe_incomplete',dict(reason='First analysis feedback turn cannot be guaranteed; remaining request is reserved.',requests=self.counts))
+            raise ValueError('PROBE_FEEDBACK_TURN_RESERVED_NO_SEND')
+        return role,feedback
+    async def handle_async_request(self,request):
+        role,feedback=self.admit(json.loads(request.content))
+        if feedback:
+            agent.record(self.host,'probe_analysis_feedback_delivery',dict(request_number=self.counts['conversation']+1,
+                scope='Actual next request; model correction or understanding must be assessed from its response.'))
         self.counts[role]+=1
         return await self.inner.handle_async_request(request)
     async def aclose(self):await self.inner.aclose()
@@ -191,7 +206,11 @@ def intercepts(host):
         from tools.research.state import guard as original_guard
         inp=SessionInput.model_validate(candidate['configuration'])
         requirements=describe_analysis_requirements(inp,{})
-        applicability=check_analysis_applicability(requirements,q,model_assessment(inp,requirements,q.operation,model_source=q.model_source))
+        exact_point=None
+        if q.model_source=='mujoco':
+            from tools.research.numerics import native_point
+            exact_point=native_point(h,q,candidate['configuration'])
+        applicability=check_analysis_applicability(requirements,q,model_assessment(inp,requirements,q.operation,model_source=q.model_source),exact_point=exact_point)
         try:
             original_guard(h,expensive=True);guard_status='passed'
         except ValueError as exc:
@@ -201,6 +220,8 @@ def intercepts(host):
             schema_valid=True,typed_request_valid=True,candidate_binding_valid=True,protocol_matches=True,
             model_source=q.model_source,task_identity=detail.get('task_identity'),
             deterministic_applicability=plain(applicability),original_guard=guard_status,
+            exact_source_validation=('native_point_validated_without_worker_reconstruction' if q.model_source=='mujoco' else
+                'not_required_for_declared_point' if q.operating_point!='saved_state' else 'not_run_original_reduced_saved_source_admission'),
             full_scientific_preflight='not_run_historical_dependencies_changed' if changed else 'not_run',
             execution_feedback=dict(status='probe_only_not_executed',worker_started=False,scientific_execution_started=False,
                 reason='No worker launched and no scientific result or task acceptance was produced.'))
@@ -209,15 +230,23 @@ def intercepts(host):
     return plan,math
 
 
-async def run(host,inner,*,max_requests=7):
+async def run(host,inner,*,max_requests=8):
     previous=reporter.provider_usage(host)
     counts={role:previous.get(role,{}).get('requests',0) for role in ('conversation','reporter')}
-    plan,math=intercepts(host);transport=CappedTransport(inner,counts)
+    plan,math=intercepts(host);transport=CappedTransport(inner,counts,host=host)
+    original_boundary=agent.LiveBoundary.handle_async_request
+    async def admitted_boundary(boundary,request):
+        # Reserve the feedback turn before the production ledger records an
+        # attempted send. Exact saved-response replay needs no new allowance.
+        if not state(host)['pilot'].get('unconsumed_response'):
+            transport.admit(json.loads(request.content))
+        return await original_boundary(boundary,request)
     # Probe-only patch scope: all scientific Plan and analysis dispatch is
     # intercepted, and the shared ledger has zero worker/backend capacity.
     with (patch('tools.research.core.guard',safe_guard),patch('tools.research.agent.guard',safe_guard),
          patch('tools.research.core.dispatch',side_effect=plan),patch('tools.research.analysis.dispatch',side_effect=math),
          patch('tools.research.rl.dispatch',side_effect=ValueError('PROBE_RL_FORBIDDEN')),
+         patch.object(agent.LiveBoundary,'handle_async_request',admitted_boundary),
          patch('tools.research.research_context.mathematics_authorization',return_value={
              'registered_study_scope_authorized':True,'methods':[],
              'method_preconditions':'Probe-only eligibility; no scientific execution authorized.'}),
@@ -227,19 +256,22 @@ async def run(host,inner,*,max_requests=7):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true');parser.add_argument('--continue-once',action='store_true');args=parser.parse_args()
-    if not args.live:raise SystemExit('Use --live only after offline boundary validation; no automatic resend.')
+    parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true');parser.add_argument('--continue-once',action='store_true')
+    parser.add_argument('--authorization',help='Exact separately granted provider-only authorization, up to 8 Main requests, zero workers.')
+    args=parser.parse_args()
+    if not args.live or not args.authorization:raise SystemExit('A new explicit independent provider-only authorization and --live are required; prior v1-v3 grants are exhausted.')
     agent.load_credential(Path('~/.codex/.env').expanduser())
     if args.continue_once:
         h=Host(DEST,PROBE_ID,actor='probe-only');usage=reporter.provider_usage(h)
-        if (usage.get('conversation',{}).get('requests')!=6 or usage.get('reporter',{}).get('requests',0)!=1
+        if (usage.get('conversation',{}).get('requests',0)>6 or usage.get('reporter',{}).get('requests',0)!=0
+                or state(h)['spec']['authorization']!=args.authorization
                 or agent.pending(h) or state(h)['pilot'].get('unconsumed_response')
                 or any(e['kind']=='probe_continuation' for e in h.store.events(h.run_id))):
-            raise ValueError('PROBE_CONTINUATION_REQUIRES_EXACT_SETTLED_FIRST_INVOCATION')
-        agent.record(h,'probe_continuation',dict(reason='One further ordinary decision after saved method-detail feedback; no repair, method direction or worker execution.',max_new_requests=1))
-        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0),max_requests=1))
+            raise ValueError('PROBE_CONTINUATION_REQUIRES_SETTLED_INVOCATION_AND_FEEDBACK_RESERVE')
+        agent.record(h,'probe_continuation',dict(reason='Ordinary continuation; no repair, method direction or worker execution.',max_new_requests=8-usage.get('conversation',{}).get('requests',0)))
+        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     else:
-        h=prepare();counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
+        h=prepare(authorization=args.authorization);counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     print(json.dumps(dict(probe=PROBE_ID,store=str(DEST),requests=counts,usage=reporter.provider_usage(h),
         ledger=h.store.remaining(),scientific_workers=0,physical_launches=0),ensure_ascii=False))
 

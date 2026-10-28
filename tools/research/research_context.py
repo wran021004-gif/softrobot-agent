@@ -1283,7 +1283,7 @@ def compact_scientific_delivery(brief,*,decision_only=False,complete_interpretat
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']
             fields=[k for k in ('candidate','operation','request_template','required_parameters','formal_execution_authorized',
-                'execution_limits','cost_scope','missing','action_prerequisites') if k in selected]
+                'execution_limits','cost_scope','missing','action_prerequisites','operating_point_guidance') if k in selected]
             brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],
                 'pointer':'/methods/'+selected['method'],**(dict(fields=fields) if fields else {})})
         intent=brief.get('research_intent',{})

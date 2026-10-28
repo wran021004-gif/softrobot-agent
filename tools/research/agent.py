@@ -418,7 +418,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
 
 
 
-def selected_analysis_schema(method, detail):
+def bound_analysis_enabled(spec):
+    return spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v1'
+
+
+def selected_analysis_schema(method, detail, *, bound=False):
     """Project the existing AnalysisRequest to one registered method."""
     from tools.research.contracts import AnalysisRequest
     from tools.research.optimal_capability import CONIC,SENSITIVITY
@@ -459,6 +463,40 @@ def selected_analysis_schema(method, detail):
         schema['properties']['model_source']={'type':'string','const':'mujoco'}
         schema['required'].append('model_source')
     schema['description']='Selected registered method: '+method+'. Required source and parameter details: '+json.dumps(detail.get('required_parameters',[]),ensure_ascii=False)+'. Exact method query: '+json.dumps(detail.get('detail_query'),ensure_ascii=False)
+    if bound:
+        for key in ('candidate','protocol','operation','capability_method'):
+            schema['properties'].pop(key,None)
+        # A native registered operation uniquely selects MuJoCo. Reduced methods
+        # retain the controller/GVS/SoRoSim choice; never infer it from a default.
+        if template.get('model_source')=='mujoco':schema['properties'].pop('model_source',None)
+        else:schema['properties']['model_source']['enum']=['controller','gvs','sorosim']
+        schema['required']=[k for k in schema['required'] if k in schema['properties']]
+        schema['required']+=['operating_point']+(['model_source'] if 'model_source' in schema['properties'] else [])
+        schema['required']=list(dict.fromkeys(schema['required']))
+        from tools.research.task_constraints import analysis_operating_points
+        points=analysis_operating_points(method,operation)
+        schema['properties']['operating_point']={**schema['properties']['operating_point'],'enum':points}
+        schema['properties']['operating_point'].pop('default',None)
+        if operation not in ('linearization','controllability'):schema['properties'].pop('scoring_window_s',None)
+        schema['allOf']=[{'if':{'properties':{'operating_point':{'const':'saved_state'}},'required':['operating_point']},
+            'then':{'oneOf':[{'required':['saved_state'],'properties':{'saved_state':{'$ref':'#/$defs/EvidenceRef'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
+                {'required':['execution','update_id'],'properties':{'execution':{'$ref':'#/$defs/EvidenceRef'},'update_id':{'type':'integer','minimum':0},'saved_state':{'type':'null'}}}]},
+            'else':{'properties':{k:{'type':'null'} for k in ('saved_state','execution','update_id')}}}]
+        if 'scoring_window_s' in schema['properties'] and template.get('protocol'):
+            windows=template['protocol']['windows_s']
+            schema['properties']['scoring_window_s']['anyOf']=[{'type':'number','enum':windows},{'type':'null'}]
+            if operation in ('linearization','controllability'):
+                schema['properties']['scoring_window_s']={'type':'number','enum':windows,'exclusiveMinimum':0}
+        # Initial tendon support and sequence optimization reject free native options.
+        if operation in ('tendon_force_capability_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):
+            schema['properties'].pop('native',None)
+        elif operation=='native_dynamics_v1':
+            schema['$defs']['NativeAnalysisOptions']['properties']={k:v for k,v in schema['$defs']['NativeAnalysisOptions']['properties'].items() if k=='tensions_n'}
+        elif operation=='fixed_input_structure_v1':
+            schema['$defs']['NativeAnalysisOptions']['properties'].pop('difference_step_n',None)
+            schema['$defs']['NativeAnalysisOptions']['properties'].pop('correction_radius_n',None)
+        guide=detail.get('operating_point_guidance',{})
+        schema['description']='Selected method '+method+'. Frozen identity and protocol are bound by the program; submit scientific variables only. '+json.dumps(guide,separators=(',',':'),ensure_ascii=False)
     needed=set()
     def visit(value):
         if isinstance(value,dict):
@@ -474,13 +512,53 @@ def selected_analysis_schema(method, detail):
     return schema
 
 
+def bind_selected_analysis_request(host, payload, *, tool_use_id):
+    """One audited boundary from Main variables to the unchanged full contract."""
+    from jsonschema import Draft202012Validator
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.design import verify_candidate
+    from tools.research.research_context import research_intent
+    selection=selected_analysis(host,None)
+    if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
+    method,detail=selection
+    intent=research_intent(host)['latest_decision']
+    candidate=intent['agent_hypothesis']['decision']['selected_candidate']
+    verify_candidate(host,candidate)
+    schema=selected_analysis_schema(method,detail,bound=True)
+    extra=sorted(set(payload)-set(schema['properties']))
+    if extra:raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH: unsupported or frozen fields: '+', '.join(extra))
+    spec=state(host)['spec'];template=detail['request_template']
+    if template.get('candidate')!=candidate or template.get('protocol')!=spec['analysis_protocol']:
+        raise ValueError('SELECTED_ANALYSIS_FROZEN_BINDING_MISMATCH')
+    frozen=dict(candidate=deepcopy(candidate),protocol=deepcopy(spec['analysis_protocol']),operation=detail['operation'])
+    sources=dict(candidate=dict(reference=intent['plan_reference'],pointer='/original_plan/decision/selected_candidate'),
+        protocol=dict(source='frozen Study',study_id=spec['study_id'],freeze=state(host)['freeze'],pointer='/spec/analysis_protocol'),
+        operation=dict(source=detail['detail_query'],pointer='/operation'))
+    if template.get('model_source')=='mujoco':
+        frozen['model_source']='mujoco';sources['model_source']=dict(source=detail['detail_query'],pointer='/request_template/model_source')
+    if 'capability_method' in template:
+        frozen['capability_method']=template['capability_method'];sources['capability_method']=dict(source=detail['detail_query'],pointer='/request_template/capability_method')
+    full={**deepcopy(payload),**frozen}
+    audit=record(host,'analysis_request_binding',dict(version='bound_scientific_variables_v1',tool_use_id=tool_use_id,
+        method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
+        field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources}))
+    # Pydantic first preserves exact scientific error codes, even if the compact
+    # schema could reject the same point. Neither validator changes Main input.
+    AnalysisRequest.model_validate(full)
+    Draft202012Validator(schema).validate(payload)
+    Draft202012Validator(AnalysisRequest.model_json_schema()).validate(full)
+    record(host,'analysis_request_binding_validated',dict(binding=audit,json_schema_valid=True,pydantic_valid=True))
+    return full
+
+
 def selected_analysis(host, brief):
     """Expose only the method in the last settled diagnose decision."""
     from tools.research.research_context import research_intent
     intent=research_intent(host)['latest_decision'] or {}
     decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}
     method=decision.get('selected_method');candidate=intent.get('candidate')
-    if intent.get('action')!='diagnose' or intent.get('execution_status')!='completed' or not method or not candidate:return None
+    if (intent.get('action')!='diagnose' or intent.get('execution_status')!='completed' or not method or not candidate
+            or (bound_analysis_enabled(state(host)['spec']) and decision.get('selected_candidate')!=candidate)):return None
     from tools.research.task_constraints import mathematical_method_view
     try:detail=mathematical_method_view(host,candidate)['methods'].get(method)
     except (ValueError,KeyError):return None
@@ -826,13 +904,18 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='analysis':
+                    payload=use['input']
                     if english_native(before['spec']):
                         selection=selected_analysis(host,None)
                         if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
-                        method,detail=selection;schema=selected_analysis_schema(method,detail);payload=use['input']
-                        validate_selected_analysis_payload(payload,schema,detail)
+                        method,detail=selection
+                        if bound_analysis_enabled(before['spec']):
+                            payload=bind_selected_analysis_request(host,payload,tool_use_id=use['toolUseId'])
+                        else:
+                            schema=selected_analysis_schema(method,detail)
+                            validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
-                    value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
+                    value=analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':
                     from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -1055,7 +1138,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if selected:
                 method,detail=selected
                 tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
-                    'inputSchema':{'json':selected_analysis_schema(method,detail)}}
+                    'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}
                 agent.tool_registry.registry['research_analysis']=tool
             else:agent.tool_registry.registry.pop('research_analysis',None)
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
