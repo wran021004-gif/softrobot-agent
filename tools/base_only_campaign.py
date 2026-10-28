@@ -37,46 +37,6 @@ def plan(action, candidate=None, reason='Frozen Base-only feasibility discovery'
         decision=dict(hypothesis_id='base-only-discovery',research_intent=PLAN_RESEARCH_INTENTS[action],
             selected_method=action,**(dict(selected_candidate=candidate) if candidate else {})),**payload)
 
-def bootstrap():
-    OWNER.mkdir(parents=True,exist_ok=True)
-    for original, new in [('family_space_bf4_s3_tracking.json','family_space_base_only_tracking_v1.json'),
-                          ('family_space_bf6_sensor_tool.json','family_space_base_only_sensor_v1.json')]:
-        value=read(CONFIG/original)
-        value.update(conditional_rules='base_only_consecutive_spans_v1',family_id='base_only_'+value['family_id'])
-        atomic_json(CONFIG/new,value)
-    for key in CAPS:
-        template = ('study_tracking_public.json' if key=='M4' else 'study_bf5_public.json' if key=='M5'
-                    else 'study_bf6_public.json' if key=='M6' else 'study_multicondition_public.json')
-        value=read(CONFIG/template)
-        value.update(study_id='base-only-'+key.lower()+'-20261028',base_commit='e0200b4b2415139088e8fea7780d4156a16cbbc1',
-            mode='formal_research',authorization='User pasted request 2026-10-28 explicitly authorizes Codex-organized Base-only feasibility discovery; '+str(CAPS[key])+' physics step attempts maximum for '+key+'. No Provider, Research Agent, PPO or NMPC. Campaign supervisor and frozen count ceilings both apply.',
-            family_space=('family_space_base_only_sensor_v1.json' if key=='M6' else
-                'family_space_base_only_tracking_v1.json' if key in ('M4','M5') else 'family_space_stage0_base_only_v1.json'),
-            evidence_destination='runs/base-only-owner-20261028/'+key+'/private-store')
-        if key in ('M1','M2'):
-            names=['positive_high','negative_low','central_high'] if key=='M1' else ['zero','positive','negative']
-            prefix='bf7_shared_reach_v1_' if key=='M1' else 'bf2_multidirectional_hold_frozen_v1_'
-            value['task_conditions']=[dict(condition_id=n,task='../../tasks/'+prefix+n+'.json') for n in names]
-            value.pop('task',None)
-        elif key=='M3':
-            value.pop('task_conditions',None)
-            value['task']='../../tasks/reach_hold_b3_050.json'
-        duration=.35 if key=='M2' else .5 if key=='M3' else .6
-        value['scoring_window_s']=duration
-        value['analysis_protocol']=dict(windows_s=[.05,.1,duration],samples_s=[0.,.1,.2,round(duration-.02,8)])
-        math, callbacks, replays=LIMITS[key]
-        value['budgets']=dict(provider_requests=0,protected_provider_requests=0,public_operations=500,
-            protected_public_operations=8,physical_launches=replays,mathematical_evaluations=math)
-        value['native_control_limits']=dict(evaluation_requests=callbacks,iterations=100,knots_s=4)
-        value['capabilities']=['analysis','control_correction','physical_replay']
-        value['allowed_plan_actions']=['generate','initialize_control','physical_replay','diagnose','select','stop']
-        atomic_json(CONFIG/('study_base_only_'+key.lower()+'_v1.json'),value)
-    atomic_json(CONFIG/'base_only_campaign_budget_v1.json',dict(version='base-only-discovery-owner-v1',
-        task_step_caps=CAPS,total_step_attempt_cap=sum(CAPS.values()),study_count_limits=LIMITS,
-        reservation='Before launch reserve evaluation_requests * ceil(duration/timestep), replay ceil(duration/timestep)+1. Unknown calls retain upper bound; no relaunch.',
-        m3_status='Development draft, locally frozen for this discovery only; original inherited Reach/Hold evaluation at 0.50 s. Not an approved benchmark.',
-        private_evidence='runs/base-only-owner-20261028; excluded from future Agent checkout and context'))
-
 def host_for(key):
     host=core.prepare(CONFIG/('study_base_only_'+key.lower()+'_v3.json'),directory=OWNER/key/'private-store')
     if 'freeze' not in state(host):core.bind(host)
@@ -141,6 +101,8 @@ def native(key,label,condition=None,tension=.2,callbacks=200,source_analysis=Non
     if source_analysis is None:start=seed(key,label,condition,tension)
     else:
         row=index['analyses'][source_analysis]
+        if (row['label'],row['condition'])!=(label,condition):
+            raise ValueError('CONTINUATION_REQUIRES_IDENTICAL_LABEL_AND_CONDITION')
         start=dict(candidate=row['candidate'],source=row['source'])
     cfg=h.store.artifact(start['candidate'])['configuration'];timing=cfg['task']['timing']
     duration=timing['duration_s'];period=timing['control_period_s']
@@ -205,12 +167,11 @@ def preflight(key):
     return {k:result[k] for k in ('benchmark','study','family','rule','study_worst_case_attempts','cap','physics_executed')}
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['bootstrap','preflight','generate','native','replay','stop','status'])
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['preflight','generate','native','replay','stop','status'])
     p.add_argument('--task');p.add_argument('--label',default='full-span');p.add_argument('--condition');p.add_argument('--tension',type=float,default=.2)
     p.add_argument('--callbacks',type=int,default=200);p.add_argument('--number',type=int);p.add_argument('--settings');p.add_argument('--request');p.add_argument('--reason',default='Evidence-based campaign stop')
     args=p.parse_args()
-    if args.action=='bootstrap':bootstrap();out={'configs_created':True,'physics_steps':0}
-    elif args.action=='preflight':out=[preflight(k) for k in ([args.task] if args.task else CAPS)]
+    if args.action=='preflight':out=[preflight(k) for k in ([args.task] if args.task else CAPS)]
     elif args.action=='generate':out=generate(args.task,args.label,read(Path(args.request)) if args.request else None)
     elif args.action=='native':out=native(args.task,args.label,args.condition,args.tension,args.callbacks,args.number,json.loads(args.settings) if args.settings else None)
     elif args.action=='replay':out=replay(args.task,args.number)

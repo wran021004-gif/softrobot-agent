@@ -1,0 +1,961 @@
+{
+  "version": "base-only-discovery-scalar-export-v1",
+  "total_step_attempts_upper": 4350151,
+  "total_step_attempts_lower": 4350151,
+  "confirmed_completed_steps": 4350150,
+  "preparations": [
+    {
+      "study_id": "base-only-m4-20261028",
+      "store_identity": "6e9dcf8c731ed1e1681cc9171783198b8ec883fc8047b3fa98d535f821d7e59f",
+      "status": "stopped",
+      "physics_step_attempts": 0,
+      "mathematical_evaluations": 0,
+      "numerical_s": 0.0,
+      "reason": "Pre-integration preparation only; original admission/preflight failures preserved"
+    },
+    {
+      "study_id": "base-only-m2-20261028-r1",
+      "store_identity": "77f547c83832671b7238056443bdb9c4ade477c351a6985d9cde0d23c29a3044",
+      "status": "stopped",
+      "physics_step_attempts": 0,
+      "mathematical_evaluations": 0,
+      "numerical_s": 0.3699598000093829,
+      "reason": "Pre-integration preparation only; original admission/preflight failures preserved"
+    },
+    {
+      "study_id": "base-only-m4-20261028-r1",
+      "store_identity": "55a63916ec9c0d577bdad09fc9082cb7796766a691aedac02156e7456aebce05",
+      "status": "stopped",
+      "physics_step_attempts": 0,
+      "mathematical_evaluations": 0,
+      "numerical_s": 0.36605099998996593,
+      "reason": "Pre-integration preparation only; original admission/preflight failures preserved"
+    }
+  ],
+  "total_cap": 30000000,
+  "results": [
+    {
+      "benchmark": "M4",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "bf4-timed-direction-change",
+      "task_version": "1.0.0",
+      "task_identity": "e41a4600feefe39614b7f660147208a73373d1f5f6fde23a0790a0a13dde472c",
+      "selected_task_identities": [
+        "e41a4600feefe39614b7f660147208a73373d1f5f6fde23a0790a0a13dde472c"
+      ],
+      "canonical_task_identity": "fbc2ec1ad6a11d2ec7a753cabbf269844bef64b6f8cc85a951d102475b7910d4",
+      "source_provenance": {
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control_bf4_tracking.json",
+          "sha256": "0621f3b392b4c532584e4e3d180cc36a5d4918bc712eddcd16a025b47ba303dc"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_tracking_v1.json",
+          "sha256": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf4_tracking_direction_change_v1.json",
+          "sha256": "4d5488fe0d70c8ecf91dc3dbc9cb06d95d06415a2d0d8ac7e598d583b1b897b2"
+        }
+      },
+      "condition_tasks": [],
+      "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "3d6ab5e460d27cb651fe0a5cae1fb5f37b30dc56ca75fdea9d3eb5c837f00c09",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "7f29b99b4d3b38fd9aac4b0a015998b2b824e4f1e552482131a74552145c9f7e",
+      "private_review_relative_path": "M4/review_manifest.json",
+      "proposals": 1,
+      "mathematical_requests": 1,
+      "native_callbacks": 105,
+      "replay_count": 1,
+      "physics_step_attempts_lower": 63600,
+      "physics_step_attempts_upper": 63600,
+      "confirmed_completed_steps": 63600,
+      "physics_step_cap": 2000000,
+      "native_kernel_wall_s": 6.254266600008123,
+      "replay_kernel_wall_s": 0.14727839999250136,
+      "operation_driver_elapsed_s": 10.789689540863037,
+      "numerical_s": 9.11256389998016,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": null,
+          "metrics": {
+            "max_position_error": 0.01198776272430606,
+            "rms_position_error": 0.008796828411071534,
+            "terminal_position_error": 0.01198776272430606
+          },
+          "components": {
+            "evaluator:tracking_max_error": {
+              "limit": 0.012,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.01198776272430606
+            }
+          },
+          "result_identity": "c9ed235aa8ceaafb4a438a4713a8433a5cc682070821a5cc2d19926da5d34500"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": null,
+          "status": "accepted",
+          "metrics": {
+            "max_position_error": 0.01198776272430606,
+            "rms_position_error": 0.008796828411071534,
+            "terminal_position_error": 0.01198776272430606
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    },
+    {
+      "benchmark": "M2",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "bf2-multidirectional-hold-frozen-v1-zero",
+      "task_version": "1.0.0",
+      "task_identity": "fc2e65f7d9e82f5eb71c9bd479a89477ad3980e6899fba4d55d99cbf93e7e097",
+      "selected_task_identities": [
+        "fc2e65f7d9e82f5eb71c9bd479a89477ad3980e6899fba4d55d99cbf93e7e097",
+        "686ea7378db80d8c1e3c362ea3e8e56ed5b95b1ba0f6522b25f0ce70cf4e168f",
+        "f09aa19b29264bf7b63c2e4bf402d031107c85d30eb2715234a5d70f9af567b8"
+      ],
+      "canonical_task_identity": "458bd8afe73a03bb1c3715da1c7a9a9b8d57c0f2a687131b6edbca5181ed194d",
+      "source_provenance": {
+        "condition:negative": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_negative.json",
+          "sha256": "de65172f6bf615332dc87f254439763cfc092c1638d68ad3a37b771e0bcf3328"
+        },
+        "condition:positive": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_positive.json",
+          "sha256": "e874696c22cdfc167581d35ce72d2c23f1d880b7befb3ba947e28d65fa80bccb"
+        },
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control.json",
+          "sha256": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+          "sha256": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_zero.json",
+          "sha256": "8d440c312a1adcd0958c78a411b52c50b3a503944c1124c573efbf7ee718e99c"
+        }
+      },
+      "condition_tasks": [
+        {
+          "condition_id": "zero",
+          "task_id": "bf2-multidirectional-hold-frozen-v1-zero",
+          "task_identity": "458bd8afe73a03bb1c3715da1c7a9a9b8d57c0f2a687131b6edbca5181ed194d"
+        },
+        {
+          "condition_id": "positive",
+          "task_id": "bf2-multidirectional-hold-frozen-v1-positive",
+          "task_identity": "1bacae6b261de105167f40757a8d51b959968036ca2590df4f379226e95dfca8"
+        },
+        {
+          "condition_id": "negative",
+          "task_id": "bf2-multidirectional-hold-frozen-v1-negative",
+          "task_identity": "d1877c3f0b26b028b13cfec31053f1d11b156a1dfa46c74f07ad2790183d6320"
+        }
+      ],
+      "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "93d006fbe3a65c9dd5dbecf49c6e2c190ff43c80d3c58b394e5ab97ead1efc8a",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "4b93f0faa9ccf22c7b3c4f2d1c3d956f462ef5b9dd97ec01f07f7e899d00e567",
+      "private_review_relative_path": "M2/review_manifest.json",
+      "proposals": 2,
+      "mathematical_requests": 6,
+      "native_callbacks": 1778,
+      "replay_count": 5,
+      "physics_step_attempts_lower": 1248100,
+      "physics_step_attempts_upper": 1248100,
+      "confirmed_completed_steps": 1248100,
+      "physics_step_cap": 8000000,
+      "native_kernel_wall_s": 119.30038999996032,
+      "replay_kernel_wall_s": 0.8797785999777261,
+      "operation_driver_elapsed_s": 173.62493801116943,
+      "numerical_s": 135.3758413999749,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": "zero",
+          "metrics": {
+            "holding_max_error_m": 0.008966762044447503,
+            "holding_max_speed_m_s": 0.01981225739479384,
+            "terminal_error_m": 0.008670734616640448
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008670734616640448
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008966762044447503
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.01981225739479384
+            }
+          },
+          "result_identity": "586638e0b53d8bf22c282e68b72b3c0cac6d8d845a8a8c595a98188daf8a3ebb"
+        },
+        {
+          "condition": "positive",
+          "metrics": {
+            "holding_max_error_m": 0.009909575963200992,
+            "holding_max_speed_m_s": 0.01999994882346008,
+            "terminal_error_m": 0.009909575963200992
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009909575963200992
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009909575963200992
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.01999994882346008
+            }
+          },
+          "result_identity": "5e659d2b37f660f4a86d0b1f8611fca6bb2af9e9bb5a05b371a42cc5474af596"
+        },
+        {
+          "condition": "negative",
+          "metrics": {
+            "holding_max_error_m": 0.009799928195357799,
+            "holding_max_speed_m_s": 0.01959999999999975,
+            "terminal_error_m": 0.009799928195357799
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009799928195357799
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009799928195357799
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.01959999999999975
+            }
+          },
+          "result_identity": "bfbfe22f21c245b599d1d8c805f6ce681c1b6c3f24ca2abf04aa1229430e0412"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": "zero",
+          "status": "valid_failure",
+          "metrics": {
+            "holding_max_error_m": 0.01400141292113295,
+            "holding_max_speed_m_s": 0.028002949140295427,
+            "terminal_error_m": 0.014001412921132952
+          }
+        },
+        {
+          "condition": "zero",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.008966762044447503,
+            "holding_max_speed_m_s": 0.01981225739479384,
+            "terminal_error_m": 0.008670734616640448
+          }
+        },
+        {
+          "condition": "positive",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009909575963200992,
+            "holding_max_speed_m_s": 0.01999994882346008,
+            "terminal_error_m": 0.009909575963200992
+          }
+        },
+        {
+          "condition": "negative",
+          "status": "valid_failure",
+          "metrics": {
+            "holding_max_error_m": 0.009908100175039299,
+            "holding_max_speed_m_s": 0.020000000000000896,
+            "terminal_error_m": 0.009908100175039297
+          }
+        },
+        {
+          "condition": "negative",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009799928195357799,
+            "holding_max_speed_m_s": 0.01959999999999975,
+            "terminal_error_m": 0.009799928195357799
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    },
+    {
+      "benchmark": "M1",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "bf7-shared-reach-v1-positive_high",
+      "task_version": "1.0.0",
+      "task_identity": "bba6b2817da1feb38893287e811964f0ff935c68f6a005456e852bb63c38c8fc",
+      "selected_task_identities": [
+        "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+        "bba6b2817da1feb38893287e811964f0ff935c68f6a005456e852bb63c38c8fc",
+        "b64cd99d153b358b038b7d88f09a79dd52f231580d1dc10675715f1dcbcea09e"
+      ],
+      "canonical_task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f",
+      "source_provenance": {
+        "condition:central_high": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_central_high.json",
+          "sha256": "1fbcceec2f393106ebccfc8d0062a949f751b3ee91c6d53049f55f37c68918a8"
+        },
+        "condition:central_high_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+          "sha256": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+        },
+        "condition:negative_low": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_negative_low.json",
+          "sha256": "d8fba9276836d7bbfa79ec59a225ba3c0bbcdb8f87b4d0aa6a2fcade281b637a"
+        },
+        "condition:negative_low_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+          "sha256": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+        },
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control.json",
+          "sha256": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+          "sha256": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_positive_high.json",
+          "sha256": "4a4c91c04ca57571d4f67b4430e984e1d08c366a9dfc99427ff3b79bc134ac37"
+        },
+        "task_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+          "sha256": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+        }
+      },
+      "condition_tasks": [
+        {
+          "condition_id": "positive_high",
+          "task_id": "bf7-shared-reach-v1-positive_high",
+          "task_identity": "cb13dc9740fda7cb456b4574ee2f09e4a8b039e50c7c518584cad41897e0f76f"
+        },
+        {
+          "condition_id": "negative_low",
+          "task_id": "bf7-shared-reach-v1-negative_low",
+          "task_identity": "46369b85d8ccbe1db59c548c67b5a4156a26ebe7ca94e1e25200c0acd05e1938"
+        },
+        {
+          "condition_id": "central_high",
+          "task_id": "bf7-shared-reach-v1-central_high",
+          "task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e"
+        }
+      ],
+      "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "430a4927e42b72d5b1dc1085eecaca74ae13c395c1fe198705abc5f4a2e3338a",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "ac240c3bdd8bc02606f70876eb3743f8ae56471b4e8636a6a519720772ca5421",
+      "private_review_relative_path": "M1/review_manifest.json",
+      "proposals": 2,
+      "mathematical_requests": 7,
+      "native_callbacks": 2410,
+      "replay_count": 6,
+      "physics_step_attempts_lower": 1449600,
+      "physics_step_attempts_upper": 1449600,
+      "confirmed_completed_steps": 1449600,
+      "physics_step_cap": 8000000,
+      "native_kernel_wall_s": 138.25913490002858,
+      "replay_kernel_wall_s": 0.8628627999860328,
+      "operation_driver_elapsed_s": 204.17334485054016,
+      "numerical_s": 157.1590677999484,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": "central_high",
+          "metrics": {
+            "holding_max_error_m": 0.00989998256253226,
+            "holding_max_speed_m_s": 0.029699999999999966,
+            "terminal_error_m": 0.009899982562532262
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009899982562532262
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00989998256253226
+            },
+            "holding_speed": {
+              "limit": 0.03,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.029699999999999966
+            }
+          },
+          "result_identity": "ec4472f2f1da276eaaae820f5bfa0646a6152230b979cd0976d7fcac909f144c"
+        },
+        {
+          "condition": "positive_high",
+          "metrics": {
+            "holding_max_error_m": 0.009677933544936502,
+            "holding_max_speed_m_s": 0.02969999715787175,
+            "terminal_error_m": 0.009677933544936502
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009677933544936502
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009677933544936502
+            },
+            "holding_speed": {
+              "limit": 0.03,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.02969999715787175
+            }
+          },
+          "result_identity": "68ed1b59a0092ba796dec7d8c0fae42db6b979629bade5348d25cc41195ebf8d"
+        },
+        {
+          "condition": "negative_low",
+          "metrics": {
+            "holding_max_error_m": 0.008726240377154812,
+            "holding_max_speed_m_s": 0.029120119883654066,
+            "terminal_error_m": 0.008632847894194254
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008632847894194254
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008726240377154812
+            },
+            "holding_speed": {
+              "limit": 0.03,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.029120119883654066
+            }
+          },
+          "result_identity": "85358582f6779862e011f771979a7efebca353da54836f349335e028d9cfaf2a"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": "positive_high",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009899809975334066,
+            "holding_max_speed_m_s": 0.029699995627895662,
+            "terminal_error_m": 0.009899809975334066
+          }
+        },
+        {
+          "condition": "negative_low",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009899999999999985,
+            "holding_max_speed_m_s": 0.029700000000000008,
+            "terminal_error_m": 0.009889648892868962
+          }
+        },
+        {
+          "condition": "central_high",
+          "status": "valid_failure",
+          "metrics": {
+            "holding_max_error_m": 0.026178486560359756,
+            "holding_max_speed_m_s": 0.07854888200107615,
+            "terminal_error_m": 0.026178486560359756
+          }
+        },
+        {
+          "condition": "central_high",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.00989998256253226,
+            "holding_max_speed_m_s": 0.029699999999999966,
+            "terminal_error_m": 0.009899982562532262
+          }
+        },
+        {
+          "condition": "positive_high",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009677933544936502,
+            "holding_max_speed_m_s": 0.02969999715787175,
+            "terminal_error_m": 0.009677933544936502
+          }
+        },
+        {
+          "condition": "negative_low",
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.008726240377154812,
+            "holding_max_speed_m_s": 0.029120119883654066,
+            "terminal_error_m": 0.008632847894194254
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    },
+    {
+      "benchmark": "M3",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "b3-reach-hold-050-draft",
+      "task_version": "1.0.0",
+      "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+      "selected_task_identities": [
+        "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234"
+      ],
+      "canonical_task_identity": "062de8ca2fd2acaebdbf856ba8fc3420d88c8d3943cfa789c5c9e6f06e486c6b",
+      "source_provenance": {
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control.json",
+          "sha256": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+          "sha256": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold_b3_050.json",
+          "sha256": "5a6d844cec99f0febc90696b0ca1bdc51d5e5161f06745e97e6aedd3b714eb01"
+        },
+        "task_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+          "sha256": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+        }
+      },
+      "condition_tasks": [],
+      "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "139ad6a2b606665a139a8613bffd76e38bf97c19a577ce11da16ae16feffa642",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "438c8fdf5833535eb51e3db37b0924c86a39b505a3634115e461cedbb1056251",
+      "private_review_relative_path": "M3/review_manifest.json",
+      "proposals": 2,
+      "mathematical_requests": 3,
+      "native_callbacks": 1176,
+      "replay_count": 2,
+      "physics_step_attempts_lower": 1178000,
+      "physics_step_attempts_upper": 1178000,
+      "confirmed_completed_steps": 1178000,
+      "physics_step_cap": 4000000,
+      "native_kernel_wall_s": 110.76188760000514,
+      "replay_kernel_wall_s": 0.5487176000024192,
+      "operation_driver_elapsed_s": 125.67790269851685,
+      "numerical_s": 119.13791369996034,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": null,
+          "metrics": {
+            "holding_max_error_m": 0.009948406169172598,
+            "holding_max_speed_m_s": 0.019887343773892167,
+            "terminal_error_m": 0.009948406169172598
+          },
+          "components": {
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009948406169172598
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009948406169172598
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.019887343773892167
+            }
+          },
+          "result_identity": "90be6e5b9ea7e0a1bb5fb1981580a40946aaae27af9598b5b73b682559c7076a"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": null,
+          "status": "valid_failure",
+          "metrics": {
+            "holding_max_error_m": 0.014586653109727708,
+            "holding_max_speed_m_s": 0.02920128217543062,
+            "terminal_error_m": 0.014586653109727708
+          }
+        },
+        {
+          "condition": null,
+          "status": "accepted",
+          "metrics": {
+            "holding_max_error_m": 0.009948406169172598,
+            "holding_max_speed_m_s": 0.019887343773892167,
+            "terminal_error_m": 0.009948406169172598
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    },
+    {
+      "benchmark": "M5",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "bf5-position-tool-axis",
+      "task_version": "1.0.0",
+      "task_identity": "17de11a26ef7c7ecadd833f4ccb0f12036b0ef113061369c80b4e1e08f2bf14a",
+      "selected_task_identities": [
+        "17de11a26ef7c7ecadd833f4ccb0f12036b0ef113061369c80b4e1e08f2bf14a"
+      ],
+      "canonical_task_identity": "5bf2dfd66aa0e480abae53b1d502677b06891339c40573cae8af00d8296db3ab",
+      "source_provenance": {
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control_bf5_tool_axis.json",
+          "sha256": "d1b410a28f268462b97ad97e73b01769b0bf6c22746266036f23c455c9a7426b"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_tracking_v1.json",
+          "sha256": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf5_position_tool_axis_v1.json",
+          "sha256": "3d96fde8e007a28e43a7caf5fa8c0856e5805fb85e80622fe33fbd65490f5d2d"
+        }
+      },
+      "condition_tasks": [],
+      "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "f39dc9c47a13c12c223e0567bee5516e139ecdb4741c94ee1b55a9cb905621a5",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "434cb1144d8ee445b17f3b7816e8a76eb4e9dea4be1044ec266f0974d1563ba3",
+      "private_review_relative_path": "M5/review_manifest.json",
+      "proposals": 1,
+      "mathematical_requests": 1,
+      "native_callbacks": 54,
+      "replay_count": 1,
+      "physics_step_attempts_lower": 33000,
+      "physics_step_attempts_upper": 33000,
+      "confirmed_completed_steps": 33000,
+      "physics_step_cap": 3000000,
+      "native_kernel_wall_s": 3.114274099993054,
+      "replay_kernel_wall_s": 0.14630949997808784,
+      "operation_driver_elapsed_s": 7.320537090301514,
+      "numerical_s": 5.842203099979088,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": null,
+          "metrics": {
+            "max_position_error": 0.007923371919783135,
+            "max_tool_axis_angle_error": 0.051884755688871666
+          },
+          "components": {
+            "evaluator:tool_axis_direction": {
+              "limit": 0.05235987755982988,
+              "passed": true,
+              "reason": null,
+              "unit": "rad",
+              "value": 0.051884755688871666
+            },
+            "evaluator:tool_position": {
+              "limit": 0.008,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007923371919783135
+            }
+          },
+          "result_identity": "5f7a2148a96741fc471a634413f320f4bf80cf721e0476ca309feb1e732ffcfe"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": null,
+          "status": "accepted",
+          "metrics": {
+            "max_position_error": 0.007923371919783135,
+            "max_tool_axis_angle_error": 0.051884755688871666
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    },
+    {
+      "benchmark": "M6",
+      "status": "accepted",
+      "selected": true,
+      "stop_status": "stopped",
+      "task_id": "bf6-rigid-sensor-oriented-tracking",
+      "task_version": "1.0.0",
+      "task_identity": "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45",
+      "selected_task_identities": [
+        "43d086056e1c704b00ce4762ae9baaef6526750d2ed15b57e59d8b309019ef45"
+      ],
+      "canonical_task_identity": "51b3a02c1caa08d6c11af418054f1ce11503126ed288c9f9ce86f190d5177111",
+      "source_provenance": {
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\control_bf4_tracking.json",
+          "sha256": "0621f3b392b4c532584e4e3d180cc36a5d4918bc712eddcd16a025b47ba303dc"
+        },
+        "defaults": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_study_defaults.json",
+          "sha256": "f83ca4a729a356e750b8bb11884560ad71c42a3cb03b13c015ce90b3c7002d81"
+        },
+        "family_space": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_sensor_v1.json",
+          "sha256": "59981dc09cf265117924b9dfa4fa05d9134efb1867cdada15dbf17045be6cbd3"
+        },
+        "family_space_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+          "sha256": "7692d9361b7cdd6b50bf8757baf08bdea22ee76fdb51460e83d1a507113dff70"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf6_sensor_oriented_tracking_v1.json",
+          "sha256": "82ca0911c6ebbab9f7ac54d0191f1d7897e61fd5685fde6acd399460cde4b4ca"
+        }
+      },
+      "condition_tasks": [],
+      "family_space_identity": "59981dc09cf265117924b9dfa4fa05d9134efb1867cdada15dbf17045be6cbd3",
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "study_identity": "2276e4a718685befb2306554e41eff369e6aedbe74785963bd6d1f53777a084a",
+      "implementation": "668d2c251608de7ecaacd7c8ae39183777e09962",
+      "private_review_manifest_identity": "b0713695227ca0be5cdb0220b251988d25638b5134c95926281ac25e8ee984c7",
+      "private_review_relative_path": "M6/review_manifest.json",
+      "proposals": 3,
+      "mathematical_requests": 4,
+      "native_callbacks": 628,
+      "replay_count": 3,
+      "physics_step_attempts_lower": 377851,
+      "physics_step_attempts_upper": 377851,
+      "confirmed_completed_steps": 377850,
+      "physics_step_cap": 5000000,
+      "native_kernel_wall_s": 37.29758110002149,
+      "replay_kernel_wall_s": 0.3242039000324439,
+      "operation_driver_elapsed_s": 54.25660824775696,
+      "numerical_s": 47.509098800015636,
+      "provider_requests": 0,
+      "nmpc_executions": 0,
+      "rl_training_stages": 0,
+      "selected_metrics": [
+        {
+          "condition": null,
+          "metrics": {
+            "max_position_error": 0.011937423248530352,
+            "max_tool_axis_angle_error": 0.17365806202573997,
+            "rms_position_error": 0.00870718377212198,
+            "terminal_position_error": 0.011937423248530352
+          },
+          "components": {
+            "evaluator:tool_axis_direction": {
+              "limit": 0.17453292519943295,
+              "passed": true,
+              "reason": null,
+              "unit": "rad",
+              "value": 0.17365806202573997
+            },
+            "evaluator:tracking_max_error": {
+              "limit": 0.012,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.011937423248530352
+            }
+          },
+          "result_identity": "ab36e881283cbd84450666b96316a07185dfe5c09327aaa47ef6e19286c8da18"
+        }
+      ],
+      "independent_statuses": [
+        {
+          "condition": null,
+          "status": "incomplete",
+          "metrics": {}
+        },
+        {
+          "condition": null,
+          "status": "valid_failure",
+          "metrics": {
+            "max_position_error": 0.01860290432589588,
+            "max_tool_axis_angle_error": 0.2706610157989607,
+            "rms_position_error": 0.011978879457090271,
+            "terminal_position_error": 0.013544834165305998
+          }
+        },
+        {
+          "condition": null,
+          "status": "accepted",
+          "metrics": {
+            "max_position_error": 0.011937423248530352,
+            "max_tool_axis_angle_error": 0.17365806202573997,
+            "rms_position_error": 0.00870718377212198,
+            "terminal_position_error": 0.011937423248530352
+          }
+        }
+      ],
+      "receipt_binding_audit": true,
+      "pending": false
+    }
+  ],
+  "interpretation": "Codex-organized development feasibility discovery. No autonomous Research Agent evaluation; no statistical structural advantage or global infeasibility claim.",
+  "future_agent_isolation": "A fresh agent requires clean checkout, separate Store/context and enforced read scope excluding owner runs, this chat, hidden reports and historical winners. Git ignore alone is not an access boundary."
+}
