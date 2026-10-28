@@ -160,5 +160,23 @@ class RecentRoundToolTests(unittest.TestCase):
         self.assertEqual(sum(e['kind']=='research_tool_route' for e in h.store.events(h.run_id)),1)
         self.assertTrue(any(e['kind']=='model_original_tool_feedback' and h.store.artifact(e['outputs'][0]).get('recovered_from_receipt') for e in h.store.events(h.run_id)))
 
+    def test_focused_schema_error_returns_original_candidate_repair_hint(self):
+        h=provision();schema=agent.plan_schema(['diagnose'],decision_required=True,diagnose_candidate_required=True,focused=True)
+        raw=dict(action='diagnose',hypothesis='Fixture.',expected_observation='Fixture.',weakening_observation='Fixture.',
+            fixed_conditions='Fixture.',stopping_condition='Fixture.',interpretation='Fixture.',
+            decision=dict(hypothesis_id='fixture',research_intent='DIAGNOSE',selected_method='endpoint'))
+        error=next(e for e in Draft202012Validator(schema).iter_errors(raw) if list(e.absolute_path)==['decision'])
+        value=agent.error_feedback(h,dict(name='research_plan',input=raw,toolUseId='offline-schema-error'),error,state(h))
+        self.assertEqual(value['field'],'decision.selected_candidate')
+        self.assertEqual(value['error_code'],'SELECTED_ANALYSIS_CANDIDATE_REQUIRED')
+        self.assertIn('no candidate is inferred',value['expected'])
+        self.assertNotIn("schema['allOf']",value['reason'])
+
+    def test_harness_distinguishes_its_limit_from_real_transport_failure(self):
+        from tests.research.main_off_live_probe import probe_limit_reason
+        error=RuntimeError('Client wrapper');error.__cause__=ValueError('PROBE_FEEDBACK_TURN_RESERVED_NO_SEND')
+        self.assertEqual(probe_limit_reason(error),'PROBE_FEEDBACK_TURN_RESERVED_NO_SEND')
+        self.assertIsNone(probe_limit_reason(RuntimeError('Real connection failure')))
+
 
 if __name__=='__main__':unittest.main()

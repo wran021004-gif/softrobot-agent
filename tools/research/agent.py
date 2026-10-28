@@ -675,6 +675,7 @@ def validate_selected_analysis_payload(payload, schema, detail):
 def error_feedback(host, use, exc, before):
     """Small correction response; exact rejected payload and traceback stay in Store."""
     import traceback
+    from jsonschema.exceptions import ValidationError as SchemaValidationError
     s=state(host)
     full=record(host,'tool_request_error',dict(tool_use=use,error=type(exc).__name__,message=str(exc),traceback=traceback.format_exc()))
     counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','local_solves','admitted_training_stages'))
@@ -694,6 +695,16 @@ def error_feedback(host, use, exc, before):
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']
+    elif isinstance(exc,SchemaValidationError):
+        # Keep the exact validator dump in Store; send a field-specific repair
+        # instead of Schema internals on the focused-tool correction turn.
+        path=list(exc.absolute_path);message=exc.message
+        missing=next((k for k in exc.validator_value if k not in exc.instance),None) if exc.validator=='required' else None
+        if missing is not None:path.append(missing)
+        field='.'.join(map(str,path)) or None
+        code='TOOL_SCHEMA_'+str(exc.validator).upper();expected=exc.message
+        if field=='decision.selected_candidate' and use.get('name')=='research_plan' and use.get('input',{}).get('action')=='diagnose':
+            code='SELECTED_ANALYSIS_CANDIDATE_REQUIRED';message=code+': '+exc.message
     hints={
         'SELECTED_ANALYSIS_CANDIDATE_REQUIRED':('decision.selected_candidate','Choose an exact owned candidate reference from the current candidate index, then resubmit the diagnose Plan with that reference. Method selection is not settled and research_analysis is unavailable until this identity is explicit; no candidate is inferred.'),
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),

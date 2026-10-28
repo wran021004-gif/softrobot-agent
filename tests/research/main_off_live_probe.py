@@ -243,6 +243,17 @@ def intercepts(host):
     return plan,math
 
 
+def probe_limit_reason(exc):
+    """Recognize only our pre-send test caps through SDK/client wrappers."""
+    seen=set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        if isinstance(exc,ValueError) and str(exc) in ('PROBE_FEEDBACK_TURN_RESERVED_NO_SEND','PROBE_LIVE_ROLE_CAP_NO_SEND'):
+            return str(exc)
+        exc=exc.__cause__
+    return None
+
+
 async def run(host,inner,*,max_requests=8):
     previous=reporter.provider_usage(host)
     counts={role:previous.get(role,{}).get('requests',0) for role in ('conversation','reporter')}
@@ -266,6 +277,11 @@ async def run(host,inner,*,max_requests=8):
          patch('httpx.AsyncHTTPTransport',return_value=transport)):
         try:
             await agent.converse(host,max_new_provider_requests=max_requests,pause_after_completed_invocations=1)
+        except Exception as exc:
+            reason=probe_limit_reason(exc)
+            if reason is None:raise
+            agent.record(host,'probe_supervisor_completion',dict(reason=reason,next_request_sent=False,
+                scientific_stop=False,original_exception_type=type(exc).__name__))
         finally:
             completed=any(e['kind']=='probe_analysis_feedback_delivery' for e in host.store.events(host.run_id))
             exhausted=counts['conversation']>=8
