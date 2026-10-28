@@ -12,6 +12,12 @@ import test from 'node:test';
 const exec = promisify(execFile);
 const cli = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
 
+test('smoke requires an explicit model before touching account state', async () => {
+  const result = await exec(process.execPath, [cli, 'smoke'], { windowsHide: true }).catch(error => error);
+  assert.equal(result.code, 1);
+  assert.equal(JSON.parse(result.stderr).error.code, 'model_required');
+});
+
 test('real Windows CLI initializes, serves authenticated health, reads key concurrently and blocks unsigned inference', { skip: process.platform !== 'win32', timeout: 40_000 }, async t => {
   const directory = await mkdtemp(join(tmpdir(), 'gateway-cli-test-'));
   t.after(() => rm(directory, { recursive: true, force: true }));

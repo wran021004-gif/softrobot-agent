@@ -52,8 +52,6 @@ def request_settings(provider):
             result.update(thinking=dict(type='disabled' if reasoning=='none' else 'enabled'),
                 reasoning_effort='none' if reasoning=='none' else 'high')
         else:
-            caps=provider.get('model_capabilities') or {}
-            if reasoning not in caps.get('reasoning',[]):raise ValueError('MODEL_REASONING_NOT_VERIFIED')
             result['reasoning_effort']=reasoning
     elif adapter=='deepseek':
         result.update(thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'])
@@ -66,7 +64,7 @@ def request_settings(provider):
 
 
 def build_model(provider, *, api_key, transport, model_class):
-    settings=request_settings(provider)
+    settings=validate_provider(provider)
     params={k:v for k,v in settings.items() if k not in ('model','stream','thinking')}
     if 'thinking' in settings:params['extra_body']=dict(thinking=settings['thinking'])
     client=AsyncOpenAI(api_key=api_key,base_url=provider['base_url'],max_retries=0,
@@ -76,15 +74,18 @@ def build_model(provider, *, api_key, transport, model_class):
 
 
 def validate_provider(provider):
-    request_settings(provider)
+    settings=request_settings(provider)
     if provider['adapter']=='chatgpt_gateway':
         caps=provider.get('model_capabilities') or {}
         if not provider.get('model') or caps.get('model')!=provider['model'] or not caps.get('tools') or not caps.get('catalog_source'):
             raise ValueError('EXPLICIT_ACCOUNT_MODEL_AND_TOOL_CAPABILITIES_REQUIRED')
         if caps.get('verification') not in ('offline_contract','account_verified'):
             raise ValueError('MODEL_CAPABILITY_VERIFICATION_REQUIRED')
+        if provider['reasoning'] not in caps.get('reasoning',[]):
+            raise ValueError('MODEL_REASONING_NOT_VERIFIED')
         if not provider.get('context_guard') or not caps.get('max_request_bytes'):
             raise ValueError('EXPLICIT_GATEWAY_CAPACITY_REQUIRED')
+    return settings
 
 
 def credential(provider, path):
@@ -223,8 +224,6 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
         from tools.research.config import role_provider
         expected=role_provider(host.store.session(run)['state']['spec'],pilot(host)['provider'],purpose)
-        from tools.research.evidence_policy import require_english
-        require_english(wire,host.store.session(run)['state']['spec'],source='model request')
         settings=request_settings(expected)
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
             or any(wire.get(k)!=v for k,v in settings.items())

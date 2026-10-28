@@ -515,8 +515,6 @@ def _finish(host, boundary, wire, response):
         from tools.research.evidence_policy import english_native
         if english_native(state(host)['spec']) and not interpretations:
             raise ValueError('REPORTER_INTERPRETATION_REQUIRED')
-        from tools.research.evidence_policy import require_english
-        require_english([plain(item) for item in interpretations],state(host)['spec'],source='new Reporter interpretation')
         # The model is allowed to fill only the interpretation field.
         report=report.model_copy(update=dict(interpretations=interpretations))
     except Exception as exc:

@@ -49,6 +49,11 @@ Windows DPAPI/CLI checks do not sign in or perform inference. Production login,
 model discovery and smoke are separate explicit operations requiring authorization.
 No real account/network verification was performed for Harness V2.
 
+`npm run smoke -- --model <active-account-slug>` requires an explicit model and
+sends exactly one text request with `reasoning_effort: none`. Missing or unlisted
+models send no inference. Catalog order is not a cost ranking. Smoke has no
+medium option; a separately authorized medium probe needs model support evidence.
+
 ## Harness configuration
 
 Use `configs/research/runtime_chatgpt_gateway.example.json` as an incomplete

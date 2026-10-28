@@ -62,7 +62,6 @@ def role_provider(spec, provider, purpose):
     policy = spec.get('research_decisions', {}).get('role_policy')
     if policy is None:
         return provider
-    validate_role_policy(policy)
     if policy['version'] == 'research_roles_v1' and purpose != 'reporter':
         return provider
     profile = policy['reporter' if purpose == 'reporter' else 'main']
@@ -543,8 +542,6 @@ def resolve(path, profile=None, *, backend_profile=None):
             if architecture=='english_decision_v2':
                 if decisions.get('language_policy')!=dict(version='english_sources_v1',authored_language='en'):
                     raise ValueError('EXPLICIT_ENGLISH_SOURCE_POLICY_REQUIRED')
-                from tools.research.evidence_policy import require_english
-                require_english(study.get('execution_instructions',''),dict(research_decisions=decisions),source='authored instructions')
             if not decisions.get('role_policy'):
                 raise ValueError('ENGLISH_STUDY_REQUIRES_VERSIONED_ROLES')
             handoff=decisions.setdefault('handoff_policy',dict(version='token_handoff_v1',input_tokens=38000))

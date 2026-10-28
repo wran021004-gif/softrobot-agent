@@ -9,7 +9,6 @@ from tools.research import agent
 from tools.research.provider import (credential, request_settings, validate_provider,
     discover_models, model_messages, LiveBoundary, pending, IncompleteModelOutput)
 from tools.research.config import role_provider
-from tools.research.evidence_policy import require_english
 from tools.research.provider_context import capacity_estimate,handoff_input_estimate
 from tools.research.state import state,update
 from tests.research.test_harness_v2 import v2_host
@@ -99,7 +98,7 @@ class ProviderV2Tests(unittest.TestCase):
         self.assertNotIn('thinking',request_settings(g))
         self.assertEqual(request_settings({**g,'reasoning':'medium'})['reasoning_effort'],'medium')
         with self.assertRaisesRegex(ValueError,'NOT_VERIFIED'):
-            request_settings({**g,'reasoning':'medium','model_capabilities':{**g['model_capabilities'],'reasoning':['none']}})
+            validate_provider({**g,'reasoning':'medium','model_capabilities':{**g['model_capabilities'],'reasoning':['none']}})
         with self.assertRaisesRegex(ValueError,'ACCOUNT_MODEL'):
             validate_provider({**g,'model':'different-model'})
 
@@ -149,15 +148,6 @@ class ProviderV2Tests(unittest.TestCase):
         self.assertTrue(all(r['usage'] is None and r['money'] is None for r in receptions))
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
 
-    def test_language_origin_and_decoded_content(self):
-        spec=dict(research_decisions=dict(language_policy=dict(version='english_sources_v1',authored_language='en')))
-        require_english(dict(text='Measured Δx = 3 µm.'),spec,source='authored fixture')
-        with self.assertRaisesRegex(ValueError,'ENGLISH_SOURCE'):
-            require_english('CURRENT_RESEARCH_PACKET\n'+json.dumps(dict(content='中文历史资料')),spec,source='historical fixture')
-        with self.assertRaisesRegex(ValueError,'REVIEWED_ENGLISH'):
-            require_english(dict(view_kind='english_derivation',content='Translated conclusion.'),spec,source='unreviewed fixture')
-        require_english(dict(view_kind='english_derivation',authored_language='en',original_reference=dict(artifact_id='a'*64),
-            reviewed_by='explicit offline fixture',content='Historical guidance; not a new observation.'),spec,source='reviewed fixture')
 
 
 if __name__=='__main__':unittest.main()

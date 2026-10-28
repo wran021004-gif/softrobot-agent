@@ -27,6 +27,9 @@ async function main() {
       throw new ChatGPTError('invalid_command', 'Missing option value.');
     }
   }
+  if (command === 'smoke' && !value('--model')) {
+    throw new ChatGPTError('model_required', 'Use smoke --model with an explicit active-account catalog model. No inference sent.');
+  }
   await secureDirectory(directory);
   const encryption = createDPAPIEncryption();
   if (!await encryption.isAvailable()) throw new ChatGPTError('protected_storage_unavailable', 'Windows DPAPI is required. This version has no Linux storage adapter.');
@@ -78,12 +81,12 @@ async function main() {
         const catalog = await fetch(`${base}/v1/models`, { headers });
         if (!catalog.ok) throw new ChatGPTError('smoke_catalog_failed', 'Model discovery failed. No inference sent.', false, catalog.status);
         const models = (await catalog.json()).data;
-        const model = value('--model') ?? models[0]?.id;
+        const model = value('--model');
         if (!model || !models.some(item => item.id === model)) throw new ChatGPTError('model_not_found', 'Select a model returned by the active account. No inference sent.');
         console.log(`身份和 plan usage 已验证；模型发现成功；选择 ${model}。将只发送一次“请只回答 OK”。`);
         const response = await fetch(`${base}/v1/chat/completions`, {
           method: 'POST', headers, signal: AbortSignal.timeout(195_000),
-          body: JSON.stringify({ model, messages: [{ role: 'user', content: 'Reply only OK.' }], stream: false }),
+          body: JSON.stringify({ model, reasoning_effort: 'none', messages: [{ role: 'user', content: 'Reply only OK.' }], stream: false }),
         });
         const body = await response.json();
         if (!response.ok) {

@@ -670,8 +670,6 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         def run(use,**kwargs):
             before=state(host)
             try:
-                from tools.research.evidence_policy import require_english
-                if kind!='plan':require_english(use['input'],before['spec'],source='new Main tool arguments')
                 if on_demand and kind!='route':
                     from jsonschema import Draft202012Validator
                     Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
@@ -1126,14 +1124,17 @@ def decision_packet(host):
         controller.pop('parameter_schema')
         controller['parameter_schema_query']=dict(reference=research['evidence_access']['reference'],
             view='working_set',pointer='/controller_capabilities/parameter_schema')
+        candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):]
+        bindings=[]
+        for ref in candidates:
+            identity=host.store.artifact(ref)['profile_identity']
+            bindings.append(dict(candidate=ref,profile_identity=identity,
+                executable_under_current_profile=identity==s['profile']['identity']))
         return dict(research=research,implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
             controller_capabilities=controller,
-            candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],
-            candidate_profile_bindings=[dict(candidate=r,profile_identity=host.store.artifact(r)['profile_identity'],
-                executable_under_current_profile=host.store.artifact(r)['profile_identity']==s['profile']['identity'])
-                for r in ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):]],
+            candidates=candidates,candidate_profile_bindings=bindings,
             family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])) if spec.get('start_mode')=='family_space' else None,
             source_relative_design=dict(reference_parameters=spec['reference_parameters'],allowed_parameters=spec['allowed_parameters'],

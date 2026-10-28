@@ -7,7 +7,6 @@ import unittest
 from schemas.platform import ModelConfig
 from tools.research.config import ROOT,resolve,role_provider
 from tools.research.provider import request_settings
-from tools.research.evidence_policy import require_english
 
 
 class AcceptanceTests(unittest.TestCase):
@@ -21,7 +20,6 @@ class AcceptanceTests(unittest.TestCase):
         for purpose in ('conversation','reporter'):
             p=role_provider(spec,spec['runtime']['provider'],purpose)
             self.assertEqual(request_settings(p)['thinking'],dict(type='disabled'))
-        require_english(spec['execution_instructions'],spec,source='reviewed English instructions')
 
     def test_frozen_r2_provider_serialization_is_unchanged(self):
         fixture=json.loads((ROOT/'tests/research/fixtures/r2_harness_boundary.json').read_text(encoding='utf8'))

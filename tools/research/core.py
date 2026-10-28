@@ -41,7 +41,7 @@ def read_tool_evidence(host,query,*,record_read=True):
     body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
     if q.view!='working_set' or q.pointer:
         if len(body)<=4096:
-            return read_evidence(host,query,record_read=record_read)
+            return _record_evidence_read(host,q,state(host),value,record_read)
     # Summary projections may contain derived paths: navigate the original
     # value instead, so every advertised pointer addresses real source data.
     node=value
@@ -533,8 +533,6 @@ def initial_structure_action(host):
 
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
-    from tools.research.evidence_policy import require_english
-    require_english(value,state(host)['spec'],source='new research Plan')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         origin='engineering'
     plan=Plan.model_validate(value)

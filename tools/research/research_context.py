@@ -1090,7 +1090,7 @@ def agent_decision_brief(host):
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
     if state(host).get('probe_lifecycle'):brief['probe_lifecycle']=state(host)['probe_lifecycle']
-    trace=research_action_trace(host,limit=None)
+    trace=current['evidence_working_set']['action_trace']
     from tools.research.config import conversation_policy
     policy=conversation_policy(state(host)['spec'])
     brief['action_trace']=bounded_action_trace(trace,policy['trace_limit']) if policy else compact_action_trace(trace)

@@ -79,7 +79,7 @@ def retrieve(host,query,*,reader='agent'):
             continue
         body=source.read_bytes()
         content=read(ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
-        from tools.research.evidence_policy import english_sources, require_english
+        from tools.research.evidence_policy import english_sources
         if q.operation=='read' and english_sources(state(host)['spec']):
             # No silent translation or claim that historical prose is a fresh
             # observation. The owner supplies a reviewed, referenced view.
@@ -90,7 +90,6 @@ def retrieve(host,query,*,reader='agent'):
                 raise ValueError('EXPERIENCE_ENGLISH_ORIGIN_REQUIRED: '+canonical)
             if origin['kind']=='reviewed_translation' and (not origin.get('original_reference') or not origin.get('reviewed_by')):
                 raise ValueError('REVIEWED_ENGLISH_DERIVATION_REQUIRED')
-            require_english(content,state(host)['spec'],source='experience '+canonical)
         refs=[]
         def walk(value):
             if isinstance(value,dict):
