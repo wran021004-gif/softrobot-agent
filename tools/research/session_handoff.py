@@ -443,7 +443,12 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
         if (verification.get('preparation')!=preparation or not verification.get('independently_restored')
                 or files!=verification['snapshot_files']):raise ValueError('SDK_COMMITTED_SNAPSHOT_FILES_MISMATCH')
         return 'initial'
-    if agent.messages or any(e['kind']=='r3_request' for e in host.store.events(host.run_id)):
+    # Reporter and read-only Provider probes share accounting, not SDK history.
+    # The caller already blocks unsettled/unconsumed Provider outcomes. Unknown
+    # purposes still require an anchor; only known non-SDK requests are excluded.
+    if agent.messages or any(e['kind']=='r3_request' and
+            host.store.artifact(e['outputs'][0]).get('purpose') not in ('reporter','provider_validation')
+            for e in host.store.events(host.run_id)):
         raise ValueError('SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR')
     return 'empty'
 

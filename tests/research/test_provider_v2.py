@@ -3,6 +3,7 @@ import asyncio
 from copy import deepcopy
 import json
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import httpx
 from tools.research import agent
@@ -23,6 +24,24 @@ def gateway(h):
 
 
 class ProviderV2Tests(unittest.TestCase):
+    def test_empty_sdk_history_distinguishes_shared_non_sdk_accounting(self):
+        from tools.research.session_handoff import trusted_history
+        from tools.research.provider import record
+        h=v2_host();sdk=SimpleNamespace(messages=[],
+            _session_manager=SimpleNamespace(session_id=state(h)['pilot']['framework_session_id']))
+        before=h.store.remaining()
+        for purpose in ('provider_validation','reporter'):
+            record(h,'r3_request',dict(purpose=purpose))
+            self.assertEqual(trusted_history(h,sdk),'empty')
+        self.assertEqual(h.store.remaining(),before)
+        for purpose in ('conversation','summarization','unknown'):
+            ref=record(h,'p4_synthetic_metadata',dict(purpose=purpose))
+            with patch.object(h.store,'events',return_value=[dict(kind='r3_request',outputs=[ref])]):
+                with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):
+                    trusted_history(h,sdk)
+        sdk.messages=[dict(role='user',content=[dict(text='Untrusted suffix')])]
+        with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):trusted_history(h,sdk)
+
     def test_gateway_completed_reasoning_reuses_original_receipt(self):
         h=v2_host();p=deepcopy(state(h)['pilot']);p['provider']=gateway(h);update(h,pilot=p)
         calls=[dict(id='opaque-call',type='function',function=dict(name='evidence_read',arguments='{}'))]
