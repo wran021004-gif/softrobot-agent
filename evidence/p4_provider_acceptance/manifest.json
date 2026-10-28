@@ -1,0 +1,644 @@
+{
+  "study_id": "p4-m5-none-20261029-a01",
+  "execution_commit": "9c7d674803225cba7265f906b331e81159a11751",
+  "rows": [
+    {
+      "number": 1,
+      "request_id": "r3-request-d9c23c11187a4a519fce162b8e8d827c",
+      "purpose": "provider_validation",
+      "request": {
+        "artifact_id": "aaa320a5eb4d5661f58aee8a75fc825e0ec4ff95bb306f539f3911e036aeb98c",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "59cd9a7827d4f38c46f4315af27633fbbb86a76fa3ee41780402e77f31876d4f",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 690,
+      "offline_serialized_token_estimate": 164,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "p4_echo",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_nZUNasPXj1VOaAKqQ8Xh1209",
+          "type": "function",
+          "function": {
+            "name": "p4_echo",
+            "arguments": "{\"token\": \"p4-live-readonly-20261029\"}"
+          }
+        }
+      ],
+      "text": "",
+      "feedback": [],
+      "usage": {
+        "completion_tokens": 48,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 325,
+        "prompt_tokens": 325,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 373
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "number": 2,
+      "request_id": "r3-request-98de475247b54c6bb4f0b1fede7e8dfe",
+      "purpose": "provider_validation",
+      "request": {
+        "artifact_id": "f134338061c166c3f6e7b7093be3c125cbdfd824b3da87a0841d17f8af015a70",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "04fbffb8b464f0062a9669ff966bb5ebdb8cff97ae7686331a7179dd0d1ce6a0",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 905,
+      "offline_serialized_token_estimate": 261,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [],
+      "tool_calls": [],
+      "text": "The exact returned token is `p4-live-readonly-20261029`, and the function succeeded (`status: \"success\"`). The result also reports `scientific_evidence: false`.",
+      "feedback": [],
+      "usage": {
+        "completion_tokens": 41,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 161,
+        "prompt_tokens": 161,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 202
+      },
+      "money": null,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "number": 3,
+      "request_id": "r3-request-f3e29f8803c947ad960ff03f15333ce5",
+      "purpose": "conversation",
+      "request": {
+        "artifact_id": "c03e93cdc7856a20cc037c21459707e4c5b588a37e2564dcaca9e2dc0024ab6d",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "e3644199595e318b6be58d7801e6bee4be7584db9c9fe96aa635cacfb18fd5ab",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 21286,
+      "offline_serialized_token_estimate": 5309,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "research_plan",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "research_route",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_bfFNQIwQJ5KTXHwlGI2k3897",
+          "type": "function",
+          "function": {
+            "name": "research_route",
+            "arguments": "{\"tool\": \"evidence_read\"}"
+          }
+        }
+      ],
+      "text": "I'll start by reading the frozen generation domain to understand the legal parameter space.",
+      "feedback": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "evidence_read"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "d6d0e0ae8fc624b556e6be60fe761f90210ec330afd554aefb2815d8b9f322f1",
+            "media_type": "application/json"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 54,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 5666,
+        "prompt_tokens": 5666,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 5720
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "number": 4,
+      "request_id": "r3-request-4f8ddb8eb1e147c4806967a220ce3ae6",
+      "purpose": "conversation",
+      "request": {
+        "artifact_id": "c355e6ea6670cff5a5521305a0989c996aeec601820ad4000cc9ac07858095ff",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "c7889875f6f7a7caae1b88b019e053e4a578acb5cb1759f50bcf77242180d7f2",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 25508,
+      "offline_serialized_token_estimate": 6505,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "research_plan",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_flgqTtDy1H2JQ57Mafja2910",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"pointer\": \"\", \"view\": \"full\"}"
+          }
+        }
+      ],
+      "text": "I'll start by examining the frozen family domain to understand what generation inputs are available.",
+      "feedback": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "1d93e9d7c3eedcb6ccd69c9fa90d8b9a33b524e42c4fb107e680ed73c565799a",
+            "media_type": "application/json"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 135,
+        "prompt_cache_hit_tokens": 3200,
+        "prompt_cache_miss_tokens": 3627,
+        "prompt_tokens": 6827,
+        "prompt_tokens_details": {
+          "cached_tokens": 3200
+        },
+        "total_tokens": 6962
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "number": 5,
+      "request_id": "r3-request-6210935bf3124ab695ec8c1c3bdeb645",
+      "purpose": "conversation",
+      "request": {
+        "artifact_id": "f4e7f86330e28cfc5ace695a1451af35922b15bacd71219901d16beea267c8ea",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "078e4a97ad3518d00f88f80b6d474e520926d9b689719f491282e9432a30e84f",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 28566,
+      "offline_serialized_token_estimate": 8770,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "research_plan",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_ocR0X0i4K4VQ5H7tySfJ5620",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"\", \"fields\": [\"candidate_index\", \"control_result_links\", \"eligible_methods\", \"read_coverage\", \"source_references\", \"citation_eligibility\", \"all_fresh_results\"]}"
+          }
+        }
+      ],
+      "text": "I'll check the working set to understand what candidate-generation or evidence paths remain available.",
+      "feedback": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "candidate_index",
+              "control_result_links",
+              "eligible_methods",
+              "read_coverage",
+              "source_references",
+              "citation_eligibility",
+              "all_fresh_results"
+            ],
+            "pointer": "",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "7c76b7536c634f3e197b38dceaeb4fa6b29048614cad655560da4c18b2d87127",
+            "media_type": "application/json"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 189,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 7818,
+        "prompt_tokens": 8074,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "total_tokens": 8263
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "number": 6,
+      "request_id": "r3-request-32ccb456ae95483cb491723161c1eb88",
+      "purpose": "conversation",
+      "request": {
+        "artifact_id": "259071cc6fa6929207f4a477da25f01cb630f4ebcedd39ac94766deb44bab4c4",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "b2ff246c8877c3dbf386361ea2fd36b266c4872d84d2e90b7a5bca4213a5b1e2",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 21621,
+      "offline_serialized_token_estimate": 5922,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "research_plan",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_4GZnmxz7QcSNgXLW547W5661",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"pointer\": \"/result\", \"view\": \"full\"}"
+          }
+        },
+        {
+          "index": 1,
+          "id": "call_01_r4ujFzdJW9geHVTbWJrx1736",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"pointer\": \"/all_fresh_results\", \"view\": \"working_set\"}"
+          }
+        }
+      ],
+      "text": "I'll examine the actual stored evidence before deciding. The working-set projection shows empty candidate/method lists, but I should verify the original domain query to confirm what's genuinely available.",
+      "feedback": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/result",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "status": "error",
+          "reference": {
+            "artifact_id": "d65cec7115bc0bcd5751cbcb39a1b93736b2fce1843104dcb14c1810bd1c35af",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "a866aa7a8bdc3cf0d4a63347c19c63b41c3b01de16f619e8bdbacbf7b288ef14",
+            "media_type": "application/json"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 274,
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 4144,
+        "prompt_tokens": 5808,
+        "prompt_tokens_details": {
+          "cached_tokens": 1664
+        },
+        "total_tokens": 6082
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "number": 7,
+      "request_id": "r3-request-8331babc0c644f4b9a44e7ab68f62521",
+      "purpose": "conversation",
+      "request": {
+        "artifact_id": "ed41ac25b1d8bacdafee108df791d2411dfc1d58acf9ae49125ee9480029b7fa",
+        "media_type": "application/json"
+      },
+      "response": {
+        "artifact_id": "f4a829fc84f172b67af416cfd639e09da6603689aa4eed6340ef50a6ba04b5a8",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "recovery_verified": {
+        "request_semantics": true,
+        "response_bytes": true,
+        "settled_receipt": true
+      },
+      "actual_request_bytes": 22078,
+      "offline_serialized_token_estimate": 6211,
+      "model": "deepseek-flash",
+      "thinking": {
+        "type": "disabled"
+      },
+      "reasoning_effort": "none",
+      "schemas": [
+        {
+          "name": "research_plan",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "actions": null
+        }
+      ],
+      "tool_calls": [
+        {
+          "index": 0,
+          "id": "call_00_iR5Jy2mkiBvTB44zpa377036",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"\"}"
+          }
+        },
+        {
+          "index": 1,
+          "id": "call_01_vEoyyHvC3JypMOr0n4jd8796",
+          "type": "function",
+          "function": {
+            "name": "evidence_read",
+            "arguments": "{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"summary\", \"pointer\": \"\"}"
+          }
+        }
+      ],
+      "text": "I'll start by reading the working-set view of the family domain to see what's actually available.",
+      "feedback": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "2cffd634888fed1ec37ecae9af9b97cac5de659fc81193f47c182027f3b98fd8",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "",
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "status": "success",
+          "reference": {
+            "artifact_id": "7f4fce237a0b166cb0efcce3a8d543251c7418978047a4bdeb1d5ea2347512f3",
+            "media_type": "application/json"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 249,
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 4415,
+        "prompt_tokens": 6079,
+        "prompt_tokens_details": {
+          "cached_tokens": 1664
+        },
+        "total_tokens": 6328
+      },
+      "money": null,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 32940,
+    "completion_tokens": 990,
+    "total_tokens": 33930
+  },
+  "usage_complete": true,
+  "money": null,
+  "money_status": "unknown",
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 8,
+      "tool_calls": 80,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 7,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 8.9220000000023
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 1,
+      "tool_calls": 73,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "pending_provider_requests": 0,
+  "unconsumed_response": null,
+  "candidates": 0,
+  "plans": 0,
+  "mathematical_evaluations": 0,
+  "independent_physical_results": 0,
+  "reporter_requests": 0,
+  "research_status": "stopped",
+  "final_disposition": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "Supervisor ended the bounded P4 acceptance run after repeated read-only browsing, one corrected invalid pointer, and no scientific Plan. Seven of eight shared Provider requests were used, including two protocol probes; one remains unspent. This is engineering closure, not model STOP, scientific infeasibility, or task acceptance. Preserve all original evidence and costs; do not open another Study to retry.",
+    "selected": null
+  },
+  "levels": {
+    "L1": false,
+    "L2": false,
+    "L3": false,
+    "L4": false
+  },
+  "scope": "Real Provider protocol passed, no scientific Plan or new task-performance evidence. Engineering closure is not model STOP. No scientific Worker or retry.",
+  "request_export": "Canonical original Store JSON, not byte-for-byte HTTP formatting; actual serialized length is recorded separately. Response files preserve exact original HTTP bodies."
+}

@@ -38,7 +38,7 @@ def audit(source):
         spec=s['spec']
         registry['research_plan']=SimpleNamespace(tool_spec=dict(name='research_plan',description=agent.DECISION_PLAN_DESCRIPTION,
             inputSchema={'json':agent.plan_schema(spec['allowed_plan_actions'],decision_required=True,
-                family_version=spec['family_space']['version'],family_space=spec['family_space'])}))
+                family_version=spec['family_space']['version'])}))
         directory=s['pilot']['tool_directory']
         loaded=agent.load_selected_tool_schema(h,registry,directory)
         packet['research'].update(tool_directory=directory,loaded_tool=loaded,

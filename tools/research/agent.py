@@ -31,7 +31,7 @@ DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed dec
     'use research_analysis when offered and obtain exact method details through evidence_read. '
     'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
     'For STOP, retrieve and cite the complete new result index.')
-def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False,focused=False):
+def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -158,7 +158,7 @@ def load_selected_tool_schema(host, registry, directory):
         else:
             spec=s['spec']
             selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
-                family_version=spec.get('family_space',{}).get('version'),family_space=spec.get('family_space'),
+                family_version=spec.get('family_space',{}).get('version'),
                 diagnose_candidate_required=spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',focused=True)}}
     elif selected and name=='research_rl':
         schema=deepcopy(selected.tool_spec['inputSchema']['json']);actions=schema['properties']['operation']['enum']
@@ -918,7 +918,6 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
-                family_space=s['spec'].get('family_space'),
                 diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)

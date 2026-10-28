@@ -39,9 +39,8 @@ def read_tool_evidence(host,query,*,record_read=True):
         return read_evidence(host,query,record_read=record_read)
     value=read_evidence(host,query,record_read=False)
     body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
-    if q.view!='working_set' or q.pointer:
-        if len(body)<=4096:
-            return _record_evidence_read(host,q,state(host),value,record_read)
+    if len(body)<=4096:
+        return _record_evidence_read(host,q,state(host),value,record_read)
     # Summary projections may contain derived paths: navigate the original
     # value instead, so every advertised pointer addresses real source data.
     node=value

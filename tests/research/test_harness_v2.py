@@ -21,6 +21,13 @@ def v2_host():
 
 
 class HarnessV2Tests(unittest.TestCase):
+    def test_small_selected_working_set_returns_values_without_navigation_wrapper(self):
+        from tools.research.core import read_tool_evidence
+        h=v2_host();query=dict(reference=state(h)['family_space_reference'],view='working_set',
+            fields=['candidate_index','all_fresh_results'])
+        value=read_tool_evidence(h,query)
+        self.assertEqual(value,dict(candidate_index=[],all_fresh_results=[]))
+
     @classmethod
     def setUpClass(cls):
         cls.r2=json.loads((ROOT/'tests/research/fixtures/r2_harness_boundary.json').read_text(encoding='utf8'))
