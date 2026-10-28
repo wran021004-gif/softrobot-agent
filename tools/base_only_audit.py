@@ -12,10 +12,13 @@ from tools.research_tasks import _source_issue, _outcome_issue
 from tools.state_io import atomic_json, digest
 
 
-def audit(key):
-    if not (OWNER/key/'private-store/platform.sqlite').exists():
+def audit(key, *, host=None, owner=None, write_manifest=True):
+    """Verify existing receipts; injected read-only host avoids preparation writes."""
+    owner=OWNER if owner is None else owner
+    if not (owner/key/'private-store/platform.sqlite').exists():
         raise ValueError('EXISTING_OWNER_STORE_REQUIRED_FOR_READ_ONLY_AUDIT')
-    h=host_for(key);s=state(h);index=load_index(key)
+    h=host if host is not None else host_for(key);s=state(h)
+    index=json.loads((owner/key/'index.json').read_text(encoding='utf8'))
     assert s['pending'] is None
     assert all(op['status']=='settled' for op in index['operations'])
     records=[]
@@ -63,7 +66,7 @@ def audit(key):
     witness=dict(benchmark=key,store=str(h.store.root),study=s['spec']['resolved_identity'],
         frozen_implementation=s.get('freeze'),selected=selected,selected_records=selected_records,
         all_records=records,supervisor_index_identity=digest(index))
-    atomic_json(OWNER/key/'review_manifest.json',witness)
+    if write_manifest:atomic_json(owner/key/'review_manifest.json',witness)
     lower=sum(op.get('confirmed_lower',0) for op in index['operations'])
     upper=sum(op.get('charged_upper',op['reserved_upper']) for op in index['operations'])
     assert upper<=CAPS[key]

@@ -150,7 +150,7 @@ class MujocoFailureSnapshot:
             raise
 
 
-def playback_tensions(inp, physics, scene, commands, folder):
+def playback_tensions(inp, physics, scene, commands, folder, *, step_observer=None, xml_path=None):
     """Run a fixed SI tension sequence through the existing candidate MuJoCo scene."""
     import mujoco
     from .mjcf import compile_xml
@@ -160,7 +160,8 @@ def playback_tensions(inp, physics, scene, commands, folder):
     if scene['control']['tension_execution_mode']!='ideal_tension':
         raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_TENSION')
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
-    xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
+    xml=(Path(xml_path) if xml_path is not None else
+        compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml'))
     model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
     tool_binding=check_rigid_tool_model(inp,model) if inp.task.family=='task.oriented_tracking' else None
     if tool_binding is not None:atomic_json(folder/'rigid_tool_binding.json',tool_binding)
@@ -202,6 +203,14 @@ def playback_tensions(inp, physics, scene, commands, folder):
             speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
             requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
     rows=[sample(0,None,np.zeros(len(aids)))];atomic_json(folder/'samples.json',rows)
+    # Observers receive a detached copy, including integration state and caches.
+    # Forward operations there cannot alter warmstarts or the executing MjData.
+    def observe(step,interval):
+        if step_observer is not None:
+            detached=mujoco.MjData(model)
+            mujoco.mj_copyData(detached,model,data)
+            step_observer(model,detached,step,interval)
+    observe(0,-1)
     steps=0;failure=None;maximum_contacts=0;contact_steps=0;first_contact_time=None
     for k,command in enumerate(u):
         data.ctrl[aids]=command
@@ -213,6 +222,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
         for j in range(substeps):
             _apply_mujoco_forces(model,data,forces)
             previous=float(data.time);safety.call(data,mujoco.mj_step,'playback.step');steps+=1
+            observe(steps,k)
             if inp.task.family=='task.oriented_tracking':
                 maximum_contacts=max(maximum_contacts,int(data.ncon))
                 if data.ncon:
