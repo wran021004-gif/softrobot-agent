@@ -24,3 +24,10 @@ Original performance and static acceptance tolerances unchanged in protocol v3.
 Initial payout domain: each reference length +/-0.2 mm, independently frozen.
 Original timestep and solver parameters initially retained. Any numerical
 protocol comparison gets explicit source identity; no retrospective relabeling.
+
+Completed 2026-10-28: steps 1–4 and final numerical verification. P0-A/B passed.
+23 assemblies / 17 unique structures, 94 math requests, 1,744,000 integration
+attempts. No six-condition performance pass; holdout loads intentionally unused.
+Best valid fine-step CD assembly remains too stiff at the force point and has
+ratio >1. Study stopped through the existing stop action; old Store unchanged.
+See phs2d_round2_results_20261028.md and the independent round-2 evidence archive.
