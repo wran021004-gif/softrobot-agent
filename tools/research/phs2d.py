@@ -20,10 +20,12 @@ ROOT=Path(__file__).resolve().parents[2]
 OWNER=ROOT/'runs/phs2d'
 
 
-def host():
-    h=core.prepare(ROOT/'configs/research/study_phs2d_v1.json',directory=OWNER/'store')
+def host(round2=False):
+    study='study_phs2d_round2_v1.json' if round2 else 'study_phs2d_v1.json'
+    owner=ROOT/'runs/phs2d-round2' if round2 else OWNER
+    h=core.prepare(ROOT/'configs/research'/study,directory=owner/'store')
     if 'freeze' not in state(h):core.bind(h)
-    p=read(ROOT/'configs/research/phs2d_protocol_v2.json')
+    p=read(ROOT/'configs/research'/('phs2d_protocol_v3.json' if round2 else 'phs2d_protocol_v2.json'))
     s=state(h)
     if 'phs' not in s:
         ref=save(h,p,'phs_protocol_freeze')
@@ -53,6 +55,11 @@ def request(h,p,details,fn,*,steps=0,math=0,phase='P1'):
         if v['steps']+steps>lim['physics_step_attempts'] or v['math']+math>lim['math_requests']:
             raise ValueError('PHS_BUDGET_EXHAUSTED')
         if phase=='P0' and v['p0_steps']+steps>lim['p0_steps']:raise ValueError('P0_BUDGET_EXHAUSTED')
+        if 'p1_steps' in lim:
+            if phase not in ('P0','P1','FINAL'):raise ValueError('UNKNOWN_PHASE')
+            used=v.setdefault('phase_steps',dict(P0=0,P1=0,FINAL=0))
+            if phase=='P1' and used['P1']+steps>lim['p1_steps']:raise ValueError('P1_RESERVE_PROTECTS_FINAL')
+            used[phase]+=steps
         v['steps']+=steps;v['math']+=math
         if phase=='P0':v['p0_steps']+=steps
         v['pending']=key
@@ -77,13 +84,14 @@ def request(h,p,details,fn,*,steps=0,math=0,phase='P1'):
     with h.store.transaction() as db:
         s=h.store.session(h.run_id,db)['state'];v=s['phs'];v['steps']-=steps-attempts
         if phase=='P0':v['p0_steps']-=steps-attempts
+        if 'phase_steps' in v:v['phase_steps'][phase]-=steps-attempts
         v['pending']=None
         receipt=h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller='phs2d-development',
             tool_id='research.phs2d_development',execution_status=execution,solver_status=execution,
             analysis_status='development_not_registered',task_success=None,charged=cost),
             output=result,elapsed=elapsed,db=db,kind='phs')
         v['results'][key]=receipt['output'];h.store.update_state(db,h.run_id,s)
-    atomic_json(OWNER/'latest_cost.json',state(h)['phs'])
+    atomic_json(h.store.root.parent/'latest_cost.json',state(h)['phs'])
     if execution=='failed':raise ValueError(result)
     return result,receipt['output']
 
@@ -103,12 +111,18 @@ def candidate(h,p,label,generation,reason):
     return ref
 
 
-def build(h,p,ref,*,slack=0.,unrestricted=False):
+def build(h,p,ref,*,slack=0.,unrestricted=False,payout_lengths_m=None):
     cfg=h.store.artifact(ref)['configuration'];design=cfg['robot']['structure']['data']
     physics=resolve(design,cfg['policy']['discretization']['data'])
     assert all(t['points'][0]['body']==-1 for t in physics['tendons'])
     payout=np.array(physics['reference_lengths_m'])+slack
-    model=PassiveModel(physics,p,payout,OWNER/'models'/digest(dict(candidate=ref,slack=slack,unrestricted=unrestricted)),unrestricted)
+    if payout_lengths_m is not None:
+        names=[t['entity'] for t in physics['tendons']]
+        if set(payout_lengths_m)!=set(names):raise ValueError('EXACT_PAYOUT_CHANNELS_REQUIRED')
+        payout=np.array([payout_lengths_m[n] for n in names])
+        if np.max(abs(payout-np.array(physics['reference_lengths_m'])))>p['payout_offset_bound_m']+1e-12:
+            raise ValueError('PAYOUT_OUTSIDE_FROZEN_ASSEMBLY_DOMAIN')
+    model=PassiveModel(physics,p,payout,h.store.root.parent/'models'/digest(dict(candidate=ref,payout=payout.tolist(),unrestricted=unrestricted)),unrestricted)
     return model
 
 

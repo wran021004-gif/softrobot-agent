@@ -1,0 +1,119 @@
+{
+  "version": "phs2d_passive_v3",
+  "status": "development_not_registered_SELECT",
+  "gravity": [
+    0,
+    0,
+    -9.81
+  ],
+  "mount_position": [
+    0,
+    0,
+    0.5
+  ],
+  "mount_rotation": [
+    [
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ]
+  ],
+  "total_flexible_length_m": 0.28,
+  "cells_per_segment": 12,
+  "force_n": 0.1,
+  "search_s": [
+    0.3,
+    0.5,
+    0.7
+  ],
+  "holdout_s": [
+    0.4,
+    0.6
+  ],
+  "monitor_s": [
+    0,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1
+  ],
+  "s_semantics": "cumulative flexible material length; rigid connector offsets excluded; tip_site measured separately",
+  "timestep_s": 0.00025,
+  "equilibrium_max_s": 4.0,
+  "load_max_s": 4.0,
+  "ramp_s": 0.5,
+  "tail_s": 0.25,
+  "sample_every_steps": 40,
+  "tip_horizontal_limit_m": 0.005,
+  "force_point_x_min_m": 0.01,
+  "ratio_limit": 0.3,
+  "out_of_plane_limit_m": 0.002,
+  "tip_speed_limit_m_s": 0.001,
+  "monitor_speed_limit_m_s": 0.001,
+  "tail_drift_limit_m": 0.0005,
+  "qvel_inf_limit_rad_s": 0.01,
+  "static_balance_inf_limit_nm": 1e-05,
+  "length_excess_limit_m": 5e-05,
+  "initial_lateral_limit_m": 0.005,
+  "solreflimit": [
+    0.004,
+    1
+  ],
+  "solimplimit": [
+    0.999,
+    0.999,
+    0.001,
+    0.5,
+    2
+  ],
+  "limits": {
+    "physics_step_attempts": 8000000,
+    "p0_steps": 400000,
+    "p1_steps": 6800000,
+    "final_reserved_steps": 800000,
+    "math_requests": 400,
+    "candidates": 80
+  },
+  "stop": "first six search and four fresh holdout development passes; otherwise finite diagnostic search; no infeasibility claim",
+  "numerical_revision_reason": "Round 2 independent authorization; split P0-A semantics and P0-B KKT plus unloaded dynamic validation. Original acceptance and force unchanged.",
+  "payout_offset_bound_m": 0.0002,
+  "static_solver": {
+    "method": "SLSQP",
+    "max_iterations": 400,
+    "ftol": 1e-13,
+    "length_tolerance_m": 1e-08,
+    "stationarity_tolerance_nm": 1e-06,
+    "complementarity_tolerance_nm": 1e-08,
+    "active_tolerance_m": 1e-07,
+    "rank_relative_tolerance": 1e-08,
+    "hessian_step_rad": 1e-05,
+    "minimum_reduced_eigenvalue": 1e-07
+  },
+  "diagnostic_recording": "qacc, force vectors and cold static recomputation in v3; original evidence immutable"
+}
