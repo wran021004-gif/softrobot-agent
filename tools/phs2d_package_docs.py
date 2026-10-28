@@ -17,7 +17,8 @@ def generate(package):
     base=package/TASK_DIR
     structure=read(base/'structure.json');physics=structure['physics'];task=read(base/'task.json')
     dataset=read(base/'dataset.json');payout=read(base/'payout_lengths.json');protocol=task['protocol']
-    for name in ('phs2d_io.py','view_phs2d.py','simulate_phs2d.py','validate_phs2d.py','validate_all.py'):
+    for name in ('phs2d_io.py','view_phs2d.py','simulate_phs2d.py','validate_phs2d.py','validate_all.py',
+                 'portable_xml.py','run_portable.py'):
         shutil.copyfile(ROOT/'scripts'/name,package/'scripts'/name)
     save(base/'requirements.txt','mujoco==3.13.0\nnumpy==2.4.6')
     save(base/'task_zh.md',f'''# PHS-2D 被动头部稳定任务
@@ -163,6 +164,9 @@ python3.11 -m venv .viewer-env
 播放只跳转至真实保存帧，不插值、不积分。--check-states 对每帧执行独立运动学检查；--check-only 只检查加载。
 --render 输出原模型 PNG，仍需要 OpenGL；Linux 的 MUJOCO_GL=egl/osmesa 未在本次 Windows 验证。
 九段深层 XML 使用已验证的 32 MiB 编译线程，不改变物理方程。实际测试记录见根 viewer_validation.json。
+Windows 中文路径由 Python 读取原 XML 字节后交给同一 MuJoCo 编译器，不修改或重新生成结构。
+原 M1–M6 入口在中文路径下使用 `python -B scripts/run_portable.py view_trajectory.py --benchmark M1 --condition central_high`；
+同样可包装 validate_package.py 和 simulate_controls.py。旧脚本及数据字节均保持不变。
 
 ## 保存动画与动力学复现的区别
 
@@ -234,8 +238,13 @@ XML SHA-256：`{structure['xml_sha256']}`；源设计 SHA-256 与各内容寻址
 
 原 M1–M6 的 10 条主动任务轨迹及历史验收完整保留，新增 PHS-2D 的 10 条被动力工况和 1 条无力基准。
 新增入口：[PHS-2D 中文说明](PHS2D_passive_head_stabilization/README.md)。
-统一校验：`python -B scripts/validate_all.py`；原主动任务校验 `python -B scripts/validate_package.py` 语义未改动。
+统一校验：`python -B scripts/validate_all.py`；原主动任务校验语义未改动。
 PHS 动画：`python -B scripts/view_phs2d.py --s 0.50 --direction positive --loop`。
+M1–M6 动画：`python -B scripts/run_portable.py view_trajectory.py --benchmark M1 --condition central_high --loop`。
+原主动校验：`python -B scripts/run_portable.py validate_package.py`；
+原主动重放：`python -B scripts/run_portable.py simulate_controls.py --benchmark M2 --condition positive --output ../new_M2_replay`。
+run_portable.py 仅适配 Windows 中文 XML 文件路径，原模型、主动脚本文件和验收语义不变。
+下方历史说明中的直接旧入口仍可在 ASCII 路径使用；中文路径统一使用以上包装入口。
 全部命令从资料包根目录执行；环境安装和 Linux/Windows 命令见各说明。
 
 **本次 PHS 增量导出新增物理积分为 0。** 下方原 M1–M6 说明中的 6,700 步属于既有历史导出，未在本次重跑。

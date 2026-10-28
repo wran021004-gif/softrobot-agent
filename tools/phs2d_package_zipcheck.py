@@ -1,6 +1,7 @@
 """Extract the final ZIP to a fresh path and run all 21 zero-integration checks."""
 import argparse
 import json
+import os
 from pathlib import Path,PurePosixPath
 import subprocess
 import sys
@@ -28,7 +29,9 @@ def check(archive,output,report_path,publication):
     package=output/roots.pop()
     print(json.dumps(dict(action='zip_extracted',arbitrary_path_with_spaces_and_unicode=True)),flush=True)
     command=[sys.executable,'-B',str(package/'scripts/validate_all.py'),'--package',str(package),'--report',str(report_path)]
-    process=subprocess.Popen(command,cwd=package,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding='utf8')
+    environment={**os.environ,'PYTHONIOENCODING':'utf-8'}
+    process=subprocess.Popen(command,cwd=package,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
+                             text=True,encoding='utf8',env=environment)
     captured=[]
     for line in process.stdout:
         captured.append(line)

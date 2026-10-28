@@ -5,11 +5,12 @@ from pathlib import Path
 from phs2d_io import read,write,require,forbid_integration,TASK_DIR
 import validate_package
 import validate_phs2d
+from portable_xml import portable_xml_loading
 
 
 def validate(root):
     forbid_integration()
-    active = validate_package.validate(root)
+    with portable_xml_loading():active = validate_package.validate(root)
     manifest = read(root/'manifest.json')
     entries = manifest.get('passive_benchmarks',[])
     require(len(entries) == 1 and entries[0]['type'] == 'passive_fixed_payout_v1' and

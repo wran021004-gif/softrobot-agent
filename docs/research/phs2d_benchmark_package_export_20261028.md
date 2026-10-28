@@ -36,6 +36,11 @@ M1–M6 的十条主动任务、原文件和历史验收不变。
 `manifest.trajectories` 仍为原十条；新增 `passive_benchmarks`。
 原 package_io、主动查看器、主动模拟器、旧校验器与导出框架都没有修改。
 
+Windows 原生 MuJoCo 文件打开接口不接受中文路径。新增 portable_xml.py 从 Python 读取原 XML 字节，
+交给同一 from_xml_string 编译器；所有包内 XML 均为自包含。PHS 编译线程使用该入口，
+统一校验临时适配旧入口的文件读取。run_portable.py 可包装原主动查看/校验/复现脚本，旧脚本字节不变。
+子进程验证明确使用 UTF-8 输出，避免中文路径错误信息造成第二个编码错误。
+
 只读工具覆盖 mj_step、mj_step1、mj_step2 为显式报错入口，避免验证阶段意外积分。
 接收方只需 Python、MuJoCo 和 NumPy，不依赖 Agent、Provider、Store 或 Harness。
 Matplotlib 只用于开发端科学图表生成，不是独立查看器依赖。
@@ -71,7 +76,7 @@ Linux 命令提供但未验证；本次实际环境为 Windows、Python 3.11.16�
 
 ## 实际检查
 
-- 新被动导出及旧主动导出针对性回归共 15 项单元测试通过；数值单元夹具均为人工构造，未调用真实积分器。
+- 新被动导出、Unicode 路径与旧主动导出针对性回归全部通过；实际测试数量见资料包交付报告。数值单元夹具均为人工构造，未调用真实积分器。
 - PHS 首轮全部 352,011 帧检查通过，CSV/NPZ 共享字段最大误差 0，独立 forward 位姿误差 0。
 - M1–M6 原十条通过原完整性校验，255 个原不可变文件哈希一致。
 - 无 GUI 查看器验证 32,001 帧，位姿误差 0；PNG 原生渲染成功；GUI smoke 3 秒正常播放，实际帧数见包中 viewer_validation.json。

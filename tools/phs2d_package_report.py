@@ -105,6 +105,8 @@ GUI 实际帧数、环境、完整相对命令和脚本 SHA 见 [viewer_validati
 暂停/继续、循环、重播、速度调整逻辑与原主动导出回归共 {test_count} 项测试通过。
 真正 dynamics 重放未自动运行；接收方以后须明确指定新包外输出目录主动执行。
 Linux 启动命令已提供但未验证。
+Windows 中文路径使用 portable_xml.py 读取原 XML 字节，旧主动入口可由 run_portable.py 包装；
+所有 XML 自包含，编译器、物理参数及旧脚本字节不变。最终 ZIP 另在含中文与空格的新路径解压校验。
 
 ## ZIP 与边界
 
@@ -131,6 +133,7 @@ PHS 结论仅是原开发性独立数值见证，尚未注册正式 TaskAdapter/
 M1–M6 的文件身份、十条轨迹与历史验收不变；旧主动导出 6,700 步为历史成本。
 本次 PHS 导出与校验新增积分 0。主动 trajectories 字段保持原语义，新增 passive_benchmarks。
 所有旧脚本保留，新根入口 scripts/validate_all.py 采用类型化分派。
+portable_xml.py 和 run_portable.py 只适配 Windows 中文 XML 路径，不改写原模型或旧脚本。
 ZIP 发布完整性与大小见包外同名 phs2d-publication.json。
 ''',encoding='utf8')
 

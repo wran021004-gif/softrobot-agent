@@ -14,6 +14,8 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import phs2d_io as io
 from view_phs2d import playback_key
 from validate_phs2d import validate_case_label
+from portable_xml import load_xml,portable_xml_loading
+from tests.research.test_base_only_export import fixture_directory
 
 
 class PortablePHSTests(unittest.TestCase):
@@ -62,7 +64,7 @@ class PortablePHSTests(unittest.TestCase):
         def fake(path):
             threads.append(threading.current_thread())
             return SimpleNamespace(opt=SimpleNamespace(iterations=0,tolerance=0.))
-        with patch.object(io.mujoco,'MjModel',SimpleNamespace(from_xml_path=fake)):
+        with patch.object(io,'load_xml',fake):
             model=io.load_model('fabricated.xml')
         self.assertNotEqual(threads[0],threading.current_thread())
         self.assertEqual(threading.stack_size(),before)
@@ -71,7 +73,7 @@ class PortablePHSTests(unittest.TestCase):
 
     def test_loader_propagates_compile_error(self):
         def fake(path):raise ValueError('fabricated compile error')
-        with patch.object(io.mujoco,'MjModel',SimpleNamespace(from_xml_path=fake)):
+        with patch.object(io,'load_xml',fake):
             with self.assertRaisesRegex(ValueError,'fabricated compile error'):io.load_model('fabricated.xml')
 
     def test_readonly_guard_blocks_all_three_integration_entrypoints(self):
@@ -102,6 +104,25 @@ class PortablePHSTests(unittest.TestCase):
         validate_case_label(entry,protocol)
         with self.assertRaises(ValueError):validate_case_label({**entry,'force_n':.1},protocol)
         with self.assertRaises(ValueError):validate_case_label({**entry,'stage':'search'},protocol)
+
+    def test_unicode_xml_adapter_preserves_bytes_model_and_legacy_factory(self):
+        xml=b'<mujoco><worldbody><body><joint/><geom type="sphere" size=".01"/></body></worldbody></mujoco>'
+        with fixture_directory() as folder:
+            path=Path(folder)/'中文 path';path.mkdir();path=path/'robot.xml';path.write_bytes(xml)
+            previous=mujoco.MjModel.from_xml_path
+            with portable_xml_loading():model=mujoco.MjModel.from_xml_path(str(path))
+            self.assertEqual(model.nq,1)
+            self.assertEqual(path.read_bytes(),xml)
+            self.assertIs(mujoco.MjModel.from_xml_path,previous)
+            with self.assertRaises(ValueError):
+                with portable_xml_loading():raise ValueError('fixture exception')
+            self.assertIs(mujoco.MjModel.from_xml_path,previous)
+
+    def test_portable_loader_rejects_missing_external_assets(self):
+        with fixture_directory() as folder:
+            path=Path(folder)/'external.xml'
+            path.write_text('<mujoco><asset><mesh file="missing.obj"/></asset></mujoco>',encoding='utf8')
+            with self.assertRaisesRegex(ValueError,'SELF_CONTAINED_XML'):load_xml(path)
 
 
 if __name__=='__main__':unittest.main()

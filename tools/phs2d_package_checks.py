@@ -35,7 +35,7 @@ def checks(package, gui=False):
         phs2d=dict(status='passed',checks=results,physics_steps=0,preview_sha256=sha(package/preview),
             environment=dict(python=platform.python_version(),mujoco=mujoco.__version__,numpy=np.__version__,platform=platform.platform()),
             gui_smoke_executed=gui,linux_tested=False,
-            script_sha256={p.name:sha(p) for p in (package/'scripts').glob('*phs2d*.py')}))
+            script_sha256={p.name:sha(p) for p in sorted((package/'scripts').glob('*.py'))}))
     write(package/'viewer_validation.json',report)
     print(json.dumps(report['phs2d'],ensure_ascii=False,indent=2))
 

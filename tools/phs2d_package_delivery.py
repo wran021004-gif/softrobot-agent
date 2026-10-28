@@ -60,7 +60,17 @@ def index(staging):
 
 def publish(package, staging):
     baseline = read(staging/TASK_DIR/'evidence/legacy_hash_snapshot.json')
-    require(snapshot(package) == baseline['files'], 'ORIGINAL_CHANGED_SINCE_SNAPSHOT')
+    original_state=snapshot(package) == baseline['files']
+    if not original_state:
+        # Permit correcting only this task's already published, hash-verified increment.
+        current=read(package/'manifest.json')
+        owned=read(package/'phs2d_delivery_report.json')
+        require(current['version']=='base_only_package_v2_with_passive_phs2d' and
+                owned['source_research_commit']==read(staging/'phs2d_delivery_report.json')['source_research_commit'],
+                'NOT_AN_OWNED_PHS_INCREMENT')
+        require(all(sha(package/p)==identity for p,identity in current['files'].items()),'CURRENT_INCREMENT_CHANGED')
+        require(all(sha(package/p)==identity for p,identity in baseline['files'].items() if p not in MUTABLE_ROOT),
+                'ORIGINAL_IMMUTABLE_FILE_CHANGED')
     manifest = read(staging/'manifest.json')
     require(all(sha(staging/p) == identity for p,identity in manifest['files'].items()), 'STAGING_HASH_FAILURE')
     require(read(staging/'validation.json')['status'] == 'passed', 'STAGING_VALIDATION_NOT_PASSED')
@@ -68,6 +78,7 @@ def publish(package, staging):
     require(shutil.disk_usage(package).free > 2*total+package.with_suffix('.zip').stat().st_size,
             'INSUFFICIENT_SPACE_OLD_ZIP_PRESERVED')
     archive = package.with_suffix('.zip')
+    previous_zip_sha256=sha(archive)
     temporary = archive.with_name(archive.name+'.phs2d-building')
     require(not temporary.exists(), 'TEMPORARY_ZIP_ALREADY_EXISTS')
     paths = [staging/'manifest.json', *[staging/p for p in manifest['files']]]
@@ -86,16 +97,20 @@ def publish(package, staging):
                 while block := stream.read(4*1024*1024): h.update(block)
             require(h.hexdigest() == identity, 'ZIP_MEMBER_SHA256:'+name)
     backup = archive.with_name(archive.stem+'.before_phs2d.zip')
-    require(not backup.exists(), 'OLD_ZIP_BACKUP_ALREADY_EXISTS')
-    shutil.copy2(archive, backup)
+    if not backup.exists():
+        require(original_state,'ORIGINAL_BACKUP_REQUIRED_FOR_CORRECTION')
+        shutil.copy2(archive, backup)
     require(sha(backup) == baseline['original_zip_sha256'], 'OLD_ZIP_BACKUP_HASH')
-    require(not (package/TASK_DIR).exists(), 'PHS_DESTINATION_ALREADY_EXISTS')
+    require(original_state == (not (package/TASK_DIR).exists()),'PHS_DESTINATION_STATE_CHANGED')
     import_copy=package.parent/'.phs2d_verified_import_20261028'
     require(not import_copy.exists(),'TEMPORARY_IMPORT_DIRECTORY_ALREADY_EXISTS')
     shutil.copytree(staging/TASK_DIR, import_copy, ignore=shutil.ignore_patterns('__pycache__'))
     for name,identity in manifest['files'].items():
         if name.startswith(TASK_DIR+'/'):
             require(sha(import_copy/Path(name).relative_to(TASK_DIR))==identity,'IMPORTED_TASK_HASH')
+    previous_import=package.parent/'.phs2d_previous_import_20261028'
+    require(not previous_import.exists(),'PREVIOUS_IMPORT_BACKUP_ALREADY_EXISTS')
+    if not original_state:os.replace(package/TASK_DIR,previous_import)
     os.replace(import_copy,package/TASK_DIR)
     for path in paths:
         name = path.relative_to(staging).as_posix()
@@ -118,9 +133,13 @@ def publish(package, staging):
     os.replace(temporary, archive)
     report = dict(status='published',zip_file=archive.name,original_zip_backup=backup.name,
         manifest_sha256=sha(package/'manifest.json'),zip_bytes=archive.stat().st_size, zip_sha256=sha(archive),
-        old_zip_backup_sha256=sha(backup), zip_crc_and_all_member_hashes='passed',
+        old_zip_backup_sha256=sha(backup),previous_zip_sha256=previous_zip_sha256,zip_crc_and_all_member_hashes='passed',
         all_legacy_immutable_files_preserved=True, physics_steps=0)
     write(staging.parent/(package.name+'.phs2d-publication.json'), report)
+    if previous_import.exists():
+        require(previous_import.resolve().parent==package.parent.resolve() and
+                previous_import.name=='.phs2d_previous_import_20261028','UNSAFE_TEMPORARY_IMPORT_CLEANUP')
+        shutil.rmtree(previous_import)
     print(json.dumps(report))
 
 

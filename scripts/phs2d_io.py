@@ -8,6 +8,7 @@ import threading
 
 import mujoco
 import numpy as np
+from portable_xml import load_xml
 
 TASK_DIR = 'PHS2D_passive_head_stabilization'
 RESEARCH_SHA = '9d6d160e050c836b87d0563a497fc0ec1c3761a8'
@@ -53,7 +54,7 @@ def load_model(path):
     results, errors = [], []
     def compile_model():
         try:
-            results.append(mujoco.MjModel.from_xml_path(str(path)))
+            results.append(load_xml(path))
         except BaseException as exc:
             errors.append(exc)
     previous = threading.stack_size()
