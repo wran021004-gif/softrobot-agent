@@ -23,12 +23,18 @@ OWNER=ROOT/'runs/phs2d'
 def host():
     h=core.prepare(ROOT/'configs/research/study_phs2d_v1.json',directory=OWNER/'store')
     if 'freeze' not in state(h):core.bind(h)
-    p=read(ROOT/'configs/research/phs2d_protocol_v1.json')
+    p=read(ROOT/'configs/research/phs2d_protocol_v2.json')
     s=state(h)
     if 'phs' not in s:
         ref=save(h,p,'phs_protocol_freeze')
         update(h,phs=dict(protocol=ref,steps=0,p0_steps=0,math=0,candidates={},results={},pending=None,p0_pass=False))
-    elif h.store.artifact(s['phs']['protocol'])!=p:raise ValueError('FROZEN_PHS_PROTOCOL_CHANGED')
+    elif h.store.artifact(s['phs']['protocol'])!=p:
+        old=h.store.artifact(s['phs']['protocol'])
+        if old['version']!='phs2d_passive_v1' or s['phs']['pending'] or s['phs']['p0_pass']:
+            raise ValueError('FROZEN_PHS_PROTOCOL_CHANGED')
+        ref=save(h,p,'phs_presearch_numerical_revision')
+        s['phs'].setdefault('protocol_history',[]).append(s['phs']['protocol'])
+        s['phs']['protocol']=ref;update(h,phs=s['phs'])
     return h,p
 
 
@@ -125,9 +131,8 @@ def math(h,p,ref,base_ref,phase='P1',slack=0.,unrestricted=False):
     native=build(h,p,ref,slack=slack,unrestricted=unrestricted)
     baseline=h.store.artifact(base_ref)
     if baseline['status']!='stable':raise ValueError('KNOWN_STABLE_EQUILIBRIUM_REQUIRED')
-    if max(baseline['samples'][-1]['tensions_n'])>1e-6:raise ValueError('ZERO_MULTIPLIER_TANGENT_SCOPE')
     return request(h,p,dict(kind='compliance',candidate=ref,baseline=base_ref,slack=slack,unrestricted=unrestricted),
-        lambda _:compliance(native,baseline['samples'][-1]['qpos'],p['search_s'],p['force_n']),math=1,phase=phase)
+        lambda _:compliance(native,baseline['samples'][-1]['qpos'],baseline['samples'][-1]['tensions_n'],p['search_s'],p['force_n']),math=1,phase=phase)
 
 
 def generation(count=2,young=(2e6,2e6),lengths=(.14,.14),spans=None):
@@ -165,7 +170,8 @@ def p0():
     for force in (.05,.10,.20,-.10):
         result,rr=equilibrium(h,p,ref,force=force,baseline=br,phase='P0')
         er=score(h,p,ref,br,rr,.5);trials.append(dict(force=force,raw=rr,evaluation=er,status=result['status']))
-    math_result,mr=math(h,p,ref,br,phase='P0')
+    mr=None
+    if base['status']=='stable':_,mr=math(h,p,ref,br,phase='P0')
     passed=(checks['max_material_mapping_error']<1e-8 and checks['tendon_jac_error']<1e-8 and
         checks['tendon_length_error']<1e-8 and checks['zero_force'] and checks['no_actuators'] and
         checks['down'] and checks['lateral']<1e-8 and base['status']=='stable' and

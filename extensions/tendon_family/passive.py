@@ -117,20 +117,20 @@ class PassiveModel:
             samples=samples,checks=checks,tail_drift_m=drift,tail_excess_m=excess)
 
 
-def compliance(native,q,locations,force):
+def compliance(native,q,tensions,locations,force):
     """Directional local QP plus bilateral nullspace diagnostic at known equilibrium."""
     from scipy.optimize import minimize, LinearConstraint
     from scipy.linalg import null_space
     m=native.model;d=mujoco.MjData(m);d.qpos[:]=q;mujoco.mj_forward(m,d)
     J=native.tendon_jac(d);Jtip=native.point(d,native.physics['tip'])[1]
-    # At no-load straight equilibrium lambda=0; Hessian U includes native gravity.
+    # Hessian of the Lagrangian includes gravity and taut-rope geometric stiffness.
     def gradient(x):
         e=mujoco.MjData(m);e.qpos[:]=x;mujoco.mj_forward(m,e)
-        return e.qfrc_bias-e.qfrc_passive
+        return e.qfrc_bias-e.qfrc_passive+native.tendon_jac(e).T@tensions
     h=1e-5;eye=np.eye(m.nv)
     K=np.column_stack([(gradient(np.array(q)+h*v)-gradient(np.array(q)-h*v))/(2*h) for v in eye])
     asym=float(np.max(np.abs(K-K.T)));K=(K+K.T)/2
-    near=(d.ten_length>=native.payout-1e-7)&np.array(m.tendon_limited,dtype=bool)
+    near=((d.ten_length>=native.payout-1e-7)|(np.array(tensions)>1e-6))&np.array(m.tendon_limited,dtype=bool)
     A=J[near];Z=null_space(A,rcond=1e-9);reduced=Z.T@K@Z
     eig=np.linalg.eigvalsh(reduced);sv=np.linalg.svd(A,compute_uv=False)
     predictions=[]
@@ -139,7 +139,10 @@ def compliance(native,q,locations,force):
         for sign in (1,-1):
             load=JF[0]*force*sign
             bilateral=Z@np.linalg.solve(reduced,Z.T@load)
-            constraints=[] if not len(A) else [LinearConstraint(A,-np.inf,np.zeros(len(A)))]
+            positive=np.array(tensions)[near]>1e-6
+            constraints=[]
+            if np.any(positive):constraints.append(LinearConstraint(A[positive],0.,0.))
+            if np.any(~positive):constraints.append(LinearConstraint(A[~positive],-np.inf,0.))
             result=minimize(lambda x:.5*x@K@x-load@x,np.zeros(m.nv),jac=lambda x:K@x-load,
                 constraints=constraints,method='SLSQP',options=dict(ftol=1e-12,maxiter=200))
             def measure(x):
@@ -149,7 +152,7 @@ def compliance(native,q,locations,force):
                 success=bool(result.success),message=result.message,iterations=int(result.nit),
                 inequality_residual=float(max(0,np.max(A@result.x))) if len(A) else 0.))
     return dict(method='passive_constrained_compliance_v1',model='native 48 hinge coordinates',
-        assumption='no-load equilibrium, zero tendon multipliers; directional unilateral tangent QP; finite-force values are extrapolations',
+        assumption='no-load equilibrium; positive multipliers held taut, zero multipliers unilateral; finite-force extrapolation only; MuJoCo soft penetration idealized as hard boundary',
         jacobian_rank=int(np.linalg.matrix_rank(A,tol=1e-9)),nullity=int(Z.shape[1]),singular_values=sv.tolist(),
         reduced_eigenvalues=eig.tolist(),stiffness_asymmetry=asym,predictions=predictions,
         K=K.tolist(),Jlength=J.tolist(),Jtip=Jtip.tolist(),q=q)
