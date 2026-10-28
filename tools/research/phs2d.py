@@ -174,7 +174,7 @@ def p0():
     if base['status']=='stable':_,mr=math(h,p,ref,br,phase='P0')
     passed=(checks['max_material_mapping_error']<1e-8 and checks['tendon_jac_error']<1e-8 and
         checks['tendon_length_error']<1e-8 and checks['zero_force'] and checks['no_actuators'] and
-        checks['down'] and checks['lateral']<1e-8 and base['status']=='stable' and
+        checks['down'] and checks['lateral']<1e-8 and base['status']=='stable' and all(r['status']=='stable' for r in trials) and
         all(h.store.artifact(r['raw']).get('checks',{}).get('rope_direction',False) and
             h.store.artifact(r['raw']).get('checks',{}).get('rope_excess',False) for r in trials))
     report=dict(passed=passed,geometry=checks,geometry_ref=checkref,baseline=br,trials=trials,math=mr,
@@ -184,10 +184,34 @@ def p0():
     return report
 
 
+def diagnose():
+    """No more integration after P0 failure; local hypotheses, not feasibility."""
+    h,p=host();s=state(h);ref=s['phs']['candidates']['reference'];n=build(h,p,ref)
+    report=h.store.artifact(s['phs']['p0_report']);baseline=h.store.artifact(report['baseline'])
+    results=[]
+    for label,q,tensions in (
+            ('straight_not_equilibrium',[0.]*n.model.nq,[0.]*n.model.ntendon),
+            ('unsettled_baseline_terminal',baseline['samples'][-1]['qpos'],baseline['samples'][-1]['tensions_n'])):
+        def calculation(_,q=q,tensions=tensions):
+            import mujoco
+            d=mujoco.MjData(n.model);d.qpos[:]=q;mujoco.mj_forward(n.model,d)
+            result=compliance(n,q,tensions,p['search_s'],p['force_n'])
+            result.update(status='diagnostic_at_unverified_equilibrium',task_acceptance='unmeasured',
+                stationarity_inf_nm=float(np.max(np.abs(d.qfrc_bias-d.qfrc_passive+n.tendon_jac(d).T@tensions))),
+                warning='P0 baseline failed. Tangent predictions are hypotheses, not validated equilibrium compliance.')
+            return result
+        body,rr=request(h,p,dict(kind='failed_P0_local_diagnostic',candidate=ref,source=report['baseline'],point=label),calculation,math=1,phase='P0')
+        results.append(dict(label=label,reference=rr,rank=body['jacobian_rank'],nullity=body['nullity'],
+            min_reduced_eigenvalue=min(body['reduced_eigenvalues']),stationarity=body['stationarity_inf_nm'],predictions=body['predictions']))
+    sr=save(h,results,'phs_failure_mathematics');s=state(h);s['phs']['failure_math']=sr;update(h,phs=s['phs'])
+    return results
+
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['p0','status','bind']);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['p0','status','bind','diagnose']);args=parser.parse_args()
     if args.action=='p0':print(json.dumps(p0(),ensure_ascii=False))
+    elif args.action=='diagnose':print(json.dumps(diagnose(),ensure_ascii=False))
     elif args.action=='bind':
         h,p=host();core.bind(h,reason='PHS implementation refinement; all prior evidence and costs retained');print('bound')
     else:
