@@ -179,6 +179,21 @@ class BoundAnalysisTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED'):resolve(path)
         finally:path.unlink()
 
+    def test_new_probe_freezes_v2_without_inheriting_provider_allowances(self):
+        identity='bound-v2-preparation-offline-'+uuid4().hex[:10]
+        directory=ROOT/'runs/research'/identity
+        host=probe.prepare(directory,identity,analysis_interface='bound_scientific_variables_v2')
+        self.assertEqual(state(host)['spec']['research_decisions']['analysis_interface'],'bound_scientific_variables_v2')
+        self.assertEqual(state(self.h)['spec']['research_decisions']['analysis_interface'],'bound_scientific_variables_v1')
+        self.assertEqual(host.store.remaining()['used']['model_calls'],0)
+        self.assertEqual(host.store.remaining()['limit']['model_calls'],8)
+        self.assertEqual(host.store.remaining()['limit']['backend_solves'],0)
+        self.assertEqual(host.store.remaining()['limit']['worker_calls'],0)
+        scope=next(e for e in host.store.events(host.run_id) if e['kind']=='probe_scope')
+        self.assertEqual(host.store.artifact(scope['outputs'][0])['analysis_interface'],'bound_scientific_variables_v2')
+        with self.assertRaisesRegex(ValueError,'PROBE_DIRECTORY_EXISTS_NO_RESET_OR_RETRY'):
+            probe.prepare(directory,identity,analysis_interface='bound_scientific_variables_v2')
+
     def test_missing_math_diagnosis_candidate_has_versioned_schema_and_feedback(self):
         from tools.research.contracts import Plan
         from tools.research.evidence_policy import admit_decision

@@ -94,7 +94,9 @@ def copy_ownership(host, source):
     return ownership
 
 
-def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None):
+def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None, analysis_interface='bound_scientific_variables_v1'):
+    if analysis_interface not in ('bound_scientific_variables_v1','bound_scientific_variables_v2'):
+        raise ValueError('VERSIONED_ANALYSIS_INTERFACE_REQUIRED')
     if directory.exists():raise ValueError('PROBE_DIRECTORY_EXISTS_NO_RESET_OR_RETRY')
     source=FrozenDecisionBoundary(ROOT,'A');s=deepcopy(source.saved_state)
     provider=deepcopy(s['pilot']['provider']);provider.update(POLICY['main']);provider.update(max_tokens=None,output_context_reserve_tokens=32768)
@@ -104,7 +106,7 @@ def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None):
     s['spec']['execution_instructions']=INSTRUCTIONS
     s['spec']['authorization']=authorization or 'OFFLINE_FIXTURE_ONLY_NO_LIVE_PROVIDER_AUTHORIZATION'
     s['spec']['research_decisions'].update(architecture='english_decision_v1',role_policy=deepcopy(POLICY),
-        analysis_interface='bound_scientific_variables_v1')
+        analysis_interface=analysis_interface)
     s['spec']['runtime']['provider']=deepcopy(provider)
     s['plans']=[];s['pending']=None;s['research_status']='ready';s['success_gate']=None;s['selected']=None
     s['pilot']=dict(provider=provider,live_model_requests=0,framework_session_id=run_id,request_deadline_unix=None)
@@ -140,6 +142,7 @@ def prepare(directory=DEST, run_id=PROBE_ID, *, authorization=None):
         source_state=source.preparation['source_state'],archive=source.folder,source_boundary_sequence=425,
         maximum_main=8,maximum_reporter=0,maximum_total=8,backend_solves=0,worker_calls=0,
         first_analysis_feedback_turn_reserved=True,live_authorization=authorization,
+        analysis_interface=analysis_interface,
         original_ownership=ownership,
         hypothetical_mathematical_eligibility=True,historical_scientific_code_changes=diff,
         no_scientific_dispatch=True,automatic_retries=0))
@@ -258,21 +261,28 @@ async def run(host,inner,*,max_requests=8):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true');parser.add_argument('--continue-once',action='store_true')
     parser.add_argument('--authorization',help='Exact separately granted provider-only authorization, up to 8 Main requests, zero workers.')
+    parser.add_argument('--probe-id',default=PROBE_ID,help='New independent Store/ledger identity; existing directories are never reset.')
+    parser.add_argument('--analysis-interface',choices=('bound_scientific_variables_v1','bound_scientific_variables_v2'),default='bound_scientific_variables_v1')
     args=parser.parse_args()
     if not args.live or not args.authorization:raise SystemExit('A new explicit independent provider-only authorization and --live are required; prior v1-v3 grants are exhausted.')
+    import re
+    if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,95}',args.probe_id):raise ValueError('BOUNDED_PROBE_ID_REQUIRED')
+    destination=ROOT/'runs/research'/args.probe_id
     agent.load_credential(Path('~/.codex/.env').expanduser())
     if args.continue_once:
-        h=Host(DEST,PROBE_ID,actor='probe-only');usage=reporter.provider_usage(h)
+        h=Host(destination,args.probe_id,actor='probe-only');usage=reporter.provider_usage(h)
         if (usage.get('conversation',{}).get('requests',0)>6 or usage.get('reporter',{}).get('requests',0)!=0
                 or state(h)['spec']['authorization']!=args.authorization
+                or state(h)['spec']['research_decisions']['analysis_interface']!=args.analysis_interface
                 or agent.pending(h) or state(h)['pilot'].get('unconsumed_response')
                 or any(e['kind']=='probe_continuation' for e in h.store.events(h.run_id))):
             raise ValueError('PROBE_CONTINUATION_REQUIRES_SETTLED_INVOCATION_AND_FEEDBACK_RESERVE')
         agent.record(h,'probe_continuation',dict(reason='Ordinary continuation; no repair, method direction or worker execution.',max_new_requests=8-usage.get('conversation',{}).get('requests',0)))
         counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
     else:
-        h=prepare(authorization=args.authorization);counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
-    print(json.dumps(dict(probe=PROBE_ID,store=str(DEST),requests=counts,usage=reporter.provider_usage(h),
+        h=prepare(destination,args.probe_id,authorization=args.authorization,analysis_interface=args.analysis_interface)
+        counts=asyncio.run(run(h,httpx.AsyncHTTPTransport(retries=0)))
+    print(json.dumps(dict(probe=args.probe_id,store=str(destination),requests=counts,usage=reporter.provider_usage(h),
         ledger=h.store.remaining(),scientific_workers=0,physical_launches=0),ensure_ascii=False))
 
 if __name__=='__main__':main()
