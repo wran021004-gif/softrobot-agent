@@ -1,0 +1,87 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "base-only-m2-20261028-r1",
+  "base_commit": "e0200b4b2415139088e8fea7780d4156a16cbbc1",
+  "authorization": "User pasted request 2026-10-28 explicitly authorizes Codex-organized Base-only feasibility discovery; 8000000 physics step attempts maximum for M2. No Provider, Research Agent, PPO or NMPC. Campaign supervisor and frozen count ceilings both apply. Use the existing engineering_numerical mode for external Codex organization with zero Provider, retaining all formal Study tools and admission. The v1 M4 preparation stopped with zero physics after formal_research protected-closeout admission; no budgets or evidence reset.",
+  "evidence_destination": "runs/base-only-owner-20261028-r1/M2/private-store",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 800,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": []
+  },
+  "task_conditions": [
+    {
+      "condition_id": "zero",
+      "task": "../../tasks/bf2_multidirectional_hold_frozen_v1_zero.json"
+    },
+    {
+      "condition_id": "positive",
+      "task": "../../tasks/bf2_multidirectional_hold_frozen_v1_positive.json"
+    },
+    {
+      "condition_id": "negative",
+      "task": "../../tasks/bf2_multidirectional_hold_frozen_v1_negative.json"
+    }
+  ],
+  "mode": "engineering_numerical",
+  "scoring_window_s": 0.35,
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.33
+    ]
+  },
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 500,
+    "protected_public_operations": 8,
+    "physical_launches": 100,
+    "mathematical_evaluations": 28
+  }
+}
