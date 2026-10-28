@@ -1,0 +1,154 @@
+{
+  "defaults": "bf7_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v3.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    }
+  ],
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.2.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.2.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "study_id": "fresh-english-shared-reach-v1-20261028",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: zero-budget draft; a separate finite research grant and newly frozen budget are required before execution.",
+  "evidence_destination": "runs/research/fresh-english-shared-reach-v1-20261028",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 0,
+    "protected_public_operations": 0,
+    "mathematical_evaluations": 0,
+    "physical_launches": 0
+  },
+  "physical_replay_limit": 0,
+  "native_control_limits": {
+    "evaluation_requests": 51,
+    "iterations": 2,
+    "knots_s": 4
+  },
+  "initial_structure_strategy": "agent_choice",
+  "family_search": {
+    "evaluation_modes": [
+      "mathematical_proxy",
+      "mujoco_control"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 24,
+    "methods": [
+      "adaptive_joint_block_v1"
+    ]
+  },
+  "mathematical_method_scope": "registered_applicable_v1",
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "routes.*.segments.*.radius_m",
+      "routes.*.segments.*.angle_rad"
+    ]
+  },
+  "base_commit": "6f50cdd9e69b14d1d5ed7a228d17eff70438b2f9",
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "architecture": "english_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "role_policy": {
+      "version": "research_roles_v1",
+      "main": {
+        "thinking": "disabled",
+        "reasoning_effort": "none",
+        "max_tokens": 4096
+      },
+      "reporter": {
+        "thinking": "enabled",
+        "reasoning_effort": "low",
+        "max_tokens": 2048
+      }
+    },
+    "handoff_policy": {
+      "version": "token_handoff_v1",
+      "input_tokens": 38000
+    }
+  },
+  "mode": "formal_research",
+  "execution_instructions": "Investigate whether one generated structure can reach and hold each frozen target using independently chosen legal controls. Start with no scientific candidates or observations. Form a testable hypothesis and choose among authorized structure, control, diagnosis, and physical validation actions according to evidence and remaining budget. A mathematical result is not task acceptance. Incomplete numerical evidence does not establish infeasibility. The original evaluator independently judges each condition; SELECT requires a fresh complete passing result for every condition on the same structure, formally read by the Main Agent. This draft has zero budget and cannot execute without a separate explicit grant and newly frozen finite allowances."
+}

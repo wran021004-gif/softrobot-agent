@@ -95,6 +95,21 @@ class S125ContractTests(unittest.TestCase):
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
         self.assertFalse(state(h).get('analysis_results'))
 
+    def test_fresh_english_draft_resolves_without_any_spend_authorization(self):
+        from tools.research.config import resolve
+        from tools.research.state import require_authorization
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        spec=resolve(ROOT/'configs/research/study_fresh_english_shared_reach_v1_pending.json')
+        self.assertTrue(spec['authorization'].startswith('PENDING_EXPLICIT_APPROVAL:'))
+        self.assertEqual(spec['initial_structure_strategy'],'agent_choice')
+        self.assertEqual(len(spec['task_conditions']),2)
+        self.assertTrue(all(not spec['research_decisions'][k] for k in ('history','mathematics','control_seeds','background')))
+        self.assertTrue(all(spec['budgets'][k]==0 for k in ('provider_requests','public_operations','physical_launches','mathematical_evaluations','local_solves','offline_nlp','bdf_replays')))
+        store=Mock();store.session.return_value={'state':{'spec':spec}};store.events.return_value=[]
+        with self.assertRaisesRegex(ValueError,'INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED'):
+            require_authorization(SimpleNamespace(store=store,run_id=spec['study_id']))
+
     def test_archived_errors_and_byte_partition(self):
         report=audit()
         self.assertEqual(len(reproduce(report['errors'])),4)
