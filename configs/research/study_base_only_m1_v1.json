@@ -1,0 +1,87 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "base-only-m1-20261028",
+  "base_commit": "e0200b4b2415139088e8fea7780d4156a16cbbc1",
+  "authorization": "User pasted request 2026-10-28 explicitly authorizes Codex-organized Base-only feasibility discovery; 8000000 physics step attempts maximum for M1. No Provider, Research Agent, PPO or NMPC. Campaign supervisor and frozen count ceilings both apply.",
+  "evidence_destination": "runs/base-only-owner-20261028/M1/private-store",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 800,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": []
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "mode": "formal_research",
+  "scoring_window_s": 0.6,
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.58
+    ]
+  },
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 500,
+    "protected_public_operations": 8,
+    "physical_launches": 100,
+    "mathematical_evaluations": 16
+  }
+}

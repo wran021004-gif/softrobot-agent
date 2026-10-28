@@ -1,0 +1,108 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_base_only_sensor_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "base-only-m6-20261028",
+  "base_commit": "e0200b4b2415139088e8fea7780d4156a16cbbc1",
+  "authorization": "User pasted request 2026-10-28 explicitly authorizes Codex-organized Base-only feasibility discovery; 5000000 physics step attempts maximum for M6. No Provider, Research Agent, PPO or NMPC. Campaign supervisor and frozen count ceilings both apply.",
+  "task": "../../tasks/bf6_sensor_oriented_tracking_v1.json",
+  "control": "control_bf4_tracking.json",
+  "evidence_destination": "runs/base-only-owner-20261028/M6/private-store",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.4.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.58
+    ]
+  },
+  "scoring_window_s": 0.6,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 800,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": []
+  },
+  "mode": "formal_research",
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 500,
+    "protected_public_operations": 8,
+    "physical_launches": 20,
+    "mathematical_evaluations": 10
+  }
+}

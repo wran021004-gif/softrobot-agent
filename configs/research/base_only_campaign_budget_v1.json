@@ -1,0 +1,47 @@
+{
+  "version": "base-only-discovery-owner-v1",
+  "task_step_caps": {
+    "M4": 2000000,
+    "M2": 8000000,
+    "M1": 8000000,
+    "M3": 4000000,
+    "M5": 3000000,
+    "M6": 5000000
+  },
+  "total_step_attempt_cap": 30000000,
+  "study_count_limits": {
+    "M4": [
+      6,
+      500,
+      20
+    ],
+    "M2": [
+      28,
+      800,
+      100
+    ],
+    "M1": [
+      16,
+      800,
+      100
+    ],
+    "M3": [
+      9,
+      800,
+      20
+    ],
+    "M5": [
+      6,
+      800,
+      20
+    ],
+    "M6": [
+      10,
+      800,
+      20
+    ]
+  },
+  "reservation": "Before launch reserve evaluation_requests * ceil(duration/timestep), replay ceil(duration/timestep)+1. Unknown calls retain upper bound; no relaunch.",
+  "m3_status": "Development draft, locally frozen for this discovery only; original inherited Reach/Hold evaluation at 0.50 s. Not an approved benchmark.",
+  "private_evidence": "runs/base-only-owner-20261028; excluded from future Agent checkout and context"
+}
