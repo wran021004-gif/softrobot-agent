@@ -1,5 +1,7 @@
 # Runtime and module ownership
 
+The optional frozen `research_roles_v1` policy is owned by `config.py`; `agent.py` validates each accounted wire against its purpose and `reporter.py` selects its Reporter profile. See [implementation status](english_native_decision_architecture.md). This partial policy does not yet enforce English-native evidence.
+
 ## Codesign integration (2026-10-23)
 
 The current baseline is [mainline/softarm-codesign](softarm_codesign_mainline.md).

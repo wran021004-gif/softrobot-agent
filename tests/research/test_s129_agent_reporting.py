@@ -69,6 +69,62 @@ class AgentReportingTests(unittest.TestCase):
     def physical(self):
         ref=self.put(self.f.physical_result());update(self.h,physical_replays=[ref]);return ref
 
+    def test_role_policy_freezes_new_study_without_reinterpreting_old_study(self):
+        from tools.research.config import resolve, ROOT
+        from tempfile import NamedTemporaryFile
+        path=ROOT/'configs/research/study_p3a_v3_pending.json'
+        old=resolve(path)
+        source=json.loads(path.read_text(encoding='utf-8'))
+        source['study_id']='offline-role-policy-fixture'
+        source['research_decisions']['role_policy']=dict(version='research_roles_v1',
+            main=dict(thinking='disabled',reasoning_effort='none',max_tokens=4096),
+            reporter=dict(thinking='enabled',reasoning_effort='low',max_tokens=2048))
+        with NamedTemporaryFile(mode='w',encoding='utf-8',suffix='.json',dir=path.parent,delete=False) as f:
+            json.dump(source,f);fixture=Path(f.name)
+        try: new=resolve(fixture)
+        finally: fixture.unlink()
+        self.assertEqual(old['configuration']['policy']['model']['thinking'],'enabled')
+        self.assertEqual(old['configuration']['policy']['model']['reasoning_effort'],'high')
+        self.assertEqual(new['configuration']['policy']['model']['thinking'],'disabled')
+        self.assertEqual(new['configuration']['policy']['model']['reasoning_effort'],'none')
+        self.assertEqual(new['research_decisions']['role_policy']['reporter']['reasoning_effort'],'low')
+
+    def test_versioned_roles_share_ledger_and_reject_wrong_wire(self):
+        from tools.research.config import role_provider, validate_role_policy
+        from tools.research.agent import pending
+        from tests.research.test_s127_provider_output import reply
+        policy=dict(version='research_roles_v1',
+            main=dict(thinking='disabled',reasoning_effort='none',max_tokens=4096),
+            reporter=dict(thinking='enabled',reasoning_effort='low',max_tokens=2048))
+        validate_role_policy(policy)
+        with self.assertRaisesRegex(ValueError,'INVALID_RESEARCH_ROLE_PROFILE'):
+            validate_role_policy({**policy,'reporter':{**policy['reporter'],'reasoning_effort':'high'}})
+        s=state(self.h);spec=deepcopy(s['spec']);spec['research_decisions']={'role_policy':policy}
+        pilot=deepcopy(s['pilot']);pilot['provider'].update(policy['main']);update(self.h,spec=spec,pilot=pilot)
+        provider=pilot['provider'];self.assertEqual(role_provider({},provider,'reporter'),provider)
+        self.assertEqual(role_provider(spec,provider,'reporter')['reasoning_effort'],'low')
+        ref=self.physical();delivery=reporter.scientific_feedback(self.h,dict(reference=ref))
+        saved=self.h.store.artifact(delivery['report_reference'])
+        generated=reporter._wire(self.h,delivery['report_reference'],saved)
+        self.assertEqual((generated['thinking'],generated['reasoning_effort'],generated['max_tokens']),
+            ({'type':'enabled'},'low',2048))
+        def response(request):return httpx.Response(200,json=reply('stop'))
+        main=LiveBoundary(self.h,httpx.MockTransport(response))
+        aux=LiveBoundary(self.h,httpx.MockTransport(response));aux.purpose='reporter'
+        main_wire=dict(model=provider['model'],thinking={'type':'disabled'},reasoning_effort='none',
+            max_tokens=4096,stream=False,messages=[{'role':'user','content':'Fixture'}],tools=[])
+        reporter_wire={**main_wire,'thinking':{'type':'enabled'},'reasoning_effort':'low','max_tokens':2048}
+        url=provider['base_url'].rstrip('/')+'/chat/completions'
+        async def run():
+            with self.assertRaisesRegex(ValueError,'PROVIDER_CONFIGURATION_MISMATCH'):
+                await aux.handle_async_request(httpx.Request('POST',url,json=main_wire))
+            await main.handle_async_request(httpx.Request('POST',url,json=main_wire));main.consumed()
+            await aux.handle_async_request(httpx.Request('POST',url,json=reporter_wire));aux.consumed()
+            await main.aclose();await aux.aclose()
+        before=self.h.store.remaining()['used']['model_calls'];asyncio.run(run())
+        self.assertEqual(self.h.store.remaining()['used']['model_calls']-before,2)
+        self.assertFalse(pending(self.h))
+
     def test_automatic_physics_math_search_and_rl_reports_preserve_f0_facts(self):
         before=state(self.h);reference=self.physical()
         auto=reporter.scientific_feedback(self.h,dict(result=dict(reference=reference)),before)

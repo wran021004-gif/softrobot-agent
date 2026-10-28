@@ -127,7 +127,9 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         store=host.store
         run=host.run_id
         wire=json.loads(request.content)
-        expected=pilot(host)['provider']
+        purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
+        from tools.research.config import role_provider
+        expected=role_provider(host.store.session(run)['state']['spec'],pilot(host)['provider'],purpose)
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
             or wire.get('model')!=expected['model'] or wire.get('thinking')!={'type':expected['thinking']}
             or wire.get('reasoning_effort')!=expected['reasoning_effort']
@@ -166,7 +168,6 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             record(host,'r3_send_rejected',dict(request=plain(raw_request),sent=False,reason=str(exc)),status='blocked')
             raise
         self.last_request=key
-        purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
         with store.transaction() as db:
             state=store.session(run,db)['state']
             state['pilot']['live_model_requests']+=1

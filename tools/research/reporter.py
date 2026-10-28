@@ -411,7 +411,9 @@ def _source_catalog(host, report, queries):
 
 
 def _wire(host, reference, saved):
-    provider=state(host)['pilot']['provider']
+    from tools.research.config import role_provider
+    s=state(host)
+    provider=role_provider(s['spec'],s['pilot']['provider'],'reporter')
     q=saved.get('request') or {};reads=[]
     guidance=[host.store.artifact(ref) for ref in q.get('experience_receipts',[])]
     for query in q.get('reads',[]):

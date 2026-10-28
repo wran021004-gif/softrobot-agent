@@ -9,6 +9,27 @@ from tools.state_io import read, digest, effective_input
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def validate_role_policy(policy):
+    """Validate the optional versioned policy without changing legacy Studies."""
+    if not isinstance(policy, dict) or set(policy) != {'version', 'main', 'reporter'} or policy['version'] != 'research_roles_v1':
+        raise ValueError('VERSIONED_RESEARCH_ROLE_POLICY_REQUIRED')
+    for role, thinking, effort in (('main', 'disabled', 'none'), ('reporter', 'enabled', 'low')):
+        profile = policy[role]
+        if (not isinstance(profile, dict) or set(profile) != {'thinking', 'reasoning_effort', 'max_tokens'}
+                or profile['thinking'] != thinking or profile['reasoning_effort'] != effort
+                or type(profile['max_tokens']) is not int or not 1 <= profile['max_tokens'] <= 32768):
+            raise ValueError('INVALID_RESEARCH_ROLE_PROFILE: ' + role)
+
+
+def role_provider(spec, provider, purpose):
+    """Select only inference options; endpoint and model remain shared and frozen."""
+    policy = spec.get('research_decisions', {}).get('role_policy')
+    if policy is None or purpose != 'reporter':
+        return provider
+    validate_role_policy(policy)
+    return {**provider, **policy['reporter']}
+
+
 def same_robot_structure(left, right):
     """Compare actual structural payloads, independent of task/control identity."""
     a, b = effective_input(left)['robot'], effective_input(right)['robot']
@@ -347,6 +368,12 @@ def resolve(path, profile=None, *, backend_profile=None):
     if set(runtime['threads']) != {'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS'} or set(runtime['threads'].values()) != {'1'}:
         raise ValueError('SINGLE_THREAD_NUMERICS_REQUIRED')
     provider = runtime['provider']
+    role_policy = (decisions or {}).get('role_policy')
+    if role_policy is not None:
+        validate_role_policy(role_policy)
+        # Freeze the main role into the existing provider configuration. The
+        # reporter role remains in the same frozen Study policy.
+        provider.update(role_policy['main'])
     if not provider.get('base_url') or not provider.get('model'):
         raise ValueError('EXPLICIT_PROVIDER_REQUIRED')
     controller = deepcopy(control['controller_defaults'])
@@ -457,7 +484,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:

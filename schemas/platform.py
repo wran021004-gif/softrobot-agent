@@ -213,7 +213,7 @@ class ModelConfig(Contract):
     model: str = 'offline-contract-fixture'
     base_url: str = 'https://api.deepseek.com'
     thinking: Literal['enabled','disabled'] | None = None
-    reasoning_effort: Literal['low','high','max'] | None = None
+    reasoning_effort: Literal['none','low','high','max'] | None = None
     length_recovery: ModelLengthRecovery | None = None
     protocol_recovery: ModelProtocolRecovery | None = None
     tool_naming: ModelToolNaming | None = None

@@ -31,6 +31,8 @@
   and workflow orchestration.
 - Existing studies own their frozen configuration; do not reload mutable
   configuration sources to reinterpret their tasks or candidates.
+- Preserve purpose-specific model profiles and the shared accounted provider
+  ledger when working with a Study that freezes `research_roles_v1`.
 
 ## Maintainability
 
