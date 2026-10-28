@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from .contracts import Discretization, RoutePoint, Section, Segment, Rigid, Attachment
+from schemas.environment_spec import Vec3
 
 
 class Domain(Contract):
@@ -231,11 +232,12 @@ class GenerationRequestV2(GenerationRequest):
     segments: dict[int,SegmentChoiceV2] = Field(default_factory=dict)
     controller_recipe: dict = Field(default_factory=dict)
     controller_solver: dict = Field(default_factory=dict)
+    guide_hole_positions_m: dict[str,dict[str,Vec3]] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def legacy_generation(self,handler):
         result=handler(self)
-        for key in ('controller_recipe','controller_solver'):
+        for key in ('controller_recipe','controller_solver','guide_hole_positions_m'):
             if not getattr(self,key):result.pop(key,None)
         return result
 

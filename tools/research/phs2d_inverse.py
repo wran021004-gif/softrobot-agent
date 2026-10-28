@@ -5,12 +5,12 @@ from .phs2d import host,request,candidate,build,ROOT
 from .state import state,save,update
 from extensions.tendon_family.compiler import resolve
 from extensions.tendon_family.passive_equilibrium import solve,consistency
-from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity
+from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics,design_sensitivity,matching
 from extensions.tendon_family.route_validation import validate_routes
 from .phs2d_evaluation import evaluate
 
 
-def context():return host(round3=True)
+def context():return host(round3=2)
 
 
 def setup(label):
@@ -41,8 +41,9 @@ def analysis(label,kind='modal',source=None,phase='P1'):
         if kind=='consistency':
             v=consistency(n);v['full_3d_coordinates']=n.model.nv==len(n.physics['dofs'])==2*sum(a['generation']['segments'][str(i)]['cells'] for i in range(a['generation']['segment_count']))
             return v
+        if kind=='matching':return matching(n,np.zeros(n.model.nv))
         return modal_target(n,h.store.artifact(source)['equilibrium'],p['search_s'])
-    b,r=request(h,p,dict(kind={'modal':'passive_modal_target_v1','geometry':'route_geometry_validation_v1','consistency':'inverse_native_consistency_v1'}[kind],assembly=ar,source=source),run,math=1,phase=phase)
+    b,r=request(h,p,dict(kind={'modal':'passive_modal_target_v1','matching':'tendon_jacobian_matching_v1','geometry':'route_geometry_validation_v1','consistency':'inverse_native_consistency_v1'}[kind],assembly=ar,source=source),run,math=1,phase=phase)
     v=state(h)['phs'];v.setdefault(kind,{})[label]=r;update(h,phs=v);return b,r
 
 
@@ -84,7 +85,7 @@ def screen(label,nonlinear=False,phase='P1'):
     ref=save(h,out,'phs_inverse_screen');v=state(h)['phs'];v.setdefault('screens',{})[label]=ref;update(h,phs=v);return out
 
 
-def dynamics(label,s=.5,force=0.,baseline=None,phase='P1',timestep=None,perturbation=0.,source=None):
+def dynamics(label,s=.5,force=0.,baseline=None,phase='P1',timestep=None,perturbation=0.,source=None,record=False,replicate=0):
     h,p,ar,a=setup(label);source=source or state(h)['phs']['static_baselines'][label];eq=h.store.artifact(source)
     if eq['status']!='qualified_local_minimum' or eq['force_n']!=0:raise ValueError('QUALIFIED_UNLOADED_SOURCE_REQUIRED')
     if baseline and h.store.artifact(baseline)['status']!='stable':raise ValueError('STABLE_DYNAMIC_BASELINE_REQUIRED')
@@ -99,26 +100,41 @@ def dynamics(label,s=.5,force=0.,baseline=None,phase='P1',timestep=None,perturba
     initial=np.array(eq['equilibrium']['qpos'] if baseline is None else h.store.artifact(baseline)['samples'][-1]['qpos'])
     initial+=perturbation*np.sin(np.arange(len(initial)))
     def run(attempt):
-        n=build(h,protocol,a['candidate'],payout_lengths_m=a['payout_lengths_m']);raw=n.run(initial,s,force,attempt=attempt,initial=force==0)
+        n=build(h,protocol,a['candidate'],payout_lengths_m=a['payout_lengths_m'])
+        steps=round(protocol['load_max_s' if force else 'equilibrium_max_s']/protocol['timestep_s']);data=None
+        if record:data=np.empty((steps,2+3*n.model.nv+2*n.model.ntendon))
+        def recorder(k,d,value):
+            tensions=np.zeros(n.model.ntendon)
+            for row in range(d.nefc):
+                if d.efc_type[row]==4:tensions[int(d.efc_id[row])]+=d.efc_force[row]
+            data[k]=np.r_[d.time,value,d.qpos,d.qvel,d.qacc,d.ten_length,tensions]
+        raw=n.run(initial,s,force,attempt=attempt,initial=force==0,step_recorder=recorder if record else None)
+        if record:
+            import io
+            stream=io.BytesIO();np.savez_compressed(stream,trajectory=data[:len(data) if raw['status'] not in ('numerical_failure','contact_failure') else raw['failed_step']],
+                columns=np.array(['time_s','force_n']+[f'qpos_{i}' for i in range(n.model.nv)]+[f'qvel_{i}' for i in range(n.model.nv)]+[f'qacc_{i}' for i in range(n.model.nv)]+[f'length_{i}' for i in range(n.model.ntendon)]+[f'tension_{i}' for i in range(n.model.ntendon)]))
+            with h.store.transaction() as db:
+                ref=h.store.put(db,stream.getvalue(),media='application/octet-stream');h.store.event(db,h.run_id,'phs_every_timestep','recorded',outputs=[ref])
+            raw['every_timestep_trajectory']=dict(reference=ref.model_dump(mode='json'),format='numpy npz; post-step refreshed state',steps=len(data),shape=list(data.shape))
         raw['geometry']=validate_routes(n,[r['qpos'] for r in raw['samples']])
         if raw['geometry']['status']!='legal_at_checked_poses':raw['status']='route_geometry_failure'
         raw['numerical_protocol']=protocol;return raw
     steps=round(protocol['load_max_s' if force else 'equilibrium_max_s']/protocol['timestep_s'])
-    return request(h,p,dict(kind='inverse_independent_dynamics_v1',assembly=ar,s=s,force_n=force,baseline=baseline,source=source,timestep=timestep,perturbation=perturbation),run,steps=steps,phase=phase)
+    return request(h,p,dict(kind='inverse_independent_dynamics_v1',assembly=ar,s=s,force_n=force,baseline=baseline,source=source,timestep=timestep,perturbation=perturbation,record=record,replicate=replicate),run,steps=steps,phase=phase)
 
 
-def dynamic_set(label,holdout=False,phase='P1',timestep=None,perturbation=0.):
+def dynamic_set(label,holdout=False,phase='P1',timestep=None,perturbation=0.,record=False,replicate=0):
     h,p,ar,a=setup(label);v=state(h)['phs']
     if holdout and not any(h.store.artifact(r)['all_pass'] and h.store.artifact(r)['label']==label and not h.store.artifact(r)['holdout'] for r in v.get('dynamic_sets',[])):
         raise ValueError('SIX_SEARCH_PASS_REQUIRED_BEFORE_HOLDOUT')
-    base,br=dynamics(label,phase=phase,timestep=timestep,perturbation=perturbation);rows=[]
+    base,br=dynamics(label,phase=phase,timestep=timestep,perturbation=perturbation,record=record,replicate=replicate);rows=[]
     if base['status']=='stable':
         for s in p['holdout_s'] if holdout else p['search_s']:
             for force in (p['force_n'],-p['force_n']):
-                raw,r=dynamics(label,s,force,br,phase,timestep,source=base['request']['source'])
+                raw,r=dynamics(label,s,force,br,phase,timestep,source=base['request']['source'],record=record,replicate=replicate)
                 e=evaluate(p,base,raw,s);er=save(h,dict(**e,assembly=ar,baseline=br,loaded=r,s=s,force_n=force),'phs_independent_evaluation')
                 rows.append(dict(s=s,force_n=force,reference=r,evaluation=er,**{k:e[k] for k in ('status','valid','tip_xy_m','point_dx_m','ratio','out_of_plane_m','worst_violation')}))
-    out=dict(label=label,holdout=holdout,baseline=br,baseline_status=base['status'],rows=rows,timestep=timestep or p['timestep_s'],perturbation=perturbation,
+    out=dict(label=label,holdout=holdout,baseline=br,baseline_status=base['status'],rows=rows,timestep=timestep or p['timestep_s'],perturbation=perturbation,record=record,replicate=replicate,
         all_valid=len(rows)==(4 if holdout else 6) and all(r['valid'] for r in rows),all_pass=len(rows)==(4 if holdout else 6) and all(r['status']=='development_pass' for r in rows))
     rr=save(h,out,'phs_inverse_dynamic_set');v=state(h)['phs'];v.setdefault('dynamic_sets',[])
     if rr not in v['dynamic_sets']:v['dynamic_sets'].append(rr)
@@ -135,3 +151,27 @@ def admit(label):
         and sem['fixed_unilateral_payout'] and sem['objective_gradient_error']<1e-7 and sem['tendon_gradient_error']<1e-7 and sem['force_consistency_error']<1e-9)
     ref=save(h,dict(passed=passed,static=sr,dynamic=dr,semantics=cr,geometry=gr),'phs_inverse_P0')
     v=state(h)['phs'];v.update(p0_pass=passed,p0_report=ref);update(h,phs=v);return dict(passed=passed,static=static['status'],dynamic=raw['status'],checks=raw.get('checks'))
+
+
+def optimize_matching(prefix,**parameters):
+    from scipy.optimize import minimize_scalar
+    from extensions.tendon_family.inverse_routing import guided_generation
+    trace=[]
+    def objective(u):
+        label=prefix+'_'+str(len(trace));g=guided_generation(end_factor=float(u),**parameters)
+        assemble(label,g,'Inverse actual Jlength row-space match to Jtip; scalar terminal lever correction, fixed topology.',category='guided_tapered')
+        out,ref=analysis(label,'matching');loss=out['horizontal_row_residuals'][0]
+        trace.append(dict(label=label,end_factor=float(u),loss=loss,reference=ref));return loss
+    result=minimize_scalar(objective,bounds=(.6,1.4),method='bounded',options=dict(maxiter=10,xatol=.001))
+    best=min(trace,key=lambda r:r['loss']);h,p=context()
+    ref=save(h,dict(method='tendon_jacobian_matching_v1',trace=trace,best=best,optimizer_success=bool(result.success),
+        stopping='finite actual-geometry evaluations; full nonlinear and unilateral validation still required'),'inverse_route_optimization')
+    v=state(h)['phs'];v.setdefault('route_optimizations',[]).append(ref);update(h,phs=v);return best
+
+
+def sensitivity(label,minus_label,plus_label,source,parameter,step=.001):
+    h,p,ar,a=setup(label);_,_,am,minus=setup(minus_label);_,_,ap,plus=setup(plus_label);eq=h.store.artifact(source)
+    def run(_):
+        natives=[build(h,p,x['candidate'],payout_lengths_m=x['payout_lengths_m']) for x in (a,minus,plus)]
+        return design_sensitivity(natives[0],eq['equilibrium'],natives[1],natives[2],parameter,step,eq['s'],eq['force_n'])
+    return request(h,p,dict(kind='passive_design_sensitivity_v1',assembly=ar,minus=am,plus=ap,source=source,parameter=parameter,normalized_step=step),run,math=1)

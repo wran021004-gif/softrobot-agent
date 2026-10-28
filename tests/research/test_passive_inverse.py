@@ -11,7 +11,7 @@ from extensions.tendon_family.inverse_routing import generation
 from extensions.tendon_family.passive import PassiveModel
 from extensions.tendon_family.passive_equilibrium import solve,consistency
 from extensions.tendon_family.passive_inverse import modal_target,multicase_metrics
-from extensions.tendon_family.route_validation import validate_routes,interval
+from extensions.tendon_family.route_validation import validate_routes,interval,intersections
 
 
 class InverseTests(unittest.TestCase):
@@ -49,6 +49,16 @@ class InverseTests(unittest.TestCase):
     def test_no_division_in_minimax_surrogate(self):
         b=dict(positions=np.zeros((22,3)).tolist());r=multicase_metrics(self.protocol,b,b,.3)
         self.assertTrue(np.isfinite(r['worst_violation']));self.assertEqual(r['violations']['point'],1.)
+
+    def test_batched_path_intersection_matches_scalar(self):
+        from scipy.spatial import ConvexHull
+        from itertools import product
+        planes=ConvexHull(list(product((-1.,1.),repeat=3))).equations
+        rng=np.random.default_rng(52);a=rng.normal(size=(100,3));b=rng.normal(size=(100,3));r=np.full(100,.01)
+        lo,hi,hit=intersections(a,b,planes,r)
+        for i in range(100):
+            scalar=interval(a[i],b[i],planes,r[i]);self.assertEqual(scalar is not None,bool(hit[i]))
+            if scalar is not None:np.testing.assert_allclose(scalar,[lo[i],hi[i]],atol=1e-12)
 
 
 if __name__=='__main__':unittest.main()

@@ -94,7 +94,7 @@ class PassiveModel:
             contacts=int(d.ncon),solver_iterations=np.array(d.solver_niter).tolist(),
             warnings=np.array(d.warning.number).tolist(),force_map_error=float(np.max(np.abs(d.qfrc_applied-JF[0]*force))))
 
-    def run(self,q0,s,force,*,attempt,initial=False):
+    def run(self,q0,s,force,*,attempt,initial=False,step_recorder=None):
         m=self.model;p=self.protocol;d=mujoco.MjData(m)
         if q0 is not None:d.qpos[:]=q0
         mujoco.mj_forward(m,d)
@@ -109,6 +109,7 @@ class PassiveModel:
                 return dict(status='numerical_failure',samples=samples,failed_step=k+1)
             # Refresh moving frame before the next force mapping and sampled measurements.
             mujoco.mj_forward(m,d)
+            if step_recorder is not None:step_recorder(k,d,value)
             if d.ncon:
                 samples.append(self.snapshot(d,s,value))
                 return dict(status='contact_failure',samples=samples,failed_step=k+1)

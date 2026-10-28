@@ -310,6 +310,10 @@ def generate_family(value):
                 if i>0:
                     guide=guides_by_segment[i]
                     hole=name+'_hole';guide['guide_holes'][hole]=yz(radius,angle+span.guide_angle_offset_rad)
+                    if serial and guide['id'] in r.guide_hole_positions_m:
+                        if not space.terminal_payload_anchor:raise ValueError('INVERSE_GUIDE_OVERRIDE_REQUIRES_OPT_IN_SPACE')
+                        position=r.guide_hole_positions_m[guide['id']].get(hole)
+                        if position is not None:guide['guide_holes'][hole]=list(position)
                     route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==i else 'guide',hole))
                 for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
             route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
@@ -378,6 +382,8 @@ def generate_family(value):
                 transmission=[dict(tendon=name,ratio=1.)]))
     used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
     for guide in guides:guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
+    if serial and any(key not in guides_by_id or set(holes)-set(guides_by_id[key]['guide_holes']) for key,holes in r.guide_hole_positions_m.items()):
+        raise ValueError('GUIDE_OVERRIDE_MUST_BIND_USED_REAL_HOLE')
     design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
