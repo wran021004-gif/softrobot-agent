@@ -88,7 +88,8 @@ class FamilyMixedSearch(Contract):
     variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
     segment_counts: list[int] = Field(min_length=1)
     tendon_counts: list[int] = Field(min_length=1)
-    span_strategies: list[Literal['whole_chain','distributed_consecutive','distal']] = Field(default_factory=lambda:['whole_chain'])
+    span_strategies: list[Literal['whole_chain','distributed_consecutive','distal',
+        'base_to_distributed_anchors']] = Field(default_factory=lambda:['whole_chain'])
     section_types: list[Literal['circle','tube','rectangle','ellipse']] = Field(default_factory=list)
     bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     screening_fidelity: str = Field(min_length=1)
@@ -326,39 +327,48 @@ class AnalysisRequest(Contract):
     protocol: TaskAnalysisProtocol = Field(description='Complete frozen analysis_protocol from the method request_template. No additional fields or changed task conditions.')
     scoring_window_s: FiniteFloat | None = Field(default=None,gt=0)
 
+    @staticmethod
+    def validate_operating_point(operation, operating_point, *, optimal_sensitivity=False):
+        """Shared point restrictions for full validation and method discovery."""
+        native_operation=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
+        if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1') and operating_point!='standardized_initial_pretension':
+            raise ValueError('NONLINEAR_CAPABILITY_REQUIRES_OWN_FROZEN_INITIALIZATION')
+        if native_operation and operating_point not in ('saved_state','standardized_initial_pretension'):
+            raise ValueError('NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION')
+        if optimal_sensitivity and operating_point not in ('controller_start_input','standardized_initial_pretension'):
+            raise ValueError('OPTIMAL_SENSITIVITY_REQUIRES_CONIC_AND_INITIAL_OPERATING_POINT')
+        if operation=='equilibrium' and operating_point!='target_equilibrium':
+            raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT: operating_point=target_equilibrium')
+        if operation=='instantaneous_braking_v1' and operating_point!='saved_state':
+            raise ValueError('INSTANTANEOUS_BRAKING_REQUIRES_EXACT_SAVED_STATE')
+        if operation in ('input_sensitivity','design_sensitivity') and operating_point!='fixed_input_equilibrium':
+            raise ValueError('STATIC_SENSITIVITY_REQUIRES_FIXED_INPUT_EQUILIBRIUM')
+
+
     @model_validator(mode='after')
     def exact_state(self):
         native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
+        self.validate_operating_point(self.operation,self.operating_point,optimal_sensitivity=self.optimal_sensitivity is not None)
         if (self.model_source=='mujoco')!=native_operation:
             raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
         if (self.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'))!=(self.control_optimization is not None):
             raise ValueError('NATIVE_CONTROL_OPTIMIZATION_REQUIRES_SOURCE_AND_SETTINGS')
         if (self.operation=='mujoco_reoptimized_structure_response_v1')!=(self.nonlinear_response is not None):
             raise ValueError('NONLINEAR_RESPONSE_REQUIRES_THREE_SAVED_T1_RESULTS')
-        if self.operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1') and self.operating_point!='standardized_initial_pretension':
-            raise ValueError('NONLINEAR_CAPABILITY_REQUIRES_OWN_FROZEN_INITIALIZATION')
         if self.control_optimization and self.native!=NativeAnalysisOptions():
             raise ValueError('NATIVE_CONTROL_USES_SEQUENCE_AND_SEARCH_SETTINGS')
-        if native_operation and self.operating_point not in ('saved_state','standardized_initial_pretension'):
-            raise ValueError('NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION')
         if not native_operation and self.native!=NativeAnalysisOptions():
             raise ValueError('NATIVE_OPTIONS_REQUIRE_NATIVE_METHOD')
         if (self.operation=='fixed_input_structure_v1')!=(self.structure_response is not None):
             raise ValueError('STRUCTURE_RESPONSE_REQUIRES_REGISTERED_COMPARISON_CANDIDATES')
         if self.capability_method is not None and (self.operation!='task_capability' or self.capability_comparison is not None):
             raise ValueError('CONIC_REQUIRES_TASK_CAPABILITY_WITHOUT_LEGACY_COMPARISON')
-        if self.optimal_sensitivity is not None and (self.capability_method is None or self.operating_point not in ('controller_start_input','standardized_initial_pretension')):
+        if self.optimal_sensitivity is not None and self.capability_method is None:
             raise ValueError('OPTIMAL_SENSITIVITY_REQUIRES_CONIC_AND_INITIAL_OPERATING_POINT')
         if self.capability_comparison is not None and self.operation != "task_capability":
             raise ValueError("CAPABILITY_COMPARISON_REQUIRES_TASK_CAPABILITY")
-        if self.operation=='equilibrium' and self.operating_point!='target_equilibrium':
-            raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT: operating_point=target_equilibrium')
-        if self.operation=='instantaneous_braking_v1' and self.operating_point!='saved_state':
-            raise ValueError('INSTANTANEOUS_BRAKING_REQUIRES_EXACT_SAVED_STATE')
         if (self.operation=='design_sensitivity')!=(self.design_sensitivity is not None):
             raise ValueError('DESIGN_SENSITIVITY_REQUIRES_PAIRED_CANDIDATES')
-        if self.operation in ('input_sensitivity','design_sensitivity') and self.operating_point!='fixed_input_equilibrium':
-            raise ValueError('STATIC_SENSITIVITY_REQUIRES_FIXED_INPUT_EQUILIBRIUM')
         if self.operation in ('linearization','controllability') and self.scoring_window_s is None:
             raise ValueError('EXPLICIT_SCORE_WINDOW_REQUIRED')
         if self.scoring_window_s is not None and self.scoring_window_s not in self.protocol.windows_s:
@@ -706,6 +716,20 @@ class RLReference(Contract):
     task_identity: str
     tendon_order: list[str]
     control_period_s: FiniteFloat = Field(gt=0)
+
+
+class ResearchRecallQuery(Contract):
+    step: StrictInt | None = Field(default=None,ge=1,description='Stable Store step number. Omit to page through the trace.')
+    view: Literal['summary','details'] = 'summary'
+    offset: StrictInt = Field(default=0,ge=0)
+    limit: StrictInt = Field(default=8,ge=1,le=10)
+    pointer: str = Field(default='',description='JSON Pointer relative to the original Plan or tool feedback result; details only.')
+    fields: list[str] | None = None
+
+
+class ResearchRouteQuery(Contract):
+    tool: Literal['research_plan','evidence_read','research_recall','research_investigate','experience_retrieve','research_analysis','research_rl']
+    action: str | None = Field(default=None,description='Exact Plan action or RL operation from the directory; omit for other tools.')
 
 
 class RLRequest(Contract):

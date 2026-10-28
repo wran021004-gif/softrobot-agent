@@ -23,6 +23,11 @@ PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_repla
     'When route_review.required, use interpretation to compare continuation, structure/control changes and diagnosis with evidence and remaining budget; no route is prescribed. '
     'Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. '
     'Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.')
+DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed decision and evidence. '
+    'A diagnose selected_method records intent; it does not execute analysis. After choosing a registered method and candidate, '
+    'use research_analysis when offered and obtain exact method details through evidence_read. '
+    'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
+    'For STOP, retrieve and cite the complete new result index.')
 class DeepSeekModel(OpenAIModel):
     """Public provider extension: retain DeepSeek reasoning on the next request.
 
@@ -81,6 +86,10 @@ class RequestBoundaryHandoff(Exception):
     """Unwind the SDK loop before a send; never a completed model invocation."""
 
 
+class CompletedBoundaryHandoff(RequestBoundaryHandoff):
+    """A completed invocation, before the next request, may be rotated."""
+
+
 class SupervisorReviewPause(RequestBoundaryHandoff):
     """The verified paired-feedback boundary, before spending closeout capacity."""
 
@@ -115,18 +124,21 @@ class LiveBoundary(httpx.AsyncBaseTransport):
     decoding. An unconsumed confirmed response is replayed only for its exact
     request; uncertainty blocks further sends and retains its reservation.
     """
-    def __init__(self,host,transport=None,*,allow_truncated_response=False):
+    def __init__(self,host,transport=None,*,allow_truncated_response=False,max_model_calls=None):
         self.host=host
         self.inner=transport or httpx.AsyncHTTPTransport(retries=0)
         self.last_request=None
         self.allow_truncated_response=allow_truncated_response
+        self.max_model_calls=max_model_calls
 
     async def handle_async_request(self,request):
         host=self.host
         store=host.store
         run=host.run_id
         wire=json.loads(request.content)
-        expected=pilot(host)['provider']
+        purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
+        from tools.research.config import role_provider
+        expected=role_provider(host.store.session(run)['state']['spec'],pilot(host)['provider'],purpose)
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
             or wire.get('model')!=expected['model'] or wire.get('thinking')!={'type':expected['thinking']}
             or wire.get('reasoning_effort')!=expected['reasoning_effort']
@@ -151,6 +163,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         from tools.research.provider_context import capacity_estimate
         capacity=capacity_estimate(request.content,expected)
         def guard(db):
+            if self.max_model_calls is not None and store.remaining(db=db)['used']['model_calls']>=self.max_model_calls:
+                raise ValueError('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
         with store.transaction() as db:
@@ -163,7 +177,6 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             record(host,'r3_send_rejected',dict(request=plain(raw_request),sent=False,reason=str(exc)),status='blocked')
             raise
         self.last_request=key
-        purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
         with store.transaction() as db:
             state=store.session(run,db)['state']
             state['pilot']['live_model_requests']+=1
@@ -275,15 +288,59 @@ def load_credential(path):
         raise ValueError('MODEL_KEY_MISSING')
 
 
-def read_tool_evidence(host,query):
-    """Apply compact defaults without replacing an explicit retrieval view."""
+def read_tool_evidence(host,query,*,record_read=True):
+    """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
     from tools.research.core import read_evidence
-    if state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+    from tools.research.contracts import EvidenceQuery
+    spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
+    if decisions.get('context_limits'):
         query={'view':'summary',**query}
-    return read_evidence(host,query)
+    if decisions.get('role_policy',{}).get('version')!='research_roles_v2' and record_read:
+        return read_evidence(host,query,record_read=record_read)
+    q=EvidenceQuery.model_validate(query)
+    # A complete root full read is the explicit SELECT interface. Existing
+    # delivery coverage checks still require the actual whole result on wire.
+    if q.view=='full' and not q.pointer:
+        return read_evidence(host,query,record_read=record_read)
+    value=read_evidence(host,query,record_read=False)
+    body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+    if q.view!='working_set' or q.pointer:
+        if len(body)<=4096:
+            return read_evidence(host,query,record_read=record_read)
+    # Summary projections may contain derived paths: navigate the original
+    # value instead, so every advertised pointer addresses real source data.
+    node=value
+    if q.view=='summary':
+        node=read_evidence(host,dict(reference=plain(q.reference),view='full',pointer=q.pointer),record_read=False)
+    view=q.view if q.view in ('working_set','mathematical_capabilities') else 'full'
+    index=dict(policy='main_evidence_navigation_v1',reference=plain(q.reference),
+        requested_view=q.view,pointer=q.pointer,original_response_bytes=len(body),
+        notice='Large result retained unchanged. Use exact pointers or bounded ranges; delegate complex interpretation to research_investigate.',
+        entries=[])
+    if isinstance(node,dict):entries=list(node.items())
+    elif isinstance(node,list):entries=list(enumerate(node))
+    else:entries=[]
+    if q.view=='range' and isinstance(value,dict) and isinstance(value.get('items'),list):
+        entries=[(q.start+i,v) for i,v in enumerate(value['items'])]
+    for key,item in entries:
+        token=str(key).replace('~','~0').replace('/','~1')
+        pointer=q.pointer+'/'+token
+        query_item=dict(reference=plain(q.reference),view=view,pointer=pointer)
+        entry=dict(field=str(key),query=query_item,type=type(item).__name__)
+        if isinstance(item,(str,int,float,bool)) or item is None:
+            if len(json.dumps(item,ensure_ascii=False).encode('utf-8'))<=256:entry['value']=item
+        elif isinstance(item,list):
+            entry['length']=len(item)
+            if view=='full':entry['range_query']=dict(reference=plain(q.reference),view='range',pointer=pointer,start=0,count=min(10,max(1,len(item))))
+        elif isinstance(item,dict):entry['available_fields']=list(item)[:12]
+        index['entries'].append(entry)
+        if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
+            index['entries'].pop();break
+    index['remaining_entries']=len(entries)-len(index['entries'])
+    return index
 
 
-def plan_schema(actions, *, decision_required=False,family_version=None):
+def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False,focused=False):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -325,6 +382,23 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
         bound=[a for a in actions if a in ('execute','initialize_control','control_search','physical_replay')]
         schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
             'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
+        if diagnose_candidate_required and 'diagnose' in actions:
+            from tools.research.task_constraints import registered_analysis_method_names
+            schema['allOf'].append({'if':{'properties':{'action':{'const':'diagnose'},'decision':{
+                'properties':{'selected_method':{'enum':registered_analysis_method_names()}},'required':['selected_method']}},'required':['action','decision']},
+                'then':{'properties':{'decision':{'required':['selected_candidate'],
+                    'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
+    if focused:
+        if len(actions)!=1:raise ValueError('FOCUSED_PLAN_REQUIRES_ONE_ACTION')
+        common=set(schema['required'])|{'supporting_evidence','experience_disposition','next_step'}
+        keep=common|allowed
+        if actions[0]=='stop':keep.add('stop_reason')
+        if actions[0] in ('select','confirm'):keep.add('revise_selection')
+        schema['properties']={k:v for k,v in schema['properties'].items() if k in keep}
+        # All branches now describe one action; dropping references to removed
+        # optional fields also removes their irrelevant parameter definitions.
+        schema['allOf']=[b for b in schema['allOf'] if not any(k in json.dumps(b) for k in ('"revise_selection"',))]
+        schema['description']='Submit the selected '+actions[0]+' action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.'
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -340,9 +414,248 @@ def plan_schema(actions, *, decision_required=False,family_version=None):
     return schema
 
 
+def tool_directory(host, registry):
+    """Describe the currently admitted native tools without parameter schemas."""
+    resources={'research_plan':'Action-specific original budgets and scientific admission.',
+        'research_analysis':'Shared mathematical allowance; selected method and original execution admission.',
+        'research_rl':'Existing RL stage/worker budgets and owned run identities.',
+        'research_investigate':'Accounted Reporter requests when interpretation is needed; no scientific worker.',
+        'evidence_read':'One public operation; original full-read rules.',
+        'research_recall':'One public operation; Store navigation, no formal evidence credit.',
+        'experience_retrieve':'One public operation; procedural guidance only.'}
+    rows=[]
+    for name,tool in registry.items():
+        if name not in resources:continue
+        row=dict(tool=name,purpose=tool.tool_spec.get('description','').split('.')[0],
+            status='available_for_request_validation',resources=resources[name])
+        if name in ('research_plan','research_rl'):
+            field='action' if name=='research_plan' else 'operation'
+            row['actions']=tool.tool_spec['inputSchema']['json']['properties'][field].get('enum',[])
+        rows.append(row)
+    return rows
+
+
+def select_tool_route(host, payload, use_id):
+    """Persist Main's selection only; never dispatch or infer a research action."""
+    from tools.research.contracts import ResearchRouteQuery
+    q=ResearchRouteQuery.model_validate(payload);s=state(host)
+    directory=s['pilot'].get('tool_directory',[])
+    entry=next((r for r in directory if r['tool']==q.tool),None)
+    if entry is None:raise ValueError('TOOL_ROUTE_UNAVAILABLE: choose from the current tool directory')
+    if (entry.get('actions') and q.action not in entry['actions']) or (not entry.get('actions') and q.action is not None):
+        raise ValueError('TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE')
+    value=dict(version='selected_tool_route_v1',tool=q.tool,action=q.action,tool_use_id=use_id,
+        scientific_execution_started=False,formal_read_credit=False)
+    ref=record(host,'research_tool_route',value)
+    pilot=deepcopy(s['pilot']);pilot['tool_route']=ref;update(host,pilot=pilot)
+    return dict(**value,scope='Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply.')
+
+
+def load_selected_tool_schema(host, registry, directory):
+    """Reuse Strands' registry, keeping only the route and one selected tool."""
+    from tools.research.contracts import ResearchRouteQuery
+    s=state(host);route_ref=s['pilot'].get('tool_route')
+    route=host.store.artifact(route_ref) if route_ref else {};name=route.get('tool')
+    # Main already chose the mathematical method in the completed diagnosis.
+    # Loading its existing scientific-variable tool needs no redundant route.
+    if name=='research_plan' and route.get('action')=='diagnose' and 'research_analysis' in registry:
+        name='research_analysis'
+    selected=registry.get(name)
+    if selected and name=='research_plan':
+        action=route.get('action');entry=next(r for r in directory if r['tool']==name)
+        if action not in entry['actions']:selected=None
+        else:
+            spec=s['spec']
+            selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
+                family_version=spec.get('family_space',{}).get('version'),family_space=spec.get('family_space'),
+                diagnose_candidate_required=spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',focused=True)}}
+    elif selected and name=='research_rl':
+        schema=deepcopy(selected.tool_spec['inputSchema']['json']);actions=schema['properties']['operation']['enum']
+        if route.get('action') not in actions:selected=None
+        else:
+            schema['properties']['operation']['enum']=[route['action']]
+            selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':schema}}
+    router=registry['research_route'];schema=ResearchRouteQuery.model_json_schema()
+    schema['properties']['tool']['enum']=[r['tool'] for r in directory]
+    schema['description']='Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.'
+    router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
+    for key in list(registry):
+        if key!='research_route' and (not selected or key!=name):registry.pop(key)
+    return dict(tool=name if selected else None,action=route.get('action') if selected else None)
+
+
+
+def bound_analysis_enabled(spec):
+    return spec.get('research_decisions',{}).get('analysis_interface') in ('bound_scientific_variables_v1','bound_scientific_variables_v2')
+
+
+def selected_analysis_schema(method, detail, *, bound=False):
+    """Project the existing AnalysisRequest to one registered method."""
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.optimal_capability import CONIC,SENSITIVITY
+    schema=AnalysisRequest.model_json_schema();operation=detail['operation']
+    common={'candidate','operation','model_source','operating_point','saved_state','execution','update_id','protocol','scoring_window_s'}
+    extra={
+        'native_dynamics_v1':{'native'},'short_input_response_v1':{'native'},
+        'fixed_input_structure_v1':{'native','structure_response'},
+        'mujoco_direct_control_v1':{'control_optimization'},
+        'mujoco_nonlinear_task_capability_v1':{'control_optimization'},
+        'mujoco_reoptimized_structure_response_v1':{'nonlinear_response'},
+        'tendon_force_capability_v1':{'tendon_force_direction'},
+        'design_sensitivity':{'design_sensitivity'},
+        'task_capability':{'capability_comparison','capability_method','optimal_sensitivity'},
+    }.get(operation,set())
+    if operation=='task_capability':
+        if method==SENSITIVITY:extra={'capability_method','optimal_sensitivity'}
+        elif method==CONIC:extra={'capability_method'}
+        else:extra={'capability_comparison'}
+    allowed=common|extra
+    schema['properties']={k:v for k,v in schema['properties'].items() if k in allowed}
+    schema['properties']['operation']={'type':'string','const':operation}
+    template=detail.get('request_template',{})
+    for key in ('candidate','protocol'):
+        if key in template:schema['properties'][key]={'const':deepcopy(template[key]),
+            'description':'Exact frozen '+key+' from the selected registered method.'}
+    if method in (CONIC,SENSITIVITY):
+        schema['properties']['capability_method']={'type':'string','const':CONIC}
+        schema['required'].append('capability_method')
+    required={'fixed_input_structure_v1':'structure_response','mujoco_direct_control_v1':'control_optimization',
+        'mujoco_nonlinear_task_capability_v1':'control_optimization',
+        'mujoco_reoptimized_structure_response_v1':'nonlinear_response',
+        'tendon_force_capability_v1':'tendon_force_direction','design_sensitivity':'design_sensitivity'}
+    if method==SENSITIVITY:schema['required'].append('optimal_sensitivity')
+    elif operation in required:schema['required'].append(required[operation])
+    if operation in ('linearization','controllability'):schema['required'].append('scoring_window_s')
+    if detail.get('request_template',{}).get('model_source')=='mujoco':
+        schema['properties']['model_source']={'type':'string','const':'mujoco'}
+        schema['required'].append('model_source')
+    schema['description']='Selected registered method: '+method+'. Required source and parameter details: '+json.dumps(detail.get('required_parameters',[]),ensure_ascii=False)+'. Exact method query: '+json.dumps(detail.get('detail_query'),ensure_ascii=False)
+    if bound:
+        for key in ('candidate','protocol','operation','capability_method'):
+            schema['properties'].pop(key,None)
+        # A native registered operation uniquely selects MuJoCo. Reduced methods
+        # retain the controller/GVS/SoRoSim choice; never infer it from a default.
+        if template.get('model_source')=='mujoco':schema['properties'].pop('model_source',None)
+        else:schema['properties']['model_source']['enum']=['controller','gvs','sorosim']
+        schema['required']=[k for k in schema['required'] if k in schema['properties']]
+        schema['required']+=['operating_point']+(['model_source'] if 'model_source' in schema['properties'] else [])
+        schema['required']=list(dict.fromkeys(schema['required']))
+        from tools.research.task_constraints import analysis_operating_points
+        points=analysis_operating_points(method,operation)
+        schema['properties']['operating_point']={**schema['properties']['operating_point'],'enum':points}
+        schema['properties']['operating_point'].pop('default',None)
+        if operation not in ('linearization','controllability'):schema['properties'].pop('scoring_window_s',None)
+        schema['allOf']=[{'if':{'properties':{'operating_point':{'const':'saved_state'}},'required':['operating_point']},
+            'then':{'oneOf':[{'required':['saved_state'],'properties':{'saved_state':{'$ref':'#/$defs/EvidenceRef'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
+                {'required':['execution','update_id'],'properties':{'execution':{'$ref':'#/$defs/EvidenceRef'},'update_id':{'type':'integer','minimum':0},'saved_state':{'type':'null'}}}]},
+            'else':{'properties':{k:{'type':'null'} for k in ('saved_state','execution','update_id')}}}]
+        if 'scoring_window_s' in schema['properties'] and template.get('protocol'):
+            windows=template['protocol']['windows_s']
+            schema['properties']['scoring_window_s']['anyOf']=[{'type':'number','enum':windows},{'type':'null'}]
+            if operation in ('linearization','controllability'):
+                schema['properties']['scoring_window_s']={'type':'number','enum':windows,'exclusiveMinimum':0}
+        # Initial tendon support and sequence optimization reject free native options.
+        if operation in ('tendon_force_capability_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):
+            schema['properties'].pop('native',None)
+        elif operation=='native_dynamics_v1':
+            schema['$defs']['NativeAnalysisOptions']['properties']={k:v for k,v in schema['$defs']['NativeAnalysisOptions']['properties'].items() if k=='tensions_n'}
+        elif operation=='fixed_input_structure_v1':
+            schema['$defs']['NativeAnalysisOptions']['properties'].pop('difference_step_n',None)
+            schema['$defs']['NativeAnalysisOptions']['properties'].pop('correction_radius_n',None)
+        guide=detail.get('operating_point_guidance',{})
+        schema['description']='Selected method '+method+'. Frozen identity and protocol are bound by the program; submit scientific variables only. '+json.dumps(guide,separators=(',',':'),ensure_ascii=False)
+    needed=set()
+    def visit(value):
+        if isinstance(value,dict):
+            if '$ref' in value:
+                key=value['$ref'].rsplit('/',1)[-1]
+                if key not in needed:
+                    needed.add(key);visit(schema['$defs'][key])
+            for child in value.values():visit(child)
+        elif isinstance(value,list):
+            for child in value:visit(child)
+    visit({k:v for k,v in schema.items() if k!='$defs'})
+    schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+    return schema
+
+
+def bind_selected_analysis_request(host, payload, *, tool_use_id):
+    """One audited boundary from Main variables to the unchanged full contract."""
+    from jsonschema import Draft202012Validator
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.design import verify_candidate
+    from tools.research.research_context import research_intent
+    selection=selected_analysis(host,None)
+    if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
+    method,detail=selection
+    intent=research_intent(host)['latest_decision']
+    candidate=intent['agent_hypothesis']['decision']['selected_candidate']
+    verify_candidate(host,candidate)
+    schema=selected_analysis_schema(method,detail,bound=True)
+    extra=sorted(set(payload)-set(schema['properties']))
+    if extra:raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH: unsupported or frozen fields: '+', '.join(extra))
+    spec=state(host)['spec'];template=detail['request_template']
+    if template.get('candidate')!=candidate or template.get('protocol')!=spec['analysis_protocol']:
+        raise ValueError('SELECTED_ANALYSIS_FROZEN_BINDING_MISMATCH')
+    frozen=dict(candidate=deepcopy(candidate),protocol=deepcopy(spec['analysis_protocol']),operation=detail['operation'])
+    sources=dict(candidate=dict(reference=intent['plan_reference'],pointer='/original_plan/decision/selected_candidate'),
+        protocol=dict(source='frozen Study',study_id=spec['study_id'],freeze=state(host)['freeze'],pointer='/spec/analysis_protocol'),
+        operation=dict(source=detail['detail_query'],pointer='/operation'))
+    if template.get('model_source')=='mujoco':
+        frozen['model_source']='mujoco';sources['model_source']=dict(source=detail['detail_query'],pointer='/request_template/model_source')
+    if 'capability_method' in template:
+        frozen['capability_method']=template['capability_method'];sources['capability_method']=dict(source=detail['detail_query'],pointer='/request_template/capability_method')
+    full={**deepcopy(payload),**frozen}
+    audit=record(host,'analysis_request_binding',dict(version=spec['research_decisions']['analysis_interface'],tool_use_id=tool_use_id,
+        method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
+        field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources}))
+    # Pydantic first preserves exact scientific error codes, even if the compact
+    # schema could reject the same point. Neither validator changes Main input.
+    AnalysisRequest.model_validate(full)
+    Draft202012Validator(schema).validate(payload)
+    Draft202012Validator(AnalysisRequest.model_json_schema()).validate(full)
+    record(host,'analysis_request_binding_validated',dict(binding=audit,json_schema_valid=True,pydantic_valid=True))
+    return full
+
+
+def selected_analysis(host, brief):
+    """Expose only the method in the last settled diagnose decision."""
+    from tools.research.research_context import research_intent
+    intent=research_intent(host)['latest_decision'] or {}
+    decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}
+    method=decision.get('selected_method');candidate=intent.get('candidate')
+    if (intent.get('action')!='diagnose' or intent.get('execution_status')!='completed' or not method or not candidate
+            or (bound_analysis_enabled(state(host)['spec']) and decision.get('selected_candidate')!=candidate)):return None
+    from tools.research.task_constraints import mathematical_method_view
+    try:detail=mathematical_method_view(host,candidate)['methods'].get(method)
+    except (ValueError,KeyError):return None
+    if (not detail or not detail.get('formal_execution_authorized')
+            or detail.get('planning_status') in ('unauthorized','unsupported','insufficient_budget','blocked')
+            or (detail.get('registered') and detail.get('executable') is False)):
+        return None
+    return method,detail
+
+
+def validate_selected_analysis_payload(payload, schema, detail):
+    """Explain selected-schema binding failures without changing the request."""
+    problems=[]
+    extra=sorted(set(payload)-set(schema['properties']))
+    if extra:problems.append('unsupported fields: '+', '.join(extra))
+    if payload.get('operation')!=detail['operation']:
+        problems.append('operation must equal '+detail['operation'])
+    for key,definition in schema['properties'].items():
+        if 'const' not in definition or payload.get(key)==definition['const'] or key=='operation':continue
+        if isinstance(definition['const'],dict) and not isinstance(payload.get(key),dict):
+            problems.append(key+' must be a JSON object matching the selected schema constant, not a string or null')
+        else:
+            problems.append(key+' must match the exact selected schema constant')
+    if problems:raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH: '+'; '.join(problems))
+
+
 def error_feedback(host, use, exc, before):
     """Small correction response; exact rejected payload and traceback stay in Store."""
     import traceback
+    from jsonschema.exceptions import ValidationError as SchemaValidationError
     s=state(host)
     full=record(host,'tool_request_error',dict(tool_use=use,error=type(exc).__name__,message=str(exc),traceback=traceback.format_exc()))
     counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','local_solves','admitted_training_stages'))
@@ -354,10 +667,25 @@ def error_feedback(host, use, exc, before):
         if isinstance(search,dict) and search.get('version')=='family_mixed_search_v1':
             matching=[e for e in errors if any('FamilyMixedSearch' in str(part) for part in e['loc'])]
             if matching:errors=matching
+        generation=use.get('input',{}).get('generation')
+        if isinstance(generation,dict) and generation.get('version')=='serial_family_generation_v2':
+            matching=[e for e in errors if any('GenerationRequestV2' in str(part) for part in e['loc'])]
+            if matching:errors=matching
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']
+    elif isinstance(exc,SchemaValidationError):
+        # Keep the exact validator dump in Store; send a field-specific repair
+        # instead of Schema internals on the focused-tool correction turn.
+        path=list(exc.absolute_path);message=exc.message
+        missing=next((k for k in exc.validator_value if k not in exc.instance),None) if exc.validator=='required' else None
+        if missing is not None:path.append(missing)
+        field='.'.join(map(str,path)) or None
+        code='TOOL_SCHEMA_'+str(exc.validator).upper();expected=exc.message
+        if field=='decision.selected_candidate' and use.get('name')=='research_plan' and use.get('input',{}).get('action')=='diagnose':
+            code='SELECTED_ANALYSIS_CANDIDATE_REQUIRED';message=code+': '+exc.message
     hints={
+        'SELECTED_ANALYSIS_CANDIDATE_REQUIRED':('decision.selected_candidate','Choose an exact owned candidate reference from the current candidate index, then resubmit the diagnose Plan with that reference. Method selection is not settled and research_analysis is unavailable until this identity is explicit; no candidate is inferred.'),
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
         'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('experience_disposition','Keys must identify an actual experience_retrieve operation=read receipt or its exact entry_id@revision. Scientific artifact IDs, invented hypothesis names, search results and SELECT physical evidence are not experience keys. If this Study does not expose legal experience_retrieve, remove the inapplicable experience_disposition field; do not guess IDs.'),
         'explicit evidence_read of this completed evaluation required':('selected_execution','Publicly evidence_read the exact selected_execution with view=full and pointer="" before SELECT; /acceptance alone does not satisfy the whole-result read required here.'),
@@ -461,6 +789,29 @@ def error_feedback(host, use, exc, before):
         expected=expected,input_query=dict(reference=full,view='full',pointer='/tool_use/input'),
         scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
+def session_storage_path(path):
+    """Use Windows extended-length paths for durable SDK snapshot temp files."""
+    value=os.path.abspath(str(path))
+    if os.name!='nt' or value.startswith('\\\\?\\'):return value
+    if value.startswith('\\\\'):return '\\\\?\\UNC\\'+value[2:]
+    return '\\\\?\\'+value
+
+
+def session_storage(path):
+    from strands.storage import LocalFileStorage
+    class NormalizedStorage(LocalFileStorage):
+        # The SDK joins opaque slash-delimited keys without normalizing; the
+        # extended-length Windows path prefix requires native separators.
+        def _path_for(self,key):
+            return os.path.normpath(super()._path_for(key))
+        def namespace(self,prefix):
+            scoped=super().namespace(prefix)
+            result=NormalizedStorage(scoped.base_dir)
+            result._namespaced=scoped._namespaced
+            return result
+    return NormalizedStorage(session_storage_path(path))
+
+
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload
     s=state(host)
@@ -474,9 +825,12 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
     context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
+    storage=session_storage(session_directory)
+    from strands.session import SnapshotSessionManager
+    manager=SnapshotSessionManager(session_id or s['pilot']['framework_session_id'],storage=storage,save_latest_on='message')
     agent=create_harness(model=model,tools=research_tools,instructions=instructions,
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
-        context_manager=context,session=dict(id=session_id or s['pilot']['framework_session_id'],dir=str(session_directory)),
+        context_manager=context,session=manager,storage=storage,
         retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(configuration_path,dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=session_id or s['pilot']['framework_session_id'],
@@ -499,7 +853,7 @@ async def wait_training(host):
             return
         await asyncio.sleep(2.)
 
-async def deliver_science_before_decision(host,agent,transport):
+async def deliver_science_before_decision(host,agent,transport,*,max_model_calls=None):
     """Settle L1 only after native results are paired and durably recoverable.
 
     This is an intra-invocation boundary, not session_handoff.safe_boundary.
@@ -530,7 +884,7 @@ async def deliver_science_before_decision(host,agent,transport):
     await agent._session_manager.save_snapshot(agent,is_latest=True)
     record(host,'science_delivery_boundary',dict(session_id=agent._session_manager.session_id,
         sdk_message_identity=digest(agent.messages),paired=True,receipts_settled=True))
-    await complete_reports(host,transport)
+    await complete_reports(host,transport,max_model_calls=max_model_calls)
     if pending(host) or state(host)['pilot'].get('unconsumed_response') or any(
             v['interpretation_status']=='deferred' for _,v in current_reports(host)):
         raise ValueError('SCIENCE_DELIVERY_INCOMPLETE_BLOCKS_DECISION')
@@ -552,9 +906,16 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False):
+async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None):
+    from tools.research.config import conversation_policy, tool_schema_policy
+    recent_policy=conversation_policy(state(host)['spec'])
+    on_demand=bool(tool_schema_policy(state(host)['spec']))
+    if session_handoff is None:session_handoff=bool(recent_policy)
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
+    if max_new_provider_requests is not None and (type(max_new_provider_requests) is not int or max_new_provider_requests<1):
+        raise ValueError('POSITIVE_NEW_PROVIDER_REQUEST_LIMIT_REQUIRED')
+    max_model_calls=(host.store.remaining()['used']['model_calls']+max_new_provider_requests if max_new_provider_requests is not None else None)
     from tools.research.state import require_authorization
     require_authorization(host)
     if state(host)['spec'].get('initial_structure_strategy'):
@@ -570,7 +931,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         raise ValueError('POSITIVE_HANDOFF_REQUEST_BYTES_REQUIRED')
     if pause_exploration_remaining is not None and (type(pause_exploration_remaining) is not int or pause_exploration_remaining<0):
         raise ValueError('NONNEGATIVE_EXPLORATION_REVIEW_THRESHOLD_REQUIRED')
-    if (handoff_before_next_request or handoff_request_bytes is not None or pause_exploration_remaining is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
+    if (bool(recent_policy and session_handoff) or handoff_before_next_request or handoff_request_bytes is not None or pause_exploration_remaining is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
         raise ValueError('REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
@@ -605,10 +966,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                     definitions={t['function']['name']:t['function'] for t in wire.get('tools',[])}
                     action=definitions.get('research_plan',{}).get('parameters',{}).get('properties',{}).get('action',{})
                     permitted=closeout_operations(host)
-                    if action.get('enum')!=permitted['research_plan'] or set(definitions)-{'research_plan','research_rl','evidence_read','retrieve_context'}:
+                    plan_valid=(not action or (bool(action.get('enum')) and set(action['enum'])<=set(permitted['research_plan']))) if on_demand else action.get('enum')==permitted['research_plan']
+                    if not plan_valid or set(definitions)-({'research_plan','research_rl','evidence_read','research_route'} if on_demand else {'research_plan','research_rl','evidence_read','retrieve_context'}):
                         raise ValueError('PROTECTED_SEND_REQUIRES_CLOSEOUT_NATIVE_SCHEMA')
                     rl=definitions.get('research_rl')
-                    if rl and rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']:
+                    if rl and (not set(rl['parameters']['properties']['operation'].get('enum',[]))<=set(permitted['research_rl']) if on_demand else rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']):
                         raise ValueError('PROTECTED_RL_SEND_REQUIRES_EXISTING_WORK')
                     retrieval=definitions.get('retrieve_context')
                     if retrieval:
@@ -616,16 +978,30 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         if advertised is None or not set(advertised)<=set(feedback_context_references()):
                             raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
             return await super().handle_async_request(request)
-    boundary=Boundary(host)
+    boundary=Boundary(host,max_model_calls=max_model_calls)
     def handler(kind):
         def run(use,**kwargs):
             before=state(host)
             try:
+                if on_demand and kind!='route':
+                    from jsonschema import Draft202012Validator
+                    Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
+                from tools.research.evidence_policy import english_native
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='analysis':
+                    payload=use['input']
+                    if english_native(before['spec']):
+                        selection=selected_analysis(host,None)
+                        if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
+                        method,detail=selection
+                        if bound_analysis_enabled(before['spec']):
+                            payload=bind_selected_analysis_request(host,payload,tool_use_id=use['toolUseId'])
+                        else:
+                            schema=selected_analysis_schema(method,detail)
+                            validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
-                    value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
+                    value=analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':
                     from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -639,12 +1015,17 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                             value=experience(host,use['input'])
                         elif kind=='investigate':
                             value=investigate(host,use['input'])
+                        elif kind=='recall':
+                            from tools.research.research_context import research_recall
+                            value=research_recall(host,use['input'])
+                        elif kind=='route':
+                            value=select_tool_route(host,use['input'],use['toolUseId'])
                         else:
                             value=read_tool_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 original=value
-                if kind not in ('evidence','investigate','experience') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                if kind not in ('evidence','investigate','experience','recall','route') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
                     from tools.research.research_context import tool_feedback
                     value=tool_feedback(host,value)
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
@@ -670,16 +1051,29 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     rl_mode=enabled(state(host)['spec'],'rl')
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
+    from tools.research.evidence_policy import english_native
+    if english_native(state(host)['spec']):
+        instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
             ('evidence_read','Read a named missing fact or verify a relevant change using exact evidence and JSON pointer. Exact repeats add no information; delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
+    if recent_policy:
+        from tools.research.contracts import ResearchRecallQuery
+        native.append(PythonAgentTool('research_recall',dict(name='research_recall',
+            description='Recall saved research by stable step number, or page through history. Details support precise JSON Pointers. Navigation grants no formal SELECT/STOP evidence credit.',
+            inputSchema={'json':ResearchRecallQuery.model_json_schema()}),handler('recall')))
+    if on_demand:
+        from tools.research.contracts import ResearchRouteQuery
+        native.append(PythonAgentTool('research_route',dict(name='research_route',description='Select a tool and action; load its Schema on the next request. No scientific execution or evidence credit.',
+            inputSchema={'json':ResearchRouteQuery.model_json_schema()}),handler('route')))
     if formal or rl_mode:
         actions=['propose','stop','diagnose','select','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
         if formal and state(host)['spec'].get('mode')!='rl_interface':
             actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
-        schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')))
+        schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')),
+            diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics. model_source selects the reduced provider or native MuJoCo methods independently of control. saved_state or execution plus update_id selects a source-bound state; native methods support standardized_initial_pretension from frozen initialization, or a complete native checkpoint or verified measured prefix. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
@@ -726,6 +1120,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     agent=build_session()
     from tools.research.session_handoff import unmatched, recover_feedback, trusted_history, INVOCATION_PROMPT
     try:
+        if recover_incomplete:
+            from tools.research.session_handoff import recover_confirmed_incomplete
+            _,agent=await recover_confirmed_incomplete(host,agent,build_session,host.store.root/'framework_sessions')
         saved=state(host)['pilot'].get('unconsumed_response')
         reporter_saved=bool(saved and (received(host,saved) or {}).get('purpose')=='reporter')
         # An interrupted pre-decision Reporter owns a saved tool-result snapshot,
@@ -757,7 +1154,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if source.get('pending_authorized_continuation')!=continuation:
                 current=decision_packet(host)['research']
                 native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
-                    decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'))}}
+                    decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'),
+                    diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
                 # Restore the authorized tools removed by the previous closeout.
                 for tool in native:
                     if tool is not native[1]:agent.tool_registry.registry[tool.tool_name]=tool
@@ -784,6 +1182,10 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         agent.tool_registry.registry.pop('retrieve_context',None)
     async def before_model(event):
         s=state(host)
+        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls and not s['pilot'].get('unconsumed_response'):
+            if s.get('pending') or pending(host) or unmatched(agent.messages):raise ValueError('REQUEST_LIMIT_REQUIRES_SETTLED_FEEDBACK')
+            await agent._session_manager.save_snapshot(agent,is_latest=True)
+            raise SupervisorReviewPause('Bounded Provider request limit reached; no further send')
         if s['research_status']=='stopped':
             event.cancel='Accepted native STOP; no additional request'
             return
@@ -817,21 +1219,41 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             return
         guard(host)
         if s['spec'].get('research_decisions'):
-            await deliver_science_before_decision(host,agent,boundary.inner)
+            await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
+        if on_demand:
+            for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
+            agent.tool_registry.registry.pop('retrieve_context',None)
         for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
         current=decision_packet(host)
+        from tools.research.evidence_policy import english_native
         if 'research' in current:
-            native[0].tool_spec={**native[0].tool_spec,'description':PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
-                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None)}}
+            native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
+                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
+                family_space=s['spec'].get('family_space'),
+                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
+        if english_native(s['spec']):
+            tool=next((t for t in native if t.tool_name=='research_analysis'),None)
+            selected=selected_analysis(host,current['research']) if tool and enabled(s['spec'],'analysis') else None
+            if selected:
+                method,detail=selected
+                tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
+                    'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}
+                agent.tool_registry.registry['research_analysis']=tool
+            else:agent.tool_registry.registry.pop('research_analysis',None)
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
         # Provider readiness is checked per selected model by analysis.dispatch;
         # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
-        record(host,'model_decision_packet',current)
+        if english_native(s['spec']):
+            from tools.research.research_context import research_decision_brief_v3
+            delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research'],
+                complete_interpretations=s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2'))
+        else:delivered=current
+        record(host,'model_decision_packet',delivered)
         agent.system_prompt=instructions
-        boundary.research_packet=deepcopy(current)
+        boundary.research_packet=deepcopy(delivered)
         if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
             permitted=closeout_operations(host)
             schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
@@ -845,6 +1267,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
                 rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('research_investigate',None)
+            if on_demand:agent.tool_registry.registry.pop('research_recall',None)
             schema=EvidenceQuery.model_json_schema()
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
@@ -855,27 +1278,55 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
             boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
-        if (session_handoff and state(host)['pilot'].get('session_handoff_boundary')=='request_feedback'
-                and agent.messages and agent.messages[-1]['role']=='user'
-                and any('toolResult' in b for b in agent.messages[-1]['content'])):
+        if on_demand:
+            registry=agent.tool_registry.registry;directory=tool_directory(host,registry)
+            pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
+            loaded=load_selected_tool_schema(host,registry,directory)
+            boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
+                tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switching consumes another model request. No selection grants execution authority.')
+            # Record the actual L0 after dynamic tool selection; no extra model call.
+            record(host,'model_decision_packet',boundary.research_packet)
+        token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
+        paired=bool(agent.messages and agent.messages[-1]['role']=='user'
+            and any('toolResult' in b for b in agent.messages[-1]['content']))
+        completed=bool((token_policy or recent_policy) and len(agent.messages)>=2 and agent.messages[-1]['role']=='user'
+            and agent.messages[-1]['content']==[dict(text=INVOCATION_PROMPT)] and agent.messages[-2]['role']=='assistant')
+        if session_handoff and (paired or completed):
+            from tools.research.session_handoff import rotation_ready
+            if recent_policy and not rotation_ready(host,agent.messages[:-1] if completed else agent.messages):return
             wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
-            size=len(httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content)
+            content=httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content
+            size=len(content)
             provider=s['pilot']['provider'];context=provider['context_guard']
+            token_due=False
+            if token_policy:
+                from tools.research.provider_context import handoff_input_estimate
+                estimate=handoff_input_estimate(content,provider)
+                token_due=estimate['input_estimate']>=token_policy['input_tokens']
+            if completed and (token_due or recent_policy):
+                # The just-added invocation prompt has not been sent. The preceding
+                # assistant turn is the durable completed boundary.
+                with host.store.connect(True) as db:
+                    from tools.research.session_handoff import safe_boundary
+                    safe_boundary(host,s,db,agent.messages[:-1])
+                agent.messages.pop()
+                raise CompletedBoundaryHandoff('Verified completed boundary; next model send has not started')
+            if not paired or s['pilot'].get('session_handoff_boundary')!='request_feedback':return
             review=(pause_exploration_remaining is not None and not protected(host)
                 and current['research']['budget']['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
             if review:
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
-            if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']:
+            if handoff_before_next_request or recent_policy or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
     def before_tool(event):
-        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
+        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read',*(['research_route'] if on_demand else [])):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
-        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context'):
+        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context',*(['research_route'] if on_demand else [])):
             event.cancel_tool='Protected closeout permits only existing work, evidence and STOP.'
         try:
             admit_closeout(host,event.tool_use['name'],event.tool_use['input'])
@@ -901,11 +1352,20 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     try:
         completed_invocations=0
         while state(host)['research_status']!='stopped':
+            if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:
+                record(host,'supervisor_pause',dict(boundary='provider_request_limit',budgets_preserved=True,next_request_sent=False))
+                break
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
             try:
-                result=await agent.invoke_async(INVOCATION_PROMPT)
+                # Public SDK continuation resumes the durable unsent prompt or
+                # paired feedback. Adding another prompt would change a saved
+                # request's hash and prevent exact response replay.
+                resume=bool(state(host)['pilot'].get('unconsumed_response') or (agent.messages
+                    and agent.messages[-1]['role']=='user'
+                    and any('toolResult' in b for b in agent.messages[-1]['content'])))
+                result=await agent.invoke_async(None if resume else INVOCATION_PROMPT)
             except Exception as exc:
                 cause=exc;seen=set()
                 while cause is not None and id(cause) not in seen and not isinstance(cause,RequestBoundaryHandoff):
@@ -917,9 +1377,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         budget=decision_packet(host)['research']['budget']))
                     break
                 record(host,'sdk_invocation_suspended_for_handoff',dict(session_id=agent._session_manager.session_id,
-                    sdk_message_identity=digest(agent.messages),invocation_completed=False,next_request_sent=False))
+                    sdk_message_identity=digest(agent.messages),invocation_completed=False,
+                    boundary_kind='completed_invocation' if isinstance(cause,CompletedBoundaryHandoff) else 'request_feedback',
+                    next_request_sent=False))
                 from tools.research.session_handoff import handoff
-                _,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions',boundary='request_feedback')
+                _,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions',boundary='completed_invocation' if isinstance(cause,CompletedBoundaryHandoff) else 'request_feedback')
                 handoff_before_next_request=False
                 agent.hooks.add_callback(BeforeModelCallEvent,before_model)
                 agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
@@ -930,13 +1392,13 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if state(host)['pending'] or pending(host):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
             if state(host)['spec'].get('research_decisions'):
-                await complete_reports(host,boundary.inner)
+                await complete_reports(host,boundary.inner,max_model_calls=max_model_calls)
             completed_invocations+=1
             if (pause_after_completed_invocations is not None and completed_invocations>=pause_after_completed_invocations
                     and state(host)['research_status']!='stopped' and not state(host).get('success_gate')):
                 await pause_completed_invocation(host,agent,completed_invocations)
                 break
-            if session_handoff and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
+            if session_handoff and not state(host)['spec'].get('research_decisions',{}).get('handoff_policy') and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
                 from tools.research.session_handoff import handoff, reconcile
                 previous=agent
                 try:_,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions')

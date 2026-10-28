@@ -16,7 +16,7 @@ SCIENTIFIC_INTERPRETATION = dict(
 METHOD_MEANINGS = {
     'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
     'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
-    'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
+    'equilibrium': ('Static input construction', 'Bounded local static target construction. Static balance cannot establish holding-window maximum speed or identify a structure-versus-dynamic-control cause. Solver failure is not structural infeasibility; matched dynamic execution and independent evaluation remain necessary.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
     'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold, timed Tracking, position/tool-axis or loaded oriented Tracking. Reuse local response/pattern search with cloned native rollouts covering every registered sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
@@ -30,6 +30,76 @@ METHOD_MEANINGS = {
     'task_capability': ('Best found task violation', 'Three-start SLSQP minimization of a dimensionless max normalized signed residual; physical conversion depends on the active constraint and its threshold. Negative means a model-sample feasible witness, not a globally optimal control. Condition numbers alone are not task-score error bounds.'),
     'sampled-affine-conic-minimax-v1': ('Numerical optimal task violation', 'min_U max_i g_i over an affine sampled model and physical box. Supports declared sampled norm/component constraints, including timed position and Reach/Hold speed; no directed-axis, rigid-load/contact acceptance. GVS predictions require matched actual-control/state/grid comparison and independent physical evaluation. SOCP primal/dual/support/gap checks are floating estimates; strict optimal_value remains unavailable. Free path progress jointly optimizes U and s, enumerating sampled corners in a chosen finite horizon; no unrestricted-time exclusion or geometric acceptance.'),
     'controlled-capability-sensitivity-v1': ('Controlled structural direction', 'Matched baseline and +/-h (optionally +/-h/2) models: reoptimized FD versus fixed U, conditional envelope and dual-face checks. Path progress is reoptimized too. Branch ties/active-set changes withhold a strict gradient; no physical improvement guarantee.')}
+
+
+def registered_analysis_method_names():
+    """Reuse existing method declarations; do not infer a candidate or a method."""
+    from tools.research.nonlinear_capability import METHODS
+    return sorted(set(METHOD_MEANINGS)|set(METHODS.values()))
+
+
+def analysis_operating_points(method, operation):
+    """Discover legal points using the original full-request restrictions."""
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.optimal_capability import SENSITIVITY
+    points=[]
+    for point in AnalysisRequest.model_json_schema()['properties']['operating_point']['enum']:
+        try:AnalysisRequest.validate_operating_point(operation,point,optimal_sensitivity=method==SENSITIVITY)
+        except ValueError:continue
+        points.append(point)
+    return points
+
+
+def selected_operating_point_guidance(host, reference, method, detail):
+    """Read-only selected-method guidance; no reconstruction or integration."""
+    from types import SimpleNamespace
+    from tools.research.state import state
+    from tools.research.numerics import native_point, execution_update
+    from tools.research.design import verify_candidate
+    s=state(host);cfg=verify_candidate(host,reference)['configuration']
+    operation=detail['operation'];native=detail['request_template'].get('model_source')=='mujoco'
+    sources=[];unavailable=[]
+    if native:
+        for ref in [*s.get('results',[]),*s.get('physical_replays',[])]:
+            result=host.store.artifact(ref)
+            if result.get('candidate')!=reference:continue
+            query=SimpleNamespace(candidate=reference,saved_state=None,execution=ref,update_id=0,operating_point='saved_state')
+            try:
+                point=native_point(host,query,cfg)
+                sources.append(dict(execution=ref,verified_update_id=0,actual_time_s=point['actual_time_s'],
+                    trajectory=point['provenance']['trajectory'],model_source='mujoco',
+                    readiness='verified_measured_prefix; choose an actual trace interval update_id; worker reconstruction not executed'))
+            except (ValueError,KeyError,IndexError) as exc:unavailable.append(dict(reference=ref,reason=str(exc)))
+    else:
+        for ref in s.get('historical_diagnostic_sources',[]):
+            saved=host.store.artifact(ref)
+            if saved.get('provenance',{}).get('candidate')!=reference or saved.get('configuration')!=cfg:continue
+            try:
+                item=execution_update(host,ref,saved['record']['update_id'])
+                if item['configuration']!=cfg:continue
+                sources.append(dict(execution=ref,update_id=item['record']['update_id'],
+                    readiness='complete recorded update; exact reduced dimensions and phase checked at admission'))
+            except (ValueError,KeyError,IndexError) as exc:unavailable.append(dict(reference=ref,reason=str(exc)))
+    points=[]
+    for point in analysis_operating_points(method,operation):
+        required=['saved_state OR execution + update_id'] if point=='saved_state' else []
+        ready='source_selection_required' if sources else 'missing_exact_state_source'
+        if point!='saved_state':ready='requires_scientific_parameters_and_admission'
+        if native and point=='standardized_initial_pretension':
+            try:
+                native_point(host,SimpleNamespace(candidate=reference,saved_state=None,operating_point=point),cfg)
+                ready='frozen_initialization_available'
+            except ValueError as exc:ready='not_applicable';required.append(str(exc))
+        points.append(dict(operating_point=point,readiness=ready,required_sources=required,
+            coverage='Exact selected instant/prefix and remaining horizon only.' if point=='saved_state' else
+                'Frozen time-zero initialization; does not diagnose the observed terminal state.' if native else
+                'Declared model operating point; no measured terminal state is implied.'))
+    return dict(method=method,scientific_purpose=detail['scientific_purpose'],operating_points=points,
+        available_source_references=sources,unavailable_sources=unavailable,
+        saved_state_requirements='Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.',
+        coverage=detail['coverage'],scientific_scope=detail.get('scientific_scope'),limitations=[detail['description'],*detail['limitations']],
+        deterministic_method_applicability=detail['applicability']['status'],execution_status=detail['execution_status'],
+        admission='Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.')
 
 
 def mathematical_method_view(host, reference):
@@ -214,6 +284,22 @@ def mathematical_method_view(host, reference):
             item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
+    for method,item in methods.items():
+        item['scientific_scope']=dict(computes=item['description'],
+            model_sources=item.get('model_sources'),operating_points=analysis_operating_points(method,item['operation']),
+            legal_sources='Exact owned candidate, model, physical input bounds, state provenance and frozen task/protocol; source admission remains mandatory.',
+            task_quantities=item.get('coverage',[]),full_task_supported=item.get('full_task_supported',False),
+            inference='Model-scoped mathematical evidence only after actual computation and validation. An intent or accepted request establishes no scientific result.',
+            missing_evidence=item.get('missing',[]),requires_mathematical_execution=True,
+            physical_acceptance='Independent registered task evaluation is required; no static, local or optimizer result substitutes for it.')
+    if spec.get('research_decisions',{}).get('analysis_interface') in ('bound_scientific_variables_v1','bound_scientific_variables_v2'):
+        from tools.research.research_context import research_intent
+        intent=research_intent(host)['latest_decision'] or {}
+        decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}
+        selected=decision.get('selected_method')
+        if (intent.get('action')=='diagnose' and intent.get('execution_status')=='completed'
+                and decision.get('selected_candidate')==reference and selected in methods and binding_error is None):
+            methods[selected]['operating_point_guidance']=selected_operating_point_guidance(host,reference,selected,methods[selected])
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
 

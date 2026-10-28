@@ -24,11 +24,11 @@ def capacity_estimate(content,provider):
     This is an offline estimate, not a Provider-reported prompt-token count.
     """
     context=provider['context_guard']
-    # With no client output cap this checks input headroom only; the Provider
-    # owns the output default and final combined-context admission.
-    reserved=(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']
+    # A v2 reserve is a context-planning margin, not an output generation cap.
+    output_reserve=provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 32768
+    reserved=output_reserve+context['framing_headroom_tokens']
     estimate=dict(method='serialized_utf8_byte_upper_estimate',input_estimate=len(content),
-        serialized_bytes=len(content),reserved_output_tokens=provider.get('max_tokens'),
+        serialized_bytes=len(content),reserved_output_tokens=output_reserve,
         framing_headroom_tokens=context['framing_headroom_tokens'],
         context_limit_tokens=context['context_limit_tokens'])
     if len(content)+reserved>context['context_limit_tokens']:
@@ -40,3 +40,14 @@ def capacity_estimate(content,provider):
     if estimate['input_estimate']+reserved>context['context_limit_tokens']:
         raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_OFFLINE_TOKEN_ESTIMATE')
     return estimate
+
+
+def handoff_input_estimate(content, provider):
+    """Estimate the complete serialized request for the soft handoff heuristic."""
+    if provider['adapter'] != 'deepseek' or provider['model'] not in ('deepseek-flash','deepseek-v4-pro'):
+        raise ValueError('TOKEN_HANDOFF_REQUIRES_PINNED_DEEPSEEK_TOKENIZER')
+    tokens=len(official_tokenizer().encode(content.decode('utf-8'),add_special_tokens=False).ids)
+    return dict(input_estimate=tokens,serialized_bytes=len(content),
+        method='pinned_official_deepseek_v4_serialized_token_estimate',
+        reserved_output_tokens=provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 32768,
+        framing_headroom_tokens=provider['context_guard']['framing_headroom_tokens'])

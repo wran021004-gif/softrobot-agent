@@ -111,6 +111,7 @@ def initial_search_progress(host):
 
 def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
+    from extensions.tendon_family.family_space import span_strategies
     grant=spec['family_search']
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
             version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
@@ -121,6 +122,7 @@ def request_guidance(spec):
             parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',
                 sections='Section type/dimensions in m',routing='Span phase, station, channel angle and radius',
                 spans='Consecutive span strategy',segment_count='Discrete number of segments',tendon_count='Discrete number of channels'),
+            applicable_span_strategies=span_strategies(spec['family_space']),
             block_selection='Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.',
             objectives=dict(task_violation='CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged',
                 target_equilibrium_residual='Static proxy only; target_equilibrium required',
@@ -129,6 +131,15 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
+    if spec['family_space'].get('version')=='serial_family_space_v2':
+        space=spec['family_space']; rule=space['serial_assembly']
+        parts={p['id']:p for p in space['assembly']['components']}
+        guidance['generate']['segment_section_format']=dict(
+            segment_keys='Integer indices; JSON keys are numeric strings such as \"0\", not segment_0.',
+            sections='When supplied, use Section objects without station s; replace each inherited station in order. Omit to inherit.',
+            required_section_counts=dict(first=len(parts[rule['root_segment']]['sections']),
+                subsequent=len(parts[rule['repeated_segment']]['sections'])),
+            scope='Counts derive from frozen prototypes; station positions remain prototype-owned.')
     if 'mujoco_control' in grant.get('evaluation_modes',[]):
         guidance['search']['native_mode']=dict(evaluation_mode='mujoco_control',objective='task_violation',
             inner_analysis='mujoco_nonlinear_task_capability_v1',
@@ -296,7 +307,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             if mixed:
                 from tools.research.mixed_moves import initial,next_move,generation
                 space=s['spec']['family_space']
-                best=min((r for r in rows if r.get('candidate_id') and (not native or rank(r,q)[0]==0)),
+                best=min((r for r in rows if r.get('candidate_id') and rank(r,q)[0]==0),
                     key=lambda row:rank(row,q),default=None)
                 if not rows:
                     point=initial(space,q)
@@ -440,7 +451,9 @@ def run_search(host,query,key,*,guard,execute,capacity):
                         numerical_s=0 if reused else r.get('charged_numerical_s'))})
         rows.append(row)
         checkpoint['pending']=None
-        checkpoint['updates'].append(dict(candidate_id=c['candidate_id'],incumbent_after=min(rows,key=lambda row:rank(row,q,limits))['candidate_id']))
+        ranked=[r for r in rows if not mathematical or rank(r,q,limits)[0]==0]
+        incumbent=min(ranked,key=lambda row:rank(row,q,limits)) if ranked else None
+        checkpoint['updates'].append(dict(candidate_id=c['candidate_id'],incumbent_after=incumbent['candidate_id'] if incumbent else None))
         if state(host).get('success_gate'):
             checkpoint['termination']='fresh_task_pass_requires_closeout'
         if mixed and q.stop_score is not None and rank(row,q)[0]==0:
@@ -453,7 +466,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
     best=min(rows,key=lambda row:rank(row,q,limits)) if rows else None
     supported=best is not None and rank(best,q,limits)[0]==0
     result=dict(problem_identity=identity,status=('best_finite_budget_native_candidate' if supported else 'no_supported_result') if native else ('best_mathematical_candidate' if supported else 'no_supported_result') if mathematical else 'bounded_backend_search',
-        requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported and not native else None,best_observed=best,evaluated=rows,
+        requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported and not native else None,best_observed=best if supported or not mathematical else None,evaluated=rows,
         termination_reason=checkpoint['termination'],search_updates=checkpoint['updates'],search_state=checkpoint_ref,
         analysis_rejection=checkpoint.get('analysis_rejection'),
         resource_use=dict(evaluated_designs=len(rows),proposed_designs=checkpoint['proposal_count'],

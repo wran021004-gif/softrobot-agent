@@ -11,7 +11,8 @@ PUBLIC_STATUS='public_procedural_guidance; generalization_unverified'
 
 
 def entries(host):
-    rows=read(ROOT/'memory/diagnostic_index.json')['entries']
+    path=ROOT/'memory/diagnostic_index.json'
+    rows=read(path).get('entries',[]) if path.is_file() else []
     if state(host)['spec'].get('capabilities'):
         rows=[r for r in rows if r['kind']=='procedure' and r['status']==PUBLIC_STATUS]
     return rows
@@ -38,7 +39,13 @@ def retrieve(host,query,*,reader='agent'):
         if q.revision is not None and q.revision!=entry['revision']:continue
         if any(getattr(q,name) is not None and getattr(q,name)!=entry[name]
             for name in ('task','structure','failure_type','version')):continue
-        body=(ROOT/entry['path']).read_bytes()
+        source=ROOT/entry['path']
+        if not source.is_file():
+            if q.operation=='read':
+                rows.append(dict(key=canonical,entry_id=entry['entry_id'],revision=entry['revision'],
+                    status='source_unavailable',source_path=entry['path'],explanation='The historical guidance source is unavailable.'))
+            continue
+        body=source.read_bytes()
         content=read(ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
         refs=[]
         def walk(value):
@@ -67,6 +74,7 @@ def disposition_bindings(host,dispositions):
         receipt=host.store.artifact(ref)
         if receipt['query']['operation']!='read' or len(receipt['results'])!=1:continue
         row=receipt['results'][0]
+        if row.get('status')=='source_unavailable':continue
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
             content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding

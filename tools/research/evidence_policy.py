@@ -15,6 +15,12 @@ FORBIDDEN=['global_nonlinear_feasibility','global_nonlinear_infeasibility',
     'continuous_time_compliance','hardware_performance','robustness','repeatability']
 
 
+def english_native(spec):
+    """The opt-in Study contract; historical Studies keep their original behavior."""
+    return spec.get('research_decisions', {}).get('architecture') == 'english_decision_v1'
+
+
+
 def mathematical_physical_relation(value, physical):
     """Associate aligned recorded constraints, never infer a causal mechanism."""
     task=(value.get('binding') or {}).get('task_identity')
@@ -252,6 +258,11 @@ def admit_decision(host,plan):
     from tools.research.contracts import PLAN_RESEARCH_INTENTS
     if d.research_intent!=PLAN_RESEARCH_INTENTS[plan.action]:
         raise ValueError(f'RESEARCH_INTENT_ACTION_MISMATCH: action={plan.action} requires decision.research_intent={PLAN_RESEARCH_INTENTS[plan.action]}; received={d.research_intent}')
+    if (s['spec']['research_decisions'].get('analysis_interface')=='bound_scientific_variables_v2'
+            and plan.action=='diagnose' and d.selected_candidate is None):
+        from tools.research.task_constraints import registered_analysis_method_names
+        if d.selected_method in registered_analysis_method_names():
+            raise ValueError('SELECTED_ANALYSIS_CANDIDATE_REQUIRED: decision.selected_candidate must explicitly name an owned candidate before mathematical method selection can settle; no candidate is inferred.')
     actual=plan.candidate
     if plan.control_seed:actual=plan.control_seed.candidate
     if plan.control_search:actual=plan.control_search.candidate

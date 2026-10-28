@@ -145,6 +145,14 @@ def read_evidence(host, query, *, record_read=True):
                     details['derived_available_fields']=list(projected)
                 details['derived_view_query']=proposed
                 details['corrected_query']=proposed
+        if (q.view in ('full','summary','fields','range') and q.pointer
+                and q.pointer.split('/')[1]=='methods' and plain(q.reference) in s.get('candidates',{}).values()):
+            proposed=dict(reference=plain(q.reference),view='mathematical_capabilities',pointer=q.pointer)
+            try:read_evidence(host,proposed,record_read=False)
+            except (KeyError,IndexError,TypeError,ValueError):pass
+            else:
+                details['derived_view_query']=proposed
+                details['corrected_query']=proposed
         if q.view=='fields' and not q.pointer:
             derived=next((k for k in q.fields if k in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','eligible_methods','read_coverage')),None)
             if derived:
@@ -193,11 +201,13 @@ def read_evidence(host, query, *, record_read=True):
 
 def _record_evidence_read(host,q,s,value,record_read):
     """Cache hits retain the same public read markers; internal reads grant none."""
+    from tools.research.evidence_policy import english_native
     if q.view=='working_set' or not record_read:return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
-        if q.pointer in ('','/acceptance','/episodes') and q.view in ('full','summary'):
+        if ((english_native(s['spec']) and q.pointer=='' and q.view=='full')
+                or (not english_native(s['spec']) and q.pointer in ('','/acceptance','/episodes') and q.view in ('full','summary'))):
             update(host,evaluation_reads=[*s.get('evaluation_reads',[]),plain(q.reference)])
         update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])
     return value

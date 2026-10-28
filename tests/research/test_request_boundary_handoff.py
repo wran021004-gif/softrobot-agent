@@ -69,6 +69,107 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         restored=h.store.artifact(h.store.events(h.run_id)[-1]['outputs'][0])
         self.assertFalse(restored['next_request_sent']);self.assertEqual(restored['unmatched_tool_ids'],[])
 
+    def test_token_threshold_rotates_only_after_settled_feedback(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['architecture']='english_decision_v1'
+        spec['research_decisions']['handoff_policy']=dict(version='token_handoff_v1',input_tokens=1)
+        update(h,spec=spec);sent=[]
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
+        self.assertEqual(len(sent),2)
+        events=h.store.events(h.run_id)
+        committed=next(e for e in events if e['kind']=='session_handoff' and e['status']=='committed')
+        preparation=h.store.artifact(committed['outputs'][0])
+        self.assertEqual(preparation['boundary_kind'],'request_feedback')
+        self.assertEqual(preparation['pending_feedback_delivery']['items'][0]['tool_id'],'fixture-read-priors')
+        packet=json.loads(sent[1]['messages'][-1]['content'].split('\n',1)[1])['research']
+        self.assertEqual(packet['version'],'research_decision_brief_v3')
+        self.assertEqual(packet['research_state']['pending_feedback']['items'][0]['tool_id'],'fixture-read-priors')
+        from tools.research.session_handoff import pending_feedback_delivery
+        self.assertIsNone(pending_feedback_delivery(h))
+        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+        self.assertNotIn('research_analysis',[t['function']['name'] for t in sent[0]['tools']])
+
+    def test_full_read_credit_survives_compact_feedback_handoff(self):
+        from tools.research.research_context import read_coverage
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['architecture']='english_decision_v1'
+        spec['research_decisions']['handoff_policy']=dict(version='token_handoff_v1',input_tokens=1)
+        update(h,spec=spec);ref=save(h,dict(status='fixture',value=0.1),'offline_read_fixture');sent=[]
+        def response(request):
+            wire=json.loads(request.content);sent.append(wire)
+            message=dict(role='assistant',content='Feedback received.')
+            if len(sent)==1:
+                message=dict(role='assistant',content=None,tool_calls=[dict(id='full-read',type='function',
+                    function=dict(name='evidence_read',arguments=json.dumps(dict(reference=ref,view='full'))))])
+            return httpx.Response(200,json=dict(id='fixture',object='chat.completion',created=1,model=wire['model'],
+                choices=[dict(index=0,finish_reason='tool_calls' if len(sent)==1 else 'stop',message=message)],
+                usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
+            asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
+        row=next(x for x in read_coverage(h) if x['tool_call_id']=='full-read')
+        self.assertTrue(row['full_artifact']);self.assertTrue(row['successfully_provided'])
+
+    def test_selected_method_changes_actual_provider_schema(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['architecture']='english_decision_v1'
+        update(h,spec=spec);sent=[]
+        detail=dict(operation='mujoco_nonlinear_task_capability_v1',
+            request_template=dict(model_source='mujoco'),required_parameters=['control_optimization source and bounded settings'])
+        with patch('tools.research.agent.selected_analysis',return_value=('mujoco-nonlinear-task-capability-v1',detail)),\
+                patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+        schema=next(t['function']['parameters'] for t in sent[0]['tools'] if t['function']['name']=='research_analysis')
+        self.assertEqual(schema['properties']['operation']['const'],'mujoco_nonlinear_task_capability_v1')
+        self.assertIn('control_optimization',schema['required'])
+        self.assertNotIn('nonlinear_response',schema['properties'])
+        self.assertNotIn('StaticDesignSensitivity',schema['$defs'])
+        self.assertIn('generate',next(t['function']['parameters']['properties']['action']['enum'] for t in sent[0]['tools'] if t['function']['name']=='research_plan'))
+
+    def test_token_threshold_rotates_at_completed_invocation(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['architecture']='english_decision_v1'
+        spec['research_decisions']['handoff_policy']=dict(version='token_handoff_v1',input_tokens=1)
+        update(h,spec=spec);sent=[]
+        def response(request):
+            wire=json.loads(request.content);sent.append(wire)
+            return httpx.Response(200,json=dict(id='completed-fixture',object='chat.completion',created=1,model=wire['model'],
+                choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='Fixture decision complete.'))],
+                usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
+            asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=2))
+        events=h.store.events(h.run_id)
+        commits=[e for e in events if e['kind']=='session_handoff' and e['status']=='committed']
+        self.assertEqual(len(commits),1)
+        self.assertEqual(h.store.artifact(commits[0]['outputs'][0])['version'],'research_session_handoff_v2')
+        self.assertEqual(len(sent),2)
+
+    def test_token_handoff_rejects_tampered_feedback_boundary(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['architecture']='english_decision_v1'
+        spec['research_decisions']['handoff_policy']=dict(version='token_handoff_v1',input_tokens=1)
+        update(h,spec=spec);sent=[]
+        async def changed(host,agent):
+            last=next(m for m in reversed(agent.messages) if m['role']=='assistant')
+            next(b for b in last['content'] if 'reasoningContent' in b)['reasoningContent']['reasoningText']['text']='Tampered fixture'
+            return await request_feedback_boundary(host,agent)
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('tools.research.session_handoff.request_feedback_boundary',side_effect=changed),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            with self.assertRaisesRegex(Exception,'ORIGINAL_RESPONSE_MISMATCH'):
+                asyncio.run(converse(h,session_handoff=True))
+        self.assertEqual(len(sent),1)
+        self.assertFalse(any(e['kind']=='session_handoff' for e in h.store.events(h.run_id)))
+
     def test_changed_original_response_blocks_rotation_and_next_send(self):
         h=self.provision();sent=[]
         async def changed(host,agent):
