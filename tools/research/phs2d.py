@@ -104,7 +104,7 @@ def candidate(h,p,label,generation,reason):
     if len(s['phs']['candidates'])>=p['limits']['candidates']:raise ValueError('CANDIDATE_LIMIT')
     if p['version']!='phs2d_passive_inverse_v1' and generation['tendon_count'] not in (1,2,4,6):raise ValueError('PHS_TENDON_SCOPE')
     if abs(sum(x['length_m'] for x in generation['segments'].values())-.28)>1e-12:raise ValueError('FIXED_LENGTH')
-    q=dict(version='serial_family_generation_v2',family_space_identity=s['spec']['family_space_identity'],segment_count=2,**generation)
+    q=dict(version='serial_family_generation_v2',family_space_identity=s['spec']['family_space_identity'],**{'segment_count':2,**generation})
     plan=dict(action='generate',generation=q,hypothesis=reason,expected_observation='Passive cross-compliance and stable finite-force deformation',
         weakening_observation='Tip follows middle, middle rigid, invalid rope or equilibrium',fixed_conditions='PHS protocol, force, length and mesh',
         stopping_condition='P0 failure, first ten-condition witness, or finite budget',interpretation='Exploratory structural hypothesis; no active control')
