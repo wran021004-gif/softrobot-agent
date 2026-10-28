@@ -124,7 +124,7 @@ def build(h,p,ref,*,slack=0.,unrestricted=False,payout_lengths_m=None):
         payout=np.array([payout_lengths_m[n] for n in names])
         if np.max(abs(payout-np.array(physics['reference_lengths_m'])))>p['payout_offset_bound_m']+1e-12:
             raise ValueError('PAYOUT_OUTSIDE_FROZEN_ASSEMBLY_DOMAIN')
-    model=PassiveModel(physics,p,payout,h.store.root.parent/'models'/digest(dict(candidate=ref,payout=payout.tolist(),unrestricted=unrestricted)),unrestricted)
+    model=PassiveModel(physics,p,payout,h.store.root.parent/'models'/digest(dict(candidate=ref,payout=payout.tolist(),unrestricted=unrestricted,protocol=p)),unrestricted)
     return model
 
 

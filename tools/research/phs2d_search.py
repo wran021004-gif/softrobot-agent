@@ -58,6 +58,8 @@ def dynamics(label,s=.5,force=0.,phase='P0',baseline=None,static_source=None,num
     if eq['force_n']!=0 or eq['status']!='qualified_local_minimum':raise ValueError('UNLOADED_KKT_INITIAL_REQUIRED')
     if force and not baseline:raise ValueError('DYNAMIC_BASELINE_REQUIRED')
     if baseline and h.store.artifact(baseline)['status']!='stable':raise ValueError('STABLE_UNLOADED_DYNAMICS_REQUIRED')
+    if set(numerics or {})-{'timestep_s','sample_every_steps','solreflimit','solimplimit','equilibrium_max_s','load_max_s'}:
+        raise ValueError('NUMERICAL_REVISION_CANNOT_CHANGE_ACCEPTANCE')
     protocol={**p,**(numerics or {})}
     initial=eq['equilibrium']['qpos'] if baseline is None else h.store.artifact(baseline)['samples'][-1]['qpos']
     initial=np.array(initial)+perturbation*np.sin(np.arange(len(initial)))
@@ -66,7 +68,7 @@ def dynamics(label,s=.5,force=0.,phase='P0',baseline=None,static_source=None,num
         result=n.run(initial,s,force,attempt=attempt,initial=force==0)
         result['numerical_protocol']=protocol
         return result
-    steps=round(protocol['load_max_s']/protocol['timestep_s'])
+    steps=round(protocol['equilibrium_max_s' if force==0 else 'load_max_s']/protocol['timestep_s'])
     body,ref=request(h,p,dict(kind='passive_independent_dynamics_v2',assembly=ar,s=s,force_n=force,
         baseline=baseline,static_source=static_source,numerics=numerics,perturbation=perturbation),run,steps=steps,phase=phase)
     if force==0:
@@ -82,7 +84,7 @@ def dynamics(label,s=.5,force=0.,phase='P0',baseline=None,static_source=None,num
 
 def semantic_check(label):
     h,p,ar,a=setup(label)
-    return request(h,p,dict(kind='P0A_potential_gradient_and_virtual_work',assembly=ar),
+    return request(h,p,dict(kind='P0A_potential_gradient_and_virtual_work',revision=2,assembly=ar),
         lambda _:consistency(build(h,p,a['candidate'],payout_lengths_m=a['payout_lengths_m'])),math=1,phase='P0')
 
 
@@ -91,12 +93,15 @@ def admit_p0(label):
     static_result=h.store.artifact(sr);dynamic=h.store.artifact(dr)
     sem,semref=semantic_check(label)
     a_ok=bool(sem['objective_gradient_error']<1e-7 and sem['tendon_gradient_error']<1e-7 and sem['force_consistency_error']<1e-9
+        and sem['no_actuators'] and sem['full_3d_coordinates'] and sem['vertical_down'] and sem['fixed_unilateral_payout']
+        and sem['gravity_error']<1e-12 and sem['mount_rotation_error']<1e-12
         and dynamic.get('checks',{}).get('rope_direction') and dynamic.get('checks',{}).get('rope_excess'))
     b_ok=bool(static_result['status']=='qualified_local_minimum' and static_result['multistart_same_branch'] and dynamic['status']=='stable'
         and max(np.linalg.norm(np.array(r)[:2]) for r in dynamic['samples'][-1]['positions'])<=p['initial_lateral_limit_m'])
-    rr=save(h,dict(version='P0_split_v1',P0A=a_ok,P0B=b_ok,assembly=ar,static=sr,dynamic=dr,semantics=semref,
+    rr=save(h,dict(version='P0_split_v2',P0A=a_ok,P0B=b_ok,assembly=ar,static=sr,dynamic=dr,semantics=semref,
         old_P0_verdict='unchanged_failed',loaded_task_pass_required=False),'phs_round2_P0_gate')
-    v=state(h)['phs'];v.update(p0_pass=a_ok and b_ok,p0_report=rr);update(h,phs=v)
+    v=state(h)['phs'];v.setdefault('p0_report_history',[]).append(v['p0_report'])
+    v.update(p0_pass=a_ok and b_ok,p0_report=rr);update(h,phs=v)
     return dict(passed=a_ok and b_ok,reference=rr)
 
 
@@ -120,18 +125,20 @@ def screen(label,nonlinear=False):
     return result
 
 
-def dynamic_six(label,numerics=None):
-    h,p,ar,a=setup(label);base,br=dynamics(label,phase='P1',numerics=numerics)
-    summary=dict(label=label,baseline=br,baseline_status=base['status'],rows=[])
+def dynamic_six(label,numerics=None,phase='P1'):
+    h,p,ar,a=setup(label);base,br=dynamics(label,phase=phase,numerics=numerics)
+    summary=dict(label=label,baseline=br,baseline_status=base['status'],rows=[],phase=phase,numerics=numerics)
     if base['status']=='stable':
         for loc in p['search_s']:
             for force in (.1,-.1):
-                raw,rr=dynamics(label,loc,force,phase='P1',baseline=br,numerics=numerics)
+                raw,rr=dynamics(label,loc,force,phase=phase,baseline=br,numerics=numerics)
                 e=evaluate(p,base,raw,loc)
                 summary['rows'].append(dict(s=loc,force_n=force,reference=rr,**{k:e[k] for k in ('status','valid','tip_xy_m','point_dx_m','ratio','out_of_plane_m','worst_violation')}))
     summary['all_valid']=len(summary['rows'])==6 and all(r['valid'] for r in summary['rows'])
     summary['all_pass']=len(summary['rows'])==6 and all(r['status']=='development_pass' for r in summary['rows'])
-    ref=save(h,summary,'phs_six_condition_result');v=state(h)['phs'];v.setdefault('dynamic_sets',[]).append(ref);update(h,phs=v)
+    ref=save(h,summary,'phs_six_condition_result');v=state(h)['phs'];v.setdefault('dynamic_sets',[])
+    if ref not in v['dynamic_sets']:v['dynamic_sets'].append(ref)
+    update(h,phs=v)
     return summary
 
 

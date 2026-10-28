@@ -129,7 +129,15 @@ def consistency(native):
     objective_difference=(p.objective(q+h*v)-p.objective(q-h*v))/(2*h)
     length_difference=(p.constraint(q+h*v)-p.constraint(q-h*v))/(2*h)
     grad=p.gradient(q);J=p.jacobian(q);d=p.at(q);native.apply_force(d,.37,.1);mujoco.mj_forward(native.model,d)
+    p.cost['native_forward_calls']+=1
     native_residual=d.qfrc_passive+d.qfrc_applied-d.qfrc_bias
+    zero=mujoco.MjData(native.model);mujoco.mj_forward(native.model,zero);p.cost['native_forward_calls']+=1
+    positions=np.array([native.point(zero,b)[0] for b in native.points])
     return dict(status='checked',objective_gradient_error=abs(objective_difference-float(grad@v)),
         tendon_gradient_error=float(np.max(abs(length_difference-J@v))),force_consistency_error=float(np.max(abs(native_residual+grad))),
+        no_actuators=native.model.nu==0,full_3d_coordinates=native.model.nv==48,
+        vertical_down=bool(np.all(np.diff(positions[:,2])<=1e-10) and np.max(abs(positions[:,:2]))<1e-8),
+        gravity_error=float(np.max(abs(native.model.opt.gravity-native.protocol['gravity']))),
+        mount_rotation_error=float(np.max(abs(zero.xmat[native.base].reshape(3,3)-native.protocol['mount_rotation']))),
+        fixed_unilateral_payout=bool(np.all(native.model.tendon_limited) and np.max(abs(native.model.tendon_range[:,1]-native.payout))<1e-12),
         numerical_cost=p.cost)
