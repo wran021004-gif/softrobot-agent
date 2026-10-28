@@ -21,7 +21,7 @@ from tools.research.state import state, update, science_hashes
 from tools.state_io import digest
 from tests.research.c3_readiness_audit import FrozenDecisionBoundary
 
-PROBE_ID='main-off-saved-c3-v2-20261028'
+PROBE_ID='main-off-saved-c3-v3-20261028'
 DEST=ROOT/'runs/research'/PROBE_ID
 POLICY={'version':'research_roles_v2',
     'main':{'thinking':'disabled','reasoning_effort':'none'},
