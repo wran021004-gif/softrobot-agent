@@ -6,6 +6,7 @@ from unittest.mock import patch
 import httpx
 from tests.research.test_p2_feedback_pair2 import Pair2Tests
 from tests.research import p2_feedback_pair2 as second,p2_feedback_pair3 as third
+from tests.research.p2_feedback_pair3_execute import admit_calls
 from tools.platform_store import zero
 from tools.research.agent import record
 from tools.research.research_context import mathematics_authorization
@@ -63,3 +64,12 @@ class Pair3Tests(unittest.TestCase):
         self.assertEqual(state(self.h)['mathematical_evaluations'],1);self.assertEqual(state(self.h)['physical_replay_launches'],1)
         with self.assertRaisesRegex(ValueError,'NO_RETRY'):
             asyncio.run(third.send_arm(self.h,bundle,'on','fixture-secret',transport=httpx.MockTransport(respond)))
+
+    def test_only_noncomputational_exact_choices_are_admitted(self):
+        def call(name,data):return {'function':{'name':name,'arguments':json.dumps(data)}}
+        admit_calls('on',[call('research_plan',{'action':'diagnose'})])
+        admit_calls('off',[call('evidence_read',{}),call('evidence_read',{})])
+        for calls in ([call('research_plan',{'action':'diagnose','diagnostic':{'foo':'bar'}})],
+                      [call('research_plan',{'action':'physical_replay'})],
+                      [call('research_analysis',{})]):
+            with self.assertRaisesRegex(ValueError,'READ_ONLY'):admit_calls('on',calls)
