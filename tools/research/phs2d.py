@@ -81,6 +81,8 @@ def request(h,p,details,fn,*,steps=0,math=0,phase='P1'):
     elapsed=time.perf_counter()-started
     result.update(request=spec,cost=dict(physics_step_attempts=attempts,math_requests=math,elapsed_s=elapsed),
         implementation_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
+    result=json.loads(json.dumps(result,allow_nan=False,default=lambda x:x.item() if isinstance(x,np.generic) else x.tolist()))
+    atomic_json(h.store.root.parent/'requests'/(key+'.json'),result)
     with h.store.transaction() as db:
         s=h.store.session(h.run_id,db)['state'];v=s['phs'];v['steps']-=steps-attempts
         if phase=='P0':v['p0_steps']-=steps-attempts

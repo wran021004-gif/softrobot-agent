@@ -34,7 +34,7 @@ def static(label,s=.5,force=0.,phase='P0',multistart=False,source=None):
         n=build(h,p,a['candidate'],payout_lengths_m=a['payout_lengths_m'])
         initial=None if source is None else h.store.artifact(source)['equilibrium']['qpos']
         return solve(n,s,force,initial=initial,multistart=multistart)
-    b,r=request(h,p,dict(kind='passive_equilibrium_v1',assembly=ar,s=s,force_n=force,source=source,multistart=multistart),run,math=1,phase=phase)
+    b,r=request(h,p,dict(kind='passive_equilibrium_v1',serialization_revision=2,assembly=ar,s=s,force_n=force,source=source,multistart=multistart),run,math=1,phase=phase)
     if force==0:
         v=state(h)['phs'];v.setdefault('static_baselines',{})[label]=r;update(h,phs=v)
     return b,r

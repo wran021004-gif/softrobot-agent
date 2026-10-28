@@ -90,7 +90,7 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
     good=[x for x in trials if x['status']=='qualified_local_minimum']
     best=min(good or trials,key=lambda x:(x['primal_violation_m'],x['stationarity_inf_nm']))
     return dict(method='passive_equilibrium_v1',s=s,force_n=force,status=best['status'],equilibrium=best,trials=trials,
-        multistart_same_branch=(max(np.linalg.norm(np.array(x['qpos'])-best['qpos']) for x in trials)<1e-4) if multistart else None,
+        multistart_same_branch=bool(max(np.linalg.norm(np.array(x['qpos'])-best['qpos']) for x in trials)<1e-4) if multistart else None,
         numerical_cost=problem.cost,task_acceptance='unmeasured',regularization='none',
         assumptions='native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium')
 
