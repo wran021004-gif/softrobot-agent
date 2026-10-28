@@ -52,7 +52,8 @@ class PassiveModel:
 
     def tendon_jac(self,d):
         m=self.model
-        if not mujoco.mj_isSparse(m):return d.ten_J.reshape(m.ntendon,m.nv).copy()
+        # Tendon Jacobians use their own compressed rows even with dense efc_J.
+        # Full-span routes can accidentally look dense; partial routes do not.
         J=np.zeros((m.ntendon,m.nv))
         mujoco.mju_sparse2dense(J,d.ten_J,m.ten_J_rownnz,m.ten_J_rowadr,m.ten_J_colind)
         return J

@@ -22,6 +22,15 @@ class EquilibriumTests(unittest.TestCase):
         self.assertLess(v['objective_gradient_error'],1e-7);self.assertLess(v['tendon_gradient_error'],1e-7)
         self.assertLess(v['force_consistency_error'],1e-10)
 
+    def test_partial_tendons_use_compressed_rows_even_dense_solver(self):
+        spec=resolve('configs/research/study_phs2d_round2_v1.json')
+        spans=[dict(last_segment=0,count=2,phase_rad=1.5707963267948966,radius_m=.014),
+               dict(last_segment=1,count=2,phase_rad=1.5707963267948966,radius_m=.023)]
+        req=dict(version='serial_family_generation_v2',family_space_identity=spec['family_space_identity'],segment_count=2,**generation(4,spans=spans))
+        _,_,physics=generate_family(dict(space=spec['family_space'],request=req))
+        n=PassiveModel(physics,self.n.protocol,physics['reference_lengths_m'],'runs/phs2d-round2/test-partial')
+        values=consistency(n);self.assertLess(values['tendon_gradient_error'],1e-7)
+
     def test_equilibrium_kkt_branch_and_loaded_geometric_hessian(self):
         raw=solve(self.n,multistart=True);eq=raw['equilibrium']
         self.assertEqual(raw['status'],'qualified_local_minimum');self.assertTrue(raw['multistart_same_branch'])
