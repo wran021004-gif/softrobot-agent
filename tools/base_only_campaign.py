@@ -97,7 +97,7 @@ def generate(key,label,request=None):
     out=core.dispatch(h,plan('generate',generation=q),'generate-'+label)
     ref=out['result']['candidate'];body=core.read_evidence(h,dict(reference=ref,view='full'))
     tendons=body['configuration']['robot']['structure']['data']['tendons']
-    assert all(t['route'][0]['part']=='fixed_base' and t['route'][0]['role']=='start' for t in tendons)
+    assert all(t['points'][0]['attachment']['part']=='fixed_base' and t['points'][0]['role']=='start' for t in tendons)
     index['candidates'][label]=ref;put_index(key,index)
     return ref
 
