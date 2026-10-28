@@ -1,0 +1,786 @@
+{
+  "provenance": {
+    "study": "m5-main-off-experience-r2-20261028",
+    "commit": "5fdea5660cc12aea23d4ff6f2744c0b132a230ba",
+    "source_events": [
+      35,
+      68,
+      105,
+      122,
+      427
+    ],
+    "scope": "Read-only extracted protocol fixture; no new scientific observation. No private card content."
+  },
+  "generate_schema": {
+    "$defs": {
+      "Attachment": {
+        "additionalProperties": false,
+        "properties": {
+          "part": {
+            "default": "fixed_base",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "title": "Part",
+            "type": "string"
+          },
+          "position_m": {
+            "default": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Position M",
+            "type": "array"
+          },
+          "quaternion_wxyz": {
+            "default": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Quaternion Wxyz",
+            "type": "array"
+          },
+          "s": {
+            "default": 0.0,
+            "maximum": 1,
+            "minimum": 0,
+            "title": "S",
+            "type": "number"
+          }
+        },
+        "title": "Attachment",
+        "type": "object"
+      },
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "GenerationRequestV2": {
+        "additionalProperties": false,
+        "properties": {
+          "control_weights": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Control Weights",
+            "type": "object"
+          },
+          "controller_recipe": {
+            "additionalProperties": true,
+            "title": "Controller Recipe",
+            "type": "object"
+          },
+          "controller_solver": {
+            "additionalProperties": true,
+            "title": "Controller Solver",
+            "type": "object"
+          },
+          "family_space_identity": {
+            "minLength": 1,
+            "title": "Family Space Identity",
+            "type": "string"
+          },
+          "route_overrides": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "type": "array"
+            },
+            "title": "Route Overrides",
+            "type": "object"
+          },
+          "segment_count": {
+            "default": 2,
+            "minimum": 1,
+            "title": "Segment Count",
+            "type": "integer"
+          },
+          "segments": {
+            "additionalProperties": {
+              "$ref": "#/$defs/SegmentChoiceV2"
+            },
+            "title": "Segments",
+            "type": "object"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "title": "Spans",
+            "type": "array"
+          },
+          "strategy": {
+            "const": "polar_consecutive_spans_v1",
+            "default": "polar_consecutive_spans_v1",
+            "title": "Strategy",
+            "type": "string"
+          },
+          "tendon_count": {
+            "minimum": 1,
+            "title": "Tendon Count",
+            "type": "integer"
+          },
+          "tendon_parameters": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Tendon Parameters",
+            "type": "object"
+          },
+          "version": {
+            "const": "serial_family_generation_v2",
+            "default": "serial_family_generation_v2",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "family_space_identity",
+          "tendon_count"
+        ],
+        "title": "GenerationRequestV2",
+        "type": "object"
+      },
+      "ResearchDecision": {
+        "additionalProperties": false,
+        "properties": {
+          "claimed_inference": {
+            "default": "empirical_search",
+            "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+            "minLength": 1,
+            "title": "Claimed Inference",
+            "type": "string"
+          },
+          "hypothesis_id": {
+            "minLength": 1,
+            "title": "Hypothesis Id",
+            "type": "string"
+          },
+          "requested_budget": {
+            "default": 0,
+            "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+            "minimum": 0,
+            "title": "Requested Budget",
+            "type": "integer"
+          },
+          "research_intent": {
+            "enum": [
+              "DIAGNOSE",
+              "MATHEMATICAL_ANALYSIS",
+              "CONTROL_SEARCH",
+              "DESIGN_MODIFICATION",
+              "NMPC_EXECUTION",
+              "RL_TRAINING",
+              "PHYSICAL_VALIDATION",
+              "SELECT",
+              "STOP"
+            ],
+            "title": "Research Intent",
+            "type": "string"
+          },
+          "selected_candidate": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source."
+          },
+          "selected_method": {
+            "description": "Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.",
+            "minLength": 1,
+            "title": "Selected Method",
+            "type": "string"
+          },
+          "selected_variables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Selected Variables",
+            "type": "array"
+          },
+          "version": {
+            "const": "research_decision_v1",
+            "default": "research_decision_v1",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hypothesis_id",
+          "research_intent",
+          "selected_method"
+        ],
+        "title": "ResearchDecision",
+        "type": "object"
+      },
+      "RoutePoint": {
+        "additionalProperties": false,
+        "properties": {
+          "attachment": {
+            "$ref": "#/$defs/Attachment"
+          },
+          "hole": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Hole"
+          },
+          "role": {
+            "enum": [
+              "start",
+              "guide",
+              "anchor"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attachment",
+          "role"
+        ],
+        "title": "RoutePoint",
+        "type": "object"
+      },
+      "Section": {
+        "additionalProperties": false,
+        "properties": {
+          "angle_rad": {
+            "default": 0.0,
+            "title": "Angle Rad",
+            "type": "number"
+          },
+          "holes_yz_m": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "title": "Holes Yz M",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "circle",
+              "tube",
+              "ellipse",
+              "rectangle",
+              "polygon"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "outer_yz_m": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Outer Yz M",
+            "type": "array"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Parameters",
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "Section",
+        "type": "object"
+      },
+      "SegmentChoiceV2": {
+        "additionalProperties": false,
+        "properties": {
+          "cells": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cells"
+          },
+          "length_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Length M"
+          },
+          "physical_parameters": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Physical Parameters",
+            "type": "object"
+          },
+          "sections": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/Section"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sections"
+          },
+          "young_pa": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Young Pa"
+          }
+        },
+        "title": "SegmentChoiceV2",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor_angle_offset_rad": {
+            "default": 0.0,
+            "title": "Anchor Angle Offset Rad",
+            "type": "number"
+          },
+          "anchor_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Anchor S"
+          },
+          "angular_offsets_rad": {
+            "description": "Extra offsets: theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]. Empty uses equal spacing. These are not absolute angles.",
+            "items": {
+              "type": "number"
+            },
+            "title": "Angular Offsets Rad",
+            "type": "array"
+          },
+          "count": {
+            "minimum": 1,
+            "title": "Count",
+            "type": "integer"
+          },
+          "first_segment": {
+            "default": 0,
+            "minimum": 0,
+            "title": "First Segment",
+            "type": "integer"
+          },
+          "guide_angle_offset_rad": {
+            "default": 0.0,
+            "title": "Guide Angle Offset Rad",
+            "type": "number"
+          },
+          "guide_s": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Guide S"
+          },
+          "last_segment": {
+            "minimum": 0,
+            "title": "Last Segment",
+            "type": "integer"
+          },
+          "phase_rad": {
+            "default": 0.0,
+            "title": "Phase Rad",
+            "type": "number"
+          },
+          "radius_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Radius M"
+          }
+        },
+        "required": [
+          "last_segment",
+          "count"
+        ],
+        "title": "Span",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "action": {
+              "enum": [
+                "generate"
+              ]
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "decision": {
+              "properties": {
+                "research_intent": {
+                  "const": "DESIGN_MODIFICATION"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "action": {
+              "enum": []
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "decision": {
+              "properties": {
+                "selected_candidate": {
+                  "$ref": "#/$defs/EvidenceRef"
+                }
+              },
+              "required": [
+                "selected_candidate"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "description": "Submit the selected generate action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.",
+    "properties": {
+      "action": {
+        "description": "Property action",
+        "enum": [
+          "generate"
+        ],
+        "type": "string"
+      },
+      "decision": {
+        "$ref": "#/$defs/ResearchDecision"
+      },
+      "expected_observation": {
+        "description": "Property expected_observation",
+        "minLength": 1,
+        "title": "Expected Observation",
+        "type": "string"
+      },
+      "experience_disposition": {
+        "additionalProperties": {
+          "enum": [
+            "adopted",
+            "rejected",
+            "context_only"
+          ],
+          "type": "string"
+        },
+        "description": "Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.",
+        "title": "Experience Disposition",
+        "type": "object"
+      },
+      "fixed_conditions": {
+        "description": "Property fixed_conditions",
+        "minLength": 1,
+        "title": "Fixed Conditions",
+        "type": "string"
+      },
+      "generation": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/GenerationRequestV2"
+          }
+        ],
+        "description": "Property generation",
+        "title": "Generation"
+      },
+      "hypothesis": {
+        "description": "Property hypothesis",
+        "minLength": 1,
+        "title": "Hypothesis",
+        "type": "string"
+      },
+      "interpretation": {
+        "description": "Property interpretation",
+        "minLength": 1,
+        "title": "Interpretation",
+        "type": "string"
+      },
+      "next_step": {
+        "anyOf": [
+          {
+            "enum": [
+              "adjust_training",
+              "revise_design",
+              "diagnose",
+              "stop"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Property next_step",
+        "title": "Next Step"
+      },
+      "stopping_condition": {
+        "description": "Property stopping_condition",
+        "minLength": 1,
+        "title": "Stopping Condition",
+        "type": "string"
+      },
+      "supporting_evidence": {
+        "description": "Property supporting_evidence",
+        "items": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "title": "Supporting Evidence",
+        "type": "array"
+      },
+      "weakening_observation": {
+        "description": "Property weakening_observation",
+        "minLength": 1,
+        "title": "Weakening Observation",
+        "type": "string"
+      }
+    },
+    "required": [
+      "action",
+      "hypothesis",
+      "expected_observation",
+      "weakening_observation",
+      "fixed_conditions",
+      "stopping_condition",
+      "interpretation",
+      "decision",
+      "generation"
+    ],
+    "title": "Plan",
+    "type": "object"
+  },
+  "route": {
+    "result": {
+      "content": [
+        {
+          "text": "{\"version\":\"selected_tool_route_v1\",\"tool\":\"research_plan\",\"action\":\"generate\",\"tool_use_id\":\"call_01_6j20goSPFHCvauLw68nV9391\",\"scientific_execution_started\":false,\"formal_read_credit\":false,\"scope\":\"Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply.\"}"
+        }
+      ],
+      "status": "success",
+      "toolUseId": "call_01_6j20goSPFHCvauLw68nV9391"
+    },
+    "tool_use": {
+      "input": {
+        "action": "generate",
+        "tool": "research_plan"
+      },
+      "name": "research_route",
+      "toolUseId": "call_01_6j20goSPFHCvauLw68nV9391"
+    }
+  },
+  "navigation": {
+    "result": {
+      "content": [
+        {
+          "text": "{\"policy\":\"main_evidence_navigation_v1\",\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"requested_view\":\"working_set\",\"pointer\":\"\",\"original_response_bytes\":6101,\"notice\":\"Large result retained unchanged. Use exact pointers or bounded ranges; delegate complex interpretation to research_investigate.\",\"entries\":[{\"field\":\"version\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/version\"},\"type\":\"str\",\"value\":\"evidence_working_set_v2\"},{\"field\":\"candidate_index\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/candidate_index\"},\"type\":\"list\",\"length\":0},{\"field\":\"candidate_count\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/candidate_count\"},\"type\":\"int\",\"value\":0},{\"field\":\"candidate_index_query\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/candidate_index_query\"},\"type\":\"str\",\"value\":\"All candidate references remain in source_references; previews retain the latest three\"},{\"field\":\"control_result_links\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/control_result_links\"},\"type\":\"list\",\"length\":0},{\"field\":\"control_comparisons\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/control_comparisons\"},\"type\":\"list\",\"length\":0},{\"field\":\"measured_facts\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/measured_facts\"},\"type\":\"list\",\"length\":0},{\"field\":\"read_coverage\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/read_coverage\"},\"type\":\"list\",\"length\":0},{\"field\":\"read_coverage_count\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/read_coverage_count\"},\"type\":\"int\",\"value\":0},{\"field\":\"source_state_identity\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/source_state_identity\"},\"type\":\"str\",\"value\":\"39daff366fec4e759e11e62925aa6bf5388b2a5e7237a28f347b311f2d419574\"},{\"field\":\"read_counts\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/read_counts\"},\"type\":\"dict\",\"available_fields\":[\"exact_repeat\",\"covered_subnode\",\"changed_content\",\"new_query\"]},{\"field\":\"method_requirements\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/method_requirements\"},\"type\":\"dict\",\"available_fields\":[]},{\"field\":\"coverage_scope\",\"query\":{\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"working_set\",\"pointer\":\"/coverage_scope\"},\"type\":\"str\",\"value\":\"Delivery is not understanding. Repeated queries remain legal; scientific question/intent is not inferred.\"}],\"remaining_entries\":12}"
+        }
+      ],
+      "status": "success",
+      "toolUseId": "call_00_zh6NZrRJj7xtqLXlkhJ80757"
+    },
+    "source_state_identity": "39daff366fec4e759e11e62925aa6bf5388b2a5e7237a28f347b311f2d419574",
+    "tool_use": {
+      "input": {
+        "pointer": "",
+        "reference": {
+          "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_00_zh6NZrRJj7xtqLXlkhJ80757"
+    }
+  },
+  "schema_error": {
+    "result": {
+      "content": [
+        {
+          "text": "{\"status\": \"rejected\", \"error_code\": \"TOOL_SCHEMA_REQUIRED\", \"field\": \"fields\", \"reason\": \"'fields' is a required property\", \"worker_started\": false, \"charged_method_counts\": {\"physical_replay_launches\": 0, \"nmpc_launches\": 0, \"mathematical_evaluations\": 0}, \"evidence_navigation\": null, \"expected\": \"'fields' is a required property\", \"input_query\": {\"reference\": {\"artifact_id\": \"5395d457b9b0917a921e23ab4b7a27bd1f595413b07938bc3410203c95a82262\", \"media_type\": \"application/json\"}, \"view\": \"full\", \"pointer\": \"/tool_use/input\"}, \"scientific_execution_started\": false, \"relevant_references\": [], \"full_error_reference\": {\"artifact_id\": \"5395d457b9b0917a921e23ab4b7a27bd1f595413b07938bc3410203c95a82262\", \"media_type\": \"application/json\"}}"
+        }
+      ],
+      "status": "error",
+      "toolUseId": "call_00_8Nm85WmiQMAGDZcFnjHN9890"
+    },
+    "tool_use": {
+      "input": {
+        "pointer": "\"\"",
+        "reference": {
+          "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_00_8Nm85WmiQMAGDZcFnjHN9890"
+    }
+  },
+  "view_error": {
+    "result": {
+      "content": [
+        {
+          "text": "{\"status\": \"rejected\", \"error_code\": \"EVIDENCE_VIEW_MISMATCH\", \"field\": \"view\", \"reason\": \"'candidate_index'\", \"worker_started\": false, \"charged_method_counts\": {\"physical_replay_launches\": 0, \"nmpc_launches\": 0, \"mathematical_evaluations\": 0}, \"evidence_navigation\": {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"fields\", \"failed_pointer\": \"\", \"parent_pointer\": \"\", \"available_fields\": [\"actuator_defaults\", \"assembly\", \"assumptions\", \"conditional_rules\", \"control_domains\", \"executable_segment_counts\", \"executable_tendon_count_bounds\", \"family_id\", \"routing_domains\", \"segment_count_bounds\", \"segment_domain\", \"segment_domains\", \"serial_assembly\", \"tendon_count_bounds\", \"tendon_domains\", \"unsupported\", \"version\"], \"list_length\": null, \"parent_query\": {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"summary\", \"pointer\": \"\"}, \"data_access\": {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view_scope\": \"original_artifact\", \"queries\": []}, \"corrected_query\": {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/candidate_index\"}, \"unavailable_fields\": [\"candidate_index\", \"control_result_links\", \"eligible_methods\", \"read_coverage\", \"source_references\", \"citation_eligibility\", \"all_fresh_results\"], \"list_queries\": [{\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"range\", \"pointer\": \"/assumptions\", \"start\": 0, \"count\": 4}, {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"range\", \"pointer\": \"/executable_segment_counts\", \"start\": 0, \"count\": 1}, {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"range\", \"pointer\": \"/executable_tendon_count_bounds\", \"start\": 0, \"count\": 2}], \"derived_view_query\": {\"reference\": {\"artifact_id\": \"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\", \"media_type\": \"application/json\"}, \"view\": \"working_set\", \"pointer\": \"/candidate_index\"}}, \"expected\": \"Use exact query: {\\\"reference\\\":{\\\"artifact_id\\\":\\\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\\\",\\\"media_type\\\":\\\"application/json\\\"},\\\"view\\\":\\\"working_set\\\",\\\"pointer\\\":\\\"/candidate_index\\\"}\", \"input_query\": {\"reference\": {\"artifact_id\": \"4e9a39eb77013813287abc33095bde6637c4656b552d73a7eed2ed4eb909bf4f\", \"media_type\": \"application/json\"}, \"view\": \"full\", \"pointer\": \"/tool_use/input\"}, \"scientific_execution_started\": false, \"relevant_references\": [], \"full_error_reference\": {\"artifact_id\": \"4e9a39eb77013813287abc33095bde6637c4656b552d73a7eed2ed4eb909bf4f\", \"media_type\": \"application/json\"}}"
+        }
+      ],
+      "status": "error",
+      "toolUseId": "call_00_H3yaWTdQR0YUC0svleWZ6319"
+    },
+    "tool_use": {
+      "input": {
+        "fields": [
+          "candidate_index",
+          "control_result_links",
+          "eligible_methods",
+          "read_coverage",
+          "source_references",
+          "citation_eligibility",
+          "all_fresh_results"
+        ],
+        "reference": {
+          "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_00_H3yaWTdQR0YUC0svleWZ6319"
+    }
+  }
+}

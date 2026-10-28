@@ -24,6 +24,18 @@ def initial_messages(study_id):
 
 def selected_evidence_facts(parsed, query, limit):
     """Keep bounded selected facts through handoff; full evidence stays in L2."""
+    if isinstance(parsed,dict) and parsed.get('policy')=='main_evidence_navigation_v1':
+        # Preserve usable exact queries before navigation metadata. This remains
+        # a partial navigation view, never a scientific or complete-read fact.
+        facts=dict(policy=parsed['policy'],entries=[],remaining_entries=0,
+            scope='Partial navigation only; exact queries address original or derived views. No full-read credit.')
+        entries=parsed.get('entries',[])
+        for entry in entries:
+            projected={k:entry[k] for k in ('field','query','type','length','value','range_query') if k in entry}
+            if len(json.dumps({**facts,'entries':facts['entries']+[projected]}).encode())>limit:break
+            facts['entries'].append(projected)
+        facts['remaining_entries']=len(entries)-len(facts['entries'])+parsed.get('remaining_entries',0)
+        return facts
     summary=query.get('view')=='summary' and isinstance(parsed,dict) and 'value' in parsed
     value=parsed['value'] if summary else parsed
     if not isinstance(value,dict):return None

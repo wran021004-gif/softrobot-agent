@@ -51,3 +51,19 @@ selection exposed three pre-existing fixture failures, reproduced unchanged at
 5fdea566: missing-cap reserve expectation, historical C3 evaluation identity,
 and a synthetic execution fixture missing calibrated environment admission.
 These are tracked for P3; no production guard or historical hash was weakened.
+
+## P1 decision continuity
+
+New on_demand_tools_v2 keeps the selected Plan available while reading evidence
+or experience. Initial generation and closeout STOP are exposed as tools, never
+submitted automatically. Legacy v1 registries retain their original behavior.
+Navigation projection preserves exact usable entries before summary metadata.
+The L0 tool_continuation view rebuilds route selections and four recent feedback
+items from existing events, separately from scientific Plan intent and trace.
+No second memory, planner, execution queue or digest was added.
+
+The R2 fixture is extracted read-only from original events 35/68/105/122/427;
+it excludes private cards. Four new real-SDK MockTransport checks pass, including
+one legal generation, feedback, precise restore, and zero scientific execution.
+Nine existing recent-round routing/recovery checks also pass. Scripted model
+outputs establish protocol operation, not autonomous research improvement.

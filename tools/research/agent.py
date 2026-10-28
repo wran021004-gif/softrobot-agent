@@ -220,9 +220,26 @@ def load_selected_tool_schema(host, registry, directory):
     schema['properties']['tool']['enum']=[r['tool'] for r in directory]
     schema['description']='Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.'
     router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
+    retained={'research_route'}
+    if selected:retained.add(name)
+    if s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v2':
+        # Retrieval must not unload the already chosen Plan. With no prior Plan,
+        # expose generate (or closeout STOP), without choosing/submitting it.
+        plan=registry.get('research_plan')
+        entry=next((r for r in directory if r['tool']=='research_plan'),None)
+        if plan and entry and name!='research_plan':
+            from tools.research.research_context import tool_continuation
+            chosen=tool_continuation(host).get('plan_action')
+            action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
+            plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
+                family_version=s['spec'].get('family_space',{}).get('version'),focused=True)}}
+            retained.add('research_plan')
     for key in list(registry):
-        if key!='research_route' and (not selected or key!=name):registry.pop(key)
-    return dict(tool=name if selected else None,action=route.get('action') if selected else None)
+        if key not in retained:registry.pop(key)
+    return dict(tool=name if selected else None,action=route.get('action') if selected else None,
+        **(dict(plan_action=registry['research_plan'].tool_spec['inputSchema']['json']['properties']['action']['enum'][0])
+           if 'research_plan' in retained else {}))
+
 
 
 

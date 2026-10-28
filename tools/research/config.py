@@ -20,7 +20,7 @@ def tool_schema_policy(spec):
 
 def validate_conversation_policy(decisions):
     tools=decisions.get('tool_schema_policy')
-    if tools is not None and (tools!={'version':'on_demand_tools_v1'}
+    if tools is not None and (tools not in ({'version':'on_demand_tools_v1'},{'version':'on_demand_tools_v2'})
             or decisions.get('architecture')!='english_decision_v1'
             or not decisions.get('conversation_policy')):
         raise ValueError('VERSIONED_ON_DEMAND_TOOLS_REQUIRES_RECENT_ROUND_POLICY')

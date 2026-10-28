@@ -1,5 +1,6 @@
 """Compact trusted research views and declared archive import using the existing Store."""
 from copy import deepcopy
+import json
 from tools.platform_store import plain
 from tools.state_io import digest
 from tools.research.state import state, save, update
@@ -815,6 +816,31 @@ def diagnostic_brief(value):
         'execution_status','task_passed','valid_complete','violated_constraints','critical_samples','limitations') if k in value}
 
 
+def tool_continuation(host):
+    """Reconstruct navigation intent from existing events, separately from science."""
+    recent=[];selection=None;plan_action=None
+    for event in host.store.events(host.run_id):
+        if event['kind']=='research_tool_route':
+            route=host.store.artifact(event['outputs'][0])
+            selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],
+                source=event['outputs'][0],status='selected_not_submitted')
+            if route['tool']=='research_plan':plan_action=route['action']
+        elif event['kind']=='model_original_tool_feedback':
+            value=host.store.artifact(event['outputs'][0]);use=value['tool_use'];result=value['result']
+            if use['name']=='research_route':continue
+            if selection and use['name']==selection['tool']:
+                selection={**selection,'status':'tool_feedback_recorded','feedback':event['outputs'][0]}
+            entry=dict(tool=use['name'],tool_use_id=use['toolUseId'],status=result['status'],source=event['outputs'][0])
+            if use['name']=='evidence_read':entry['query']=use['input']
+            if result['status']=='error':
+                try:detail=json.loads(''.join(b.get('text','') for b in result['content']))
+                except ValueError:detail={}
+                entry.update({k:detail[k] for k in ('error_code','expected') if k in detail})
+            recent.append(entry);recent=recent[-4:]
+    return dict(selection=selection,plan_action=plan_action,recent=recent,
+        scope='Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.')
+
+
 def research_intent(host):
     """Rebuild the last decision and experiment from original plans and receipts."""
     import json
@@ -1065,6 +1091,7 @@ def agent_decision_brief(host):
     if policy:
         from tools.research.session_handoff import recent_round
         brief['recent_round']=recent_round(host)
+        brief['tool_continuation']=tool_continuation(host)
     from tools.research.session_handoff import pending_feedback_delivery
     delivery=pending_feedback_delivery(host)
     if delivery:brief['pending_feedback_delivery']=delivery
@@ -1280,6 +1307,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         if recent and recent['feedback']==brief.get('pending_feedback_delivery'):
             recent.pop('feedback');recent['feedback_at']='research_state.pending_feedback'
         result.update(recent_round=recent,history_trace=brief['action_trace'],
+            tool_continuation=brief.get('tool_continuation'),
             current_intent=brief.get('research_intent',{}).get('latest_decision'),
             current_control=brief.get('current_candidate'),
             lifecycle=brief.get('probe_lifecycle'))
