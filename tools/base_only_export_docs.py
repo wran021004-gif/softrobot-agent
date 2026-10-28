@@ -125,12 +125,12 @@ structure.json / structure.md 给出结构与单位；joint_map.json 给出列�
 def root_readme(environment,entries):
     rows='\n'.join(f"| {e['benchmark']} | {e['condition']} | {e['rows']} | {e['timestep_s']} | {e['duration_s']} |"
         for e in entries)
-    return f'''# Base-only accepted MuJoCo 本地资料包
+    return f'''# Base-only accepted MuJoCo 可移植实验资料包
 
 六项历史独立 accepted 任务，十条真实物理步轨迹，六份原 XML。M3 仍是 development draft。
 原研究提交：314f75a4971e0a9e4521fe79ddf744ff71de61e2，分支 research/base-only-benchmark-feasibility。
 来源为 base-only-owner-20261028-r2 各任务原 SELECT、内容寻址 artifact、review_manifest/index 和原始 receipt。
-provenance.json 保存精确绑定；本包不需要原研究 Store。完整资料仅用于本地私有实验。
+provenance.json 保存精确绑定；本包不需要原研究 Store。接收方可解压到任意目录使用。
 
 目录：M1–M6 各有 robot.xml、structure.json/md、joint_map.json 和 README；
 下属 condition 目录提供 task.json、task_zh.md、control_schedule.csv、trajectory_timestep.csv、reference.csv、
@@ -139,7 +139,7 @@ evidence/artifacts 保留对应内容寻址原始 JSON；其身份可用 SHA 校
 scripts 是独立查看、显式动力学重放、零积分校验入口。manifest.json 对所有交付文件记录 SHA-256；它自身不是数字签名。
 
 验证环境：Python {environment['python']}，MuJoCo {environment['mujoco']}，NumPy {environment['numpy']}；Windows 已验证。
-原研究 .f3-prestudy-env 可直接使用。独立查看/重放只需要 MuJoCo 和 NumPy，不需要整个 Softrobot-Agent。
+接收方可按以下命令创建自己的环境。独立查看/重放只需要 MuJoCo 和 NumPy，不需要整个 Softrobot-Agent。
 
 Windows PowerShell（从导出根目录执行）：
 ```powershell
