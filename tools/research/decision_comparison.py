@@ -1,9 +1,4 @@
-"""Offline matched Provider-only decision preparation; never sends or executes tools.
-
-A separate Store is not a shared P2 budget.  The live comparison remains
-blocked until an existing atomic authority can charge both projects without
-mutating the original Study or spending its protected requests.
-"""
+"""Matched Provider-only decisions, with a shared-ledger, protected one-shot probe."""
 from copy import deepcopy
 import json
 from jsonschema import Draft202012Validator
@@ -114,3 +109,104 @@ def validate_proposals(wire,packet,body):
         out.append(row)
     return dict(status='complete',finish_reason=choice.get('finish_reason'),proposals=out,scientific_execution='not_dispatched',
         limitation='Read-only contract/visible-reference checks do not establish full scientific admission, optimization or task acceptance.')
+
+
+class ProtectedProbeStore:
+    """Add a probe-specific check inside the existing Store reservation transaction."""
+    def __init__(self, store, parent, child, parent_state_identity):
+        self.store,self.parent,self.child,self.parent_state_identity=store,parent,child,parent_state_identity
+
+    def __getattr__(self,name):
+        return getattr(self.store,name)
+
+    def reserve(self,run_id,request_id,request_hash,caller,cost,**kwargs):
+        previous=kwargs.pop('guard',None)
+        def guard(db):
+            if previous:previous(db)
+            parent=self.store.session(self.parent,db)['state']
+            remaining=self.store.remaining(db=db)
+            parent_remaining=self.store.remaining(self.parent,db)
+            protected=parent['spec']['budgets']['protected_provider_requests']
+            if run_id!=self.child or cost['model_calls']!=1 or any(cost[k] for k in ('tool_calls','backend_solves','worker_calls')):
+                raise ValueError('PROBE_PROVIDER_ONLY_GRANT_REQUIRED')
+            if digest(parent)!=self.parent_state_identity or parent.get('pending') or parent.get('pilot',{}).get('unconsumed_response'):
+                raise ValueError('SOURCE_STATE_CHANGED_OR_BUSY')
+            if protected!=2 or remaining['used']['model_calls']!=5 or remaining['limit']['model_calls']!=8:
+                raise ValueError('ORIGINAL_P2_BUDGET_CHANGED')
+            if min(remaining['remaining']['model_calls'],parent_remaining['remaining']['model_calls'])<=protected:
+                raise ValueError('PROTECTED_PROVIDER_CAPACITY')
+            if db.execute("SELECT 1 FROM calls WHERE status IN ('running','unknown') LIMIT 1").fetchone():
+                raise ValueError('UNCONFIRMED_EXECUTION_BLOCKS_PROBE')
+            if db.execute('SELECT 1 FROM calls WHERE run_id=? LIMIT 1',(self.child,)).fetchone():
+                raise ValueError('PROBE_ALREADY_ATTEMPTED_NO_RETRY')
+        return self.store.reserve(run_id,request_id,request_hash,caller,cost,guard=guard,**kwargs)
+
+
+def prepare_shared_probe(source, baseline, child_id):
+    """Create an explicitly authorized provider-only child in the original ledger."""
+    from types import SimpleNamespace
+    from tools.research.agent import record
+    from tools.research.state import update
+    state=source.store.session(source.run_id)['state']
+    if baseline['original_request_identity']!=digest(baseline['wire']):raise ValueError('BASELINE_IDENTITY_MISMATCH')
+    if state.get('pending') or state.get('pilot',{}).get('unconsumed_response'):raise ValueError('SOURCE_BUSY')
+    ledger=source.store.remaining()
+    if ledger['limit']['model_calls']!=8 or ledger['used']['model_calls']!=5 or ledger['remaining']['model_calls']!=3 or state['spec']['budgets']['protected_provider_requests']!=2:
+        raise ValueError('ORIGINAL_P2_BUDGET_CHANGED')
+    budget=dict(tool_calls=0,model_calls=1,backend_solves=0,worker_calls=0,wall_s=None)
+    snapshot=dict(input=dict(run_id=child_id,policy=dict(budget=budget)),parent_run_id=source.run_id,
+        purpose='authorized matched provider-only decision observation')
+    source.store.create_session(snapshot)  # Duplicate child ID always fails closed.
+    provider=deepcopy(state['pilot']['provider']);provider.update(thinking='disabled',reasoning_effort=None)
+    child=SimpleNamespace(store=source.store,run_id=child_id)
+    update(child,pilot=dict(provider=provider,live_model_requests=0),probe=dict(
+        baseline_request=baseline['request_id'],baseline_identity=baseline['original_request_identity'],
+        paired_identity=digest(nonthinking_wire(baseline['wire'])),parent_state_identity=digest(state)))
+    record(child,'provider_only_authorization',dict(user_approved=True,provider_requests=1,protected_requests=2,
+        scientific_executions=0,automatic_retries=0,parent_run_id=source.run_id,
+        baseline_request=baseline['request_id'],paired_identity=digest(nonthinking_wire(baseline['wire']))))
+    return child
+
+
+async def execute_shared_probe(source, child, baseline, api_key, *, transport=None):
+    """Send once, archive the real receipt, inspect only; never dispatch tool calls."""
+    import httpx
+    from types import SimpleNamespace
+    from tools.platform_store import plain
+    from tools.research.agent import LiveBoundary,received,record
+    probe=child.store.session(child.run_id)['state']['probe']
+    wire=nonthinking_wire(baseline['wire'])
+    if digest(wire)!=probe['paired_identity'] or baseline['original_request_identity']!=probe['baseline_identity']:
+        raise ValueError('PROBE_FROZEN_IDENTITY_MISMATCH')
+    with child.store.connect(True) as db:
+        if db.execute('SELECT 1 FROM calls WHERE run_id=? LIMIT 1',(child.run_id,)).fetchone():
+            raise ValueError('PROBE_ALREADY_ATTEMPTED_NO_RETRY')
+    body=json.dumps(wire,ensure_ascii=False,separators=(',',':')).encode('utf8')
+    if not api_key or api_key.encode() in body or b'credentials_reference' in body:
+        raise ValueError('PRIVATE_CREDENTIAL_IN_REQUEST_OR_MISSING')
+    wrapped=SimpleNamespace(store=ProtectedProbeStore(child.store,source.run_id,child.run_id,probe['parent_state_identity']),run_id=child.run_id)
+    boundary=LiveBoundary(wrapped,transport=transport,allow_truncated_response=True,max_model_calls=6)
+    boundary.purpose='matched_thinking_off_provider_only'
+    provider=child.store.session(child.run_id)['state']['pilot']['provider']
+    request=httpx.Request('POST',provider['base_url'].rstrip('/')+'/chat/completions',content=body,
+        headers={'Authorization':'Bearer '+api_key,'Content-Type':'application/json'},
+        extensions={'timeout':dict(connect=30,read=600,write=30,pool=30)})
+    try:
+        response=await boundary.handle_async_request(request)
+        reception=received(child,boundary.last_request)
+        result=dict(version=VERSION,baseline_request=baseline['request_id'],request_id=boundary.last_request,
+            baseline_identity=baseline['original_request_identity'],paired_identity=digest(wire),
+            request_bytes=len(body),http_status=response.status_code,usage=reception['usage'],elapsed_s=reception['elapsed_s'],
+            response_reference=reception['body'],scientific_execution='not_dispatched')
+        try:
+            decoded=json.loads(response.content)
+            result['validation']=validate_proposals(wire,baseline['packet'],decoded)
+        except (ValueError,TypeError,AttributeError):
+            result['validation']=dict(status='invalid_response',scientific_execution='not_dispatched')
+        result['baseline_validation']=validate_proposals(baseline['wire'],baseline['packet'],baseline['response'])
+        result['ledger_after']=child.store.remaining()
+        record(child,'provider_only_comparison',result,status='observed')
+        if response.is_success and result['validation']['status']=='complete':boundary.consumed()
+        return result
+    finally:
+        await boundary.aclose()
