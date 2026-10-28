@@ -1,5 +1,5 @@
 """Zero-integration contract/virtual-work checks; these are not research results."""
-import tempfile
+from contextlib import nullcontext
 import unittest
 from copy import deepcopy
 from pathlib import Path
@@ -24,7 +24,7 @@ class PassiveTests(unittest.TestCase):
         cls.p=read('configs/research/phs2d_protocol_v1.json')
 
     def test_force_virtual_work_and_tendon_derivatives(self):
-        with tempfile.TemporaryDirectory(dir='runs/phs2d/tests') as folder:
+        with nullcontext('runs/phs2d/tests/virtual-work') as folder:
             n=PassiveModel(self.physics,self.p,self.physics['reference_lengths_m'],folder);m=n.model;d=mujoco.MjData(m)
             d.qpos[:]=.02*np.sin(np.arange(m.nv));mujoco.mj_forward(m,d)
             q=d.qpos.copy();v=np.cos(np.arange(m.nv));h=1e-6
@@ -42,7 +42,7 @@ class PassiveTests(unittest.TestCase):
             self.assertTrue(all(r['multiplier_n']>=0 and r['upper_sign_error']<1e-10 for r in row['constraint_rows']))
 
     def test_active_modes_preserved_and_payout_validation(self):
-        with tempfile.TemporaryDirectory(dir='runs/phs2d/tests') as folder:
+        with nullcontext('runs/phs2d/tests/modes') as folder:
             n=PassiveModel(self.physics,self.p,self.physics['reference_lengths_m'],folder)
             for mode in ('ideal_tension','actuator_realistic'):
                 scene=deepcopy(n.scene);scene['control']['tension_execution_mode']=mode
