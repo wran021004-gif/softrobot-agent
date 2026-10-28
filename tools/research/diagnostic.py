@@ -209,6 +209,22 @@ def diagnose(host, refs):
     incomplete=[]
     for ref in refs:
         r=host.store.artifact(ref)
+        # Native analyses and fixed-control replays are stored outside the
+        # ordinary NMPC results list.  Preserve their actual partial failure
+        # facts rather than silently returning an empty diagnosis.
+        source_kind=('native_analysis' if plain(ref) in s.get('analysis_results',[]) else
+            'physical_replay' if plain(ref) in s.get('physical_replays',[]) else None)
+        if source_kind and r.get('status')=='execution_incomplete':
+            raw=host.store.artifact(r['raw_reference']) if r.get('raw_reference') else r
+            failure=raw.get('numerical_failure') or {}
+            integration=failure.get('integration_state') or []
+            incomplete.append(dict(reference=plain(ref),source_kind=source_kind,status=r['status'],
+                error=raw.get('error'),reason=raw.get('reason'),boundary=r.get('boundary'),
+                completed_steps=failure.get('confirmed_completed_steps'),attempted_steps=failure.get('attempted_steps'),
+                failure_time_s=integration[0] if integration else None,
+                control_before_call=failure.get('control_before_call'),raw_reference=r.get('raw_reference'),
+                acceptance_available=False,scope='Partial numerical observations; no task pass or cause established.'))
+            continue
         if plain(ref) not in s['results'] and r.get('status')=='evaluated':
             from tools.research.feedback import result_view
             numerical.append(dict(reference=plain(ref),historical=True,**result_view(host,ref)))
@@ -218,6 +234,7 @@ def diagnose(host, refs):
                 ('operation','status','execution_id','trajectory_metrics','relaxed_nlp_feasible','original_task_feasible','replay','charged_numerical_s')}))
             continue
         if plain(ref) in s['results'] and r.get('status')!='evaluated':
+            from tools.research.execution import compact_result
             incomplete.append(dict(reference=plain(ref),**compact_result(r),acceptance_available=False,
                 archived_partial_evidence=s.get('incomplete_execution_evidence',[])))
             continue
