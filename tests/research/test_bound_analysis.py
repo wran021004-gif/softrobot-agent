@@ -98,6 +98,9 @@ class BoundAnalysisTests(unittest.TestCase):
         self.assertEqual(analysis_operating_points('mujoco-nonlinear-task-capability-v1','mujoco_nonlinear_task_capability_v1'),['standardized_initial_pretension'])
 
     def test_mock_http_invalid_then_corrected_feedback_without_worker(self):
+        original_spec=deepcopy(state(self.h)['spec']);spec=deepcopy(original_spec)
+        spec['research_decisions']['analysis_interface']='bound_scientific_variables_v2'
+        update(self.h,spec=spec);self.addCleanup(lambda:update(self.h,spec=original_spec))
         self.select();sent=[]
         def respond(request):
             wire=json.loads(request.content);sent.append(wire)
@@ -115,6 +118,8 @@ class BoundAnalysisTests(unittest.TestCase):
         self.assertEqual(len(sent),3)
         schema=next(t['function']['parameters'] for t in sent[0]['tools'] if t['function']['name']=='research_analysis')
         self.assertNotIn('candidate',schema['properties']);self.assertNotIn('protocol',schema['properties'])
+        plan_schema=next(t['function']['parameters'] for t in sent[0]['tools'] if t['function']['name']=='research_plan')
+        self.assertTrue(any('selected_method' in rule.get('if',{}).get('properties',{}).get('decision',{}).get('properties',{}) for rule in plan_schema['allOf']))
         self.assertIn('NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION',json.dumps(sent[1]['messages']))
         self.assertIn('probe_only_not_executed',json.dumps(sent[2]['messages']))
         events=self.h.store.events(self.h.run_id)
@@ -167,10 +172,42 @@ class BoundAnalysisTests(unittest.TestCase):
         value['research_decisions']['analysis_interface']='bound_scientific_variables_v1'
         try:
             path.write_text(json.dumps(value),encoding='utf8');self.assertTrue(agent.bound_analysis_enabled(resolve(path)))
+            value['research_decisions']['analysis_interface']='bound_scientific_variables_v2'
+            path.write_text(json.dumps(value),encoding='utf8');self.assertTrue(agent.bound_analysis_enabled(resolve(path)))
             value['research_decisions']['analysis_interface']='unversioned'
             path.write_text(json.dumps(value),encoding='utf8')
             with self.assertRaisesRegex(ValueError,'VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED'):resolve(path)
         finally:path.unlink()
+
+    def test_missing_math_diagnosis_candidate_has_versioned_schema_and_feedback(self):
+        from tools.research.contracts import Plan
+        from tools.research.evidence_policy import admit_decision
+        evidence=json.loads((ROOT/'evidence/main_off_binding_v4/live_validation.json').read_text(encoding='utf8'))
+        raw=next(x['value']['tool_use']['input'] for x in evidence['original_tool_requests']
+            if x['value']['tool_use']['name']=='research_plan' and x['value']['tool_use']['input']['action']=='diagnose')
+        self.assertNotIn('selected_candidate',raw['decision'])
+        legacy=agent.plan_schema(['diagnose','stop'],decision_required=True)
+        repaired=agent.plan_schema(['diagnose','stop'],decision_required=True,diagnose_candidate_required=True)
+        self.assertTrue(Draft202012Validator(legacy).is_valid(raw))
+        self.assertFalse(Draft202012Validator(repaired).is_valid(raw))
+        original=deepcopy(state(self.h)['spec']);before=self.h.store.remaining()
+        try:
+            self.assertIsNotNone(admit_decision(self.h,Plan.model_validate(raw)))
+            spec=deepcopy(original);spec['research_decisions']['analysis_interface']='bound_scientific_variables_v2';update(self.h,spec=spec)
+            with self.assertRaisesRegex(ValueError,'SELECTED_ANALYSIS_CANDIDATE_REQUIRED') as failure:
+                admit_decision(self.h,Plan.model_validate(raw))
+            feedback=agent.error_feedback(self.h,dict(name='research_plan',input=raw,toolUseId='offline-missing-candidate'),failure.exception,state(self.h))
+            self.assertEqual(feedback['field'],'decision.selected_candidate')
+            corrected=deepcopy(raw);corrected['decision']['selected_candidate']=next(r for r in state(self.h)['candidates'].values()
+                if r['artifact_id']=='e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543')
+            Draft202012Validator(repaired).validate(corrected)
+            self.assertIsNotNone(admit_decision(self.h,Plan.model_validate(corrected)))
+            generic=deepcopy(raw);generic['decision']['selected_method']='read_saved_observations'
+            self.assertIsNotNone(admit_decision(self.h,Plan.model_validate(generic)))
+        finally:update(self.h,spec=original)
+        self.assertEqual(self.h.store.remaining(),before)
+        self.assertEqual(agent.plan_schema(['select','stop'],decision_required=True),
+            agent.plan_schema(['select','stop'],decision_required=True,diagnose_candidate_required=True))
 
 
 if __name__=='__main__':unittest.main()

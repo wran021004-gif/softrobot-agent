@@ -33,6 +33,12 @@ METHOD_MEANINGS = {
     'controlled-capability-sensitivity-v1': ('Controlled structural direction', 'Matched baseline and +/-h (optionally +/-h/2) models: reoptimized FD versus fixed U, conditional envelope and dual-face checks. Path progress is reoptimized too. Branch ties/active-set changes withhold a strict gradient; no physical improvement guarantee.')}
 
 
+def registered_analysis_method_names():
+    """Reuse existing method declarations; do not infer a candidate or a method."""
+    from tools.research.nonlinear_capability import METHODS
+    return sorted(set(METHOD_MEANINGS)|set(METHODS.values()))
+
+
 def analysis_operating_points(method, operation):
     """Discover legal points using the original full-request restrictions."""
     from tools.research.contracts import AnalysisRequest
@@ -291,7 +297,7 @@ def mathematical_method_view(host, reference):
             item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
-    if spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v1':
+    if spec.get('research_decisions',{}).get('analysis_interface') in ('bound_scientific_variables_v1','bound_scientific_variables_v2'):
         from tools.research.research_context import research_intent
         intent=research_intent(host)['latest_decision'] or {}
         decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}

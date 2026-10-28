@@ -1,10 +1,14 @@
-# Main-Off v4: deterministic analysis binding, offline validation
+# Main-Off v4: deterministic binding and bounded live follow-up
 
 ## Outcome: C — real decision capability remains uncertain
 
+Latest result: after independent evidence-and-destination authorization, the live follow-up used **7 Main requests, 0 Reporter requests, 0 scientific or physical workers**. Main understood the speed failure and chose `short_input_response_v1`, but omitted the candidate from its diagnose decision. No `research_analysis` Schema or analysis call appeared. The feedback-reserve guard stopped before request eight; one allowance remains deliberately unused. A narrow candidate-settlement repair was subsequently verified offline under the new opt-in `bound_scientific_variables_v2`, preserving the tested v1 Store. The live chain remains incomplete; this is not an A result. Detailed live decisions, costs and post-run validation follow the preserved offline milestone below.
+
+## Offline milestone
+
 On 2026-10-28, the engineering interface passed focused offline validation, including actual Strands tool registration and a scripted correction through Mock HTTP. **No live DeepSeek request was authorized or sent. No mathematical or physical worker, NMPC, PPO, or formal Study ran.** The task explicitly requires a new independent Provider grant; exhausted v1-v3 grants were not reused.
 
-The baseline and remote branch both resolved to `b5d82ad2d50ed352271afc8aef07ef1f264403c6`. Validated implementation commit: `f5c1a1a0bed296adcfcc5dd3547b4152ef43cbd0`, on `codex/english-native-decision-brief`, in `.worktrees/english-native-decision-brief`. That worktree was clean after the implementation commit; this report is a separate documentation follow-up. The final documentation commit and push status are identified in the delivery message. The unrelated `feat/gvs-dynamics` worktree and its untracked work were preserved. Historical Stores were opened read-only; new offline fixtures used independent run IDs.
+The baseline and remote branch both resolved to `b5d82ad2d50ed352271afc8aef07ef1f264403c6`. Validated initial implementation commit: `f5c1a1a0bed296adcfcc5dd3547b4152ef43cbd0`, on `codex/english-native-decision-brief`, in `.worktrees/english-native-decision-brief`; its offline report followed in `bc5227d986ea4d964d94f13a5ed057c5be89da70`. Both milestones had clean worktrees. This update records the subsequent live run and v2 repair; the final delivery commit and push status are identified in the delivery message. The unrelated `feat/gvs-dynamics` worktree and its untracked work were preserved. Historical Stores were opened read-only; new offline fixtures used independent run IDs.
 
 ## Interface and ownership
 
@@ -72,7 +76,7 @@ tests.research.test_s11_decision_context.DecisionContextTests.test_stop_coverage
 
 One additional existing C1 test failed at `test_c1_method_context.py:142`: it expects an external-force case to be unsupported, whereas the baseline native assessment now supports it and returns `requires_parameters`. Running that same test with **unmodified baseline `task_constraints.py` loaded in memory reproduced the identical failure**. This is an existing stale expectation, not a v4 binding regression; neither scientific support nor the test was changed to manufacture a pass. Initial test-harness restore errors were fixed by applying the same probe guard to restore-only verification; the final relevant tests pass. `git diff --check` passed. Invoking the live CLI without an authorization argument stopped before credential loading or sending.
 
-## Provider cost and request reserve
+## Offline cost measurement and request reserve
 
 Live requests: **0 Main, 0 Reporter**. Live tokens, cache usage and incurred Provider cost: zero for this task. No real Main hypothesis, scientific-variable request, correction or feedback interpretation was observed in v4.
 
@@ -80,7 +84,7 @@ For the same selected native method, independently serialized Schema bytes chang
 
 The separate v4 live scope, if explicitly granted later, is at most eight Main requests, zero new Reporter calls, zero automatic retries and zero workers. The script checks caps before ledger reservation and again at transport. If seven Main calls have occurred without analysis feedback, it stops with `PROBE_FEEDBACK_TURN_RESERVED_NO_SEND`, records insufficient evidence and leaves the final allowance unused. If the first analysis occurs on call seven, call eight can process its actual feedback. Earlier feedback similarly reaches subsequent decisions. This does not force Main to choose mathematics or a particular method. Native source reconstruction, numerical solves and independent physics remain forbidden even for a fully typed request.
 
-## Decision assessment and readiness
+## Offline milestone assessment and readiness
 
 | Layer | v4 conclusion |
 |---|---|
@@ -97,4 +101,67 @@ The separate v4 live scope, if explicitly granted later, is at most eight Main r
 
 No new live scientific statements exist to audit for causal overclaiming. The prior structure/control confound and the inability of a local diagnostic to establish global structure infeasibility remain unresolved. The mocked initial-state request cannot count as a scientifically sufficient terminal-state experiment. The final mocked acknowledgement tests feedback delivery, not real scientific understanding.
 
-**Do not enter the formal two-condition cold-start Study yet.** First obtain a new independent Provider-only grant and observe autonomous method/point selection plus at least one real feedback decision using this interface. Preserve a C outcome if Main chooses another reasonable direction or the finite budget cannot complete the chain. Separately resolve/migrate historical scientific dependency identities through the existing mechanisms before claiming execution readiness; this provider-only probe cannot grant it. The pending fresh Study and all formal research allowances remain untouched.
+At the offline milestone, entry to the formal two-condition Study was not recommended. The subsequently granted live follow-up below did not resolve readiness. Historical scientific dependency identities still require the existing explicit migration/admission mechanisms before execution readiness can be claimed. The pending fresh Study and all formal research allowances remain untouched.
+
+## Authorized live follow-up and exact boundary
+
+The user subsequently explicitly permitted the saved C3 task, candidate, failed metrics, original evidence excerpts and existing Reporter conclusions to be sent to `https://api.deepseek.com/chat/completions`, with at most eight Main requests, zero Reporter requests, zero workers and no automatic retries. An earlier approval-review rejection occurred before process creation and sent nothing. After the explicit payload/destination authorization, one live invocation ran on tested commit `bc5227d986ea4d964d94f13a5ed057c5be89da70`, using `bound_scientific_variables_v1` in the new isolated Store `runs/research/main-off-saved-c3-v4-20261028`. That Store has not been edited or migrated after the run.
+
+[Live validation evidence](../../evidence/main_off_binding_v4/live_validation.json) retains all seven original responses, request/wire/response identities, advertised Plan Schema, raw tool requests and feedback, the settled original Plan, rejection traces, usage and zero-worker ledger. Original full wires remain content addressed in the isolated Store. Each wire omitted `max_tokens`; Main used `deepseek-flash`, thinking disabled, reasoning effort none. All seven responses finished with `tool_calls`, not `length`; there was no truncation, resend or automatic retry.
+
+## Observed live scientific decisions and interface use
+
+1. Requests 1–3 made six evidence reads: the earlier working set, latest summary, holding acceptance components, method catalog and control-source navigation. One call used `view=fields` for the derived `/control_result_links` pointer and received `EVIDENCE_VIEW_MISMATCH`. Main then used the correct working-set view. It read navigation indexes rather than the actual final commanded-tension trace.
+2. On request 4, Main formally diagnosed the residual speed failure and chose `short_input_response_v1` without being told which method to choose. It correctly named 0.043009681835387996 m/s versus 0.02 m/s, with position error 0.0040334275990930235 m below 0.01 m. It proposed that nearly constant final-window tensions sustain drift, with a bounded short input perturbation as a discriminating check. The alternative was weak local response versus residual/extrapolated dynamics. This is a testable proposal, but constant applied final-window input was not established by the reads performed; weak local sensitivity alone cannot identify the remaining cause. Main explicitly acknowledged the simultaneous structure/control confound, which prevents single-factor attribution.
+3. Its original Plan named candidate `e85fc8` only in prose. Both top-level candidate and `decision.selected_candidate` were omitted. The v1 Schema allowed this, and read-only diagnosis completed. Its feedback honestly returned zero new scientific computations, `selected_method_status=intent_only`, `candidate_required=true` and no candidate-bound methods query. This was not a successfully settled candidate/method selection. The selector did not guess a candidate; **none of the seven actual wires advertised `research_analysis`**. Thus Main never saw the bound method's working-point guidance and never submitted scientific analysis variables.
+4. On request 5, Main understood that diagnosis produced no new facts and stated that mathematics had not run. It chose a scoped non-acceptance STOP because all execution was intercepted. That is a real autonomous change of direction and was not forced back to mathematics. However, its STOP cited the readable diagnose wrapper `a5240e333a71c03b951f869a02974cf77e5030de9ea8dad417aff82133d36f84`, which was not registered evidence. The original admission returned `UNREGISTERED_RESEARCH_EVIDENCE`. Its `claimed_inference=scoped_mathematical_exclusion` was also scientifically unsupported when no mathematics had run; registration rejection occurred first, so no subsequent inference admission was passed or claimed.
+5. On request 6, Main correctly recognized the citation rejection and read `/all_fresh_results` and `/citation_eligibility`. On request 7, it searched procedural experience and received no matches. It did not submit a corrected STOP or any analysis request. There were eight evidence reads total, one experience search and two Plan calls. The STOP did not settle, and no SELECT occurred. Main sometimes described the latest result as the only evaluation despite two saved fresh results; its own later text acknowledged two. Its phrase suggesting a task pass before acceptance was unsupported: the cited evaluation failed speed.
+
+The existing sourced Reporter interpretation was available and mentioned by Main; no new report or Low-profile experiment was produced. Main did not present a local prediction as a computed mathematical result and did not claim global structural infeasibility, but the unsupported input premise and STOP inference label remain substantive limitations.
+
+## Validation status and feedback reserve
+
+There is **no live raw analysis input, bound analysis object, selected/full analysis Schema validation, Pydantic analysis result, selected operating point, analysis applicability result or original mathematical dispatch admission** to report. Their absence is preserved as empty binding/intercept lists, not replaced by the successful offline fixture. The historical source retains the same eight dependency differences; no full historical scientific preflight was attempted in this live run. The original ownership rows were copied and retained; omission of candidate identity by Main is distinct from the old missing-ownership fixture defect.
+
+After seven actual sends, no analysis feedback existed. `PROBE_FEEDBACK_TURN_RESERVED_NO_SEND` rejected the next request **before the production send ledger was reserved**. The Store records seven used model calls and one remaining, with zero occupied resources. The SDK wrapped this deliberate local guard in `APIConnectionError`/`EventLoopException` and the CLI exited nonzero. This was not an external DeepSeek connection failure or an eighth sent request. No continuation or retry was attempted. The reserved allowance was not repurposed to force an analysis, and this probe is recorded as insufficient to establish the target chain.
+
+## Actual Provider accounting
+
+Every row is one actual accounted Main request. Full request IDs, wire and response references are in the linked live evidence file; the request-ID column provides direct row matching. Cache columns are hit/miss tokens. Currency cost was not returned and remains unknown.
+
+| # / request ID | Bytes | Prompt | Completion | Cache hit / miss | Seconds |
+|---|---:|---:|---:|---:|---:|
+| 1 `r3-request-a7dff52cd1b444e7bd591f30d5a40d45` | 40,463 | 11,324 | 242 | 7,808 / 3,516 | 1.469 |
+| 2 `r3-request-2188749f054d449f812016461607dee0` | 49,895 | 13,873 | 291 | 7,808 / 6,065 | 1.672 |
+| 3 `r3-request-9deea75ff83b40efb6ad7e99a980bbe0` | 74,174 | 21,441 | 278 | 10,240 / 11,201 | 1.656 |
+| 4 `r3-request-7234ad5f56344ff085dfdc71a2bfcaa4` | 80,594 | 23,095 | 944 | 17,920 / 5,175 | 5.375 |
+| 5 `r3-request-e7cc290ad7eb4bf5996b7dda998d4808` | 88,352 | 25,023 | 2,157 | 19,456 / 5,567 | 10.875 |
+| 6 `r3-request-23adb620ec3e428ba5d1e7ca9c1c5dc7` | 99,524 | 27,972 | 299 | 21,504 / 6,468 | 1.562 |
+| 7 `r3-request-0ee6aa4b5c974fcf99a0269319f8a21d` | 104,180 | 29,502 | 112 | 24,448 / 5,054 | 1.032 |
+
+Totals: **152,230 prompt + 4,323 completion = 156,553 tokens**, cache hit 109,184 and miss 43,046; summed Provider elapsed intervals 23.641 s. The shared ledger used seven model calls and eleven public tools, with **zero backend solves and zero worker calls**. No mathematical evaluation, physical rollout, NMPC or PPO ran. Two rejected tool calls were the evidence-view mismatch and unregistered STOP citation; there were no live analysis type errors because no analysis was submitted. This run cannot establish cheaper total research flow or fewer analysis-parameter rounds. The offline 3,791→4,507-byte selected-Schema measurement above remains a projection, not an actually advertised live selected Schema.
+
+## Post-run narrow repair, without another Provider send
+
+The missing mathematical-diagnosis candidate exposed a small interface gap: a success receipt could leave the method unbound, with only a generic candidate-required hint. The program correctly refused to infer ownership, but should reject the incomplete selection explicitly.
+
+The repair is opt-in **`bound_scientific_variables_v2`**, not a silent change to frozen v1. `plan_schema()` adds a conditional candidate requirement only when diagnose chooses a registered mathematical method. The existing `admit_decision()` applies the matching ownership prerequisite before settlement and returns `SELECTED_ANALYSIS_CANDIDATE_REQUIRED` with field `decision.selected_candidate` and an actionable resubmission instruction. It reuses existing method declarations; it does not select a method or candidate, alter a scientific variable, loosen analysis dispatch, change generic read-only diagnoses, or alter SELECT/STOP. Both interface versions remain supported, and the executed live v1 Store stays unchanged.
+
+The exact original live Plan is now a focused offline regression: original v1 permits it, v2 Schema and admission reject it, and a clearly scripted explicit candidate selection passes both. That scripted repair is not attributed to Main. Mock HTTP also verifies that the v2 condition is present in the actual Provider Plan Schema and that the analysis feedback path still works. The final focused batch passed **10 tests**: seven binding tests plus three selected-method/saved-Schema tests. Together with the prior milestone this covers 17 distinct passing tests; the previously documented baseline C1 failure remains unchanged. No broad suite or scientific Worker was run. Live effectiveness of the repair is untested, and no additional Provider request was sent after it.
+
+## Final live assessment
+
+| Required layer | Live finding |
+|---|---|
+| Understand task failure | Yes: speed failure and passing position metric identified |
+| Falsifiable, supported hypothesis | Proposed bounded perturbation test; actual constant-input premise remains unverified |
+| Autonomous method choice | Yes: `short_input_response_v1`, but candidate-bound selection did not settle |
+| Meaningful legal operating point | Not selected |
+| Correct Main scientific variables | Not submitted |
+| Frozen-field binding | Not exercised live; verified offline only |
+| Complete original contract | Not exercised live |
+| Original scientific admission | Not exercised; historical dependency mismatch remains |
+| Correction after analysis feedback | Not observed; other feedback was partly understood, STOP correction incomplete |
+| Mathematical computation | **No** |
+
+**Final classification: C. Do not start the formal two-condition cold-start Study.** A reproducible candidate-settlement interface issue was repaired offline, but Main also voluntarily chose STOP after understanding that this probe could produce no science. A future independently authorized probe must use a new ID and the explicitly frozen v2 interface, preserve a feedback turn and allow Main to choose its scientific direction freely. It must not reuse this probe's residual allowance, instruct Main toward a preferred method/point, or represent hypothetical execution eligibility as a passed scientific guard. Formal execution additionally needs the existing scientific dependency/admission boundary to be resolved for its own frozen configuration.

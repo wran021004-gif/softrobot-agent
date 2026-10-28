@@ -340,7 +340,7 @@ def read_tool_evidence(host,query):
     return index
 
 
-def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None):
+def plan_schema(actions, *, decision_required=False,family_version=None,family_space=None,diagnose_candidate_required=False):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -402,6 +402,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
         bound=[a for a in actions if a in ('execute','initialize_control','control_search','physical_replay')]
         schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
             'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
+        if diagnose_candidate_required and 'diagnose' in actions:
+            from tools.research.task_constraints import registered_analysis_method_names
+            schema['allOf'].append({'if':{'properties':{'action':{'const':'diagnose'},'decision':{
+                'properties':{'selected_method':{'enum':registered_analysis_method_names()}},'required':['selected_method']}},'required':['action','decision']},
+                'then':{'properties':{'decision':{'required':['selected_candidate'],
+                    'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -419,7 +425,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
 
 
 def bound_analysis_enabled(spec):
-    return spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v1'
+    return spec.get('research_decisions',{}).get('analysis_interface') in ('bound_scientific_variables_v1','bound_scientific_variables_v2')
 
 
 def selected_analysis_schema(method, detail, *, bound=False):
@@ -539,7 +545,7 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id):
     if 'capability_method' in template:
         frozen['capability_method']=template['capability_method'];sources['capability_method']=dict(source=detail['detail_query'],pointer='/request_template/capability_method')
     full={**deepcopy(payload),**frozen}
-    audit=record(host,'analysis_request_binding',dict(version='bound_scientific_variables_v1',tool_use_id=tool_use_id,
+    audit=record(host,'analysis_request_binding',dict(version=spec['research_decisions']['analysis_interface'],tool_use_id=tool_use_id,
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
         field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources}))
     # Pydantic first preserves exact scientific error codes, even if the compact
@@ -608,6 +614,7 @@ def error_feedback(host, use, exc, before):
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']
     hints={
+        'SELECTED_ANALYSIS_CANDIDATE_REQUIRED':('decision.selected_candidate','Choose an exact owned candidate reference from the current candidate index, then resubmit the diagnose Plan with that reference. Method selection is not settled and research_analysis is unavailable until this identity is explicit; no candidate is inferred.'),
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
         'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('experience_disposition','Keys must identify an actual experience_retrieve operation=read receipt or its exact entry_id@revision. Scientific artifact IDs, invented hypothesis names, search results and SELECT physical evidence are not experience keys. If this Study does not expose legal experience_retrieve, remove the inapplicable experience_disposition field; do not guess IDs.'),
         'explicit evidence_read of this completed evaluation required':('selected_execution','Publicly evidence_read the exact selected_execution with view=full and pointer="" before SELECT; /acceptance alone does not satisfy the whole-result read required here.'),
@@ -972,7 +979,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         if formal and state(host)['spec'].get('mode')!='rl_interface':
             actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
-        schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')))
+        schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')),
+            diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics. model_source selects the reduced provider or native MuJoCo methods independently of control. saved_state or execution plus update_id selects a source-bound state; native methods support standardized_initial_pretension from frozen initialization, or a complete native checkpoint or verified measured prefix. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
@@ -1053,7 +1061,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if source.get('pending_authorized_continuation')!=continuation:
                 current=decision_packet(host)['research']
                 native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
-                    decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'))}}
+                    decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'),
+                    diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
                 # Restore the authorized tools removed by the previous closeout.
                 for tool in native:
                     if tool is not native[1]:agent.tool_registry.registry[tool.tool_name]=tool
@@ -1131,7 +1140,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
-                family_space=s['spec'].get('family_space'))}}
+                family_space=s['spec'].get('family_space'),
+                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)
             selected=selected_analysis(host,current['research']) if tool and enabled(s['spec'],'analysis') else None
