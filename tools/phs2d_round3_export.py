@@ -21,7 +21,7 @@ LABEL='P3_real9_E80_full8'
 
 
 def split_archive(folder):
-    path=folder/'immutable_artifacts.tar.gz';manifest=json.loads((folder/'archive_manifest.json').read_text());parts=[];whole=hashlib.sha256()
+    path=folder/'immutable_artifacts.tar.gz';manifest=json.loads((folder/'archive_manifest.json').read_text(encoding='utf8'));parts=[];whole=hashlib.sha256()
     with path.open('rb') as stream:
         while data:=stream.read(40*1024*1024):
             part=path.with_name(path.name+f'.part{len(parts)+1:02d}');part.write_bytes(data);whole.update(data)
@@ -87,7 +87,7 @@ def audit_study(revision):
     for label,ref in v.get('assemblies',{}).items():
         a=h.store.artifact(ref);c=h.store.artifact(a['candidate'])
         structures[label]=dict(reference=ref,**a,configuration=c['configuration'])
-    failures=[r for r in raw if r['status'] in ('exception','output_unavailable')]
+    failures=[r for r in raw if r.get('status') in ('exception','output_unavailable')]
     lookup={ref['artifact_id']:r for ref,r in zip(v['results'].values(),raw)};labels={ref['artifact_id']:label for label,ref in v.get('assemblies',{}).items()}
     cumulative=dict(physics_step_attempts=0,math_requests=0,generation_attempts=0);history=[]
     for c in calls:
@@ -96,11 +96,16 @@ def audit_study(revision):
         if r:
             cumulative['physics_step_attempts']+=r['cost']['physics_step_attempts'];cumulative['math_requests']+=r['cost']['math_requests']
             history.append(dict(request_id=c['request_id'],label=labels.get((r['request'].get('assembly') or {}).get('artifact_id')),
-                kind=r['request']['kind'],phase=r['request']['phase'],status=r['status'],cumulative=dict(cumulative)))
+                kind=r['request']['kind'],phase=r['request']['phase'],s=r['request'].get('s'),force_n=r['request'].get('force_n'),status=r.get('status','diagnostic'),cumulative=dict(cumulative)))
     assert cumulative['physics_step_attempts']==steps and cumulative['math_requests']==math and cumulative['generation_attempts']==len(v['candidates'])
+    screens={label:h.store.artifact(r) for label,r in v.get('screens',{}).items()}
+    for screen in screens.values():
+        if screen.get('modal'):
+            predictions=h.store.artifact(screen['modal'])['B_C_unilateral_force_response']['predictions']
+            screen['linear_predictions']=[{k:r[k] for k in ('s','force_increment_n','point_dx_m','tip_xy_m','ratio')} for r in predictions]
     return h,dict(study_id=h.run_id,study_status=s['research_status'],protocol=p,p0=h.store.artifact(v['p0_report']),
         p0_history=v.get('p0_report_history',[]),dynamic_sets=sets,structures=structures,
-        screens={label:h.store.artifact(r) for label,r in v.get('screens',{}).items()},
+        screens=screens,generation_order=[c['request_id'][len('phs-generate-'):] for c in calls if c['request_id'].startswith('phs-generate-')],
         ten_case_witness=v.get('ten_case_witness'),route_optimizations=[h.store.artifact(r) for r in v.get('route_optimizations',[])],
         chronological_cost_history=history,
         analyses=[dict(reference=ref,**r) for ref,r in zip(v['results'].values(),raw) if r['request']['kind'] in ('passive_design_sensitivity_v1','tendon_jacobian_matching_v1')],
@@ -126,7 +131,7 @@ def export():
         matched=[s for s in sets if s.get('replicate')==rep]
         assert len(matched)==2 and all(s['all_pass'] for s in matched) and sum(len(s['rows']) for s in matched)==10
     # Every original acceptance field is identical across the two freezes and round two.
-    original=json.loads((ROOT/'configs/research/phs2d_protocol_v3.json').read_text())
+    original=json.loads((ROOT/'configs/research/phs2d_protocol_v3.json').read_text(encoding='utf8'))
     keys=['gravity','mount_position','mount_rotation','total_flexible_length_m','force_n','search_s','holdout_s','monitor_s','equilibrium_max_s','load_max_s','ramp_s','tail_s','tip_horizontal_limit_m','force_point_x_min_m','ratio_limit','out_of_plane_limit_m','tip_speed_limit_m_s','monitor_speed_limit_m_s','tail_drift_limit_m','qvel_inf_limit_rad_s','static_balance_inf_limit_nm','length_excess_limit_m','initial_lateral_limit_m','solreflimit','solimplimit']
     assert all(s['protocol'][k]==original[k] for s in studies for k in keys)
     chosen=current['structures'][LABEL];cfg=chosen['configuration'];physics=resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data'])
@@ -169,7 +174,7 @@ def export():
 def verify():
     count=0
     for revision in (1,2):
-        folder=OUT/('store_v'+str(revision));manifest=json.loads((folder/'archive_manifest.json').read_text());whole=hashlib.sha256()
+        folder=OUT/('store_v'+str(revision));manifest=json.loads((folder/'archive_manifest.json').read_text(encoding='utf8'));whole=hashlib.sha256()
         path=ROOT/'runs/phs3_archive_verify'/('v'+str(revision)+'.tar.gz');path.parent.mkdir(parents=True,exist_ok=True)
         with path.open('wb') as stream:
             for part in manifest['archive_parts']:

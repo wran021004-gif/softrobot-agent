@@ -1,0 +1,23 @@
+======================================================================
+FAIL: test_compact_summary_exact_evidence_and_claims (tests.research.test_family_space.FamilySpaceTests.test_compact_summary_exact_evidence_and_claims)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\phs2d-inverse-passive-design\runs\phs3-baseline-regression\tests\research\test_family_space.py", line 250, in test_compact_summary_exact_evidence_and_claims
+    self.assertLess(len(json.dumps(summary)),len(json.dumps(self.spec['family_space']))*.6)
+AssertionError: 5619 not less than 4702.2
+
+======================================================================
+FAIL: test_legacy_configuration_identity (tests.research.test_family_space.FamilySpaceTests.test_legacy_configuration_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\phs2d-inverse-passive-design\runs\phs3-baseline-regression\tests\research\test_family_space.py", line 221, in test_legacy_configuration_identity
+    self.assertEqual(digest(cfg),'31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e')
+AssertionError: 'a6446a271e68c152df9c684f792a140b3245a9ab8439817830b09b41d0087dc0' != '31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e'
+- a6446a271e68c152df9c684f792a140b3245a9ab8439817830b09b41d0087dc0
++ 31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 6.294s
+
+FAILED (failures=2)
