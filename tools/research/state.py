@@ -68,6 +68,7 @@ SCIENCE_FILES += ['extensions/math_analysis/conic_capability.py','extensions/mat
 SCIENCE_FILES += ['extensions/tendon_family/family_space.py']
 SCIENCE_FILES += ['extensions/tendon_family/mujoco_analysis.py']
 SCIENCE_FILES += ['extensions/tendon_family/'+name+'.py' for name in ('passive','passive_equilibrium','mjcf')]
+SCIENCE_FILES += ['extensions/tendon_family/'+name+'.py' for name in ('passive_inverse','route_validation')]
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
 CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']

@@ -188,6 +188,13 @@ class SerialAssemblyRule(Contract):
 class FamilySpaceV2(FamilySpace):
     version: Literal['serial_family_space_v2'] = 'serial_family_space_v2'
     serial_assembly: SerialAssemblyRule
+    terminal_payload_anchor: bool = False
+
+    @model_serializer(mode='wrap')
+    def optional_payload_anchor(self, handler):
+        result=handler(self)
+        if not self.terminal_payload_anchor:result.pop('terminal_payload_anchor',None)
+        return result
 
     @model_validator(mode='after')
     def serial(self):

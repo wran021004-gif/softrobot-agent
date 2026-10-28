@@ -20,12 +20,12 @@ ROOT=Path(__file__).resolve().parents[2]
 OWNER=ROOT/'runs/phs2d'
 
 
-def host(round2=False):
-    study='study_phs2d_round2_v1.json' if round2 else 'study_phs2d_v1.json'
-    owner=ROOT/'runs/phs2d-round2' if round2 else OWNER
+def host(round2=False, *, round3=False):
+    study='study_phs2d_round3_v1.json' if round3 else 'study_phs2d_round2_v1.json' if round2 else 'study_phs2d_v1.json'
+    owner=ROOT/'runs/phs2d-round3' if round3 else ROOT/'runs/phs2d-round2' if round2 else OWNER
     h=core.prepare(ROOT/'configs/research'/study,directory=owner/'store')
     if 'freeze' not in state(h):core.bind(h)
-    p=read(ROOT/'configs/research'/('phs2d_protocol_v3.json' if round2 else 'phs2d_protocol_v2.json'))
+    p=read(ROOT/'configs/research'/('phs2d_protocol_inverse_v1.json' if round3 else 'phs2d_protocol_v3.json' if round2 else 'phs2d_protocol_v2.json'))
     s=state(h)
     if 'phs' not in s:
         ref=save(h,p,'phs_protocol_freeze')
@@ -102,7 +102,7 @@ def candidate(h,p,label,generation,reason):
     s=state(h)
     if label in s['phs']['candidates']:return s['phs']['candidates'][label]
     if len(s['phs']['candidates'])>=p['limits']['candidates']:raise ValueError('CANDIDATE_LIMIT')
-    if generation['tendon_count'] not in (1,2,4,6):raise ValueError('PHS_TENDON_SCOPE')
+    if p['version']!='phs2d_passive_inverse_v1' and generation['tendon_count'] not in (1,2,4,6):raise ValueError('PHS_TENDON_SCOPE')
     if abs(sum(x['length_m'] for x in generation['segments'].values())-.28)>1e-12:raise ValueError('FIXED_LENGTH')
     q=dict(version='serial_family_generation_v2',family_space_identity=s['spec']['family_space_identity'],segment_count=2,**generation)
     plan=dict(action='generate',generation=q,hypothesis=reason,expected_observation='Passive cross-compliance and stable finite-force deformation',
@@ -125,6 +125,7 @@ def build(h,p,ref,*,slack=0.,unrestricted=False,payout_lengths_m=None):
         if np.max(abs(payout-np.array(physics['reference_lengths_m'])))>p['payout_offset_bound_m']+1e-12:
             raise ValueError('PAYOUT_OUTSIDE_FROZEN_ASSEMBLY_DOMAIN')
     model=PassiveModel(physics,p,payout,h.store.root.parent/'models'/digest(dict(candidate=ref,payout=payout.tolist(),unrestricted=unrestricted,protocol=p)),unrestricted)
+    model.design_components=design['components']
     return model
 
 

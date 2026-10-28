@@ -333,6 +333,12 @@ def generate_family(value):
                     envelope=max(np.linalg.norm(properties(st['section'])['outer_yz_m'],axis=1).max() for st in segments[i]['sections'])
                     if distance<envelope+tendon_values['diameter_m']/2:raise ValueError('SECTION_ROUTE_CLEARANCE')
                     order.append(i+a['s'])
+                elif (serial and space.terminal_payload_anchor and part=='payload' and p['role']=='anchor'
+                        and span.last_segment==len(segments)-1):
+                    payload=next(c for c in components if c['id']=='payload')
+                    if p.get('hole') or a['s'] or any(abs(x)>h for x,h in zip(a['position_m'],payload['envelope_halfsize_m'])):
+                        raise ValueError('PAYLOAD_ANCHOR_MUST_BE_INSIDE_REAL_ENVELOPE')
+                    order.append(float(len(segments)+1))
                 elif part in guides_by_id:
                     i=next(k for k,g in guides_by_segment.items() if g['id']==part)
                     if not max(1,span.first_segment)<=i<=span.last_segment:
@@ -344,7 +350,9 @@ def generate_family(value):
                     if a['s'] or a['position_m'][0]!=0:raise ValueError('BASE_SECTION_PLANE_REQUIRED')
                     bounds['radius_m'].check(np.linalg.norm(a['position_m'][1:]),'base_radius_m');order.append(0.)
                 else:raise ValueError('ROUTE_ATTACHMENT_OUTSIDE_FAMILY')
-            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
+            terminal=route[-1]['attachment']['part']
+            terminal_ok=terminal==segments[span.last_segment]['id'] or (serial and space.terminal_payload_anchor and terminal=='payload' and span.last_segment==len(segments)-1)
+            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or not terminal_ok:
                 raise ValueError('ORDERED_SELECTED_SPAN_REQUIRED')
             for point_index,p in enumerate(route):
                 a=p['attachment']

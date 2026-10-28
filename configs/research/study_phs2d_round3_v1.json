@@ -1,0 +1,51 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_phs2d_inverse_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "phs2d-inverse-passive-design-20261028-v1",
+  "base_commit": "f33648d0bf5fcebbe3d5f5a5878c3198eb32a69c",
+  "authorization": "User pasted round-three request 2026-10-28: isolated inverse passive design; <=20000000 integration attempts, <=1200 top-level math requests, <=300 audited structures/assemblies; reserve 4000000 final steps. Provider, Research Agent, NMPC and PPO zero. Commit/push research branch; no merge.",
+  "evidence_destination": "runs/phs2d-round3/store",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "capabilities": [],
+  "allowed_plan_actions": [
+    "generate",
+    "stop"
+  ],
+  "mode": "engineering_numerical",
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 6000,
+    "protected_public_operations": 0,
+    "physical_launches": 1500,
+    "mathematical_evaluations": 1200
+  }
+}
