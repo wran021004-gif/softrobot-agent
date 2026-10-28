@@ -70,6 +70,26 @@ class IntegrationTests(unittest.TestCase):
         wire=json.dumps(views)
         for key in ('"states"','"discrete_dynamics"','"applied_input_n"'):self.assertNotIn(key,wire)
 
+    def test_v3_brief_keeps_saved_facts_and_closeout_navigation(self):
+        from tools.research.research_context import research_decision_brief_v3
+        pair,refs=self.saved_pair()
+        for ref in refs:reporter.scientific_feedback(self.h,dict(reference=ref),{})
+        base=agent_decision_brief(self.h);brief=research_decision_brief_v3(base)
+        self.assertEqual(brief['version'],'research_decision_brief_v3')
+        self.assertEqual(brief['research_state']['task_identity'],base['task_identity'])
+        self.assertEqual(brief['budget']['model_calls'],base['budget']['provider_budget']['remaining_total'])
+        self.assertEqual(brief['evidence_access']['stop_index'],base['stop_result_index'])
+        self.assertIn('formally read',brief['evidence_access']['select_requirement'])
+        self.assertTrue(brief['action_menu'])
+        import re
+        self.assertIsNone(re.search(r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])',json.dumps(brief['action_menu'])))
+        violation=next(f for f in brief['verified_facts'] if f['name']=='best_found_violation')
+        self.assertEqual(violation['value'],pair['changed']['trajectory']['best_found_violation'])
+        self.assertEqual(violation['source']['reference'],refs[-1])
+        self.assertNotIn('analysis_protocol',brief)
+        self.assertNotIn('mathematical_capabilities',brief)
+        self.assertEqual(brief['reporter_summary']['report_reference'],base['latest_reports'][-1]['report_reference'])
+
     def test_receipt_recovery_selects_old_math_not_newest_and_never_reexecutes(self):
         pair,refs=self.saved_pair();raw=pair['baseline'];query=raw['requested_operation']
         use=dict(name='research_analysis',toolUseId='old-math',input=query)
@@ -204,7 +224,11 @@ class IntegrationTests(unittest.TestCase):
         self.assertNotIn('report',missing)
 
     def test_priority_keeps_reports_and_limits_duplicate_physics_calls(self):
-        before=state(self.h);ref=self.fixture.physical()
+        before=state(self.h);raw=self.fixture.physical()
+        # Pair comparisons need a complete current candidate identity and its
+        # configuration reference, not the minimal single-card fixture.
+        value=deepcopy(self.h.store.artifact(raw));value['candidate']=self.fixture.case.candidate
+        ref=save(self.h,value,'physical_comparison_fixture');update(self.h,physical_replays=[ref])
         first=reporter.scientific_feedback(self.h,dict(reference=ref),before)
         other=deepcopy(self.h.store.artifact(ref));other['fixture_repetition']='second'
         second=save(self.h,other);update(self.h,physical_replays=[ref,second])

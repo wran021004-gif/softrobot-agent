@@ -125,6 +125,127 @@ class AgentReportingTests(unittest.TestCase):
         self.assertEqual(self.h.store.remaining()['used']['model_calls']-before,2)
         self.assertFalse(pending(self.h))
 
+    def test_new_architecture_freezes_roles_and_token_threshold(self):
+        from tempfile import NamedTemporaryFile
+        from tools.research.config import resolve, ROOT
+        path=ROOT/'configs/research/study_p3a_v3_pending.json'
+        source=json.loads(path.read_text(encoding='utf-8'))
+        source['study_id']='offline-english-architecture-fixture'
+        source['research_decisions'].update(architecture='english_decision_v1',background=[],
+            role_policy=dict(version='research_roles_v1',main=dict(thinking='disabled',reasoning_effort='none',max_tokens=4096),
+                reporter=dict(thinking='enabled',reasoning_effort='low',max_tokens=2048)))
+        with NamedTemporaryFile(mode='w',encoding='utf-8',suffix='.json',dir=path.parent,delete=False) as f:
+            json.dump(source,f);fixture=Path(f.name)
+        try:spec=resolve(fixture)
+        finally:fixture.unlink()
+        self.assertEqual(spec['research_decisions']['handoff_policy'],dict(version='token_handoff_v1',input_tokens=38000))
+        self.assertEqual(spec['configuration']['policy']['model']['thinking'],'disabled')
+        self.assertEqual(spec['research_decisions']['role_policy']['reporter']['reasoning_effort'],'low')
+        self.assertTrue(spec['authorization'].startswith('PENDING_EXPLICIT_APPROVAL:'))
+
+    def test_english_boundary_withholds_legacy_without_formal_read(self):
+        from tools.research.evidence_policy import incompatible_text
+        self.assertFalse(incompatible_text('Displacement 0.4 μm; angle θ ≤ 2π.'))
+        self.assertTrue(incompatible_text('历史记录'))
+        ref=self.physical();raw=self.h.store.artifact(ref);raw['legacy_note']='历史记录'
+        legacy=save(self.h,raw,'legacy_fixture');spec=deepcopy(state(self.h)['spec'])
+        spec['research_decisions']={'architecture':'english_decision_v1'}
+        update(self.h,spec=spec,physical_replays=[legacy],evaluation_reads=[])
+        original=deepcopy(self.h.store.artifact(legacy))
+        value=read_evidence(self.h,dict(reference=legacy,view='full'))
+        self.assertEqual(value['status'],'legacy_text_unavailable')
+        self.assertEqual(value['reference'],legacy)
+        self.assertEqual(state(self.h)['evaluation_reads'],[])
+        self.assertEqual(self.h.store.artifact(legacy),original)
+        spec['research_decisions']={}
+        update(self.h,spec=spec)
+        self.assertEqual(read_evidence(self.h,dict(reference=legacy,view='full'))['legacy_note'],'历史记录')
+
+    def test_english_selection_requires_full_read_not_summary(self):
+        reference=self.physical();spec=deepcopy(state(self.h)['spec'])
+        spec['research_decisions']={'architecture':'english_decision_v1'}
+        update(self.h,spec=spec,evaluation_reads=[])
+        read_evidence(self.h,dict(reference=reference,view='summary'))
+        self.assertNotIn(reference,state(self.h)['evaluation_reads'])
+        read_evidence(self.h,dict(reference=reference,view='full'))
+        self.assertIn(reference,state(self.h)['evaluation_reads'])
+
+    def test_non_english_main_response_is_preserved_but_not_consumed(self):
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'architecture':'english_decision_v1'}
+        update(self.h,spec=spec);provider=state(self.h)['pilot']['provider']
+        wire=dict(model=provider['model'],thinking={'type':provider['thinking']},
+            reasoning_effort=provider['reasoning_effort'],max_tokens=provider['max_tokens'],stream=False,
+            messages=[dict(role='user',content='Fixture')],tools=[])
+        body=dict(id='fixture',object='chat.completion',created=1,model=provider['model'],
+            choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='非英文'))])
+        boundary=LiveBoundary(self.h,httpx.MockTransport(lambda r:httpx.Response(200,json=body)))
+        async def run():
+            with self.assertRaisesRegex(ValueError,'MAIN_ENGLISH_OUTPUT_REQUIRED'):
+                await boundary.handle_async_request(httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire))
+            self.assertEqual(state(self.h)['pilot']['unconsumed_response'],boundary.last_request)
+            from tools.research.agent import received
+            raw=self.h.store.artifact(received(self.h,boundary.last_request)['body'],raw=True)
+            self.assertEqual(json.loads(raw),body)
+            await boundary.aclose()
+        asyncio.run(run())
+
+    def test_new_reporter_incomplete_novelty_and_english_rejection(self):
+        from tools.research.evidence_policy import incompatible_text
+        reference=self.physical();report=plain(reporter.assemble(self.h,[reference]))
+        card=report['results'][0];card['deterministic_summary']['task_gap']['valid_complete']=False
+        self.assertEqual(reporter.interpretation_priority(report,[],decision_v3=True),'new_incomplete_task_result')
+        self.assertEqual(reporter.interpretation_priority(report,[deepcopy(report)],decision_v3=True),'routine_or_repeated_result')
+        conflict=deepcopy(report);summary=conflict['results'][0]['deterministic_summary']
+        summary.pop('task_gap',None);summary['task_capability']={'physical_failure_relation':{'status':'constraint_mismatch'}}
+        self.assertEqual(reporter.interpretation_priority(conflict,[],decision_v3=True),'model_physical_constraint_mismatch')
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'architecture':'english_decision_v1'}
+        update(self.h,spec=spec)
+        delivery=reporter.scientific_feedback(self.h,dict(reference=reference));base=delivery['report_reference']
+        wire=reporter._wire(self.h,base,self.h.store.artifact(base))
+        request=httpx.Request('POST','https://offline.invalid',json=wire)
+        response=reporter_response(request);body=response.json()
+        output=json.loads(body['choices'][0]['message']['content']);output['interpretations'][0]['text']='中文报告'
+        body['choices'][0]['message']['content']=json.dumps(output)
+        saved=reporter._finish(self.h,SimpleNamespace(last_request='offline-non-english'),wire,httpx.Response(200,json=body))
+        result=self.h.store.artifact(saved)
+        self.assertEqual(result['interpretation_status'],'unavailable')
+        self.assertEqual(result['error'],'REPORTER_ENGLISH_OUTPUT_REQUIRED')
+        self.assertEqual(result['report']['interpretations'],[])
+        self.assertFalse(incompatible_text(result['report']))
+
+    def test_unchanged_scientific_feedback_does_not_repeat_reporter_call(self):
+        ref=self.physical();first=reporter.scientific_feedback(self.h,dict(reference=ref),{})
+        other=deepcopy(self.h.store.artifact(ref));other['fixture_repetition']='second'
+        second=save(self.h,other,'synthetic_fixture');update(self.h,physical_replays=[ref,second])
+        duplicate=reporter.scientific_feedback(self.h,dict(reference=second),{})
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'architecture':'english_decision_v1'}
+        update(self.h,spec=spec);calls=[]
+        def respond(request):calls.append(request);return reporter_response(request)
+        asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
+        self.assertEqual(len(calls),1)
+        revision=next(v for _,v in reporter.entries(self.h) if v['interpretation_for']==duplicate['report_reference'])
+        self.assertEqual(revision['interpretation_status'],'skipped')
+
+    def test_selected_method_requires_settled_diagnosis_and_matching_candidate(self):
+        from tools.research.agent import selected_analysis,selected_analysis_schema
+        candidate=self.f.candidate;method='mujoco-nonlinear-task-capability-v1'
+        plan=dict(action='diagnose',decision=dict(selected_method=method,selected_candidate=candidate))
+        row,_=self.h.store.reserve(self.h.run_id,'native-selected-fixture',digest(plan),self.h.actor,zero())
+        ref=save(self.h,dict(request_id=row['request_id'],original_plan=plan),'original_research_plan')
+        detail=dict(operation='mujoco_nonlinear_task_capability_v1',formal_execution_authorized=True,
+            planning_status='ready',request_template=dict(candidate=candidate,model_source='mujoco',protocol={'version':'fixture'}),required_parameters=[])
+        update(self.h,plans=[ref])
+        with patch('tools.research.task_constraints.mathematical_method_view',return_value={'methods':{method:detail}}):
+            self.assertIsNone(selected_analysis(self.h,{}))
+            self.h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=self.h.actor,
+                tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),dict(result={}))
+            selection=selected_analysis(self.h,{})
+        self.assertEqual(selection,(method,detail))
+        schema=selected_analysis_schema(*selection)
+        self.assertEqual(schema['properties']['candidate']['const'],candidate)
+        self.assertEqual(schema['properties']['protocol']['const'],{'version':'fixture'})
+        self.assertNotIn('nonlinear_response',schema['properties'])
+
     def test_automatic_physics_math_search_and_rl_reports_preserve_f0_facts(self):
         before=state(self.h);reference=self.physical()
         auto=reporter.scientific_feedback(self.h,dict(result=dict(reference=reference)),before)

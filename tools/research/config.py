@@ -484,11 +484,28 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
                 raise ValueError('BOUNDED_RESEARCH_CONTEXT_LIMIT_REQUIRED')
+        architecture=decisions.get('architecture')
+        if architecture is not None and architecture!='english_decision_v1':
+            raise ValueError('UNKNOWN_RESEARCH_ARCHITECTURE')
+        if architecture:
+            from tools.research.evidence_policy import incompatible_text
+            if any(decisions.get(k) for k in ('history','mathematics','control_seeds','background')) or study.get('supplied_evidence'):
+                raise ValueError('ENGLISH_STUDY_REQUIRES_EMPTY_AUTOMATIC_HISTORY')
+            if not decisions.get('role_policy'):
+                raise ValueError('ENGLISH_STUDY_REQUIRES_VERSIONED_ROLES')
+            handoff=decisions.setdefault('handoff_policy',dict(version='token_handoff_v1',input_tokens=38000))
+            if (not isinstance(handoff,dict) or set(handoff)!={'version','input_tokens'}
+                    or handoff['version']!='token_handoff_v1' or type(handoff['input_tokens']) is not int
+                    or handoff['input_tokens']<1
+                    or handoff['input_tokens']+provider['max_tokens']+provider['context_guard']['framing_headroom_tokens']>provider['context_guard']['context_limit_tokens']):
+                raise ValueError('INVALID_TOKEN_HANDOFF_POLICY')
+            if incompatible_text([study.get('execution_instructions'), cfg['task']]):
+                raise ValueError('ENGLISH_STUDY_SOURCE_TEXT_REQUIRED')
         study['research_decisions']=decisions
     if readiness is not None:
         report=read((path.parent/readiness).resolve())
@@ -524,6 +541,9 @@ def resolve(path, profile=None, *, backend_profile=None):
                 canonical['initializer']['parameters']['data']=dict(rule=study['candidate_initialization'])
             frozen.append(dict(condition_id=condition['condition_id'],task=canonical,seed=value['seed'],
                 settling=deepcopy(value['settling'])))
+        if decisions and decisions.get('architecture')=='english_decision_v1':
+            from tools.research.evidence_policy import incompatible_text
+            if incompatible_text(frozen):raise ValueError('ENGLISH_STUDY_SOURCE_TEXT_REQUIRED')
         study['task_conditions']=frozen
     if fixed_structure is not None:study['fixed_structure_reference']=plain(EvidenceRef.model_validate(fixed_structure))
     study['resolved_identity'] = digest(study)

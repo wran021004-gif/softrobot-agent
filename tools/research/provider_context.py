@@ -40,3 +40,14 @@ def capacity_estimate(content,provider):
     if estimate['input_estimate']+reserved>context['context_limit_tokens']:
         raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_OFFLINE_TOKEN_ESTIMATE')
     return estimate
+
+
+def handoff_input_estimate(content, provider):
+    """Estimate the complete serialized request for the soft handoff heuristic."""
+    if provider['adapter'] != 'deepseek' or provider['model'] not in ('deepseek-flash','deepseek-v4-pro'):
+        raise ValueError('TOKEN_HANDOFF_REQUIRES_PINNED_DEEPSEEK_TOKENIZER')
+    tokens=len(official_tokenizer().encode(content.decode('utf-8'),add_special_tokens=False).ids)
+    return dict(input_estimate=tokens,serialized_bytes=len(content),
+        method='pinned_official_deepseek_v4_serialized_token_estimate',
+        reserved_output_tokens=provider.get('max_tokens'),
+        framing_headroom_tokens=provider['context_guard']['framing_headroom_tokens'])

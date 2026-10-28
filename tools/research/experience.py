@@ -11,7 +11,8 @@ PUBLIC_STATUS='public_procedural_guidance; generalization_unverified'
 
 
 def entries(host):
-    rows=read(ROOT/'memory/diagnostic_index.json')['entries']
+    path=ROOT/'memory/diagnostic_index.json'
+    rows=read(path).get('entries',[]) if path.is_file() else []
     if state(host)['spec'].get('capabilities'):
         rows=[r for r in rows if r['kind']=='procedure' and r['status']==PUBLIC_STATUS]
     return rows
@@ -23,7 +24,8 @@ def retrieval_hint(host):
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')
-    available=sorted({r['task'] for r in entries(host)})
+    from tools.research.evidence_policy import english_native, incompatible_text
+    available=sorted({r['task'] for r in entries(host) if not english_native(s['spec']) or not incompatible_text(r)})
     if not available:return None
     return dict(query=dict(operation='search',task=name) if name in available else dict(operation='search'), available_historical_tasks=available,
         scope='Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.')
@@ -38,8 +40,28 @@ def retrieve(host,query,*,reader='agent'):
         if q.revision is not None and q.revision!=entry['revision']:continue
         if any(getattr(q,name) is not None and getattr(q,name)!=entry[name]
             for name in ('task','structure','failure_type','version')):continue
-        body=(ROOT/entry['path']).read_bytes()
+        from tools.research.evidence_policy import english_native, incompatible_text
+        if english_native(state(host)['spec']) and incompatible_text(entry):
+            if q.operation=='read':
+                rows.append(dict(key=canonical,entry_id=entry['entry_id'],revision=entry['revision'],
+                    status='legacy_text_unavailable',source_path=entry['path'],
+                    explanation='Historical guidance metadata is unavailable under the English-native Study contract; its original source is unchanged.'))
+            continue
+        source=ROOT/entry['path']
+        if not source.is_file():
+            if q.operation=='read':
+                rows.append(dict(key=canonical,entry_id=entry['entry_id'],revision=entry['revision'],
+                    status='source_unavailable',source_path=entry['path'],explanation='The historical guidance source is unavailable.'))
+            continue
+        body=source.read_bytes()
         content=read(ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
+        from tools.research.evidence_policy import english_native, incompatible_text
+        if english_native(state(host)['spec']) and incompatible_text(content):
+            if q.operation=='read':
+                rows.append(dict(key=canonical,entry_id=entry['entry_id'],revision=entry['revision'],
+                    status='legacy_text_unavailable',source_path=entry['path'],
+                    explanation='Historical guidance is unavailable under the English-native Study contract; its original source is unchanged.'))
+            continue
         refs=[]
         def walk(value):
             if isinstance(value,dict):
@@ -67,6 +89,7 @@ def disposition_bindings(host,dispositions):
         receipt=host.store.artifact(ref)
         if receipt['query']['operation']!='read' or len(receipt['results'])!=1:continue
         row=receipt['results'][0]
+        if row.get('status') in ('legacy_text_unavailable','source_unavailable'):continue
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
             content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding

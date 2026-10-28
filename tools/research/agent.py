@@ -23,6 +23,11 @@ PLAN_TOOL_DESCRIPTION=('Propose/search/execute/initialize_control/physical_repla
     'When route_review.required, use interpretation to compare continuation, structure/control changes and diagnosis with evidence and remaining budget; no route is prescribed. '
     'Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. '
     'Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.')
+DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed decision and evidence. '
+    'A diagnose selected_method records intent; it does not execute analysis. After choosing a registered method and candidate, '
+    'use research_analysis when offered and obtain exact method details through evidence_read. '
+    'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
+    'For STOP, retrieve and cite the complete new result index.')
 class DeepSeekModel(OpenAIModel):
     """Public provider extension: retain DeepSeek reasoning on the next request.
 
@@ -79,6 +84,10 @@ class IncompleteModelOutput(ValueError):
 
 class RequestBoundaryHandoff(Exception):
     """Unwind the SDK loop before a send; never a completed model invocation."""
+
+
+class CompletedBoundaryHandoff(RequestBoundaryHandoff):
+    """A completed invocation, before the next request, may be rotated."""
 
 
 class SupervisorReviewPause(RequestBoundaryHandoff):
@@ -224,6 +233,21 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             and diagnostic['model_output']=='confirmed_incomplete'):
             raise IncompleteModelOutput(diagnostic)
 
+        from tools.research.evidence_policy import english_native, incompatible_text
+        if english_native(state(self.host)['spec']) and diagnostic.get('http_status',0) in range(200,300):
+            reception=received(self.host,self.last_request)
+            body=json.loads(self.host.store.artifact(reception['body'],raw=True))
+            for choice in body.get('choices',[]):
+                message=choice.get('message') or {}
+                texts=[message.get('content')]
+                for call in message.get('tool_calls') or []:
+                    arguments=(call.get('function') or {}).get('arguments','')
+                    try:arguments=json.loads(arguments)
+                    except (ValueError,TypeError):pass
+                    texts.append(arguments)
+                if incompatible_text(texts):
+                    raise ValueError('MAIN_ENGLISH_OUTPUT_REQUIRED_RESPONSE_PRESERVED')
+
     def consumed(self):
         self.require_complete()
         with self.host.store.transaction() as db:
@@ -362,6 +386,80 @@ def plan_schema(actions, *, decision_required=False,family_version=None,family_s
     visit(schema['properties'])
     schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
     return schema
+
+
+
+def selected_analysis_schema(method, detail):
+    """Project the existing AnalysisRequest to one registered method."""
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.optimal_capability import CONIC,SENSITIVITY
+    schema=AnalysisRequest.model_json_schema();operation=detail['operation']
+    common={'candidate','operation','model_source','operating_point','saved_state','execution','update_id','protocol','scoring_window_s'}
+    extra={
+        'native_dynamics_v1':{'native'},'short_input_response_v1':{'native'},
+        'fixed_input_structure_v1':{'native','structure_response'},
+        'mujoco_direct_control_v1':{'control_optimization'},
+        'mujoco_nonlinear_task_capability_v1':{'control_optimization'},
+        'mujoco_reoptimized_structure_response_v1':{'nonlinear_response'},
+        'tendon_force_capability_v1':{'tendon_force_direction'},
+        'design_sensitivity':{'design_sensitivity'},
+        'task_capability':{'capability_comparison','capability_method','optimal_sensitivity'},
+    }.get(operation,set())
+    if operation=='task_capability':
+        if method==SENSITIVITY:extra={'capability_method','optimal_sensitivity'}
+        elif method==CONIC:extra={'capability_method'}
+        else:extra={'capability_comparison'}
+    allowed=common|extra
+    schema['properties']={k:v for k,v in schema['properties'].items() if k in allowed}
+    schema['properties']['operation']={'type':'string','const':operation}
+    template=detail.get('request_template',{})
+    for key in ('candidate','protocol'):
+        if key in template:schema['properties'][key]={'const':deepcopy(template[key]),
+            'description':'Exact frozen '+key+' from the selected registered method.'}
+    if method in (CONIC,SENSITIVITY):
+        schema['properties']['capability_method']={'type':'string','const':CONIC}
+        schema['required'].append('capability_method')
+    required={'fixed_input_structure_v1':'structure_response','mujoco_direct_control_v1':'control_optimization',
+        'mujoco_nonlinear_task_capability_v1':'control_optimization',
+        'mujoco_reoptimized_structure_response_v1':'nonlinear_response',
+        'tendon_force_capability_v1':'tendon_force_direction','design_sensitivity':'design_sensitivity'}
+    if method==SENSITIVITY:schema['required'].append('optimal_sensitivity')
+    elif operation in required:schema['required'].append(required[operation])
+    if operation in ('linearization','controllability'):schema['required'].append('scoring_window_s')
+    if detail.get('request_template',{}).get('model_source')=='mujoco':
+        schema['properties']['model_source']={'type':'string','const':'mujoco'}
+        schema['required'].append('model_source')
+    schema['description']='Selected registered method: '+method+'. Required source and parameter details: '+json.dumps(detail.get('required_parameters',[]),ensure_ascii=False)+'. Exact method query: '+json.dumps(detail.get('detail_query'),ensure_ascii=False)
+    needed=set()
+    def visit(value):
+        if isinstance(value,dict):
+            if '$ref' in value:
+                key=value['$ref'].rsplit('/',1)[-1]
+                if key not in needed:
+                    needed.add(key);visit(schema['$defs'][key])
+            for child in value.values():visit(child)
+        elif isinstance(value,list):
+            for child in value:visit(child)
+    visit({k:v for k,v in schema.items() if k!='$defs'})
+    schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+    return schema
+
+
+def selected_analysis(host, brief):
+    """Expose only the method in the last settled diagnose decision."""
+    from tools.research.research_context import research_intent
+    intent=research_intent(host)['latest_decision'] or {}
+    decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}
+    method=decision.get('selected_method');candidate=intent.get('candidate')
+    if intent.get('action')!='diagnose' or intent.get('execution_status')!='completed' or not method or not candidate:return None
+    from tools.research.task_constraints import mathematical_method_view
+    try:detail=mathematical_method_view(host,candidate)['methods'].get(method)
+    except (ValueError,KeyError):return None
+    if (not detail or not detail.get('formal_execution_authorized')
+            or detail.get('planning_status') in ('unauthorized','unsupported','insufficient_budget','blocked')
+            or (detail.get('registered') and detail.get('executable') is False)):
+        return None
+    return method,detail
 
 
 def error_feedback(host, use, exc, before):
@@ -679,9 +777,19 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         def run(use,**kwargs):
             before=state(host)
             try:
+                from tools.research.evidence_policy import english_native, incompatible_text
+                if english_native(before['spec']) and incompatible_text(use['input']):
+                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error='ENGLISH_TOOL_INPUT_REQUIRED',message='Use English for research decisions and tool arguments.')))])
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='analysis':
+                    if english_native(before['spec']):
+                        selection=selected_analysis(host,None)
+                        if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
+                        method,detail=selection;schema=selected_analysis_schema(method,detail);payload=use['input']
+                        if (set(payload)-set(schema['properties']) or payload.get('operation')!=detail['operation']
+                                or any(payload.get(k)!=v['const'] for k,v in schema['properties'].items() if 'const' in v)):
+                            raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH')
                     from tools.research.analysis import dispatch as analysis_dispatch
                     value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':
@@ -712,14 +820,22 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 if result.get('execution_feedback'):value['execution_feedback']=result['execution_feedback']
                 if isinstance(original,dict) and original.get('inference_assessment'):
                     value['inference_assessment']=original['inference_assessment']
+                if english_native(state(host)['spec']) and incompatible_text(value):
+                    value=dict(status='source_text_unavailable', explanation='This result contains text unavailable under the English-native Study contract. The original record is unchanged.',
+                        reference=(value.get('reference') or value.get('scientific_result_reference') or value.get('report_reference')) if isinstance(value,dict) else None)
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
+                from tools.research.evidence_policy import english_native, incompatible_text
+                unavailable=english_native(state(host)['spec']) and incompatible_text(str(exc))
+                message='NON_ENGLISH_DIAGNOSTIC_UNAVAILABLE' if unavailable else str(exc)
                 key='native-'+use['toolUseId']
                 reserved=host.store.lookup(host.run_id,key)
                 if reserved and not reserved['receipt']:
                     host.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=host.actor,
-                        tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
+                        tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=message,charged=zero()),dict(error=message))
                 from tools.research.feedback import facts
+                if unavailable:
+                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error='NON_ENGLISH_DIAGNOSTIC_UNAVAILABLE',message='The operation failed; its original diagnostic is retained in the Store.')))])
                 if state(host)['spec'].get('research_decisions'):
                     return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(error_feedback(host,use,exc,before)))])
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
@@ -728,6 +844,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     rl_mode=enabled(state(host)['spec'],'rl')
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
+    from tools.research.evidence_policy import english_native
+    if english_native(state(host)['spec']):
+        instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
@@ -892,17 +1011,33 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
         current=decision_packet(host)
+        from tools.research.evidence_policy import english_native, incompatible_text
+        if english_native(s['spec']) and incompatible_text([instructions,current]):
+            raise ValueError('ENGLISH_DECISION_SOURCE_UNAVAILABLE')
         if 'research' in current:
-            native[0].tool_spec={**native[0].tool_spec,'description':PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
+            native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
                 family_space=s['spec'].get('family_space'))}}
+        if english_native(s['spec']):
+            tool=next((t for t in native if t.tool_name=='research_analysis'),None)
+            selected=selected_analysis(host,current['research']) if tool and enabled(s['spec'],'analysis') else None
+            if selected:
+                method,detail=selected
+                tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
+                    'inputSchema':{'json':selected_analysis_schema(method,detail)}}
+                agent.tool_registry.registry['research_analysis']=tool
+            else:agent.tool_registry.registry.pop('research_analysis',None)
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
         # Provider readiness is checked per selected model by analysis.dispatch;
         # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
-        record(host,'model_decision_packet',current)
+        if english_native(s['spec']):
+            from tools.research.research_context import research_decision_brief_v3
+            delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research']))
+        else:delivered=current
+        record(host,'model_decision_packet',delivered)
         agent.system_prompt=instructions
-        boundary.research_packet=deepcopy(current)
+        boundary.research_packet=deepcopy(delivered)
         if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
             permitted=closeout_operations(host)
             schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
@@ -926,19 +1061,37 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
             boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
-        if (session_handoff and state(host)['pilot'].get('session_handoff_boundary')=='request_feedback'
-                and agent.messages and agent.messages[-1]['role']=='user'
-                and any('toolResult' in b for b in agent.messages[-1]['content'])):
+        token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
+        paired=bool(agent.messages and agent.messages[-1]['role']=='user'
+            and any('toolResult' in b for b in agent.messages[-1]['content']))
+        completed=bool(token_policy and len(agent.messages)>=2 and agent.messages[-1]['role']=='user'
+            and agent.messages[-1]['content']==[dict(text=INVOCATION_PROMPT)] and agent.messages[-2]['role']=='assistant')
+        if session_handoff and (paired or completed):
             wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
-            size=len(httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content)
+            content=httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content
+            size=len(content)
             provider=s['pilot']['provider'];context=provider['context_guard']
+            token_due=False
+            if token_policy:
+                from tools.research.provider_context import handoff_input_estimate
+                estimate=handoff_input_estimate(content,provider)
+                token_due=estimate['input_estimate']>=token_policy['input_tokens']
+            if completed and token_due:
+                # The just-added invocation prompt has not been sent. The preceding
+                # assistant turn is the durable completed boundary.
+                with host.store.connect(True) as db:
+                    from tools.research.session_handoff import safe_boundary
+                    safe_boundary(host,s,db,agent.messages[:-1])
+                agent.messages.pop()
+                raise CompletedBoundaryHandoff('Verified completed boundary; next model send has not started')
+            if not paired or s['pilot'].get('session_handoff_boundary')!='request_feedback':return
             review=(pause_exploration_remaining is not None and not protected(host)
                 and current['research']['budget']['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
             if review:
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
-            if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']:
+            if handoff_before_next_request or token_due or (handoff_request_bytes is not None and size>=handoff_request_bytes) or (not token_policy and size+(provider.get('max_tokens') or 0)+context['framing_headroom_tokens']>context['context_limit_tokens']):
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
@@ -991,9 +1144,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                         budget=decision_packet(host)['research']['budget']))
                     break
                 record(host,'sdk_invocation_suspended_for_handoff',dict(session_id=agent._session_manager.session_id,
-                    sdk_message_identity=digest(agent.messages),invocation_completed=False,next_request_sent=False))
+                    sdk_message_identity=digest(agent.messages),invocation_completed=False,
+                    boundary_kind='completed_invocation' if isinstance(cause,CompletedBoundaryHandoff) else 'request_feedback',
+                    next_request_sent=False))
                 from tools.research.session_handoff import handoff
-                _,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions',boundary='request_feedback')
+                _,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions',boundary='completed_invocation' if isinstance(cause,CompletedBoundaryHandoff) else 'request_feedback')
                 handoff_before_next_request=False
                 agent.hooks.add_callback(BeforeModelCallEvent,before_model)
                 agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
@@ -1010,7 +1165,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                     and state(host)['research_status']!='stopped' and not state(host).get('success_gate')):
                 await pause_completed_invocation(host,agent,completed_invocations)
                 break
-            if session_handoff and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
+            if session_handoff and not state(host)['spec'].get('research_decisions',{}).get('handoff_policy') and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
                 from tools.research.session_handoff import handoff, reconcile
                 previous=agent
                 try:_,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions')

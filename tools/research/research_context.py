@@ -414,7 +414,9 @@ def read_coverage(host):
             content=message.get('content')
             if message.get('role')=='user' and isinstance(content,str) and content.startswith('CURRENT_RESEARCH_PACKET\n'):
                 packet=json.loads(content.split('\n',1)[1])
-                for item in packet.get('research',{}).get('pending_feedback_delivery',{}).get('items',[]):
+                research=packet.get('research',{})
+                delivery=research.get('pending_feedback_delivery') or (research.get('research_state') or {}).get('pending_feedback') or {}
+                for item in delivery.get('items',[]):
                     if item['delivery']=='exact_feedback':
                         deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
                     else:summaries.add(item['tool_id'])
@@ -1131,6 +1133,69 @@ def agent_decision_brief(host):
             scope='Choose any currently admitted action; exact request templates and frozen grants are available at detail_query.')
     brief['route_review']=route_review(host,current,brief,trace)
     return compact_scientific_delivery(brief,decision_only=True)
+
+
+
+def research_decision_brief_v3(brief):
+    """Bounded presentation of existing deterministic state; no action admission."""
+    task=brief.get('task') or {}
+    best=brief.get('best_valid') or {}
+    latest=brief.get('latest_scientific_feedback') or {}
+    reports=brief.get('latest_reports') or []
+    report=reports[-1] if reports else {}
+    facts=[]
+    for finding in report.get('findings',[]):
+        for metric in finding.get('metrics',[]):
+            facts.append({k:metric.get(k) for k in ('name','value','unit','threshold','passed','scope','source')})
+        for quantity in (finding.get('mathematics') or {}).get('quantities',[]):
+            if quantity.get('name') in ('best_found_violation','optimal_task_violation'):
+                facts.append({k:quantity.get(k) for k in ('name','value','unit','status','source','control_reoptimization')})
+    if not facts and best.get('task_gap'):
+        facts.append(dict(name='task_gap',value=best['task_gap'],source=best.get('reference')))
+    actions=[]
+    rows=brief.get('available_research_actions',[])
+    for action in brief.get('actions',[]):
+        matching=[r for r in rows if r.get('action')==action]
+        active=[r for r in matching if r.get('status') in ('available','preflight_eligible','prerequisites_only')]
+        direct=action in ('generate','search','diagnose','stop')
+        actions.append(dict(action=action,status='available' if active or (not matching and direct) else 'conditional',
+            reason='Full request admission and budget checks apply.' if active or (not matching and direct) else 'A suitable candidate, source, read, or other prerequisite is required.',
+            cost='See remaining allowances; exact cost depends on the requested operation.'))
+    catalog=brief.get('mathematical_capabilities') or {}
+    methods=[dict(method=k,status=v.get('planning_status'),execution_status=v.get('execution_status'),estimated_evaluations=v.get('estimated_evaluations'))
+        for k,v in catalog.get('methods',{}).items()]
+    if 'analysis' in (brief.get('capabilities') or []):
+        science=(brief.get('budget') or {}).get('science_budget') or {}
+        closed=(brief.get('budget') or {}).get('closeout',{}).get('next_request_will_protect')
+        blocked=closed or science.get('remaining_mathematical',0)<1
+        actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',methods=methods,
+            reason=('Protected closeout or no mathematical allowance.' if blocked else
+                'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
+            cost='Uses the shared mathematical allowance; inspect the method detail.'))
+    interpretation=[dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
+        for i in (report.get('interpretations') or [])[:3]]
+    budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
+    return dict(version='research_decision_brief_v3',
+        research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics') if k in task},
+            task_conditions=(brief.get('task_conditions') or {}).get('frozen',[]),
+            candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
+            task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),
+            pending_feedback=brief.get('pending_feedback_delivery')),
+        verified_facts=facts[:8],
+        reporter_summary=dict(status=report.get('reporter_status','unavailable'),
+            report_reference=report.get('report_reference'),interpretations=interpretation,
+            excerpt_scope='First 240 characters of each cited interpretation; read the report for the complete text.',
+            unresolved=report.get('unresolved',[])[:3]),
+        action_menu=actions,
+        evidence_access=dict(working_set=brief.get('evidence_access'),
+            method_query=catalog.get('detail_query'),stop_index=brief.get('stop_result_index'),
+            select_requirement='A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.',
+            stop_requirement='Retrieve and cite the complete new result index; original admission checks remain in force.',
+            knowledge='Optional experience_retrieve provides procedural guidance only; it is not scientific evidence.'),
+        budget=dict(model_calls=provider.get('remaining_total'),model_closeout_reserve=provider.get('reserved_for_closeout'),
+            public_operations=public.get('remaining_total'),public_closeout_reserve=public.get('reserved_for_closeout'),
+            physical= science.get('remaining_physical'),mathematical=science.get('remaining_mathematical'),
+            closeout=budget.get('closeout')))
 
 
 def route_review(host,current,brief,trace):

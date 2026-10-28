@@ -352,6 +352,8 @@ def result_card(host, reference):
     value=deepcopy(read_evidence(host, dict(reference=reference), record_read=False))
     if not isinstance(value,dict):
         raise ValueError('RESULT_CARD_REQUIRES_RESULT_OBJECT')
+    if value.get('status')=='legacy_text_unavailable':
+        raise ValueError('RESULT_CARD_SOURCE_UNAVAILABLE_UNDER_ENGLISH_CONTRACT')
     control=value.get('control_schedule_reference',value.get('source_reference'))
     if control:
         trajectory=host.store.artifact(control).get('trajectory') or {}

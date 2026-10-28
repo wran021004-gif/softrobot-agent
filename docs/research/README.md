@@ -101,4 +101,4 @@ The first real chain completed both training stages and continuation checks but 
 
 The completed scientific study `research-count-20261015` remains bound to `b3ba9cc019302cbd74de73c991977a31f44e0551`. The model selected its first fresh passing NMPC result after reading it: one execution, seven provider requests, no RL stages and no extra confirmation. See [results](results.md) for exact evidence and limitations. The final configuration-validation repair was made after closure; normalized effective defaults are identical to those actually studied, and the sealed study was neither rebound nor rerun.
 
-The optional role-profile configuration and its current limitations are documented in [English-native decision architecture status](english_native_decision_architecture.md). The remaining architecture is not yet ready for a new Study.
+The optional role-profile configuration and its current limitations are documented in [English-native decision architecture status](english_native_decision_architecture.md). New Studies opt in explicitly; the report documents the offline validation and remaining limits.

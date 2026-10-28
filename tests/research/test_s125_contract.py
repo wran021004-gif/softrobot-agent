@@ -68,6 +68,33 @@ class S125ContractTests(unittest.TestCase):
         self.assertEqual(ledger['used']['model_calls'],0)
         self.assertEqual(ledger['used']['backend_solves'],0)
 
+    def test_settled_diagnosis_exposes_actual_candidate_method_schema(self):
+        from tools.research.agent import selected_analysis,selected_analysis_schema
+        from tools.research.design import generate_candidate
+        from tools.research.core import dispatch
+        h=cold_host();s=state(h)
+        candidate=generate_candidate(h,dict(version='serial_family_generation_v2',
+            family_space_identity=s['spec']['family_space_identity'],segment_count=2,tendon_count=4),
+            dict(origin='offline schema fixture'))['candidate']
+        plan=dict(action='diagnose',hypothesis='The local model may lack authority.',
+            expected_observation='A bounded local diagnostic.',weakening_observation='Sufficient local authority.',
+            fixed_conditions='The frozen task.',stopping_condition='No additional computation.',interpretation='A diagnostic only.',
+            decision=dict(hypothesis_id='fixture',research_intent='DIAGNOSE',selected_method='controllability',
+                selected_candidate=candidate))
+        with patch('tools.research.core.guard'):
+            dispatch(h,plan,'native-selected-method-fixture')
+        with patch('tools.research.research_context.mathematics_authorization',
+                return_value={'registered_study_scope_authorized':True}):
+            selected=selected_analysis(h,{})
+        self.assertEqual(selected[0],'controllability')
+        schema=selected_analysis_schema(*selected)
+        self.assertEqual(schema['properties']['candidate']['const'],candidate)
+        self.assertEqual(schema['properties']['operation']['const'],'controllability')
+        self.assertIn('scoring_window_s',schema['required'])
+        self.assertNotIn('control_optimization',schema['properties'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        self.assertFalse(state(h).get('analysis_results'))
+
     def test_archived_errors_and_byte_partition(self):
         report=audit()
         self.assertEqual(len(reproduce(report['errors'])),4)

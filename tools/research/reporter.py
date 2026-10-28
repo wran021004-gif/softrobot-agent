@@ -266,10 +266,29 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
             error='REPORT_ASSEMBLY_UNAVAILABLE: '+str(exc),scientific_results=references)
 
 
-def interpretation_priority(report, previous):
+def interpretation_priority(report, previous, *, decision_v3=False):
     """Observable novelty only; no action selection or inferred importance score."""
     if report['mode']=='investigation':return 'explicit_investigation'
     old=[c for r in previous for c in r['results']]
+    if decision_v3:
+        def signature(card):
+            return dict(operation=card['identity'].get('operation'),task=card['identity'].get('task_identity'),
+                candidate=card['identity'].get('candidate'),status=card['evidence_summary'].get('verification_status'),
+                gap=card['deterministic_summary'].get('task_gap'),
+                metrics=[{k:m.get(k) for k in ('name','value','unit','threshold','passed','scope')} for m in card.get('metrics',[])],
+                violations=card.get('main_violations',[]))
+        prior=[signature(card) for card in old]
+        for card in report['results']:
+            if signature(card) in prior:continue
+            summary=card['deterministic_summary'];gap=summary.get('task_gap')
+            if gap and not gap.get('valid_complete'):return 'new_incomplete_task_result'
+            if any((summary.get(key) or {}).get('physical_failure_relation',{}).get('status')=='constraint_mismatch'
+                    for key in ('task_capability','optimal_sensitivity')):return 'model_physical_constraint_mismatch'
+            status=str(summary.get('status') or card['evidence_summary'].get('verification_status') or '').lower()
+            if any(word in status for word in ('incomplete','numerical_failure','inconclusive')):
+                return 'new_numerically_incomplete_result'
+            if gap and gap.get('valid_complete'):return 'changed_complete_task_result'
+        # Fall through for previously supported meaningful mathematical novelty.
     for card in report['results']:
         summary=card['deterministic_summary'];math=summary.get('task_capability',{})
         if math.get('structural_comparison'):return 'structure_control_comparison'
@@ -424,14 +443,17 @@ def _wire(host, reference, saved):
     comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
         for card in report.results if 'task_capability' in card.deterministic_summary]
+    from tools.research.evidence_policy import english_native, incompatible_text
+    if english_native(s['spec']) and incompatible_text([saved['report'], q, reads, guidance]):
+        raise ValueError('REPORTER_SOURCE_TEXT_UNAVAILABLE_UNDER_ENGLISH_CONTRACT')
     return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
         reasoning_effort=provider['reasoning_effort'],stream=False,
         **(dict(max_tokens=provider['max_tokens']) if provider.get('max_tokens') is not None else {}),
         messages=[dict(role='system',content=(
-            'You are a read-only scientific Reporter. Return JSON with only interpretations, a list '
+            'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
             'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
             '. Every item requires source_ids selected only from source_catalog. '
-            'Usually return 1-3 important interpretations; more only for an explicitly complex investigation. '
+            'For a substantive interpretation target approximately 200–400 English words in total; expand only when needed. Return 1-3 important interpretations; more only for an explicitly complex investigation. '
             'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
             'Explain quantitative new information with exact values, units and valid comparison scope. '
             'Use selected diagnostic_relations to assess possible failure mechanisms and observations '
@@ -486,11 +508,19 @@ def _finish(host, boundary, wire, response):
                 if source.reference.artifact_id not in allowed:
                     rejection=dict(code='REPORTER_SOURCE_OUTSIDE_SCOPE',interpretation_index=index,invalid_locations=[plain(source)])
                     raise ValueError('REPORTER_SOURCE_OUTSIDE_SCOPE')
-                try:read_evidence(host,plain(source),record_read=False)
+                try:
+                    source_value=read_evidence(host,plain(source),record_read=False)
+                    if isinstance(source_value,dict) and source_value.get('status')=='legacy_text_unavailable':
+                        raise ValueError('REPORTER_SOURCE_TEXT_UNAVAILABLE_UNDER_ENGLISH_CONTRACT')
                 except Exception as exc:
                     rejection=dict(code='REPORTER_SOURCE_READ_INVALID',interpretation_index=index,
                         invalid_locations=[plain(source)],navigation=getattr(exc,'evidence_navigation',None))
                     raise
+        from tools.research.evidence_policy import english_native, incompatible_text
+        if english_native(state(host)['spec']) and not interpretations:
+            raise ValueError('REPORTER_INTERPRETATION_REQUIRED')
+        if english_native(state(host)['spec']) and incompatible_text([plain(item) for item in interpretations]):
+            raise ValueError('REPORTER_ENGLISH_OUTPUT_REQUIRED')
         # The model is allowed to fill only the interpretation field.
         report=report.model_copy(update=dict(interpretations=interpretations))
     except Exception as exc:
@@ -542,7 +572,8 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
                 status='unavailable',interpretation_for=ref,error='REPORTER_INTERRUPTED_NO_AUTOMATIC_RETRY')
             continue
         previous=[v['report'] for r,v in reports[:reports.index((ref,saved))] if not v['interpretation_for']]
-        priority=interpretation_priority(saved['report'],previous)
+        from tools.research.evidence_policy import english_native
+        priority=interpretation_priority(saved['report'],previous,decision_v3=english_native(s['spec']))
         record(host,'reporter_priority',dict(base_report=ref,reason=priority,
             requested=priority!='routine_or_repeated_result'))
         if priority=='routine_or_repeated_result':

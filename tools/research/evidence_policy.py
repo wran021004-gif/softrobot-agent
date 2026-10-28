@@ -15,6 +15,27 @@ FORBIDDEN=['global_nonlinear_feasibility','global_nonlinear_infeasibility',
     'continuous_time_compliance','hardware_performance','robustness','repeatability']
 
 
+def english_native(spec):
+    """The opt-in Study contract; historical Studies keep their original behavior."""
+    return spec.get('research_decisions', {}).get('architecture') == 'english_decision_v1'
+
+
+def incompatible_text(value):
+    """Detect common non-English scripts, without changing text or rejecting SI symbols.
+
+    This is a rejection check, not proof that Latin-script text is English.
+    """
+    if isinstance(value, str):
+        return any(0x3400 <= ord(c) <= 0x9fff or 0x20000 <= ord(c) <= 0x323af
+            or 0x3040 <= ord(c) <= 0x30ff or 0xac00 <= ord(c) <= 0xd7af
+            or 0x0400 <= ord(c) <= 0x052f or 0x0600 <= ord(c) <= 0x06ff for c in value)
+    if isinstance(value, dict):
+        return any(incompatible_text(k) or incompatible_text(v) for k, v in value.items())
+    if isinstance(value, (list, tuple)):
+        return any(incompatible_text(v) for v in value)
+    return False
+
+
 def mathematical_physical_relation(value, physical):
     """Associate aligned recorded constraints, never infer a causal mechanism."""
     task=(value.get('binding') or {}).get('task_identity')

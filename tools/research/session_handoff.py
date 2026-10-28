@@ -105,7 +105,9 @@ def pending_feedback_delivery(host):
         tail=wire['messages'][-1].get('content')
         if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n'):
             packet=json.loads(tail.split('\n',1)[1])
-            if packet.get('research',{}).get('pending_feedback_delivery')==delivery:return None
+            research=packet.get('research',{})
+            shown=research.get('pending_feedback_delivery') or (research.get('research_state') or {}).get('pending_feedback')
+            if shown==delivery:return None
     return delivery
 
 
