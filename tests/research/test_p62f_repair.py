@@ -3,6 +3,7 @@ import json
 from copy import deepcopy
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 from tests.research import test_s129_agent_reporting as reporting
 from tests.research.test_information_flow import flow_host, generation
 from tools.platform_store import plain
@@ -118,10 +119,13 @@ class RepairTests(unittest.TestCase):
         from tests.research.test_recent_round_tools import run_fixture
         from tests.research.test_information_flow import packet
         from tools.platform_host import Host
+        from tools.research import session_handoff
         h=flow_host()
-        wires=run_fixture(h,[('experience_retrieve',dict(operation='search',task='reach',version='999')),
-            ('experience_retrieve',dict(operation='read',entry_id='research-strict-near-tolerance',revision='2')),
-            ('research_recall',dict(trace='actions')),None])
+        with patch.object(session_handoff,'INVOCATION_PROMPT','Supervised fixture prompt: read procedural knowledge only.'):
+            wires=run_fixture(h,[('experience_retrieve',dict(operation='search',task='reach',version='999')),
+                ('experience_retrieve',dict(operation='read',entry_id='research-strict-near-tolerance',revision='2')),
+                ('research_recall',dict(trace='actions')),None])
+        self.assertIn('Supervised fixture prompt',json.dumps(wires[0]))
         self.assertIn('empty_search_recovery',json.dumps(packet(wires[1])))
         self.assertIn('historical_facts',json.dumps(wires[2]))
         progress=read_progress(h);self.assertTrue(progress['reads'][0]['body_delivered'])

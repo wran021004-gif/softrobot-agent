@@ -122,7 +122,8 @@ async def supervised_knowledge(requests):
             research_continuations=[*old.get('research_continuations',[]),approval],pending_authorized_continuation=approval)
     else:
         record(h,'p62f_supervised_window',dict(prompt=prompt,previous_ledger=ledger,scope='Explicit supervision, not autonomous Knowledge choice.'))
-    with patch.object(agent,'INVOCATION_PROMPT',prompt):
+    from tools.research import session_handoff
+    with patch.object(session_handoff,'INVOCATION_PROMPT',prompt):
         await main_window(requests)
 
 
