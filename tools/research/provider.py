@@ -33,7 +33,10 @@ def gateway_history(host, messages):
             original=choice.get('message',{})
             key=tuple(c['id'] for c in original.get('tool_calls',[]))
             if key in wanted and original.get('provider_output') is not None:
-                wanted[key]['provider_output']=original['provider_output']
+                # The SDK parses/re-serializes arguments (including whitespace).
+                # Original calls and opaque output must share the same bytes.
+                wanted[key].update(tool_calls=deepcopy(original['tool_calls']),
+                    provider_output=deepcopy(original['provider_output']))
     return messages
 
 

@@ -44,16 +44,17 @@ class ProviderV2Tests(unittest.TestCase):
 
     def test_gateway_completed_reasoning_reuses_original_receipt(self):
         h=v2_host();p=deepcopy(state(h)['pilot']);p['provider']=gateway(h);update(h,pilot=p)
-        calls=[dict(id='opaque-call',type='function',function=dict(name='evidence_read',arguments='{}'))]
+        calls=[dict(id='opaque-call',type='function',function=dict(name='evidence_read',arguments='{"view":"full"}'))]
         output=[dict(type='reasoning',summary=[],encrypted_content='opaque-fixture'),
-            dict(type='function_call',namespace='research',name='evidence_read',arguments='{}',call_id='opaque-call',status='completed')]
+            dict(type='function_call',namespace='research',name='evidence_read',arguments='{"view":"full"}',call_id='opaque-call',status='completed')]
         with h.store.transaction() as db:
             body=h.store.put(db,json.dumps(dict(choices=[dict(message=dict(role='assistant',tool_calls=calls,provider_output=output))])).encode(),media='application/octet-stream')
             meta=h.store.put(db,dict(http_status=200,body=body.model_dump(mode='json')))
             h.store.event(db,h.run_id,'r3_response','metadata_saved',outputs=[meta])
-        messages=[dict(role='assistant',content=[dict(toolUse=dict(toolUseId='opaque-call',name='evidence_read',input={}))])]
+        messages=[dict(role='assistant',content=[dict(toolUse=dict(toolUseId='opaque-call',name='evidence_read',input={'view':'full'}))])]
         before=h.store.remaining();wire=model_messages(h,messages)
         self.assertEqual(wire[0]['provider_output'],output)
+        self.assertEqual(wire[0]['tool_calls'],calls)
         self.assertNotIn('reasoning_content',wire[0]);self.assertEqual(h.store.remaining(),before)
     def test_reporter_uses_independent_gateway_model_and_english_sources(self):
         from tests.research.test_s129_agent_reporting import AgentReportingTests,reporter_response
