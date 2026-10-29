@@ -10,6 +10,25 @@ from tools.research.config import ROOT, resolve
 
 
 class GenerationInputTests(unittest.TestCase):
+    def test_generation_only_window_retains_zero_compute_and_protected_closeout(self):
+        from unittest.mock import patch
+        from tests.research.test_information_flow import flow_host
+        from tools.research.state import state,update
+        from tools.research.budget import science_fits,protected
+        h=flow_host();spec=deepcopy(state(h)['spec'])
+        spec.update(capabilities=[],allowed_plan_actions=['generate','stop'])
+        spec['budgets']['mathematical_evaluations']=0
+        update(h,spec=spec)
+        self.assertTrue(science_fits(h));self.assertFalse(protected(h))
+        with patch('tools.research.budget.provider_allowance',return_value=dict(protected_current_request=True)):
+            self.assertTrue(protected(h))
+        update(h,candidates={'offline-valid-construction':{'artifact_id':'0'*64}})
+        self.assertFalse(science_fits(h));self.assertTrue(protected(h))
+        update(h,candidates={});spec['allowed_plan_actions'].append('diagnose');update(h,spec=spec)
+        self.assertFalse(science_fits(h))
+        self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+
     @classmethod
     def setUpClass(cls):
         cls.spec=resolve(ROOT/'configs/research/study_p63b1_sol_m1_traces12.json')

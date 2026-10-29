@@ -143,6 +143,9 @@ def science_fits(host):
     limits=spec['rl_limits']
     evaluations=limits['evaluation_episodes']-sum(e['evaluations'] for e in runs.values())
     return bool(
+        (not capabilities and spec.get('start_mode')=='family_space'
+            and 'generate' in spec.get('allowed_plan_actions',[])
+            and set(spec['allowed_plan_actions'])<={'generate','stop'} and not s.get('candidates')) or
         ('analysis' in capabilities and s.get('mathematical_evaluations',0)<b['mathematical_evaluations']) or
         ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
         ('physical_replay' in capabilities and backend>=1 and s.get('physical_replay_launches',0)<
