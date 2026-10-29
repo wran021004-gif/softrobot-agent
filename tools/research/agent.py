@@ -141,6 +141,14 @@ def compact_plan_schema(schema, action, study):
         properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
         lo,hi=space['executable_tendon_count_bounds']
         properties['tendon_count']={**properties['tendon_count'],'minimum':lo,'maximum':hi}
+        schema['$defs'][name]['description']='Supply only intended design changes. Omitted optional overrides inherit frozen defaults/prototypes; sections and cells need not be filled. Valid generation does not establish task success.'
+        choice=schema['$defs']['SegmentChoiceV2' if name=='GenerationRequestV2' else 'SegmentChoice']['properties']
+        choice['sections']['description']='Optional override. Omit unchanged sections; otherwise match the exact count and order of the selected prototype stations shown in generation_inputs.'
+        if name=='GenerationRequestV2':
+            lo,hi=space['serial_assembly']['cell_count_bounds']
+            for branch in choice['cells']['anyOf']:
+                if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
+            choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
     def clean(node):
         if isinstance(node,list):return [clean(v) for v in node]
         if not isinstance(node,dict):return node
@@ -1047,12 +1055,13 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
-                tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
+                tool_loading='Submit an already loaded tool directly. Use research_route only to switch tool/action; direct reads preserve the loaded Plan. Selection alone executes nothing.')
             if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
                 boundary.research_packet['research']['generation_contract']=dict(
                     family_space_identity=s['spec']['family_space_identity'],
                     version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
                     domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
+                    generation_inputs=current['family_space']['generation_inputs'],
                     scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
             if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')):
                 from tools.research.research_context import compact_tool_delivery

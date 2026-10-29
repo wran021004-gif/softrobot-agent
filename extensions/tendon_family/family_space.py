@@ -298,8 +298,22 @@ def decision_summary(value, evidence, operations):
     if isinstance(space,FamilySpaceV2):
         result['serial_assembly']=plain(space.serial_assembly)
         result['generation_version']='serial_family_generation_v2'
+        parts={p.id:p for p in space.assembly.components}
+        prototypes=[('index 0',parts[space.serial_assembly.root_segment]),
+            ('indices >= 1',parts[space.serial_assembly.repeated_segment])]
     else:
         result['generation_version']='serial_family_generation_v1'
+        prototypes=[('index '+str(i),p) for i,p in enumerate(p for p in space.assembly.components if isinstance(p,Segment))]
+    result['generation_inputs']=dict(
+        overrides='Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.',
+        sections=dict(rule='If explicitly changed, supply exactly one section per prototype station, in the same order.',
+            prototypes=[dict(applies_to=role,prototype=p.id,count=len(p.sections),stations_s=[st.s for st in p.sections])
+                for role,p in prototypes]),
+        acceptance='Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.')
+    if isinstance(space,FamilySpaceV2):
+        result['generation_inputs']['cells']=dict(bounds=list(space.serial_assembly.cell_count_bounds),
+            default=space.serial_assembly.default_cells,
+            rule='Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds.')
     result.update(family_space_identity=digest(frozen),full_specification=evidence, available_operations=operations,
         routing_strategy='polar_consecutive_spans_v1',
         span_semantics='first_segment <= last_segment < selected segment_count; counts sum to tendon_count',

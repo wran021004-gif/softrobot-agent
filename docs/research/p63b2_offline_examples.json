@@ -1,0 +1,592 @@
+{
+  "label": "Offline fixtures, not scientific evidence or a formal Study",
+  "examples": [
+    {
+      "source": "Actual real-SDK/Mock HTTP offline fixture; no live model or scientific worker",
+      "l0": {
+        "tool_continuation": {
+          "selection": null,
+          "plan_action": null,
+          "plan_selection": null,
+          "recent": [],
+          "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "switch_tool": "Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.",
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  1,
+                  32
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "domain": {
+          "query": {
+            "reference": {
+              "artifact_id": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "media_type": "application/json"
+            },
+            "view": "full",
+            "pointer": ""
+          },
+          "role": "domain_reference"
+        }
+      },
+      "generate_schema": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "generate"
+          ],
+          "description": "Property action"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_family_generation_v2",
+              "default": "serial_family_generation_v2",
+              "type": "string"
+            },
+            "family_space_identity": {
+              "type": "string",
+              "const": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa"
+            },
+            "segment_count": {
+              "default": 2,
+              "minimum": 1,
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ]
+            },
+            "tendon_count": {
+              "minimum": 1,
+              "type": "integer",
+              "maximum": 7
+            },
+            "strategy": {
+              "const": "polar_consecutive_spans_v1",
+              "default": "polar_consecutive_spans_v1",
+              "type": "string"
+            },
+            "spans": {
+              "items": {
+                "$ref": "#/$defs/Span"
+              },
+              "type": "array"
+            },
+            "segments": {
+              "additionalProperties": {
+                "$ref": "#/$defs/SegmentChoiceV2"
+              },
+              "type": "object"
+            },
+            "tendon_parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "control_weights": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "route_overrides": {
+              "additionalProperties": {
+                "items": {
+                  "$ref": "#/$defs/RoutePoint"
+                },
+                "type": "array"
+              },
+              "type": "object"
+            },
+            "controller_recipe": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "controller_solver": {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          },
+          "required": [
+            "family_space_identity",
+            "tendon_count",
+            "version"
+          ],
+          "type": "object",
+          "description": "Supply only intended design changes. Omitted optional overrides inherit frozen defaults/prototypes; sections and cells need not be filled. Valid generation does not establish task success."
+        },
+        "segment_choice": {
+          "additionalProperties": false,
+          "properties": {
+            "length_m": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "sections": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/$defs/Section"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional override. Omit unchanged sections; otherwise match the exact count and order of the selected prototype stations shown in generation_inputs."
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer",
+                  "maximum": 32
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional override within frozen cell_count_bounds; omit to inherit default_cells."
+            },
+            "physical_parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "last_knowledge_read_progress": null
+    },
+    {
+      "source": "Actual real-SDK/Mock HTTP offline fixture; no live model or scientific worker",
+      "l0": {
+        "tool_continuation": {
+          "selection": null,
+          "plan_action": null,
+          "plan_selection": null,
+          "recent": [],
+          "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "switch_tool": "Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.",
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  1,
+                  32
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "domain": {
+          "query": {
+            "reference": {
+              "artifact_id": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "media_type": "application/json"
+            },
+            "view": "full",
+            "pointer": ""
+          },
+          "role": "domain_reference"
+        }
+      },
+      "generate_schema": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "generate"
+          ],
+          "description": "Property action"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_family_generation_v2",
+              "default": "serial_family_generation_v2",
+              "type": "string"
+            },
+            "family_space_identity": {
+              "type": "string",
+              "const": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa"
+            },
+            "segment_count": {
+              "default": 2,
+              "minimum": 1,
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ]
+            },
+            "tendon_count": {
+              "minimum": 1,
+              "type": "integer",
+              "maximum": 7
+            },
+            "strategy": {
+              "const": "polar_consecutive_spans_v1",
+              "default": "polar_consecutive_spans_v1",
+              "type": "string"
+            },
+            "spans": {
+              "items": {
+                "$ref": "#/$defs/Span"
+              },
+              "type": "array"
+            },
+            "segments": {
+              "additionalProperties": {
+                "$ref": "#/$defs/SegmentChoiceV2"
+              },
+              "type": "object"
+            },
+            "tendon_parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "control_weights": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "route_overrides": {
+              "additionalProperties": {
+                "items": {
+                  "$ref": "#/$defs/RoutePoint"
+                },
+                "type": "array"
+              },
+              "type": "object"
+            },
+            "controller_recipe": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "controller_solver": {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          },
+          "required": [
+            "family_space_identity",
+            "tendon_count",
+            "version"
+          ],
+          "type": "object",
+          "description": "Supply only intended design changes. Omitted optional overrides inherit frozen defaults/prototypes; sections and cells need not be filled. Valid generation does not establish task success."
+        },
+        "segment_choice": {
+          "additionalProperties": false,
+          "properties": {
+            "length_m": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "sections": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/$defs/Section"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional override. Omit unchanged sections; otherwise match the exact count and order of the selected prototype stations shown in generation_inputs."
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer",
+                  "maximum": 32
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional override within frozen cell_count_bounds; omit to inherit default_cells."
+            },
+            "physical_parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "last_knowledge_read_progress": {
+        "reads": [
+          {
+            "entry_id": "research-strict-near-tolerance",
+            "revision": "2",
+            "read_receipt": {
+              "artifact_id": "435227db2e52cd76d50265a5ff083d8d67d3da4812f46a27c63f1067fba6bf43",
+              "media_type": "application/json"
+            },
+            "tool_read_completed": true,
+            "body_delivered": false
+          }
+        ],
+        "scope": "Main read receipts only; body_delivered requires exact feedback in a confirmed Provider request. No card bodies preloaded here; delivery proves neither understanding, adoption nor scientific evidence."
+      }
+    }
+  ],
+  "frozen_m1_derived_projection": {
+    "source": "Derived from existing sol frozen-config resolver; not a full Provider wire",
+    "generation_inputs": {
+      "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+      "sections": {
+        "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+        "prototypes": [
+          {
+            "applies_to": "index 0",
+            "prototype": "segment_0",
+            "count": 1,
+            "stations_s": [
+              0.0
+            ]
+          },
+          {
+            "applies_to": "indices >= 1",
+            "prototype": "segment_1",
+            "count": 2,
+            "stations_s": [
+              0.0,
+              1.0
+            ]
+          }
+        ]
+      },
+      "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+      "cells": {
+        "bounds": [
+          12,
+          12
+        ],
+        "default": 12,
+        "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+      }
+    },
+    "cells_schema": {
+      "type": "integer",
+      "minimum": 12,
+      "maximum": 12,
+      "optional": true
+    }
+  },
+  "proposed_tests": [
+    {
+      "test": "G",
+      "configuration": "study_p63b2_g_m1_draft.json",
+      "study_id": "p63b2-g-m1-pending",
+      "resolved_identity": "3a73a5a6ed4ccaf4f74d054bacdd52365fad1ef434299ba18b1d99736f9404a1",
+      "budgets": {
+        "provider_requests": 8,
+        "protected_provider_requests": 1,
+        "public_operations": 16,
+        "protected_public_operations": 2,
+        "physical_launches": 0,
+        "local_solves": 0,
+        "local_solve_s": null,
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "mathematical_evaluations": 0,
+        "numerical_s": null,
+        "activity_s": null,
+        "delivery_reserve_s": null,
+        "provider_reserve_policy": "last_requests_v2"
+      },
+      "prepared_store": false,
+      "formal_authorization": false
+    },
+    {
+      "test": "M",
+      "configuration": "study_p63b2_m_m1_draft.json",
+      "study_id": "p63b2-m-m1-pending",
+      "resolved_identity": "83a2960f0e1edb386ebb259e382ce835e0e8ad8dc5c83eaa40ca2a4a64fb0ee4",
+      "budgets": {
+        "provider_requests": 12,
+        "protected_provider_requests": 1,
+        "public_operations": 32,
+        "protected_public_operations": 2,
+        "physical_launches": 0,
+        "local_solves": 0,
+        "local_solve_s": null,
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "mathematical_evaluations": 4,
+        "numerical_s": null,
+        "activity_s": null,
+        "delivery_reserve_s": null,
+        "provider_reserve_policy": "last_requests_v2"
+      },
+      "prepared_store": false,
+      "formal_authorization": false
+    }
+  ]
+}

@@ -1385,7 +1385,13 @@ def information_flow_brief(brief, delivered):
     control=deepcopy(value.get('current_control') or {})
     control.pop('candidate',None)
     continuation=value.get('tool_continuation') or {}
-    continuation['switch_tool']='research_route(tool="research_plan", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing.'
+    continuation['switch_tool']='Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.'
+    loaded=continuation.get('loaded') or {}
+    if loaded.get('plan_action'):
+        continuation['direct_plan']=dict(tool='research_plan',action=loaded['plan_action'],
+            instruction='This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.')
+        if loaded['plan_action']=='generate' and value.get('generation_contract'):
+            continuation['direct_plan']['generation_inputs']=value['generation_contract']['generation_inputs']
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source

@@ -61,6 +61,19 @@ class InformationFlowTests(unittest.TestCase):
         self.assertEqual(len(first['capabilities']),5)
         self.assertEqual(first['evidence_access']['citation_eligibility']['scientific_result_count'],0)
         self.assertIsNone(first['research_focus']['candidate'])
+        direct=first['tool_continuation']['direct_plan']
+        self.assertEqual((direct['tool'],direct['action']),('research_plan','generate'))
+        self.assertIn('no research_route call is needed',direct['instruction'])
+        guidance=direct['generation_inputs']
+        self.assertIn('Omit unchanged sections, cells',guidance['overrides'])
+        spec=state(h)['spec'];bounds=spec['family_space']['serial_assembly']['cell_count_bounds']
+        self.assertEqual(guidance['cells']['bounds'],bounds)
+        schema=next(t['function']['parameters'] for t in wires[0]['tools'] if t['function']['name']=='research_plan')
+        choice=schema['$defs']['SegmentChoiceV2']['properties']
+        integer=next(b for b in choice['cells']['anyOf'] if b.get('type')=='integer')
+        self.assertEqual([integer['minimum'],integer['maximum']],bounds)
+        self.assertNotIn('cells',schema['$defs']['SegmentChoiceV2'].get('required',[]))
+        self.assertNotIn('sections',schema['$defs']['SegmentChoiceV2'].get('required',[]))
         self.assertEqual(last['research_focus']['formal_hypothesis']['hypothesis_id'],'offline-p61')
         self.assertTrue(last['research_focus']['candidate'])
         self.assertEqual(last['tool_continuation']['loaded']['plan_action'],'generate')
@@ -164,6 +177,12 @@ class InformationFlowTests(unittest.TestCase):
         self.assertIsNone(pending_feedback_delivery(h))
         self.assertTrue(read_progress(h)['reads'][0]['body_delivered'])
         self.assertIn('pending_feedback',packet(wires[1])['tool_continuation'])
+        progress=packet(wires[-1])['knowledge']['read_progress']['reads'][0]
+        self.assertEqual(progress['entry_id'],'research-strict-near-tolerance')
+        self.assertTrue(progress['tool_read_completed'])
+        # This wire first carries the feedback; confirmation is recorded only
+        # after its HTTP response. The Store assertion above checks that fact.
+        self.assertFalse(progress['body_delivered'])
 
     def test_pending_native_submission_is_in_trace_without_execution_claim(self):
         h=flow_host()
