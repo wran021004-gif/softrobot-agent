@@ -151,4 +151,7 @@ none 若达到 D1，不强制消耗 medium；none 充分信息下仍不行动，
 修改覆盖 budget/provider/agent/config/research_context、两个 pending 配置、Gateway 代理启动及只读诊断、
 原审计脚本的参数化复用和少量定向测试。session_handoff.py、reporter.py、evidence_policy.py、
 Store、任务、FamilySpace 与独立 evaluator 没有生产修改。
-提交与 push 结果由最终结算补记；不自动启动长期科研或创建实际 P5 Study。
+工程提交 `344caed2c2ebef16b31b8ad56218f8198e070446` 已成功 push 至
+`origin/mainline/research-harness-v2`（远端由 c56bae83e 前进至 344caed2c）。
+本文的后续结算提交只补充该发布结果；最终 HEAD 见交付消息及 Git 记录。
+不自动启动长期科研或创建实际 P5 Study。
