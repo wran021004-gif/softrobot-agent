@@ -30,6 +30,11 @@ def audit(arm):
     host=Host(ROOT/'runs/research'/run,run)
     before=hashlib.sha256(host.store.db.read_bytes()).hexdigest()
     events=host.store.events(run);s=state(host)
+    feedback_by_id={}
+    for event in events:
+        if event['kind']=='model_original_tool_feedback':
+            saved=host.store.artifact(event['outputs'][0])
+            feedback_by_id[saved['tool_use']['toolUseId']]=saved['result']
     sends=[e for e in events if e['kind']=='r3_request'];rows=[]
     for n,event in enumerate(sends,1):
         meta=host.store.artifact(event['outputs'][0]);wire=host.store.artifact(meta['request'])
@@ -40,6 +45,10 @@ def audit(arm):
             schemas=[dict(name=t['function']['name'],identity=digest(t['function']['parameters']),
                 actions=t['function']['parameters'].get('properties',{}).get('action',{}).get('enum')) for t in wire.get('tools',[])])
         row['returned_tool_ids']=[m['tool_call_id'] for m in wire['messages'] if m['role']=='tool']
+        row['tool_result_delivery']=[dict(call_id=m['tool_call_id'],
+            exact_saved_text=m['content']=='\n'.join(b['text'] for b in
+                feedback_by_id.get(m['tool_call_id'],{}).get('content',[]) if 'text' in b))
+            for m in wire['messages'] if m['role']=='tool']
         originals=[m for m in wire['messages'] if m.get('provider_output') is not None]
         row['native_function_arguments_exact']=all(
             [(c['id'],c['function']['name'],c['function']['arguments']) for c in m.get('tool_calls',[])]==
