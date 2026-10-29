@@ -212,6 +212,7 @@ class ModelConfig(Contract):
     strategy_version: str = '1.0.0'
     model: str = 'offline-contract-fixture'
     base_url: str = 'https://api.deepseek.com'
+    proxy_url: str | None = None
     thinking: Literal['enabled','disabled'] | None = None
     reasoning_effort: Literal['none','low','medium','high','max'] | None = None
     reasoning: Literal['none','medium'] | None = None
@@ -238,7 +239,7 @@ class ModelConfig(Contract):
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning','model_capabilities','reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit','context_guard','output_context_reserve_tokens'):
+        for key in ('reasoning','model_capabilities','reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit','context_guard','output_context_reserve_tokens','proxy_url'):
             if data.get(key) is None: data.pop(key,None)
         return data
 

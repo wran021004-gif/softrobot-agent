@@ -9,7 +9,7 @@ import httpx
 from tools.platform_tasks import compile_input
 from tools.platform_registry import registry
 from tools.research.config import ROOT, resolve
-from tools.research.provider import credential, request_settings
+from tools.research.provider import credential, request_settings, discover_models, LiveBoundary
 from tools.research.state import state, update
 from tests.research.test_harness_v2 import v2_host
 
@@ -19,9 +19,21 @@ def runtime():
 
 
 class OpenAIAPITests(unittest.TestCase):
+    def test_explicit_proxy_and_mock_catalog_stay_on_the_selected_transport(self):
+        h=v2_host();s=state(h);p=runtime()['provider'];update(h,pilot={**s['pilot'],'provider':p})
+        with patch('httpx.AsyncHTTPTransport') as transport:
+            LiveBoundary(h)
+            transport.assert_called_once_with(retries=0,proxy='http://127.0.0.1:7890')
+        seen=[]
+        def catalog(request):
+            seen.append(str(request.url));return httpx.Response(200,json=dict(data=[dict(id=p['model'])]))
+        result=asyncio.run(discover_models(p,'official-key-fixture',transport=httpx.MockTransport(catalog)))
+        self.assertEqual(seen,['https://api.openai.com/v1/models'])
+        self.assertEqual(result['models'],[dict(id=p['model'])])
+
     def test_explicit_profile_compiles_and_maps_official_parameters(self):
         p=runtime()['provider'];settings=request_settings({**p,'max_tokens':128})
-        self.assertEqual(settings,dict(model='gpt-5.6-luna',stream=False,store=False,
+        self.assertEqual(settings,dict(model='gpt-5.4-mini',stream=False,store=False,
             reasoning_effort='none',max_completion_tokens=128))
         spec=resolve(ROOT/'configs/research/study_harness_v2.json')
         cfg=deepcopy(spec['configuration']);cfg['policy']['model']=p

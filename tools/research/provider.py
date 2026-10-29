@@ -116,7 +116,8 @@ async def discover_models(provider, api_key, *, transport=None):
 
     Catalog availability does not verify tool support or establish price order.
     """
-    async with httpx.AsyncClient(transport=transport,follow_redirects=False,timeout=provider['timeout_s']) as client:
+    async with httpx.AsyncClient(transport=transport,proxy=provider.get('proxy_url') if transport is None else None,
+            follow_redirects=False,timeout=provider['timeout_s']) as client:
         response=await client.get(provider['base_url'].rstrip('/')+'/models',headers={'Authorization':'Bearer '+api_key})
         response.raise_for_status()
         return dict(models=response.json()['data'],pricing='unknown',tool_support='requires_separate_verification')
@@ -219,7 +220,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
     """
     def __init__(self,host,transport=None,*,allow_truncated_response=False,max_model_calls=None):
         self.host=host
-        self.inner=transport or httpx.AsyncHTTPTransport(retries=0)
+        self.inner=transport or httpx.AsyncHTTPTransport(retries=0,proxy=pilot(host)['provider'].get('proxy_url'))
         self.last_request=None
         self.allow_truncated_response=allow_truncated_response
         self.max_model_calls=max_model_calls
