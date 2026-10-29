@@ -1,0 +1,247 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "passive-force-response-research",
+  "revision": "1",
+  "kind": "procedure",
+  "version": "1",
+  "failure_type": "not_applicable",
+  "task": "passive_progressive_stiffness",
+  "structure": "serial_passive_soft_arm",
+  "retrieval_summary": "用张力/长度/活跃集核查机制；静力后做连续动力学、有效消融、时空离散检查，明确未决边界。",
+  "status": {
+    "diagnostic_method_supported": true,
+    "cross_task_generalization": "unverified",
+    "acceptance_certificate": false
+  },
+  "applicability": [
+    "适用于含被动约束、分阶段外载或结构机制归因的软体机器人研究。",
+    "推荐动作是待新任务检验的方法经验，不是可复用的获胜设计。"
+  ],
+  "confidence": {
+    "observations": "reference_backed",
+    "physical_interpretation": "within valid paired models",
+    "generalization": "hypothesis requiring task-local validation"
+  },
+  "evidence_assessment": {
+    "observed": [
+      "静力有希望的候选可在动力学失败。",
+      "有效消融与单工况通过是不同门槛。",
+      "同设计两种较粗网格通过，更细网格的有约束响应未稳定。"
+    ],
+    "interpretation": [
+      "有效配对模型支持目标被动约束贡献。"
+    ],
+    "unverified": [
+      "对任意软臂、材料、载荷及空间精度均有效。",
+      "本次更细网格失稳的唯一数值根因。"
+    ]
+  },
+  "experiences": [
+    {
+      "principle": "【观察与模型内解释】把刚度变化与真实被动腱的松弛—承力切换一起验证。",
+      "trigger": "声称小载柔顺、大载变硬，但机制尚未复核。",
+      "recommended_action": "同查带符号位移、实际腱长相对固定放绳长度的残差、单侧约束状态和张力；逐方向检查。",
+      "limitation": "单凭曲线形状不足以识别机制；不稳定窗口、摩擦、接触或材料非线性会影响解释。",
+      "evidence": "accepted#/cases/*/evaluation/tendon_transitions; spatial#/meshes"
+    },
+    {
+      "principle": "【可迁移设计假设】放绳余量、腱路及终止位置可作为约束激活区间的设计变量。",
+      "trigger": "低载已经张紧或高载仍未有效限制位移。",
+      "recommended_action": "仅在获授权设计域内做有界比较；每次变化重算无载平衡和完整响应，并检查真实孔位及绳路。",
+      "limitation": "几何、载荷、密度与边界条件会改变作用；本案例不提供跨任务通用参数或调节公式。",
+      "evidence": "c01#/curves/1; c05#/curves/1; c16_static#/curves"
+    },
+    {
+      "principle": "【观察】静力/KKT 筛选成功不能替代软约束动力学验收。",
+      "trigger": "局部非线性静力预测已满足位移或刚度条件。",
+      "recommended_action": "继续独立连续加载—卸载，检查末窗速度、漂移、静力残差和全过程约束；保留失败与未知成本。",
+      "limitation": "局部求解失败不证明结构无解；硬绳静力模型和软约束动力学的结论不能互换。",
+      "evidence": "c16_static; c16_dynamic; c17_invalid; c18_invalid"
+    },
+    {
+      "principle": "【观察】单工况成功只覆盖该工况，联合成功必须覆盖冻结的完整组合。",
+      "trigger": "某方向或载荷已通过，但卸载、另一方向或机制检验尚缺失。",
+      "recommended_action": "保持同一结构和输入约束，独立检查所有规定方向、载荷阶段、恢复和额外门槛，再决定是否停止。",
+      "limitation": "不能组合不同结构的单向通过，也不能把未决检验默认为通过；有限工况不证明全局鲁棒性。",
+      "evidence": "c25_plus; c25_ablation; accepted#/cases"
+    },
+    {
+      "principle": "【模型内因果证据】稳定、可比较的配对消融可区分目标约束与骨架自身响应。",
+      "trigger": "需要区分被动腱作用与材料、几何硬化或碰撞止挡。",
+      "recommended_action": "只禁用目标约束，保持实体、质量、惯量、环境及载荷一致；在两组都稳定有效时比较位移和增量刚度。",
+      "limitation": "任一组无效时机制结论为未决；消融不自动排除未建模效应或跨精度数值耦合。",
+      "evidence": "accepted#/mechanism; spatial#/meshes/2/paired_mechanism_plus_x; spatial#/meshes/4/paired_mechanism_plus_x"
+    },
+    {
+      "principle": "【观察】时间积分、空间离散和物理可信度应分别报告。",
+      "trigger": "粗离散通过或时间步减半后结果接近。",
+      "recommended_action": "固定连续设计、质量、腱路和放绳长度，单独加密空间；重新建立合法平衡并检查每个网格的稳定性和机制门槛。",
+      "limitation": "三组有限网格不构成严格数学收敛证明；固定时间步加密失败可能涉及约束/时间步耦合，未稳定均值不能证明静态收敛，仿真也不等于硬件证据。",
+      "evidence": "accepted#/cases/half_plus_x; spatial#/verdict; spatial#/changes"
+    }
+  ],
+  "sources": {
+    "c01": {
+      "sha256": "04b002323e42e88abab6ce7eb474507a66fef3812b2a49f218bb2df927ff351e",
+      "evidence_refs": [
+        {
+          "artifact_id": "5420c4169ffe3ffcf987147eae6abca5c3ff32feb18742dc4748ec89554c6700",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "93104680a23f9916e66ae3a8a6c339bc42991c6bcf4f4ba2ebaa9c42212817b3",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "eb5cffbf28cb2801d9a02afad729ae73eed0407df89249c33d78d226339dcc93",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7ecafd6f8e14c41102ed7a504e5dcd37a515f6707de8e58c35d30e0fe29ea28f",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c05": {
+      "sha256": "85170045feb251f13b3ac7f05b612578ca5a9a340e49030ce34102c5f1fd89a1",
+      "evidence_refs": [
+        {
+          "artifact_id": "9a89a16a6364881a557d5a14eb9b87f401dc0e17a4d81f237544b83e9b81ac4c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cfcfeea9ee529ab2a690f6ef3c585d04833658520fbf4c9eaa6a9aa6b53aba85",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "24490a0572d89af5fc25bc6066488e707ddb862a6cdf8ebefeb34b19625b6a60",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "85640add812a36a443c206c90b17406f41db70a8e04afcfe46ff8123b25c7e85",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c16_static": {
+      "sha256": "105bd03f6c9fccce7bede7aa639d5b9eaa290659bc416b7d61eb9956ccea96da",
+      "evidence_refs": [
+        {
+          "artifact_id": "7d90ff91f70b030c0a304568aa978c36c1c74dfbc1465b0bdc0c3dc4c83b696f",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "3e7cad1cd2b496ddcd246e6dcb2b14a699fe08f3503d827ceef011e9e6144cbe",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "67e2001ade0d89c320da6230c93b202d0ae7ac1d7e94a36a790091d242201ae8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4858d6de4b1c13cdc859e99f0437ac0a6f40b31781d8e9b269c8e3a16d0d8757",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "8911914e231547b32110621679092b926a09a97bee958d280c3adbaddf006a01",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "32621df89eebc4d19f22af5c89a7d0614eb84cf09918cdd93e162a7ea75680d4",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "0a93906d604eb5fd3a590ff216b5a79b4332bd2d48109b2bd2f91b9c21349dd3",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a68855afea32ac4f323359c3ebc62fe24068ee83e8928e77843457df608490e7",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c16_dynamic": {
+      "sha256": "998c403eddf091fbc61feeadc5d7c9ca4f73307cd8496ec726b95e72e2a7d621",
+      "evidence_refs": [
+        {
+          "artifact_id": "df4ed646d06ef526d75b7409588ae504c1ee5606a575f65d220e4e4c2c7537f0",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c17_invalid": {
+      "sha256": "8cac0fd817577bc7af800c14f465069ceed9b5fcf38fec59bbf4a3d86bcc5ea2",
+      "evidence_refs": [
+        {
+          "artifact_id": "12da114f02afaab3e4d28ce721f1963df491484862d86a626c87227db5961a2a",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c18_invalid": {
+      "sha256": "b19be7a61f021122f7998844715c21f88fc041aa6f9c3f76ea8baef82a23c7ac",
+      "evidence_refs": [
+        {
+          "artifact_id": "9f813ac66c230198623b4cb95b88b48b7c936d72fcbab63eefdf56cf1eaff1ea",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c25_plus": {
+      "sha256": "211b0a4c33581165816e2501dd10e17ceb8263e751a3e5055b07f85718bfda5e",
+      "evidence_refs": [
+        {
+          "artifact_id": "a119b49c5bb202e67f323457e9945e0d4ddd591fa5ae3d46a132a0d3a1ec8e52",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c25_ablation": {
+      "sha256": "ef652d680961cff858bfbf3e0b594532b9279c87c4d4ae2b75c28b29f5781200",
+      "evidence_refs": [
+        {
+          "artifact_id": "c8ac1e61aed6f5c61c3c28c2c2d09a91a632782227908424e3cb1b359c490de7",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "accepted": {
+      "sha256": "e4333330de7f67324625416b67086a20a98fba841d8b3232c2d63f1c5b9cbaa4",
+      "evidence_refs": []
+    },
+    "spatial": {
+      "sha256": "9af882c13d73b2edd60a272ca6bce488add6d352f76cc2897f2e17c296a1ed04",
+      "evidence_refs": [
+        {
+          "artifact_id": "ec708b2ee3720be56d4317a9ea4dfc980fbd2e541c8882409e81e077d65fa3b9",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b6232da9d03d45751f7f2dc4aa0126ac50572e33f821337404f2fe84c4ddb7c2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe564afd1b3da6836717683f49028ec21570932977ecbb3f0773b010a13de8d0",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e7494d1275da47cfd91a34caa84196a169f49bd407df9e569c78c60ddd27bf06",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "f4eb398dd292e638be9508d049de619da1b8a74db458d0c76586af956bf2b91b",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1e0a4f050bdf0b307e41f2fcc4395be6027909de4b32e090c674e916a1436afd",
+          "media_type": "application/json"
+        }
+      ]
+    }
+  },
+  "bindings": {
+    "source_task_id": "passive_progressive_stiffness_dev_v1",
+    "original_store_sha256": "ef9a8a7636a651ee2d3e00bbd0aaf7e21545898f2edf1ee2779fb9705c2b4ca2",
+    "spatial_comparison_sha256": "9af882c13d73b2edd60a272ca6bce488add6d352f76cc2897f2e17c296a1ed04"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-strict-near-tolerance",
+  "revision": "3",
+  "kind": "procedure",
+  "authored_language": "en",
+  "language_origin": {
+    "kind": "authored_english",
+    "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+    "human_review": "not_claimed"
+  },
+  "retrieval_summary": "Preserve unrounded joint residuals and original evaluator thresholds before considering finite continuation.",
+  "trigger": "Preserve unrounded joint residuals and original evaluator thresholds before considering finite continuation.",
+  "procedure": [
+    "A tiny positive residual is still failure; a display rounded to the threshold is not evidence of acceptance.",
+    "Check units, complete coverage, source identity and every predicate. Joint position/axis or position/speed tasks cannot be reduced to one passing component.",
+    "M2 retained a holding-speed excess of about 8.96e-16 m/s. Same-candidate continuation with an internal search margin then required a new independent replay; it did not relax acceptance.",
+    "BF5 continuation was separately authorized. BF6 R7 is a counterexample to equating near-threshold improvement with success; retain its STOP and spent budget."
+  ],
+  "bindings": {
+    "task": "position_tool_axis",
+    "structure": "tendon_robot_family",
+    "physics": "Check task-local model, load, constraints and validity before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "generalization": "unverified",
+    "current_scientific_evidence": false
+  },
+  "applicability": [
+    "Finite continuation may stagnate or worsen; directed axis does not establish full orientation, robustness or physical feasibility outside the tested model."
+  ],
+  "escalation": "Obtain current scoped evidence and separate action authorization; retain original evaluator and budgets.",
+  "source_case_ids": [
+    "BF5",
+    "BF6",
+    "M2"
+  ],
+  "evidence": [
+    {
+      "path": "memory/diagnostics/research-strict-near-tolerance_v2.json",
+      "sha256": "6816175b614239d925df831fa5e681a21a8e33a72c57bc5d81f12389b70d2edc",
+      "source_scope": "Preserved previous method version; follow its original source chain."
+    },
+    {
+      "path": "memory/cases/m2_research_v1/success_trace.json",
+      "sha256": "dfc542104bf051191b49be86bc6bcf9cc0d31d54eaf0a63ce6dfe44404366206",
+      "source_case": "M2",
+      "source_scope": "Sanitized owner-authorized historical trace, not current evidence."
+    }
+  ]
+}

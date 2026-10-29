@@ -1,0 +1,357 @@
+{
+  "schema": "project_research_success_case_v1",
+  "entry_id": "p3-passive-progressive-stiffness-success",
+  "revision": "1",
+  "kind": "success_case",
+  "version": "1",
+  "task": "passive_progressive_stiffness",
+  "structure": "three_segments_two_tendons",
+  "failure_type": "not_applicable",
+  "benchmark_sensitive": true,
+  "retrieval_summary": "被动渐进变刚度的开发成功案例：固定协议、张紧切换、有效消融与独立重放；后续空间检查限定其适用精度。",
+  "status": {
+    "original_task_passed": true,
+    "two_cells_per_segment_passed": true,
+    "four_cells_per_segment": "INVALID",
+    "spatial_generalization": "not_supported",
+    "formal_SELECT": false
+  },
+  "applicability": [
+    "原冻结 P3、对应离散软约束模型和已测载荷；不能转作其他任务的验收证书。",
+    "4 单元在固定原时间步下未通过；不能只归因于空间截断误差，也未证明结构本身无解。"
+  ],
+  "confidence": {
+    "observed_facts": "原 Store 与独立物理回放、逐物理步检查支持",
+    "mechanism": "只在有效稳定配对的 1/2 单元模型支持",
+    "cross_task_generalization": "unverified"
+  },
+  "source_identity": {
+    "source_branch": "codex/passive-progressive-stiffness",
+    "source_commit": "83d9b8f35b4015a924e0f8c32d073607247f92b9",
+    "original_store": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\store\\platform.sqlite",
+    "original_store_sha256": "ef9a8a7636a651ee2d3e00bbd0aaf7e21545898f2edf1ee2779fb9705c2b4ca2",
+    "task_file_sha256": "3f88a70e4461a384969d2173ae7c5da68379556344fd89df3fed7a7e993b064d",
+    "spatial_store": "D:\\softrobot-agent\\.worktrees\\p3-spatial-fidelity\\runs\\p3-spatial-fidelity-v1\\store\\platform.sqlite",
+    "spatial_store_sha256": "e026123e8b384b021f37393bccc53193b7ef373fa686e1d2b5f5be47135a275a",
+    "spatial_code_commit": "e48d4e3a47a304f292ba26fdf3102515a8dbb1e5",
+    "evidence_selection": "Scientific Store/candidate/evaluator artifacts only; no Codex conversation or private reasoning",
+    "decision_semantics": "Recorded next actions and frozen gates. Where no contemporaneous rationale exists, none is reconstructed.",
+    "original_physics_code_commit": "30c3da199fc1f7a34abad784ac8f30ef5a470782",
+    "spatial_evidence_commit": "f0379f8508025f350b6ddfaeaf92c8b8401f0c97"
+  },
+  "trace": [
+    {
+      "step": 1,
+      "action": "冻结被动渐进变刚度任务及物理验收规则。",
+      "observation": "固定材料点、双向连续加载、稳定性和张紧切换门槛；原任务配置哈希绑定进 Store。",
+      "decision": "按冻结门槛开始合法性及静力筛选，不将旧 PHS 内部 P3 标签视为本任务成功。",
+      "evidence": "task; final_freeze#/protocol"
+    },
+    {
+      "step": 2,
+      "action": "检查初始候选 c01 的多载荷静力响应。",
+      "observation": "+X 位移约 21.19/40.37/73.92 mm，刚度比 1.143；低载一根腱已承力约 0.0272 N。",
+      "decision": "后续实际记录改为三段并把腱终止于第二段；Store 未保存该转折的额外因果假设。",
+      "evidence": "c01#/curves/1; c05#/assembly"
+    },
+    {
+      "step": 3,
+      "action": "改变腱终止位置并继续有限合法结构比较。",
+      "observation": "c05 在第二段 0.9 处终止；静力高载位移约 49.89 mm、刚度比 1.031，仍不满足目标。",
+      "decision": "随后实际比较截面、松弛量及长度等合法变量，进入 c16 静力筛选。",
+      "evidence": "c05#/curves/1; c16_static"
+    },
+    {
+      "step": 4,
+      "action": "用原静力/KKT 内核筛选 c16。",
+      "observation": "双向均得到合格局部平衡；+X 位移约 9.276/16.281/21.885 mm，刚度比 2.500。",
+      "decision": "进入完整 MuJoCo 时序验证，静力结果本身不登记为物理成功。",
+      "evidence": "c16_static#/curves; c16_dynamic"
+    },
+    {
+      "step": 5,
+      "action": "执行 c16 连续动力学。",
+      "observation": "第 99,532 次积分后腱长超限达到 50.036 μm，超过冻结的 50 μm，结果 INVALID。",
+      "decision": "保留失败及真实步数；后续记录提高物理黏性，并比较离散精度，不放宽门槛。",
+      "evidence": "c16_dynamic#/full_step_maxima; c17_invalid"
+    },
+    {
+      "step": 6,
+      "action": "继续有限黏性和离散配置比较，并复核未决输出。",
+      "observation": "c17/c18 各完成 160,000 步后序列化失败；原 UNKNOWN 回执保留，只读轨迹复算均因稳定性不足 INVALID。",
+      "decision": "后续实际记录继续有限配置比较至 c25，不把未决输出改写为成功。",
+      "evidence": "c17_invalid#/evaluation; c18_invalid#/evaluation"
+    },
+    {
+      "step": 7,
+      "action": "取得 c25 加载成功后检查机制对照。",
+      "observation": "+X 主结构通过；消融恢复末窗静力残差约 1.146e-5 N·m，高于 1e-5，消融 INVALID。",
+      "decision": "未认定完整机制见证；下一条结构记录 c26 将柔性长度从 220 mm 缩短为 200 mm。",
+      "evidence": "c25_plus#/evaluation; c25_ablation#/evaluation; c26_assembly"
+    },
+    {
+      "step": 8,
+      "action": "冻结 c26 结构并进入独立验证。",
+      "observation": "c26 仍为三段、两根固定被动腱，完整长度 242 mm；预验证获得有效加载和稳定消融数据。",
+      "decision": "冻结设计、离散、放绳长度、XML、协议和代码身份，再执行独立进程重放。",
+      "evidence": "c26_assembly; final_freeze"
+    },
+    {
+      "step": 9,
+      "action": "验证同一结构在 +X/-X 下的真实腱切换。",
+      "observation": "双向低载均为零张力；高载对应腱约 0.647 N，+X 激活 tendon_1、-X 激活 tendon_0，长度残差和约束状态同步验证。",
+      "decision": "使用同一 XML 和固定放绳长度评判双向联合通过，不合并不同结构的单方向结果。",
+      "evidence": "accepted#/cases/plus_x/evaluation/tendon_transitions; accepted#/cases/minus_x/evaluation/tendon_transitions"
+    },
+    {
+      "step": 10,
+      "action": "在两个方向做只禁用腱长限制的配对消融。",
+      "observation": "有效稳定消融使大载位移增加 95.49%、后段刚度下降 81.75%；未删除骨架、导向件或质量实体。",
+      "decision": "在这些已测模型和载荷下接受被动腱的机制贡献；不以无效消融数据作因果证明。",
+      "evidence": "accepted#/mechanism; final_freeze#/cases"
+    },
+    {
+      "step": 11,
+      "action": "完成独立重放、半时间步和初态扰动复核。",
+      "observation": "最终 8 个案例保留 1,600,000 行物理步 CSV；独立检查和回放校验通过，原 1 单元开发见证成立。",
+      "decision": "停止结构搜索并导出；当时尚未验证空间离散收敛。",
+      "evidence": "accepted#/cases; accepted_validation"
+    },
+    {
+      "step": 12,
+      "action": "本轮固定连续设计，仅比较每段 1/2/4 单元。",
+      "observation": "1、2 单元双向 PASS；4 单元双向 INVALID，高载张力间歇归零且末窗速度/静力残差超限，4 单元机制对照 UNKNOWN。",
+      "decision": "保留原 PASS，注明空间/约束数值耦合敏感性；不把未稳定均值称为静态收敛，不调整结构修复。",
+      "evidence": "spatial#/meshes; spatial#/changes"
+    }
+  ],
+  "sources": {
+    "task": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\configs\\research\\passive_progressive_stiffness_dev_v1.json",
+      "sha256": "3f88a70e4461a384969d2173ae7c5da68379556344fd89df3fed7a7e993b064d",
+      "evidence_refs": []
+    },
+    "c01": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\screens\\c01.json",
+      "sha256": "04b002323e42e88abab6ce7eb474507a66fef3812b2a49f218bb2df927ff351e",
+      "evidence_refs": [
+        {
+          "artifact_id": "5420c4169ffe3ffcf987147eae6abca5c3ff32feb18742dc4748ec89554c6700",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "93104680a23f9916e66ae3a8a6c339bc42991c6bcf4f4ba2ebaa9c42212817b3",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "eb5cffbf28cb2801d9a02afad729ae73eed0407df89249c33d78d226339dcc93",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7ecafd6f8e14c41102ed7a504e5dcd37a515f6707de8e58c35d30e0fe29ea28f",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c05": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\screens\\c05.json",
+      "sha256": "85170045feb251f13b3ac7f05b612578ca5a9a340e49030ce34102c5f1fd89a1",
+      "evidence_refs": [
+        {
+          "artifact_id": "9a89a16a6364881a557d5a14eb9b87f401dc0e17a4d81f237544b83e9b81ac4c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cfcfeea9ee529ab2a690f6ef3c585d04833658520fbf4c9eaa6a9aa6b53aba85",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "24490a0572d89af5fc25bc6066488e707ddb862a6cdf8ebefeb34b19625b6a60",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "85640add812a36a443c206c90b17406f41db70a8e04afcfe46ff8123b25c7e85",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c16_static": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\screens\\c16.json",
+      "sha256": "105bd03f6c9fccce7bede7aa639d5b9eaa290659bc416b7d61eb9956ccea96da",
+      "evidence_refs": [
+        {
+          "artifact_id": "7d90ff91f70b030c0a304568aa978c36c1c74dfbc1465b0bdc0c3dc4c83b696f",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "3e7cad1cd2b496ddcd246e6dcb2b14a699fe08f3503d827ceef011e9e6144cbe",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "67e2001ade0d89c320da6230c93b202d0ae7ac1d7e94a36a790091d242201ae8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4858d6de4b1c13cdc859e99f0437ac0a6f40b31781d8e9b269c8e3a16d0d8757",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "8911914e231547b32110621679092b926a09a97bee958d280c3adbaddf006a01",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "32621df89eebc4d19f22af5c89a7d0614eb84cf09918cdd93e162a7ea75680d4",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "0a93906d604eb5fd3a590ff216b5a79b4332bd2d48109b2bd2f91b9c21349dd3",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a68855afea32ac4f323359c3ebc62fe24068ee83e8928e77843457df608490e7",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "c16_dynamic": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\requests\\passive-9918e2b9ff0a33486e320ca8196167215732d9c6c4dd2503a1e2763c129cc9a8.json",
+      "sha256": "998c403eddf091fbc61feeadc5d7c9ca4f73307cd8496ec726b95e72e2a7d621",
+      "evidence_refs": [
+        {
+          "artifact_id": "df4ed646d06ef526d75b7409588ae504c1ee5606a575f65d220e4e4c2c7537f0",
+          "media_type": "application/json"
+        }
+      ],
+      "event_sequences": [
+        217
+      ]
+    },
+    "c17_invalid": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\requests\\passive-fdc882d5e3b5dcdaf07a2d1da1261ec8074b0187d673a9bb1e109f87a5580051.json",
+      "sha256": "8cac0fd817577bc7af800c14f465069ceed9b5fcf38fec59bbf4a3d86bcc5ea2",
+      "evidence_refs": [
+        {
+          "artifact_id": "12da114f02afaab3e4d28ce721f1963df491484862d86a626c87227db5961a2a",
+          "media_type": "application/json"
+        }
+      ],
+      "event_sequences": [
+        255
+      ]
+    },
+    "c18_invalid": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\requests\\passive-e579d83128d680fae6085781cb141ad8e37b205b6aecf014f69843e8c4adc5d3.json",
+      "sha256": "b19be7a61f021122f7998844715c21f88fc041aa6f9c3f76ea8baef82a23c7ac",
+      "evidence_refs": [
+        {
+          "artifact_id": "9f813ac66c230198623b4cb95b88b48b7c936d72fcbab63eefdf56cf1eaff1ea",
+          "media_type": "application/json"
+        }
+      ],
+      "event_sequences": [
+        257
+      ]
+    },
+    "c25_plus": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\requests\\passive-fa36e5fa4e7ac396f825f38d29a66591ce88c10023cb7938484fe01baf697215.json",
+      "sha256": "211b0a4c33581165816e2501dd10e17ceb8263e751a3e5055b07f85718bfda5e",
+      "evidence_refs": [
+        {
+          "artifact_id": "a119b49c5bb202e67f323457e9945e0d4ddd591fa5ae3d46a132a0d3a1ec8e52",
+          "media_type": "application/json"
+        }
+      ],
+      "event_sequences": [
+        379
+      ]
+    },
+    "c25_ablation": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\requests\\passive-d91ea4d8b20ca29df35c51aafc7ef65564961e8d47bf27d0d8ca6aac38794859.json",
+      "sha256": "ef652d680961cff858bfbf3e0b594532b9279c87c4d4ae2b75c28b29f5781200",
+      "evidence_refs": [
+        {
+          "artifact_id": "c8ac1e61aed6f5c61c3c28c2c2d09a91a632782227908424e3cb1b359c490de7",
+          "media_type": "application/json"
+        }
+      ],
+      "event_sequences": [
+        383
+      ]
+    },
+    "c26_assembly": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\candidates\\c26.json",
+      "sha256": "268a936b297e779772b1fc1ea67886737ac93c7108ec70f2d6bad1a09d841f43",
+      "evidence_refs": [
+        {
+          "artifact_id": "d54ea76153ee568e7ed0d1fbdf8293c7398e67f1d13213878fb9f5403208baa7",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "final_freeze": {
+      "path": "D:\\softrobot-agent\\.worktrees\\passive-progressive-stiffness\\runs\\passive-progressive-stiffness-v1\\final_freeze.json",
+      "sha256": "e657c7ed3fa36a40e0e4e03706ed0735c49558cea31a4a666a8b7070f995c7ce",
+      "evidence_refs": []
+    },
+    "accepted": {
+      "path": "D:\\softrobot-benchmark-exports\\base_only_accepted_20261028\\P3_passive_progressive_stiffness\\summary.json",
+      "sha256": "e4333330de7f67324625416b67086a20a98fba841d8b3232c2d63f1c5b9cbaa4",
+      "evidence_refs": []
+    },
+    "accepted_validation": {
+      "path": "D:\\softrobot-benchmark-exports\\base_only_accepted_20261028\\P3_passive_progressive_stiffness\\validation.json",
+      "sha256": "fad8b5ed0a90c17c47fe029511e226f7f1baad612770b2baa5b7ef8210d734bb",
+      "evidence_refs": []
+    },
+    "spatial": {
+      "path": "D:\\softrobot-agent\\.worktrees\\p3-spatial-fidelity\\runs\\p3-spatial-fidelity-v1\\spatial_fidelity_comparison.json",
+      "sha256": "9af882c13d73b2edd60a272ca6bce488add6d352f76cc2897f2e17c296a1ed04",
+      "evidence_refs": [
+        {
+          "artifact_id": "ec708b2ee3720be56d4317a9ea4dfc980fbd2e541c8882409e81e077d65fa3b9",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b6232da9d03d45751f7f2dc4aa0126ac50572e33f821337404f2fe84c4ddb7c2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe564afd1b3da6836717683f49028ec21570932977ecbb3f0773b010a13de8d0",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e7494d1275da47cfd91a34caa84196a169f49bd407df9e569c78c60ddd27bf06",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "f4eb398dd292e638be9508d049de619da1b8a74db458d0c76586af956bf2b91b",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1e0a4f050bdf0b307e41f2fcc4395be6027909de4b32e090c674e916a1436afd",
+          "media_type": "application/json"
+        }
+      ]
+    }
+  },
+  "bindings": {
+    "task_id": "passive_progressive_stiffness_dev_v1",
+    "task_digest": "7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+    "continuous_design_digest": "15f653c2e9f6facc74dfc71bb8c102f2188412b7b7c48260f5ed79b6bd195f4e",
+    "candidate": {
+      "artifact_id": "d54ea76153ee568e7ed0d1fbdf8293c7398e67f1d13213878fb9f5403208baa7",
+      "media_type": "application/json"
+    },
+    "discretization": {
+      "cells": {
+        "segment_0": 1,
+        "segment_1": 1,
+        "segment_2": 1
+      },
+      "coordinates": "two_principal_bending_angles_per_cell",
+      "model": "serial_bending_cells_v1",
+      "version": "serial_bending_discretization_v1"
+    },
+    "source_study": "passive_progressive_stiffness_dev_v1"
+  }
+}

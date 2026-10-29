@@ -1,0 +1,58 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-timed-tracking",
+  "revision": "2",
+  "kind": "procedure",
+  "authored_language": "en",
+  "language_origin": {
+    "kind": "authored_english",
+    "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+    "human_review": "not_claimed"
+  },
+  "retrieval_summary": "Evaluate time-indexed tracking predicates over the full frozen grid, rather than substituting endpoint reach.",
+  "trigger": "Evaluate time-indexed tracking predicates over the full frozen grid, rather than substituting endpoint reach.",
+  "procedure": [
+    "A good terminal point can coexist with intermediate tracking error. Position, directed axis, speed and contact predicates are conjunctive when required.",
+    "Use the frozen reference r(t), sample phase and scoring window. Separate an inclusive formal grid from denser diagnostic samples; neither silently replaces the other.",
+    "M4 recorded a first-replay accepted calibration with no intermediate scientific failure. BF4 finite failures and later continuation are different cases, not M4 milestones.",
+    "C1 retained an intersample speed overshoot despite formal-grid acceptance. Finite sampled acceptance is not a continuous-time certificate."
+  ],
+  "bindings": {
+    "task": "tracking",
+    "structure": "tendon_robot_family",
+    "physics": "Check task-local model, load, constraints and validity before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "generalization": "unverified",
+    "current_scientific_evidence": false
+  },
+  "applicability": [
+    "Unmeasured intermediate behavior, changed timing or missing output signals invalidate transfer; do not transfer historical controls."
+  ],
+  "escalation": "Obtain current scoped evidence and separate action authorization; retain original evaluator and budgets.",
+  "source_case_ids": [
+    "BF4",
+    "M4",
+    "C1"
+  ],
+  "evidence": [
+    {
+      "path": "memory/diagnostics/research-timed-tracking_v1.json",
+      "sha256": "4cadae7c9fb0784397d8231a5a863f69cac40b2483943011ef29cfd22425839f",
+      "source_scope": "Preserved previous method version; follow its original source chain."
+    },
+    {
+      "path": "memory/cases/m4_research_v1/success_trace.json",
+      "sha256": "ccfd202130145d178a0fbebb7a9c3aeb2a302ffdbd8424bc5dd6d8d2e2ea55f9",
+      "source_case": "M4",
+      "source_scope": "Sanitized owner-authorized historical trace, not current evidence."
+    },
+    {
+      "path": "memory/cases/c1_multicondition_research_v1/success_trace.json",
+      "sha256": "d647ad3f5c06420706eea6f3adcdbf328db6020d6014e5f831aa45cf35c507bb",
+      "source_case": "C1",
+      "source_scope": "Sanitized owner-authorized historical trace, not current evidence."
+    }
+  ]
+}

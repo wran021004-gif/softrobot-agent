@@ -173,6 +173,513 @@
         "basis": "New English synthesis of hash-verified original historical summaries; not a reviewed translation.",
         "human_review": "not_claimed"
       }
+    },
+    {
+      "entry_id": "p3-passive-progressive-stiffness-success",
+      "revision": "1",
+      "kind": "success_case",
+      "task": "passive_progressive_stiffness",
+      "structure": "three_segments_two_tendons",
+      "failure_type": "not_applicable",
+      "version": "1",
+      "path": "memory/cases/p3_passive_progressive_stiffness_v1/success_trace.json",
+      "status": "reference_backed_scoped",
+      "summary": "被动渐进变刚度的开发成功案例：固定协议、张紧切换、有效消融与独立重放；后续空间检查限定其适用精度。",
+      "confidence": {
+        "observed_facts": "原 Store 与独立物理回放、逐物理步检查支持",
+        "mechanism": "只在有效稳定配对的 1/2 单元模型支持",
+        "cross_task_generalization": "unverified"
+      },
+      "applicability_summary": [
+        "原冻结 P3、对应离散软约束模型和已测载荷；不能转作其他任务的验收证书。",
+        "4 单元在固定原时间步下未通过；不能只归因于空间截断误差，也未证明结构本身无解。"
+      ],
+      "benchmark_sensitive": true,
+      "introduced_in": "p3_knowledge_v1",
+      "source_case_ids": [
+        "P3"
+      ],
+      "decision_ownership": {
+        "orchestration": "Codex/operator plus fixed scripts",
+        "numeric": "original static/KKT and MuJoCo programs",
+        "llm_autonomous": false
+      },
+      "historical_costs": {
+        "original": {
+          "math_requests": 161,
+          "physics_step_attempts": 3619532
+        },
+        "spatial": {
+          "math_requests": 2,
+          "physics_step_attempts": 960000
+        }
+      },
+      "metadata_scope": "Supplement to unchanged original P3 trace; original and spatial costs are separate campaigns, money invoice unknown."
+    },
+    {
+      "entry_id": "passive-force-response-research",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "passive_progressive_stiffness",
+      "structure": "serial_passive_soft_arm",
+      "failure_type": "not_applicable",
+      "version": "1",
+      "path": "memory/diagnostics/passive-force-response-research_v1.json",
+      "status": "reference_backed_scoped",
+      "summary": "用张力/长度/活跃集核查机制；静力后做连续动力学、有效消融、时空离散检查，明确未决边界。",
+      "confidence": {
+        "observations": "reference_backed",
+        "physical_interpretation": "within valid paired models",
+        "generalization": "hypothesis requiring task-local validation"
+      },
+      "applicability_summary": [
+        "适用于含被动约束、分阶段外载或结构机制归因的软体机器人研究。",
+        "推荐动作是待新任务检验的方法经验，不是可复用的获胜设计。"
+      ],
+      "applicable_tasks": [
+        "passive_force_response",
+        "soft_robot_research",
+        "reach_and_hold",
+        "tracking"
+      ],
+      "applicable_structures": [
+        "tendon_robot_family",
+        "tendon_soft_arm"
+      ],
+      "introduced_in": "p3_knowledge_v1",
+      "source_case_ids": [
+        "P3"
+      ]
+    },
+    {
+      "entry_id": "owner-m1-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m1_research_v1/success_trace.json",
+      "task": "reach_and_hold",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M1: scoped historical research milestones; original registered task accepted; not autonomous LLM discovery.",
+      "source_case_ids": [
+        "M1"
+      ]
+    },
+    {
+      "entry_id": "owner-m2-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m2_research_v1/success_trace.json",
+      "task": "reach_and_hold",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M2: scoped historical research milestones; original registered task accepted; not autonomous LLM discovery.",
+      "source_case_ids": [
+        "M2"
+      ]
+    },
+    {
+      "entry_id": "owner-m3-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m3_research_v1/success_trace.json",
+      "task": "reach_and_hold",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M3: scoped historical research milestones; development draft, not formal Benchmark approval.",
+      "source_case_ids": [
+        "M3"
+      ]
+    },
+    {
+      "entry_id": "owner-m4-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m4_research_v1/success_trace.json",
+      "task": "tracking",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M4: scoped historical research milestones; original registered task accepted; not autonomous LLM discovery.",
+      "source_case_ids": [
+        "M4"
+      ]
+    },
+    {
+      "entry_id": "owner-m5-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m5_research_v1/success_trace.json",
+      "task": "position_tool_axis",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M5: scoped historical research milestones; original registered task accepted; not autonomous LLM discovery.",
+      "source_case_ids": [
+        "M5"
+      ]
+    },
+    {
+      "entry_id": "owner-m6-research-trace",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/m6_research_v1/success_trace.json",
+      "task": "oriented_tracking",
+      "structure": "base_only_two_segments_six_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise curation of owner-authorized original cards and verified Store/export identities.",
+        "human_review": "not_claimed"
+      },
+      "summary": "M6: scoped historical research milestones; original registered task accepted; not autonomous LLM discovery.",
+      "source_case_ids": [
+        "M6"
+      ]
+    },
+    {
+      "entry_id": "c1-multicondition-research",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/c1_multicondition_research_v1/success_trace.json",
+      "task": "multicondition_reach_tool_axis",
+      "structure": "base_only_four_tendons",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise synthesis of hash-verified original research reports and scoped evidence.",
+        "human_review": "not_claimed"
+      },
+      "summary": "C1: one structure passed four original sampled protocols; four is the smallest successful tested tendon count, not a global minimum.",
+      "source_case_ids": [
+        "C1"
+      ]
+    },
+    {
+      "entry_id": "phs2d-passive-research",
+      "revision": "1",
+      "kind": "success_case",
+      "path": "memory/cases/phs2d_passive_research_v1/success_trace.json",
+      "task": "passive_head_stabilization",
+      "structure": "serial_passive_soft_arm",
+      "failure_type": "historical_research",
+      "version": "1",
+      "status": "reference_backed_scoped",
+      "benchmark_sensitive": true,
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New concise synthesis of hash-verified original research reports and scoped evidence.",
+        "human_review": "not_claimed"
+      },
+      "summary": "PHS-2D: ten-condition development numerical witness with bounded independent checks; no registered TaskAdapter/SELECT or general passive-stability proof.",
+      "source_case_ids": [
+        "PHS2D"
+      ]
+    },
+    {
+      "entry_id": "research-timed-tracking",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-timed-tracking_v2.json",
+      "task": "tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Evaluate time-indexed tracking predicates over the full frozen grid, rather than substituting endpoint reach.",
+      "applicable_tasks": [
+        "tracking"
+      ],
+      "source_case_ids": [
+        "BF4",
+        "M4",
+        "C1"
+      ]
+    },
+    {
+      "entry_id": "research-strict-near-tolerance",
+      "revision": "3",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-strict-near-tolerance_v3.json",
+      "task": "position_tool_axis",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Preserve unrounded joint residuals and original evaluator thresholds before considering finite continuation.",
+      "applicable_tasks": [
+        "position_tool_axis",
+        "reach",
+        "reach_and_hold",
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF5",
+        "BF6",
+        "M2"
+      ]
+    },
+    {
+      "entry_id": "research-stable-start",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-stable-start_v2.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Establish a complete, correctly loaded execution before interpreting task-performance differences.",
+      "applicable_tasks": [
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF6",
+        "M6",
+        "C1"
+      ]
+    },
+    {
+      "entry_id": "research-contact-causality",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-contact-causality_v2.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Use phase-aligned diagnostics and competing hypotheses to distinguish contact, instability and numerical failure.",
+      "applicable_tasks": [
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF6",
+        "M6",
+        "PHS-2D"
+      ]
+    },
+    {
+      "entry_id": "research-bounded-continuation",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-bounded-continuation_v2.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "BF4",
+        "BF6",
+        "M1",
+        "M2",
+        "M3"
+      ]
+    },
+    {
+      "entry_id": "research-witness-and-cost",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-witness-and-cost_v2.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Keep numerical witnesses, independent acceptance, same-structure joint conditions and actual resource ledgers distinct.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "BF5",
+        "BF6",
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "C1",
+        "PHS-2D",
+        "P3"
+      ]
+    },
+    {
+      "entry_id": "passive-force-response-research",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/passive-force-response-research_v2.json",
+      "task": "passive_force_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Validate unilateral constraint activation and finite loaded dynamics after geometry or static/KKT screening.",
+      "applicable_tasks": [
+        "passive_force_response",
+        "passive_progressive_stiffness",
+        "passive_head_stabilization",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "P3",
+        "PHS-2D"
+      ]
+    },
+    {
+      "entry_id": "model-physics-comparison",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/model-physics-comparison_v1.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "C1",
+        "PHS-2D",
+        "P3"
+      ]
     }
   ]
 }

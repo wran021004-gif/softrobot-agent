@@ -1,0 +1,59 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "passive-force-response-research",
+  "revision": "2",
+  "kind": "procedure",
+  "authored_language": "en",
+  "language_origin": {
+    "kind": "authored_english",
+    "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+    "human_review": "not_claimed"
+  },
+  "retrieval_summary": "Validate unilateral constraint activation and finite loaded dynamics after geometry or static/KKT screening.",
+  "trigger": "Validate unilateral constraint activation and finite loaded dynamics after geometry or static/KKT screening.",
+  "procedure": [
+    "For the recorded ideal fixed-payout model, g(q)=ell(q)-L<=0, lambda>=0 and lambda*g=0. Equilibrium uses grad U+Jell.T*lambda-JF.T*F=0.",
+    "On a fixed regular taut set, the constrained tangent system is [Kt,JA.T;JA,0][dq;dlambda]=[JF.T*dF;0]. Kt includes geometric and load terms; at switching or degeneracy ordinary derivatives may not apply.",
+    "Geometric Jacobian matching does not prove real finite-force response: slackening, unilateral activation and deformation can change the admissible modes. Check actual lengths, tensions, shape and force excitation.",
+    "P3 static screening passed before dynamic invalidity. Valid paired ablation supported the tested mechanism only when both responses were stable; invalid ablation left it unresolved.",
+    "PHS-2D retained early equilibrium and valid-performance failures before its ten-condition development witness. Time refinement, spatial refinement and physical validation remain separate.",
+    "P3 one/two-cell results passed while four-cell response was INVALID at the original time step; do not hide that counterexample or infer a unique spatial-error cause."
+  ],
+  "bindings": {
+    "task": "passive_force_response",
+    "structure": "tendon_robot_family",
+    "physics": "Check task-local model, load, constraints and validity before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "generalization": "unverified",
+    "current_scientific_evidence": false
+  },
+  "applicability": [
+    "Finite tested equilibria and grids do not prove universal passive stability, hard-rope/soft-constraint equivalence, global nonlinear feasibility or hardware behavior."
+  ],
+  "escalation": "Obtain current scoped evidence and separate action authorization; retain original evaluator and budgets.",
+  "source_case_ids": [
+    "P3",
+    "PHS-2D"
+  ],
+  "evidence": [
+    {
+      "path": "memory/diagnostics/passive-force-response-research_v1.json",
+      "sha256": "08350c8cc73b421fb9f82f814dba3045fd47d83d3bcbc986fc2c4194bc66ca88",
+      "source_scope": "Preserved previous method version; follow its original source chain."
+    },
+    {
+      "path": "memory/cases/p3_passive_progressive_stiffness_v1/success_trace.json",
+      "sha256": "cf18ffb5124a61bf7f7bdd8c39d590bdc710163a65d9bdcfc8fe37794285cdd7",
+      "source_case": "P3",
+      "source_scope": "Sanitized owner-authorized historical trace, not current evidence."
+    },
+    {
+      "path": "memory/cases/phs2d_passive_research_v1/success_trace.json",
+      "sha256": "9bc9cb8c81dfead0aa8627e650f21136246395474f15bbe5b7fdb5f82411bee8",
+      "source_case": "PHS-2D",
+      "source_scope": "Sanitized owner-authorized historical trace, not current evidence."
+    }
+  ]
+}
