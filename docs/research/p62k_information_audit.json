@@ -1,0 +1,134 @@
+{
+  "report": {
+    "source_store": "D:\\softrobot-agent\\.worktrees\\p6-2f-scientific-information-repair\\runs\\research\\p62f-luna-20261029\\platform.sqlite",
+    "source_study": "p62f-luna-20261029",
+    "report_reference": {
+      "artifact_id": "0b3b39a3bf3f2f3ae8c83801d657db74447df2a68c2001cde03e361cdf85f74f",
+      "media_type": "application/json"
+    },
+    "historical_state": {
+      "artifact_id": "c51ddcf4856294388cf352f29d2a97894f74c8048bcacd3c9977e1de4ee97627",
+      "media_type": "application/json"
+    },
+    "historical_handoff_event": 96,
+    "original_full_read_event": 99,
+    "original_rejected_plan_event": 53,
+    "rejected_action": "diagnose",
+    "rejected_method": "endpoint",
+    "rejected_selected_candidate": null,
+    "requested_budget": 0,
+    "original_max_main_input_tokens": 109144,
+    "full_bytes": 287721,
+    "summary_bytes": 54442,
+    "interpretations_bytes": 10673,
+    "summary_fraction": 0.1892180271860587,
+    "result_count": 3,
+    "original_metrics_preserved": 13,
+    "failed_metrics_preserved": 4,
+    "quantitative_facts_equal": true,
+    "conclusion_scopes_equal": true,
+    "all_original_sources_retained": true,
+    "interpretation_non_authoritative": true,
+    "full_read_unchanged": true,
+    "formal_read_credit": false,
+    "resource_comparisons": [
+      {
+        "resource": "numerical_s",
+        "value": 3212.3950461999048,
+        "baseline": 3321.8154292001855,
+        "delta": -109.42038300028071,
+        "unit": "s",
+        "time_basis": "recorded_elapsed_unspecified",
+        "numeric_change": "decrease",
+        "preference": "unknown",
+        "direction": "unknown",
+        "source": {
+          "reference": {
+            "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+            "media_type": "application/json"
+          },
+          "pointer": "/numerical_s"
+        },
+        "baseline_source": {
+          "reference": {
+            "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+            "media_type": "application/json"
+          },
+          "pointer": "/numerical_s"
+        },
+        "comparable": false,
+        "scope": "Recorded resource arithmetic only; no efficiency ranking, causal attribution or additive cost claim."
+      },
+      {
+        "resource": "simulation_wall_s",
+        "value": 3210.219000000041,
+        "baseline": 3316.3910000000615,
+        "delta": -106.17200000002049,
+        "unit": "s",
+        "time_basis": "recorded_elapsed_unspecified",
+        "numeric_change": "decrease",
+        "preference": "unknown",
+        "direction": "unknown",
+        "source": {
+          "reference": {
+            "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+            "media_type": "application/json"
+          },
+          "pointer": "/acceptance/timing/simulation_wall_s"
+        },
+        "baseline_source": {
+          "reference": {
+            "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+            "media_type": "application/json"
+          },
+          "pointer": "/acceptance/timing/simulation_wall_s"
+        },
+        "comparable": false,
+        "scope": "Recorded resource arithmetic only; no efficiency ranking, causal attribution or additive cost claim."
+      }
+    ],
+    "provider_requests": 0,
+    "scientific_executions": 0
+  },
+  "minimum_problem": {
+    "source_case": "M1",
+    "source_study": "base-only-m1-20261028-r2",
+    "candidate": {
+      "artifact_id": "fef9a8198996105575d5d954ba7b24ab26b38722e56640fd476bfa39f5e2651a",
+      "media_type": "application/json"
+    },
+    "candidate_owned_in_original_study": true,
+    "source_store": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M1\\private-store\\platform.sqlite",
+    "source_selected": {
+      "artifact_id": "9e06f5455e3a9961f7139eef5a0624b121f26fc7b87b016a0a769c3f1b909136",
+      "media_type": "application/json"
+    },
+    "task_family": "task.reach",
+    "parameters": [
+      {
+        "parameter_id": "segments.0.length_m",
+        "unit": "m",
+        "minimum": 0.08,
+        "maximum": 0.24,
+        "domain_source": "segment_domains.0.length_m",
+        "continuous_perturbation": true
+      },
+      {
+        "parameter_id": "segments.1.length_m",
+        "unit": "m",
+        "minimum": 0.06,
+        "maximum": 0.2,
+        "domain_source": "segment_domains.1.length_m",
+        "continuous_perturbation": true
+      }
+    ],
+    "metric": "best_found_J: maximum normalized signed task excess under fixed finite T1 budget",
+    "methods": [
+      "mujoco-nonlinear-task-capability-v1",
+      "mujoco-reoptimized-structure-response-v1"
+    ],
+    "no_new_parameter_samples": true,
+    "no_new_worker_or_gradient": true,
+    "scope": "Declared continuous parameter domains only; perturbed candidates still require existing compilation/admission and fresh scientific authorization. No derivative or improved design is claimed."
+  }
+}

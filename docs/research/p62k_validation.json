@@ -1,0 +1,76 @@
+{
+  "version": "p62k_validation_v1",
+  "prior_full_regression": {
+    "tests": 127,
+    "elapsed_s": 204.932,
+    "passed": true,
+    "scope": "14 relevant modules before the final report-summary/menu additions"
+  },
+  "final_targeted_regression": {
+    "tests": 100,
+    "elapsed_s": 133.58,
+    "passed": true,
+    "modules": [
+      "test_p62k_knowledge",
+      "test_information_flow",
+      "test_p62f_repair",
+      "test_research_reporting",
+      "test_evidence_policy",
+      "test_study_private_experience",
+      "test_research_knowledge",
+      "test_s129_agent_reporting",
+      "test_provider_v2",
+      "test_openai_api"
+    ]
+  },
+  "measurements": {
+    "scope": "Synthetic English oriented_tracking fixture; knowledge portion of L0 only, not the whole Provider request.",
+    "old_hint_bytes": 349,
+    "new_hint_bytes": 1157,
+    "hint_count": 2,
+    "metadata_only": true,
+    "no_auto_receipts": true,
+    "experience_query_schema_bytes": 1158,
+    "default_search_limit": null,
+    "runtime_hash_gate": false,
+    "policy_validation": "Once at resolve; no repeat validation on retrieval",
+    "search_body_reads": false,
+    "worker_executions": 0,
+    "real_provider_requests": 0
+  },
+  "original_report_audit": "docs/research/p62k_information_audit.json",
+  "original_source_recheck": {
+    "files": 111,
+    "matched": 111,
+    "changed": 0,
+    "unavailable": 0
+  },
+  "unchanged_baseline_failures": {
+    "baseline": "9d2ca3e288b41cfe425e34eac2555f3465d9f0d0",
+    "module": "test_c1_method_context",
+    "tests": [
+      "test_observed_navigation_and_native_handoff_errors",
+      "test_four_frozen_contexts_preserve_science_and_reduce_only_dynamic_input",
+      "test_method_planning_and_execution_applicability_remain_distinct"
+    ],
+    "original_baseline_reproduction": {
+      "tests": 3,
+      "elapsed_s": 28.021,
+      "passed": false
+    },
+    "status": "Same one Mock lookup error and two historical expectation failures reproduced on untouched P6-F; not changed or counted as passing."
+  },
+  "real_execution": {
+    "provider_requests": 0,
+    "mathematical_workers": 0,
+    "physical_workers": 0,
+    "nmpc": 0,
+    "rl": 0
+  },
+  "scientific_admission": "admit_decision and Plan/AnalysisRequest/EvidenceQuery AST unchanged from P6-F",
+  "limitations": [
+    "No real post-repair Main run or new scientific validation; all SDK requests were MockTransport fixtures.",
+    "Historical source audit hashes are provenance only; no new runtime content hash gate.",
+    "Original P3 Trace remains Chinese and is not mislabeled as a reviewed English source."
+  ]
+}
