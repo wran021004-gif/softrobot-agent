@@ -37,5 +37,13 @@ class AcceptanceTests(unittest.TestCase):
         for module,function in entries.items():
             with self.subTest(module=module):self.assertTrue(callable(getattr(importlib.import_module(module),function)))
 
+    def test_gateway_model_is_registered_for_formal_input_compilation(self):
+        from tools.platform_registry import registry
+        from tools.platform_tasks import compile_input
+        spec=resolve(ROOT/'configs/research/study_p5_luna_none.json')
+        snapshot=compile_input(spec['configuration'],registry())
+        self.assertIn('chatgpt_gateway@8.0.0',list(snapshot['dependencies']))
+        self.assertEqual(snapshot['input']['policy']['model']['adapter'],'chatgpt_gateway')
+
 
 if __name__=='__main__':unittest.main()
