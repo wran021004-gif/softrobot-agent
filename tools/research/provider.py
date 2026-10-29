@@ -43,9 +43,10 @@ def gateway_history(host, messages):
 def request_settings(provider):
     """One wire contract for Main, Reporter, validation and offline probes."""
     adapter=provider['adapter']
-    if adapter not in ('deepseek','chatgpt_gateway'):
+    if adapter not in ('deepseek','chatgpt_gateway','openai_api'):
         raise ValueError('UNSUPPORTED_RESEARCH_PROVIDER')
     result=dict(model=provider['model'],stream=False)
+    if adapter=='openai_api':result['store']=False
     reasoning=provider.get('reasoning')
     if reasoning is not None:
         if reasoning not in ('none','medium'):raise ValueError('REASONING_MUST_BE_NONE_OR_MEDIUM')
@@ -59,10 +60,10 @@ def request_settings(provider):
     elif adapter=='deepseek':
         result.update(thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'])
     else:
-        raise ValueError('GATEWAY_REQUIRES_EXPLICIT_REASONING_PROFILE')
+        raise ValueError(('OPENAI_API' if adapter=='openai_api' else 'GATEWAY')+'_REQUIRES_EXPLICIT_REASONING_PROFILE')
     if provider.get('max_tokens') is not None:
         if adapter=='chatgpt_gateway':raise ValueError('GATEWAY_OUTPUT_CAP_UNSUPPORTED')
-        result['max_tokens']=provider['max_tokens']
+        result['max_completion_tokens' if adapter=='openai_api' else 'max_tokens']=provider['max_tokens']
     return result
 
 
@@ -97,13 +98,17 @@ def credential(provider, path):
         load_credential(Path(path).expanduser())
         return os.environ['DEEPSEEK_API_KEY']
     config=json.loads(Path(path).expanduser().read_text(encoding='utf-8-sig'))
+    prefix='OPENAI_API' if provider['adapter']=='openai_api' else 'GATEWAY'
     configured=config['base_url'].rstrip('/')
     target=provider['base_url'].rstrip('/')
     if target not in (configured,configured+'/v1'):
-        raise ValueError('GATEWAY_CREDENTIAL_ENDPOINT_MISMATCH')
+        raise ValueError(prefix+'_CREDENTIAL_ENDPOINT_MISMATCH')
     if config.get('model') and provider.get('model') and config['model']!=provider['model']:
-        raise ValueError('GATEWAY_CREDENTIAL_MODEL_MISMATCH')
-    return config['api_key']
+        raise ValueError(prefix+'_CREDENTIAL_MODEL_MISMATCH')
+    key=config['api_key']
+    if provider['adapter']=='openai_api' and not key.strip():
+        raise ValueError('OPENAI_API_KEY_MISSING_FILL_LOCAL_CREDENTIAL_FILE')
+    return key
 
 
 async def discover_models(provider, api_key, *, transport=None):
