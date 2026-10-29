@@ -11,6 +11,18 @@ from tests.research.test_p5_budget import provision, plan
 
 
 class P5ContextTests(unittest.TestCase):
+    def test_focused_plan_rules_remain_nested_and_reject_wrong_intent(self):
+        h=provision();spec=state(h)['spec']
+        for action in spec['allowed_plan_actions']:
+            schema=plan_schema([action],decision_required=True,family_version=spec['family_space']['version'],
+                diagnose_candidate_required=True,focused=True,study=spec)
+            Draft202012Validator.check_schema(schema)
+            self.assertEqual(schema['type'],'object')
+            self.assertFalse(set(schema)&{'allOf','anyOf','oneOf','enum','const','not'})
+        schema=plan_schema(['generate'],decision_required=True,family_version=spec['family_space']['version'],focused=True,study=spec)
+        value=plan(h,'generate');value['decision']['research_intent']='STOP'
+        with self.assertRaises(ValidationError):Draft202012Validator(schema).validate(value)
+
     def test_closeout_keeps_stop_when_previous_plan_action_is_no_longer_available(self):
         h=provision();s=state(h)
         route=save(h,dict(tool='research_plan',action='initialize_control'),'offline_route_fixture')

@@ -115,8 +115,18 @@ def compact_plan_schema(schema, action, study):
         owners=condition.get('action',{}).get('enum')
         if set(condition)=={'action'} and owners is not None:
             if action in owners:branches.append(branch.get('then',{}))
+        elif set(condition)=={'action'} and 'not' in condition['action']:
+            if action not in condition['action']['not']['enum']:branches.append(branch['then'])
+        elif set(condition)=={'action','decision'} and condition['action'].get('const')==action:
+            branches.append(dict(properties=dict(decision=dict(
+                **{'if':condition['decision']},then=branch['then']['properties']['decision']))))
         else:branches.append(branch)
-    schema['allOf']=branches
+    # The action is fixed. Keep its constraints on the original properties;
+    # official function tools reject composition keywords at the object root.
+    schema.pop('allOf',None)
+    for branch in branches:
+        for name,constraint in branch['properties'].items():
+            schema['properties'][name]={'allOf':[schema['properties'][name],constraint]}
     if action=='generate':
         space=study['family_space'];name='GenerationRequestV2' if space['version']=='serial_family_space_v2' else 'GenerationRequest'
         # Plan's legacy union default is v1; do not advertise omission as v2.
