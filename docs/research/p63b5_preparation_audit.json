@@ -1,0 +1,355 @@
+{
+  "scope": "Offline preparation only; no real Provider, Native model, mathematical or physical Worker.",
+  "baseline_commit": "b1e51c1579ef88e56c323da9a2283ca3a3d360e1",
+  "historical_audit": "docs/research/p63b4_m_live_audit.json",
+  "b4_failures": [
+    {
+      "request_number": 9,
+      "tool_use_id": "call_4bc244130dac4f159ec3c65edc2dda71",
+      "binding_reference": {
+        "artifact_id": "2d65066653a71c5a2c981e7393f56d93459935b3701ae411118ce453ccd3a4ef",
+        "media_type": "application/json"
+      },
+      "source_pointer": "/analysis_bindings/0",
+      "raw_main_input": {
+        "control_optimization": {
+          "settings": {
+            "coefficient_limit_n": 2.0,
+            "correction_window_s": [
+              0.0,
+              0.6
+            ],
+            "difference_step_n": 0.01,
+            "evaluation_requests": 24,
+            "initial_radius_n": 0.1,
+            "iterations": 3,
+            "knots_s": [
+              0.0,
+              0.2,
+              0.4,
+              0.6
+            ],
+            "method": "pattern",
+            "minimum_radius_n": 0.0001,
+            "safety_margin_fraction": 0.05,
+            "version": "local_control_search_v2"
+          },
+          "source": {
+            "artifact_id": "d2f4fb613c510d3af866cd5fc0d4550ef7c2084f3612256666e0dc20c9bcecd1",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "bound_candidate": {
+        "artifact_id": "d2f4fb613c510d3af866cd5fc0d4550ef7c2084f3612256666e0dc20c9bcecd1",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "model_source": "mujoco",
+      "contract_validation_completed": false,
+      "admission_error": "SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD",
+      "worker_started": false,
+      "original_input_reference": {
+        "artifact_id": "2b068a155ea986616936270bdb603c801aa3532a2c65fb5a68040af4f0701190",
+        "media_type": "application/json"
+      },
+      "feedback_reference": {
+        "artifact_id": "97a569fce8fa07c454eccf76ce2e236e20baa0b50942f3ac406e1bc9b95c9e93",
+        "media_type": "application/json"
+      },
+      "original_error": {
+        "status": "rejected",
+        "error_code": "value_error",
+        "field": "control_optimization.settings",
+        "reason": "1 validation error for AnalysisRequest\ncontrol_optimization.settings\n  Value error, SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD [type=value_error, input_value={'version': 'local_contro...s': 24, 'iterations': 3}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error",
+        "expected": "Value error, SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD",
+        "worker_started": false,
+        "scientific_execution_started": false,
+        "charged_method_counts": {
+          "physical_replay_launches": 0,
+          "nmpc_launches": 0,
+          "mathematical_evaluations": 0
+        },
+        "full_error_reference": {
+          "artifact_id": "90999985f2145e3dc5f68ac379bfecf068be9363a196e06397efde7391d4f2e8",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "request_number": 10,
+      "tool_use_id": "call_bf006ca7ee444775af94de84b136dd78",
+      "binding_reference": {
+        "artifact_id": "fedcfafd91ab0b747e6b382b9f254c415060c9898f43742928863c861e0769f3",
+        "media_type": "application/json"
+      },
+      "source_pointer": "/analysis_bindings/1",
+      "raw_main_input": {
+        "control_optimization": {
+          "settings": {
+            "coefficient_limit_n": 2.0,
+            "correction_window_s": [
+              0.0,
+              0.6
+            ],
+            "difference_step_n": 0.01,
+            "evaluation_requests": 24,
+            "initial_radius_n": 0.1,
+            "iterations": 3,
+            "knots_s": [
+              0.0,
+              0.2,
+              0.4,
+              0.6
+            ],
+            "method": "response",
+            "minimum_radius_n": 0.0001,
+            "safety_margin_fraction": 0.05,
+            "version": "local_control_search_v2"
+          },
+          "source": {
+            "artifact_id": "d2f4fb613c510d3af866cd5fc0d4550ef7c2084f3612256666e0dc20c9bcecd1",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "bound_candidate": {
+        "artifact_id": "d2f4fb613c510d3af866cd5fc0d4550ef7c2084f3612256666e0dc20c9bcecd1",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "model_source": "mujoco",
+      "contract_validation_completed": true,
+      "admission_error": "BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED",
+      "worker_started": false,
+      "original_input_reference": {
+        "artifact_id": "9f55dd29ff74fb753044ec06262b7743c4e0925ba4ca5fc852c1eecda24458b8",
+        "media_type": "application/json"
+      },
+      "feedback_reference": {
+        "artifact_id": "21234a81f3b5cf246bd45ba0634a81799964688dfe8e3777088b7c260d3373ab",
+        "media_type": "application/json"
+      },
+      "original_error": {
+        "status": "rejected",
+        "error_code": "BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED",
+        "field": null,
+        "reason": "BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED",
+        "expected": "BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED",
+        "worker_started": false,
+        "scientific_execution_started": false,
+        "charged_method_counts": {
+          "physical_replay_launches": 0,
+          "nmpc_launches": 0,
+          "mathematical_evaluations": 0
+        },
+        "full_error_reference": {
+          "artifact_id": "15db1ee45f38e6e222eb1184a070a3a4c24b1de8a3d62b284320c39517b928f8",
+          "media_type": "application/json"
+        }
+      }
+    }
+  ],
+  "prepared_study": {
+    "study_id": "p63b5-m-native-sol-20261029",
+    "store": "D:\\softrobot-agent\\.worktrees\\p6-3b5-native-math-entry\\runs\\research\\p63b5-m-native-sol-20261029",
+    "resolved_identity": "a1ae8242263061e3701270b55d29c6327b424b0dfd4e6fa6fefee1e506caa127",
+    "configuration": "study_p63b5_m_native_sol_prepared.json",
+    "baseline": {
+      "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+      "media_type": "application/json"
+    },
+    "baseline_generation_request": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+      "segment_count": 2,
+      "tendon_count": 4
+    },
+    "baseline_provenance": {
+      "decision_owner": "Operator",
+      "origin": "operator_provided_unmeasured_baseline",
+      "scope": "B5 engineering structure input; legal compilation only, no scientific or task evaluation."
+    },
+    "control_initialization": {
+      "candidate": {
+        "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "4d5721137c201c7667ef2dedb8bcb10d5c5a253cfb51756feec3964aba6de956",
+        "media_type": "application/json"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    "control_seed_request": {
+      "candidate": {
+        "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+        "media_type": "application/json"
+      },
+      "method": "baseline"
+    },
+    "control_operator_provenance": {
+      "artifact_id": "7cc3d605fd2035bbbc41d4518c345c98b8b6b19c0682353bce23f996103f5fd8",
+      "media_type": "application/json"
+    },
+    "source_provenance": {
+      "channel_map": null,
+      "control_initialization": "bounded_candidate_control_v1",
+      "inherited_acceptance": false,
+      "operation_key": "operator-p63b5-initialize-control",
+      "parent": null,
+      "source": null,
+      "time_rule": "zero-order hold; hold last input beyond source horizon; new channels use candidate pretension"
+    },
+    "task_acceptance": "unmeasured",
+    "task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+    "family_space_identity": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 4,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 0,
+      "protected_provider_requests": 1,
+      "protected_public_operations": 2,
+      "provider_requests": 12,
+      "provider_reserve_policy": "last_requests_v2",
+      "public_operations": 32
+    },
+    "native_control_limits": {
+      "evaluation_requests": 24,
+      "iterations": 3,
+      "knots_s": 4
+    },
+    "provider": {
+      "model": "gpt-5.6-sol",
+      "reasoning": "none"
+    },
+    "trajectory_binding": {
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ],
+      "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+      "model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+      "design_identity": "c53685e2baaa17f8a2f5479924c943f5df6a6360e5fb6acb8622381d54e3e672"
+    },
+    "time_grid": {
+      "points": 31,
+      "intervals": 30,
+      "start_s": 0.0,
+      "end_s": 0.6,
+      "period_s": 0.02
+    },
+    "default_tensions_n": [
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "tension_bounds_n": [
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ]
+    ],
+    "authorization": "pending separate explicit approval; no formal authorization or live handoff admission",
+    "imported_scientific_results": [],
+    "main_plans": 0,
+    "real_provider_requests": 0,
+    "scientific_workers": 0,
+    "preparation_reference": {
+      "artifact_id": "abb87f7015bac253f082fb08f22dbdd3bfeed34e1eebae583360ca60ae31f654",
+      "media_type": "application/json"
+    }
+  },
+  "authorization_check": "INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE",
+  "actual_state": {
+    "plans": [],
+    "analysis_results": [],
+    "results": [],
+    "mathematical_evaluations": 0,
+    "pending": null,
+    "numerical_s": 0.48242499999469146,
+    "control_initialization_s": 0.13084769999841228,
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.0
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "formal_authorization_events": 0,
+    "live_handoff_events": 0
+  },
+  "solver_and_scientific_admission_changes": false,
+  "imported_m0_results": false,
+  "offline_validation": {
+    "added_test_cases": 3,
+    "initial_targeted_suite": {
+      "command": "python -m unittest tests.research.test_p63b5_native_entry tests.research.test_p63b4_preparation tests.research.test_p63b3_action_interface -v",
+      "passed": 9,
+      "elapsed_s": 80.986
+    },
+    "original_admission_boundary": "Original AnalysisRequest, candidate ownership, frozen protocol, Native applicability, executable-source provenance and schedule binding pass before Store.reserve; test raises before reservation, accounting or Worker launch.",
+    "fixtures": "Mock HTTP wire requests are scripted engineering fixtures; no real Provider. Worker and NativeModel constructors fail if called. Authorization and snapshot are fixture-only; prepared live Study has no authorization.",
+    "methods": {
+      "accepted": [
+        "v2 pattern + margin 0",
+        "v2 response + margin 0",
+        "v2 response + margin 0.05"
+      ],
+      "rejected": {
+        "v2 pattern + margin 0.05": "SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD",
+        "v1 response + margin 0.05": "SAFETY_MARGIN_REQUIRES_V2_SEARCH"
+      }
+    },
+    "b4_evidence": "Read original results and both raw Main analysis bindings; M0 original JSON reviewed only, not recomputed.",
+    "scientific_results": 0,
+    "real_provider_requests": 0,
+    "native_model_builds": 0,
+    "scientific_workers": 0,
+    "final_wire_recheck": {
+      "command": "python -m unittest tests.research.test_p63b5_native_entry.NativeEntryTests.test_method_margin_guidance_schema_and_diagnose_initialize_diagnose_wire -v",
+      "passed": 1,
+      "elapsed_s": 30.161,
+      "scope": "Final T1 initial-state-only required_parameters, exact evidence_read action response, actual Mock Provider Schema and diagnose-initialize-diagnose handoff; no real Provider or scientific Worker."
+    },
+    "diff_check": "git diff --check passed"
+  }
+}

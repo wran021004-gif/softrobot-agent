@@ -152,6 +152,7 @@ def mathematical_method_view(host, reference):
             elif key=='short_input_response_v1':required.append('Optional native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
         if key=='mujoco_direct_control_v1':
             required.append('control_optimization={source,settings}; v2 settings require explicit correction_window_s and knots_s. Window starts at the selected native state and ends at the frozen task deadline, covering all required samples.')
+            required.append('method=pattern requires safety_margin_fraction=0; positive safety_margin_fraction requires compatible v2 method=response. correction_window_s allows control changes; it is not the Reach/Hold scoring holding window.')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; choose a legal continuous variable and owned same-task comparable single-parameter candidates; fixed input is not reoptimized capability')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
         if row.get('capability_method'):request['capability_method']=CONIC
@@ -190,6 +191,15 @@ def mathematical_method_view(host, reference):
             elif not reasons:methods[key]['planning_status']='ready'
             methods[key]['structural_proposal']='Optional research_plan(action=generate, generation=<copy current parameters with one bounded edit>, supporting_evidence=[T2 result], decision.claimed_inference=empirical_search). Choose direction and step from the evidence; unresolved permits contrasts or no edit. New candidate requires its own T1 control reoptimization (1 model + B solves); physical acceptance remains unmeasured.'
         if key=='mujoco_direct_control_v1':
+            methods[key]['control_input_guidance']=dict(
+                candidate_role='Structure reference; candidate is not an executable control source.',
+                source_role='Complete executable sequence bound to candidate/task/channels/time grid/bounds; use the returned source reference.',
+                recorded_sources=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==reference][-3:],
+                baseline_initialization=dict(tool='research_plan',action='initialize_control',
+                    control_seed=dict(candidate=reference,method='baseline'),
+                    scope='Optional candidate pretension baseline on the full frozen task grid; task_acceptance=unmeasured. Full Plan/decision admission applies.'),
+                after_initialization='Use returned source, not candidate. An initialization Plan supersedes the last diagnose. Submit diagnose again with your chosen hypothesis, candidate and method, then research_analysis.',
+                settings=required[-1])
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
             from tools.research.native_control import window_facts
             from tools.research.budget import decision_budget
@@ -239,7 +249,7 @@ def mathematical_method_view(host, reference):
         item.update(operation=operation,method=method,method_version=method,
             scientific_purpose='Finite-budget nonlinear task capability' if method==T1 else 'Reoptimized structural response',
             description='Limited-budget mathematical diagnostic; automatic physical ranking has not been validated.',
-            limitations=LIMITATIONS,required_parameters=['control_optimization={source,settings}'] if method==T1 else
+            limitations=LIMITATIONS,required_parameters=[r for r in item['required_parameters'] if not r.startswith('operating_point:')] if method==T1 else
                 ['nonlinear_response={variable,unit,t1_results=[baseline,minus,plus]}'],
             cost_scope=item['cost_scope'] if method==T1 else 'One aggregation evaluation for admitted saved T1 results, zero new native models, optimizations or physics steps. Prior T1 charges remain referenced; actual preparation/worker wall time is additional.',
             request_template=dict(candidate=reference,operation=operation,model_source='mujoco',
@@ -258,7 +268,7 @@ def mathematical_method_view(host, reference):
         if method==T2:
             item['missing']=[m for m in item['missing'] if not m.startswith('control_optimization')]
             item['missing'].append('three comparable completed T1 results')
-            for name in ('handoff','measured_control_initialization','control_sources','execution_limits','action_prerequisites'):
+            for name in ('handoff','measured_control_initialization','control_sources','control_input_guidance','execution_limits','action_prerequisites'):
                 item.pop(name,None)
             item['coverage']=[]
             item['applicability']=dict(status='requires_parameters',
@@ -300,7 +310,7 @@ def mathematical_method_view(host, reference):
         elif method=='design_sensitivity':
             item['required_sources']=['Current candidate, minus_candidate and plus_candidate for one legal continuous variable; fixed physical input.']
         elif method in (T1,'mujoco_direct_control_v1'):
-            item['required_sources']=['Current candidate and a legal initialized or explicitly rebound control_optimization.source; Main chooses settings.']
+            item['required_sources']=['Current structure candidate is not a control source. control_optimization.source must reference a complete candidate/task/channel/time/bounds-bound executable sequence. If missing, use research_plan(initialize_control) baseline and its returned source; then resubmit diagnose. Main chooses method and settings.']
         elif method==T2:item['required_sources']=['Comparable completed same-task T1 results; original stencil admission applies.']
         item['request_template_query']={**item['detail_query'],'pointer':item['detail_query']['pointer']+'/request_template'}
         item['scientific_scope']=dict(computes=item['description'],
@@ -329,7 +339,7 @@ def mathematical_action_view(detail):
     import json
     keys=('method','operation','scientific_purpose','description','planning_status','missing',
         'required_parameters','required_sources','estimated_evaluations','estimated_evaluation_range','wall_cost',
-        'cost_scope','formal_execution_authorized','execution_status','request_template_query')
+        'cost_scope','formal_execution_authorized','execution_status','request_template_query','control_input_guidance')
     result={k:detail[k] for k in keys if k in detail}
     row=detail['applicability']
     result['applicability']={k:row[k] for k in ('status','model','task_applicable','reasons') if k in row}

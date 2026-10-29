@@ -1454,6 +1454,10 @@ def information_flow_brief(brief, delivered):
     continuation=value.get('tool_continuation') or {}
     continuation['switch_tool']='Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.'
     loaded=continuation.get('loaded') or {}
+    if intent.get('action')=='initialize_control' and intent.get('execution_status')=='completed':
+        continuation['control_initialization_handoff']=dict(candidate=intent.get('candidate'),
+            control_sources=control.get('control_sources',[]),task_acceptance='unmeasured',
+            next='Use the initialization result source reference, not candidate. Submit a new diagnose Plan with your chosen hypothesis, candidate and registered method before research_analysis; initialization superseded the previous diagnose.')
     if loaded.get('plan_action'):
         continuation['direct_plan']=dict(tool='research_plan',action=loaded['plan_action'],
             instruction='This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.')
@@ -1475,6 +1479,7 @@ def information_flow_brief(brief, delivered):
             remaining_scientific_fields_scope='Top-level required fields in the current Provider Schema only; conditional sources are listed separately. All original AnalysisRequest admission applies.',
             conditional_scientific_inputs=handoff.get('conditional_scientific_inputs',[]),
             operating_point_sources=handoff.get('operating_point_sources',{}),
+            control_input_guidance=handoff.get('control_input_guidance'),
             next='Submit scientific variables directly to loaded research_analysis; source, parameter and budget admission still applies.' if loaded.get('tool')=='research_analysis' else 'research_analysis is not loaded; consult current tool directory and method prerequisites.')
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):

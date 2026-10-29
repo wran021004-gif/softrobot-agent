@@ -166,9 +166,9 @@ class OptimalCapabilitySensitivity(Contract):
 
 class LocalControlSearchSettings(Contract):
     version: Literal['local_control_search_v1','local_control_search_v2'] = 'local_control_search_v1'
-    correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
-    safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound; original physical acceptance is unchanged. Zero preserves boundary-seeking legacy behavior.')
-    method: Literal['response','pattern'] = 'response'
+    correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = Field(default=None,description='Time range in which control corrections are allowed, not the Reach/Hold task scoring holding window. Native optimization must cover the selected state through the frozen task deadline.')
+    safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound. Positive margin requires method=response; method=pattern requires exactly 0. Original physical acceptance is unchanged.')
+    method: Literal['response','pattern'] = Field(default='response',description='pattern requires safety_margin_fraction=0; a positive safety margin requires compatible v2 response settings. Main selects the method.')
     knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
     coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
     difference_step_n: FiniteFloat = Field(default=.01,gt=0)
@@ -208,7 +208,7 @@ class LocalControlSearchSettings(Contract):
 
 
 class NativeControlOptimization(Contract):
-    source: EvidenceRef
+    source: EvidenceRef = Field(description='Complete executable control sequence reference bound to this candidate, frozen task, input channels, time grid and tension bounds; never the structure candidate reference. If absent, research_plan(action=initialize_control, control_seed={candidate,method:baseline}) can create an unmeasured baseline. Use its returned source. After an initialization Plan, submit diagnose again with your chosen candidate and method before research_analysis.')
     settings: LocalControlSearchSettings
     resume_from: EvidenceRef | None = None
     failed_replays: list[EvidenceRef] = Field(default_factory=list)
@@ -309,7 +309,7 @@ class NonlinearStructureResponse(Contract):
 
 
 class AnalysisRequest(Contract):
-    candidate: EvidenceRef = Field(description='Exact current-Study owned candidate; operation and model_source must match a registered mathematical_capabilities method.')
+    candidate: EvidenceRef = Field(description='Exact current-Study owned structure candidate reference, not a control sequence. operation and model_source must match a registered mathematical_capabilities method.')
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
@@ -519,7 +519,7 @@ class ControlSeedRequest(Contract):
     parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
-    method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = 'baseline'
+    method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = Field(default='baseline',description='baseline with only candidate uses candidate pretensions over the full task grid, without task evaluation. Use the returned source as control_optimization.source, never candidate. An initialization Plan replaces the latest diagnose; submit diagnose again with your own candidate and method before research_analysis.')
     response_evidence: EvidenceRef | None = None
     channels: list[str] | None = Field(default=None,min_length=1)
     difference_step_n: FiniteFloat = Field(default=.02,gt=0)

@@ -290,7 +290,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
     template=detail.get('request_template',{})
     for key in ('candidate','protocol'):
         if key in template:schema['properties'][key]={'const':deepcopy(template[key]),
-            'description':'Exact frozen '+key+' from the selected registered method.'}
+            'description':schema['properties'][key]['description']+' Exact frozen value from the selected registered method.'}
     if method in (CONIC,SENSITIVITY):
         schema['properties']['capability_method']={'type':'string','const':CONIC}
         schema['required'].append('capability_method')
@@ -345,6 +345,8 @@ def selected_analysis_schema(method, detail, *, bound=False):
             schema['$defs']['NativeAnalysisOptions']['properties'].pop('correction_radius_n',None)
         guide=detail.get('operating_point_guidance',{})
         schema['description']='Selected method '+method+'. Frozen identity and protocol are bound by the program; submit scientific variables only. '+json.dumps(guide,separators=(',',':'),ensure_ascii=False)
+    if detail.get('control_input_guidance'):
+        schema['description']+=' Control input prerequisites: '+json.dumps(detail['control_input_guidance'],separators=(',',':'),ensure_ascii=False)
     needed=set()
     def visit(value):
         if isinstance(value,dict):
