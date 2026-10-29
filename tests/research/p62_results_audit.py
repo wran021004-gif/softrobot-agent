@@ -3,6 +3,7 @@ import argparse
 from copy import deepcopy
 import hashlib
 import json
+from unittest.mock import patch
 from tests.research.p62_live_audit import host, source_data
 from tests.research.p5_comparison_audit import decoded_feedback
 from tools.research import reporter
@@ -26,7 +27,7 @@ def audit(arm):
         assert receipt['charged']['model_calls']==1
         assert digest(wire)==h.store.lookup(h.run_id,e['request_id'])['request_hash']
         row=dict(sequence=e['sequence'],request_id=e['request_id'],purpose=meta['purpose'],
-            model=wire['model'],reasoning=wire.get('reasoning_effort'),input_bytes=meta['input_bytes'],
+            model=wire['model'],response_model=body.get('model'),reasoning=wire.get('reasoning_effort'),input_bytes=meta['input_bytes'],
             request_reference=meta['request'],response_reference=response.get('body') if response else None,
             http_status=response.get('http_status') if response else None,usage=body.get('usage'),
             error=body.get('error'),text=msg.get('content'),
@@ -69,6 +70,17 @@ def audit(arm):
         after=json.loads(wires[next_seq]['messages'][-1]['content'].split('\n',1)[1])['research'] if next_seq else None
         fields=('study_goal','research_focus','verified_facts','research_trace','knowledge','reporter_findings','budget','evidence_access','tool_continuation')
         equal={k:prior.get(k)==after.get(k) for k in fields} if after and prior else {}
+        # A completed invocation may have settled STOP after the previous wire.
+        # Compare the fresh wire to its actual handoff snapshot, not stale L0.
+        from tools.research.research_context import agent_decision_brief, research_decision_brief_v3, information_flow_brief
+        source_state=h.store.artifact(prep['source_state'])
+        source_session={**h.store.session(h.run_id),'state':source_state}
+        with patch.object(h.store,'session',return_value=source_session),\
+                patch.object(h.store,'events',return_value=[e for e in events if e['sequence']<event['sequence']]),\
+                patch.object(h.store,'remaining',return_value=prep['budget']):
+            brief=agent_decision_brief(h)
+            expected_l0=information_flow_brief(brief,research_decision_brief_v3(brief))
+        snapshot_equal={k:expected_l0[k]==after[k] for k in fields if k not in ('evidence_access','tool_continuation')} if after else {}
         expected=prep.get('pending_feedback_delivery')
         delivered=packet_feedback(after) if after else None
         continuation_equal=(
@@ -80,6 +92,8 @@ def audit(arm):
             source_state_identity=prep['source_state_identity'],scientific_results=prep['scientific_results'],
             budget=prep['budget'],independently_restored=verification['independently_restored'],
             original_tool_pairs_complete=True,next_request_sequence=next_seq,actual_wire_field_equality=equal,
+            authoritative_snapshot_to_actual_wire=snapshot_equal,
+            archived_evidence_references_retained=source_state['scoped_context']==s['scoped_context'],
             selected_and_loaded_tools_preserved=continuation_equal,
             feedback_representation='Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.',
             precise_feedback_preserved=(expected==delivered) if expected else None,

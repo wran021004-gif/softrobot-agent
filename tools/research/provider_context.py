@@ -1,4 +1,4 @@
-"""Local capacity estimates for the accounted DeepSeek transport; never sends."""
+"""Local capacity estimates for accounted Provider transports; never sends."""
 from functools import lru_cache
 import hashlib
 from tools.research.config import ROOT
@@ -46,7 +46,7 @@ def capacity_estimate(content,provider):
 
 def handoff_input_estimate(content, provider):
     """Estimate the complete serialized request for the soft handoff heuristic."""
-    if provider['adapter']=='chatgpt_gateway':
+    if provider['adapter'] in ('chatgpt_gateway','openai_api'):
         return capacity_estimate(content,provider)
     if provider['adapter'] != 'deepseek' or provider['model'] not in ('deepseek-flash','deepseek-v4-pro'):
         raise ValueError('TOKEN_HANDOFF_REQUIRES_PINNED_DEEPSEEK_TOKENIZER')
