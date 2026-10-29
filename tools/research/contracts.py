@@ -636,6 +636,16 @@ class Plan(Contract):
         return self
 
 
+class KnowledgePolicy(Contract):
+    """Existing P3 authority contract, frozen at new Study preparation."""
+    version: Literal['curated_knowledge_policy_v1'] = 'curated_knowledge_policy_v1'
+    mode: Literal['enabled','off'] = 'enabled'
+    exclude_entry_ids: list[str] = Field(default_factory=list)
+    include_entry_ids: list[str] | None = None
+    allowed_kinds: list[str] | None = None
+    allow_benchmark_answers: bool = False
+
+
 class ExperienceQuery(Contract):
     operation: Literal['search', 'read'] = 'search'
     key: str | None = Field(default=None,min_length=1)
@@ -645,6 +655,9 @@ class ExperienceQuery(Contract):
     structure: str | None = None
     failure_type: str | None = None
     version: str | None = None
+    kind: str | None = None
+    limit: int | None = Field(default=None,ge=1,
+        description='Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.')
 
 
 class EvidenceQuery(Contract):

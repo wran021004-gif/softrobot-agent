@@ -41,6 +41,7 @@ def run_fixture(h, responses, *, limit=None):
             model=wire['model'],choices=[dict(index=0,finish_reason='tool_calls' if use else 'stop',message=message)],
             usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
     with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+            patch('tools.research.tool_readiness.execution_environment',return_value=dict(status='ready',scope='Mock HTTP fixture only; no scientific execution')),\
             patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
             patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
         asyncio.run(agent.converse(h,max_new_provider_requests=limit,pause_after_completed_invocations=1))

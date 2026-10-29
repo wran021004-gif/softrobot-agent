@@ -1209,6 +1209,7 @@ def agent_decision_brief(host):
         brief['current_candidate']=dict(status='not_generated',control_sources=[],control_source_status='missing')
     brief['scientific_execution']=dict(pending={k:s['pending'][k] for k in ('kind','worker_request_id') if k in s['pending']} if s.get('pending') else None,
         scope='Receipts/results establish execution. Plan selected_method is intent; read-only diagnosis starts no selected mathematical worker. Independent evaluation alone establishes task acceptance.')
+    brief['analysis_interface']=s['spec'].get('research_decisions',{}).get('analysis_interface')
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     for report in brief['latest_reports']:
@@ -1296,15 +1297,28 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
     if not facts and best.get('task_gap'):
         facts.append(dict(name='task_gap',value=best['task_gap'],source=best.get('reference')))
     actions=[]
+    science=(brief.get('budget') or {}).get('science_budget') or {}
+    candidate=brief.get('current_candidate') or {}
+    catalog=brief.get('mathematical_capabilities') or {}
     rows=brief.get('available_research_actions',[])
     for action in brief.get('actions',[]):
         matching=[r for r in rows if r.get('action')==action]
         active=[r for r in matching if r.get('status') in ('available','preflight_eligible','prerequisites_only')]
         direct=action in ('generate','search','diagnose','stop')
         actions.append(dict(action=action,status='available' if active or (not matching and direct) else 'conditional',
-            reason='Full request admission and budget checks apply.' if active or (not matching and direct) else 'A suitable candidate, source, read, or other prerequisite is required.',
+            reason=('Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.'
+                if action=='diagnose' else 'Full request admission and budget checks apply.' if active or (not matching and direct)
+                else 'A suitable candidate, source, read, or other prerequisite is required.'),
             cost='See remaining allowances; exact cost depends on the requested operation.'))
-    catalog=brief.get('mathematical_capabilities') or {}
+        if action=='diagnose' and brief.get('analysis_interface')=='bound_scientific_variables_v2':
+            actions[-1]['read_only_investigation']=dict(tool='research_investigate',scientific_execution=False)
+            actions[-1]['analysis_selection']=dict(
+                status='requires_owned_candidate' if not candidate.get('candidate') else
+                    'insufficient_mathematical_budget' if science.get('remaining_mathematical',0)<1 else 'requires_registered_method_and_authorization',
+                candidate_query=candidate.get('details_query'),
+                methods_query=dict(reference=candidate['candidate'],view='mathematical_capabilities',pointer='/methods') if candidate.get('candidate') else None,
+                required_fields=['decision.selected_candidate','decision.selected_method'],
+                scope='Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here.')
     methods=[dict(method=k,status=v.get('planning_status'),execution_status=v.get('execution_status'),estimated_evaluations=v.get('estimated_evaluations'))
         for k,v in catalog.get('methods',{}).items()]
     if 'analysis' in (brief.get('capabilities') or []):
@@ -1329,7 +1343,9 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         verified_facts=facts[:8],
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
-            excerpt_scope=('Complete source-grounded final conclusions; Reporter internal reasoning and reads are excluded.' if complete_interpretations else 'First 240 characters of each cited interpretation; read the report for the complete text.'),
+            interpretation_query=report.get('restore_query'),
+            summary_query=report.get('summary_query'),
+            excerpt_scope=('Complete source-grounded final conclusions; Reporter internal reasoning and reads are excluded.' if complete_interpretations else 'First 240 characters of each cited interpretation; use interpretation_query for complete text.'),
             unresolved=report.get('unresolved',[])[:3]),
         action_menu=actions,
         evidence_access=dict(working_set=brief.get('evidence_access'),
@@ -1377,6 +1393,8 @@ def information_flow_brief(brief, delivered):
             reference_role='reporter_report',scientific_citation_eligible=False,
             result_references=report.get('result_references',[]),status=report['reporter_status'],
             interpretation_query=report.get('restore_query'),
+            summary_query=report.get('summary_query'),
+            reading_guidance='Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.',
             interpretations=report.get('interpretations',[]),
             unresolved=report.get('unresolved',[])[:3]))
     # Values are owned by verified_facts; explanations carry references only.

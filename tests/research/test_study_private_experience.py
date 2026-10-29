@@ -51,7 +51,7 @@ class StudyPrivateExperienceTests(unittest.TestCase):
 
     def test_exact_reads_are_scoped_and_require_receipts_for_disposition(self):
         h=self.host();spec=deepcopy(state(h)['spec'])
-        search=retrieve(h,dict(operation='search'))
+        search=retrieve(h,dict(operation='search',kind='case',limit=20))
         private=[r for r in search['results'] if r['status']==PRIVATE_STATUS]
         self.assertEqual(len(private),6)
         self.assertTrue(all('content' not in row for row in private))
@@ -78,6 +78,16 @@ class StudyPrivateExperienceTests(unittest.TestCase):
             freeze_study_entries(self.value,self.value['study_experience_index'])
         with self.assertRaisesRegex(ValueError,'OUTSIDE_OWNED_SCOPE'):
             freeze_study_entries(self.value,'memory/diagnostic_index.json')
+
+    def test_private_cards_are_direct_reads_and_off_precedes_io(self):
+        from tools.research.contracts import KnowledgePolicy
+        from tools.research import experience
+        with patch.object(experience,'read',side_effect=AssertionError('OFF_BEFORE_INDEX_IO')):
+            self.assertEqual(freeze_study_entries(self.value,'unavailable',KnowledgePolicy(mode='off')),[])
+        h=self.host()
+        (self.folder/'M1.md').write_text('Changed offline fixture body',encoding='utf8')
+        actual=retrieve(h,dict(operation='read',entry_id='fixture-m1',revision='1'))
+        self.assertEqual(actual['results'][0]['content'],'Changed offline fixture body')
 
     def test_main_wire_discovers_six_cards_without_startup_body_injection(self):
         h=self.host()
@@ -124,16 +134,17 @@ class StudyPrivateExperienceTests(unittest.TestCase):
         self.assertEqual(len(progress),1);self.assertEqual(progress[0]['entry_id'],'fixture-m5')
         self.assertTrue(progress[0]['tool_read_completed']);self.assertTrue(progress[0]['body_delivered'])
         self.assertNotIn('离线合成经验',json.dumps(wires[4],ensure_ascii=False))
-        self.assertEqual(packet(wires[4])['loaded_tool'],dict(tool='research_plan',action='generate'))
+        self.assertEqual({k:packet(wires[4])['loaded_tool'][k] for k in ('tool','action')},dict(tool='research_plan',action='generate'))
         self.assertFalse(state(h)['analysis_results']);self.assertFalse(state(h)['physical_replays'])
         from tools.research.agent import converse
         before=h.store.remaining()
         with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.tool_readiness.execution_environment',return_value=dict(status='ready')),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
             asyncio.run(converse(h,restore_only=True))
         self.assertEqual(h.store.remaining(),before)
         resumed=run_fixture(h,[None])
-        self.assertEqual(packet(resumed[0])['loaded_tool'],dict(tool='research_plan',action='generate'))
+        self.assertEqual({k:packet(resumed[0])['loaded_tool'][k] for k in ('tool','action')},dict(tool='research_plan',action='generate'))
         self.assertTrue(packet(resumed[0])['experience_read_progress']['reads'][0]['body_delivered'])
         schema=next(t['function']['parameters'] for t in resumed[0]['tools'] if t['function']['name']=='research_plan')
         self.assertEqual(schema['properties']['action']['enum'],['generate'])

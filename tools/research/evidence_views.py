@@ -402,6 +402,10 @@ def _resources(value, reference):
         add(value,key,'s',time_basis='recorded_elapsed_unspecified')
     boundary=value.get('boundary') or {}
     add(boundary,'elapsed_s','s','/boundary','worker_wall')
+    add(value,'cpu_time_s','s',time_basis='cpu')
+    add(boundary,'cpu_time_s','s','/boundary','cpu')
+    add((value.get('acceptance') or {}).get('timing') or {},'simulation_wall_s','s',
+        '/acceptance/timing','recorded_elapsed_unspecified')
     costs=value.get('cost_feedback') or {}
     for key in ('new_physical_evaluations','evaluation_callbacks','cache_reuses'):
         add(costs,key,'evaluations','/cost_feedback')

@@ -231,7 +231,10 @@ def read_evidence(host, query, *, record_read=True):
         value=family_analysis_parameters(s['spec'],value)
     elif q.view=='summary':
         from tools.research.research_context import compact_evidence
-        value=compact_evidence(value,plain(q.reference),q.pointer)
+        if not q.pointer and isinstance(value,dict) and value.get('report',{}).get('version')=='scientific_report_v1':
+            from tools.research.reporter import reporter_handoff_summary
+            value=reporter_handoff_summary(host,plain(q.reference),value)
+        else:value=compact_evidence(value,plain(q.reference),q.pointer)
         from tools.research.evidence_views import data_access
         value['data_access']=data_access(host,plain(q.reference),root_value)
     elif q.view=='fields' or (q.view in ('working_set','mathematical_capabilities') and q.fields):

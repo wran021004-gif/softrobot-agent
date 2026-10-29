@@ -213,6 +213,8 @@ def _reference(source, key, provenance):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    study.pop('knowledge_manifest',None)
+    knowledge=study.pop('knowledge',{})
     provider_reserve_policy=study.get('budgets',{}).pop('provider_reserve_policy',None)
     if 'study_experience_entries' in study:
         raise ValueError('STUDY_EXPERIENCE_REQUIRES_SCOPED_LOCAL_INDEX')
@@ -233,6 +235,11 @@ def resolve(path, profile=None, *, backend_profile=None):
     decisions=study.pop('research_decisions',None)
     readiness=study.pop('tool_readiness',None)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
+    if isinstance(knowledge,str):
+        source=(path.parent/knowledge).resolve()
+        knowledge=_reference(source,'knowledge',provenance)
+    from tools.research.contracts import KnowledgePolicy
+    knowledge=KnowledgePolicy.model_validate(knowledge)
     correction=study.pop('correction_search',None)
     local_search=study.pop('local_control_search',None)
     native_limits=study.pop('native_control_limits',None)
@@ -293,7 +300,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['initial_structure_strategy']=first_strategy
     if experience_index is not None:
         from tools.research.experience import freeze_study_entries
-        study['study_experience_entries']=freeze_study_entries(study,experience_index)
+        study['study_experience_entries']=freeze_study_entries(study,experience_index,knowledge)
     if additions:
         if not family_mode:
             raise ValueError('NEW_FIDELITY_SEARCH_POLICY_REQUIRES_FAMILY_STUDY')
@@ -596,6 +603,9 @@ def resolve(path, profile=None, *, backend_profile=None):
                 settling=deepcopy(value['settling'])))
         study['task_conditions']=frozen
     if fixed_structure is not None:study['fixed_structure_reference']=plain(EvidenceRef.model_validate(fixed_structure))
+    from tools.research.experience import freeze_knowledge
+    study['knowledge']=plain(knowledge)
+    study['knowledge_manifest']=freeze_knowledge(knowledge)
     study['resolved_identity'] = digest(study)
     return study
 

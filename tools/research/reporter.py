@@ -15,7 +15,7 @@ from tools.platform_store import plain
 from tools.research.core import read_evidence
 from tools.research.contracts import EvidenceQuery, ExperienceQuery
 from tools.research.evidence_views import (result_card,recorded_math_summary,recorded_control_diagnostics,
-    recorded_static_summary,metric_semantics,quantitative_facts)
+    recorded_static_summary,metric_semantics,quantitative_facts,_resources)
 from tools.research.evidence_policy import paired_evidence
 from tools.research.state import state, protected
 
@@ -161,10 +161,22 @@ def _comparison(host, left, right):
             delta=m.value-old.value
             changes.append(dict(metric=m.name,value=m.value,baseline=old.value,
                 delta=delta,unit=m.unit,threshold=m.threshold,preference=preference,
+                numeric_change='unchanged' if delta==0 else 'decrease' if delta<0 else 'increase',
                 direction=('unchanged' if delta==0 else 'improved' if delta<0 else 'worsened') if preference=='lower' else 'unknown',
                 metric_definition=semantics,passed=m.passed,baseline_passed=old.passed,
                 source=plain(m.source),baseline_source=plain(old.source),comparable=comparable,
                 scope='Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion'))
+    baseline_resources={(r.name,r.unit,r.time_basis,r.source.pointer if r.source else None):r for r in right.resources}
+    for resource in left.resources:
+        old=baseline_resources.get((resource.name,resource.unit,resource.time_basis,resource.source.pointer if resource.source else None))
+        if old is None or resource.amount is None or old.amount is None:continue
+        delta=resource.amount-old.amount
+        changes.append(dict(resource=resource.name,value=resource.amount,baseline=old.amount,
+            delta=delta,unit=resource.unit,time_basis=resource.time_basis,
+            numeric_change='unchanged' if delta==0 else 'decrease' if delta<0 else 'increase',
+            preference='unknown',direction='unknown',
+            source=plain(resource.source),baseline_source=plain(old.source),comparable=comparable,
+            scope='Recorded resource arithmetic only; no efficiency ranking, causal attribution or additive cost claim.'))
     return relation,changes
 
 
@@ -174,7 +186,8 @@ def assemble(host, references, *, question=None):
     for other in cards[1:]:
         relation,changes=_comparison(host,cards[0],other);relations.append(relation)
         cards[0].deterministic_summary.setdefault('comparisons',[]).append(dict(
-            baseline=plain(other.identity.result),metrics=changes))
+            baseline=plain(other.identity.result),metrics=[r for r in changes if 'metric' in r],
+            resources=[r for r in changes if 'resource' in r]))
     if question is None and any(m.scope=='physical_task' for m in cards[0].metrics):
         # Reuse the existing complete-outcome ranking; at most one historical card.
         from tools.research.feedback import task_gap
@@ -186,7 +199,8 @@ def assemble(host, references, *, question=None):
         if eligible:
             baseline=min(eligible,key=lambda r:task_gap(host.store.artifact(r))['normalized_gap'])
             relation,changes=_comparison(host,cards[0],_card(host,baseline));relations.append(relation)
-            cards[0].deterministic_summary['comparisons']=[dict(baseline=baseline,metrics=changes)]
+            cards[0].deterministic_summary['comparisons']=[dict(baseline=baseline,
+                metrics=[r for r in changes if 'metric' in r],resources=[r for r in changes if 'resource' in r])]
     return ScientificReport(mode='investigation' if question is not None else 'result_summary',
         question=question,results=cards,relations=relations)
 
@@ -384,7 +398,7 @@ def reporter_handoff_summary(host, reference, saved):
         fact['quantitative_facts']=quantitative_facts(raw,card['identity']['result']['reference'])
         fact['critical_observations']=card.get('critical_observations',[])
         for metric in fact['metrics']:metric['semantics']=metric_semantics(raw,metric['name'])
-        fact['resources']=[r for r in card['resources'] if r['amount'] is not None]
+        fact['resources']=[plain(r) for r in _resources(raw,card['identity']['result']['reference']) if r.amount is not None]
         if card['deterministic_summary'].get('comparisons'):
             fact['comparisons']=card['deterministic_summary']['comparisons']
         if math:fact['mathematics']=math
@@ -425,6 +439,7 @@ def reporter_handoff_summary(host, reference, saved):
         selected_reads=[dict(query=r['query'],status=r.get('status','available'))
             for r in (saved.get('request') or {}).get('selected_reads',[])],
         restore_query=dict(reference=reference,view='full',pointer='/report/interpretations'),
+        summary_query=dict(reference=reference,view='summary'),
         full_report_query=dict(reference=reference,view='full'),
         applicable_corrections=corrections,
         current_interpretation_status='superseded_pending_reinterpretation' if pending else saved['interpretation_status'],
@@ -541,6 +556,7 @@ def _wire(host, reference, saved):
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
             'State uncertainty when evidence is insufficient. '
             'quantitative_facts and comparison direction are authoritative derived facts. Do not reverse them. '
+            'For resources use numeric_change for increase/decrease; preference and direction are separate. Unknown preference cannot justify an improvement or efficiency claim. '
             'Retain every failed constraint, including tiny strict violations. valid_failure means valid evaluation with failed task. '
             'Solver failure is not infeasibility; target distance is not mechanical equilibrium residual. '
             'Historical procedural_guidance is advisory only; it is excluded from source_catalog. '

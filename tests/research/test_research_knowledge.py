@@ -40,7 +40,7 @@ class KnowledgeTests(unittest.TestCase):
         row=found['results'][0]
         actual=retrieve(self.h,dict(operation='read',entry_id=row['entry_id'],revision=row['revision']))
         binding=disposition_bindings(self.h,{row['exact_key']:'context_only'})[0]
-        self.assertEqual(binding['content_sha256'],row['content_sha256'])
+        self.assertEqual(binding['content_sha256'],actual['results'][0]['content_sha256'])
         self.assertEqual(binding['read_receipt'],actual['reference'])
         self.assertFalse(actual['scientific_evidence'])
         self.assertEqual(registered_references(self.h),[])

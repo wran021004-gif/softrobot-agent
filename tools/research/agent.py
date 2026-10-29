@@ -819,7 +819,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
-            ('evidence_read','Read a named missing fact or verify a relevant change using exact evidence and JSON pointer. Exact repeats add no information; delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
+            ('evidence_read','Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.',EvidenceQuery,'evidence')]]
     if recent_policy:
         from tools.research.contracts import ResearchRecallQuery
         native.append(PythonAgentTool('research_recall',dict(name='research_recall',
@@ -851,7 +851,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('research_decisions') and not state(host)['spec'].get('rl_evaluation_source'):
         native.append(PythonAgentTool('research_investigate',dict(name='research_investigate',
-            description='Delegate reading, numerical extraction, comparison and explanation of saved results: provide a question and result references; exact reads are optional. Returns a saved report reference; formal interpretation arrives before the next research decision. No new scientific computation; internal reads give no SELECT/STOP credit.',
+            description='Read-only investigation of saved results: provide a question and result references; exact reads and authorized experience_queries are optional. No candidate is needed to read existing evidence. This does not execute research_plan(diagnose) or candidate-bound research_analysis. Returns compact findings and an interpretation_query; internal reads give no SELECT/STOP credit.',
             inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
     agent=None
     def build_session(session_id=None):
@@ -990,6 +990,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
         current=decision_packet(host)
+        from tools.research.experience import knowledge_enabled
+        if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
         from tools.research.evidence_policy import english_native
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
