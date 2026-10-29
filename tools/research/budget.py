@@ -1,5 +1,33 @@
 """Count admission and stage settlement over the existing transactional ledger."""
 from tools.platform_store import plain
+from contextlib import contextmanager
+
+
+def provider_allowance(host, db=None):
+    """One count boundary; frozen legacy Studies retain the pre-debit margin.
+
+    last_requests_v2 buys the current request's phase before its single debit.
+    Its last N requests are closeout-only; an already bought exploration request
+    retains that phase while its tools run. No extra persistent budget is used.
+    """
+    s=host.store.session(host.run_id,db)['state'];b=s['spec']['budgets']
+    total=host.store.remaining(db=db)['remaining']['model_calls'];reserve=b['protected_provider_requests']
+    current=b.get('provider_reserve_policy')=='last_requests_v2'
+    phase=getattr(host,'_provider_request_phase',None) if current else None
+    return dict(remaining_total=total,reserved_for_closeout=reserve,
+        protected_current_request=(phase=='closeout' if phase is not None else total<=reserve),
+        next_request_will_protect=total<=reserve if current else total-1<=reserve,
+        science_capable_main_requests=max(0,total-reserve-(0 if current else 1)),
+        request_phase=('closeout' if total<=reserve else 'exploration') if current else None)
+
+
+@contextmanager
+def provider_request_scope(host, phase):
+    """Only the synchronous native tool call uses its paid Provider phase."""
+    previous=getattr(host,'_provider_request_phase',None)
+    host._provider_request_phase=phase
+    try:yield
+    finally:host._provider_request_phase=previous
 
 
 def backend_capacity(host, db=None, *, evaluation_run=None):
@@ -39,7 +67,7 @@ def protected(host):
     remaining = host.store.remaining()['remaining']
     b = s['spec']['budgets']
     return bool(s.get('success_gate') or s.get('count_closeout') or
-        remaining['model_calls'] <= b['protected_provider_requests'] or
+        provider_allowance(host)['protected_current_request'] or
         remaining['tool_calls'] <= b.get('protected_public_operations', 0) or
         (s['spec'].get('budget_semantics',{}).get('mode')=='count'
             and s['spec'].get('mode')!='engineering_investigation' and not science_fits(host)))
@@ -50,6 +78,7 @@ def decision_budget(host):
     from tools.research.state import state
     s=state(host);remaining=host.store.remaining()['remaining'];b=s['spec']['budgets']
     total=remaining['model_calls'];reserve=b['protected_provider_requests']
+    provider=provider_allowance(host)
     active=protected(host)
     from tools.research.reporter import current_reports
     reporter_used=sum(e['kind']=='r3_request' and host.store.artifact(e['outputs'][0]).get('purpose')=='reporter'
@@ -70,9 +99,9 @@ def decision_budget(host):
             scope='Shared ledger includes public requests and charged child operations; a scientific action may cost multiple operations.'),
         provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
         reporter_requests_used=reporter_used,pending_reporter_requests_upper_bound=reporter_pending,
-        science_capable_main_requests=0 if active else max(0,total-reserve-1),
-        science_capable_after_pending_reporters=0 if active else max(0,total-reserve-1-reporter_pending),
-        supervisor_review_due=not active and total-reserve-1<=4+reporter_pending,
+        science_capable_main_requests=0 if active else provider['science_capable_main_requests'],
+        science_capable_after_pending_reporters=0 if active else max(0,provider['science_capable_main_requests']-reporter_pending),
+        supervisor_review_due=not active and provider['science_capable_main_requests']<=4+reporter_pending,
         supervisor_rule='Review finite authorized addendum at a verified settled boundary before protection/STOP; no Agent reset. Reporter shares this total.',
         available_for_exploration=max(0,total-reserve),
         next_request_exploration_remaining=max(0,total-reserve-1),
@@ -96,8 +125,8 @@ def decision_budget(host):
                 cost_record_complete=all(complete and all(v.get(k) is not None for k in ('rollouts','physics_steps')) for _,v,_,complete in native_costs) and len(native)==len(native_costs),
                 integration_scope='Recorded physics_steps already includes prefix reconstruction and suffix rollouts. Callback counts describe these rollouts, not additional integrations. Independent full replay is separate; zero independent physical evaluations does not imply zero native integration.',
                 allowance_scope='Recorded totals are known subtotals; incomplete records leave actual total unknown. Native analysis shares remaining_mathematical; per-request limits are not a separate cumulative allowance. Missing costs are unknown, not zero.'),
-            any_scientific_route_fits=science_fits(host) and not (active or total-1<=reserve)),
-        closeout=dict(active=active,next_request_will_protect=active or total-1<=reserve,
+            any_scientific_route_fits=science_fits(host) and not (active or provider['next_request_will_protect'])),
+        closeout=dict(active=active,next_request_will_protect=active or provider['next_request_will_protect'],
             reason='Existing success/count/resource protection' if active else None))
 
 

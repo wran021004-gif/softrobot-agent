@@ -1321,6 +1321,42 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
 
 
 
+def compact_tool_delivery(brief):
+    """Give overlapping L0/tool fields one owner; retain original L1 queries."""
+    menu=brief.pop('action_menu',[])
+    directory=brief['tool_directory']
+    plan=next((r for r in directory if r['tool']=='research_plan'),None)
+    if plan is not None:
+        plan['actions']=[r for r in menu if r['action'] in plan['actions']]
+    extra=[r for r in menu if r['action'] not in (a['action'] for a in (plan or {}).get('actions',[]))]
+    if extra:brief['additional_action_requirements']=extra
+    continuation=brief.get('tool_continuation') or {}
+    continuation['loaded']=brief.pop('loaded_tool')
+    feedback=(brief.get('research_state') or {}).get('pending_feedback') or {}
+    delivered={r['tool_id'] for r in feedback.get('items',[])}
+    continuation['recent']=[r for r in continuation.get('recent',[]) if r['tool_use_id'] not in delivered]
+    brief['tool_continuation']=continuation
+    trace=brief.get('history_trace') or {}
+    intent=brief.get('current_intent') or {}
+    for step in trace.get('recent',[]):
+        if step.get('agent_hypothesis') and step['agent_hypothesis']==intent.get('agent_hypothesis'):
+            step.pop('agent_hypothesis');step['intent_at']='current_intent'
+    if trace.get('total')==0:
+        brief['history_trace']={'total':0,'full_trace_query':trace.get('full_trace_query')}
+    control=brief.get('current_control') or {}
+    if control.get('status')=='not_generated' and not control.get('control_sources'):
+        brief.pop('current_control',None)
+    report=brief.get('reporter_summary') or {}
+    if not report.get('report_reference') and not report.get('interpretations') and not report.get('unresolved'):
+        brief['reporter_summary']={'status':report.get('status','unavailable')}
+    # Version and identity are now actual generate Schema constants. The source
+    # query remains here; neither constants nor retrieval choose a structure.
+    generation=brief.get('generation_contract')
+    if generation and continuation['loaded'].get('plan_action')=='generate':
+        generation.pop('version',None);generation.pop('family_space_identity',None)
+    return brief
+
+
 def route_review(host,current,brief,trace):
     """Small evidence projection, not a route selector or convergence test."""
     import math

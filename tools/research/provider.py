@@ -215,6 +215,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         self.last_request=None
         self.allow_truncated_response=allow_truncated_response
         self.max_model_calls=max_model_calls
+        self.request_phase=None
 
     async def handle_async_request(self,request):
         host=self.host
@@ -243,6 +244,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             if not reception:
                 raise ValueError('R3_SAVED_RESPONSE_MISSING')
             self.last_request=saved
+            send=next(e for e in store.events(run) if e['kind']=='r3_request' and e['request_id']==saved)
+            self.request_phase=store.artifact(send['outputs'][0]).get('request_phase')
             if not row['receipt']:settle(host,row,reception)
             record(host,'r3_response_replay',dict(request_id=saved,new_send=False))
             if not self.allow_truncated_response:self.require_complete()
@@ -256,6 +259,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 raise ValueError('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
+            from tools.research.budget import provider_allowance
+            self.request_phase=provider_allowance(host,db)['request_phase']
         with store.transaction() as db:
             raw_request=store.put(db,wire)
         key='r3-request-'+uuid4().hex
@@ -273,6 +278,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             metadata=store.put(db,dict(request=plain(raw_request),purpose=purpose,pid=os.getpid(),
                 input_bytes=len(request.content),
                 context_capacity=capacity,
+                **(dict(request_phase=self.request_phase) if self.request_phase is not None else {}),
                 endpoint=str(request.url),timeout_s=request.extensions.get('timeout'),client_retries=0,transport_retries=0))
             store.event(db,run,'r3_request','sent',request=key,execution=row['execution_id'],outputs=[metadata])
         started=time.monotonic()

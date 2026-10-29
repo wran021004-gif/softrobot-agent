@@ -64,6 +64,16 @@ test('authenticated HTTP health, catalog and nonstream completion', async t => {
   assert.equal(f.calls(), 1);
 });
 
+test('catalog upstream admission error preserves safe diagnostics and never starts inference', async t => {
+  const f=await fixture(t,{listModels:async()=>{throw new ChatGPTError('subscription_sharing_route_not_supported',
+    'Sanitized SDK diagnostic',false,403,{requestId:'req_p5_fixture',param:'model',responseShape:'{error:{code:string}}'});}});
+  const response=await f.request('/v1/models');const body=await response.json();
+  assert.equal(response.status,403);assert.equal(body.error.upstream_status,403);
+  assert.equal(body.error.code,'subscription_sharing_route_not_supported');
+  assert.equal(body.error.requestId,'req_p5_fixture');assert.equal(body.error.param,'model');
+  assert.equal(f.calls(),0);
+});
+
 test('rejects absent auth, foreign Origin, hostile Host and unsupported request without inference', async t => {
   const f = await fixture(t);
   assert.equal((await f.request('/health', { headers: { authorization: '' } })).status, 401);

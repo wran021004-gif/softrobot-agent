@@ -1,0 +1,75 @@
+{
+  "status": "blocked_external_admission",
+  "observation_scope": "Last actual catalog result is from P4. New user-requested proxy routing has not been revalidated.",
+  "upstream": {
+    "endpoint": "https://api.openai.com/v1/models",
+    "last_observed_http_status": 403,
+    "code": "api_error",
+    "retryable": false,
+    "response_shape": "undefined",
+    "request_id": null,
+    "raw_error_body_retained": false,
+    "cause": "Undetermined external admission: policy, account, workspace or service region cannot be distinguished by the retained evidence."
+  },
+  "gateway": {
+    "version": "0.1.0",
+    "node_version": "24.19.0",
+    "devkit_commit": "0a36fefeb913055c8c7a1a29b63d82b96b2e841a",
+    "source": "V2 worktree local-chatgpt-gateway",
+    "observed_listener_pid": 379820,
+    "listener": "127.0.0.1:8787",
+    "startup": "npm run start:proxy -> node --use-env-proxy src/cli.mjs serve",
+    "proxy": "http://127.0.0.1:7890",
+    "loopback_direct": true,
+    "authentication_configuration_changed": false
+  },
+  "offline_saved_state_consistency": {
+    "active_profile_found": true,
+    "stored_status_connected": true,
+    "required_scopes": {
+      "openid": true,
+      "profile": true,
+      "email": true,
+      "offline_access": true,
+      "resource.invoke": true,
+      "chatgpt.tokens.use.direct": true
+    },
+    "issued_client_saved": true,
+    "id_token_subject_matches_profile": true,
+    "id_token_audience_matches_client": true,
+    "id_token_issuer_expected": true,
+    "access_client_matches_registration": true,
+    "access_token_present": true,
+    "pending_refresh_present": false,
+    "access_token_expired_now": true,
+    "host_id_format_valid": true,
+    "workspace_binding": "not_independently_recorded_by_pinned_devkit",
+    "signature_reverified": false,
+    "network_requests": 0,
+    "limitation": "Decoded claims are consistency checks, not fresh signature verification or upstream admission. No identity or token value is emitted.",
+    "p4_published_payload_audit": {
+      "files_checked": 24,
+      "files_matching_private_auth_values": 0,
+      "request_fields_contain_no_headers": true,
+      "limitation": "Exact saved private-value check plus request-field review; not a universal secret detector. No private value is output."
+    },
+    "state_file_unchanged": true
+  },
+  "p4_deepseek_credential_audit": {
+    "files_checked": 24,
+    "files_matching_deepseek_credential": 0,
+    "network_requests": 0,
+    "limitation": "Exact current credential check only, not a universal secret detector. No credential is emitted."
+  },
+  "new_catalog_requests": 0,
+  "new_inference_requests": 0,
+  "new_oauth_refresh_requests": 0,
+  "account_catalog_luna_verified": false,
+  "inference_capability_verified": false,
+  "next_step": "One controlled catalog validation is pending explicit approval after the user-requested routing configuration change. No retry of the same non-retryable error; no inference grant is inferred.",
+  "official_documents": [
+    "https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference",
+    "https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery",
+    "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations"
+  ]
+}

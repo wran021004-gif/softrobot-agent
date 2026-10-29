@@ -31,7 +31,7 @@ DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed dec
     'use research_analysis when offered and obtain exact method details through evidence_read. '
     'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
     'For STOP, retrieve and cite the complete new result index.')
-def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False):
+def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False,study=None):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
@@ -102,7 +102,37 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             for x in v:visit(x)
     visit(schema['properties'])
     schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+    if focused and study and study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3':
+        schema=compact_plan_schema(schema,actions[0],study)
     return schema
+
+
+def compact_plan_schema(schema, action, study):
+    """Remove annotations/unreachable branches; bind the actual frozen domain."""
+    branches=[]
+    for branch in schema.get('allOf',[]):
+        condition=branch.get('if',{}).get('properties',{})
+        owners=condition.get('action',{}).get('enum')
+        if set(condition)=={'action'} and owners is not None:
+            if action in owners:branches.append(branch.get('then',{}))
+        else:branches.append(branch)
+    schema['allOf']=branches
+    if action=='generate':
+        space=study['family_space'];name='GenerationRequestV2' if space['version']=='serial_family_space_v2' else 'GenerationRequest'
+        properties=schema['$defs'][name]['properties']
+        properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
+        properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
+        lo,hi=space['executable_tendon_count_bounds']
+        properties['tendon_count']={**properties['tendon_count'],'minimum':lo,'maximum':hi}
+    def clean(node):
+        if isinstance(node,list):return [clean(v) for v in node]
+        if not isinstance(node,dict):return node
+        result={k:({name:clean(child) for name,child in v.items()} if k in ('properties','$defs') else clean(v))
+            for k,v in node.items() if k!='title'}
+        if len(result.get('anyOf',[]))==1:
+            result={**result.pop('anyOf')[0],**result}
+        return result
+    return clean(schema)
 
 
 def tool_directory(host, registry):
@@ -159,7 +189,7 @@ def load_selected_tool_schema(host, registry, directory):
             spec=s['spec']
             selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
                 family_version=spec.get('family_space',{}).get('version'),
-                diagnose_candidate_required=spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',focused=True)}}
+                diagnose_candidate_required=spec.get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',focused=True,study=spec)}}
     elif selected and name=='research_rl':
         schema=deepcopy(selected.tool_spec['inputSchema']['json']);actions=schema['properties']['operation']['enum']
         if route.get('action') not in actions:selected=None
@@ -172,7 +202,7 @@ def load_selected_tool_schema(host, registry, directory):
     router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
     retained={'research_route'}
     if selected:retained.add(name)
-    if s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v2':
+    if s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v2','on_demand_tools_v3'):
         # Retrieval must not unload the already chosen Plan. With no prior Plan,
         # expose generate (or closeout STOP), without choosing/submitting it.
         plan=registry.get('research_plan')
@@ -182,7 +212,7 @@ def load_selected_tool_schema(host, registry, directory):
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
             plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
-                family_version=s['spec'].get('family_space',{}).get('version'),focused=True)}}
+                family_version=s['spec'].get('family_space',{}).get('version'),focused=True,study=s['spec'])}}
             retained.add('research_plan')
     for key in list(registry):
         if key not in retained:registry.pop(key)
@@ -734,7 +764,11 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(error_feedback(host,use,exc,before)))])
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
-        return run
+        def paid_tool(use,**kwargs):
+            from tools.research.budget import provider_request_scope
+            with provider_request_scope(host,boundary.request_phase):
+                return run(use,**kwargs)
+        return paid_tool
     rl_mode=enabled(state(host)['spec'],'rl')
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
@@ -970,12 +1004,15 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
                 tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
-            if tool_schema_policy(s['spec'])==dict(version='on_demand_tools_v2') and s.get('family_space_reference'):
+            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3')) and s.get('family_space_reference'):
                 boundary.research_packet['research']['generation_contract']=dict(
                     family_space_identity=s['spec']['family_space_identity'],
                     version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
                     domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
                     scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
+            if tool_schema_policy(s['spec'])==dict(version='on_demand_tools_v3'):
+                from tools.research.research_context import compact_tool_delivery
+                compact_tool_delivery(boundary.research_packet['research'])
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
@@ -1014,7 +1051,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
-    def before_tool(event):
+    def check_before_tool(event):
         if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read',*(['research_route'] if on_demand else [])):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
@@ -1028,6 +1065,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             event.cancel_tool='Accepted STOP seals further workflow work.'
         if protected(host) and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
             event.cancel_tool='Protected closeout permits existing execution feedback only.'
+    def before_tool(event):
+        from tools.research.budget import provider_request_scope
+        with provider_request_scope(host,boundary.request_phase):
+            check_before_tool(event)
     def after_tool(event):
         saved=dict(tool_use=event.tool_use,result=event.result)
         if event.tool_use['name']=='evidence_read' and event.tool_use['input'].get('view') in ('working_set','mathematical_capabilities','capabilities'):

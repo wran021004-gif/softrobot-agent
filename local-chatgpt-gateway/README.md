@@ -47,7 +47,22 @@ explicitly unsupported here. The 1 MiB body limit includes tools and replay hist
 `npm test` uses mocked remote OAuth/inference and isolated temporary storage. Real
 Windows DPAPI/CLI checks do not sign in or perform inference. Production login,
 model discovery and smoke are separate explicit operations requiring authorization.
-No real account/network verification was performed for Harness V2.
+Account admission results are recorded separately in `../docs/research/p5_acceptance.md`;
+offline tests do not establish real model availability.
+
+For the user-selected local HTTP proxy at `127.0.0.1:7890`, stop the existing
+runtime and run `npm run start:proxy` from this V2 directory. Node 24.5+ native
+`--use-env-proxy` routes OAuth/catalog/Responses fetches through process-local
+HTTP_PROXY/HTTPS_PROXY. NO_PROXY keeps localhost, 127.0.0.1 and ::1 direct.
+This does not change OAuth, consent, account, region selection or billing.
+Starting the server performs no upstream request. Do not repeat a known
+non-retryable admission error merely because proxy startup succeeded.
+
+`node scripts/diagnose-state.mjs --audit-p4` reads protected state offline and
+emits consistency booleans only. It does not create a client, refresh tokens,
+verify JWT signatures remotely, write credentials or reveal private IDs.
+The optional audit checks the existing P4 publication for exact saved private
+values; it is not a universal secret detector or a license to publish raw state.
 
 `npm run smoke -- --model <active-account-slug>` requires an explicit model and
 sends exactly one text request with `reasoning_effort: none`. Missing or unlisted

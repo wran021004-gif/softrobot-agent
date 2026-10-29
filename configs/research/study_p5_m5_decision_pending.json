@@ -1,0 +1,145 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_base_only_tracking_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "p5-m5-none-pending",
+  "base_commit": "c56bae83e86ec78451f0acd68c9f78f91f5c503c",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: P5 decision-window proposal only. No new Provider quota or formal Study authorization has been granted. Proposed shared total nine requests, last three closeout-only; at most six Main exploration requests before any Reporter consumption. No Echo validation is charged to this proposed Study. Do not prepare, bind, run, or reuse the stopped P4 authority without fresh explicit approval.",
+  "task": "../../tasks/bf5_position_tool_axis_v1.json",
+  "control": "control_bf5_tool_axis.json",
+  "evidence_destination": "runs/research/p5-m5-none-pending",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ],
+    "cells_per_segment": 12
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.3.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "windows_s": [
+      0.1,
+      0.3,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ]
+  },
+  "scoring_window_s": 0.6,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "control_search",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "control_search",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 100,
+    "iterations": 16,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": [],
+    "architecture": "english_decision_v2",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "bound_scientific_variables_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "on_demand_tools_v3"
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    }
+  },
+  "mode": "formal_research",
+  "runtime": "runtime_harness_v2.json",
+  "initial_structure_strategy": "agent_choice",
+  "physical_replay_limit": 2,
+  "budgets": {
+    "provider_reserve_policy": "last_requests_v2",
+    "provider_requests": 9,
+    "protected_provider_requests": 3,
+    "public_operations": 80,
+    "protected_public_operations": 12,
+    "physical_launches": 2,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 2,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "execution_instructions": "Start from the frozen canonical task and Base-only family domain. Choose and submit useful research actions autonomously using the available typed tools. Routing selects a tool; submit research_plan to perform a Plan. Use English for all new decisions and scientific interpretations. Read exact feedback and distinguish local mathematical diagnostics from independent task evaluation. Historical guidance grants no current evidence or permission. Stop and select the first complete independently accepted result after the required full read; otherwise stop truthfully within the original budget. No NMPC, PPO, automatic retries or extra success confirmations."
+}

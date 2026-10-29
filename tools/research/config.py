@@ -20,7 +20,7 @@ def tool_schema_policy(spec):
 
 def validate_conversation_policy(decisions):
     tools=decisions.get('tool_schema_policy')
-    if tools is not None and (tools not in ({'version':'on_demand_tools_v1'},{'version':'on_demand_tools_v2'})
+    if tools is not None and (tools not in ({'version':'on_demand_tools_v1'},{'version':'on_demand_tools_v2'},{'version':'on_demand_tools_v3'})
             or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')
             or not decisions.get('conversation_policy')):
         raise ValueError('VERSIONED_ON_DEMAND_TOOLS_REQUIRES_RECENT_ROUND_POLICY')
@@ -208,6 +208,7 @@ def _reference(source, key, provenance):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    provider_reserve_policy=study.get('budgets',{}).pop('provider_reserve_policy',None)
     if 'study_experience_entries' in study:
         raise ValueError('STUDY_EXPERIENCE_REQUIRES_SCOPED_LOCAL_INDEX')
     experience_index=study.pop('study_experience_index',None)
@@ -357,6 +358,9 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('INVALID_REFERENCE_EDIT: ' + key)
         current[parts[-1]] = value
     b = study['budgets']
+    if provider_reserve_policy is not None:b['provider_reserve_policy']=provider_reserve_policy
+    if b.get('provider_reserve_policy') not in (None,'last_requests_v2'):
+        raise ValueError('UNKNOWN_PROVIDER_RESERVE_POLICY')
     if native_limits is not None and (set(native_limits)!={'evaluation_requests','iterations','knots_s'}
             or any(type(v) is not int or v<1 for v in native_limits.values())):
         raise ValueError('POSITIVE_NATIVE_CONTROL_COUNT_LIMITS_REQUIRED')
