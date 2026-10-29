@@ -1,0 +1,3043 @@
+{
+  "study_id": "p63b5-m-native-sol-20261029",
+  "resolved_identity": "a1ae8242263061e3701270b55d29c6327b424b0dfd4e6fa6fefee1e506caa127",
+  "freeze": "d74a97a001519e14e2c674879dcac2553de461a7",
+  "authorization": [
+    {
+      "kind": "formal_study_authorization",
+      "reference": {
+        "artifact_id": "60532403f2d0906f325e788665463a53d23a13a2998b2706b423071bc0568961",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "live_handoff_admission",
+      "reference": {
+        "artifact_id": "2ead673b3db1fba2e75a9af28ac1793742efc365f1603181c82d77b279bd3fb6",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "scope": "Actual Store/wire read-only projection. Full Store, Knowledge bodies, credentials and opaque Provider output excluded.",
+  "requests": [
+    {
+      "number": 1,
+      "request_id": "r3-request-e407916a1a1d40d684b4a61355b624f7",
+      "timestamp": "2026-10-29T14:39:41.390421+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "faa374f697a57474a633450f86d1d4787f048d13c9b958534fa53bcabb415e1f",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 41071,
+      "http_status": 200,
+      "elapsed_s": 9.281000000002678,
+      "usage": {
+        "completion_tokens": 94,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 8073,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 8167
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 9.281000000002678,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-e407916a1a1d40d684b4a61355b624f7",
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "method",
+              "status",
+              "execution_status",
+              "estimated_evaluations",
+              "request_template"
+            ],
+            "pointer": "/methods",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_3269bc6d33124c1399701fe59f041c25",
+          "input_reference": {
+            "artifact_id": "a99639de1ca7e3d3c47df1d371e94beedf8c717f77e745bc4385a5cb02217c82",
+            "media_type": "application/json"
+          },
+          "feedback_status": "error",
+          "feedback_reference": {
+            "artifact_id": "8ab0d7559cf9277122246394ff2d59975becfc92b44154c22c9c56ab9d441264",
+            "media_type": "application/json"
+          },
+          "error": {
+            "status": "rejected",
+            "error_code": "INVALID_EVIDENCE_POINTER",
+            "field": "fields",
+            "reason": "'method'",
+            "expected": "Use exact query: {\"reference\":{\"artifact_id\":\"5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04\",\"media_type\":\"application/json\"},\"view\":\"mathematical_capabilities\",\"pointer\":\"/methods\"}",
+            "worker_started": false,
+            "scientific_execution_started": false,
+            "charged_method_counts": {
+              "physical_replay_launches": 0,
+              "nmpc_launches": 0,
+              "mathematical_evaluations": 0
+            },
+            "full_error_reference": {
+              "artifact_id": "30245c0e4988d1ac7407342e190d0e1e4fe3a2c40b264b4e0b55af27fad3723d",
+              "media_type": "application/json"
+            },
+            "corrected_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            }
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "5490b6dda2d0419701e0de14ffd52d5a3b30230f34f6070fe20e4534b7eaeaeb",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 2,
+      "request_id": "r3-request-76001012c89b474fa01f44d3064942ad",
+      "timestamp": "2026-10-29T14:39:54.715870+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "0e007215e434d18e13b75f2c14662452bd745edf4fcd4072467e54b2cc349201",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 43228,
+      "http_status": 200,
+      "elapsed_s": 10.764999999999418,
+      "usage": {
+        "completion_tokens": 76,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 8609,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 8685
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 10.764999999999418,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-76001012c89b474fa01f44d3064942ad",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/methods",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_bc9ba32db0fc455ca0591c79e882bf4f",
+          "input_reference": {
+            "artifact_id": "c4a9246ed0f7338ec13ffdfffe61d0161f7233aaf72c8268984fb8c18416b945",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "80a24117bf7f90b9e5d89fa0fb5f9a47e29f742192ea42352fe57ea0509af1a7",
+            "media_type": "application/json"
+          },
+          "output": {
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "returned_fields": [
+              "policy",
+              "reference",
+              "requested_view",
+              "pointer",
+              "original_response_bytes",
+              "notice",
+              "entries",
+              "remaining_entries"
+            ],
+            "navigation_fields": [
+              "equilibrium",
+              "linearization",
+              "controllability",
+              "endpoint",
+              "braking",
+              "instantaneous_braking_v1",
+              "trajectory_feasibility",
+              "task_capability"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "fdbe6f870e5fdf9ac55af96f4bc76de3fea8c489e5440e0328e5197ebb7a06e3",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 3,
+      "request_id": "r3-request-d906371576c44cf79a09f59393185503",
+      "timestamp": "2026-10-29T14:40:09.605751+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "884e9408103c191c7e86d172109fb8552c1c0a8c24084f13cfb2f9b9f0404655",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 45706,
+      "http_status": 200,
+      "elapsed_s": 10.64100000000326,
+      "usage": {
+        "completion_tokens": 353,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9312,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3200
+        },
+        "total_tokens": 9665
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 10.64100000000326,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-d906371576c44cf79a09f59393185503",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/parameters",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "tool_use_id": "call_1ab5ce28151d435ea1ef932e3015561b",
+          "input_reference": {
+            "artifact_id": "257735e242193fd0db5a163585038c917b1d8f3d6522d4cdc1a04c9b5ba4f689",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "72df1851571f1d2e880f07acd8e51151ef186f0b271373165cba284c153ae83b",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count",
+              "version"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-d906371576c44cf79a09f59393185503",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/provenance",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "tool_use_id": "call_7c709cc2181e40e2bef61e312c9bcad2",
+          "input_reference": {
+            "artifact_id": "f3116cbee70c5e928a6b1694ff249aac3f1f2ba1477f7360b64fdfec5f6fe318",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "7a79c290b46336b6c263d41ce84e92f68b35802dbfa7b8e142aa2f21f51201ce",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "decision_owner",
+              "origin",
+              "scope"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-d906371576c44cf79a09f59393185503",
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "source",
+              "source_kind",
+              "origin_kind",
+              "origin_status",
+              "historical_origin",
+              "origin_reference",
+              "initialized",
+              "full_control_sequence",
+              "task_acceptance",
+              "trajectory_query",
+              "execution_references"
+            ],
+            "pointer": "/control_result_links/0",
+            "reference": {
+              "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_3f9ed5731ee246cfa69f22bd77b25c72",
+          "input_reference": {
+            "artifact_id": "16bd3a49fc9be6653bf1410b40dd76fdcdd7e7285a8f595ccd6457cc4a860631",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "51af054bd1dc434a78d5073534cb7144a3f3422362763bed5ebc71a570cbe033",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "source",
+              "source_kind",
+              "origin_kind",
+              "origin_status",
+              "historical_origin",
+              "origin_reference",
+              "initialized",
+              "full_control_sequence",
+              "task_acceptance",
+              "trajectory_query",
+              "execution_references"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-d906371576c44cf79a09f59393185503",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_352e551240174ebab48610b200fb0642",
+          "input_reference": {
+            "artifact_id": "5aaac66db1d9d4086d399ecc9d5f074ca1de605c5ca37aa1fb1f4215d51c2a49",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "7230bbc0a1b4851921870deeb32e400e8d3ec8f8a80133dff275f761b9a93b26",
+            "media_type": "application/json"
+          },
+          "output": {
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "planning_status": "requires_parameters",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "request_template_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template"
+            },
+            "next_submission": {
+              "tool": "research_plan",
+              "action": "diagnose",
+              "available": true,
+              "after_completed_diagnose": "research_analysis; original source, parameter and budget admission applies."
+            },
+            "execution_status": "conditional_on_admission",
+            "returned_fields": [
+              "next_submission",
+              "method",
+              "operation",
+              "scientific_purpose",
+              "description",
+              "planning_status",
+              "missing",
+              "required_parameters",
+              "required_sources",
+              "estimated_evaluations",
+              "estimated_evaluation_range",
+              "wall_cost",
+              "cost_scope",
+              "formal_execution_authorized",
+              "execution_status",
+              "request_template_query",
+              "control_input_guidance",
+              "applicability",
+              "limitations",
+              "full_detail_queries",
+              "query_rule",
+              "already_bound"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "dfed3fa725cf540d97f05a959c5c8ab3431edb08f8e69346f1a3085d52fe8b8e",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 4,
+      "request_id": "r3-request-293c4862c3454055b860a66c6e094872",
+      "timestamp": "2026-10-29T14:40:25.427708+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "d0bdbdc08e3e53899e7241a3a55ee139c72017e8d091a3bbbd9ed438fc441679",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 49320,
+      "http_status": 200,
+      "elapsed_s": 10.312000000005355,
+      "usage": {
+        "completion_tokens": 47,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 10040,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 10087
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 10.312000000005355,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-293c4862c3454055b860a66c6e094872",
+          "tool": "experience_retrieve",
+          "input": {
+            "failure_type": "unmeasured initialized control",
+            "kind": "success_case",
+            "limit": 9,
+            "operation": "search",
+            "structure": "soft robot",
+            "task": "reach"
+          },
+          "tool_use_id": "call_702075e1d9c645c59e02a0ec73743c1f",
+          "input_reference": {
+            "artifact_id": "9402b724a6b2af010d8e7ba282a492025dd84aa67ee1e83172a83085c81a8122",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "4c5dc012b75098fa7ad4bd7f0240aee2ea58e33641fc44d39953c4165ac50f02",
+            "media_type": "application/json"
+          },
+          "knowledge": {
+            "matched_count": 0,
+            "scientific_evidence": false,
+            "entries": []
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "7999ff3406bf98d957a8667f9e22b97243f58eb0f427fe77cdedc6de8f804c4a",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 5,
+      "request_id": "r3-request-4e3e11d436e44e708fa13fec8431a368",
+      "timestamp": "2026-10-29T14:40:39.560880+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "8378aa46722311949d0f843b6c457d2dabd9ea55eedf6dd97f915c8fc497f465",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 45883,
+      "http_status": 200,
+      "elapsed_s": 9.264999999999418,
+      "usage": {
+        "completion_tokens": 87,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9269,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9356
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 9.264999999999418,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-4e3e11d436e44e708fa13fec8431a368",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_9163c48b1f7046058dc9ee2b9017bf45",
+          "input_reference": {
+            "artifact_id": "f0bfbcdfc3bcaaecd3832efcfb0f5dce0be667ee0a2933f44ab55a62f32ce58a",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "7f27d33d40388ecde1289cc58e8e06c767ea599370ad0753f5fc2fdc8577ea6a",
+            "media_type": "application/json"
+          },
+          "output": {
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "planning_status": "requires_parameters",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "request_template_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template"
+            },
+            "next_submission": {
+              "tool": "research_plan",
+              "action": "diagnose",
+              "available": true,
+              "after_completed_diagnose": "research_analysis; original source, parameter and budget admission applies."
+            },
+            "execution_status": "conditional_on_admission",
+            "returned_fields": [
+              "next_submission",
+              "method",
+              "operation",
+              "scientific_purpose",
+              "description",
+              "planning_status",
+              "missing",
+              "required_parameters",
+              "required_sources",
+              "estimated_evaluations",
+              "estimated_evaluation_range",
+              "wall_cost",
+              "cost_scope",
+              "formal_execution_authorized",
+              "execution_status",
+              "request_template_query",
+              "control_input_guidance",
+              "applicability",
+              "limitations",
+              "full_detail_queries",
+              "query_rule",
+              "already_bound"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "a2416c3217fae63c0374bfc8ff8ecbba8d874c0ed98714789a34004274691dea",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 6,
+      "request_id": "r3-request-0dc8e2cbdca4408b9c747f1a4d3d2f24",
+      "timestamp": "2026-10-29T14:40:53.183611+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "ef38edfc9b1acfa5cc889d34fbf6bfe2ef05faa427f254f87885610687ddaae8",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 46894,
+      "http_status": 200,
+      "elapsed_s": 10.796000000002095,
+      "usage": {
+        "completion_tokens": 50,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9404,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9454
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 10.796000000002095,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-0dc8e2cbdca4408b9c747f1a4d3d2f24",
+          "tool": "experience_retrieve",
+          "input": {
+            "failure_type": "bounded nonlinear control search",
+            "kind": "success_case",
+            "limit": 3,
+            "operation": "search",
+            "structure": "continuum tendon robot",
+            "task": "reach_and_hold"
+          },
+          "tool_use_id": "call_b61c9cf59b2b436b9e1fc657333d272d",
+          "input_reference": {
+            "artifact_id": "f5fb9171378610a1b6b4cc26945e16e990981c30e299330275256ce9462d958c",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "644e179ea43f1482cc46ee57b10277b44f0d000e0ad6ae6533bc20489ac5c35e",
+            "media_type": "application/json"
+          },
+          "knowledge": {
+            "matched_count": 0,
+            "scientific_evidence": false,
+            "entries": []
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "72fd15181b2aa0c8e10b59eec695a0189dbdcd3c913c863d2e18d23303638fcc",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 7,
+      "request_id": "r3-request-4e31b4d2d96040f1bd6c139bb131090b",
+      "timestamp": "2026-10-29T14:41:07.676296+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "19c80ce9ab2730a1bae3ed14190d16f1c410cf0cecd570e2286d55783b6b2922",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 45550,
+      "http_status": 200,
+      "elapsed_s": 9.656000000002678,
+      "usage": {
+        "completion_tokens": 87,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9184,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3200
+        },
+        "total_tokens": 9271
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 9.656000000002678,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-4e31b4d2d96040f1bd6c139bb131090b",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_7e337861f51a4ade987d16173b321e3f",
+          "input_reference": {
+            "artifact_id": "82ee3f86292703599bd7abc21df1a16635a944dd460738ea085ddb97d1c1c234",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "2c12d49f568e7ba91f6dbb8ec9511f5fae493649fe716b9fbd24f5ff64b33bd6",
+            "media_type": "application/json"
+          },
+          "output": {
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "planning_status": "requires_parameters",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "request_template_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template"
+            },
+            "next_submission": {
+              "tool": "research_plan",
+              "action": "diagnose",
+              "available": true,
+              "after_completed_diagnose": "research_analysis; original source, parameter and budget admission applies."
+            },
+            "execution_status": "conditional_on_admission",
+            "returned_fields": [
+              "next_submission",
+              "method",
+              "operation",
+              "scientific_purpose",
+              "description",
+              "planning_status",
+              "missing",
+              "required_parameters",
+              "required_sources",
+              "estimated_evaluations",
+              "estimated_evaluation_range",
+              "wall_cost",
+              "cost_scope",
+              "formal_execution_authorized",
+              "execution_status",
+              "request_template_query",
+              "control_input_guidance",
+              "applicability",
+              "limitations",
+              "full_detail_queries",
+              "query_rule",
+              "already_bound"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "d9f4bcda808955217d36119d1a5c31be9c67714b56ae372a526d17abb41e7863",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 8,
+      "request_id": "r3-request-8be79fc46a7e4546b61c1904a1a2b768",
+      "timestamp": "2026-10-29T14:41:21.712457+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "6cfd5346cd00bf2ae8c7812f6aa1867542d052ee0a07599a58ae4e6ac34a4197",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 46461,
+      "http_status": 200,
+      "elapsed_s": 9.25,
+      "usage": {
+        "completion_tokens": 374,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9313,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3200
+        },
+        "total_tokens": 9687
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 9.25,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-8be79fc46a7e4546b61c1904a1a2b768",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/parameters",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "tool_use_id": "call_228f30a6289147158590117297b6b607",
+          "input_reference": {
+            "artifact_id": "538a1ee26dd0b7c5973a284042c07f0e827ff250f77536ffa49d2ddc8b31a992",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "f11615bb8f6ff952263a449feeb8284a2a869aa37efe2418cd9688d816867524",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "family_space_identity",
+              "segment_count",
+              "tendon_count",
+              "version"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-8be79fc46a7e4546b61c1904a1a2b768",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/provenance",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "full"
+          },
+          "tool_use_id": "call_93c9372d56094d3abced7c5d917c7bd8",
+          "input_reference": {
+            "artifact_id": "2ded562ad1701c371fcbbad968e35e0858c58fee6f577ad397dfa9db0d6f394a",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "850986a6959aaa070e3d0b25c6a63a3c37f1485a333d21bea0889f215d1bf43e",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "decision_owner",
+              "origin",
+              "scope"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-8be79fc46a7e4546b61c1904a1a2b768",
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "source",
+              "source_kind",
+              "origin_kind",
+              "origin_status",
+              "historical_origin",
+              "origin_reference",
+              "initialized",
+              "full_control_sequence",
+              "task_acceptance",
+              "trajectory_query",
+              "execution_references"
+            ],
+            "pointer": "/control_result_links/0",
+            "reference": {
+              "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_d0c293f4255a4f8faea077ac3444ee49",
+          "input_reference": {
+            "artifact_id": "a3dac4a68b2d637b79647e38ad02c8a08c701de9645285bc0deb236eff490bcd",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "59c68e5fa165579f26c377531b0dcf51a37bb096ed92536da19d9df32adcbe4b",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "source",
+              "source_kind",
+              "origin_kind",
+              "origin_status",
+              "historical_origin",
+              "origin_reference",
+              "initialized",
+              "full_control_sequence",
+              "task_acceptance",
+              "trajectory_query",
+              "execution_references"
+            ]
+          }
+        },
+        {
+          "parent_request": "r3-request-8be79fc46a7e4546b61c1904a1a2b768",
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "request_template_query",
+              "required_sources",
+              "control_input_guidance",
+              "applicability",
+              "limitations"
+            ],
+            "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_5ec79d7de0b94ae48bdd4e31ec6eac0d",
+          "input_reference": {
+            "artifact_id": "e2aee8d0ea90d8196e479cc707430cfb1e24cfc1555778ee478efc4b0802105a",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "21f9dc6581784828f43f0aa6fa76cbeeeb917e9fb3db4be0c766aecb4d1c69ea",
+            "media_type": "application/json"
+          },
+          "output": {
+            "request_template_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template"
+            },
+            "returned_fields": [
+              "request_template_query",
+              "required_sources",
+              "control_input_guidance",
+              "applicability",
+              "limitations"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "ac9d1df381b89d38bd58bbd3d815173d73d196e13bff6b218032500fde754d17",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 9,
+      "request_id": "r3-request-1a5599f5747948f6b164a4eb4fffb8ad",
+      "timestamp": "2026-10-29T14:41:36.342837+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "86d644dd7d947aa3f856094e2d3388b80ba89d758ec75bb6413ad9545ef0729b",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 49030,
+      "http_status": 200,
+      "elapsed_s": 11.264999999999418,
+      "usage": {
+        "completion_tokens": 89,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 10051,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3200
+        },
+        "total_tokens": 10140
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 11.264999999999418,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-1a5599f5747948f6b164a4eb4fffb8ad",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template",
+            "reference": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_e0483e06ddf141209a902e28f49b6a33",
+          "input_reference": {
+            "artifact_id": "89884d989367e0b52f18f0d76ebc47ba804c91c72dbe250879d8a768d3217316",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "a6599b3d04b301842b22a65387afa55a1b8a511f21e13b560cba7126aaad2d2c",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "candidate",
+              "operation",
+              "model_source",
+              "operating_point",
+              "protocol"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "56b192e07e754038d21d8397407c63906d8ddce56ce62ed563ec84d91e24c903",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 10,
+      "request_id": "r3-request-1668af7f50cf40c5834fef790c487ef8",
+      "timestamp": "2026-10-29T14:41:52.101638+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "7567ffa6ed2e807f4d9027925dcfdc6778a8d1a10ba216fbe95cc78f569268f8",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 46048,
+      "http_status": 200,
+      "elapsed_s": 16.187999999994645,
+      "usage": {
+        "completion_tokens": 25,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9452,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 3200
+        },
+        "total_tokens": 9477
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 16.187999999994645,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-1668af7f50cf40c5834fef790c487ef8",
+          "tool": "research_route",
+          "input": {
+            "action": "diagnose",
+            "tool": "research_plan"
+          },
+          "tool_use_id": "call_4722f25559f7409197be087d2739d4a4",
+          "input_reference": {
+            "artifact_id": "d64da7a58e513b6cd8ad19d57207b530fcc23572d72be6b02f27347e4b03f866",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "ef11ece7f3a646347110fb7bc25d61f3c96a050d7ba988f4cf81525b2ae5e0da",
+            "media_type": "application/json"
+          },
+          "output": {
+            "tool": "research_plan",
+            "action": "diagnose",
+            "returned_fields": [
+              "version",
+              "tool",
+              "action",
+              "tool_use_id",
+              "scientific_execution_started",
+              "formal_read_credit",
+              "scope"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "4c6e3c12d2d327fea7ac2c1a9eba8c4aa7d936885d05a6c95322d3c86e21e008",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "research",
+            "action": null,
+            "source": null
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "generate",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.",
+            "generation_inputs": {
+              "overrides": "Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.",
+              "sections": {
+                "rule": "If explicitly changed, supply exactly one section per prototype station, in the same order.",
+                "prototypes": [
+                  {
+                    "applies_to": "index 0",
+                    "prototype": "segment_0",
+                    "count": 1,
+                    "stations_s": [
+                      0.0
+                    ]
+                  },
+                  {
+                    "applies_to": "indices >= 1",
+                    "prototype": "segment_1",
+                    "count": 2,
+                    "stations_s": [
+                      0.0,
+                      1.0
+                    ]
+                  }
+                ]
+              },
+              "acceptance": "Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.",
+              "cells": {
+                "bounds": [
+                  12,
+                  12
+                ],
+                "default": 12,
+                "rule": "Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds."
+              }
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 11,
+      "request_id": "r3-request-48a16de5647b419aaa684aa2ff06eebc",
+      "timestamp": "2026-10-29T14:42:12.084479+00:00",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "wire_reference": {
+        "artifact_id": "db3db9617a3f5bb0cab9094c385a8e23c6e03acf3c7e96d6e1f9410595da1194",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 42090,
+      "http_status": 200,
+      "elapsed_s": 16.389999999999418,
+      "usage": {
+        "completion_tokens": 568,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 8849,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9417
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 16.389999999999418,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-48a16de5647b419aaa684aa2ff06eebc",
+          "tool": "research_plan",
+          "input": {
+            "action": "diagnose",
+            "decision": {
+              "claimed_inference": "empirical_search",
+              "hypothesis_id": "H1_bounded_native_control_correction",
+              "requested_budget": 1,
+              "research_intent": "DIAGNOSE",
+              "selected_candidate": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "selected_method": "mujoco-nonlinear-task-capability-v1",
+              "selected_variables": [
+                "initialized full control schedule; local bounded control corrections at knots 0.42 s, 0.50 s, 0.58 s over correction window 0.18 s"
+              ],
+              "version": "research_decision_v1"
+            },
+            "expected_observation": "Direct MuJoCo Native rollouts from local_control_search_v2 return a best-found corrected schedule with lower best_found_J than the initialized schedule; success would additionally require terminal_error_m and holding_max_error_m at most 0.01 m and holding_max_speed_m_s at most 0.03 m/s.",
+            "fixed_conditions": "Keep candidate structure, MuJoCo model and integration settings, task target [0.295, 0, 0.215] m, 0.6 s duration, 0.02 s control/sample periods, 0.001 s timestep, and the supplied initialized schedule as source fixed; use local_control_search_v2 with correction_window_s 0.18, knots_s [0.42, 0.50, 0.58], at most 24 callbacks and at most 3 iterations. Treat all outcomes as simulation-only and local finite-search evidence.",
+            "hypothesis": "For the fixed legal structure and initialized full control schedule, a bounded three-knot correction over the final 0.18 seconds can reduce the MuJoCo Native reach-and-hold objective relative to that schedule and may satisfy the sealed terminal, holding-error, and holding-speed thresholds within this local finite search.",
+            "interpretation": "This test evaluates bounded local control capability of one fixed structure under direct MuJoCo Native dynamics. Improvement supports only a local correction opportunity; failure weakens this correction hypothesis but does not establish structural or global task infeasibility.",
+            "next_step": "diagnose",
+            "stopping_condition": "After one admitted Native nonlinear capability result, interpret its exact baseline and best-rollout metrics and choose continuation, design revision, or truthful STOP without claiming global optimality, strict gradients, hardware performance, or infeasibility.",
+            "supporting_evidence": [],
+            "weakening_observation": "The admitted finite search finds no valid correction improving best_found_J, encounters numerical failure, or its best rollout remains outside one or more frozen reach-and-hold thresholds."
+          },
+          "tool_use_id": "call_3be60dc723384c5b96a283e0ad80a9ae",
+          "input_reference": {
+            "artifact_id": "4affb4e859d6962fae453edb2abaf4644db077ca527e576e2b60ebb828e1a2b4",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "a782e7ac527f1e72094d47f10cd49eac3263eaf5fff313e15e31d550af6f5174",
+            "media_type": "application/json"
+          },
+          "output": {
+            "returned_fields": [
+              "wrapper_reference",
+              "wrapper_role",
+              "execution_feedback",
+              "scientific_reference",
+              "new_facts"
+            ]
+          }
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "6f3ce2f1d202ed332502200c337546288a90c27735b9457616e313fb17c2c9ab",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "research",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "tool_selected_not_submitted",
+            "action": "diagnose",
+            "source": {
+              "artifact_id": "076c4f33064d4e95c161ce59af3867010c2671de14af05612a5799b0f02a163f",
+              "media_type": "application/json"
+            }
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": "research_plan",
+            "action": "diagnose",
+            "plan_action": "diagnose"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "diagnose",
+            "instruction": "Diagnose is loaded; tool selection has not submitted scientific choices. Submit research_plan(action=diagnose) directly with your hypothesis, candidate and registered method; no research_route call is needed.",
+            "status": "tool_selected_not_submitted",
+            "scientific_fields": [
+              "hypothesis",
+              "decision.selected_candidate",
+              "decision.selected_method",
+              "expected_observation",
+              "weakening_observation",
+              "fixed_conditions"
+            ],
+            "current_hypothesis": null,
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            }
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": null,
+        "stop_reference_allowed": null,
+        "analysis_schema": null
+      }
+    },
+    {
+      "number": 12,
+      "request_id": "r3-request-30da922e401b4c59adff4e439e599699",
+      "timestamp": "2026-10-29T14:42:33.774784+00:00",
+      "purpose": "conversation",
+      "phase": "closeout",
+      "wire_reference": {
+        "artifact_id": "1bf673e79c619f597549cb000fab84831e6a3f9b4b544a4898fb95886d875db3",
+        "media_type": "application/json"
+      },
+      "model": "gpt-5.6-sol",
+      "reasoning": "none",
+      "input_bytes": 35698,
+      "http_status": 200,
+      "elapsed_s": 11.188000000009197,
+      "usage": {
+        "completion_tokens": 77,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 7833,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 7910
+      },
+      "money": null,
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 11.188000000009197,
+        "worker_calls": 0
+      },
+      "tools": [
+        {
+          "parent_request": "r3-request-30da922e401b4c59adff4e439e599699",
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_efd9283950704c5fa18393d1ebe87446",
+          "input_reference": {
+            "artifact_id": "9c290940e565b0d193acde7ce3bb841b21b9921396c4c4e130a2018a738b16fe",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_reference": {
+            "artifact_id": "23de27ae31bf00a06818d47c5ce3c30f1dfa5806401a6ad0c82b1230e7145515",
+            "media_type": "application/json"
+          },
+          "output": []
+        }
+      ],
+      "response_body_reference": {
+        "artifact_id": "0c50b36f65c62ee28817f9440c32acf7ed0d42a9857253ee1948987a8bb7728e",
+        "media_type": "application/octet-stream"
+      },
+      "visible_assistant_text": [],
+      "actual_wire_projection": {
+        "current_research_state": {
+          "phase": "budget_closeout",
+          "object": {
+            "candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "origin": "Operator",
+            "provenance_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/provenance"
+            },
+            "compiled": true,
+            "control_initialized": true,
+            "mathematical_result": false,
+            "independently_evaluated": false,
+            "task_acceptance": "unmeasured"
+          },
+          "completed": [
+            "legal_candidate_compiled",
+            "control_initialized",
+            "Main_hypothesis_recorded",
+            "diagnose_plan_completed"
+          ],
+          "methods_read": [
+            "mujoco-nonlinear-task-capability-v1"
+          ],
+          "last_effective_action": {
+            "status": "request_submitted",
+            "action": "diagnose",
+            "source": {
+              "reference": {
+                "artifact_id": "38c29b20758edd6659d8d10b476fe538a755916f7a12cf1ca5dc1078eb9f37df",
+                "media_type": "application/json"
+              },
+              "pointer": "/original_plan"
+            }
+          },
+          "unresolved": [],
+          "scope": "Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence."
+        },
+        "tool_continuation": {
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "stop"
+          },
+          "direct_plan": {
+            "tool": "research_plan",
+            "action": "stop",
+            "instruction": "This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action."
+          },
+          "analysis_handoff": {
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "operation": "mujoco_nonlinear_task_capability_v1",
+            "already_bound": {
+              "fields": [
+                "candidate",
+                "protocol",
+                "operation",
+                "model_source",
+                "operating_point"
+              ],
+              "query": {
+                "reference": {
+                  "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                  "media_type": "application/json"
+                },
+                "view": "mathematical_capabilities",
+                "pointer": "/methods/mujoco-nonlinear-task-capability-v1/already_bound"
+              }
+            },
+            "required_parameters": [
+              "control_optimization={source,settings}; v2 settings require explicit correction_window_s and knots_s. Window starts at the selected native state and ends at the frozen task deadline, covering all required samples.",
+              "method=pattern requires safety_margin_fraction=0; positive safety_margin_fraction requires compatible v2 method=response. correction_window_s allows control changes; it is not the Reach/Hold scoring holding window."
+            ],
+            "required_sources": [
+              "Current structure candidate is not a control source. control_optimization.source must reference a complete candidate/task/channel/time/bounds-bound executable sequence. If missing, use research_plan(initialize_control) baseline and its returned source; then resubmit diagnose. Main chooses method and settings."
+            ],
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+              "protected_closeout"
+            ],
+            "planning_status": "blocked",
+            "formal_execution_authorized": true,
+            "execution_status": "blocked",
+            "estimated_evaluations": 1,
+            "request_template_query": {
+              "reference": {
+                "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1/request_template"
+            },
+            "tool": "research_analysis",
+            "loaded": false,
+            "remaining_scientific_fields": [],
+            "remaining_scientific_fields_scope": "Top-level required fields in the current Provider Schema only; conditional sources are listed separately. All original AnalysisRequest admission applies.",
+            "conditional_scientific_inputs": [],
+            "operating_point_sources": {
+              "operating_points": [
+                {
+                  "operating_point": "standardized_initial_pretension",
+                  "readiness": "frozen_initialization_available",
+                  "required_sources": [],
+                  "coverage": "Frozen time-zero initialization; does not diagnose the observed terminal state."
+                }
+              ],
+              "available_source_references": [],
+              "unavailable_sources": []
+            },
+            "control_input_guidance": {
+              "candidate_role": "Structure reference; candidate is not an executable control source.",
+              "source_role": "Complete executable sequence bound to candidate/task/channels/time grid/bounds; use the returned source reference.",
+              "recorded_sources": [
+                {
+                  "artifact_id": "4d5721137c201c7667ef2dedb8bcb10d5c5a253cfb51756feec3964aba6de956",
+                  "media_type": "application/json"
+                }
+              ],
+              "baseline_initialization": {
+                "tool": "research_plan",
+                "action": "initialize_control",
+                "control_seed": {
+                  "candidate": {
+                    "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                    "media_type": "application/json"
+                  },
+                  "method": "baseline"
+                },
+                "scope": "Optional candidate pretension baseline on the full frozen task grid; task_acceptance=unmeasured. Full Plan/decision admission applies."
+              },
+              "after_initialization": "Use returned source, not candidate. An initialization Plan supersedes the last diagnose. Submit diagnose again with your chosen hypothesis, candidate and method, then research_analysis.",
+              "settings": "method=pattern requires safety_margin_fraction=0; positive safety_margin_fraction requires compatible v2 method=response. correction_window_s allows control changes; it is not the Reach/Hold scoring holding window."
+            },
+            "next": "research_analysis is not loaded; consult current tool directory and method prerequisites."
+          }
+        },
+        "stop_query": {
+          "reference": {
+            "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        },
+        "allowed_reference_enum": [
+          "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+          "4d5721137c201c7667ef2dedb8bcb10d5c5a253cfb51756feec3964aba6de956",
+          "a782e7ac527f1e72094d47f10cd49eac3263eaf5fff313e15e31d550af6f5174",
+          "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+          "e7d991308f71484584b08103ad52aed308bf589a85fdedd23eff5f7782611992"
+        ],
+        "stop_reference_allowed": true,
+        "analysis_schema": null
+      }
+    }
+  ],
+  "plans": [
+    {
+      "reference": {
+        "artifact_id": "38c29b20758edd6659d8d10b476fe538a755916f7a12cf1ca5dc1078eb9f37df",
+        "media_type": "application/json"
+      },
+      "original_plan": {
+        "action": "diagnose",
+        "candidate": null,
+        "cross_replay": null,
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H1_bounded_native_control_correction",
+          "requested_budget": 1,
+          "research_intent": "DIAGNOSE",
+          "selected_candidate": {
+            "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+            "media_type": "application/json"
+          },
+          "selected_method": "mujoco-nonlinear-task-capability-v1",
+          "selected_variables": [
+            "initialized full control schedule; local bounded control corrections at knots 0.42 s, 0.50 s, 0.58 s over correction window 0.18 s"
+          ],
+          "version": "research_decision_v1"
+        },
+        "diagnostic": null,
+        "expected_observation": "Direct MuJoCo Native rollouts from local_control_search_v2 return a best-found corrected schedule with lower best_found_J than the initialized schedule; success would additionally require terminal_error_m and holding_max_error_m at most 0.01 m and holding_max_speed_m_s at most 0.03 m/s.",
+        "experience_disposition": {},
+        "fixed_conditions": "Keep candidate structure, MuJoCo model and integration settings, task target [0.295, 0, 0.215] m, 0.6 s duration, 0.02 s control/sample periods, 0.001 s timestep, and the supplied initialized schedule as source fixed; use local_control_search_v2 with correction_window_s 0.18, knots_s [0.42, 0.50, 0.58], at most 24 callbacks and at most 3 iterations. Treat all outcomes as simulation-only and local finite-search evidence.",
+        "hypothesis": "For the fixed legal structure and initialized full control schedule, a bounded three-knot correction over the final 0.18 seconds can reduce the MuJoCo Native reach-and-hold objective relative to that schedule and may satisfy the sealed terminal, holding-error, and holding-speed thresholds within this local finite search.",
+        "interpretation": "This test evaluates bounded local control capability of one fixed structure under direct MuJoCo Native dynamics. Improvement supports only a local correction opportunity; failure weakens this correction hypothesis but does not establish structural or global task infeasibility.",
+        "matched_state": null,
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": "diagnose",
+        "nmpc_prediction_diagnostic": null,
+        "parameters": null,
+        "physical_replay": null,
+        "refinement": null,
+        "revise_selection": false,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "After one admitted Native nonlinear capability result, interpret its exact baseline and best-rollout metrics and choose continuation, design revision, or truthful STOP without claiming global optimality, strict gradients, hardware performance, or infeasibility.",
+        "supporting_evidence": [],
+        "weakening_observation": "The admitted finite search finds no valid correction improving best_found_J, encounters numerical failure, or its best rollout remains outside one or more frozen reach-and-hold thresholds."
+      },
+      "execution_status": "completed",
+      "request_id": "native-call_3be60dc723384c5b96a283e0ad80a9ae"
+    }
+  ],
+  "mathematical_results": [],
+  "action_trace": {
+    "total": 1,
+    "failed_or_rejected": 0,
+    "recent": [
+      {
+        "request_id": "native-call_3be60dc723384c5b96a283e0ad80a9ae",
+        "step": 208,
+        "feedback_source": {
+          "reference": {
+            "artifact_id": "a782e7ac527f1e72094d47f10cd49eac3263eaf5fff313e15e31d550af6f5174",
+            "media_type": "application/json"
+          },
+          "pointer": "/result"
+        },
+        "action": "diagnose",
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "candidate": {
+          "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+          "media_type": "application/json"
+        },
+        "task_protocol_identity": null,
+        "agent_hypothesis": {
+          "hypothesis": "For the fixed legal structure and initialized full control schedule, a bounded three-knot correction over the final 0.18 seconds can reduce the MuJoCo Native reach-and-hold objective relative to that schedule and may satisfy the sealed terminal, holding-error, and holding-speed thresholds within this local finite search.",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "H1_bounded_native_control_correction",
+            "requested_budget": 1,
+            "research_intent": "DIAGNOSE",
+            "selected_candidate": {
+              "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+              "media_type": "application/json"
+            },
+            "selected_method": "mujoco-nonlinear-task-capability-v1",
+            "selected_variables": [
+              "initialized full control schedule; local bounded control corrections at knots 0.42 s, 0.50 s, 0.58 s over correction window 0.18 s"
+            ],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "Direct MuJoCo Native rollouts from local_control_search_v2 return a best-found corrected schedule with lower best_found_J than the initialized schedule; success would additionally require terminal_error_m and holding_max_error_m at most 0.01 m and holding_max_speed_m_s at most 0.03 m/s.",
+          "weakening_observation": "The admitted finite search finds no valid correction improving best_found_J, encounters numerical failure, or its best rollout remains outside one or more frozen reach-and-hold thresholds.",
+          "supporting_evidence": [],
+          "interpretation": "This test evaluates bounded local control capability of one fixed structure under direct MuJoCo Native dynamics. Improvement supports only a local correction opportunity; failure weakens this correction hypothesis but does not establish structural or global task infeasibility.",
+          "fixed_conditions": "Keep candidate structure, MuJoCo model and integration settings, task target [0.295, 0, 0.215] m, 0.6 s duration, 0.02 s control/sample periods, 0.001 s timestep, and the supplied initialized schedule as source fixed; use local_control_search_v2 with correction_window_s 0.18, knots_s [0.42, 0.50, 0.58], at most 24 callbacks and at most 3 iterations. Treat all outcomes as simulation-only and local finite-search evidence.",
+          "stopping_condition": "After one admitted Native nonlinear capability result, interpret its exact baseline and best-rollout metrics and choose continuation, design revision, or truthful STOP without claiming global optimality, strict gradients, hardware performance, or infeasibility."
+        },
+        "execution_status": "completed",
+        "result_references": [],
+        "receipt_output": {
+          "artifact_id": "67f9c15fd713d87694c466eebce61793347327d1eca3d4175aa42f7cbfb520af",
+          "media_type": "application/json"
+        },
+        "execution_id": "8509c85d671343e7ac2aecc898f8df84",
+        "outcome": {
+          "status": "read_only_diagnosis",
+          "execution_feedback": {
+            "executable_request_submitted": false,
+            "execution_entry": {
+              "candidate_required": false,
+              "methods_query": {
+                "pointer": "/methods",
+                "reference": {
+                  "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+                  "media_type": "application/json"
+                },
+                "view": "mathematical_capabilities"
+              },
+              "request": "To execute mathematics, choose an owned candidate and submit the registered method request_template with required_parameters. For other actions submit the matching research_plan payload. A method label or requested_budget alone starts no computation.",
+              "tool": "research_analysis"
+            },
+            "new_scientific_computations": 0,
+            "selected_method_status": "intent_only; not dispatched by diagnose",
+            "status": "read_only_diagnosis_completed"
+          }
+        },
+        "source": {
+          "reference": {
+            "artifact_id": "38c29b20758edd6659d8d10b476fe538a755916f7a12cf1ca5dc1078eb9f37df",
+            "media_type": "application/json"
+          },
+          "pointer": "/original_plan"
+        },
+        "execution_kind": "read_only_diagnosis",
+        "interpretation_status": "Agent interpretation or mechanism hypothesis; no causal verification inferred",
+        "distinguishing_observation_status": "no_saved_scientific_result_for_this_action"
+      }
+    ],
+    "scope": "Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose"
+  },
+  "reporter_reports": [],
+  "resources": {
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 18,
+        "model_calls": 12,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 134.99700000001758
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 14,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "mathematical_evaluations": 0,
+    "numerical_s": 0.48242499999469146,
+    "independent_physical_evaluations": 0,
+    "nmpc": 0,
+    "rl": 0,
+    "nlp": 0,
+    "bdf": 0,
+    "native_work": {
+      "mathematical_workers": 0,
+      "model_builds": 0,
+      "rollouts": 0,
+      "physics_steps": 0,
+      "reason": "No mathematical or physical dispatch submitted, no pending science and no analysis results; original final budget native cost record complete with zero recorded rollouts/steps."
+    }
+  },
+  "navigation": {
+    "method_detail_reads": {
+      "/methods/mujoco-nonlinear-task-capability-v1": 4
+    },
+    "wrong_view_pointer_count": 1,
+    "errors": {
+      "INVALID_EVIDENCE_POINTER": 1
+    },
+    "success_case_reads": 0
+  },
+  "outcome": {
+    "M1": true,
+    "M2": false,
+    "M3": false,
+    "store_status": "ready",
+    "native_stop": false,
+    "selected": null,
+    "pending_provider": 0,
+    "pending_science": null,
+    "control_initializations": [
+      {
+        "candidate": {
+          "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "4d5721137c201c7667ef2dedb8bcb10d5c5a253cfb51756feec3964aba6de956",
+          "media_type": "application/json"
+        },
+        "task_acceptance": "unmeasured"
+      }
+    ],
+    "operator_pause": [
+      {
+        "artifact_id": "6a6e4d5930e995ef7e6e689713187d1fd9cf610430cd3dba05965746214383ed",
+        "media_type": "application/json"
+      }
+    ],
+    "no_m0_import": true,
+    "grading_basis": {
+      "M1": "Request 11 settled Main diagnose selects owned candidate, hypothesis and Native T1 method.",
+      "M2": "No research_analysis submission, analysis_request_binding, mathematical charge or Worker result.",
+      "M3": "No scientific numerical result exists for a result-grounded next decision."
+    },
+    "research_analysis_submissions": 0,
+    "analysis_request_bindings": 0,
+    "actual_math_worker_lifecycle_records": 0
+  },
+  "operator_inputs": {
+    "study_id": "p63b5-m-native-sol-20261029",
+    "store": "D:\\softrobot-agent\\.worktrees\\p6-3b5-native-math-entry\\runs\\research\\p63b5-m-native-sol-20261029",
+    "resolved_identity": "a1ae8242263061e3701270b55d29c6327b424b0dfd4e6fa6fefee1e506caa127",
+    "configuration": "study_p63b5_m_native_sol_prepared.json",
+    "baseline": {
+      "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+      "media_type": "application/json"
+    },
+    "baseline_generation_request": {
+      "version": "serial_family_generation_v2",
+      "family_space_identity": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+      "segment_count": 2,
+      "tendon_count": 4
+    },
+    "baseline_provenance": {
+      "decision_owner": "Operator",
+      "origin": "operator_provided_unmeasured_baseline",
+      "scope": "B5 engineering structure input; legal compilation only, no scientific or task evaluation."
+    },
+    "control_initialization": {
+      "candidate": {
+        "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "4d5721137c201c7667ef2dedb8bcb10d5c5a253cfb51756feec3964aba6de956",
+        "media_type": "application/json"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    "control_seed_request": {
+      "candidate": {
+        "artifact_id": "5ea5e8f8ff70825d07d756cc666cdd3388b51cefdd678cc5cebcd3298a171b04",
+        "media_type": "application/json"
+      },
+      "method": "baseline"
+    },
+    "control_operator_provenance": {
+      "artifact_id": "7cc3d605fd2035bbbc41d4518c345c98b8b6b19c0682353bce23f996103f5fd8",
+      "media_type": "application/json"
+    },
+    "source_provenance": {
+      "channel_map": null,
+      "control_initialization": "bounded_candidate_control_v1",
+      "inherited_acceptance": false,
+      "operation_key": "operator-p63b5-initialize-control",
+      "parent": null,
+      "source": null,
+      "time_rule": "zero-order hold; hold last input beyond source horizon; new channels use candidate pretension"
+    },
+    "task_acceptance": "unmeasured",
+    "task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+    "family_space_identity": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 4,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 0,
+      "protected_provider_requests": 1,
+      "protected_public_operations": 2,
+      "provider_requests": 12,
+      "provider_reserve_policy": "last_requests_v2",
+      "public_operations": 32
+    },
+    "native_control_limits": {
+      "evaluation_requests": 24,
+      "iterations": 3,
+      "knots_s": 4
+    },
+    "provider": {
+      "model": "gpt-5.6-sol",
+      "reasoning": "none"
+    },
+    "trajectory_binding": {
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ],
+      "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+      "model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+      "design_identity": "c53685e2baaa17f8a2f5479924c943f5df6a6360e5fb6acb8622381d54e3e672"
+    },
+    "time_grid": {
+      "points": 31,
+      "intervals": 30,
+      "start_s": 0.0,
+      "end_s": 0.6,
+      "period_s": 0.02
+    },
+    "default_tensions_n": [
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "tension_bounds_n": [
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ],
+      [
+        0.0,
+        8.0
+      ]
+    ],
+    "authorization": "pending separate explicit approval; no formal authorization or live handoff admission",
+    "imported_scientific_results": [],
+    "main_plans": 0,
+    "real_provider_requests": 0,
+    "scientific_workers": 0,
+    "preparation_reference": {
+      "artifact_id": "abb87f7015bac253f082fb08f22dbdd3bfeed34e1eebae583360ca60ae31f654",
+      "media_type": "application/json"
+    }
+  },
+  "preflight": {
+    "study_id": "p63b5-m-native-sol-20261029",
+    "resolved_identity": "a1ae8242263061e3701270b55d29c6327b424b0dfd4e6fa6fefee1e506caa127",
+    "freeze": "d74a97a001519e14e2c674879dcac2553de461a7",
+    "environment": {
+      "status": "ready",
+      "host_python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+      "expected_research_python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+      "exact_execution_interpreter": true,
+      "mathematical_worker_python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+      "conic": {
+        "python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+        "available": true,
+        "cvxpy": "1.9.3",
+        "clarabel": "0.11.1"
+      },
+      "threads": {
+        "MKL_NUM_THREADS": {
+          "expected": "1",
+          "actual": "1"
+        },
+        "OMP_NUM_THREADS": {
+          "expected": "1",
+          "actual": "1"
+        },
+        "OPENBLAS_NUM_THREADS": {
+          "expected": "1",
+          "actual": "1"
+        }
+      },
+      "packages": {
+        "numpy": "2.4.6",
+        "scipy": "1.17.1",
+        "casadi": "3.7.2",
+        "mujoco": "3.13.0",
+        "pydantic": "2.14.0",
+        "strands-agents": "1.59.0",
+        "strands-harness": "0.2.0"
+      },
+      "scope": "Imports and interpreter/thread admission only; no NMPC, PPO, physics or Provider request"
+    },
+    "compatibility": {
+      "compatible": true,
+      "changed": [],
+      "action": "resume allowed"
+    },
+    "credential_validation": "Original credential() succeeded; no credential contents recorded.",
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.0
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "pending": null
+  },
+  "analysis_bindings": [],
+  "actual_analysis_results": [],
+  "totals": {
+    "prompt_tokens": 109389,
+    "completion_tokens": 1927,
+    "total_tokens": 111316,
+    "http_200": 12,
+    "reporter_provider_requests": 0,
+    "monetary_cost": "unknown; no price or invoice inferred from token counts",
+    "reasoning_tokens": 0
+  },
+  "input_guidance_actual_wire": [
+    {
+      "provider_request": 1,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 2,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 3,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 4,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": true,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 5,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 6,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": true,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 7,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 8,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": true,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 9,
+      "source_reference_present": true,
+      "candidate_role_text_present": true,
+      "settings_guidance_present": true,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 10,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 11,
+      "source_reference_present": true,
+      "candidate_role_text_present": false,
+      "settings_guidance_present": false,
+      "analysis_schema_loaded": false
+    },
+    {
+      "provider_request": 12,
+      "source_reference_present": true,
+      "candidate_role_text_present": true,
+      "settings_guidance_present": true,
+      "analysis_schema_loaded": false
+    }
+  ],
+  "stop_index_read": {
+    "query": {
+      "pointer": "/all_fresh_results",
+      "reference": {
+        "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+        "media_type": "application/json"
+      },
+      "view": "working_set"
+    },
+    "feedback_reference": {
+      "artifact_id": "23de27ae31bf00a06818d47c5ce3c30f1dfa5806401a6ad0c82b1230e7145515",
+      "media_type": "application/json"
+    },
+    "value": []
+  },
+  "comparison_limits": "Independent B4/B5 windows have changed preparation and observed different Main choices; this is not a causal comparison. No B5 mathematical request means real source/method-settings admission repair effect remains unverified."
+}
