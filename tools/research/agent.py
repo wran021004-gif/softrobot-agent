@@ -119,6 +119,8 @@ def compact_plan_schema(schema, action, study):
     schema['allOf']=branches
     if action=='generate':
         space=study['family_space'];name='GenerationRequestV2' if space['version']=='serial_family_space_v2' else 'GenerationRequest'
+        # Plan's legacy union default is v1; do not advertise omission as v2.
+        schema['$defs'][name]['required']=[*schema['$defs'][name].get('required',[]),'version']
         properties=schema['$defs'][name]['properties']
         properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
         properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
@@ -202,12 +204,13 @@ def load_selected_tool_schema(host, registry, directory):
     router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
     retained={'research_route'}
     if selected:retained.add(name)
-    if s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v2','on_demand_tools_v3'):
+    policy=s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version')
+    if policy in ('on_demand_tools_v2','on_demand_tools_v3'):
         # Retrieval must not unload the already chosen Plan. With no prior Plan,
         # expose generate (or closeout STOP), without choosing/submitting it.
         plan=registry.get('research_plan')
         entry=next((r for r in directory if r['tool']=='research_plan'),None)
-        if plan and entry and name!='research_plan':
+        if plan and entry and (name!='research_plan' or (selected is None and policy=='on_demand_tools_v3')):
             from tools.research.research_context import tool_continuation
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')

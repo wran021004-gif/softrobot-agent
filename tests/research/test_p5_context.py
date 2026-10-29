@@ -2,20 +2,34 @@
 from copy import deepcopy
 import json
 import unittest
+from types import SimpleNamespace
 from jsonschema import Draft202012Validator, ValidationError
-from tools.research.agent import plan_schema
+from tools.research.agent import plan_schema, load_selected_tool_schema
 from tools.research.research_context import compact_tool_delivery
-from tools.research.state import state
+from tools.research.state import state, save, update
 from tests.research.test_p5_budget import provision, plan
 
 
 class P5ContextTests(unittest.TestCase):
+    def test_closeout_keeps_stop_when_previous_plan_action_is_no_longer_available(self):
+        h=provision();s=state(h)
+        route=save(h,dict(tool='research_plan',action='initialize_control'),'offline_route_fixture')
+        update(h,pilot={**s['pilot'],'tool_route':route})
+        registry={name:SimpleNamespace(tool_spec=dict(name=name,inputSchema={'json':{}}))
+            for name in ('research_plan','research_route')}
+        loaded=load_selected_tool_schema(h,registry,[dict(tool='research_plan',actions=['stop','select'])])
+        self.assertIn('research_plan',registry)
+        self.assertEqual(loaded['plan_action'],'stop')
+        self.assertEqual(registry['research_plan'].tool_spec['inputSchema']['json']['properties']['action']['enum'],['stop'])
+
     def test_generate_schema_keeps_research_fields_and_binds_frozen_domain(self):
         h=provision();spec=state(h)['spec']
         old=plan_schema(['generate'],decision_required=True,family_version=spec['family_space']['version'],focused=True)
         new=plan_schema(['generate'],decision_required=True,family_version=spec['family_space']['version'],focused=True,study=spec)
         Draft202012Validator.check_schema(new)
         validator=Draft202012Validator(new);value=plan(h,'generate');validator.validate(value)
+        missing_version=deepcopy(value);missing_version['generation'].pop('version')
+        with self.assertRaises(ValidationError):validator.validate(missing_version)
         self.assertLess(len(json.dumps(new)),len(json.dumps(old)))
         for key in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation','decision'):
             broken=deepcopy(value);broken.pop(key)
