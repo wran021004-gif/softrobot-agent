@@ -1198,12 +1198,15 @@ def agent_decision_brief(host):
             details_query=dict(reference=anchor,view='working_set',pointer='/candidate_index/'+str(ws['candidate_index'].index(row))),
             control_source_scope='Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.')
         brief['current_candidate']=facts
-        from tools.research.task_constraints import mathematical_method_view, mathematical_catalog
+        from tools.research.task_constraints import mathematical_method_view, mathematical_catalog, mathematical_opportunity_summary
         view=mathematical_method_view(host,candidate)
         brief['mathematical_capabilities']=mathematical_catalog(view)
+        brief['mathematical_research']=mathematical_opportunity_summary(view)
         selected=((intent['latest_decision'] or {}).get('agent_hypothesis',{}).get('decision') or {}).get('selected_method')
         if selected in view['methods']:brief['selected_mathematical_method']=view['methods'][selected]
     else:
+        brief['mathematical_research']=dict(status='requires_owned_candidate',
+            query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/research_opportunities")')
         brief['mathematical_capabilities']=dict(status='candidate_selection_required',
             query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/methods/<method>")')
         brief['current_candidate']=dict(status='not_generated',control_sources=[],control_source_status='missing')
@@ -1340,7 +1343,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
             task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),
             pending_feedback=brief.get('pending_feedback_delivery')),
-        verified_facts=facts[:8],
+        verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
             interpretation_query=report.get('restore_query'),
@@ -1454,7 +1457,7 @@ def information_flow_brief(brief, delivered):
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     return dict(version='research_information_flow_v1',
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
-        research_focus=focus,verified_facts=facts[:8],
+        research_focus=focus,verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
         research_trace=trace,
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),

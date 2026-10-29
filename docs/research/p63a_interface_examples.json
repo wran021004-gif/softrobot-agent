@@ -1,0 +1,2649 @@
+{
+  "label": "OFFLINE SYNTHETIC INTERFACE FIXTURE; NOT SCIENTIFIC EVIDENCE",
+  "fixture_store": "D:\\softrobot-agent\\.worktrees\\p6-3a-math-decision-interface\\runs\\p63a-fixture-8b24a587",
+  "candidate": {
+    "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+    "media_type": "application/json"
+  },
+  "l0": {
+    "version": "research_information_flow_v1",
+    "study_goal": {
+      "task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+      "task": {
+        "family": "task.reach",
+        "reference": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.295,
+              0.0,
+              0.215
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "holding": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.03,
+          "window_s": 0.06
+        },
+        "timing": {
+          "control_period_s": 0.02,
+          "duration_s": 0.6,
+          "sample_period_s": 0.02,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001
+        },
+        "metrics": [
+          {
+            "name": "terminal_error_m",
+            "unit": "m",
+            "meaning": "Sealed endpoint evaluator position error"
+          },
+          {
+            "name": "holding_max_error_m",
+            "unit": "m",
+            "meaning": "Maximum sampled final-window tip error"
+          },
+          {
+            "name": "holding_max_speed_m_s",
+            "unit": "m/s",
+            "meaning": "Maximum sampled world translational tip speed"
+          }
+        ]
+      },
+      "task_conditions": []
+    },
+    "research_focus": {
+      "candidate": {
+        "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+        "media_type": "application/json"
+      },
+      "candidate_status": {
+        "generated_valid": 5,
+        "control_sources_initialized": 10,
+        "mathematical_evaluations": 6,
+        "independent_physical_evaluations": 0,
+        "has_executable_candidate": true,
+        "task_passed": false,
+        "has_measured_task_feedback": false
+      },
+      "task_accepted": false,
+      "control": {
+        "structure_identity": "c1fe5c6c2518017e29e96869143a7c8fae6d769f435fafb68ec8e53fb38bd729",
+        "executable_under_current_profile": true,
+        "generated": true,
+        "compiled": true,
+        "control_initialized": true,
+        "has_completed_nmpc_execution": false,
+        "methods_used": [
+          "mujoco_nonlinear_task_capability_v1",
+          "mujoco_reoptimized_structure_response_v1"
+        ],
+        "mathematically_evaluated": true,
+        "physically_evaluated": false,
+        "accepted": false,
+        "best_valid_reference": null,
+        "control_sources": [
+          {
+            "source": {
+              "artifact_id": "8479e6c434e658ac0f62ecdf03144bb041ae47281402c298cc8d5d0a4704eca7",
+              "media_type": "application/json"
+            },
+            "source_kind": "explicit_control_schedule_v1",
+            "origin_kind": "bounded_candidate_control_v1",
+            "origin_status": "mathematical_prediction",
+            "historical_origin": false,
+            "origin_reference": {
+              "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+              "media_type": "application/json"
+            },
+            "initialized": true,
+            "full_control_sequence": true,
+            "task_acceptance": "unmeasured",
+            "query": {
+              "reference": {
+                "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/control_result_links/7",
+              "fields": [
+                "source",
+                "source_kind",
+                "origin_kind",
+                "origin_status",
+                "historical_origin",
+                "origin_reference",
+                "initialized",
+                "full_control_sequence",
+                "task_acceptance",
+                "trajectory_query",
+                "execution_references"
+              ]
+            }
+          },
+          {
+            "source": {
+              "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+              "media_type": "application/json"
+            },
+            "source_kind": "mathematical_prediction",
+            "initialized": true,
+            "full_control_sequence": true,
+            "task_acceptance": "unmeasured",
+            "control_source": {
+              "artifact_id": "8479e6c434e658ac0f62ecdf03144bb041ae47281402c298cc8d5d0a4704eca7",
+              "media_type": "application/json"
+            },
+            "query": {
+              "reference": {
+                "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/control_result_links/8",
+              "fields": [
+                "source",
+                "source_kind",
+                "initialized",
+                "full_control_sequence",
+                "task_acceptance",
+                "control_source",
+                "trajectory_query"
+              ]
+            }
+          },
+          {
+            "source": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            },
+            "source_kind": "mathematical_prediction",
+            "initialized": false,
+            "full_control_sequence": false,
+            "task_acceptance": "unmeasured",
+            "control_source": null,
+            "query": {
+              "reference": {
+                "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/control_result_links/9",
+              "fields": [
+                "source",
+                "source_kind",
+                "initialized",
+                "full_control_sequence",
+                "task_acceptance",
+                "control_source",
+                "trajectory_query"
+              ]
+            }
+          }
+        ],
+        "control_source_status": "complete_sequence_recorded",
+        "details_query": {
+          "reference": {
+            "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/candidate_index/2"
+        },
+        "control_source_scope": "Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected."
+      },
+      "latest_result": {
+        "reference": {
+          "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+          "media_type": "application/json"
+        },
+        "operation": "mujoco_reoptimized_structure_response_v1",
+        "status": "computed",
+        "scientific_scope": {
+          "claim_kind": "NUMERICAL_DIAGNOSTIC",
+          "verification_status": "unresolved",
+          "supported_inferences": [
+            "local_diagnostic",
+            "finite_budget_native_observation"
+          ],
+          "unresolved": [
+            "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+            "Global optimal task capability and a strict structural improvement direction are not established.",
+            "Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.",
+            "Original independent physical task acceptance is unmeasured by this evidence."
+          ]
+        },
+        "report_reference": {
+          "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+          "media_type": "application/json"
+        }
+      },
+      "formal_hypothesis": {
+        "plan_reference": {
+          "artifact_id": "8a243bc79e34811684cef14550c2c4e5aef68110d82fdd9268f2e968cba6bf1b",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan",
+        "hypothesis_id": "offline-p63a",
+        "hypothesis": "Offline interface hypothesis",
+        "expected_observation": "Bound request",
+        "status": "Main intent excerpts; not verified facts. Restore full text from the Plan."
+      },
+      "open_questions": [
+        {
+          "text": "Binding rejected",
+          "kind": "Main falsification target excerpt",
+          "source": {
+            "reference": {
+              "artifact_id": "8a243bc79e34811684cef14550c2c4e5aef68110d82fdd9268f2e968cba6bf1b",
+              "media_type": "application/json"
+            },
+            "pointer": "/original_plan/weakening_observation"
+          }
+        }
+      ]
+    },
+    "verified_facts": [
+      {
+        "result_reference": {
+          "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+          "media_type": "application/json"
+        },
+        "metrics": [],
+        "quantitative_facts": {
+          "computation_status": "computed",
+          "solver": null,
+          "mathematical_conclusion": "diagnostic",
+          "verification_status": "unresolved",
+          "task_acceptance": "unmeasured",
+          "source": {
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            },
+            "pointer": ""
+          },
+          "model_context": {
+            "basis": null,
+            "model_scope": null,
+            "solver_scope": null,
+            "state_dimension": null,
+            "generalized_coordinate_count": null,
+            "physical_inputs": {
+              "control_period_s": 0.02,
+              "frame": "tendon_path",
+              "lower": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "phase": "pre_step",
+              "provenance": [
+                "/robot/structure/data/tendons",
+                "/task/timing/control_period_s"
+              ],
+              "signal": "tendon_tension",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2",
+                "tendon_3"
+              ],
+              "units": "N",
+              "upper": [
+                8.0,
+                8.0,
+                8.0,
+                8.0
+              ]
+            },
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/scoped_claim"
+            }
+          },
+          "nonlinear_research": {
+            "directions": [
+              {
+                "direction_id": "segments.0.length_m",
+                "status": "unresolved",
+                "reasons": [
+                  "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+                ],
+                "source": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/nonlinear_response/directions/0"
+                },
+                "detail_query": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "view": "full",
+                  "pointer": "/nonlinear_response/directions/0"
+                }
+              },
+              {
+                "direction_id": "segments.1.length_m",
+                "status": "unresolved",
+                "reasons": [
+                  "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+                ],
+                "source": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/nonlinear_response/directions/1"
+                },
+                "detail_query": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "view": "full",
+                  "pointer": "/nonlinear_response/directions/1"
+                }
+              }
+            ],
+            "referenced_costs_query": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/nonlinear_response/referenced_t1_costs"
+            },
+            "scope": "Fixed-control and reoptimized quantities retain their separate source pointers in mathematics.quantities; prior T1 costs are referenced, not charged again."
+          }
+        },
+        "comparisons": [],
+        "mathematics": {
+          "nonlinear_response": {
+            "comparison_query": {
+              "pointer": "/nonlinear_response/comparison_summary",
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "cost": {
+              "kernel_wall_s": 0.0007306000043172389,
+              "model_builds": 0,
+              "optimization_evaluations": 0,
+              "physics_steps": 0,
+              "reused_t1_results": 5,
+              "rollouts": 0
+            },
+            "detail_query": {
+              "pointer": "/nonlinear_response",
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "direction_count": 2,
+            "direction_status": "unresolved",
+            "directions": [
+              {
+                "change_significance": "unresolved_without_error_bound",
+                "derivative_scope": "independent_parameter_secant",
+                "detail_pointer": "/nonlinear_response/directions/0",
+                "direction_id": "segments.0.length_m",
+                "evidence_level": "finite_budget_observation",
+                "followup_hypothesis": "Recheck the observed lower J with an independent control initialization",
+                "observed_changed_metrics": [
+                  "holding_max_speed_m_s",
+                  "signed_maximum_excess"
+                ],
+                "observed_lower_J": [
+                  {
+                    "coordinate": -0.0050000000000000044,
+                    "delta_J": -0.010000000000000009
+                  }
+                ],
+                "parameters": [
+                  "segments.0.length_m"
+                ],
+                "source_direction_ids": [
+                  "segments.0.length_m"
+                ],
+                "status": "unresolved",
+                "strict_improvement_direction": "unresolved",
+                "task_sensitivity": {
+                  "fixed_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [],
+                    "status": "local_estimate_unvalidated"
+                  },
+                  "reoptimized_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [
+                      "FINITE_BUDGET_CONTROL_OPTIMALITY_UNRESOLVED"
+                    ],
+                    "status": "unresolved"
+                  }
+                }
+              },
+              {
+                "change_significance": "unresolved_without_error_bound",
+                "derivative_scope": "independent_parameter_secant",
+                "detail_pointer": "/nonlinear_response/directions/1",
+                "direction_id": "segments.1.length_m",
+                "evidence_level": "finite_budget_observation",
+                "followup_hypothesis": "Recheck the observed lower J with an independent control initialization",
+                "observed_changed_metrics": [
+                  "holding_max_speed_m_s",
+                  "signed_maximum_excess"
+                ],
+                "observed_lower_J": [
+                  {
+                    "coordinate": 0.0050000000000000044,
+                    "delta_J": -0.015000000000000013
+                  }
+                ],
+                "parameters": [
+                  "segments.1.length_m"
+                ],
+                "source_direction_ids": [
+                  "segments.1.length_m"
+                ],
+                "status": "unresolved",
+                "strict_improvement_direction": "unresolved",
+                "task_sensitivity": {
+                  "fixed_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [],
+                    "status": "local_estimate_unvalidated"
+                  },
+                  "reoptimized_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [
+                      "FINITE_BUDGET_CONTROL_OPTIMALITY_UNRESOLVED"
+                    ],
+                    "status": "unresolved"
+                  }
+                }
+              }
+            ],
+            "evidence_level": "finite_budget_observation",
+            "method": "mujoco-reoptimized-structure-response-v1",
+            "omitted_directions": 0,
+            "status": "computed_diagnostic",
+            "stencil_count": 2,
+            "strict_improvement_direction": "unresolved",
+            "task_acceptance": "unmeasured",
+            "worst_constraint": {
+              "constraint_id": "holding_max_speed_m_s",
+              "kind": "holding_speed",
+              "limit": 0.03,
+              "unit": "m/s",
+              "value": 0.045
+            }
+          },
+          "owning_study": "p63a-fixture-8b24a587",
+          "scope": {
+            "model_declaration": {
+              "model_id": "model.mujoco_native",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+                "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+                "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+                "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+              ],
+              "representation_id": "native_named_hinges_v1"
+            },
+            "computation_status": "computed",
+            "verification_status": "unresolved",
+            "supported_interpretation": "Evidence-only finite-budget structural secants; direction is conditional or unresolved.",
+            "unsupported_conclusions": [
+              "task acceptance",
+              "whole holding-window compliance",
+              "global nonlinear feasibility or infeasibility",
+              "hardware performance",
+              "robustness",
+              "repeatability",
+              "equilibrium validity at a non-equilibrium point"
+            ],
+            "horizon": {
+              "interpretation": "Aggregate existing complete T1 evidence; no new integration.",
+              "task_duration_s": 0.6
+            },
+            "constraint_coverage": []
+          },
+          "unresolved": {
+            "potential_discriminating_checks": [
+              "Check task constraints with an applicable operation."
+            ],
+            "supported_facts": [
+              "Local model diagnostic only."
+            ],
+            "unresolved_questions": [
+              "Bounded task feasibility unresolved."
+            ],
+            "unsupported_inferences": [
+              "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+            ],
+            "evidence_limits": [
+              "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+              "Global optimal task capability and a strict structural improvement direction are not established.",
+              "Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.",
+              "Original independent physical task acceptance is unmeasured by this evidence."
+            ]
+          },
+          "cost_scope": "Costs belong to owning_study, unknown if unrecorded. T2 aggregates saved T1 results with zero new rollouts or physics steps; referenced T1 costs were previously charged and are not charged again. Preparation and worker time are additional; independent physical acceptance is separate.",
+          "cost": {
+            "evaluations": 1,
+            "numerical_s": 1.2995047000003979,
+            "sources": [
+              {
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                },
+                "pointer": "/charged_analysis_evaluations"
+              },
+              {
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                },
+                "pointer": "/charged_numerical_s"
+              }
+            ]
+          },
+          "detail_query": {
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            },
+            "view": "working_set",
+            "pointer": "/mathematical_decision_view/nonlinear_response"
+          }
+        }
+      }
+    ],
+    "mathematical_research": {
+      "version": "candidate_mathematical_research_v1",
+      "candidate": {
+        "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+        "media_type": "application/json"
+      },
+      "task_binding": {
+        "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+        "effective_configuration_identity": "b66e1c50bfe743cca3617e697ff8ab88a69bd8ebd337b364a3e3be705187d01e",
+        "task_id": "bf7-shared-reach-v1-central_high",
+        "task_version": "1.0.0",
+        "task_family": "task.reach",
+        "canonical_task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+        "condition_id": null
+      },
+      "parameters": {
+        "total": 39,
+        "continuous_authorized": 2,
+        "categories": [
+          "controller",
+          "discretization",
+          "geometry",
+          "routing",
+          "segment",
+          "tendon",
+          "topology"
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "terminal_error_m",
+          "unit": "m"
+        },
+        {
+          "metric_id": "holding_max_error_m",
+          "unit": "m"
+        },
+        {
+          "metric_id": "holding_max_speed_m_s",
+          "unit": "m/s"
+        },
+        {
+          "metric_id": "best_found_J",
+          "unit": "1"
+        }
+      ],
+      "methods": [
+        {
+          "method": "fixed_input_structure_v1",
+          "status": "unauthorized",
+          "missing": [
+            "Insufficient mathematical evaluation budget.",
+            "formal_study_math_scope_required"
+          ],
+          "estimated_evaluations": 3,
+          "wall_cost": "unknown"
+        },
+        {
+          "method": "mujoco-nonlinear-task-capability-v1",
+          "status": "unauthorized",
+          "missing": [
+            "Insufficient mathematical evaluation budget.",
+            "control_optimization.source",
+            "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+            "formal_study_math_scope_required"
+          ],
+          "estimated_evaluations": 1,
+          "wall_cost": "unknown"
+        },
+        {
+          "method": "mujoco-reoptimized-structure-response-v1",
+          "status": "unauthorized",
+          "missing": [
+            "Insufficient mathematical evaluation budget.",
+            "formal_study_math_scope_required"
+          ],
+          "estimated_evaluations": 1,
+          "wall_cost": "unknown"
+        }
+      ],
+      "method_directory_query": {
+        "reference": {
+          "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities",
+        "pointer": "/methods"
+      },
+      "detail_query": {
+        "reference": {
+          "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities",
+        "pointer": "/research_opportunities"
+      },
+      "scope": "Candidate-bound discovery, not execution permission. Main chooses the research route; use L1 for units, domains, coverage, costs and exact method requests."
+    },
+    "research_trace": {
+      "total": 0,
+      "action_total": 1,
+      "recall": {
+        "trace": "actions"
+      }
+    },
+    "capabilities": [
+      {
+        "category": "Design",
+        "actions": []
+      },
+      {
+        "category": "Control",
+        "actions": []
+      },
+      {
+        "category": "Mathematical Research",
+        "actions": []
+      },
+      {
+        "category": "Physical Validation",
+        "actions": []
+      },
+      {
+        "category": "Evidence & Knowledge",
+        "actions": []
+      }
+    ],
+    "tool_continuation": {
+      "selection": null,
+      "plan_action": null,
+      "plan_selection": null,
+      "recent": [],
+      "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+      "switch_tool": "research_route(tool=\"research_plan\", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing."
+    },
+    "knowledge": {
+      "role": "procedural_knowledge",
+      "access": {
+        "query": {
+          "operation": "search",
+          "task": "reach"
+        },
+        "available_historical_tasks": [
+          "oriented_tracking",
+          "passive_force_response",
+          "position_tool_axis",
+          "soft_robot_research",
+          "tracking"
+        ],
+        "study_private_entries": [],
+        "scope": "Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.",
+        "hints": [
+          {
+            "entry_id": "model-physics-comparison",
+            "revision": "1",
+            "method": "Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.",
+            "task": "soft_robot_research",
+            "scope": "context_only; cross-task generalization unverified",
+            "read_query": {
+              "operation": "read",
+              "entry_id": "model-physics-comparison",
+              "revision": "1"
+            }
+          },
+          {
+            "entry_id": "research-bounded-continuation",
+            "revision": "2",
+            "method": "Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.",
+            "task": "soft_robot_research",
+            "scope": "context_only; cross-task generalization unverified",
+            "read_query": {
+              "operation": "read",
+              "entry_id": "research-bounded-continuation",
+              "revision": "2"
+            }
+          }
+        ]
+      },
+      "read_progress": null
+    },
+    "reporter_findings": [
+      {
+        "report_reference": {
+          "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+          "media_type": "application/json"
+        },
+        "question": null,
+        "reference_role": "reporter_report",
+        "scientific_citation_eligible": false,
+        "result_references": [
+          {
+            "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+            "media_type": "application/json"
+          }
+        ],
+        "status": "deferred",
+        "interpretation_query": {
+          "reference": {
+            "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+            "media_type": "application/json"
+          },
+          "view": "full",
+          "pointer": "/report/interpretations"
+        },
+        "summary_query": {
+          "reference": {
+            "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+            "media_type": "application/json"
+          },
+          "view": "summary"
+        },
+        "reading_guidance": "Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.",
+        "interpretations": [],
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Global optimal task capability and a strict structural improvement direction are not established.",
+          "Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings."
+        ]
+      }
+    ],
+    "evidence_access": {
+      "working_set": {
+        "reference": {
+          "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+          "media_type": "application/json"
+        },
+        "view": "working_set",
+        "pointer": ""
+      },
+      "method_query": {
+        "reference": {
+          "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities",
+        "pointer": "/methods"
+      },
+      "stop_index": {
+        "count": 6,
+        "query": {
+          "reference": {
+            "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/all_fresh_results"
+        }
+      },
+      "select_requirement": "A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.",
+      "stop_requirement": "Retrieve and cite the complete new result index; original admission checks remain in force.",
+      "citation_eligibility": {
+        "query": {
+          "reference": {
+            "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/citation_eligibility"
+        },
+        "registered_count": 16,
+        "scientific_result_count": 6,
+        "rule": "supporting_evidence requires registered result_reference matching inference, candidate, task and model scope. report_reference only restores Reporter text; Knowledge is procedural context; Domain Reference defines the problem; tool receipts record operations. None gains scientific eligibility by being read.",
+        "recent_registered": [
+          {
+            "reference": {
+              "artifact_id": "ac9f59ce9605f52f7dadfd4c49205fa0795a4d37a05865f82cbee5febf570140",
+              "media_type": "application/json"
+            },
+            "role": "tool_receipt",
+            "registered": true,
+            "supports_scientific_conclusion": false,
+            "candidate": null,
+            "task_identity": null,
+            "claim_kind": "UNVERIFIED_HYPOTHESIS",
+            "supported_inferences": []
+          }
+        ]
+      },
+      "result_scopes": [
+        {
+          "result": {
+            "pointer": "",
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            }
+          },
+          "claim_kind": "NUMERICAL_DIAGNOSTIC",
+          "verification_status": "unresolved",
+          "supported_inferences": [
+            "local_diagnostic",
+            "finite_budget_native_observation"
+          ]
+        }
+      ],
+      "delegated_read": {
+        "tool": "research_investigate",
+        "arguments": "question and existing result references; optional exact reads",
+        "scope": "Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit."
+      }
+    },
+    "budget": {
+      "model_calls": 48,
+      "model_closeout_reserve": 4,
+      "public_operations": 193,
+      "public_closeout_reserve": 12,
+      "physical": 64,
+      "mathematical": 0,
+      "closeout": {
+        "active": false,
+        "next_request_will_protect": false,
+        "reason": null
+      }
+    }
+  },
+  "l1": {
+    "version": "candidate_mathematical_research_v1",
+    "candidate": {
+      "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+      "media_type": "application/json"
+    },
+    "task_binding": {
+      "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+      "effective_configuration_identity": "b66e1c50bfe743cca3617e697ff8ab88a69bd8ebd337b364a3e3be705187d01e",
+      "task_id": "bf7-shared-reach-v1-central_high",
+      "task_version": "1.0.0",
+      "task_family": "task.reach",
+      "canonical_task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+      "condition_id": null
+    },
+    "protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 0.6,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.02,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.34
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.05,
+        0.1,
+        0.35
+      ]
+    },
+    "parameters": [
+      {
+        "parameter_id": "segments.0.length_m",
+        "category": "segment",
+        "data_type": "number",
+        "unit": "m",
+        "current_value": 0.16,
+        "minimum": 0.08,
+        "maximum": 0.24,
+        "default": 0.16,
+        "choices": null,
+        "conditional_dependencies": {
+          "segment_count": 2,
+          "tendon_count": 4
+        },
+        "effective_in_current_execution": true,
+        "continuous_perturbation": true,
+        "analysis_status": "conditional",
+        "analysis_reason": "Candidate rebuild, legal input and matched task checks required",
+        "physical_component": {
+          "kind": "flexible_segment",
+          "id": "segment_0"
+        },
+        "domain_source": "segment_domains.0.length_m",
+        "supported_methods": [
+          "generate",
+          "mujoco-reoptimized-structure-response-v1",
+          "fixed_input_structure_v1"
+        ],
+        "validation_status": "candidate_specific_compilation_required",
+        "study_authorized": true,
+        "applicable_mathematical_methods": [
+          "mujoco-reoptimized-structure-response-v1",
+          "fixed_input_structure_v1"
+        ],
+        "method_links": [
+          {
+            "method": "mujoco-reoptimized-structure-response-v1",
+            "metric_ids": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "best_found_J"
+            ],
+            "planning_status": "unauthorized",
+            "request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-reoptimized-structure-response-v1"
+            },
+            "source_method": "mujoco-nonlinear-task-capability-v1",
+            "source_request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1"
+            },
+            "scope": "Saved comparable T1 contrasts"
+          },
+          {
+            "method": "fixed_input_structure_v1",
+            "metric_ids": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "planning_status": "unauthorized",
+            "request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/fixed_input_structure_v1"
+            },
+            "scope": "See method coverage and original admission"
+          }
+        ]
+      },
+      {
+        "parameter_id": "segments.1.length_m",
+        "category": "segment",
+        "data_type": "number",
+        "unit": "m",
+        "current_value": 0.11,
+        "minimum": 0.06,
+        "maximum": 0.2,
+        "default": 0.11,
+        "choices": null,
+        "conditional_dependencies": {
+          "segment_count": 2,
+          "tendon_count": 4
+        },
+        "effective_in_current_execution": true,
+        "continuous_perturbation": true,
+        "analysis_status": "conditional",
+        "analysis_reason": "Candidate rebuild, legal input and matched task checks required",
+        "physical_component": {
+          "kind": "flexible_segment",
+          "id": "segment_1"
+        },
+        "domain_source": "segment_domains.1.length_m",
+        "supported_methods": [
+          "generate",
+          "mujoco-reoptimized-structure-response-v1",
+          "fixed_input_structure_v1"
+        ],
+        "validation_status": "candidate_specific_compilation_required",
+        "study_authorized": true,
+        "applicable_mathematical_methods": [
+          "mujoco-reoptimized-structure-response-v1",
+          "fixed_input_structure_v1"
+        ],
+        "method_links": [
+          {
+            "method": "mujoco-reoptimized-structure-response-v1",
+            "metric_ids": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "best_found_J"
+            ],
+            "planning_status": "unauthorized",
+            "request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-reoptimized-structure-response-v1"
+            },
+            "source_method": "mujoco-nonlinear-task-capability-v1",
+            "source_request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco-nonlinear-task-capability-v1"
+            },
+            "scope": "Saved comparable T1 contrasts"
+          },
+          {
+            "method": "fixed_input_structure_v1",
+            "metric_ids": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "planning_status": "unauthorized",
+            "request_query": {
+              "reference": {
+                "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/fixed_input_structure_v1"
+            },
+            "scope": "See method coverage and original admission"
+          }
+        ]
+      }
+    ],
+    "metrics": [
+      {
+        "metric_id": "terminal_error_m",
+        "constraint": {
+          "constraint_id": "terminal_error_m",
+          "signal": {
+            "name": "tip_position",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "indices": [
+            30
+          ],
+          "kind": "norm_bound",
+          "reference": [
+            [
+              0.295,
+              0.0,
+              0.215
+            ]
+          ],
+          "radius": 0.01,
+          "lower": null,
+          "upper": null,
+          "provenance": [
+            "/task/evaluator/parameters/data/tolerance_m",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "unsupported_requirement": null
+        },
+        "sources": [
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/evaluator/parameters/data/tolerance_m"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/timing"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/goal"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/policy/controller/parameters/data/settling/window_s"
+          }
+        ],
+        "semantics": "Frozen TaskAdapter constraint; mathematical coverage and independent task acceptance are separate."
+      },
+      {
+        "metric_id": "holding_max_error_m",
+        "constraint": {
+          "constraint_id": "holding_max_error_m",
+          "signal": {
+            "name": "tip_position",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "indices": [
+            27,
+            28,
+            29,
+            30
+          ],
+          "kind": "norm_bound",
+          "reference": [
+            [
+              0.295,
+              0.0,
+              0.215
+            ],
+            [
+              0.295,
+              0.0,
+              0.215
+            ],
+            [
+              0.295,
+              0.0,
+              0.215
+            ],
+            [
+              0.295,
+              0.0,
+              0.215
+            ]
+          ],
+          "radius": 0.01,
+          "lower": null,
+          "upper": null,
+          "provenance": [
+            "/policy/controller/parameters/data/settling/position_limit_m",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "unsupported_requirement": null
+        },
+        "sources": [
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/policy/controller/parameters/data/settling/position_limit_m"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/timing"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/goal"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/policy/controller/parameters/data/settling/window_s"
+          }
+        ],
+        "semantics": "Frozen TaskAdapter constraint; mathematical coverage and independent task acceptance are separate."
+      },
+      {
+        "metric_id": "holding_max_speed_m_s",
+        "constraint": {
+          "constraint_id": "holding_max_speed_m_s",
+          "signal": {
+            "name": "tip_velocity",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m/s",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "indices": [
+            27,
+            28,
+            29,
+            30
+          ],
+          "kind": "norm_bound",
+          "reference": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "radius": 0.03,
+          "lower": null,
+          "upper": null,
+          "provenance": [
+            "/policy/controller/parameters/data/settling/speed_limit_m_s",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "unsupported_requirement": null
+        },
+        "sources": [
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/policy/controller/parameters/data/settling/speed_limit_m_s"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/timing"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/task/goal"
+          },
+          {
+            "reference": {
+              "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration/policy/controller/parameters/data/settling/window_s"
+          }
+        ],
+        "semantics": "Frozen TaskAdapter constraint; mathematical coverage and independent task acceptance are separate."
+      },
+      {
+        "metric_id": "best_found_J",
+        "unit": "1",
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "constraint_ids": [
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "definition": "Minimum observed maximum normalized signed constraint excess under the recorded native control search and budget.",
+        "source": {
+          "module": "tools.research.nonlinear_capability",
+          "function": "t1_summary"
+        },
+        "result_pointer": "/nonlinear_capability/best_found_J",
+        "limitations": "Finite-budget model diagnostic; neither global optimum nor independent task acceptance."
+      }
+    ],
+    "methods": {
+      "equilibrium": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/equilibrium"
+        }
+      },
+      "linearization": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Positive aligned horizon within actual remaining task time is required.",
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/linearization"
+        }
+      },
+      "controllability": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Positive aligned horizon within actual remaining task time is required.",
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/controllability"
+        }
+      },
+      "endpoint": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/endpoint"
+        }
+      },
+      "braking": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/braking"
+        }
+      },
+      "instantaneous_braking_v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Exact saved state required.",
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/instantaneous_braking_v1"
+        }
+      },
+      "trajectory_feasibility": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/trajectory_feasibility"
+        }
+      },
+      "task_capability": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/task_capability"
+        }
+      },
+      "input_sensitivity": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Static IFT v1 is implemented only by the SoRoSim provider.",
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/input_sensitivity"
+        }
+      },
+      "design_sensitivity": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Static IFT v1 is implemented only by the SoRoSim provider.",
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 3,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/design_sensitivity"
+        }
+      },
+      "native_dynamics_v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/native_dynamics_v1"
+        }
+      },
+      "short_input_response_v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "One baseline + up to four FD rollouts per channel (two input sizes, central or one-sided) + optional one nonlinear candidate rollout. Required prefix reconstruction is already included in native cost.physics_steps; recorded rollouts/physics_steps own actual cost. Full independent physical_replay is additional if requested.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/short_input_response_v1"
+        }
+      },
+      "fixed_input_structure_v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 3,
+        "wall_cost": "unknown",
+        "cost_scope": "Model preparation and internal solver attempts are distinct; see original receipts.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/fixed_input_structure_v1"
+        }
+      },
+      "mujoco_direct_control_v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "control_optimization.source",
+          "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/mujoco_direct_control_v1"
+        }
+      },
+      "sampled-affine-conic-minimax-v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "method_not_authorized",
+          "insufficient_budget",
+          "study_method_grant_required",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 2,
+        "wall_cost": "unknown",
+        "cost_scope": "One model build plus 1 internal conic subproblems",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/sampled-affine-conic-minimax-v1"
+        }
+      },
+      "controlled-capability-sensitivity-v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "method_not_authorized",
+          "insufficient_budget",
+          "method_not_authorized",
+          "insufficient_budget",
+          "missing_validated_model_stencil",
+          "study_method_grant_required",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 5,
+        "wall_cost": "unknown",
+        "cost_scope": "M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/controlled-capability-sensitivity-v1"
+        }
+      },
+      "mujoco-nonlinear-task-capability-v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "control_optimization.source",
+          "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/mujoco-nonlinear-task-capability-v1"
+        }
+      },
+      "mujoco-reoptimized-structure-response-v1": {
+        "planning_status": "unauthorized",
+        "execution_status": "blocked",
+        "missing": [
+          "Insufficient mathematical evaluation budget.",
+          "formal_study_math_scope_required"
+        ],
+        "estimated_evaluations": 1,
+        "wall_cost": "unknown",
+        "cost_scope": "One aggregation evaluation for admitted saved T1 results, zero new native models, optimizations or physics steps. Prior T1 charges remain referenced; actual preparation/worker wall time is additional.",
+        "request_query": {
+          "reference": {
+            "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods/mujoco-reoptimized-structure-response-v1"
+        }
+      }
+    },
+    "fixed_conditions": [
+      "Frozen task condition and protocol, topology, nonselected parameters, material/load, initial state, input channels/bounds, time grid and control-search settings/budget; compare actual search opportunities."
+    ],
+    "workflow": "Main chooses hypothesis, parameters and legal contrasts. research_plan(diagnose) selects candidate/method; research_analysis binds frozen identities and separately admits the request. Read original results via evidence_read or research_investigate.",
+    "limitations": [
+      "Parameter continuity does not establish compiled perturbation candidates or a mathematical derivative.",
+      "Method links identify declared parameter support; missing task, source, grant and budget prerequisites still block execution.",
+      "No registered arbitrary mechanism metric is inferred from a task score."
+    ]
+  },
+  "requests": {
+    "T1": {
+      "candidate": {
+        "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+        "media_type": "application/json"
+      },
+      "control_optimization": {
+        "settings": {
+          "active_coefficients": [
+            0
+          ],
+          "coefficient_limit_n": 2.0,
+          "correction_window_s": [
+            0.0,
+            0.6
+          ],
+          "difference_step_n": 0.01,
+          "evaluation_requests": 4,
+          "initial_radius_n": 0.1,
+          "iterations": 1,
+          "knots_s": [
+            0.0,
+            0.6
+          ],
+          "method": "response",
+          "minimum_radius_n": 0.0001,
+          "version": "local_control_search_v2"
+        },
+        "source": {
+          "artifact_id": "8479e6c434e658ac0f62ecdf03144bb041ae47281402c298cc8d5d0a4704eca7",
+          "media_type": "application/json"
+        }
+      },
+      "execution": null,
+      "model_source": "mujoco",
+      "native": {
+        "correction_radius_n": 0.0,
+        "difference_step_n": 0.02,
+        "horizon_s": 0.01,
+        "tensions_n": null
+      },
+      "operating_point": "standardized_initial_pretension",
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.16,
+          "segment_1": 0.11,
+          "segment_2": 0.14,
+          "segment_3": 0.14,
+          "segment_4": 0.14,
+          "segment_5": 0.14,
+          "segment_6": 0.14,
+          "segment_7": 0.14,
+          "segment_8": 0.14
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 0.6,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.02,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.34
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.05,
+          0.1,
+          0.35
+        ]
+      },
+      "saved_state": null,
+      "scoring_window_s": null,
+      "update_id": null
+    },
+    "T2": {
+      "candidate": {
+        "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
+        "media_type": "application/json"
+      },
+      "execution": null,
+      "model_source": "mujoco",
+      "native": {
+        "correction_radius_n": 0.0,
+        "difference_step_n": 0.02,
+        "horizon_s": 0.01,
+        "tensions_n": null
+      },
+      "nonlinear_response": {
+        "directions": [
+          {
+            "comparison_variables": [],
+            "coordinate_unit": "m",
+            "coordinates": [
+              0.0,
+              -0.0050000000000000044,
+              0.0050000000000000044
+            ],
+            "direction_id": "segments.0.length_m",
+            "mode": "continuous",
+            "t1_results": [
+              {
+                "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "778514dcff48ca6e7dcaf13838b4cb496ef8672bc8c3c77d7e0a04e980e960b8",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "ec04ae945793a203a564946f33788aca1988aea2692689ee2a24d3cf6c8f2675",
+                "media_type": "application/json"
+              }
+            ],
+            "variables": {
+              "segments.0.length_m": 1.0
+            }
+          },
+          {
+            "comparison_variables": [],
+            "coordinate_unit": "m",
+            "coordinates": [
+              0.0,
+              -0.0050000000000000044,
+              0.0050000000000000044
+            ],
+            "direction_id": "segments.1.length_m",
+            "mode": "continuous",
+            "t1_results": [
+              {
+                "artifact_id": "dc75162d7a5853ac56977dcd6cbef6c13d994282e397b7a38aecc9da2fc59e70",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "959cb93386ce6b4995d9e622d5a0a988483c1ff62d64982f2dffac6a22d3f647",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "fc299260a66079414cbd1724ccd091f0e6daaba10094de3741f62af9ddf318e9",
+                "media_type": "application/json"
+              }
+            ],
+            "variables": {
+              "segments.1.length_m": 1.0
+            }
+          }
+        ],
+        "version": "nonlinear_response_v2"
+      },
+      "operating_point": "standardized_initial_pretension",
+      "operation": "mujoco_reoptimized_structure_response_v1",
+      "protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.16,
+          "segment_1": 0.11,
+          "segment_2": 0.14,
+          "segment_3": 0.14,
+          "segment_4": 0.14,
+          "segment_5": 0.14,
+          "segment_6": 0.14,
+          "segment_7": 0.14,
+          "segment_8": 0.14
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 0.6,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.02,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.34
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.05,
+          0.1,
+          0.35
+        ]
+      },
+      "saved_state": null,
+      "scoring_window_s": null,
+      "update_id": null
+    }
+  },
+  "reporter_main_handoff": {
+    "delivery_version": "scientific_handoff_v1",
+    "report_reference": {
+      "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+      "media_type": "application/json"
+    },
+    "result_references": [
+      {
+        "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+        "media_type": "application/json"
+      }
+    ],
+    "mode": "result_summary",
+    "question": null,
+    "reporter_status": "deferred",
+    "delivery_mode": "deterministic_only",
+    "findings": [
+      {
+        "result": {
+          "pointer": "",
+          "reference": {
+            "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+            "media_type": "application/json"
+          }
+        },
+        "operation": "mujoco_reoptimized_structure_response_v1",
+        "result_reference": {
+          "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+          "media_type": "application/json"
+        },
+        "metrics": [],
+        "main_violations": [],
+        "quantitative_facts": {
+          "computation_status": "computed",
+          "solver": null,
+          "mathematical_conclusion": "diagnostic",
+          "verification_status": "unresolved",
+          "task_acceptance": "unmeasured",
+          "source": {
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            },
+            "pointer": ""
+          },
+          "model_context": {
+            "basis": null,
+            "model_scope": null,
+            "solver_scope": null,
+            "state_dimension": null,
+            "generalized_coordinate_count": null,
+            "physical_inputs": {
+              "control_period_s": 0.02,
+              "frame": "tendon_path",
+              "lower": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "phase": "pre_step",
+              "provenance": [
+                "/robot/structure/data/tendons",
+                "/task/timing/control_period_s"
+              ],
+              "signal": "tendon_tension",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2",
+                "tendon_3"
+              ],
+              "units": "N",
+              "upper": [
+                8.0,
+                8.0,
+                8.0,
+                8.0
+              ]
+            },
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/scoped_claim"
+            }
+          },
+          "nonlinear_research": {
+            "directions": [
+              {
+                "direction_id": "segments.0.length_m",
+                "status": "unresolved",
+                "reasons": [
+                  "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+                ],
+                "source": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/nonlinear_response/directions/0"
+                },
+                "detail_query": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "view": "full",
+                  "pointer": "/nonlinear_response/directions/0"
+                }
+              },
+              {
+                "direction_id": "segments.1.length_m",
+                "status": "unresolved",
+                "reasons": [
+                  "CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE"
+                ],
+                "source": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/nonlinear_response/directions/1"
+                },
+                "detail_query": {
+                  "reference": {
+                    "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                    "media_type": "application/json"
+                  },
+                  "view": "full",
+                  "pointer": "/nonlinear_response/directions/1"
+                }
+              }
+            ],
+            "referenced_costs_query": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/nonlinear_response/referenced_t1_costs"
+            },
+            "scope": "Fixed-control and reoptimized quantities retain their separate source pointers in mathematics.quantities; prior T1 costs are referenced, not charged again."
+          }
+        },
+        "critical_observations": [],
+        "resources": [
+          {
+            "name": "charged_analysis_evaluations",
+            "amount": 1.0,
+            "unit": "analyses",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/charged_analysis_evaluations"
+            }
+          },
+          {
+            "name": "charged_numerical_s",
+            "amount": 1.2995047000003979,
+            "unit": "s",
+            "time_basis": "recorded_elapsed_unspecified",
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/charged_numerical_s"
+            }
+          },
+          {
+            "name": "elapsed_s",
+            "amount": 0.030398900009458885,
+            "unit": "s",
+            "time_basis": "worker_wall",
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/boundary/elapsed_s"
+            }
+          },
+          {
+            "name": "model_builds",
+            "amount": 0.0,
+            "unit": "models",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/nonlinear_response/cost/model_builds"
+            }
+          },
+          {
+            "name": "rollouts",
+            "amount": 0.0,
+            "unit": "rollouts",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/nonlinear_response/cost/rollouts"
+            }
+          },
+          {
+            "name": "physics_steps",
+            "amount": 0.0,
+            "unit": "steps",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/nonlinear_response/cost/physics_steps"
+            }
+          },
+          {
+            "name": "optimization_evaluations",
+            "amount": 0.0,
+            "unit": "evaluations",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/nonlinear_response/cost/optimization_evaluations"
+            }
+          },
+          {
+            "name": "admission_preparation_numerical_s",
+            "amount": 1.269105799990939,
+            "unit": "s",
+            "time_basis": "parent_action_wall",
+            "source": {
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "pointer": "/admission_preparation_numerical_s"
+            }
+          }
+        ],
+        "mathematics": {
+          "claim_source": {
+            "pointer": "/scoped_claim",
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            }
+          },
+          "requirement_source": {
+            "pointer": "/task_analysis",
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            }
+          },
+          "problem_definition": {
+            "pointer": "/nonlinear_response",
+            "reference": {
+              "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+              "media_type": "application/json"
+            }
+          },
+          "scope": {
+            "model_declaration": {
+              "model_id": "model.mujoco_native",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+                "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+                "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+                "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+              ],
+              "representation_id": "native_named_hinges_v1"
+            },
+            "computation_status": "computed",
+            "verification_status": "unresolved",
+            "supported_interpretation": "Evidence-only finite-budget structural secants; direction is conditional or unresolved.",
+            "unsupported_conclusions": [
+              "task acceptance",
+              "whole holding-window compliance",
+              "global nonlinear feasibility or infeasibility",
+              "hardware performance",
+              "robustness",
+              "repeatability",
+              "equilibrium validity at a non-equilibrium point"
+            ],
+            "horizon": {
+              "interpretation": "Aggregate existing complete T1 evidence; no new integration.",
+              "task_duration_s": 0.6
+            },
+            "constraint_coverage": []
+          },
+          "operating_point": {
+            "name": "standardized_initial_pretension"
+          },
+          "quantities": [
+            {
+              "control_reoptimization": "fixed_control",
+              "name": "segments.0.length_m/fixed_control/central",
+              "source": {
+                "pointer": "/nonlinear_response/directions/0/fixed_control/central",
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                }
+              },
+              "status": "unverified_estimate",
+              "structural_parameters": [],
+              "unit": "signed J / m",
+              "value": 2.0
+            },
+            {
+              "control_reoptimization": "required",
+              "name": "segments.0.length_m/reoptimized/central",
+              "source": {
+                "pointer": "/nonlinear_response/directions/0/reoptimized/central",
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                }
+              },
+              "status": "unverified_estimate",
+              "structural_parameters": [],
+              "unit": "signed J / m",
+              "value": 2.0
+            },
+            {
+              "control_reoptimization": "fixed_control",
+              "name": "segments.1.length_m/fixed_control/central",
+              "source": {
+                "pointer": "/nonlinear_response/directions/1/fixed_control/central",
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                }
+              },
+              "status": "unverified_estimate",
+              "structural_parameters": [],
+              "unit": "signed J / m",
+              "value": -3.0
+            },
+            {
+              "control_reoptimization": "required",
+              "name": "segments.1.length_m/reoptimized/central",
+              "source": {
+                "pointer": "/nonlinear_response/directions/1/reoptimized/central",
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                }
+              },
+              "status": "unverified_estimate",
+              "structural_parameters": [],
+              "unit": "signed J / m",
+              "value": -3.0
+            }
+          ],
+          "capability": null,
+          "owning_study": "p63a-fixture-8b24a587",
+          "unresolved": {
+            "potential_discriminating_checks": [
+              "Check task constraints with an applicable operation."
+            ],
+            "supported_facts": [
+              "Local model diagnostic only."
+            ],
+            "unresolved_questions": [
+              "Bounded task feasibility unresolved."
+            ],
+            "unsupported_inferences": [
+              "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+            ],
+            "evidence_limits": [
+              "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+              "Global optimal task capability and a strict structural improvement direction are not established.",
+              "Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.",
+              "Original independent physical task acceptance is unmeasured by this evidence."
+            ]
+          },
+          "nonlinear_response": {
+            "comparison_query": {
+              "pointer": "/nonlinear_response/comparison_summary",
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "cost": {
+              "kernel_wall_s": 0.0007306000043172389,
+              "model_builds": 0,
+              "optimization_evaluations": 0,
+              "physics_steps": 0,
+              "reused_t1_results": 5,
+              "rollouts": 0
+            },
+            "detail_query": {
+              "pointer": "/nonlinear_response",
+              "reference": {
+                "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "direction_count": 2,
+            "direction_status": "unresolved",
+            "directions": [
+              {
+                "change_significance": "unresolved_without_error_bound",
+                "derivative_scope": "independent_parameter_secant",
+                "detail_pointer": "/nonlinear_response/directions/0",
+                "direction_id": "segments.0.length_m",
+                "evidence_level": "finite_budget_observation",
+                "followup_hypothesis": "Recheck the observed lower J with an independent control initialization",
+                "observed_changed_metrics": [
+                  "holding_max_speed_m_s",
+                  "signed_maximum_excess"
+                ],
+                "observed_lower_J": [
+                  {
+                    "coordinate": -0.0050000000000000044,
+                    "delta_J": -0.010000000000000009
+                  }
+                ],
+                "parameters": [
+                  "segments.0.length_m"
+                ],
+                "source_direction_ids": [
+                  "segments.0.length_m"
+                ],
+                "status": "unresolved",
+                "strict_improvement_direction": "unresolved",
+                "task_sensitivity": {
+                  "fixed_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [],
+                    "status": "local_estimate_unvalidated"
+                  },
+                  "reoptimized_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [
+                      "FINITE_BUDGET_CONTROL_OPTIMALITY_UNRESOLVED"
+                    ],
+                    "status": "unresolved"
+                  }
+                }
+              },
+              {
+                "change_significance": "unresolved_without_error_bound",
+                "derivative_scope": "independent_parameter_secant",
+                "detail_pointer": "/nonlinear_response/directions/1",
+                "direction_id": "segments.1.length_m",
+                "evidence_level": "finite_budget_observation",
+                "followup_hypothesis": "Recheck the observed lower J with an independent control initialization",
+                "observed_changed_metrics": [
+                  "holding_max_speed_m_s",
+                  "signed_maximum_excess"
+                ],
+                "observed_lower_J": [
+                  {
+                    "coordinate": 0.0050000000000000044,
+                    "delta_J": -0.015000000000000013
+                  }
+                ],
+                "parameters": [
+                  "segments.1.length_m"
+                ],
+                "source_direction_ids": [
+                  "segments.1.length_m"
+                ],
+                "status": "unresolved",
+                "strict_improvement_direction": "unresolved",
+                "task_sensitivity": {
+                  "fixed_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [],
+                    "status": "local_estimate_unvalidated"
+                  },
+                  "reoptimized_control": {
+                    "active_switches": [],
+                    "maximum_validation_error_over_threshold": null,
+                    "reasons": [
+                      "FINITE_BUDGET_CONTROL_OPTIMALITY_UNRESOLVED"
+                    ],
+                    "status": "unresolved"
+                  }
+                }
+              }
+            ],
+            "evidence_level": "finite_budget_observation",
+            "method": "mujoco-reoptimized-structure-response-v1",
+            "omitted_directions": 0,
+            "status": "computed_diagnostic",
+            "stencil_count": 2,
+            "strict_improvement_direction": "unresolved",
+            "task_acceptance": "unmeasured",
+            "worst_constraint": {
+              "constraint_id": "holding_max_speed_m_s",
+              "kind": "holding_speed",
+              "limit": 0.03,
+              "unit": "m/s",
+              "value": 0.045
+            }
+          },
+          "cost_scope": "Costs belong to owning_study, unknown if unrecorded. T2 aggregates saved T1 results with zero new rollouts or physics steps; referenced T1 costs were previously charged and are not charged again. Preparation and worker time are additional; independent physical acceptance is separate.",
+          "cost": {
+            "evaluations": 1,
+            "numerical_s": 1.2995047000003979,
+            "sources": [
+              {
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                },
+                "pointer": "/charged_analysis_evaluations"
+              },
+              {
+                "reference": {
+                  "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+                  "media_type": "application/json"
+                },
+                "pointer": "/charged_numerical_s"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "result_count": 1,
+    "scope": [
+      {
+        "result": {
+          "pointer": "",
+          "reference": {
+            "artifact_id": "c87f1c14e645770770feadafa121270515274de826d21d48369da2f2224db83a",
+            "media_type": "application/json"
+          }
+        },
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "unresolved",
+        "supported_inferences": [
+          "local_diagnostic",
+          "finite_budget_native_observation"
+        ]
+      }
+    ],
+    "comparisons": [],
+    "limitations": [
+      "global_nonlinear_feasibility",
+      "global_nonlinear_infeasibility",
+      "structural_infeasibility",
+      "whole_horizon_from_instantaneous_braking",
+      "adapted_dynamic_improvement_from_static_sensitivity",
+      "unvisited_simulation_descent_guarantee",
+      "continuous_time_compliance",
+      "hardware_performance",
+      "robustness",
+      "repeatability",
+      "observed_task_pass"
+    ],
+    "unresolved": [
+      "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+      "Global optimal task capability and a strict structural improvement direction are not established.",
+      "Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.",
+      "Original independent physical task acceptance is unmeasured by this evidence."
+    ],
+    "interpretations": [],
+    "interpretation_sources": [],
+    "selected_reads": [],
+    "restore_query": {
+      "reference": {
+        "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+        "media_type": "application/json"
+      },
+      "view": "full",
+      "pointer": "/report/interpretations"
+    },
+    "summary_query": {
+      "reference": {
+        "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+        "media_type": "application/json"
+      },
+      "view": "summary"
+    },
+    "full_report_query": {
+      "reference": {
+        "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+        "media_type": "application/json"
+      },
+      "view": "full"
+    },
+    "applicable_corrections": [],
+    "current_interpretation_status": "deferred",
+    "historical_interpretations_query": {
+      "reference": {
+        "artifact_id": "68013ec23e008ac5a333b5f97466b95aa95a48887f83c485cc0e59a34993da28",
+        "media_type": "application/json"
+      },
+      "view": "full",
+      "pointer": "/report/interpretations"
+    },
+    "interpretation_scope": "Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions",
+    "error": null,
+    "rejection_details": null
+  },
+  "accounting": {
+    "synthetic_mathematical_admissions": 6,
+    "ledger": {
+      "tool_calls": 7,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0998937000404112
+    },
+    "real_provider_requests": 0,
+    "real_mathematical_workers": 0,
+    "real_physical_workers": 0,
+    "NMPC": 0,
+    "RL": 0
+  }
+}

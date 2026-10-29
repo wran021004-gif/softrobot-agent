@@ -362,6 +362,27 @@ def quantitative_facts(value, reference):
             all_requested_checked=trajectory.get('all_requested_checked'),
             full_requested_coverage=trajectory.get('full_requested_coverage'),
             source=dict(reference=reference,pointer='/trajectory/replay'))
+    t1=value.get('nonlinear_capability')
+    if t1:
+        facts['nonlinear_research']=dict(
+            metrics=[dict(name=key,value=t1['best_metrics'][key],unit=unit,
+                source=dict(reference=reference,pointer='/nonlinear_capability/best_metrics/'+key))
+                for key,unit in t1.get('metric_units',{}).items()],
+            best_found_J=dict(value=t1['best_found_J'],unit='1',
+                source=dict(reference=reference,pointer='/nonlinear_capability/best_found_J')),
+            reliability=dict(stop_reason=t1['stop_reason'],search_quality=t1['search_quality'],
+                source=dict(reference=reference,pointer='/nonlinear_capability')),
+            detail_query=dict(reference=reference,view='full',pointer='/nonlinear_capability'),
+            scope='Finite-budget native model observations; task acceptance remains independent.')
+    t2=value.get('nonlinear_response')
+    if t2:
+        facts['nonlinear_research']=dict(directions=[dict(
+            direction_id=d.get('direction_id','parameter'),status=d['direction_status'],reasons=d.get('reasons',[]),
+            source=dict(reference=reference,pointer='/nonlinear_response'+('/directions/'+str(i) if 'directions' in t2 else '')),
+            detail_query=dict(reference=reference,view='full',pointer='/nonlinear_response'+('/directions/'+str(i) if 'directions' in t2 else '')))
+            for i,d in enumerate(t2.get('directions',[t2]))],
+            referenced_costs_query=dict(reference=reference,view='full',pointer='/nonlinear_response/referenced_t1_costs'),
+            scope='Fixed-control and reoptimized quantities retain their separate source pointers in mathematics.quantities; prior T1 costs are referenced, not charged again.')
     return facts
 
 

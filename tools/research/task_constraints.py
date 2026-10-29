@@ -300,8 +300,83 @@ def mathematical_method_view(host, reference):
         if (intent.get('action')=='diagnose' and intent.get('execution_status')=='completed'
                 and decision.get('selected_candidate')==reference and selected in methods and binding_error is None):
             methods[selected]['operating_point_guidance']=selected_operating_point_guidance(host,reference,selected,methods[selected])
-    return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
+    return dict(**readiness,candidate=reference,methods=methods,
+        research_opportunities=mathematical_research_view(spec,c,reference,requirements,methods),
+        scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
+
+
+def mathematical_research_view(spec, candidate, reference, requirements, methods):
+    """Join existing FamilySpace paths, task constraints and method applicability.
+
+    This is a read projection, not a parameter/metric registry or execution gate.
+    Candidate compilation and the original method admission remain authoritative.
+    """
+    from tools.research.optimal_capability import family_analysis_parameters
+    from tools.research.nonlinear_capability import T1, T2
+    parameters=(family_analysis_parameters(spec,candidate) if candidate.get('generation_version')
+        in ('serial_family_generation_v1','serial_family_generation_v2') else [])
+    constraints=plain(requirements)['constraints']
+    metrics=[dict(metric_id=c['constraint_id'],constraint=c,
+        sources=[dict(reference=reference,pointer='/configuration'+p) for p in c['provenance']],
+        semantics='Frozen TaskAdapter constraint; mathematical coverage and independent task acceptance are separate.')
+        for c in constraints]
+    if T1 in methods:
+        metrics.append(dict(metric_id='best_found_J',unit='1',method=T1,
+            constraint_ids=[c['constraint_id'] for c in constraints],
+            definition='Minimum observed maximum normalized signed constraint excess under the recorded native control search and budget.',
+            source=dict(module='tools.research.nonlinear_capability',function='t1_summary'),
+            result_pointer='/nonlinear_capability/best_found_J',
+            limitations='Finite-budget model diagnostic; neither global optimum nor independent task acceptance.'))
+    rows=[]
+    for parameter in parameters:
+        links=[]
+        for method in parameter['applicable_mathematical_methods']:
+            if method not in methods:continue
+            detail=methods[method]
+            coverage=detail.get('coverage',[])
+            # T2 aggregates T1's frozen task quantities; it enforces no task itself.
+            metric_ids=([c['constraint_id'] for c in constraints]+(['best_found_J'] if T1 in methods else []) if method==T2 and detail['kernel_supported'] else
+                [c['constraint_id'] for c in coverage if c.get('status')!='not_applicable'])
+            links.append(dict(method=method,metric_ids=metric_ids,
+                planning_status=detail['planning_status'],request_query=detail['detail_query'],
+                **(dict(source_method=T1,source_request_query=methods[T1]['detail_query']) if method==T2 and T1 in methods else {}),
+                scope='Saved comparable T1 contrasts' if method==T2 else 'See method coverage and original admission'))
+        rows.append({**parameter,'method_links':links})
+    return dict(version='candidate_mathematical_research_v1',candidate=reference,
+        task_binding={**requirements.binding, 'task_family':candidate['configuration']['task']['family'],
+            'canonical_task_identity':candidate.get('task_identity'),
+            'condition_id':candidate.get('condition_id')},protocol=spec['analysis_protocol'],
+        parameters=rows,metrics=metrics,
+        methods={key:dict(planning_status=detail['planning_status'],
+            execution_status=detail['execution_status'],missing=detail['missing'],
+            estimated_evaluations=detail['estimated_evaluations'],wall_cost=detail['wall_cost'],
+            cost_scope=detail['cost_scope'],request_query=detail['detail_query']) for key,detail in methods.items()},
+        fixed_conditions=['Frozen task condition and protocol, topology, nonselected parameters, material/load, initial state, input channels/bounds, time grid and control-search settings/budget; compare actual search opportunities.'],
+        workflow='Main chooses hypothesis, parameters and legal contrasts. research_plan(diagnose) selects candidate/method; research_analysis binds frozen identities and separately admits the request. Read original results via evidence_read or research_investigate.',
+        limitations=['Parameter continuity does not establish compiled perturbation candidates or a mathematical derivative.',
+            'Method links identify declared parameter support; missing task, source, grant and budget prerequisites still block execution.',
+            'No registered arbitrary mechanism metric is inferred from a task score.'])
+
+
+def mathematical_opportunity_summary(view):
+    """L0 discovery only; the complete parameter table stays in L1."""
+    research=view['research_opportunities'];rows=research['parameters']
+    linked={link['method'] for p in rows for link in p['method_links']}
+    linked.update(m['method'] for m in research['metrics'] if 'method' in m)
+    return dict(version=research['version'],candidate=view['candidate'],
+        task_binding=research['task_binding'],
+        parameters=dict(total=len(rows),continuous_authorized=sum(
+            bool(p['continuous_perturbation'] and p['study_authorized']) for p in rows),
+            categories=sorted({p['category'] for p in rows})),
+        metrics=[dict(metric_id=m['metric_id'],unit=m.get('unit',m.get('constraint',{}).get('signal',{}).get('units')))
+            for m in research['metrics']],
+        methods=[dict(method=k,status=m['planning_status'],missing=m['missing'],
+            estimated_evaluations=m['estimated_evaluations'],wall_cost=m['wall_cost'])
+            for k,m in research['methods'].items() if k in linked],
+        method_directory_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/methods'),
+        detail_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/research_opportunities'),
+        scope='Candidate-bound discovery, not execution permission. Main chooses the research route; use L1 for units, domains, coverage, costs and exact method requests.')
 
 
 def mathematical_catalog(view):
