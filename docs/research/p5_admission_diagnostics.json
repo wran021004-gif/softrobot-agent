@@ -1,16 +1,6 @@
 {
-  "status": "blocked_external_admission",
-  "observation_scope": "Last actual catalog result is from P4. New user-requested proxy routing has not been revalidated.",
-  "upstream": {
-    "endpoint": "https://api.openai.com/v1/models",
-    "last_observed_http_status": 403,
-    "code": "api_error",
-    "retryable": false,
-    "response_shape": "undefined",
-    "request_id": null,
-    "raw_error_body_retained": false,
-    "cause": "Undetermined external admission: policy, account, workspace or service region cannot be distinguished by the retained evidence."
-  },
+  "status": "catalog_admitted_inference_unverified",
+  "observation_scope": "One explicitly approved catalog validation after the user-requested proxy configuration change succeeded. This does not verify inference or autonomous tools.",
   "gateway": {
     "version": "0.1.0",
     "node_version": "24.19.0",
@@ -61,15 +51,76 @@
     "network_requests": 0,
     "limitation": "Exact current credential check only, not a universal secret detector. No credential is emitted."
   },
-  "new_catalog_requests": 0,
+  "new_catalog_requests": 1,
   "new_inference_requests": 0,
-  "new_oauth_refresh_requests": 0,
-  "account_catalog_luna_verified": false,
+  "new_oauth_refresh_requests": null,
+  "account_catalog_luna_verified": true,
   "inference_capability_verified": false,
-  "next_step": "One controlled catalog validation is pending explicit approval after the user-requested routing configuration change. No retry of the same non-retryable error; no inference grant is inferred.",
+  "next_step": "Stop at catalog-only authorization. Any new inference or Study requires its separately authorized model and finite ledger. Do not treat catalog visibility as tool capability or price verification.",
   "official_documents": [
     "https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference",
     "https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery",
     "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations"
-  ]
+  ],
+  "historical_p4_upstream_error": {
+    "endpoint": "https://api.openai.com/v1/models",
+    "last_observed_http_status": 403,
+    "code": "api_error",
+    "retryable": false,
+    "response_shape": "undefined",
+    "request_id": null,
+    "raw_error_body_retained": false,
+    "cause": "Undetermined external admission: policy, account, workspace or service region cannot be distinguished by the retained evidence."
+  },
+  "post_proxy_catalog_validation": {
+    "completed_utc": "2026-10-29T00:55:28.986Z",
+    "catalog_http_status": 200,
+    "catalog_success": true,
+    "catalog_requests": 1,
+    "inference_requests": 0,
+    "retries": 0,
+    "models": [
+      {
+        "id": "gpt-6.1-sol",
+        "display_name": "GPT-6.1-Sol"
+      },
+      {
+        "id": "gpt-6-astra",
+        "display_name": "GPT-6-Astra"
+      },
+      {
+        "id": "gpt-6.1-terra",
+        "display_name": "GPT-6.1 Terra"
+      },
+      {
+        "id": "gpt-6-sol",
+        "display_name": "GPT-6-Sol"
+      },
+      {
+        "id": "gpt-6-luna",
+        "display_name": "GPT-6-Luna"
+      },
+      {
+        "id": "gpt-5.6-sol",
+        "display_name": "GPT-5.6-Sol"
+      },
+      {
+        "id": "gpt-5.6-terra",
+        "display_name": "GPT-5.6-Terra"
+      },
+      {
+        "id": "gpt-5.6-luna",
+        "display_name": "GPT-5.6-Luna"
+      }
+    ],
+    "luna_catalog_entries": [
+      {
+        "id": "gpt-5.6-luna",
+        "display_name": "GPT-5.6-Luna"
+      }
+    ],
+    "tool_support": "Not independently verified by this catalog-only operation.",
+    "pricing": "Not returned by this catalog."
+  },
+  "oauth_refresh_observability": "Normal SDK renewal was authorized if needed; refresh traffic was not separately instrumented. No forced renewal, new login or consent operation was invoked."
 }

@@ -1,6 +1,7 @@
 # P5 验收记录（2026-10-29）
 
-工程修复与离线准备已完成。ChatGPT 准入尚未通过；真实 Main 决策测试未运行，不能宣称达到 D1–D4。
+工程修复与离线准备已完成。ChatGPT 模型目录准入复验已通过，推理和工具能力仍未验证；
+真实 Main 决策测试未运行，不能宣称达到 D1–D4。
 本轮没有新的推理请求、科学 Worker 或正式 Study。原 P4 已停止的 7/8 账本未恢复。
 
 ## 1. ChatGPT 准入及代理
@@ -25,7 +26,7 @@ P4 的目录请求已到达上游，标准化结果为 HTTP 403、`api_error`、
 responseShape=`undefined`，没有 request ID。源码说明：非 JSON 错误被 DevKit 标准化时不会保留原正文；
 上游未提供或 SDK 未保留的信息现在不能恢复。新增离线 Gateway 测试确认：当 SDK 确实提供 code、
 upstream status、request ID 和 param 时，现有转换会保留这些字段。没有仅为补日志重发原 403。
-现有证据不能唯一判定是账号、地区、Workspace 还是其他服务策略，状态记为 `blocked_external_admission`。
+当时证据不能唯一判定是账号、地区、Workspace 还是其他服务策略，历史状态为 `blocked_external_admission`。
 
 用户明确要求使用本机 7890 代理后，仅停止本轮之前启动的 V2 PID 68704，保留锁及 OAuth/DPAPI 文件，
 等待原锁自然过期，再从 V2 运行 `npm run start:proxy`。记录时 PID 379820 监听 `127.0.0.1:8787`，
@@ -35,12 +36,18 @@ upstream status、request ID 和 param 时，现有转换会保留这些字段�
 本地 fake proxy 测试验证 Node 原生代理路由，不访问外部网络。
 该开关见 [Node 官方文档](https://nodejs.org/download/release/v24.20.0/docs/api/cli.html#--use-env-proxy)。
 
-代理启动后尚未复验真实目录；一次目录验证的明确授权正在等待用户回复。
-没有把代理作为绕过地区或服务策略限制的方案，没有换身份、重复登录或猜测模型 slug。
-GPT-5.6 Luna 是否存在于当前账号目录、支持本地工具、可以实际推理，均未验证；不声称它最便宜。
+用户随后明确批准一次真实目录验证、不发送推理。北京时间 2026-10-29 08:55:28，
+通过当前 V2 Gateway 的唯一一次 GET /v1/models 返回 HTTP 200，重试为零。
+当前账号目录包含 `gpt-5.6-luna`（GPT-5.6-Luna），另含 gpt-5.6-sol、gpt-5.6-terra、
+gpt-6-luna、gpt-6-sol、gpt-6-astra、gpt-6.1-sol 和 gpt-6.1-terra。
+当前状态更新为 `catalog_admitted_inference_unverified`，历史 403 不改写。
+目录操作沿现有 SDK 运行；正常续期被允许但未单独计量，不声称 OAuth 网络请求为零。
+没有手动续期、重新登录、改账号、改 consent 或猜测模型 slug。
+代理切换后成功与之前失败的先后关系，不能证明原 403 的唯一原因，也不证明推理已经获准。
+此次目录未提供价格或独立工具能力结果，不声称 Luna 最便宜或已通过工具闭环。
 用户现在无需另开 Gateway，重复启动仍会遇到 runtime_busy。
 
-脱敏支持材料见 `p5_admission_diagnostics.json`。它包含端点、错误边界、版本和一致性布尔值；
+脱敏支持材料见 `p5_admission_diagnostics.json`。它包含端点、历史错误边界、本次目录结果、版本和一致性布尔值；
 没有账号或 OAuth 私有信息。若官方需要原始 request ID，本轮证据无法提供，应明确说明缺失。
 
 ## 2. 预算提前保护的原因及修复
@@ -121,6 +128,7 @@ generate 保持加载、小型 working_set 直接交付、原 evidence reference
 D1（合法科学 Plan）、D2（真实新结果）、D3（消费反馈并决定下一步）、D4（正式通过及 SELECT/STOP）
 全部为 **未运行**。P5 要求新的明确授权与冻结额度，目前没有收到，不复制 P4 授权、不恢复原 Study。
 本轮新增真实 Provider 推理请求 0、实际 Token 0；没有新增推理费用或 usage 估计。
+另有用户单独批准的目录读取 1 次，不计作推理请求；目录没有返回 usage 或费用信息。
 P4 的既有 7 次请求、33,930 Token 和未知费用原样保留。
 
 目前有依据先做 none 决策边界测试，没有依据直接启动 medium 或完整长期科研。
@@ -154,4 +162,5 @@ Store、任务、FamilySpace 与独立 evaluator 没有生产修改。
 工程提交 `344caed2c2ebef16b31b8ad56218f8198e070446` 已成功 push 至
 `origin/mainline/research-harness-v2`（远端由 c56bae83e 前进至 344caed2c）。
 本文的后续结算提交只补充该发布结果；最终 HEAD 见交付消息及 Git 记录。
+后续目录复验记录在本报告及脱敏诊断中，完整响应只保存在 ignored `runs/p5-catalog-validation-20261029`。
 不自动启动长期科研或创建实际 P5 Study。
