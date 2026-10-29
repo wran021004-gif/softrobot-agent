@@ -103,6 +103,15 @@ class RepairTests(unittest.TestCase):
         self.assertEqual(feedback['citation_errors'][0]['reference'],report)
         self.assertEqual(feedback['inventory_query']['pointer'],'/citation_eligibility')
         self.assertEqual(raw['supporting_evidence'],[report])
+        from tools.research.session_handoff import feedback_delivery
+        # Force the existing bounded feedback path, not its exact-small-result path.
+        feedback['fixture_padding']='Synthetic offline padding. '*400
+        agent.record(h,'model_original_tool_feedback',dict(tool_use=dict(name='research_plan',
+            input=raw,toolUseId='fixture-reject'),result=dict(status='error',content=[dict(text=json.dumps(feedback))])))
+        projected=feedback_delivery(h,['fixture-reject'],compact=True)['items'][0]
+        self.assertEqual(projected['delivery'],'summary_only')
+        self.assertEqual(projected['facts']['citation_errors'][0]['role'],'reporter_report')
+        self.assertEqual(projected['facts']['inventory_query'],feedback['inventory_query'])
         raw['supporting_evidence']=[]
         self.assertIsNotNone(admit_decision(h,Plan.model_validate(raw)))
 

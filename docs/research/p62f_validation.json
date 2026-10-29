@@ -25,7 +25,11 @@
   },
   "log_hashes": {
     "runs/p62f/offline_final.log": "bc4df178f9a654e4245d4759b9e231e9383891fec382951f4cae11549916a15d",
-    "runs/p62f/offline_last_changes.log": "4562a18b9d31cffefe7bceda9a29320c668bac7842ae738d2909b2db563d9882"
+    "runs/p62f/offline_last_changes.log": "4562a18b9d31cffefe7bceda9a29320c668bac7842ae738d2909b2db563d9882",
+    "runs/p62f/offline_record_time_fix.log": "b813bed9f29d25292ffb229777779fd66db0ffb30450781b4a0ec0807ab2a6f7",
+    "runs/p62f/offline_supervised_prompt.log": "d4257ea2dda6bf44409543c5d146373ee0abb37845a284bc14d0457c2fefb4ee",
+    "runs/p62f/offline_legacy_projection.log": "fc7771ebe9ef136e8af78ccfe0b639b501dee23cb19b9e0207c9879f9b72f256",
+    "runs/p62f/offline_citation_feedback.log": "5b084f72dbf4ee227c261918990a123ca44acc1ed4de516762c9e00a55d340de"
   },
   "baseline_outputs": {
     "docs/research/p62_luna_results.json": "e49b2b32297312e1660779170200c751154ce55995e64f495d0b9f8af12db027",
@@ -39,5 +43,47 @@
     "provider_requests_before_repair": 1,
     "tests": 6,
     "log": "runs/p62f/offline_record_time_fix.log"
+  },
+  "supplemental_checks": [
+    {
+      "log": "runs/p62f/offline_record_time_fix.log",
+      "tests": 6,
+      "passed": 6
+    },
+    {
+      "log": "runs/p62f/offline_supervised_prompt.log",
+      "tests": 1,
+      "passed": 1
+    },
+    {
+      "log": "runs/p62f/offline_legacy_projection.log",
+      "tests": 7,
+      "passed": 7
+    },
+    {
+      "log": "runs/p62f/offline_citation_feedback.log",
+      "tests": 1,
+      "passed": 1
+    }
+  ],
+  "final_audit": {
+    "actual_provider_requests": 10,
+    "main": 7,
+    "reporter": 3,
+    "zero_new_science": true,
+    "source_unchanged": true,
+    "admit_decision_ast_unchanged": true,
+    "handoffs": 6,
+    "all_snapshot_fields_equal": true,
+    "knowledge_body_delivered": true,
+    "model_stop": false,
+    "assessments": {
+      "Reporter Scientific Accuracy": "PARTIAL",
+      "Reporter Context Efficiency": "PASS",
+      "Main Evidence Use": "PARTIAL",
+      "Knowledge Delivery": "PASS (supervised)",
+      "Handoff Continuity": "PASS (tested feedback boundaries)"
+    },
+    "p63_ready": false
   }
 }

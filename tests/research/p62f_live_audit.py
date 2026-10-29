@@ -20,7 +20,7 @@ from tools.research.core import prepare
 from tools.research.experience import read_progress
 from tools.research.provider import credential, discover_models, received, record, pending
 from tools.research.state import state, update, save
-from tools.state_io import atomic_json
+from tools.state_io import atomic_json, digest
 
 RUN='p62f-luna-20261029'
 CONFIG=ROOT/'configs/research/study_p62f_luna.json'
@@ -134,8 +134,39 @@ def audit():
     h=host();before=hashlib.sha256(h.store.db.read_bytes()).hexdigest()
     result['knowledge_read_progress']=read_progress(h)
     result['knowledge_retrievals']=[dict(reference=r,**h.store.artifact(r)) for r in state(h)['retrievals']]
-    result['operator_events'] += [dict(sequence=e['sequence'],kind=e['kind'],records=[h.store.artifact(r) for r in e['outputs']])
+    result['operator_events'] += [dict(sequence=e['sequence'],kind=e['kind'],references=e['outputs'],
+        records=[dict(immutable_state_snapshot=True,restore_query=dict(reference=r,view='full'))
+            if e['kind'].endswith('_state') else h.store.artifact(r) for r in e['outputs']])
         for e in h.store.events(h.run_id) if e['kind'].startswith('p62f_')]
+    # The original exact payloads stay in the Store. Export equality and hashes
+    # instead of duplicating a whole report in both sides of a continuity check.
+    for handoff in result['handoffs']:
+        expected=handoff['pending_feedback_expected'];actual=handoff['actual_feedback']
+        assert handoff['precise_feedback_preserved'] and expected==actual
+        assert all(handoff['authoritative_snapshot_to_actual_wire'].values())
+        handoff['feedback_digests']=dict(expected=digest(expected),actual=digest(actual))
+        handoff['feedback_restore_queries']=[item['original_result_query'] for item in expected['items']]
+        if len(json.dumps(expected).encode())>16000:
+            handoff['pending_feedback_expected']=dict(omitted_from_export=True,restore_from=handoff['reference'],pointer='/pending_feedback_delivery')
+            handoff['actual_feedback']=dict(omitted_from_export=True,restore_from=next(r['request_reference'] for r in result['rows']
+                if r['sequence']==handoff['next_request_sequence']),scope='Actual CURRENT_RESEARCH_PACKET pending_feedback; exact equality checked before export.')
+    calls=[(row,tool) for row in result['rows'] for tool in row['tool_calls']]
+    raw_ids={r['artifact_id'] for r in result['source_manifest']['references']}
+    searches=[digest(t['arguments']) for _,t in calls if t['name']=='experience_retrieve' and t['arguments']['operation']=='search']
+    result['tool_counts']=dict(total=len(calls),direct_original_result_reads=sum(t['name']=='evidence_read' and
+            t['arguments'].get('reference',{}).get('artifact_id') in raw_ids for _,t in calls),
+        full_report_reads=sum(t['name']=='evidence_read' and not t['arguments'].get('pointer') for _,t in calls),
+        reporter_investigations=sum(t['name']=='research_investigate' for _,t in calls),
+        routing=sum(t['name']=='research_route' for _,t in calls),
+        knowledge_searches=sum(t['name']=='experience_retrieve' and t['arguments']['operation']=='search' for _,t in calls),
+        knowledge_exact_reads=sum(t['name']=='experience_retrieve' and t['arguments']['operation']=='read' for _,t in calls),
+        repeated_knowledge_searches=len(searches)-len(set(searches)),accepted_scientific_plans=len(state(h)['plans']))
+    result['efficiency']=dict(reporter_input_tokens=[r['usage']['prompt_tokens'] for r in result['rows'] if r['purpose']=='reporter'],
+        main_max_input_tokens=max(r['usage']['prompt_tokens'] for r in result['rows'] if r['purpose']!='reporter'),
+        total_tokens=sum(v['total_tokens'] for v in result['usage'].values()),
+        comparison_scope='First two Reporter questions reuse original sources; third synthesis differs. Main 1-4 autonomous, 5-7 supervised with preceding full-report feedback. No causal end-to-end efficiency or autonomous Knowledge adoption claim.',
+        tokens_per_completed_reporter_request=result['usage']['reporter']['total_tokens']/result['usage']['reporter']['requests'],
+        tokens_per_accepted_scientific_plan=None)
     assert hashlib.sha256(h.store.db.read_bytes()).hexdigest()==before
     atomic_json(destination,result)
     print(json.dumps(dict(knowledge=result['knowledge_read_progress'],status=result['final_status'])))
