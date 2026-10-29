@@ -1,0 +1,184 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "research-strict-near-tolerance",
+  "revision": "2",
+  "kind": "procedure",
+  "authored_language": "en",
+  "language_origin": {
+    "kind": "authored_english",
+    "basis": "New English synthesis of hash-verified original historical summaries; not a reviewed translation.",
+    "human_review": "not_claimed"
+  },
+  "trigger": "Position/tool-axis control is close to a joint threshold; position alone may pass.",
+  "procedure": [
+    "Evaluate every original position and directed tool-axis predicate on the complete frozen scoring grid. A passing position alone does not establish task acceptance.",
+    "Read unrounded residuals, units, solver status and independent evaluation before interpreting a near-threshold failure. Finite search failure does not prove structural infeasibility or evaluator error.",
+    "BF5 records a failed precheck followed by a separately authorized finite continuation and an independent pass. This supports investigating residuals under the original thresholds; it does not guarantee that another task or continuation will pass.",
+    "Counterexample: BF6 R7 still failed the original position bound despite a passing tool-axis predicate and improved native values. Preserve the recorded STOP; a small positive residual is still a failure.",
+    "Check model, task, timing, structure, initialization and budget applicability before transfer. Directed tool axis does not cover full orientation or axial roll. Historical controls and parameter values are not a current-task prescription."
+  ],
+  "bindings": {
+    "task": "position_tool_axis",
+    "structure": "tendon_serial_bending",
+    "physics": "Frozen historical MuJoCo/GVS model and task; check exact applicability before transfer"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "generalization": "unverified"
+  },
+  "applicability": [
+    "Conjunctive sampled position/directed-axis tasks, including oriented tracking.",
+    "Directed tool axis is two orientation degrees of freedom; this does not cover full pose or axial roll."
+  ],
+  "escalation": "Guidance only. Obtain current scoped evidence and authorization before any scientific action; preserve original STOP and budgets.",
+  "evidence": [
+    {
+      "path": "evidence/bf5_tool_axis_preparation/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "405b5c9eabfe541450ff73f0405aa8720d4db5024cd20b7b32bf00729cf19081",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf5_tool_axis_continuation/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "a26eb8f20d166e8a2ee05c2862c76655326ec942b9363211497f3b1e2c560c04",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    },
+    {
+      "path": "evidence/bf6_r7_feasibility/summary.json",
+      "source_commit": "8a6a15d4667b946d4e1dd6b20e544cc8d683452a",
+      "sha256": "5059554fd32171de31e3c30e3b63a7e4d831e6689b3142d12ef3855ca91ca7da",
+      "hash_convention": "Raw git blob bytes at source_commit"
+    }
+  ],
+  "historical_facts": [
+    {
+      "pointer": "/independent_components",
+      "value": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:tool_axis_direction": {
+          "limit": 0.05235987755982988,
+          "passed": true,
+          "reason": null,
+          "unit": "rad",
+          "value": 0.051758721734539846
+        },
+        "evaluator:tool_position": {
+          "limit": 0.008,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.00795895632595311
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "tool_axis_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": "Both real world position and unit tool-axis signals on the complete post-step grid",
+          "unit": null,
+          "value": true
+        }
+      },
+      "evidence_index": 1
+    },
+    {
+      "pointer": "/cumulative_bf5",
+      "value": {
+        "native_callbacks": 54,
+        "independent_replays": 2,
+        "physics_steps": 33600,
+        "numerical_s": 8.566561799991177,
+        "kinematic_audit_physics_steps": 0
+      },
+      "evidence_index": 1
+    },
+    {
+      "pointer": "/acceptance/components/evaluator:tracking_max_error",
+      "value": {
+        "value": 0.012034913019737243,
+        "passed": false,
+        "unit": "m",
+        "limit": 0.012,
+        "reason": null
+      },
+      "evidence_index": 2
+    },
+    {
+      "pointer": "/acceptance/components/evaluator:tool_axis_direction",
+      "value": {
+        "value": 0.17373349303659474,
+        "passed": true,
+        "unit": "rad",
+        "limit": 0.17453292519943295,
+        "reason": null
+      },
+      "evidence_index": 2
+    },
+    {
+      "pointer": "/native_cost",
+      "value": {
+        "completed_response_steps": 6,
+        "forward_evaluations": 9212,
+        "kernel_wall_s": 8.798744200001238,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 151,
+        "optimization_iterations": 6,
+        "physics_step_attempts": 90600,
+        "physics_steps": 90600,
+        "rollouts": 151
+      },
+      "evidence_index": 2
+    },
+    {
+      "pointer": "/replay_cost",
+      "value": {
+        "forward_evaluations": 61,
+        "kernel_wall_s": 0.142287300011958,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "evidence_index": 2
+    },
+    {
+      "pointer": "/numerical_s",
+      "value": 11.639339499990456,
+      "evidence_index": 2
+    }
+  ]
+}

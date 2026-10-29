@@ -1,0 +1,80 @@
+{
+  "task": "P6.1 Research Information Flow V1",
+  "baseline_sha": "44667616bf1a6b98876e48889b2782f0a353d7d8",
+  "branch": "codex/p6-1-research-information-flow",
+  "test_modules": [
+    "tests.research.test_information_flow",
+    "tests.research.test_recent_round_tools",
+    "tests.research.test_harness_v2",
+    "tests.research.test_openai_api",
+    "tests.research.test_provider_v2",
+    "tests.research.test_f1_integration",
+    "tests.research.test_research_knowledge",
+    "tests.research.test_research_reporting",
+    "tests.research.test_evidence_policy",
+    "tests.research.test_s129_agent_reporting"
+  ],
+  "runs": [
+    {
+      "log": "p61-regression-final.log",
+      "scope": "Full regression before the final reference-normalization and repeated-investigation refinements",
+      "tests": 88,
+      "elapsed_s": 131.675,
+      "status": "passed",
+      "exit_code": 0,
+      "log_sha256": "853f9d37605ccb401b32443ef66c5cc11a1ad675d8eedf205ecb92143ff38db8"
+    },
+    {
+      "log": "p61-final-boundaries.log",
+      "scope": "Final affected contract, Reporter, evidence, Plan and Handoff boundaries after those refinements",
+      "tests": 55,
+      "elapsed_s": 67.017,
+      "status": "passed",
+      "exit_code": 0,
+      "log_sha256": "7e8a61ab2e64ed41bba592b980024db2ee301f595b4e85fc320fa1d1905df698"
+    },
+    {
+      "log": "p61-final-reporter.log",
+      "scope": "Final Reporter checks after removing a redundant resource projection",
+      "tests": 16,
+      "elapsed_s": 9.068,
+      "status": "passed",
+      "exit_code": 0,
+      "log_sha256": "01029b70cbe192cab4c12b632f2c5503fbbd8a5bcaeb66f79b957e8a1640bf58"
+    }
+  ],
+  "unique_regression_tests": 88,
+  "remaining_failures": [],
+  "source_files_sha256": {
+    "tools/research/agent.py": "0206afb15cd4a39b2ce7cc65530cda3baff44c0d1343c19e365ae024a6d7108e",
+    "tools/research/config.py": "1492084acf7b5bb5d8ba894d055eeb99418fba3b361fb2b521c1f2354ce8501b",
+    "tools/research/contracts.py": "ffeebc49542f5de62fe3559d1c991f6033d8833b355f87b1a33bc8b0b507afe7",
+    "tools/research/evidence_policy.py": "7f2c93f079c7aad972eb0e523f871f815f660bbc19abd478e122952f4586b93d",
+    "tools/research/experience.py": "380c5aabacd3d2342270815c8fe9926c0d505a55435861db24bbe993e6abf49a",
+    "tools/research/provider.py": "1f7f776cdf801b8fb8a3a6042e731d25ecd26f87b48556250fc666ea480e5e17",
+    "tools/research/reporter.py": "7a1d3c62acd35c94e11a13189fd9e6b121b067bcec2d4ff7ac42f85433766208",
+    "tools/research/research_context.py": "dcefabb0b3f7c0cd4530f2f4ec7b0a6dc35dc5a095e845124af752f80ed37901",
+    "tools/research/session_handoff.py": "b1a85c6c75f27e21ea15dbb82012e214034bb09e393c9be3dc3eea63e22cdbcf"
+  },
+  "source_hash_convention": "Final working-tree file bytes; line endings can differ on another checkout.",
+  "resources": {
+    "real_provider_requests": 0,
+    "new_math_workers": 0,
+    "physical_workers": 0,
+    "rl_training": 0
+  },
+  "environment": {
+    "python": "Existing .mainline5-env",
+    "matlab": "Installed source path used for discovery only; Engine not started",
+    "tokenizers": "0.22.2 installed only under ignored runs/p61-deps"
+  },
+  "sealed_state_audits": [
+    "p61_r2_metrics.json",
+    "p61_closeout_metrics.json"
+  ],
+  "limitations": [
+    "No live model behavior or official API acceptance trial; those remain P6.2.",
+    "No P6.3 parameterized mathematics implementation.",
+    "Mock HTTP ledger charges are synthetic protocol fixtures, not real Provider requests."
+  ]
+}

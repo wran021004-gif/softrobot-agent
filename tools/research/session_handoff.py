@@ -104,9 +104,11 @@ def feedback_delivery(host, tool_ids, *, compact=False):
             and query.get('view',default_view)=='full' and not query.get('pointer'))
         short_experience=False
         if value['tool_use']['name']=='experience_retrieve' and result['status']=='success' and query.get('operation')=='read':
+            from tools.research.config import information_flow_v1
             parsed=json.loads(''.join(b.get('text','') for b in result['content']))
             entries=parsed.get('results',[])
-            short_experience=(len(entries)==1 and isinstance(entries[0].get('content'),str)
+            body_types=(str,dict) if information_flow_v1(state(host)['spec']) else (str,)
+            short_experience=(len(entries)==1 and isinstance(entries[0].get('content'),body_types)
                 and entries[0].get('status')!='source_unavailable' and size<=8192)
         # A deliberate whole-result read is the formal SELECT interface. It is
         # delivered exactly even when large; the unchanged hard context guard
@@ -177,6 +179,13 @@ def rotation_ready(host, messages):
     return True
 
 
+def packet_feedback(research):
+    """Locate delivered feedback in frozen legacy packets and the P6.1 view."""
+    return (research.get('pending_feedback_delivery') or
+        (research.get('research_state') or {}).get('pending_feedback') or
+        (research.get('tool_continuation') or {}).get('pending_feedback'))
+
+
 def pending_feedback_delivery(host):
     """The existing preparation owns delivery until a confirmed saved request."""
     ref=state(host)['pilot'].get('handoff')
@@ -193,7 +202,7 @@ def pending_feedback_delivery(host):
         if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n'):
             packet=json.loads(tail.split('\n',1)[1])
             research=packet.get('research',{})
-            shown=research.get('pending_feedback_delivery') or (research.get('research_state') or {}).get('pending_feedback')
+            shown=packet_feedback(research)
             if shown==delivery:return None
     return delivery
 
@@ -448,7 +457,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
     # purposes still require an anchor; only known non-SDK requests are excluded.
     events=host.store.events(host.run_id)
     sends=[e for e in events if e['kind']=='r3_request']
-    if (s.get('spec',{}).get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3'
+    if (s.get('spec',{}).get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v3','research_information_flow_v1')
             and len(sends)==1 and not s.get('pending')):
         from tools.research.provider import received,model_messages
         send=sends[0];row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])

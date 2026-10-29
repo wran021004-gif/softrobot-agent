@@ -171,7 +171,8 @@ async def run_case(folder,frozen,case_id,model,transport=None,*,recover_unsent=F
     if not existing:
         host.store.create(project)
         host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='Provider-only comparison; no Study'))
-        update(host,spec=dict(mode='engineering_numerical',research_decisions=dict(context_limits={'evidence':3})),
+        update(host,spec=dict(mode='engineering_numerical',budgets=dict(protected_provider_requests=0),
+            research_decisions=dict(context_limits={'evidence':3})),
             pilot=dict(provider=provider,live_model_requests=0,framework_session_id=short_session))
         update(host,retrievals=[])
     else:

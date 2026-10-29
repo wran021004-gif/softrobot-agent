@@ -89,7 +89,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         # All branches now describe one action; dropping references to removed
         # optional fields also removes their irrelevant parameter definitions.
         schema['allOf']=[b for b in schema['allOf'] if not any(k in json.dumps(b) for k in ('"revise_selection"',))]
+        if actions[0] in ('stop','select'):
+            schema['properties']['hypothesis']['description']='Existing claim or closure rationale. No new design hypothesis is requested.'
+            schema['$defs']['ResearchDecision']['properties']['hypothesis_id']['description']='Reference an existing hypothesis or the closure rationale identifier; do not invent a new design hypothesis.'
         schema['description']='Submit the selected '+actions[0]+' action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.'
+        if actions[0] in ('stop','select'):
+            schema['description']+=' Observation/condition fields describe existing evidence and closure criteria; state unmeasured or not applicable where appropriate.'
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -102,7 +107,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             for x in v:visit(x)
     visit(schema['properties'])
     schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
-    if focused and study and study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3':
+    if focused and study and study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v3','research_information_flow_v1'):
         schema=compact_plan_schema(schema,actions[0],study)
     return schema
 
@@ -148,12 +153,10 @@ def compact_plan_schema(schema, action, study):
 
 
 def evidence_query_schema(study):
-    """Use the same fields-view rule without a root composition keyword."""
+    """Project the canonical evidence query through the shared wire adapter."""
     from tools.research.contracts import EvidenceQuery
-    schema=EvidenceQuery.model_json_schema()
-    if study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3':
-        schema.update(schema.pop('allOf')[0])
-    return schema
+    from tools.research.provider import provider_schema
+    return provider_schema(EvidenceQuery.model_json_schema())
 
 
 def tool_directory(host, registry):
@@ -224,18 +227,22 @@ def load_selected_tool_schema(host, registry, directory):
     retained={'research_route'}
     if selected:retained.add(name)
     policy=s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version')
-    if policy in ('on_demand_tools_v2','on_demand_tools_v3'):
+    if policy in ('on_demand_tools_v2','on_demand_tools_v3','research_information_flow_v1'):
         # Retrieval must not unload the already chosen Plan. With no prior Plan,
         # expose generate (or closeout STOP), without choosing/submitting it.
         plan=registry.get('research_plan')
         entry=next((r for r in directory if r['tool']=='research_plan'),None)
-        if plan and entry and (name!='research_plan' or (selected is None and policy=='on_demand_tools_v3')):
+        if plan and entry and (name!='research_plan' or (selected is None and policy in ('on_demand_tools_v3','research_information_flow_v1'))):
             from tools.research.research_context import tool_continuation
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
             plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
-                family_version=s['spec'].get('family_space',{}).get('version'),focused=True,study=s['spec'])}}
+                family_version=s['spec'].get('family_space',{}).get('version'),
+                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',
+                focused=True,study=s['spec'])}}
             retained.add('research_plan')
+    if policy=='research_information_flow_v1':
+        retained.update(k for k in ('evidence_read','research_recall','experience_retrieve','research_investigate') if k in registry)
     for key in list(registry):
         if key not in retained:registry.pop(key)
     return dict(tool=name if selected else None,action=route.get('action') if selected else None,
@@ -536,11 +543,16 @@ def error_feedback(host, use, exc, before):
         field='reference';expected='Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP'
     citation={}
     if code=='UNREGISTERED_RESEARCH_EVIDENCE' or code.startswith(('INFERENCE_NOT_SUPPORTED','EVIDENCE_TASK_IDENTITY','EVIDENCE_DESIGN_IDENTITY','EVIDENCE_MODEL_SCOPE')):
-        from tools.research.evidence_policy import registered_references,citation_inventory
+        from tools.research.evidence_policy import registered_references,citation_inventory,citation_role
+        from schemas.platform import EvidenceRef
         known=registered_references(host)
-        refs=[r for r in use['input'].get('supporting_evidence',[]) if r not in known]
+        cited=[plain(EvidenceRef.model_validate(r)) for r in use['input'].get('supporting_evidence',[])]
+        refs=[r for r in cited if r not in known or code!='UNREGISTERED_RESEARCH_EVIDENCE']
         anchor=next(iter(known),s.get('family_space_reference'))
         citation=dict(rejected_references=refs,registered_count=len({r['artifact_id'] for r in known}),
+            citation_errors=[dict(reference=r,role=citation_role(host,r),
+                reason=('Not registered for supporting_evidence; reading never changes citation eligibility.' if r not in known else message[:400]),
+                correction='For an exploratory empirical_search action use supporting_evidence=[] when no result is available. For conclusions use a registered scoped result; SELECT/STOP retain their original gates.') for r in refs],
             recent_registered=citation_inventory(host)[-3:],
             inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
             missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
@@ -832,7 +844,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('research_decisions') and not state(host)['spec'].get('rl_evaluation_source'):
         native.append(PythonAgentTool('research_investigate',dict(name='research_investigate',
-            description='Submit a read-only investigation of saved results and optional exact reads. Returns a saved report reference; formal interpretation arrives before the next research decision. No new scientific computation; internal reads give no SELECT/STOP credit.',
+            description='Delegate reading, numerical extraction, comparison and explanation of saved results: provide a question and result references; exact reads are optional. Returns a saved report reference; formal interpretation arrives before the next research decision. No new scientific computation; internal reads give no SELECT/STOP credit.',
             inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
     agent=None
     def build_session(session_id=None):
@@ -1027,15 +1039,19 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
                 tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
-            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3')) and s.get('family_space_reference'):
+            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
                 boundary.research_packet['research']['generation_contract']=dict(
                     family_space_identity=s['spec']['family_space_identity'],
                     version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
                     domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
                     scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
-            if tool_schema_policy(s['spec'])==dict(version='on_demand_tools_v3'):
+            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')):
                 from tools.research.research_context import compact_tool_delivery
                 compact_tool_delivery(boundary.research_packet['research'])
+            from tools.research.config import information_flow_v1
+            if information_flow_v1(s['spec']):
+                from tools.research.research_context import information_flow_brief
+                boundary.research_packet['research']=information_flow_brief(current['research'],boundary.research_packet['research'])
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')

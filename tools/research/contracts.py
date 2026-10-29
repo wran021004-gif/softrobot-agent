@@ -720,6 +720,7 @@ class RLReference(Contract):
 
 class ResearchRecallQuery(Contract):
     step: StrictInt | None = Field(default=None,ge=1,description='Stable Store step number. Omit to page through the trace.')
+    trace: Literal['actions','milestones'] = 'actions'
     view: Literal['summary','details'] = 'summary'
     offset: StrictInt = Field(default=0,ge=0)
     limit: StrictInt = Field(default=8,ge=1,le=10)

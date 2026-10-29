@@ -237,12 +237,34 @@ def registered_references(host):
     return known
 
 
+def citation_role(host, reference):
+    """Role describes provenance, not strength or formal reading eligibility."""
+    from tools.research.state import state
+    from schemas.platform import EvidenceRef
+    s=state(host);ref=plain(EvidenceRef.model_validate(reference))
+    if ref==s.get('family_space_reference') or ref in s.get('candidates',{}).values() or ref==s.get('freeze'):
+        return 'domain_reference'
+    if ref in s.get('retrievals',[]) or ref==s.get('public_prior_manifest'):
+        return 'procedural_knowledge'
+    if ref in [r for k in ('results','physical_replays','rl_evaluations') for r in s.get(k,[])]:
+        return 'independent_evaluation'
+    if ref in [r for k in ('analysis_results','mechanics_results','research_mathematics','control_search_results','joint_results') for r in s.get(k,[])]:
+        return 'scientific_result'
+    if ref in registered_references(host):
+        summary=summarize_evidence(host.store.artifact(ref),ref)
+        if summary['supported_inferences']:return 'scientific_result'
+        return 'tool_receipt'
+    return 'unregistered_reference'
+
+
 def citation_inventory(host):
     """Registration permits citation checks; it never upgrades an artifact's claim."""
     rows=[]
     for ref in {r['artifact_id']:r for r in registered_references(host)}.values():
         value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
-        rows.append(dict(reference=ref,candidate=summary['candidate_identity'],task_identity=summary['task_identity'],
+        rows.append(dict(reference=ref,role=citation_role(host,ref),registered=True,
+            supports_scientific_conclusion=bool(summary['supported_inferences']),
+            candidate=summary['candidate_identity'],task_identity=summary['task_identity'],
             claim_kind=summary['claim_kind'],supported_inferences=summary['supported_inferences']))
     return rows
 

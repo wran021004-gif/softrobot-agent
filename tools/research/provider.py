@@ -11,6 +11,21 @@ from tools.state_io import digest
 CALLER = 'research-provider'
 
 
+def provider_schema(schema):
+    """Equivalent object schema without provider-forbidden root compositions.
+
+    A true conditional applies the original conjunction/disjunction unchanged.
+    Definitions stay at the root, so absolute JSON references keep their meaning.
+    Canonical Pydantic and focused-schema validation still run at the Host.
+    """
+    result=deepcopy(schema)
+    constraints={k:result.pop(k) for k in ('allOf','anyOf','oneOf','not') if k in result}
+    if constraints:
+        constraints.update({k:result.pop(k) for k in ('if','then','else') if k in result})
+        result.update({'if':{},'then':constraints})
+    return result
+
+
 def model_type(provider):
     return DeepSeekModel if provider['adapter']=='deepseek' else OpenAIModel
 
@@ -356,10 +371,20 @@ def live_model_class(boundary):
             if pilot(boundary.host)['provider']['adapter']=='chatgpt_gateway':
                 request['messages']=gateway_history(boundary.host,request['messages'])
             saved=pilot(boundary.host).get('unconsumed_response')
+            if not saved:
+                for tool in request.get('tools',[]):
+                    function=tool.get('function',{})
+                    if 'parameters' in function:function['parameters']=provider_schema(function['parameters'])
             if saved:
                 event=next(e for e in boundary.host.store.events(boundary.host.run_id)
                     if e['kind']=='r3_request' and e['request_id']==saved)
                 original=boundary.host.store.artifact(boundary.host.store.artifact(event['outputs'][0])['request'])
+                original_tools={t['function']['name']:t['function'].get('parameters') for t in original.get('tools',[]) if 'function' in t}
+                for tool in request.get('tools',[]):
+                    function=tool.get('function',{})
+                    if 'parameters' not in function:continue
+                    projected=provider_schema(function['parameters'])
+                    if original_tools.get(function.get('name'))==projected:function['parameters']=projected
                 last=original['messages'][-1]
                 # Preserve the saved tail verbatim. LiveBoundary still checks the
                 # entire wire hash; no new L0 may reinterpret a saved response.

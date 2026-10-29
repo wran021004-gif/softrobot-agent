@@ -195,6 +195,14 @@ def investigate(host, request):
     q.reads.extend(EvidenceQuery.model_validate({k:c[k] for k in ('reference','pointer','view')})
         for c in applicable_corrections(host,[plain(r) for r in q.references]))
     report=assemble(host,q.references,question=q.question)
+    if not q.reads:
+        # Cards already carry verified metrics/status/cost with raw pointers.
+        # Discover bounded child structure, not an entire trajectory/history.
+        for card in report.results:
+            q.reads.append(EvidenceQuery(reference=card.identity.result.reference,view='summary'))
+            for source in card.detail_sources[:3]:
+                query=EvidenceQuery(reference=source.reference,pointer=source.pointer,view='summary')
+                if query not in q.reads:q.reads.append(query)
     # Investigation owns detailed cross-model reading; main Agent receives L1.
     for reference in q.references:
         raw=host.store.artifact(reference)
@@ -202,10 +210,21 @@ def investigate(host, request):
         query=EvidenceQuery(reference=reference,view='working_set',pointer='/diagnostic_relations')
         if query not in q.reads:q.reads.append(query)
     # Validate explicit reads now; only selected subnodes enter the Reporter input.
-    for query in q.reads:read_evidence(host,plain(query),record_read=False)
+    selected_reads=[]
+    for query in q.reads:
+        try:
+            selected_reads.append(dict(query=plain(query),value=read_evidence(host,plain(query),record_read=False)))
+        except (ValueError,KeyError,IndexError) as exc:
+            selected_reads.append(dict(query=plain(query),status='unavailable',reason=str(exc),
+                navigation=getattr(exc,'evidence_navigation',None),
+                suggested_query=dict(reference=plain(query.reference),view='summary',pointer='')))
     from tools.research.experience import retrieve
     request=plain(q)
+    request['selected_reads']=selected_reads
     request['experience_receipts']=[retrieve(host,plain(query),reader='reporter')['reference'] for query in q.experience_queries]
+    # Distinct explicit invocations may ask the identical question again.
+    # Native receipt recovery reuses the saved report instead of calling here.
+    request['invocation_step']=max((e['sequence'] for e in host.store.events(host.run_id)),default=0)+1
     ref=_save(host,report,request=request)
     return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
         report_reference=ref,question=q.question,result_count=len(report.results),
@@ -339,6 +358,9 @@ def reporter_handoff_summary(host, reference, saved):
         fact=dict(result=card['identity']['result'],operation=card['identity']['operation'],
             metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source')}
                 for m in metrics],main_violations=card['main_violations'])
+        fact['resources']=[r for r in card['resources'] if r['amount'] is not None]
+        if card['deterministic_summary'].get('comparisons'):
+            fact['comparisons']=card['deterministic_summary']['comparisons']
         if math:fact['mathematics']=math
         else:
             fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
@@ -348,7 +370,6 @@ def reporter_handoff_summary(host, reference, saved):
             fact['control_search']=dict(stop_reason=search['stop_reason'],all_steps=search['all_steps'],
                 best={k:v for k,v in best.items() if k!='metrics'} if best else None)
             if best:fact['metrics']=best['metrics']
-            fact['resources']=[r for r in card['resources'] if r['amount'] is not None]
         task_family=(raw.get('acceptance') or {}).get('task_family')
         if task_family=='task.reach':
             names={'evaluator:task_bound':'terminal_position_error','holding_position':'holding_max_position_error',
@@ -375,6 +396,8 @@ def reporter_handoff_summary(host, reference, saved):
         comparisons=[{k:r[k] for k in ('kind','comparable','reasons','changed_factors','sources')} for r in report['relations'][:2]],
         limitations=list(dict.fromkeys(limitations)),unresolved=list(dict.fromkeys(unresolved)),
         interpretations=interpretations,interpretation_sources=[s for i in interpretations for s in i['sources']],
+        selected_reads=(saved.get('request') or {}).get('selected_reads',[]),
+        restore_query=dict(reference=reference,view='full'),
         applicable_corrections=corrections,
         current_interpretation_status='superseded_pending_reinterpretation' if pending else saved['interpretation_status'],
         historical_interpretations_query=dict(reference=reference,view='full',pointer='/report/interpretations'),
@@ -435,10 +458,12 @@ def _wire(host, reference, saved):
     provider=role_provider(s['spec'],s['pilot']['provider'],'reporter')
     q=saved.get('request') or {};reads=[]
     guidance=[host.store.artifact(ref) for ref in q.get('experience_receipts',[])]
-    for query in q.get('reads',[]):
-        reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
+    if 'selected_reads' in q:reads=q['selected_reads']
+    else:
+        for query in q.get('reads',[]):
+            reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
     report=ScientificReport.model_validate(saved['report'])
-    catalog=_source_catalog(host,report,q.get('reads',[]))
+    catalog=_source_catalog(host,report,[r['query'] for r in reads if r.get('status')!='unavailable'])
     from tools.research.capability import signed_score_comparisons
     comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
@@ -466,7 +491,7 @@ def _wire(host, reference, saved):
             'Ground every interpretation in this Study evidence; advice grants no scientific evidence or permission. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=saved['report'],request=q,selected_reads=reads,source_catalog=catalog,procedural_guidance=guidance,
+                report=saved['report'],request={k:v for k,v in q.items() if k!='selected_reads'},selected_reads=reads,source_catalog=catalog,procedural_guidance=guidance,
                 score_comparisons=comparisons),separators=(',',':')))])
 
 
@@ -559,7 +584,6 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
     reports=entries(host)
     finished={saved['interpretation_for']['artifact_id'] for _,saved in reports if saved['interpretation_for']}
     for ref,saved in reports:
-        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:return
         if saved['interpretation_status']!='deferred' or ref['artifact_id'] in finished:continue
         if ref['artifact_id'] in attempted:
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
@@ -576,7 +600,8 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
             continue
         # Keep protected closure capacity and at least one main decision request.
         reserve=s['spec']['budgets'].get('protected_provider_requests',0)
-        if protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1:
+        if (protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1
+                or (max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls)):
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_SKIPPED_TO_PRESERVE_CLOSEOUT')
             continue

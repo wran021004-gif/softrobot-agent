@@ -360,8 +360,9 @@ class ReportingSessionTests(unittest.TestCase):
                 packet=decision_packet(h)
                 intent=packet['research']['research_intent']['last_research']
                 if intent.get('same_as')=='research_intent.latest_decision':intent=packet['research']['research_intent']['latest_decision']
-                self.assertEqual(intent['agent_hypothesis']['decision']['hypothesis_id'],'H-fixture')
-                self.assertEqual(intent['agent_hypothesis']['weakening_observation'],'Higher speed')
+                original=read_evidence(h,intent['original_plan_query'],record_read=False)
+                self.assertEqual(original['decision']['hypothesis_id'],'H-fixture')
+                self.assertEqual(original['weakening_observation'],'Higher speed')
                 self.assertEqual(intent['actual_result'],observation)
                 self.assertEqual(h.store.remaining(),ledger)
                 self.assertEqual((await reconcile(h,build,h.store.root/'sdk')).messages,agent.messages)

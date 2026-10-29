@@ -404,6 +404,7 @@ def context(host):
 def confirmed_tool_deliveries(host):
     """Reuse confirmed Provider wires for exact tool feedback and summary markers."""
     import json
+    from tools.research.session_handoff import packet_feedback
     events=host.store.events(host.run_id);deliveries={};summaries=set()
     confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
     for event in events:
@@ -415,7 +416,7 @@ def confirmed_tool_deliveries(host):
             if message.get('role')=='user' and isinstance(content,str) and content.startswith('CURRENT_RESEARCH_PACKET\n'):
                 packet=json.loads(content.split('\n',1)[1])
                 research=packet.get('research',{})
-                delivery=research.get('pending_feedback_delivery') or (research.get('research_state') or {}).get('pending_feedback') or {}
+                delivery=packet_feedback(research) or {}
                 for item in delivery.get('items',[]):
                     if item['delivery']=='exact_feedback':
                         deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
@@ -734,6 +735,8 @@ def decision_brief(current):
         scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage, source_references or citation_eligibility. Original references support full/fields/range reads.')
     brief['citation_eligibility']=dict(query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
         registered_count=len(ws['citation_eligibility']),latest_registered=deepcopy(ws['citation_eligibility'][-1:]),
+        scientific_result_count=sum(r['role'] in ('scientific_result','independent_evaluation') for r in ws['citation_eligibility']),
+        empty_reference_rule='With no scientific results, exploratory empirical_search may use supporting_evidence=[]. Domain references and procedural knowledge do not support scientific conclusions. SELECT/STOP keep their original evidence gates.',
         rule='supporting_evidence requires registration AND matching inference/candidate/task/model scope. Candidate/control identity is not task success. FamilySpace and unregistered raw motion samples are readable only; reading never registers evidence.',
         required_observations='Physical claims need a complete bound independent evaluation; mathematical claims need verified scoped results. STOP cites all_fresh_results; SELECT requires a read fresh pass.')
     brief['budget']=deepcopy(current['budget'])
@@ -919,7 +922,7 @@ def trace_entry(row):
             or outcome.get('scientific_execution_started') is False
             or row['execution_status']=='rejected' or row['execution_kind']=='read_only_diagnosis' else
             'result_recorded' if row['result_references'] else 'unknown; inspect original receipt'),
-        unresolved=not bool(row['result_references']) or row['execution_status'] in ('failed','rejected','pending')
+        unresolved=row['execution_status'] in ('failed','rejected','pending')
             or outcome.get('task_passed') is False or status in ('failed','unsupported','inconclusive','unresolved'))
 
 
@@ -933,15 +936,31 @@ def bounded_action_trace(trace, limit=8):
         scope='Recorded actions and actual statuses only. Request acceptance, computation, verification and physical acceptance are distinct.')
 
 
+def milestone_trace(trace):
+    """Select original event rows, never manufacture a narrative or causal link."""
+    selected=[];seen=set()
+    for row in trace['recent']:
+        action=row['action'];status=row['execution_status']
+        failure=status in ('failed','rejected','pending') or row['outcome'].get('task_passed') is False
+        first=action in ('generate','propose','search','initialize_control') and status=='completed'
+        key=(action,(row.get('candidate') or {}).get('artifact_id'))
+        if row['result_references'] or failure or (first and key not in seen) or (action in ('select','stop') and status=='completed'):
+            selected.append(row)
+        if first:seen.add(key)
+    return dict(total=len(selected),recent=selected,source_total=trace['total'])
+
+
 def research_recall(host, query):
     """Navigate existing trace/source readers; never award formal evidence credit."""
     from tools.research.contracts import ResearchRecallQuery
     from tools.research.core import read_tool_evidence
     q=ResearchRecallQuery.model_validate(query);trace=research_action_trace(host,limit=None)
     rows=trace['recent']
+    if q.trace=='milestones' and q.step is None:rows=milestone_trace(trace)['recent']
     if q.step is None:
         page=rows[q.offset:q.offset+q.limit]
-        return dict(total=len(rows),items=[trace_entry(r) for r in page],
+        return dict(total=len(rows),items=[dict(**trace_entry(r),source=r['source'],
+            receipt_output=r['receipt_output'],result_references=r['result_references']) for r in page],
             next_offset=q.offset+q.limit if q.offset+q.limit<len(rows) else None,formal_read_credit=False)
     row=next((r for r in rows if r['step']==q.step),None)
     if row is None:raise ValueError('RESEARCH_STEP_NOT_FOUND: use research_recall without step to list saved steps')
@@ -1007,10 +1026,11 @@ def research_action_trace(host, limit=5):
         saved=host.store.artifact(ref);key=saved['request_id']
         rows[key]=item(key,saved['original_plan'],dict(reference=ref,pointer='/original_plan'),positions[ref['artifact_id']])
     for i,event in enumerate(events):
-        if event['kind'] not in ('tool_request_error','model_original_tool_feedback'):continue
+        if event['kind'] not in ('tool_request_error','model_original_tool_feedback','model_original_tool_request'):continue
         value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
         if use['name'] not in ('research_plan','research_analysis','research_rl','research_investigate'):continue
         key='native-'+use['toolUseId']+('-analysis' if use['name']=='research_analysis' else '')
+        if event['kind']=='model_original_tool_request' and key in feedback:continue
         if key in rows:continue
         source=dict(reference=event['outputs'][0],pointer='/tool_use/input')
         rows[key]=item(key,{'action':use['name'],**use['input']},source,i)
@@ -1237,6 +1257,18 @@ def agent_decision_brief(host):
             if key in ws:
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
+    from tools.research.config import information_flow_v1
+    if information_flow_v1(s['spec']):
+        brief['focus_hypothesis']=deepcopy(intent.get('latest_decision'))
+        brief['flow_facts']=[]
+        for report in reversed(brief.get('latest_reports',[])):
+            for finding in report.get('findings',[]):
+                brief['flow_facts'].extend(finding.get('metrics',[]))
+                brief['flow_facts'].extend((finding.get('mathematics') or {}).get('quantities',[]))
+        milestones=milestone_trace(trace)
+        brief['milestone_trace']=bounded_action_trace(milestones,4)
+        brief['milestone_trace']['action_total']=trace['total']
+        brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
@@ -1318,6 +1350,89 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             current_control=brief.get('current_candidate'),
             lifecycle=brief.get('probe_lifecycle'))
     return result
+
+
+
+def information_flow_brief(brief, delivered):
+    """P6.1 projection of the existing brief: each L0 fact has one owner."""
+    value=deepcopy(delivered);current=value.get('research_state',{})
+    intent=brief.get('focus_hypothesis') or value.get('current_intent') or {}
+    hypothesis=intent.get('agent_hypothesis') or {}
+    control=deepcopy(value.get('current_control') or {})
+    control.pop('candidate',None)
+    continuation=value.get('tool_continuation') or {}
+    continuation['switch_tool']='research_route(tool="research_plan", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing.'
+    for key,source in (('pending_execution',current.get('pending')),
+            ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
+        if source:continuation[key]=source
+    reports=brief.get('latest_reports',[])
+    findings=[]
+    for report in reports:
+        findings.append(dict(report_reference=report['report_reference'],question=report.get('question'),
+            result_references=report.get('result_references',[]),status=report['reporter_status'],
+            interpretations=report.get('interpretations',[]),
+            unresolved=report.get('unresolved',[])[:3]))
+    # Values are owned by verified_facts; explanations carry references only.
+    facts=deepcopy(brief.get('flow_facts') or value.get('verified_facts',[]))
+    for result in brief.get('additional_mathematical_evidence',[]):
+        for quantity in (result.get('mathematics') or {}).get('quantities',[])[:3]:
+            if quantity.get('source') and quantity not in facts:facts.append(quantity)
+    groups={
+        'Design':('generate','propose','search'),
+        'Control':('initialize_control','control_search','execute','research_rl'),
+        'Mathematical Research':('diagnose','mechanics','research_analysis','refine','matched_state','nmpc_prediction_diagnostic'),
+        'Physical Validation':('physical_replay','replay','cross_replay','select','confirm','stop'),
+        'Evidence & Knowledge':('evidence_read','research_recall','experience_retrieve','research_investigate')}
+    directory=value.get('tool_directory',[]);action_rows=[]
+    for tool in directory:
+        if tool['tool']=='research_plan':action_rows.extend(dict(**r,tool='research_plan') for r in tool.get('actions',[]))
+        else:action_rows.append(dict(action=tool['tool'],tool=tool['tool'],status=tool['status']))
+    action_rows.extend(value.get('additional_action_requirements',[]))
+    for row in action_rows:
+        if row.get('cost')=='See remaining allowances; exact cost depends on the requested operation.':row.pop('cost')
+        if row.get('reason')=='Full request admission and budget checks apply.':row.pop('reason')
+    capabilities=[dict(category=name,actions=[r for r in action_rows if r['action'] in names])
+        for name,names in groups.items()]
+    access=value.get('evidence_access',{})
+    access.pop('knowledge',None)
+    if access.get('working_set'):access['working_set'].pop('scope',None)
+    if access.get('stop_index'):access['stop_index'].pop('rule',None)
+    eligibility=brief.get('citation_eligibility') or {}
+    access['citation_eligibility']={k:eligibility[k] for k in ('query','registered_count','scientific_result_count') if k in eligibility}
+    access['citation_eligibility']['rule']='Readable is not citable: domain definitions, procedural knowledge and tool receipts do not establish scientific conclusions. Use registered results matching inference, candidate, task and model scope.'
+    scopes=[scope for report in reports for scope in report.get('scope',[])]
+    if scopes:access['result_scopes']=scopes[-3:]
+    if eligibility.get('scientific_result_count')==0:
+        access['citation_eligibility'].update(registered_scientific_results=[],
+            exploration='Exploratory empirical_search may use supporting_evidence=[]. SELECT/STOP gates still apply.')
+    if value.get('generation_contract'):
+        access['domain']=dict(query=value['generation_contract']['domain_query'],role='domain_reference')
+    access['delegated_read']=dict(tool='research_investigate',
+        arguments='question and existing result references; optional exact reads',
+        scope='Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit.')
+    focus=dict(candidate=current.get('current_candidate'),candidate_status=current.get('candidate_status'),
+        task_accepted=current.get('task_accepted'),control=control,
+        latest_result=current.get('latest_result'))
+    if intent:
+        focus['formal_hypothesis']=dict(plan_reference=intent.get('plan_reference'),
+            pointer='/original_plan',hypothesis_id=(hypothesis.get('decision') or {}).get('hypothesis_id'),
+            hypothesis=(hypothesis.get('hypothesis') or '')[:240],expected_observation=(hypothesis.get('expected_observation') or '')[:240],
+            status='Main intent excerpts; not verified facts. Restore full text from the Plan.')
+    # Only recorded unresolved questions are exposed; no program-authored hypothesis.
+    focus['open_questions']=[dict(reference=report['report_reference'],pointer='/report/interpretations/'+str(n),kind=i['kind'])
+        for report in reports for n,i in enumerate(report.get('interpretations',[])) if i['kind'] in ('unresolved_question','further_investigation')][-3:]
+    if hypothesis.get('weakening_observation'):
+        focus['open_questions'].append(dict(text=hypothesis['weakening_observation'][:240],kind='Main falsification target excerpt',
+            source=dict(reference=intent['plan_reference'],pointer='/original_plan/weakening_observation')))
+    trace=brief.get('milestone_trace',value.get('history_trace'))
+    if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
+    return dict(version='research_information_flow_v1',
+        study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
+        research_focus=focus,verified_facts=facts[:8],
+        research_trace=trace,
+        capabilities=capabilities,tool_continuation=continuation,
+        knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
+        reporter_findings=findings,evidence_access=access,budget=value['budget'])
 
 
 

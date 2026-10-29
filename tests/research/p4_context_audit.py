@@ -66,6 +66,23 @@ def audit(source, *, study='m5-main-off-experience-r2-20261028',handoff_event=11
             from tools.research.budget import closeout_operations
             directory=[r for r in directory if r['tool'] in ('research_plan','evidence_read','research_rl')]
             next(r for r in directory if r['tool']=='research_plan')['actions']=closeout_operations(h)['research_plan']
+        if policy=='research_information_flow_v1':
+            # Read literal production descriptions without constructing an SDK
+            # session or maintaining another tool description catalog.
+            import ast
+            descriptions={}
+            for node in ast.walk(ast.parse(Path(agent.__file__).read_text(encoding='utf8'))):
+                if isinstance(node,ast.Tuple) and len(node.elts)>=2 and all(isinstance(v,ast.Constant) and isinstance(v.value,str) for v in node.elts[:2]):
+                    descriptions[node.elts[0].value]=node.elts[1].value
+                if isinstance(node,ast.Call):
+                    fields={k.arg:k.value.value for k in node.keywords if isinstance(k.value,ast.Constant)}
+                    if 'name' in fields and 'description' in fields:descriptions[fields['name']]=fields['description']
+            from tools.research.contracts import EvidenceQuery, ExperienceQuery, ResearchRecallQuery
+            from tools.research.reporter import InvestigationRequest
+            for name,contract in (('evidence_read',EvidenceQuery),('experience_retrieve',ExperienceQuery),
+                    ('research_recall',ResearchRecallQuery),('research_investigate',InvestigationRequest)):
+                if any(r['tool']==name for r in directory):
+                    registry[name]=SimpleNamespace(tool_spec=dict(name=name,description=descriptions[name],inputSchema={'json':contract.model_json_schema()}))
         loaded=agent.load_selected_tool_schema(h,registry,directory)
         packet['research'].update(tool_directory=directory,loaded_tool=loaded,
             tool_loading='Choose research_route to load one tool/action. Reuse the loaded tool for consecutive operations; switch only when needed; submit the loaded tool to act. No selection grants execution authority.')
@@ -73,21 +90,28 @@ def audit(source, *, study='m5-main-off-experience-r2-20261028',handoff_event=11
             version='serial_family_generation_v2' if spec['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
             domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
             scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
-        if policy=='on_demand_tools_v3':
+        if policy in ('on_demand_tools_v3','research_information_flow_v1'):
             from tools.research.research_context import compact_tool_delivery
             compact_tool_delivery(packet['research'])
+        if policy=='research_information_flow_v1':
+            from tools.research.research_context import information_flow_brief
+            packet['research']=information_flow_brief(brief,packet['research'])
         projected=deepcopy(old)
         projected['messages'][-1]['content']='CURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':'))
         projected['tools']=[dict(type='function',function=dict(name=name,description=tool.tool_spec.get('description',''),
             parameters=tool.tool_spec['inputSchema']['json'])) for name,tool in registry.items()]
+        from tools.research.provider import provider_schema
+        for tool in projected['tools']:tool['function']['parameters']=provider_schema(tool['function']['parameters'])
     def measure(wire):
         body=httpx.Request('POST','http://offline.invalid',json=wire).content
         def metric(value):
             text=json.dumps(value,separators=(',',':'),ensure_ascii=False)
             return dict(bytes=len(text.encode()),tokens=len(official_tokenizer().encode(text,add_special_tokens=False).ids))
         packet=json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']
-        feedback=packet['research_state'].get('pending_feedback')
-        l0=deepcopy(packet);l0['research_state'].pop('pending_feedback',None)
+        from tools.research.session_handoff import packet_feedback
+        feedback=packet_feedback(packet)
+        l0=deepcopy(packet)
+        for key in ('research_state','tool_continuation'):l0.get(key,{}).pop('pending_feedback',None)
         return dict(total=dict(bytes=len(body),tokens=len(official_tokenizer().encode(body.decode(),add_special_tokens=False).ids)),
             components=dict(system=metric([m for m in wire['messages'] if m['role']=='system']),
                 history=metric(wire['messages'][1:-1]),l0_without_feedback=metric(l0),

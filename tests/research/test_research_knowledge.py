@@ -86,7 +86,7 @@ class KnowledgeTests(unittest.TestCase):
     def test_reporter_wire_keeps_guidance_outside_scientific_sources(self):
         from tools.research import reporter
         receipt=retrieve(self.h,dict(operation='read',entry_id='research-contact-causality',revision='1'),reader='reporter')
-        update(self.h,pilot=dict(provider=dict(model='fixture',thinking='disabled',reasoning_effort='high',max_tokens=None)))
+        update(self.h,pilot=dict(provider=dict(adapter='deepseek',model='fixture',thinking='disabled',reasoning_effort='high',max_tokens=None)))
         saved=dict(report={'fixture':'No scientific result'},request=dict(experience_receipts=[receipt['reference']]))
         # Only the wire's advisory boundary is exercised; no report is registered.
         with patch.object(reporter.ScientificReport,'model_validate',return_value=SimpleNamespace(results=[],relations=[])):
@@ -123,7 +123,7 @@ class KnowledgeTests(unittest.TestCase):
         folder=self.h.store.root/('p'+uuid4().hex[:5])
         with patch('tools.research.core.dispatch',side_effect=AssertionError('NO_SCIENTIFIC_DISPATCH')),patch('tools.research.analysis.dispatch',side_effect=AssertionError('NO_SCIENTIFIC_DISPATCH')):
             result=asyncio.run(run_case(folder,frozen,'on','deepseek-v4-pro',httpx.MockTransport(reply),experience_enabled=True))
-        self.assertEqual(result['actual_requests'],4)
+        self.assertEqual(result['actual_requests'],4,result.get('harness_error'))
         self.assertEqual(result['accepted_decisions'],1)
         self.assertEqual(result['scientific_workers'],0)
         self.assertEqual([r['contract'] for r in result['tool_checks']],['valid']*3)

@@ -53,18 +53,28 @@ def retrieval_hint(host):
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')
-    available=sorted({r['task'] for r in entries(host)})
+    from tools.research.evidence_policy import english_sources
+    eligible=[r for r in entries(host) if not english_sources(s['spec']) or english_source_ready(r)]
+    available=sorted({r['task'] for r in eligible})
     if not available:return None
     return dict(query=dict(operation='search',task=name) if name in available else dict(operation='search'), available_historical_tasks=available,
         study_private_entries=[dict(entry_id=r['entry_id'],revision=r['revision'],task=r['task'],
             read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision']))
-            for r in entries(host) if r['status']==PRIVATE_STATUS],
+            for r in eligible if r['status']==PRIVATE_STATUS],
         scope='Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.')
+
+
+def english_source_ready(entry):
+    origin=entry.get('language_origin') or {}
+    return entry.get('authored_language')=='en' and (origin.get('kind')=='authored_english' or
+        (origin.get('kind')=='reviewed_translation' and bool(origin.get('original_reference')) and bool(origin.get('reviewed_by'))))
 
 
 def retrieve(host,query,*,reader='agent'):
     q=ExperienceQuery.model_validate(query);rows=[]
     for entry in entries(host):
+        from tools.research.evidence_policy import english_sources
+        if q.operation=='search' and english_sources(state(host)['spec']) and not english_source_ready(entry):continue
         canonical=entry['entry_id']+'@'+entry['revision']
         if q.key is not None and q.key not in (entry.get('legacy_key'),entry['entry_id'],canonical):continue
         if q.entry_id is not None and q.entry_id!=entry['entry_id']:continue
