@@ -30,6 +30,7 @@ def audit(arm):
             model=wire['model'],response_model=body.get('model'),reasoning=wire.get('reasoning_effort'),input_bytes=meta['input_bytes'],
             request_reference=meta['request'],response_reference=response.get('body') if response else None,
             http_status=response.get('http_status') if response else None,usage=body.get('usage'),
+            finish_reason=body.get('choices',[{}])[0].get('finish_reason'),
             error=body.get('error'),text=msg.get('content'),
             tool_calls=[dict(id=t['id'],name=t['function']['name'],arguments=json.loads(t['function']['arguments'])) for t in msg.get('tool_calls',[])],
             schema_names=[t['function']['name'] for t in wire.get('tools',[])],
@@ -114,12 +115,17 @@ def audit(arm):
     assert source_unchanged and len(rows)<=10 and usage['main']['requests']<=7 and usage['reporter']['requests']<=3
     ledger=h.store.remaining();assert ledger['used']['model_calls']==len(rows)
     assert ledger['used']['backend_solves']==ledger['used']['worker_calls']==s['mathematical_evaluations']==0
+    operator_events=[dict(sequence=e['sequence'],kind=e['kind'],references=e['outputs'],
+        records=[h.store.artifact(ref) for ref in e['outputs']]) for e in events
+        if e['kind'] in ('p62_operator_continuation','p62_local_handoff_failure')]
     result=dict(arm=arm,study=h.run_id,execution_commit=s['freeze'],source_manifest=manifest,
         rows=rows,reports=reports,handoffs=handoffs,usage=usage,ledger=ledger,
         provider_pending=len(pending(h)),unconsumed_response=s['pilot'].get('unconsumed_response'),
         scientific_pending=s['pending'],new_science=dict(mathematics=0,physics=0,rl=0),
         source_unchanged=source_unchanged,read_coverage=s['reads'],
         final_status=s['research_status'],final_disposition=s.get('final_disposition'),
+        final_disposition_record=h.store.artifact(s['final_disposition']) if s.get('final_disposition') else None,
+        operator_events=operator_events,
         limitations=['Single trajectory per model; no causal model ranking or efficiency-improvement claim.',
             'Historical S142 observations are background evidence and do not earn current-study acceptance.',
             'Raw Provider requests/responses and SDK snapshots remain in the local ignored Store; opaque reasoning and credentials are not exported.',

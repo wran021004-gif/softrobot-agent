@@ -358,6 +358,7 @@
       "request_id": "r3-request-f3eb398a6e334775b619a27924fda7a4",
       "purpose": "reporter",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 122478,
       "request_reference": {
@@ -381,6 +382,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "stop",
       "error": null,
       "text": "{\"interpretations\":[{\"kind\":\"new_information\",\"text\":\"The calculation was not a timed-out search and did not produce an infeasibility certificate. It terminated normally after 18.24707129993476 s, with one charged analysis evaluation and return code 0, but the embedded SLSQP trajectory solve stopped at its maximum of 100 iterations (status 9, “Iteration limit reached”; success=false). Thus the result is a failed or incomplete numerical search, not proof that the reach-and-hold task is infeasible. The reported conclusion and verification status are both “inconclusive” and “insufficient,” with no witness or exclusion certificate.\",\"source_ids\":[\"S1\",\"S6\",\"S7\",\"S8\",\"S17\"]},{\"kind\":\"supported_explanation\",\"text\":\"Within the sampled model trajectory, the principal violation is the holding speed constraint at t = 0.33 s. The required tip-speed norm is at most 0.02 m/s, while the computed value is 0.02000489088519356 m/s: an excess of 4.890885193561262e-06 m/s, or normalized violation 0.0002445442596780631. The six sampled holding times are 0.30–0.35 s at 0.01 s spacing; the speed constraint was satisfied only at samples 0.32 s and 0.34 s, so the discrete trajectory does not satisfy every checked sample. This is a local sampled-model diagnostic, not evidence of continuous-time failure or global infeasibility. The initial construction also was not static equilibrium: its position residual was 0.053749418601506754 m, although that residual is not itself a global impossibility result.\",\"source_ids\":[\"S2\",\"S3\",\"S4\",\"S5\",\"S17\"]},{\"kind\":\"unresolved_question\",\"text\":\"Validity remains limited by the analysis setup. The horizon covered 0.35 s with 0.01 s control and sample periods, but no between-sample compliance was established. The model is a structural-linear GVS representation with 24 states and assumptions including inextensibility, no shear, no torsion, and straight frictionless tendon spans; local physical agreement and linearization validation were unavailable. Inputs were bounded tendon tensions of 0–8 N, yet the scalar local measures do not fully represent unilateral bounded-input feasibility. Execution data, hardware performance, robustness, repeatability, and independent task acceptance were not assessed. It therefore remains unresolved whether a different solver result, a different operating point, nonlinear dynamics, or physical execution could satisfy the task; the present evidence cannot distinguish these possibilities.\",\"source_ids\":[\"S4\",\"S9\",\"S10\",\"S11\",\"S12\",\"S14\",\"S15\",\"S16\"]}]}",
       "tool_calls": [],
@@ -393,6 +395,7 @@
       "request_id": "r3-request-00fb517cf46c430d8e1af6c52b00ede3",
       "purpose": "reporter",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 192699,
       "request_reference": {
@@ -416,6 +419,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "stop",
       "error": null,
       "text": "{\"interpretations\":[{\"kind\":\"new_information\",\"text\":\"Both independent evaluations are valid completed simulations of the same reach-and-hold task, lasting 0.35 s with a 0.05 s sampled holding interval from 0.30 to 0.35 s. In both cases, the sole principal violation was holding speed: the limit was 0.02 m/s. Using the second-listed evaluation as the baseline, its holding speed was 0.022849089710631265 m/s, exceeding the limit by 0.002849089710631265 m/s, whereas the first-listed evaluation was 0.05203049356582944 m/s, exceeding it by 0.03203049356582944 m/s. Thus the first-listed result was worse by 0.029181403855198178 m/s, or approximately 2.28 times the baseline value. The violation occurred in the final sampled holding window; the reported terminal observations were at t=0.35 s. Both evaluations passed terminal position and holding-position criteria, with a 0.01 m limit. The baseline terminal/holding position error was 0.0031364418844500026 m, and the first-listed value was 0.0027808380549602055 m, an improvement of 0.00035560382948979707 m for terminal error and 0.00010541684881510728 m for holding-position error, respectively. Force-bound violation was 0 N in both, and solver-error count was 0 in both. Neither execution achieved joint reach-and-hold acceptance because the speed component failed.\",\"source_ids\":[\"S1\",\"S3\",\"S7\",\"S8\",\"S9\",\"S10\",\"S11\",\"S17\",\"S19\",\"S23\",\"S24\",\"S25\",\"S26\",\"S27\"]},{\"kind\":\"weakened_explanation\",\"text\":\"The componentwise numerical comparison is valid descriptively because task identity, evaluation profile, timing, thresholds, sampling interval, and acceptance definitions match. However, it is not a valid causal or single-factor comparison. The recorded relation explicitly identifies the structures and controls as changed and marks them non-comparable for causal attribution; design identity, model identity, and control source are unavailable. The configurations also show confounded structural changes: the first-listed evaluation uses Young’s moduli of 4,590,000 Pa and 6,120,000 Pa for the two segments, while the second-listed baseline uses 6,209,999 Pa and 8,279,999 Pa. Controller execution also differed: the first-listed run had 34 accepted non-initialization plans, one unusable/recovered plan, and 35 iteration-limit/deadline events, whereas the baseline had 35 accepted plans and no unusable plans, although both had 35 deadline misses and no solver-error count. These observations support possible explanations involving altered structural dynamics, optimization/recovery behavior, or their interaction, but none is identified by the evidence. The lower speed in the baseline cannot be assigned specifically to stiffness, controller behavior, initialization, or numerical convergence. The reported differences also cannot establish hardware performance, continuous-time compliance, robustness, repeatability, or global feasibility.\",\"source_ids\":[\"S14\",\"S15\",\"S30\",\"S31\",\"S1\",\"S17\"]},{\"kind\":\"unresolved_question\",\"text\":\"The evidence does not identify why the first-listed evaluation had substantially higher terminal speed despite slightly smaller position errors. Diagnostic relations provide no mechanism-specific support, and actual tendon tension channels are unavailable. The runs also terminated with the nominal duration and numerical-failure termination labels, while the simulations completed with zero reported solver errors; this does not by itself establish a physical failure mechanism. Discriminating evidence would require matched-input and matched-state comparisons, plus controller and structural identities sufficient to separate the changed factors. In particular, the existing records do not determine whether the speed difference arose mainly from structure, control, plan recovery, transient trajectory history, or an interaction. The comparison therefore supports a descriptive result—better holding speed but worse terminal and holding position in the first-listed run relative to baseline—rather than an overall improvement claim or a causal conclusion.\",\"source_ids\":[\"S1\",\"S12\",\"S14\",\"S15\",\"S17\",\"S28\",\"S30\",\"S31\"]}]}",
       "tool_calls": [],
@@ -428,6 +432,7 @@
       "request_id": "r3-request-d739e0755f1c41069802c6a0ba8b8824",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 44835,
       "request_reference": {
@@ -451,6 +456,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -495,6 +501,7 @@
       "request_id": "r3-request-12a0073bc3f2414ebb2c62d9073b6c02",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 47191,
       "request_reference": {
@@ -518,6 +525,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -587,6 +595,7 @@
       "request_id": "r3-request-8c6cf23bb7534d70af9cc36341245944",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 49956,
       "request_reference": {
@@ -610,6 +619,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -654,6 +664,7 @@
       "request_id": "r3-request-eeba8e2772e542f1830537dba0f317e8",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 50297,
       "request_reference": {
@@ -677,6 +688,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -750,6 +762,7 @@
       "request_id": "r3-request-1b503a2aeaee4062bc3f0ad580c5fe90",
       "purpose": "reporter",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 372917,
       "request_reference": {
@@ -773,6 +786,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "stop",
       "error": null,
       "text": "{\"interpretations\":[{\"kind\":\"new_information\",\"text\":\"The sealed S142 record supports a clear separation between the incomplete mathematical search and the two completed physical simulations. The mathematical trajectory evaluation terminated normally after 18.24707129993476 s, but its SLSQP solve reached the 100-iteration limit with status 9 and success=false. It produced neither a feasible witness nor an exclusion certificate; its conclusion and verification status were therefore inconclusive and insufficient. Its local sampled diagnostic identified only a holding-speed violation: 0.02000489088519356 m/s against a 0.02 m/s limit at t=0.33 s, an excess of 4.890885193561262e-06 m/s. This does not establish mathematical or physical infeasibility. By contrast, both physical simulations were valid, complete registered executions of the same 0.35 s reach-and-hold task, with six samples over the 0.30–0.35 s holding interval. Both passed terminal position and holding-position limits but failed the joint task solely on holding speed. Relative to the second-listed run as baseline, the first-listed run measured 0.05203049356582944 m/s versus 0.022849089710631265 m/s, worsening by 0.029181403855198178 m/s. Neither result establishes continuous-time compliance, hardware performance, robustness, repeatability, or global feasibility.\",\"source_ids\":[\"S1\",\"S3\",\"S17\",\"S18\",\"S24\",\"S25\",\"S26\",\"S34\",\"S39\",\"S41\",\"S42\"]},{\"kind\":\"weakened_explanation\",\"text\":\"The physical results permit descriptive comparison but not causal attribution. The task identity, timing, sampling, thresholds, and acceptance definition match, so the componentwise observations are comparable: the first-listed run had slightly lower terminal error, 0.0027808380549602055 m versus 0.0031364418844500026 m, while having substantially higher holding speed. However, the recorded comparison explicitly changed both structure and control and marks the pair non-comparable for causal interpretation. The structural records also differ in Young’s moduli, while controller execution differed in iteration-limit events, recovery behavior, and unusable-plan history. Consequently, the lower speed in the baseline cannot be assigned specifically to stiffness, controller behavior, initialization, convergence, or any interaction among them. Zero force-bound violation and zero reported solver-error counts in both runs do not isolate a mechanism. The absence of actual tension-channel observations further prevents a force-authority explanation. The evidence supports a trade-off description, not an overall improvement claim or a single-factor diagnosis.\",\"source_ids\":[\"S14\",\"S15\",\"S18\",\"S31\",\"S32\",\"S34\",\"S47\",\"S48\",\"S49\",\"S50\"]},{\"kind\":\"unresolved_question\",\"text\":\"The decision-relevant unresolved issue is whether the observed holding-speed failures reflect the particular numerical search and execution histories, the declared structural/model representation, or a genuine limitation of the task under the tested conditions. The mathematical record uses a structural-linear GVS model with inextensibility, no shear, no torsion, and straight frictionless tendon-span assumptions; local physical agreement and linearization validation were unavailable. Its standardized initial construction was not static equilibrium and had a 0.053749418601506754 m position residual. The physical records show all 35 control updates applied, but all had deadline misses and mean update times of 91.47820985428989 s and 94.37566245425758 s; these wall-time facts do not establish skipped updates or actuator delay. One-step prediction discrepancies were also recorded, but they do not identify whether structure, control, recovery, transient history, or model mismatch dominates. Thus the sealed evidence cannot support structural necessity, global nonlinear feasibility or infeasibility, continuous-time failure, or transfer to hardware. The missing discriminating evidence is matched, identity-complete information sufficient to separate model, structure, control, state, input, and sampling effects; no such evidence is present in this study.\",\"source_ids\":[\"S4\",\"S9\",\"S10\",\"S11\",\"S14\",\"S15\",\"S18\",\"S34\",\"S47\",\"S48\",\"S49\",\"S50\"]}]}",
       "tool_calls": [],
@@ -785,6 +799,7 @@
       "request_id": "r3-request-1816727b63a641dc9b052f313ea6cc3f",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 55050,
       "request_reference": {
@@ -808,6 +823,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -850,6 +866,7 @@
       "request_id": "r3-request-8ee608ec2cc64967860755f46c55be1a",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 474823,
       "request_reference": {
@@ -873,6 +890,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -943,6 +961,7 @@
       "request_id": "r3-request-4eef4fb34e6c4ca985931569e0f5043e",
       "purpose": "conversation",
       "model": "gpt-5.6-luna",
+      "response_model": "gpt-5.6-luna",
       "reasoning": "none",
       "input_bytes": 55096,
       "request_reference": {
@@ -966,6 +985,7 @@
           "cache_write_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -3961,6 +3981,16 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": true,
@@ -4107,6 +4137,16 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": true,
@@ -4245,6 +4285,16 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": true,
@@ -4387,6 +4437,16 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": true,
@@ -4525,6 +4585,16 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": true,
@@ -4664,6 +4734,14 @@
     "artifact_id": "cc7079b470758f5dd77edaa1aa5a64dbeba4a5f4ca32c08ff12f5563786776bd",
     "media_type": "application/json"
   },
+  "final_disposition_record": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "P6.2 Luna ten-request cap reached; operator audit closure, not a model STOP or scientific acceptance.",
+    "selected": null
+  },
+  "operator_events": [],
   "limitations": [
     "Single trajectory per model; no causal model ranking or efficiency-improvement claim.",
     "Historical S142 observations are background evidence and do not earn current-study acceptance.",

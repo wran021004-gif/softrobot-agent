@@ -1,7 +1,7 @@
 {
   "arm": "mini",
   "study": "p62-mini-20261029",
-  "execution_commit": "b900fd38228b2687c2435b4bcc18c833fe80ba91",
+  "execution_commit": "f690125262a2e5288b6623f9265d1446101b3b93",
   "source_manifest": {
     "source_store": "D:\\softrobot-agent\\.worktrees\\s142-reach-hold-autonomous\\runs\\research\\s142-reach-hold-coldstart-20261023\\platform.sqlite",
     "source_store_sha256": "bfc920b67e7c3f42795b408bc9a452210e4e78abff67ab06e76229883de8a581",
@@ -385,6 +385,7 @@
           "rejected_prediction_tokens": 0
         }
       },
+      "finish_reason": "stop",
       "error": null,
       "text": "{\"interpretations\":[{\"kind\":\"supported_explanation\",\"text\":\"The calculation did not prove reach-and-hold feasibility because the solver search itself failed to converge and the resulting claim remains inconclusive. The internal solver was SciPy SLSQP with 100 iterations attempted, 101 objective evaluations, and 102 constraint evaluations; it terminated with status 9 and message “Iteration limit reached,” success=false. That is a failed search, not a verified infeasibility certificate. The run consumed 18.24707129993476 s of numerical/worker time, and the reported task acceptance is explicitly unmeasured. Therefore, this evidence cannot establish that the task is impossible; it only shows that this particular optimization attempt did not finish a proof of feasibility.\",\"source_ids\":[\"S1\",\"S6\",\"S7\",\"S8\",\"S14\",\"S15\",\"S16\",\"S17\"]},{\"kind\":\"new_information\",\"text\":\"The principal violated modeled constraint was terminal/holding tip speed. At absolute time 0.33 s, the tip velocity in world frame was [0.0, -0.014393650111489614, -0.01389310965178478] m/s, giving a speed magnitude of 0.02000489088519356 m/s against a 0.02 m/s limit. The absolute violation was 4.890885193561262e-06 m/s, with normalized violation 0.0002445442596780631 under the declared 0.02 m/s scale. The position residual at the standardized initial pretension operating point was 0.053749418601506754 m, and the operating point was not in static equilibrium. These exact values show a very small speed-margin breach plus a substantial initial offset from equilibrium, but they do not by themselves identify the cause of failure or prove global infeasibility.\",\"source_ids\":[\"S1\",\"S2\",\"S3\",\"S4\",\"S5\",\"S9\",\"S10\",\"S11\",\"S12\"]},{\"kind\":\"unresolved_question\",\"text\":\"The evidence leaves open whether the failure is due to the chosen local model, the operating-point construction, or the true task physics. The model uses a structural-linear bending-basis representation with 12 generalized coordinates and assumptions including inextensible centerline, no shear, no torsion, and straight frictionless tendon spans. The documentation also states that linearization validation is unavailable, local unconstrained frozen Jacobians do not establish bounded-input feasibility, and finite discrete observations do not establish continuous-time compliance. The task horizon covered 0.35 s with 0.01 s sampling (36 time grid points, 35 control intervals), and the analysis applicably covered terminal error at sample 35 and holding error/speed over samples 30–35. What cannot be concluded is global nonlinear feasibility, global infeasibility, continuous-time satisfaction between samples, or hardware performance. Further investigation would need independent physical or legal feasibility evidence, because this record alone cannot discriminate a missed search from true impossibility.\",\"source_ids\":[\"S1\",\"S9\",\"S10\",\"S11\",\"S12\",\"S17\"]}]}",
       "tool_calls": [],
@@ -424,6 +425,7 @@
           "rejected_prediction_tokens": 0
         }
       },
+      "finish_reason": "stop",
       "error": null,
       "text": "{\"interpretations\":[{\"kind\":\"supported_explanation\",\"text\":\"Both independent reach-and-hold evaluations failed for the same principal reason: holding speed exceeded the 0.02 m/s limit in the final 0.05 s window [0.30, 0.35] s. In the first listed result, holding speed was 0.05203049356582944 m/s, which is 0.03203049356582944 m/s above the limit; terminal position error was 0.0027808380549602055 m, within the 0.01 m bound, and force_bounds was 0 N with solver_errors = 0. In the second listed result, holding speed was 0.022849089710631265 m/s, 0.002849089710631265 m/s above the limit; terminal position error was 0.0031364418844500026 m, also within tolerance, and force_bounds = 0 N with solver_errors = 0. The time-sampled holding window was complete in both cases (6 samples).\",\"source_ids\":[\"S1\",\"S12\",\"S13\",\"S17\",\"S28\",\"S29\"]},{\"kind\":\"supported_explanation\",\"text\":\"Relative to the second listed result as the baseline, the first listed result improved holding speed by 0.029181403855198178 m/s in the unfavorable direction of being faster, i.e. it worsened the only violated constraint. The first listed result also improved terminal error slightly: 0.0027808380549602055 m versus 0.0031364418844500026 m, a decrease of 0.00035560382948979707 m. However, this is not a valid overall ranking for task success because both runs remain invalid and the comparison is not causal: the report marks the structure/control comparison as not comparable, and the two runs differ in more than one factor. Therefore, only componentwise descriptive comparison is valid, not attribution of the different outcomes to any single cause.\",\"source_ids\":[\"S1\",\"S2\",\"S3\",\"S6\",\"S7\",\"S8\",\"S9\",\"S14\",\"S17\",\"S18\",\"S19\",\"S22\",\"S23\",\"S24\",\"S25\"]},{\"kind\":\"further_investigation\",\"text\":\"A cause for the difference between the two executions cannot be concluded from these records alone. The evidence explicitly says the structure/control comparison is not comparable and that sampled observations do not identify a dominant cause. To discriminate mechanisms, additional matched evidence would be needed under controlled conditions, but this report does not contain such evidence. What can be concluded is limited to the observed metrics, timing, and pass/fail status; what cannot be concluded is whether the changed geometry, material properties, control settings, or other confounded differences caused the holding-speed improvement.\",\"source_ids\":[\"S14\",\"S15\",\"S16\",\"S30\",\"S31\",\"S32\"]}]}",
       "tool_calls": [],
@@ -463,6 +465,7 @@
           "rejected_prediction_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -576,6 +579,7 @@
           "rejected_prediction_tokens": 0
         }
       },
+      "finish_reason": "tool_calls",
       "error": null,
       "text": null,
       "tool_calls": [
@@ -610,6 +614,535 @@
           "result": {
             "action": "stop",
             "scope": "History navigation only. SELECT requires an explicit original whole-result evidence_read; STOP retains original admission."
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 73,
+      "request_id": "r3-request-92e16f1d2f8143ca960aab2c024131f7",
+      "purpose": "conversation",
+      "model": "gpt-5.4-mini",
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "reasoning": "none",
+      "input_bytes": 47736,
+      "request_reference": {
+        "artifact_id": "d5010363a705f8729bd4598f4f085211983d4162a37b16d9c185df0a75640975",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "dfed71befc0f04442d5f6f6d1837ca84caf128496721cb5b35005e72adf36bfb",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 11277,
+        "completion_tokens": 622,
+        "total_tokens": 11899,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "tool_calls",
+      "error": null,
+      "text": null,
+      "tool_calls": [
+        {
+          "id": "call_Ad8zgvwUsrx5CFWm8X65lB6C",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "reporter-backed closure on sealed reach-and-hold evidence",
+              "selected_variables": [
+                "terminal_error_m",
+                "holding_max_error_m",
+                "holding_max_speed_m_s"
+              ],
+              "selected_candidate": {
+                "artifact_id": "acbcb117e6963857201ae0ad91de778de8c14ddc5d962b99e35056218dd363b5",
+                "media_type": "application/json"
+              },
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "The sealed S142 reach-and-hold study is not demonstrated feasible by the saved evidence; the observed hard failure is the holding-speed limit breach in the final window, while terminal position error remains within tolerance.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "92578ece5e72ee1e4143c55116b6e36283d8c4973c76ed3756983f56d059231e",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "db59073a14ffa282fb2e15aff6582396af61998516866c5bcad89c5c03f38152",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "A fresh complete passing evaluation on the same frozen task and candidate would overturn the current failure-focused closure.",
+            "weakening_observation": "Any independently evaluated complete pass on the frozen task/candidate, especially one satisfying holding speed under 0.02 m/s, would weaken this closure.",
+            "fixed_conditions": "Frozen reach task, same acceptance limits, same candidate/structure scope, and sealed evidence only; no new model or control search is being launched here.",
+            "stopping_condition": "Saved evidence already shows repeated terminal-position success but repeated holding-speed failure; no current evidence establishes feasibility.",
+            "interpretation": "The current record supports a conservative closure: the task has not been demonstrated feasible, because the only directly observed hard failure is the final-window holding-speed violation and the available evidence does not supply a fresh passing result. Competing explanations remain open—search miss, local-model limitations, or true physical infeasibility—but none is established by the saved evidence alone.",
+            "experience_disposition": {
+              "reporter-backed closure on sealed reach-and-hold evidence": "context_only"
+            }
+          }
+        }
+      ],
+      "schema_names": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "delivered_tool_ids": [],
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_Ad8zgvwUsrx5CFWm8X65lB6C",
+          "reference": {
+            "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 92,
+      "request_id": "r3-request-4c7099ff77dd40ce8e3509af6f1d6b40",
+      "purpose": "conversation",
+      "model": "gpt-5.4-mini",
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "reasoning": "none",
+      "input_bytes": 48947,
+      "request_reference": {
+        "artifact_id": "6b71e25665b3a8597e70c9f3d5aceca75c718bedce90cdd94d94a88087ef79bd",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "938cac2443b10641f10c748acaccdecadf710ec560f15f8d1b599ecab67b0437",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 11586,
+        "completion_tokens": 677,
+        "total_tokens": 12263,
+        "prompt_tokens_details": {
+          "cached_tokens": 4608,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "tool_calls",
+      "error": null,
+      "text": "I will not launch any new science. I will use the saved evidence and, since the current packet already contains enough registered physical-outcome facts and Reporter interpretation to close the diagnostic branch, I will STOP with a read-only evidence-based assessment.",
+      "tool_calls": [
+        {
+          "id": "call_hLFGe8UXvPpczL7nDHFj2kzr",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "stop",
+              "selected_variables": [
+                "terminal_error_m",
+                "holding_max_error_m",
+                "holding_max_speed_m_s"
+              ],
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "The sealed S142 reach-and-hold study is not demonstrated feasible by the saved evidence; the only hard failure signal is final-window holding speed exceeding 0.02 m/s, while terminal position error remains within tolerance in the observed records.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "92578ece5e72ee1e4143c55116b6e36283d8c4973c76ed3756983f56d059231e",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "db59073a14ffa282fb2e15aff6582396af61998516866c5bcad89c5c03f38152",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "A fresh complete independently evaluated passing result on the same frozen task and candidate would overturn the current failure-focused conclusion.",
+            "weakening_observation": "Any registered result showing terminal position error > 0.01 m, holding position error > 0.01 m, or holding speed <= 0.02 m/s would materially change the closure judgment; likewise a complete passing result would falsify the current non-feasibility conclusion.",
+            "fixed_conditions": "Frozen reach task with target [0.29, 0.035, 0.19] m, tolerance 0.01 m, holding window 0.05 s, speed limit 0.02 m/s, and the saved candidate/control profile in CURRENT_RESEARCH_PACKET.",
+            "stopping_condition": "The saved evidence already contains two complete physical executions, both failing the holding-speed criterion while meeting terminal position tolerance. No additional registered passing result is available in the packet.",
+            "interpretation": "The study remains unresolved as a global feasibility question, but the best registered conclusion is failure of the observed executions due to holding-speed violations. Reporter findings distinguish failed search from impossibility: the numerical attempt did not converge to a proof, and the physical records show repeated speed-limit breaches despite acceptable terminal position error.",
+            "experience_disposition": {
+              "experience_queries": "context_only"
+            }
+          }
+        }
+      ],
+      "schema_names": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "delivered_tool_ids": [],
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_hLFGe8UXvPpczL7nDHFj2kzr",
+          "reference": {
+            "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 110,
+      "request_id": "r3-request-f4991d8b33184eb19eee90befc3ceb64",
+      "purpose": "conversation",
+      "model": "gpt-5.4-mini",
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "reasoning": "none",
+      "input_bytes": 49685,
+      "request_reference": {
+        "artifact_id": "2605b01f97ddf6459ca29ed1885ad09a9efa384d04373595fada416c136e10d1",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "4ecdc834cc34c07bd6bf33654ffb01078f4820ea109c63d5e137cc296fa90002",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 11758,
+        "completion_tokens": 531,
+        "total_tokens": 12289,
+        "prompt_tokens_details": {
+          "cached_tokens": 4608,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "tool_calls",
+      "error": null,
+      "text": null,
+      "tool_calls": [
+        {
+          "id": "call_k3L1F2wh1BchTtXL9s96T0r5",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "sealed evidence closure on registered physical observations and diagnostic report consistency",
+              "selected_variables": [
+                "terminal_position_error",
+                "holding_max_speed",
+                "holding_max_error"
+              ],
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "The sealed S142 reach-and-hold study is not demonstrated feasible by the saved evidence; the observed task failures are driven by holding-speed violations, while terminal position error remains within tolerance in the registered physical results.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "92578ece5e72ee1e4143c55116b6e36283d8c4973c76ed3756983f56d059231e",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "db59073a14ffa282fb2e15aff6582396af61998516866c5bcad89c5c03f38152",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "A fresh complete passing evaluation on the frozen task and candidate would overturn this closure judgment.",
+            "weakening_observation": "A registered full pass on the same frozen task/candidate, with all frozen conditions satisfied, would weaken the current failure-based closure.",
+            "fixed_conditions": "Frozen reach task, same candidate and sealed evaluator settings; no new design or control search is being claimed here.",
+            "stopping_condition": "Enough registered evidence exists to conclude the current evidence set does not demonstrate feasibility; no further read is necessary for closure.",
+            "interpretation": "The available registered physical evaluations both fail only the holding-speed criterion while meeting terminal position and force bounds, and the diagnostic report shows the optimization attempt was a failed search rather than a feasibility proof. Therefore the appropriate evidence-based closure is that feasibility is not demonstrated, while true impossibility remains unproven."
+          }
+        }
+      ],
+      "schema_names": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "delivered_tool_ids": [],
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_k3L1F2wh1BchTtXL9s96T0r5",
+          "reference": {
+            "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 129,
+      "request_id": "r3-request-939ddc2646274ee2b7a0caaf83570f26",
+      "purpose": "conversation",
+      "model": "gpt-5.4-mini",
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "reasoning": "none",
+      "input_bytes": 50278,
+      "request_reference": {
+        "artifact_id": "d977008f02c8f035c67ac1a0d93af162e29964f5424b9061f9b35e300c09c85f",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "aafe646ca6d280bd0581a808019c4c626f82bfc9f193d65ac0713c43948ed055",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 11865,
+        "completion_tokens": 23,
+        "total_tokens": 11888,
+        "prompt_tokens_details": {
+          "cached_tokens": 4608,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "tool_calls",
+      "error": null,
+      "text": null,
+      "tool_calls": [
+        {
+          "id": "call_Ad3ygR8r7s9WBsFpMZzPmQbs",
+          "name": "research_route",
+          "arguments": {
+            "tool": "research_plan",
+            "action": "stop"
+          }
+        }
+      ],
+      "schema_names": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "delivered_tool_ids": [],
+      "feedback": [
+        {
+          "tool": "research_route",
+          "tool_id": "call_Ad3ygR8r7s9WBsFpMZzPmQbs",
+          "reference": {
+            "artifact_id": "f91f6e49eaf8e821aa8b716f9f2d2d84f8ac90a3b820731e167cd08334285857",
+            "media_type": "application/json"
+          },
+          "status": "success",
+          "result": {
+            "scientific_execution_started": false,
+            "tool": "research_plan",
+            "action": "stop",
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 146,
+      "request_id": "r3-request-a55d2fffc0a4492684d62bb0728fc09c",
+      "purpose": "conversation",
+      "model": "gpt-5.4-mini",
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "reasoning": "none",
+      "input_bytes": 50936,
+      "request_reference": {
+        "artifact_id": "87e0c84174b4c30141d5768f797df6a93cb3e503aed5197711b982165e0b4ad8",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "fba438b00a9bddfa6eb59ae88943c8e045ac8cf80f24ef981f954084c66f896f",
+        "media_type": "application/octet-stream"
+      },
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 12092,
+        "completion_tokens": 548,
+        "total_tokens": 12640,
+        "prompt_tokens_details": {
+          "cached_tokens": 4608,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "finish_reason": "tool_calls",
+      "error": null,
+      "text": null,
+      "tool_calls": [
+        {
+          "id": "call_3Wf3y8UyTAW07TG0fd783l4V",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "sealed evidence closure on registered physical observations",
+              "selected_variables": [
+                "holding_max_speed_m_s",
+                "holding_max_error_m",
+                "terminal_error_m"
+              ],
+              "selected_candidate": {
+                "artifact_id": "acbcb117e6963857201ae0ad91de778de8c14ddc5d962b99e35056218dd363b5",
+                "media_type": "application/json"
+              },
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "The sealed S142 reach-and-hold study remains unsupported as feasible by the saved evidence; the only registered hard failure is final-window holding speed exceeding 0.02 m/s in the observed physical executions, while terminal position error stayed within tolerance.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "92578ece5e72ee1e4143c55116b6e36283d8c4973c76ed3756983f56d059231e",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "A fresh registered passing result on the frozen same task/candidate would weaken this closure judgment.",
+            "weakening_observation": "Any complete independently evaluated pass on the same frozen task and candidate would weaken the current failure-based closure.",
+            "fixed_conditions": "Same frozen task definition, same candidate/control context, and same evaluator thresholds from the CURRENT_RESEARCH_PACKET.",
+            "stopping_condition": "No further registered evidence is needed for a read-only closure judgment unless a new complete passing result appears in Store.",
+            "interpretation": "Registered physical evidence shows repeated terminal position compliance but repeated holding-speed violations in the final window. Reporter findings also state that the numerical diagnostic was a failed search, not a proof of infeasibility. Therefore the conservative conclusion is unresolved feasibility with observed failure, not demonstrated impossibility or success.",
+            "experience_disposition": {
+              "sealed evidence closure on registered physical observations": "adopted"
+            }
+          }
+        }
+      ],
+      "schema_names": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "delivered_tool_ids": [],
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_3Wf3y8UyTAW07TG0fd783l4V",
+          "reference": {
+            "artifact_id": "8f551fde72de9a1b58be7f8dce0f064bb5e788ff770bd8e25bb63e56a6466390",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
           }
         }
       ]
@@ -1831,11 +2364,831 @@
         "evidence_access": true,
         "tool_continuation": false
       },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
       "selected_and_loaded_tools_preserved": true,
       "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
       "precise_feedback_preserved": null,
       "pending_feedback_expected": null,
       "actual_feedback": null,
+      "old_history_absent": true
+    },
+    {
+      "sequence": 70,
+      "reference": {
+        "artifact_id": "6162a3b2ef307e26c477928dbfa84b3d7a9d551ec673339532ac85f684d7aeb4",
+        "media_type": "application/json"
+      },
+      "boundary": "request_feedback",
+      "old_session": "rh-6b360da59bf1372b66c2ea4c",
+      "new_session": "rh-d52c70e56f46c4a70256d986",
+      "source_state_identity": "6f410ef9bc43bfdd52aa480d13d85b50aef90c0abd68575680788b23e4bc34d2",
+      "scientific_results": [],
+      "budget": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 10,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {},
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 78,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 2,
+          "wall_s": 21.718000000000757,
+          "worker_calls": 0
+        }
+      },
+      "independently_restored": true,
+      "original_tool_pairs_complete": true,
+      "next_request_sequence": 73,
+      "actual_wire_field_equality": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true,
+        "evidence_access": true,
+        "tool_continuation": false
+      },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
+      "selected_and_loaded_tools_preserved": true,
+      "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
+      "precise_feedback_preserved": true,
+      "pending_feedback_expected": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "candidate": null,
+              "source": {
+                "pointer": "/result",
+                "reference": {
+                  "artifact_id": "5bc050b80b389eed759fba57f314bd9c9e4d180dd597f7593c0758efbe712057",
+                  "media_type": "application/json"
+                }
+              }
+            },
+            "feedback_reference": {
+              "artifact_id": "8c3cc3d88e8cf9771347e478daac0292041c755cb55a54634fa37c5452845428",
+              "media_type": "application/json"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "8c3cc3d88e8cf9771347e478daac0292041c755cb55a54634fa37c5452845428",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query": {
+              "step": 38,
+              "trace": "actions",
+              "view": "details"
+            },
+            "status": "success",
+            "tool": "research_recall",
+            "tool_id": "call_XFoO3gIsSzcPbkf1Br3YiAeu"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "actual_feedback": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "candidate": null,
+              "source": {
+                "pointer": "/result",
+                "reference": {
+                  "artifact_id": "5bc050b80b389eed759fba57f314bd9c9e4d180dd597f7593c0758efbe712057",
+                  "media_type": "application/json"
+                }
+              }
+            },
+            "feedback_reference": {
+              "artifact_id": "8c3cc3d88e8cf9771347e478daac0292041c755cb55a54634fa37c5452845428",
+              "media_type": "application/json"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "8c3cc3d88e8cf9771347e478daac0292041c755cb55a54634fa37c5452845428",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query": {
+              "step": 38,
+              "trace": "actions",
+              "view": "details"
+            },
+            "status": "success",
+            "tool": "research_recall",
+            "tool_id": "call_XFoO3gIsSzcPbkf1Br3YiAeu"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "old_history_absent": true
+    },
+    {
+      "sequence": 89,
+      "reference": {
+        "artifact_id": "e4dfcc3557f04a273c240a4e4b330a20abcfc5e93968efdb5c78a48d52833977",
+        "media_type": "application/json"
+      },
+      "boundary": "request_feedback",
+      "old_session": "rh-d52c70e56f46c4a70256d986",
+      "new_session": "rh-cd971dcd9675cf0011b50655",
+      "source_state_identity": "1f89df2aa9b9272ec822da0e32332c87b8ae319c8cf112a936e05874e2ea7e89",
+      "scientific_results": [],
+      "budget": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 10,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {},
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 5,
+          "tool_calls": 77,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "backend_solves": 0,
+          "model_calls": 5,
+          "tool_calls": 3,
+          "wall_s": 25.718000000000757,
+          "worker_calls": 0
+        }
+      },
+      "independently_restored": true,
+      "original_tool_pairs_complete": true,
+      "next_request_sequence": 92,
+      "actual_wire_field_equality": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true,
+        "evidence_access": true,
+        "tool_continuation": false
+      },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
+      "selected_and_loaded_tools_preserved": true,
+      "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
+      "precise_feedback_preserved": true,
+      "pending_feedback_expected": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "89a81ac317bd845c802b3cff66aab91a3773c41c9c620d4aad54fe8c29d4a378",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_Ad8zgvwUsrx5CFWm8X65lB6C"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "actual_feedback": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "89a81ac317bd845c802b3cff66aab91a3773c41c9c620d4aad54fe8c29d4a378",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "4ceb5ebab1b6e434a332732dff42e29c22f8a346a046bd34df034cb5ade45f7b",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_Ad8zgvwUsrx5CFWm8X65lB6C"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "old_history_absent": true
+    },
+    {
+      "sequence": 107,
+      "reference": {
+        "artifact_id": "ffbd76828a2759fa681291522c0bb6ac8f1b2a6b60d26bc9f465e114825a3a91",
+        "media_type": "application/json"
+      },
+      "boundary": "request_feedback",
+      "old_session": "rh-cd971dcd9675cf0011b50655",
+      "new_session": "rh-7eab6656ca1e2c7a5108e90a",
+      "source_state_identity": "d4299406ab1db8310c413f5248cbd6a73fe7de791eba4ee0149f21189b6909ca",
+      "scientific_results": [],
+      "budget": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 10,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {},
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 76,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 4,
+          "wall_s": 30.546000000002095,
+          "worker_calls": 0
+        }
+      },
+      "independently_restored": true,
+      "original_tool_pairs_complete": true,
+      "next_request_sequence": 110,
+      "actual_wire_field_equality": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true,
+        "evidence_access": true,
+        "tool_continuation": false
+      },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
+      "selected_and_loaded_tools_preserved": true,
+      "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
+      "precise_feedback_preserved": true,
+      "pending_feedback_expected": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "b1538e28b42eb1a3fc6e021230a3e868eca86f24f39d49948adfec3b792e47c4",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_hLFGe8UXvPpczL7nDHFj2kzr"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "actual_feedback": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "b1538e28b42eb1a3fc6e021230a3e868eca86f24f39d49948adfec3b792e47c4",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "eff51015e767efbc58555003718311e95b9776a6a01205a59ea670cc1586e88f",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_hLFGe8UXvPpczL7nDHFj2kzr"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "old_history_absent": true
+    },
+    {
+      "sequence": 126,
+      "reference": {
+        "artifact_id": "014f7dfbb11e595359fe7bdd098f00ba02806b498574c08bbc3081079a6f225c",
+        "media_type": "application/json"
+      },
+      "boundary": "request_feedback",
+      "old_session": "rh-7eab6656ca1e2c7a5108e90a",
+      "new_session": "rh-c29bb5aace12ecae21b622a3",
+      "source_state_identity": "0d168150177c0fbef4fc12750ac2fa54fd94322c1feecb7f3db01f82edbf3014",
+      "scientific_results": [],
+      "budget": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 10,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {},
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 3,
+          "tool_calls": 75,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "backend_solves": 0,
+          "model_calls": 7,
+          "tool_calls": 5,
+          "wall_s": 34.375,
+          "worker_calls": 0
+        }
+      },
+      "independently_restored": true,
+      "original_tool_pairs_complete": true,
+      "next_request_sequence": 129,
+      "actual_wire_field_equality": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true,
+        "evidence_access": true,
+        "tool_continuation": false
+      },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
+      "selected_and_loaded_tools_preserved": true,
+      "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
+      "precise_feedback_preserved": true,
+      "pending_feedback_expected": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "64a2f455c76413e8ea67068793b44737cd0209b289bc625f03490459828a13ad",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_k3L1F2wh1BchTtXL9s96T0r5"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "actual_feedback": {
+        "items": [
+          {
+            "delivery": "summary_only",
+            "facts": {
+              "charged_method_counts": {
+                "mathematical_evaluations": 0,
+                "nmpc_launches": 0,
+                "physical_replay_launches": 0
+              },
+              "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+              "field": "supporting_evidence",
+              "full_error_reference": {
+                "artifact_id": "64a2f455c76413e8ea67068793b44737cd0209b289bc625f03490459828a13ad",
+                "media_type": "application/json"
+              },
+              "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+              "scientific_execution_started": false,
+              "status": "rejected",
+              "worker_started": false
+            },
+            "feedback_reference": {
+              "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+              "media_type": "application/json"
+            },
+            "original_input_query": {
+              "pointer": "/tool_use/input",
+              "reference": {
+                "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "6429a9e26771483c10cde8c580313686df8d13224cab2498002458be897315f4",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query_summary": {
+              "action": "stop"
+            },
+            "status": "error",
+            "tool": "research_plan",
+            "tool_id": "call_k3L1F2wh1BchTtXL9s96T0r5"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "old_history_absent": true
+    },
+    {
+      "sequence": 143,
+      "reference": {
+        "artifact_id": "3ecd0c1d9645ddd50daea3e7488031d9b14ff032a5b50d6a3c0c8a54ac96deb6",
+        "media_type": "application/json"
+      },
+      "boundary": "request_feedback",
+      "old_session": "rh-c29bb5aace12ecae21b622a3",
+      "new_session": "rh-62879d883561d534d4344074",
+      "source_state_identity": "af276ff292ec83f6ad4a164471dde08c0d664c52d227261d2606390a71edf497",
+      "scientific_results": [],
+      "budget": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 10,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {},
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 74,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "backend_solves": 0,
+          "model_calls": 8,
+          "tool_calls": 6,
+          "wall_s": 36.2809999999954,
+          "worker_calls": 0
+        }
+      },
+      "independently_restored": true,
+      "original_tool_pairs_complete": true,
+      "next_request_sequence": 146,
+      "actual_wire_field_equality": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true,
+        "evidence_access": true,
+        "tool_continuation": false
+      },
+      "authoritative_snapshot_to_actual_wire": {
+        "study_goal": true,
+        "research_focus": true,
+        "verified_facts": true,
+        "research_trace": true,
+        "knowledge": true,
+        "reporter_findings": true,
+        "budget": true
+      },
+      "archived_evidence_references_retained": true,
+      "selected_and_loaded_tools_preserved": true,
+      "feedback_representation": "Settled native feedback is projected into pending_feedback in the fresh SDK session; recent is consumed, not lost.",
+      "precise_feedback_preserved": true,
+      "pending_feedback_expected": {
+        "items": [
+          {
+            "delivery": "exact_feedback",
+            "feedback_reference": {
+              "artifact_id": "f91f6e49eaf8e821aa8b716f9f2d2d84f8ac90a3b820731e167cd08334285857",
+              "media_type": "application/json"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "f91f6e49eaf8e821aa8b716f9f2d2d84f8ac90a3b820731e167cd08334285857",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query": {
+              "action": "stop",
+              "tool": "research_plan"
+            },
+            "result": {
+              "content": [
+                {
+                  "text": "{\"version\":\"selected_tool_route_v1\",\"tool\":\"research_plan\",\"action\":\"stop\",\"tool_use_id\":\"call_Ad3ygR8r7s9WBsFpMZzPmQbs\",\"scientific_execution_started\":false,\"formal_read_credit\":false,\"scope\":\"Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply.\"}"
+                }
+              ],
+              "status": "success",
+              "toolUseId": "call_Ad3ygR8r7s9WBsFpMZzPmQbs"
+            },
+            "status": "success",
+            "tool": "research_route",
+            "tool_id": "call_Ad3ygR8r7s9WBsFpMZzPmQbs"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
+      "actual_feedback": {
+        "items": [
+          {
+            "delivery": "exact_feedback",
+            "feedback_reference": {
+              "artifact_id": "f91f6e49eaf8e821aa8b716f9f2d2d84f8ac90a3b820731e167cd08334285857",
+              "media_type": "application/json"
+            },
+            "original_result_query": {
+              "pointer": "/result",
+              "reference": {
+                "artifact_id": "f91f6e49eaf8e821aa8b716f9f2d2d84f8ac90a3b820731e167cd08334285857",
+                "media_type": "application/json"
+              },
+              "view": "full"
+            },
+            "query": {
+              "action": "stop",
+              "tool": "research_plan"
+            },
+            "result": {
+              "content": [
+                {
+                  "text": "{\"version\":\"selected_tool_route_v1\",\"tool\":\"research_plan\",\"action\":\"stop\",\"tool_use_id\":\"call_Ad3ygR8r7s9WBsFpMZzPmQbs\",\"scientific_execution_started\":false,\"formal_read_credit\":false,\"scope\":\"Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply.\"}"
+                }
+              ],
+              "status": "success",
+              "toolUseId": "call_Ad3ygR8r7s9WBsFpMZzPmQbs"
+            },
+            "status": "success",
+            "tool": "research_route",
+            "tool_id": "call_Ad3ygR8r7s9WBsFpMZzPmQbs"
+          }
+        ],
+        "omitted_tools": 0,
+        "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+        "total_tools": 1,
+        "version": "pending_feedback_delivery_v1"
+      },
       "old_history_absent": true
     }
   ],
@@ -1849,11 +3202,11 @@
       "usage_missing": 0
     },
     "main": {
-      "requests": 2,
-      "prompt_tokens": 21450,
-      "completion_tokens": 517,
-      "total_tokens": 21967,
-      "cached_tokens": 2560,
+      "requests": 7,
+      "prompt_tokens": 80028,
+      "completion_tokens": 2918,
+      "total_tokens": 82946,
+      "cached_tokens": 20992,
       "usage_missing": 0
     }
   },
@@ -1866,16 +3219,16 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 2,
-      "model_calls": 4,
+      "tool_calls": 7,
+      "model_calls": 9,
       "backend_solves": 0,
       "worker_calls": 0,
-      "wall_s": 21.718000000000757
+      "wall_s": 40.71799999999348
     },
     "remaining": {
       "backend_solves": 0,
-      "model_calls": 6,
-      "tool_calls": 78,
+      "model_calls": 1,
+      "tool_calls": 73,
       "wall_s": null,
       "worker_calls": 0
     },
@@ -1891,8 +3244,88 @@
   },
   "source_unchanged": true,
   "read_coverage": {},
-  "final_status": "ready",
-  "final_disposition": null,
+  "final_status": "stopped",
+  "final_disposition": {
+    "artifact_id": "a8e1983355f295e2a4272ff72873ed65503668235cf9b3d11d71c68a03bef58a",
+    "media_type": "application/json"
+  },
+  "final_disposition_record": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "P6.2 operator closure: Main role cap 7 exhausted; total sends 9 of 10, Reporter 2 of 3. No further provider sends authorized within the Main cap; not model STOP.",
+    "selected": null
+  },
+  "operator_events": [
+    {
+      "sequence": 47,
+      "kind": "p62_operator_continuation",
+      "references": [
+        {
+          "artifact_id": "5b8ddd3638cb45044fc170476beafabea060804aa578c6acaf723ff4358074fb",
+          "media_type": "application/json"
+        }
+      ],
+      "records": [
+        {
+          "approval_basis": "User authorized P6.2 real Main handoff validation and then a same-condition gpt-5.4-mini arm with the same finite budget.",
+          "budget_before": {
+            "limit": {
+              "backend_solves": 0,
+              "model_calls": 10,
+              "tool_calls": 80,
+              "wall_s": null,
+              "worker_calls": 0
+            },
+            "occupied": {},
+            "remaining": {
+              "backend_solves": 0,
+              "model_calls": 7,
+              "tool_calls": 79,
+              "wall_s": null,
+              "worker_calls": 0
+            },
+            "used": {
+              "backend_solves": 0,
+              "model_calls": 3,
+              "tool_calls": 1,
+              "wall_s": 19.796000000002095,
+              "worker_calls": 0
+            }
+          },
+          "operator_scope": "One additional read-only cross-session test window within the unchanged ten-request grant; original STOP and natural-trajectory result retained. Not a new user instruction after STOP; not a budget extension.",
+          "previous_final_disposition": {
+            "artifact_id": "665aaf38e237bfcb04b7785dfafab2ab412ff81a8afd7385ee6d4a827ca736bd",
+            "media_type": "application/json"
+          },
+          "previous_state": {
+            "artifact_id": "1407472b50d76b5c8111f28d985febbe601429dd4c39006b1bc3395ba093366f",
+            "media_type": "application/json"
+          },
+          "user_approval": true
+        }
+      ]
+    },
+    {
+      "sequence": 64,
+      "kind": "p62_local_handoff_failure",
+      "references": [
+        {
+          "artifact_id": "beb7f395c3db4b9bd2de2c5bbff5c4e78466510eed572e8a9202416331c14040",
+          "media_type": "application/json"
+        }
+      ],
+      "records": [
+        {
+          "actual_provider_attempts": 4,
+          "automatic_retry": false,
+          "cause": "openai_api omitted from existing conservative handoff capacity path",
+          "error": "TOKEN_HANDOFF_REQUIRES_PINNED_DEEPSEEK_TOKENIZER",
+          "stage": "before HTTP reservation/send"
+        }
+      ]
+    }
+  ],
   "limitations": [
     "Single trajectory per model; no causal model ranking or efficiency-improvement claim.",
     "Historical S142 observations are background evidence and do not earn current-study acceptance.",
