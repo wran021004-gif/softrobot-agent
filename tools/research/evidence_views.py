@@ -282,6 +282,87 @@ def _acceptance_metrics(acceptance, reference):
     return metrics
 
 
+def metric_semantics(value, name):
+    """Direction comes from the recorded constraint/evaluator, never the number."""
+    constraint=next((c for c in (value.get('task_analysis') or {}).get('constraints',[])
+        if c['constraint_id']==name),None)
+    if constraint and constraint['kind']=='norm_bound':
+        return dict(preference='lower',definition='Norm of recorded signal minus reference',
+            signal=constraint['signal'],source_pointer='/task_analysis/constraints/'+str(value['task_analysis']['constraints'].index(constraint)))
+    acceptance=value.get('acceptance') or {}
+    if acceptance.get('task_family')=='task.reach' and name in (
+            'evaluator:task_bound','holding_position','holding_speed','force_bounds','solver_errors'):
+        labels={'evaluator:task_bound':'terminal_position_error',
+            'holding_position':'holding_max_position_error','holding_speed':'holding_max_speed',
+            'force_bounds':'force_bound_violation','solver_errors':'solver_error_count'}
+        return dict(preference='lower',definition=labels[name],source_pointer='/acceptance/components/'+_token(name))
+    return dict(preference='unknown',definition='No registered ordering for this metric')
+
+
+def _replay_metrics(value, reference):
+    """One extremum per recorded constraint; retain every strict failed sample."""
+    if value.get('operation')=='task_capability' and not (value.get('trajectory') or {}).get('replay',{}).get('numerically_valid'):
+        return []
+    records=(value.get('trajectory') or {}).get('replay',{}).get('records',[])
+    constraints=(value.get('task_analysis') or {}).get('constraints',[])
+    metrics=[]
+    for j,c in enumerate(constraints):
+        rows=[(i,r) for i,r in enumerate(records) if r['constraint_id']==c['constraint_id']]
+        if not rows or c['kind']!='norm_bound' or any(type(r.get('value')) not in (int,float) for _,r in rows):continue
+        i,row=max(rows,key=lambda pair:pair[1]['value'])
+        times=[r['absolute_time_s'] for _,r in rows]
+        metrics.append(ReportedMetric(name=c['constraint_id'],value=row['value'],unit=c['signal']['units'],
+            threshold=c['radius'],passed=all(r['value']<=c['radius'] for _,r in rows),
+            scope='model_sample',time_s=row['absolute_time_s'],window_s=(min(times),max(times)),
+            source=_location(reference,f'/trajectory/replay/records/{i}/value'),
+            threshold_source=_location(reference,f'/task_analysis/constraints/{j}/radius')))
+    return metrics
+
+
+def quantitative_facts(value, reference):
+    """Small deterministic state view; no language-model interpretation or new score."""
+    trajectory=value.get('trajectory') or {};claim=value.get('scoped_claim') or {}
+    acceptance=value.get('acceptance') or {};construction=value.get('construction') or {}
+    facts=dict(computation_status=value.get('status'),solver=trajectory.get('solver'),
+        mathematical_conclusion=claim.get('conclusion'),verification_status=claim.get('verification_status'),
+        task_acceptance=acceptance.get('status',value.get('task_acceptance')),
+        source=dict(reference=reference,pointer=''))
+    if claim:
+        model=value.get('model') or {};binding=claim.get('binding') or {}
+        facts['model_context']=dict(basis=binding.get('basis'),model_scope=trajectory.get('model_scope'),
+            solver_scope=trajectory.get('solver_scope'),
+            state_dimension=sum(s['dimension'] for s in model.get('state_definition',[])) or None,
+            generalized_coordinate_count=len(binding.get('coordinate_order',[])) or None,
+            physical_inputs=claim.get('physical_inputs'),source=dict(reference=reference,pointer='/scoped_claim'))
+    if acceptance:
+        settling=((value.get('profile') or {}).get('control_parameters') or {}).get('data',{}).get('settling',{})
+        duration=acceptance.get('timing',{}).get('duration_s');window=settling.get('window_s')
+        facts['acceptance']=dict(accepted=acceptance.get('accepted'),components=acceptance.get('components',{}),
+            holding_window_s=[duration-window,duration] if duration is not None and window is not None else None,
+            timing={k:v for k,v in acceptance.get('timing',{}).items() if k!='termination'},
+            termination_conditions=acceptance.get('timing',{}).get('termination'),
+            termination_conditions_role='configured conditions, not observed termination reason',
+            source=dict(reference=reference,pointer='/acceptance'))
+        facts['evaluation_valid']= (acceptance.get('components',{}).get('evaluation_validity') or {}).get('passed')
+    if construction:
+        facts['operating_point']=dict(static_equilibrium=construction.get('static_equilibrium'),
+            target_position_distance_m=construction.get('position_residual_m'),
+            residual_semantics='distance to task target; not force or mechanical equilibrium residual',
+            source=dict(reference=reference,pointer='/construction'))
+    replay=trajectory.get('replay') or {}
+    if replay.get('records'):
+        facts['replay_checks']={k:v for k,v in replay.items() if k not in ('records','states','outputs') and not isinstance(v,(dict,list))}
+        facts['sampled_constraints']=dict(checked_samples=len(replay['records']),
+            failed_samples=[dict(constraint_id=r['constraint_id'],time_s=r['absolute_time_s'],
+                value=r['value'],unit=r.get('units'),violation=r.get('violation'),
+                source=dict(reference=reference,pointer=f'/trajectory/replay/records/{i}'))
+                for i,r in enumerate(replay['records']) if r.get('passed') is False],
+            all_requested_checked=trajectory.get('all_requested_checked'),
+            full_requested_coverage=trajectory.get('full_requested_coverage'),
+            source=dict(reference=reference,pointer='/trajectory/replay'))
+    return facts
+
+
 def _search(value, reference):
     def step(row, pointer):
         return ControlSearchStep(label=row['label'], source=_location(reference, pointer),
@@ -458,6 +539,11 @@ def result_card(host, reference):
                 passed=row['status']=='satisfied_sample',scope='model_sample',time_s=row['absolute_time_s'],
                 source=_location(reference,row['source_pointer']+'/value')))
             if row['status']!='satisfied_sample':violations.append(row['constraint_id'])
+        replay_metrics=_replay_metrics(value,reference)
+        if replay_metrics:
+            names={m.name for m in replay_metrics}
+            metrics=[m for m in metrics if m.name not in names]+replay_metrics
+            violations=list(dict.fromkeys([*violations,*[m.name for m in replay_metrics if m.passed is False]]))
     elif 'acceptance' in value:
         summary['recorded_control_diagnostics']=recorded_control_diagnostics(host,value)
         components=(value['acceptance'] or {}).get('components',{})

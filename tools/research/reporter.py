@@ -14,7 +14,8 @@ from schemas.research_reporting import (EvidenceLocation, EvidenceRelation,
 from tools.platform_store import plain
 from tools.research.core import read_evidence
 from tools.research.contracts import EvidenceQuery, ExperienceQuery
-from tools.research.evidence_views import result_card,recorded_math_summary,recorded_control_diagnostics,recorded_static_summary
+from tools.research.evidence_views import (result_card,recorded_math_summary,recorded_control_diagnostics,
+    recorded_static_summary,metric_semantics,quantitative_facts)
 from tools.research.evidence_policy import paired_evidence
 from tools.research.state import state, protected
 
@@ -149,12 +150,19 @@ def _comparison(host, left, right):
         left=a,right=b,comparable=comparable,reasons=reasons,
         changed_factors=list(dict.fromkeys(factors)),sources=sources)
     changes=[]
+    current_raw=host.store.artifact(a.result.reference)
+    baseline_raw=host.store.artifact(b.result.reference)
     baseline={m.name:m for m in right.metrics}
     for m in left.metrics:
         old=baseline.get(m.name)
         if old and m.unit==old.unit and m.threshold==old.threshold and type(m.value) in (int,float) and type(old.value) in (int,float):
+            semantics=metric_semantics(current_raw,m.name)
+            preference=semantics['preference'] if semantics==metric_semantics(baseline_raw,m.name) else 'unknown'
+            delta=m.value-old.value
             changes.append(dict(metric=m.name,value=m.value,baseline=old.value,
-                delta=m.value-old.value,unit=m.unit,threshold=m.threshold,
+                delta=delta,unit=m.unit,threshold=m.threshold,preference=preference,
+                direction=('unchanged' if delta==0 else 'improved' if delta<0 else 'worsened') if preference=='lower' else 'unknown',
+                metric_definition=semantics,passed=m.passed,baseline_passed=old.passed,
                 source=plain(m.source),baseline_source=plain(old.source),comparable=comparable,
                 scope='Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion'))
     return relation,changes
@@ -192,9 +200,20 @@ def _save(host, report, *, request=None, status='deferred', interpretation_for=N
 def investigate(host, request):
     """Typed synchronous tool: existing evidence only, no nested Provider send."""
     q=InvestigationRequest.model_validate(request)
+    # A prior report is a retrieval wrapper. Investigate its original results,
+    # never recursively send the old full report as another scientific result.
+    previous_reports=[];references=[]
+    for ref in q.references:
+        raw=host.store.artifact(ref)
+        if raw.get('report',{}).get('version')=='scientific_report_v1':
+            previous_reports.append(plain(ref))
+            references.extend(EvidenceRef.model_validate(c['identity']['result']['reference']) for c in raw['report']['results'])
+        else:references.append(ref)
+    q=q.model_copy(update=dict(references=list({r.artifact_id:r for r in references}.values())))
     q.reads.extend(EvidenceQuery.model_validate({k:c[k] for k in ('reference','pointer','view')})
         for c in applicable_corrections(host,[plain(r) for r in q.references]))
     report=assemble(host,q.references,question=q.question)
+    automatic=[]
     if not q.reads:
         # Cards already carry verified metrics/status/cost with raw pointers.
         # Discover bounded child structure, not an entire trajectory/history.
@@ -203,6 +222,7 @@ def investigate(host, request):
             for source in card.detail_sources[:3]:
                 query=EvidenceQuery(reference=source.reference,pointer=source.pointer,view='summary')
                 if query not in q.reads:q.reads.append(query)
+        automatic=[plain(query) for query in q.reads]
     # Investigation owns detailed cross-model reading; main Agent receives L1.
     for reference in q.references:
         raw=host.store.artifact(reference)
@@ -221,6 +241,8 @@ def investigate(host, request):
     from tools.research.experience import retrieve
     request=plain(q)
     request['selected_reads']=selected_reads
+    request['automatic_reads']=automatic
+    request['previous_report_references']=previous_reports
     request['experience_receipts']=[retrieve(host,plain(query),reader='reporter')['reference'] for query in q.experience_queries]
     # Distinct explicit invocations may ask the identical question again.
     # Native receipt recovery reuses the saved report instead of calling here.
@@ -356,8 +378,12 @@ def reporter_handoff_summary(host, reference, saved):
         evidence=card['evidence_summary'];math=mathematical_decision_view(card)
         metrics=sorted(card['metrics'],key=lambda m:m['passed'] is not False)
         fact=dict(result=card['identity']['result'],operation=card['identity']['operation'],
-            metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source')}
+            result_reference=card['identity']['result']['reference'],
+            metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source','time_s','window_s')}
                 for m in metrics],main_violations=card['main_violations'])
+        fact['quantitative_facts']=quantitative_facts(raw,card['identity']['result']['reference'])
+        fact['critical_observations']=card.get('critical_observations',[])
+        for metric in fact['metrics']:metric['semantics']=metric_semantics(raw,metric['name'])
         fact['resources']=[r for r in card['resources'] if r['amount'] is not None]
         if card['deterministic_summary'].get('comparisons'):
             fact['comparisons']=card['deterministic_summary']['comparisons']
@@ -396,13 +422,32 @@ def reporter_handoff_summary(host, reference, saved):
         comparisons=[{k:r[k] for k in ('kind','comparable','reasons','changed_factors','sources')} for r in report['relations'][:2]],
         limitations=list(dict.fromkeys(limitations)),unresolved=list(dict.fromkeys(unresolved)),
         interpretations=interpretations,interpretation_sources=[s for i in interpretations for s in i['sources']],
-        selected_reads=(saved.get('request') or {}).get('selected_reads',[]),
-        restore_query=dict(reference=reference,view='full'),
+        selected_reads=[dict(query=r['query'],status=r.get('status','available'))
+            for r in (saved.get('request') or {}).get('selected_reads',[])],
+        restore_query=dict(reference=reference,view='full',pointer='/report/interpretations'),
+        full_report_query=dict(reference=reference,view='full'),
         applicable_corrections=corrections,
         current_interpretation_status='superseded_pending_reinterpretation' if pending else saved['interpretation_status'],
         historical_interpretations_query=dict(reference=reference,view='full',pointer='/report/interpretations'),
         interpretation_scope='Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions',
         error=saved['error'],rejection_details=saved.get('rejection_details'))
+
+
+def _compact_reads(reads, automatic):
+    """Keep explicit focused reads; broad repeats become exact recovery entries."""
+    result=[]
+    for row in reads:
+        query=row['query']
+        if row.get('status')=='unavailable':result.append(row);continue
+        if query in automatic:
+            result.append(dict(query=query,status='projected_in_result_facts'));continue
+        value=row.get('value')
+        if len(json.dumps(value,separators=(',',':')).encode())>12000:
+            result.append(dict(query=query,status='detail_not_included',
+                available_fields=list(value) if isinstance(value,dict) else None,
+                recovery_query=query,reason='Broad read exceeds compact input; request a focused field or range. No conclusion from omitted detail.'))
+        else:result.append(row)
+    return result
 
 
 def applicable_corrections(host, references):
@@ -469,6 +514,14 @@ def _wire(host, reference, saved):
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
         for card in report.results if 'task_capability' in card.deterministic_summary]
     from tools.research.provider import request_settings
+    summary=reporter_handoff_summary(host,reference,{**saved,'report':plain(report)})
+    findings=deepcopy(summary['findings'])
+    for finding in findings:
+        # Static initializer dictionaries may include every joint. The exact
+        # construction stays recoverable; its scalar semantics have one owner.
+        if finding.get('mathematics'):finding['mathematics'].pop('recorded_static_construction',None)
+    compact_report=dict(mode=report.mode,question=report.question,results=findings,
+        relations=summary['comparisons'],scope=summary['scope'],limitations=summary['limitations'])
     return dict(**request_settings(provider),
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
@@ -487,11 +540,15 @@ def _wire(host, reference, saved):
             'identify causes. Do not choose experiments or parameters for the main Agent. '
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
             'State uncertainty when evidence is insufficient. '
+            'quantitative_facts and comparison direction are authoritative derived facts. Do not reverse them. '
+            'Retain every failed constraint, including tiny strict violations. valid_failure means valid evaluation with failed task. '
+            'Solver failure is not infeasibility; target distance is not mechanical equilibrium residual. '
             'Historical procedural_guidance is advisory only; it is excluded from source_catalog. '
             'Ground every interpretation in this Study evidence; advice grants no scientific evidence or permission. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=saved['report'],request={k:v for k,v in q.items() if k!='selected_reads'},selected_reads=reads,source_catalog=catalog,procedural_guidance=guidance,
+                report=compact_report,request={k:q[k] for k in ('question','focus','constraints') if k in q},
+                selected_reads=_compact_reads(reads,q.get('automatic_reads',[])),source_catalog=catalog,procedural_guidance=guidance,
                 score_comparisons=comparisons),separators=(',',':')))])
 
 

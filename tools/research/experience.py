@@ -115,7 +115,15 @@ def retrieve(host,query,*,reader='agent'):
             **(dict(content=content) if q.operation=='read' else {})))
     if q.operation=='read' and len(rows)!=1:raise ValueError('EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION')
     record=dict(query=plain(q),results=rows,supplied_startup_context=False,
+        evidence_role='context_only',
         reader=reader,scientific_evidence=False,scope='Historical procedural guidance, not current Study scientific evidence; transfer analytical principles only, not historical task values or control results. Cross-task validity is unverified; no acceptance or action authorization')
+    if q.operation=='search' and not rows:
+        from tools.research.evidence_policy import english_sources
+        eligible=[r for r in entries(host) if not english_sources(state(host)['spec']) or english_source_ready(r)]
+        record['empty_search_recovery']=dict(available_task_tags=sorted({r['task'] for r in eligible}),
+            search_query=dict(operation='search'),
+            exact_reads=[dict(operation='read',entry_id=r['entry_id'],revision=r['revision']) for r in eligible[:8]],
+            reason='Filters are exact metadata matches. Version and revision are distinct fields. Cross-task entries are context_only; applicability unverified.')
     ref=save(host,record,'actual_experience_retrieval')
     update(host,retrievals=[*state(host)['retrievals'],ref])
     return dict(reference=ref,**record)

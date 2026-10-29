@@ -1261,10 +1261,15 @@ def agent_decision_brief(host):
     if information_flow_v1(s['spec']):
         brief['focus_hypothesis']=deepcopy(intent.get('latest_decision'))
         brief['flow_facts']=[]
+        seen_results=set()
         for report in reversed(brief.get('latest_reports',[])):
             for finding in report.get('findings',[]):
-                brief['flow_facts'].extend(finding.get('metrics',[]))
-                brief['flow_facts'].extend((finding.get('mathematics') or {}).get('quantities',[]))
+                key=finding['result']['reference']['artifact_id']
+                if key in seen_results:continue
+                seen_results.add(key)
+                brief['flow_facts'].append(dict(result_reference=finding['result']['reference'],
+                    metrics=finding.get('metrics',[]),quantitative_facts=finding.get('quantitative_facts'),
+                    comparisons=finding.get('comparisons',[]),mathematics=finding.get('mathematics')))
         milestones=milestone_trace(trace)
         brief['milestone_trace']=bounded_action_trace(milestones,4)
         brief['milestone_trace']['action_total']=trace['total']
@@ -1369,7 +1374,9 @@ def information_flow_brief(brief, delivered):
     findings=[]
     for report in reports:
         findings.append(dict(report_reference=report['report_reference'],question=report.get('question'),
+            reference_role='reporter_report',scientific_citation_eligible=False,
             result_references=report.get('result_references',[]),status=report['reporter_status'],
+            interpretation_query=report.get('restore_query'),
             interpretations=report.get('interpretations',[]),
             unresolved=report.get('unresolved',[])[:3]))
     # Values are owned by verified_facts; explanations carry references only.
@@ -1399,7 +1406,8 @@ def information_flow_brief(brief, delivered):
     if access.get('stop_index'):access['stop_index'].pop('rule',None)
     eligibility=brief.get('citation_eligibility') or {}
     access['citation_eligibility']={k:eligibility[k] for k in ('query','registered_count','scientific_result_count') if k in eligibility}
-    access['citation_eligibility']['rule']='Readable is not citable: domain definitions, procedural knowledge and tool receipts do not establish scientific conclusions. Use registered results matching inference, candidate, task and model scope.'
+    access['citation_eligibility']['rule']='supporting_evidence requires registered result_reference matching inference, candidate, task and model scope. report_reference only restores Reporter text; Knowledge is procedural context; Domain Reference defines the problem; tool receipts record operations. None gains scientific eligibility by being read.'
+    access['citation_eligibility']['recent_registered']=eligibility.get('latest_registered',[])
     scopes=[scope for report in reports for scope in report.get('scope',[])]
     if scopes:access['result_scopes']=scopes[-3:]
     if eligibility.get('scientific_result_count')==0:
@@ -1696,7 +1704,9 @@ def mathematical_decision_view(card):
         result['cost_scope']='Costs belong to owning_study, unknown if unrecorded. T2 aggregates saved T1 results with zero new rollouts or physics steps; referenced T1 costs were previously charged and are not charged again. Preparation and worker time are additional; independent physical acceptance is separate.'
     if summary.get('native_analysis'):
         result['native_analysis']={k:v for k,v in summary['native_analysis'].items() if k!='quantities'}
-    if summary.get('recorded_static_construction'):result['recorded_static_construction']=summary['recorded_static_construction']
+    if summary.get('recorded_static_construction'):
+        result['recorded_static_construction']={k:v for k,v in summary['recorded_static_construction'].items() if k!='initializer_source'}
+        result['recorded_static_construction']['initializer_query']=dict(reference=card['identity']['result']['reference'],view='full',pointer='/construction/initializer_source')
     if summary.get('optimal_sensitivity') or summary.get('nonlinear_capability') or summary.get('nonlinear_response') or (capability and capability.get('method_version')):
         result['cost']=dict(evaluations=summary.get('evaluations'),numerical_s=summary.get('numerical_s'),
             sources=[dict(reference=card['identity']['result']['reference'],pointer='/'+key)

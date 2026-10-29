@@ -236,6 +236,7 @@ class AgentReportingTests(unittest.TestCase):
         ref,saved=reporter.entries(self.h)[0];wire=reporter._wire(self.h,ref,saved)
         payload=json.loads(wire['messages'][-1]['content'])
         payload.pop('source_catalog');payload.pop('score_comparisons')
+        payload['report']=saved['report']  # Persist the actual pre-compact contract.
         wire['messages'][-1]['content']=json.dumps(payload)
         wire['messages'][0]['content']='Legacy Reporter contract: '+json.dumps(reporter.InterpretationResponse.model_json_schema())
         boundary=LiveBoundary(self.h,httpx.MockTransport(reporter_response));boundary.purpose='reporter'

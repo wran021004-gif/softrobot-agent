@@ -136,7 +136,8 @@ def feedback_delivery(host, tool_ids, *, compact=False):
                 # Error reason/expectation must survive beside the exact input
                 # already in row.query, even when navigation details are large.
                 facts={k:parsed[k] for k in ('status','error_code','field','reason','expected',
-                    'worker_started','scientific_execution_started','charged_method_counts','full_error_reference') if k in parsed}
+                    'worker_started','scientific_execution_started','charged_method_counts','full_error_reference',
+                    'citation_errors','candidate_registered_results','candidate_count','inventory_query','candidate_scope') if k in parsed}
             if (value['tool_use']['name']=='evidence_read' and
                     value['tool_use']['input'].get('view')=='mathematical_capabilities' and isinstance(parsed,dict)):
                 for field in ('request_template','execution_limits','required_parameters','measured_control_initialization'):

@@ -254,6 +254,10 @@ def citation_role(host, reference):
         summary=summarize_evidence(host.store.artifact(ref),ref)
         if summary['supported_inferences']:return 'scientific_result'
         return 'tool_receipt'
+    for event in host.store.events(host.run_id):
+        if ref not in event.get('outputs',[]):continue
+        if event['kind']=='research_report':return 'reporter_report'
+        if event['kind'] in ('model_original_tool_feedback','complete_tool_output'):return 'tool_receipt'
     return 'unregistered_reference'
 
 

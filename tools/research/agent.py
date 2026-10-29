@@ -549,13 +549,20 @@ def error_feedback(host, use, exc, before):
         cited=[plain(EvidenceRef.model_validate(r)) for r in use['input'].get('supporting_evidence',[])]
         refs=[r for r in cited if r not in known or code!='UNREGISTERED_RESEARCH_EVIDENCE']
         anchor=next(iter(known),s.get('family_space_reference'))
+        inference=(use['input'].get('decision') or {}).get('claimed_inference','empirical_search')
+        inventory=citation_inventory(host)
+        candidates=[r for r in inventory if inference=='empirical_search' or inference in r['supported_inferences']]
         citation=dict(rejected_references=refs,registered_count=len({r['artifact_id'] for r in known}),
             citation_errors=[dict(reference=r,role=citation_role(host,r),
-                reason=('Not registered for supporting_evidence; reading never changes citation eligibility.' if r not in known else message[:400]),
-                correction='For an exploratory empirical_search action use supporting_evidence=[] when no result is available. For conclusions use a registered scoped result; SELECT/STOP retain their original gates.') for r in refs],
-            recent_registered=citation_inventory(host)[-3:],
+                claimed_inference=inference,
+                reason=('Reporter reports organize existing results and cannot support formal scientific inference.'
+                    if citation_role(host,r)=='reporter_report' else
+                    'Not registered for supporting_evidence; reading never changes citation eligibility.' if r not in known else message[:400]),
+                correction=('Use result_reference from report findings, then check the inventory for this inference and task scope. '
+                    'Exploratory empirical_search may use supporting_evidence=[]; SELECT/STOP keep existing gates.')) for r in refs],
+            candidate_registered_results=candidates[-3:],candidate_count=len(candidates),
             inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
-            missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
+            candidate_scope='Candidates are query leads, not automatic replacements; verify candidate/task/model and formal-read gates.')
     new_analysis=[host.store.artifact(r) for r in s.get('analysis_results',[]) if r not in before.get('analysis_results',[])]
     worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,

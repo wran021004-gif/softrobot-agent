@@ -89,7 +89,8 @@ class KnowledgeTests(unittest.TestCase):
         update(self.h,pilot=dict(provider=dict(adapter='deepseek',model='fixture',thinking='disabled',reasoning_effort='high',max_tokens=None)))
         saved=dict(report={'fixture':'No scientific result'},request=dict(experience_receipts=[receipt['reference']]))
         # Only the wire's advisory boundary is exercised; no report is registered.
-        with patch.object(reporter.ScientificReport,'model_validate',return_value=SimpleNamespace(results=[],relations=[])):
+        with patch.object(reporter.ScientificReport,'model_validate',return_value=SimpleNamespace(results=[],relations=[],mode='investigation',question='Fixture')),\
+                patch.object(reporter,'reporter_handoff_summary',return_value=dict(findings=[],comparisons=[],scope=[],limitations=[])):
             wire=reporter._wire(self.h,receipt['reference'],saved)
         packet=json.loads(wire['messages'][-1]['content'])
         self.assertNotIn('max_tokens',wire)
