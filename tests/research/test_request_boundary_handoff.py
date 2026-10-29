@@ -14,6 +14,41 @@ from tests.research.test_s125_contract import cold_host
 
 
 class RequestBoundaryHandoffTests(unittest.TestCase):
+    def test_settled_initial_connect_failure_resumes_without_duplicate_prompt(self):
+        from tools.platform_store import zero
+        from tools.research.provider import pending, CALLER
+        from tools.research.session_handoff import INVOCATION_PROMPT
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['tool_schema_policy']=dict(version='research_information_flow_v1')
+        update(h,spec=spec);sent=[]
+        def disconnected(request):
+            sent.append(json.loads(request.content))
+            raise httpx.ConnectError('Explicit offline listener absent',request=request)
+        def response(request):
+            sent.append(json.loads(request.content))
+            return httpx.Response(200,json=dict(id='offline-connect-recovery',object='chat.completion',created=1,
+                model=sent[-1]['model'],usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14),choices=[dict(index=0,finish_reason='stop',
+                    message=dict(role='assistant',content='Offline recovered initial request'))]))
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'):
+            with patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(disconnected)):
+                with self.assertRaises(Exception):asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+            row=pending(h)[0]
+            with self.assertRaisesRegex(ValueError,'UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND'):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=CALLER,
+                tool_id='model.deepseek',tool_version='1.0.0',execution_status='failed',charged=zero()),
+                dict(reason='Explicit offline user-approved budget exemption'),actual_cost=zero())
+            with patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+                self.assertEqual(len(sent),1)
+                asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+        self.assertEqual(len(sent),2)
+        self.assertEqual([m for m in sent[1]['messages'] if m.get('content')==INVOCATION_PROMPT],
+            [m for m in sent[0]['messages'] if m.get('content')==INVOCATION_PROMPT])
+        self.assertEqual(h.store.remaining()['used']['model_calls'],1)
+        self.assertEqual(pending(h),[])
+
     def provision(self):
         h=cold_host();pilot=deepcopy(state(h)['pilot'])
         pilot.update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback')
