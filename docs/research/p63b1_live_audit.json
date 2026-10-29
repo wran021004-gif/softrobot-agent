@@ -1,0 +1,2108 @@
+{
+  "study_id": "p63b1-m1-traces12-20261029",
+  "resolved_identity": "7d3b77c45234e58316bd8d93d6cc34dd6464a6b39e9772c188cfbddde82e9763",
+  "execution_commit": "a9c04d86b8f2589c944060eff19a951680c80cca",
+  "study_status": "ready",
+  "operator_status": "window_stopped; no Main STOP",
+  "knowledge": {
+    "mode": "Knowledge-enabled, success-case-accessible",
+    "frozen": {
+      "allow_benchmark_answers": true,
+      "allowed_kinds": [
+        "procedure",
+        "success_case"
+      ],
+      "exclude_entry_ids": [],
+      "include_entry_ids": null,
+      "mode": "enabled",
+      "version": "curated_knowledge_policy_v1"
+    },
+    "nine_case_preflight": "p63b1_preflight.json",
+    "main_read_entries": [
+      {
+        "operation": "read",
+        "entry_id": "research-bounded-continuation",
+        "revision": "2"
+      }
+    ],
+    "main_success_case_reads": 0,
+    "main_search_operations": 3
+  },
+  "accounting": {
+    "raw_attempts": 13,
+    "charged_model_calls": 12,
+    "first_failed_connect_exempt": true,
+    "confirmed_http_200": 11,
+    "confirmed_http_502": 1,
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 12,
+        "tool_calls": 32,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 11,
+        "model_calls": 12,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 102.0425690000113
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 21,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "resource_use": {
+      "shared_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 11,
+          "model_calls": 12,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 102.0425690000113
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 21,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "numerical_s": 0.0,
+      "numerical_reserved_s": 0.0,
+      "remaining_numerical_s": null,
+      "charged_starts": 0,
+      "shared_start_limit": null,
+      "elapsed_s": 875.5630056858063
+    },
+    "provider_pending": 0
+  },
+  "scientific_outcome": {
+    "candidates": 0,
+    "mathematical_evaluations": 0,
+    "analysis_results": [],
+    "native_callbacks": 0,
+    "native_model_builds": 0,
+    "native_rollouts": 0,
+    "native_physics_steps": 0,
+    "native_numerical_wall_s": 0,
+    "independent_physical_evaluations": 0,
+    "nmpc": 0,
+    "rl": 0,
+    "reporter_provider_calls": 0,
+    "reporter_interpretations": 0,
+    "main_submitted_plans": 0,
+    "main_submitted_analyses": 0,
+    "mathematical_followup_decision_validated": false,
+    "selected": null
+  },
+  "requests": [
+    {
+      "attempt": 1,
+      "request_id": "r3-request-87b9e29c71234a9ba26e2e7073cec0d7",
+      "timestamp": "2026-10-29T11:18:26.602889+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "3caf80e26de686471ff4136e0444fd0f67c4c096551030616892336b6fb0ef6a",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "4e6108ae02ce5860b0c442cfa1f842461c61302955edf25f3abf5483fe658b45",
+        "media_type": "application/json"
+      },
+      "response_reference": null,
+      "receipt_status": "failed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 2.058569,
+        "worker_calls": 0
+      },
+      "http_status": null,
+      "elapsed_s": 2.058569,
+      "input_bytes": 31138,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": null,
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": null
+    },
+    {
+      "attempt": 2,
+      "request_id": "r3-request-12f3ab815f4843928995667596415316",
+      "timestamp": "2026-10-29T11:27:29.384579+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "3caf80e26de686471ff4136e0444fd0f67c4c096551030616892336b6fb0ef6a",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "94d65cb96c4f55ab0a9c76c70f057e26e647e42feba5f12610bd1ecab2bbef4b",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "b52c71457830e8d1f8490102ccc6ec44976df516af5cba33cc38bdb543419f44",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 8.734000000011292,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 8.734000000011292,
+      "input_bytes": 31138,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "experience_retrieve",
+          "input": {
+            "operation": "search",
+            "task": "reach",
+            "limit": 5
+          },
+          "tool_use_id": "call_32bf400bf44c45e38c72567e29eabe2c",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "8e0ab5e84e85216bfd2f14980fe1084e32ac084acbf26419d625b1215c106ab7",
+            "media_type": "application/json"
+          },
+          "matched_count": 4,
+          "returned_entries": [
+            {
+              "entry_id": "research-strict-near-tolerance",
+              "revision": "3",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-bounded-continuation",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-witness-and-cost",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "model-physics-comparison",
+              "revision": "1",
+              "kind": "procedure"
+            }
+          ],
+          "reader": "main"
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "capabilities": [
+          {
+            "category": "Design",
+            "actions": [
+              {
+                "action": "generate",
+                "status": "available",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Control",
+            "actions": [
+              {
+                "action": "initialize_control",
+                "status": "conditional",
+                "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Mathematical Research",
+            "actions": [
+              {
+                "action": "diagnose",
+                "status": "available",
+                "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+                "read_only_investigation": {
+                  "tool": "research_investigate",
+                  "scientific_execution": false
+                },
+                "analysis_selection": {
+                  "status": "requires_owned_candidate",
+                  "candidate_query": null,
+                  "methods_query": null,
+                  "required_fields": [
+                    "decision.selected_candidate",
+                    "decision.selected_method"
+                  ],
+                  "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+                },
+                "tool": "research_plan"
+              },
+              {
+                "action": "research_analysis",
+                "status": "conditional",
+                "methods": [],
+                "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+                "cost": "Uses the shared mathematical allowance; inspect the method detail."
+              }
+            ]
+          },
+          {
+            "category": "Physical Validation",
+            "actions": [
+              {
+                "action": "stop",
+                "status": "available",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Evidence & Knowledge",
+            "actions": [
+              {
+                "action": "experience_retrieve",
+                "tool": "experience_retrieve",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "evidence_read",
+                "tool": "evidence_read",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "research_recall",
+                "tool": "research_recall",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "research_investigate",
+                "tool": "research_investigate",
+                "status": "available_for_request_validation"
+              }
+            ]
+          }
+        ],
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": null,
+          "plan_action": null,
+          "plan_selection": null,
+          "recent": [],
+          "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          },
+          "switch_tool": "research_route(tool=\"research_plan\", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing."
+        },
+        "research_focus": {
+          "candidate": null,
+          "candidate_status": {
+            "generated_valid": 0,
+            "control_sources_initialized": 0,
+            "mathematical_evaluations": 0,
+            "independent_physical_evaluations": 0,
+            "has_executable_candidate": false,
+            "task_passed": false,
+            "has_measured_task_feedback": false
+          },
+          "task_accepted": false,
+          "control": {},
+          "latest_result": {},
+          "open_questions": []
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 1
+    },
+    {
+      "attempt": 3,
+      "request_id": "r3-request-dd3e09b258c848f7b6c58c00f073647f",
+      "timestamp": "2026-10-29T11:27:40.246503+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "195edea6813a78cfb5b30b5844d474796d9212f2ce22f2c6b281058d9f2e5c25",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "62355bedfa651cc41a48dd3c90ba029bae75f15c8dd963bbed8943b5d66ea112",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "ed6ac702fd538d7ecc90a8a1cc07a078fc4f5c6b07a976b927a7ea38e8e7bd27",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 10.093999999997322,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 10.093999999997322,
+      "input_bytes": 34764,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "research_plan",
+            "action": "generate"
+          },
+          "tool_use_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "fa99a937c3e3aa5773b4f2c392deb4950efdaa785cd104071b3496e9e0a8449d",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": null,
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 2
+    },
+    {
+      "attempt": 4,
+      "request_id": "r3-request-43db8250473b4cdc98b5ff27adf234a6",
+      "timestamp": "2026-10-29T11:27:52.373418+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "660e376c8bf86b3b2eee674c06c51bae5450d3e19914762d0706110bb4f3b998",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "42b30e6ff6d0b15832a1c3eadaa82207c13b1f1e9d01f032141aedd3bc12f9b0",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "d6e50df7378a96d298acef4e30bc9735db0a918d6568f80bd5365f511916de9b",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 8.140999999988708,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 8.140999999988708,
+      "input_bytes": 33679,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "experience_retrieve",
+          "input": {
+            "operation": "search",
+            "task": "reach",
+            "limit": 10
+          },
+          "tool_use_id": "call_339e071c2ba04e83b7097e46a13d7248",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "6debcfa8658b341482d51322f63dd59d7ccfd81e05ea4a1bbcbdff5cf6d7f1a1",
+            "media_type": "application/json"
+          },
+          "matched_count": 4,
+          "returned_entries": [
+            {
+              "entry_id": "research-strict-near-tolerance",
+              "revision": "3",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-bounded-continuation",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-witness-and-cost",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "model-physics-comparison",
+              "revision": "1",
+              "kind": "procedure"
+            }
+          ],
+          "reader": "main"
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "capabilities": [
+          {
+            "category": "Design",
+            "actions": [
+              {
+                "action": "generate",
+                "status": "available",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Control",
+            "actions": [
+              {
+                "action": "initialize_control",
+                "status": "conditional",
+                "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Mathematical Research",
+            "actions": [
+              {
+                "action": "diagnose",
+                "status": "available",
+                "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+                "read_only_investigation": {
+                  "tool": "research_investigate",
+                  "scientific_execution": false
+                },
+                "analysis_selection": {
+                  "status": "requires_owned_candidate",
+                  "candidate_query": null,
+                  "methods_query": null,
+                  "required_fields": [
+                    "decision.selected_candidate",
+                    "decision.selected_method"
+                  ],
+                  "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+                },
+                "tool": "research_plan"
+              },
+              {
+                "action": "research_analysis",
+                "status": "conditional",
+                "methods": [],
+                "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+                "cost": "Uses the shared mathematical allowance; inspect the method detail."
+              }
+            ]
+          },
+          {
+            "category": "Physical Validation",
+            "actions": [
+              {
+                "action": "stop",
+                "status": "available",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Evidence & Knowledge",
+            "actions": [
+              {
+                "action": "experience_retrieve",
+                "tool": "experience_retrieve",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "evidence_read",
+                "tool": "evidence_read",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "research_recall",
+                "tool": "research_recall",
+                "status": "available_for_request_validation"
+              },
+              {
+                "action": "research_investigate",
+                "tool": "research_investigate",
+                "status": "available_for_request_validation"
+              }
+            ]
+          }
+        ],
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45",
+            "source": {
+              "artifact_id": "cb3b4c9513106dac2ffaa63c907a1c65cca3781f5e1ae19ac5d60aedd6d532ec",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "plan_action": "generate",
+          "plan_selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45",
+            "source": {
+              "artifact_id": "cb3b4c9513106dac2ffaa63c907a1c65cca3781f5e1ae19ac5d60aedd6d532ec",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "recent": [
+            {
+              "tool": "experience_retrieve",
+              "tool_use_id": "call_32bf400bf44c45e38c72567e29eabe2c",
+              "status": "success",
+              "source": {
+                "artifact_id": "8e0ab5e84e85216bfd2f14980fe1084e32ac084acbf26419d625b1215c106ab7",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          },
+          "switch_tool": "research_route(tool=\"research_plan\", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing.",
+          "pending_feedback": {
+            "omitted_tools": 0,
+            "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+            "total_tools": 1,
+            "version": "pending_feedback_delivery_v1",
+            "items": [
+              {
+                "delivery": "exact_feedback",
+                "feedback_reference": {
+                  "artifact_id": "fa99a937c3e3aa5773b4f2c392deb4950efdaa785cd104071b3496e9e0a8449d",
+                  "media_type": "application/json"
+                },
+                "original_result_query": {
+                  "pointer": "/result",
+                  "reference": {
+                    "artifact_id": "fa99a937c3e3aa5773b4f2c392deb4950efdaa785cd104071b3496e9e0a8449d",
+                    "media_type": "application/json"
+                  },
+                  "view": "full"
+                },
+                "status": "success",
+                "tool": "research_route",
+                "tool_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45"
+              }
+            ]
+          }
+        },
+        "research_focus": {
+          "candidate": null,
+          "candidate_status": {
+            "generated_valid": 0,
+            "control_sources_initialized": 0,
+            "mathematical_evaluations": 0,
+            "independent_physical_evaluations": 0,
+            "has_executable_candidate": false,
+            "task_passed": false,
+            "has_measured_task_feedback": false
+          },
+          "task_accepted": false,
+          "control": {},
+          "latest_result": {},
+          "open_questions": []
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 3
+    },
+    {
+      "attempt": 5,
+      "request_id": "r3-request-b325dba34f924e3ab1276769f0b898db",
+      "timestamp": "2026-10-29T11:28:02.668319+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "a8dc69bac3098aee9aea447c842f683264f16936461f17dbf0f0dc5d524b48a2",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "e9a019ad492f5919cf45d157fedacdec1d5c92832e2ea6bd06aafc7be9f73724",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "0755e8eda4a0274ede964b36b8d939ad6907d107b8a918746f55168fa0b66720",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 7.89100000000326,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 7.89100000000326,
+      "input_bytes": 35599,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "research_plan",
+            "action": "generate"
+          },
+          "tool_use_id": "call_c9f8d32beefb4bef8a335151306a8381",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "3181ccb6f4e71e86b4ee7ba14dba003a401d823a383a1392cb7733a948890559",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_c9f8d32beefb4bef8a335151306a8381",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_fa3ac2c7ec74486a8d888f0c40d8cb45",
+            "source": {
+              "artifact_id": "cb3b4c9513106dac2ffaa63c907a1c65cca3781f5e1ae19ac5d60aedd6d532ec",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 4
+    },
+    {
+      "attempt": 6,
+      "request_id": "r3-request-61a19c9777fc450598488d1408673bd1",
+      "timestamp": "2026-10-29T11:28:12.716558+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "ff58ccb8fddd0727c10f000462911292e3c736c42305593c062bf06331c4b297",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "c86d328b917626bebe9f9c42a4b6bc132a5277c53de7be0744e303084a7a84c6",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "90277074acb87027f04ba0ed6969886dc74b0788ad32ce96c17fefb12ca89299",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 8.031000000002678,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 8.031000000002678,
+      "input_bytes": 33928,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "experience_retrieve",
+          "input": {
+            "operation": "search",
+            "task": "reach",
+            "limit": 5
+          },
+          "tool_use_id": "call_6a8339cdd6d44ad0ab9d780506f8bc4f",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "e13b61d9aa56c6aacc851dcfc34acd10aec44fcfb7fcbb421251f2757330cf74",
+            "media_type": "application/json"
+          },
+          "matched_count": 4,
+          "returned_entries": [
+            {
+              "entry_id": "research-strict-near-tolerance",
+              "revision": "3",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-bounded-continuation",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "research-witness-and-cost",
+              "revision": "2",
+              "kind": "procedure"
+            },
+            {
+              "entry_id": "model-physics-comparison",
+              "revision": "1",
+              "kind": "procedure"
+            }
+          ],
+          "reader": "main"
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_c9f8d32beefb4bef8a335151306a8381",
+            "source": {
+              "artifact_id": "14b687592fd9f97cad19afbd18d834baf641c381d45d04ddfcc38e4e40d0c014",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 5
+    },
+    {
+      "attempt": 7,
+      "request_id": "r3-request-de297e337ed44066be3afdd6e4585269",
+      "timestamp": "2026-10-29T11:28:22.967750+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "40419cdd7d49c040d219d039d9392a7f299c5873e7bf0ec53090de9d18b302b7",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "6358d33535e117031571d6d688970a9057626641a38278f65c8c68ef2eaf7824",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "61fc124992bcefda3ba7dc39086c0e24bb9d284715c904ccfe74eee0c0f159c2",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 6.686999999990803,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 6.686999999990803,
+      "input_bytes": 35847,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "research_plan",
+            "action": "generate"
+          },
+          "tool_use_id": "call_577fdc907d9f4b7a9d7f988f53a9ca9a",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "769a8817d951238e552109a7b14f7b829edc613a18f0cfb3a862239463dc60f1",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_577fdc907d9f4b7a9d7f988f53a9ca9a",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_c9f8d32beefb4bef8a335151306a8381",
+            "source": {
+              "artifact_id": "14b687592fd9f97cad19afbd18d834baf641c381d45d04ddfcc38e4e40d0c014",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 6
+    },
+    {
+      "attempt": 8,
+      "request_id": "r3-request-58ca05b1b4fb4b099116c4239be6906e",
+      "timestamp": "2026-10-29T11:28:31.776869+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "1d3ee84d87dce7a35c204bb9b3ce4cfb9dc1012fa9b492de6af3eb5c2af8384e",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "7889a6e80622598558cba06e19716fd074e47c215b55433d072f2360a09645c8",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "628c3c118f122fa35bea0f5cd7e73a62e7c09b3902bf0817512896aa93fd373b",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 7.344000000011874,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 7.344000000011874,
+      "input_bytes": 34178,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "experience_retrieve",
+          "input": {
+            "operation": "read",
+            "entry_id": "research-bounded-continuation",
+            "revision": "2"
+          },
+          "tool_use_id": "call_9b576b30745149489ecfe604602bf2d9",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "77385445227f1cdd3c4cc383e4614566c716f8ad2650c6fea3a0e880238b0537",
+            "media_type": "application/json"
+          },
+          "matched_count": 1,
+          "returned_entries": [
+            {
+              "entry_id": "research-bounded-continuation",
+              "revision": "2",
+              "kind": "procedure"
+            }
+          ],
+          "reader": "main"
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_577fdc907d9f4b7a9d7f988f53a9ca9a",
+            "source": {
+              "artifact_id": "162174b76e72c9dd0457d16333d7d8c52447357d38cd31936fe10b2cc0d86abf",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 7
+    },
+    {
+      "attempt": 9,
+      "request_id": "r3-request-580b11d5b01341d396fba01339a3a162",
+      "timestamp": "2026-10-29T11:28:41.304581+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "16a84189ad3e2a22971c8051f0c5c48bc0ba79de7614a99b5b0ab22c3ea5ac5c",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "feddc694e9bccdd5a023910aec08ebddfc4c3cc05894b4ddf3a9348bbc1628c6",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "95e2729a47809e1693909b06ff34e98c6811409e167de646f362c4b61d028797",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 11.59299999999348,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 11.59299999999348,
+      "input_bytes": 40734,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "reference": {
+              "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+              "media_type": "application/json"
+            },
+            "pointer": "/research_opportunities",
+            "view": "mathematical_capabilities"
+          },
+          "tool_use_id": "call_e983d9d61dee45479bace44e435424ae",
+          "status": "error",
+          "feedback_reference": {
+            "artifact_id": "e9d544da201e15571b425bba05ea5d62ab9cc49132192b92da8bed76ee55be7e",
+            "media_type": "application/json"
+          },
+          "error": {
+            "status": "rejected",
+            "error_code": "OWNED_RESOLVED_CANDIDATE_REQUIRED",
+            "field": null,
+            "reason": "OWNED_RESOLVED_CANDIDATE_REQUIRED",
+            "worker_started": false,
+            "charged_method_counts": {
+              "physical_replay_launches": 0,
+              "nmpc_launches": 0,
+              "mathematical_evaluations": 0
+            },
+            "evidence_navigation": null,
+            "expected": "OWNED_RESOLVED_CANDIDATE_REQUIRED",
+            "input_query": {
+              "reference": {
+                "artifact_id": "81aa61f554ea1881a96a270763ffedfdfeabf58eeb18851e2a686098694e2aeb",
+                "media_type": "application/json"
+              },
+              "view": "full",
+              "pointer": "/tool_use/input"
+            },
+            "scientific_execution_started": false,
+            "relevant_references": [],
+            "full_error_reference": {
+              "artifact_id": "81aa61f554ea1881a96a270763ffedfdfeabf58eeb18851e2a686098694e2aeb",
+              "media_type": "application/json"
+            }
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_577fdc907d9f4b7a9d7f988f53a9ca9a",
+            "source": {
+              "artifact_id": "162174b76e72c9dd0457d16333d7d8c52447357d38cd31936fe10b2cc0d86abf",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 8
+    },
+    {
+      "attempt": 10,
+      "request_id": "r3-request-466d2e6f52d5443db9a8305f27cbf39b",
+      "timestamp": "2026-10-29T11:28:55.148051+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "16f332f06c38cab02d4eb57d9994bd9e92bcce06fa98fd378b3f3472319bcbe9",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "602efdb8e56a4a0b435c63da8e8ffc07ded44b696cbc7e0762f7e4131e572e41",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "8b79fee209f96c4a70d83bc2752854f832aead4fc25923157020a940c1a997a1",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 8.922000000005937,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 8.922000000005937,
+      "input_bytes": 35369,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "evidence_read",
+            "action": null
+          },
+          "tool_use_id": "call_e74f122970274d7d82a4d1988e0aba44",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "93b121fa001bc370238597ce0df59b08d64e233927865c8ca25d131e86d177de",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "evidence_read",
+            "action": null,
+            "tool_use_id": "call_e74f122970274d7d82a4d1988e0aba44",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_577fdc907d9f4b7a9d7f988f53a9ca9a",
+            "source": {
+              "artifact_id": "162174b76e72c9dd0457d16333d7d8c52447357d38cd31936fe10b2cc0d86abf",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 9
+    },
+    {
+      "attempt": 11,
+      "request_id": "r3-request-540e8a7172bb4a778fd5b6f3d330fb27",
+      "timestamp": "2026-10-29T11:29:06.324284+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "22abc3e89cdaebbf8349ab099bb0c68891622028a2e794bcbd15e565cc396b5f",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "dbce3639a870204a15fca0915c98699a08c96fa64922bd40d2eeca7b4fa7ec62",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "d7bb827bbc9338c3edaea19bbc8c8825bd7c15b3e8669149a334c4de575e8264",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 7.76600000000326,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 7.76600000000326,
+      "input_bytes": 35201,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "research_plan",
+            "action": "generate"
+          },
+          "tool_use_id": "call_60a0e084e7184108a9a50ab381bf3917",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "37e6bd2579761d5c37b099c1e557d6d1f0c0ad9145ddb8543ed560a58bae6075",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_60a0e084e7184108a9a50ab381bf3917",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "evidence_read",
+            "action": null,
+            "tool_use_id": "call_e74f122970274d7d82a4d1988e0aba44",
+            "source": {
+              "artifact_id": "d07d0320e27803750d830a9d71114fdefb774f70bba57e9ae5299dfd952dca72",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "evidence_read",
+            "action": null,
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 10
+    },
+    {
+      "attempt": 12,
+      "request_id": "r3-request-80a53d097f4247bdb2017074ccb7070d",
+      "timestamp": "2026-10-29T11:29:16.379973+00:00",
+      "phase": "exploration",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "4b88347fdeadb224ebc514a878b7b42e71da309d34f4223421d8734a0e3f5a11",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "c36f1e2b9151387ba276efe15c1d0ffcc6ccd89efcee4d735963e0d89e0fb977",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "6a6a1d6eb147ccab1585e9aab323fcb2b53b642d0a1adef6d849976928824c7f",
+        "media_type": "application/json"
+      },
+      "receipt_status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 11.781000000002678,
+        "worker_calls": 0
+      },
+      "http_status": 200,
+      "elapsed_s": 11.781000000002678,
+      "input_bytes": 35237,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "tool_actions": [
+        {
+          "tool": "research_route",
+          "input": {
+            "tool": "research_plan",
+            "action": "generate"
+          },
+          "tool_use_id": "call_5cc8d2354c2443c1ab38f1ce71e25b76",
+          "status": "success",
+          "feedback_reference": {
+            "artifact_id": "85ba4c17a54f10ed6b347d518e51748a948b1f67e81bbee683aa9299fc5c11c5",
+            "media_type": "application/json"
+          },
+          "result": {
+            "version": "selected_tool_route_v1",
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_5cc8d2354c2443c1ab38f1ce71e25b76",
+            "scientific_execution_started": false,
+            "formal_read_credit": false,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ],
+      "error": null,
+      "wire_l0": {
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_60a0e084e7184108a9a50ab381bf3917",
+            "source": {
+              "artifact_id": "50cacaa92d2188e10bfbf02b5a3c8d6e5aff59e4185c5eafb059bd03a2654db6",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "loaded": {
+            "tool": "research_plan",
+            "action": "generate",
+            "plan_action": "generate"
+          }
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "generate"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision",
+          "generation"
+        ],
+        "generation": {
+          "$ref": "#/$defs/GenerationRequestV2"
+        }
+      },
+      "charged_request_number": 11
+    },
+    {
+      "attempt": 13,
+      "request_id": "r3-request-24afaa6019f548c9ab5b63dd54ca088d",
+      "timestamp": "2026-10-29T11:29:30.314641+00:00",
+      "phase": "closeout",
+      "purpose": "conversation",
+      "wire_reference": {
+        "artifact_id": "8b0d5bb434c40a88d8d1e1ba5cab41af6874d761c62b0a210927455ce33aae74",
+        "media_type": "application/json"
+      },
+      "metadata_reference": {
+        "artifact_id": "14c5d00fc61538d6d5fd13137cbedce3bef6cef8fcf8ed858b66e333e2a348d6",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "48d0851b4b8fe0209a4ae9cbbf30bb535f4b40ed6f223144741bd602d376ec12",
+        "media_type": "application/json"
+      },
+      "receipt_status": "failed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 3.0,
+        "worker_calls": 0
+      },
+      "http_status": 502,
+      "elapsed_s": 3.0,
+      "input_bytes": 22016,
+      "model": "gpt-5.6-luna",
+      "reasoning": "none",
+      "tools": [
+        "research_plan",
+        "evidence_read",
+        "research_route"
+      ],
+      "tool_actions": [],
+      "error": {
+        "code": "network_error",
+        "message": "Could not reach ChatGPT. Check your connection and try again.",
+        "retryable": true
+      },
+      "wire_l0": {
+        "capabilities": [
+          {
+            "category": "Design",
+            "actions": []
+          },
+          {
+            "category": "Control",
+            "actions": []
+          },
+          {
+            "category": "Mathematical Research",
+            "actions": [
+              {
+                "action": "research_analysis",
+                "status": "blocked",
+                "methods": [],
+                "reason": "Protected closeout or no mathematical allowance.",
+                "cost": "Uses the shared mathematical allowance; inspect the method detail."
+              }
+            ]
+          },
+          {
+            "category": "Physical Validation",
+            "actions": [
+              {
+                "action": "stop",
+                "status": "available",
+                "tool": "research_plan"
+              },
+              {
+                "action": "select",
+                "status": "conditional",
+                "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+                "tool": "research_plan"
+              }
+            ]
+          },
+          {
+            "category": "Evidence & Knowledge",
+            "actions": [
+              {
+                "action": "evidence_read",
+                "tool": "evidence_read",
+                "status": "available_for_request_validation"
+              }
+            ]
+          }
+        ],
+        "mathematical_research": {
+          "status": "requires_owned_candidate",
+          "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+        },
+        "tool_continuation": {
+          "selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_5cc8d2354c2443c1ab38f1ce71e25b76",
+            "source": {
+              "artifact_id": "b507b8fc5ce392b509443b5eff52952baccfefff3d68cd9d6ef7ef2fd81b1cb7",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "plan_action": "generate",
+          "plan_selection": {
+            "tool": "research_plan",
+            "action": "generate",
+            "tool_use_id": "call_5cc8d2354c2443c1ab38f1ce71e25b76",
+            "source": {
+              "artifact_id": "b507b8fc5ce392b509443b5eff52952baccfefff3d68cd9d6ef7ef2fd81b1cb7",
+              "media_type": "application/json"
+            },
+            "status": "selected_not_submitted"
+          },
+          "recent": [
+            {
+              "tool": "experience_retrieve",
+              "tool_use_id": "call_339e071c2ba04e83b7097e46a13d7248",
+              "status": "success",
+              "source": {
+                "artifact_id": "6debcfa8658b341482d51322f63dd59d7ccfd81e05ea4a1bbcbdff5cf6d7f1a1",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "tool": "experience_retrieve",
+              "tool_use_id": "call_6a8339cdd6d44ad0ab9d780506f8bc4f",
+              "status": "success",
+              "source": {
+                "artifact_id": "e13b61d9aa56c6aacc851dcfc34acd10aec44fcfb7fcbb421251f2757330cf74",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "tool": "experience_retrieve",
+              "tool_use_id": "call_9b576b30745149489ecfe604602bf2d9",
+              "status": "success",
+              "source": {
+                "artifact_id": "77385445227f1cdd3c4cc383e4614566c716f8ad2650c6fea3a0e880238b0537",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "tool": "evidence_read",
+              "tool_use_id": "call_e983d9d61dee45479bace44e435424ae",
+              "status": "error",
+              "source": {
+                "artifact_id": "e9d544da201e15571b425bba05ea5d62ab9cc49132192b92da8bed76ee55be7e",
+                "media_type": "application/json"
+              },
+              "query": {
+                "pointer": "/research_opportunities",
+                "reference": {
+                  "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+                  "media_type": "application/json"
+                },
+                "view": "mathematical_capabilities"
+              },
+              "error_code": "OWNED_RESOLVED_CANDIDATE_REQUIRED",
+              "expected": "OWNED_RESOLVED_CANDIDATE_REQUIRED"
+            }
+          ],
+          "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+          "loaded": {
+            "tool": null,
+            "action": null,
+            "plan_action": "stop"
+          },
+          "switch_tool": "research_route(tool=\"research_plan\", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing.",
+          "pending_feedback": {
+            "omitted_tools": 0,
+            "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+            "total_tools": 1,
+            "version": "pending_feedback_delivery_v1",
+            "items": [
+              {
+                "delivery": "exact_feedback",
+                "feedback_reference": {
+                  "artifact_id": "85ba4c17a54f10ed6b347d518e51748a948b1f67e81bbee683aa9299fc5c11c5",
+                  "media_type": "application/json"
+                },
+                "original_result_query": {
+                  "pointer": "/result",
+                  "reference": {
+                    "artifact_id": "85ba4c17a54f10ed6b347d518e51748a948b1f67e81bbee683aa9299fc5c11c5",
+                    "media_type": "application/json"
+                  },
+                  "view": "full"
+                },
+                "status": "success",
+                "tool": "research_route",
+                "tool_id": "call_5cc8d2354c2443c1ab38f1ce71e25b76"
+              }
+            ]
+          }
+        },
+        "research_focus": {
+          "candidate": null,
+          "candidate_status": {
+            "generated_valid": 0,
+            "control_sources_initialized": 0,
+            "mathematical_evaluations": 0,
+            "independent_physical_evaluations": 0,
+            "has_executable_candidate": false,
+            "task_passed": false,
+            "has_measured_task_feedback": false
+          },
+          "task_accepted": false,
+          "control": {},
+          "latest_result": {},
+          "open_questions": []
+        }
+      },
+      "plan_schema_projection": {
+        "action": {
+          "description": "Property action",
+          "enum": [
+            "stop"
+          ],
+          "type": "string"
+        },
+        "required": [
+          "action",
+          "hypothesis",
+          "expected_observation",
+          "weakening_observation",
+          "fixed_conditions",
+          "stopping_condition",
+          "interpretation",
+          "decision"
+        ],
+        "generation": null
+      },
+      "charged_request_number": 12
+    }
+  ],
+  "audit_record_references": [
+    {
+      "sequence": 9,
+      "kind": "implementation_binding",
+      "status": "committed",
+      "references": [
+        {
+          "artifact_id": "d0b9f7b7952c5535738c2f355463171dfe6f43b3af208aab7b12f62134186c1a",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 10,
+      "kind": "formal_study_authorization",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "467e468c52db67fddbcfe3217d69a7e039e947fe9728125630cee0b3d3830a30",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 16,
+      "kind": "r3_boundary_failure",
+      "status": "stopped",
+      "references": [
+        {
+          "artifact_id": "3fe240204bf78847f535d3000ea7e379b97f5290aa946d566310ed9cd9ed6485",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 17,
+      "kind": "transport_failure_budget_exemption",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "c69aa70ff9c9c96d12bf39a5c0bba6ecd83445400d0510f790ba459755a91b7f",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 18,
+      "kind": "r3_transport_failure_settled",
+      "status": "failed",
+      "references": [
+        {
+          "artifact_id": "e2fdda2ff5d8a1267893f0b6c19f9f301b6ef5d4b2d5346779f11973b7a4adf1",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 19,
+      "kind": "implementation_binding",
+      "status": "committed",
+      "references": [
+        {
+          "artifact_id": "66e31e41b84d8db9ac09c54683354f1ff9e82a6cb3520947c6a73cbcf3dbbc6b",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 20,
+      "kind": "sdk_restore_verified",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "ffafe2391b870319161707ad82f536b1cd7a9f05904262042b4f20670231c9cf",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 214,
+      "kind": "supervisor_review",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "dff0bbed97e33b7b618eb9d637d7fb2537339a63b114dcc300c5d139fb69c7c2",
+          "media_type": "application/json"
+        }
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "name": "RequestBoundaryHandoffTests.test_settled_initial_connect_failure_resumes_without_duplicate_prompt",
+      "status": "passed; offline Mock HTTP"
+    },
+    {
+      "name": "OpenAIAPITests.test_sdk_tool_loop_uses_only_selected_official_endpoint_and_shared_ledger",
+      "status": "passed; offline Mock HTTP"
+    }
+  ],
+  "scope": "Read-only projection of actual Store events and wire; no synthetic science, no complete history Store or credentials included",
+  "wire_scope_verification": {
+    "first_real_request_id": "r3-request-12f3ab815f4843928995667596415316",
+    "system_prompt_explicitly_discloses_all_nine_success_cases": true,
+    "p3_original_chinese_explicitly_available": true,
+    "no_success_case_body_injected_in_l0": true,
+    "actual_generate_schema_present_before_and_after_route": true,
+    "actual_generate_schema_required_fields": [
+      "action",
+      "hypothesis",
+      "expected_observation",
+      "weakening_observation",
+      "fixed_conditions",
+      "stopping_condition",
+      "interpretation",
+      "decision",
+      "generation"
+    ],
+    "last_request_closeout_action": [
+      "stop"
+    ],
+    "same_study_identity": true,
+    "mathematical_engine_execution_not_reached": true
+  }
+}
