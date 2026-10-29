@@ -6,6 +6,7 @@ import os
 import unittest
 from unittest.mock import patch
 from openai import BadRequestError
+from jsonschema import Draft202012Validator
 import httpx
 from tools.platform_tasks import compile_input
 from tools.platform_registry import registry
@@ -77,6 +78,13 @@ class OpenAIAPITests(unittest.TestCase):
                 self.assertEqual(len(sends),3)
                 self.assertTrue(any(m.get('tool_call_id')=='official-call-fixture' for m in wire['messages']))
                 self.assertFalse(any('provider_output' in m for m in wire['messages']))
+                schema=next(t['function']['parameters'] for t in wire['tools'] if t['function']['name']=='evidence_read')
+                self.assertNotIn('allOf',schema)
+                validator=Draft202012Validator(schema)
+                ref=dict(artifact_id='0'*64)
+                self.assertTrue(validator.is_valid(dict(reference=ref,view='full')))
+                self.assertFalse(validator.is_valid(dict(reference=ref,view='fields')))
+                self.assertTrue(validator.is_valid(dict(reference=ref,view='fields',fields=['status'])))
             return httpx.Response(200,json=dict(model=p['model'],choices=[dict(index=0,
                 finish_reason='tool_calls' if len(sends)==2 else 'stop',message=message)]))
         with patch('tools.research.core.guard'),patch('tools.research.agent.guard'), \

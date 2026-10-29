@@ -147,6 +147,15 @@ def compact_plan_schema(schema, action, study):
     return clean(schema)
 
 
+def evidence_query_schema(study):
+    """Use the same fields-view rule without a root composition keyword."""
+    from tools.research.contracts import EvidenceQuery
+    schema=EvidenceQuery.model_json_schema()
+    if study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3':
+        schema.update(schema.pop('allOf')[0])
+    return schema
+
+
 def tool_directory(host, registry):
     """Describe the currently admitted native tools without parameter schemas."""
     resources={'research_plan':'Action-specific original budgets and scientific admission.',
@@ -960,7 +969,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             agent.tool_registry.registry.pop('retrieve_context',None)
         for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
             tool=agent.tool_registry.registry.get(name)
-            if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
+            if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
         current=decision_packet(host)
         from tools.research.evidence_policy import english_native
         if 'research' in current:
@@ -1002,7 +1011,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('research_investigate',None)
             if on_demand:agent.tool_registry.registry.pop('research_recall',None)
-            schema=EvidenceQuery.model_json_schema()
+            schema=evidence_query_schema(s['spec'])
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
             retrieval=agent.tool_registry.registry.get('retrieve_context')
