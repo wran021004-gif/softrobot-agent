@@ -147,6 +147,8 @@ class MathInterfaceTests(unittest.TestCase):
         wire=run_fixture(h,[None])[0];l0=packet(wire)['mathematical_research']
         self.assertEqual(l0['candidate'],candidate);self.assertNotIn('segments.0.length_m',json.dumps(l0))
         self.assertEqual(l0['parameters']['continuous_authorized'],2)
+        self.assertEqual(l0['parameters']['categories'],['segment'])
+        self.assertIn('controller',l0['parameters']['registered_categories'])
         self.assertEqual(h.store.remaining()['used']['worker_calls'],0)
         self.assertTrue(all(t['function']['parameters'] for t in wire['tools']))
 

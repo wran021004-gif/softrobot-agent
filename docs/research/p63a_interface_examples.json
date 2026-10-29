@@ -5,6 +5,7 @@
     "artifact_id": "380b847f1653fe021d8d0352a6f6597436a8e05237dc7803962ca91fed81c6ee",
     "media_type": "application/json"
   },
+  "l0_kind": "derived_projection_without_dynamic_tool_directory; not a complete Provider wire",
   "l0": {
     "version": "research_information_flow_v1",
     "study_goal": {
@@ -612,6 +613,9 @@
         "total": 39,
         "continuous_authorized": 2,
         "categories": [
+          "segment"
+        ],
+        "registered_categories": [
           "controller",
           "discretization",
           "geometry",
@@ -2645,5 +2649,2023 @@
     "real_physical_workers": 0,
     "NMPC": 0,
     "RL": 0
+  },
+  "mock_provider_request": {
+    "label": "Exact recorded Mock HTTP L0 and tool Schema excerpt; no live Provider",
+    "source_store": "D:\\softrobot-agent\\.worktrees\\p6-3b0-math-study-preparation\\runs\\p63b0-fixture-2fe09030",
+    "source_reference": {
+      "artifact_id": "af94e8fbc6a25e47c0239656fcb4a4a3f56caafac28079f6f89c6688c11b5b21",
+      "media_type": "application/json"
+    },
+    "model": "gpt-5.6-luna",
+    "l0": {
+      "version": "research_information_flow_v1",
+      "study_goal": {
+        "task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+        "task": {
+          "family": "task.reach",
+          "reference": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.295,
+                0.0,
+                0.215
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "holding": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "window_s": 0.06
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "metrics": [
+            {
+              "name": "terminal_error_m",
+              "unit": "m",
+              "meaning": "Sealed endpoint evaluator position error"
+            },
+            {
+              "name": "holding_max_error_m",
+              "unit": "m",
+              "meaning": "Maximum sampled final-window tip error"
+            },
+            {
+              "name": "holding_max_speed_m_s",
+              "unit": "m/s",
+              "meaning": "Maximum sampled world translational tip speed"
+            }
+          ]
+        },
+        "task_conditions": []
+      },
+      "research_focus": {
+        "candidate": {
+          "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+          "media_type": "application/json"
+        },
+        "candidate_status": {
+          "generated_valid": 1,
+          "control_sources_initialized": 1,
+          "mathematical_evaluations": 0,
+          "independent_physical_evaluations": 0,
+          "has_executable_candidate": true,
+          "task_passed": false,
+          "has_measured_task_feedback": false
+        },
+        "task_accepted": false,
+        "control": {
+          "structure_identity": "6abaeca403f4ae99fca861a97d8533b63bbbefac12209023b3f428fd47f809df",
+          "executable_under_current_profile": true,
+          "generated": true,
+          "compiled": true,
+          "control_initialized": true,
+          "has_completed_nmpc_execution": false,
+          "methods_used": [],
+          "mathematically_evaluated": false,
+          "physically_evaluated": false,
+          "accepted": false,
+          "best_valid_reference": null,
+          "control_sources": [
+            {
+              "source": {
+                "artifact_id": "8479e6c434e658ac0f62ecdf03144bb041ae47281402c298cc8d5d0a4704eca7",
+                "media_type": "application/json"
+              },
+              "source_kind": "explicit_control_schedule_v1",
+              "origin_kind": "bounded_candidate_control_v1",
+              "origin_status": "unmeasured_control_plan",
+              "historical_origin": false,
+              "origin_reference": null,
+              "initialized": true,
+              "full_control_sequence": true,
+              "task_acceptance": "unmeasured",
+              "query": {
+                "reference": {
+                  "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+                  "media_type": "application/json"
+                },
+                "view": "working_set",
+                "pointer": "/control_result_links/0",
+                "fields": [
+                  "source",
+                  "source_kind",
+                  "origin_kind",
+                  "origin_status",
+                  "historical_origin",
+                  "origin_reference",
+                  "initialized",
+                  "full_control_sequence",
+                  "task_acceptance",
+                  "trajectory_query",
+                  "execution_references"
+                ]
+              }
+            }
+          ],
+          "control_source_status": "complete_sequence_recorded",
+          "details_query": {
+            "reference": {
+              "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+              "media_type": "application/json"
+            },
+            "view": "working_set",
+            "pointer": "/candidate_index/0"
+          },
+          "control_source_scope": "Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected."
+        },
+        "latest_result": {},
+        "formal_hypothesis": {
+          "plan_reference": {
+            "artifact_id": "0291a3294f42ae6eb2615525e035980476ffb521f5741da45c2050dbea6aa4c1",
+            "media_type": "application/json"
+          },
+          "pointer": "/original_plan",
+          "hypothesis_id": "b0-fixture",
+          "hypothesis": "Synthetic B0 scientific selection",
+          "expected_observation": "Legal mathematics Schema becomes visible",
+          "status": "Main intent excerpts; not verified facts. Restore full text from the Plan."
+        },
+        "open_questions": [
+          {
+            "text": "Request unavailable",
+            "kind": "Main falsification target excerpt",
+            "source": {
+              "reference": {
+                "artifact_id": "0291a3294f42ae6eb2615525e035980476ffb521f5741da45c2050dbea6aa4c1",
+                "media_type": "application/json"
+              },
+              "pointer": "/original_plan/weakening_observation"
+            }
+          }
+        ]
+      },
+      "verified_facts": [],
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_identity": "52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8",
+          "effective_configuration_identity": "46c9cf6a73bc6b9ca6a96e112c88e6923849bda5bf940f7964675dc5c163e2aa",
+          "task_id": "bf7-shared-reach-v1-central_high",
+          "task_version": "1.0.0",
+          "task_family": "task.reach",
+          "canonical_task_identity": "26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e",
+          "condition_id": null
+        },
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 12,
+          "categories": [
+            "geometry",
+            "routing",
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "metrics": [
+          {
+            "metric_id": "terminal_error_m",
+            "unit": "m"
+          },
+          {
+            "metric_id": "holding_max_error_m",
+            "unit": "m"
+          },
+          {
+            "metric_id": "holding_max_speed_m_s",
+            "unit": "m/s"
+          },
+          {
+            "metric_id": "best_found_J",
+            "unit": "1"
+          }
+        ],
+        "methods": [
+          {
+            "method": "fixed_input_structure_v1",
+            "status": "ready",
+            "missing": [],
+            "estimated_evaluations": 3,
+            "wall_cost": "unknown"
+          },
+          {
+            "method": "mujoco-nonlinear-task-capability-v1",
+            "status": "requires_parameters",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown"
+          },
+          {
+            "method": "mujoco-reoptimized-structure-response-v1",
+            "status": "requires_comparable_t1_results",
+            "missing": [
+              "three comparable completed T1 results"
+            ],
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown"
+          }
+        ],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Candidate-bound discovery, not execution permission. Main chooses the research route; use L1 for units, domains, coverage, costs and exact method requests."
+      },
+      "research_trace": {
+        "total": 0,
+        "action_total": 1,
+        "recall": {
+          "trace": "actions"
+        }
+      },
+      "capabilities": [
+        {
+          "category": "Design",
+          "actions": [
+            {
+              "action": "generate",
+              "status": "available",
+              "tool": "research_plan"
+            }
+          ]
+        },
+        {
+          "category": "Control",
+          "actions": [
+            {
+              "action": "initialize_control",
+              "status": "available",
+              "tool": "research_plan"
+            }
+          ]
+        },
+        {
+          "category": "Mathematical Research",
+          "actions": [
+            {
+              "action": "diagnose",
+              "status": "available",
+              "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+              "read_only_investigation": {
+                "tool": "research_investigate",
+                "scientific_execution": false
+              },
+              "analysis_selection": {
+                "status": "requires_registered_method_and_authorization",
+                "candidate_query": {
+                  "reference": {
+                    "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+                    "media_type": "application/json"
+                  },
+                  "view": "working_set",
+                  "pointer": "/candidate_index/0"
+                },
+                "methods_query": {
+                  "reference": {
+                    "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+                    "media_type": "application/json"
+                  },
+                  "view": "mathematical_capabilities",
+                  "pointer": "/methods"
+                },
+                "required_fields": [
+                  "decision.selected_candidate",
+                  "decision.selected_method"
+                ],
+                "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+              },
+              "tool": "research_plan"
+            },
+            {
+              "action": "research_analysis",
+              "tool": "research_analysis",
+              "status": "available_for_request_validation"
+            },
+            {
+              "action": "research_analysis",
+              "status": "conditional",
+              "methods": [
+                {
+                  "method": "equilibrium",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "linearization",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "controllability",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "endpoint",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "braking",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "instantaneous_braking_v1",
+                  "status": "unsupported",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "trajectory_feasibility",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "task_capability",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "input_sensitivity",
+                  "status": "unsupported",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "design_sensitivity",
+                  "status": "unsupported",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 3
+                },
+                {
+                  "method": "native_dynamics_v1",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "short_input_response_v1",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "fixed_input_structure_v1",
+                  "status": "ready",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 3
+                },
+                {
+                  "method": "mujoco_direct_control_v1",
+                  "status": "requires_parameters",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "sampled-affine-conic-minimax-v1",
+                  "status": "unauthorized",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 2
+                },
+                {
+                  "method": "controlled-capability-sensitivity-v1",
+                  "status": "unauthorized",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 5
+                },
+                {
+                  "method": "mujoco-nonlinear-task-capability-v1",
+                  "status": "requires_parameters",
+                  "execution_status": "conditional_on_admission",
+                  "estimated_evaluations": 1
+                },
+                {
+                  "method": "mujoco-reoptimized-structure-response-v1",
+                  "status": "requires_comparable_t1_results",
+                  "execution_status": "blocked",
+                  "estimated_evaluations": 1
+                }
+              ],
+              "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+              "cost": "Uses the shared mathematical allowance; inspect the method detail."
+            }
+          ]
+        },
+        {
+          "category": "Physical Validation",
+          "actions": [
+            {
+              "action": "stop",
+              "status": "available",
+              "tool": "research_plan"
+            }
+          ]
+        },
+        {
+          "category": "Evidence & Knowledge",
+          "actions": [
+            {
+              "action": "experience_retrieve",
+              "tool": "experience_retrieve",
+              "status": "available_for_request_validation"
+            },
+            {
+              "action": "evidence_read",
+              "tool": "evidence_read",
+              "status": "available_for_request_validation"
+            },
+            {
+              "action": "research_recall",
+              "tool": "research_recall",
+              "status": "available_for_request_validation"
+            },
+            {
+              "action": "research_investigate",
+              "tool": "research_investigate",
+              "status": "available_for_request_validation"
+            }
+          ]
+        }
+      ],
+      "tool_continuation": {
+        "selection": {
+          "tool": "research_plan",
+          "action": "diagnose",
+          "tool_use_id": "offline-use-0",
+          "source": {
+            "artifact_id": "9f7cd25e8ac121c59dcac2e9d0d12c3e0582279f68a70c70485bd56b86aff90e",
+            "media_type": "application/json"
+          },
+          "status": "tool_feedback_recorded",
+          "feedback": {
+            "artifact_id": "e7a6751a1923cb6d284d251170376242716c88df6cc014e68dd81713c9c12ce1",
+            "media_type": "application/json"
+          }
+        },
+        "plan_action": "diagnose",
+        "plan_selection": {
+          "tool": "research_plan",
+          "action": "diagnose",
+          "tool_use_id": "offline-use-0",
+          "source": {
+            "artifact_id": "9f7cd25e8ac121c59dcac2e9d0d12c3e0582279f68a70c70485bd56b86aff90e",
+            "media_type": "application/json"
+          },
+          "status": "submission_feedback_recorded",
+          "feedback_status": "success",
+          "feedback": {
+            "artifact_id": "e7a6751a1923cb6d284d251170376242716c88df6cc014e68dd81713c9c12ce1",
+            "media_type": "application/json"
+          }
+        },
+        "recent": [],
+        "scope": "Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.",
+        "loaded": {
+          "tool": "research_analysis",
+          "action": "diagnose",
+          "plan_action": "diagnose"
+        },
+        "switch_tool": "research_route(tool=\"research_plan\", action=<available action>) loads a focused Plan; direct reads preserve it. Selection alone executes nothing.",
+        "pending_feedback": {
+          "items": [
+            {
+              "delivery": "summary_only",
+              "facts": {},
+              "feedback_reference": {
+                "artifact_id": "e7a6751a1923cb6d284d251170376242716c88df6cc014e68dd81713c9c12ce1",
+                "media_type": "application/json"
+              },
+              "original_result_query": {
+                "pointer": "/result",
+                "reference": {
+                  "artifact_id": "e7a6751a1923cb6d284d251170376242716c88df6cc014e68dd81713c9c12ce1",
+                  "media_type": "application/json"
+                },
+                "view": "full"
+              },
+              "query": {
+                "action": "diagnose",
+                "decision": {
+                  "hypothesis_id": "b0-fixture",
+                  "requested_budget": 0,
+                  "research_intent": "DIAGNOSE",
+                  "selected_candidate": {
+                    "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+                    "media_type": "application/json"
+                  },
+                  "selected_method": "mujoco-nonlinear-task-capability-v1"
+                },
+                "expected_observation": "Legal mathematics Schema becomes visible",
+                "fixed_conditions": "Frozen M1 condition",
+                "hypothesis": "Synthetic B0 scientific selection",
+                "interpretation": "Offline routing only",
+                "stopping_condition": "No numerical execution",
+                "weakening_observation": "Request unavailable"
+              },
+              "status": "success",
+              "tool": "research_plan",
+              "tool_id": "offline-use-1"
+            }
+          ],
+          "omitted_tools": 0,
+          "scope": "Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.",
+          "total_tools": 1,
+          "version": "pending_feedback_delivery_v1"
+        }
+      },
+      "knowledge": {
+        "role": "procedural_knowledge",
+        "access": {
+          "query": {
+            "operation": "search",
+            "task": "reach"
+          },
+          "available_historical_tasks": [
+            "oriented_tracking",
+            "passive_force_response",
+            "position_tool_axis",
+            "soft_robot_research",
+            "tracking"
+          ],
+          "study_private_entries": [],
+          "scope": "Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.",
+          "hints": [
+            {
+              "entry_id": "model-physics-comparison",
+              "revision": "1",
+              "method": "Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.",
+              "task": "soft_robot_research",
+              "scope": "context_only; cross-task generalization unverified",
+              "read_query": {
+                "operation": "read",
+                "entry_id": "model-physics-comparison",
+                "revision": "1"
+              }
+            },
+            {
+              "entry_id": "research-bounded-continuation",
+              "revision": "2",
+              "method": "Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.",
+              "task": "soft_robot_research",
+              "scope": "context_only; cross-task generalization unverified",
+              "read_query": {
+                "operation": "read",
+                "entry_id": "research-bounded-continuation",
+                "revision": "2"
+              }
+            }
+          ]
+        },
+        "read_progress": null
+      },
+      "reporter_findings": [],
+      "evidence_access": {
+        "working_set": {
+          "reference": {
+            "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": ""
+        },
+        "method_query": {
+          "reference": {
+            "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "stop_index": {
+          "count": 0,
+          "query": {
+            "reference": {
+              "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+              "media_type": "application/json"
+            },
+            "view": "working_set",
+            "pointer": "/all_fresh_results"
+          }
+        },
+        "select_requirement": "A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.",
+        "stop_requirement": "Retrieve and cite the complete new result index; original admission checks remain in force.",
+        "citation_eligibility": {
+          "query": {
+            "reference": {
+              "artifact_id": "c6cf7056ba7be1b5a73d81a8fae910d6db0de24a1c442d07c7f6b73afe53d1a5",
+              "media_type": "application/json"
+            },
+            "view": "working_set",
+            "pointer": "/citation_eligibility"
+          },
+          "registered_count": 2,
+          "scientific_result_count": 0,
+          "rule": "supporting_evidence requires registered result_reference matching inference, candidate, task and model scope. report_reference only restores Reporter text; Knowledge is procedural context; Domain Reference defines the problem; tool receipts record operations. None gains scientific eligibility by being read.",
+          "recent_registered": [
+            {
+              "reference": {
+                "artifact_id": "8479e6c434e658ac0f62ecdf03144bb041ae47281402c298cc8d5d0a4704eca7",
+                "media_type": "application/json"
+              },
+              "role": "tool_receipt",
+              "registered": true,
+              "supports_scientific_conclusion": false,
+              "candidate": null,
+              "task_identity": null,
+              "claim_kind": "UNVERIFIED_HYPOTHESIS",
+              "supported_inferences": []
+            }
+          ],
+          "registered_scientific_results": [],
+          "exploration": "Exploratory empirical_search may use supporting_evidence=[]. SELECT/STOP gates still apply."
+        },
+        "domain": {
+          "query": {
+            "reference": {
+              "artifact_id": "b12eba7228d4797c2babf4860947ae0c330e8f7b85a78b15dbe050911ab22279",
+              "media_type": "application/json"
+            },
+            "view": "full",
+            "pointer": ""
+          },
+          "role": "domain_reference"
+        },
+        "delegated_read": {
+          "tool": "research_investigate",
+          "arguments": "question and existing result references; optional exact reads",
+          "scope": "Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit."
+        }
+      },
+      "budget": {
+        "model_calls": 5,
+        "model_closeout_reserve": 1,
+        "public_operations": 30,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 4,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      }
+    },
+    "tools": [
+      {
+        "function": {
+          "description": "Choose an available research action with a typed decision and evidence. A diagnose selected_method records intent; it does not execute analysis. After choosing a registered method and candidate, use research_analysis when offered and obtain exact method details through evidence_read. Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. For STOP, retrieve and cite the complete new result index.",
+          "name": "research_plan",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "default": "application/json",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifact_id"
+                ],
+                "type": "object"
+              },
+              "LocalDiagnostic": {
+                "additionalProperties": false,
+                "properties": {
+                  "execution": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "mode": {
+                    "default": "research_policy",
+                    "enum": [
+                      "research_policy",
+                      "research_current"
+                    ],
+                    "type": "string"
+                  },
+                  "repetitions": {
+                    "default": 2,
+                    "maximum": 2,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "update_id": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "execution",
+                  "update_id"
+                ],
+                "type": "object"
+              },
+              "ResearchDecision": {
+                "additionalProperties": false,
+                "properties": {
+                  "claimed_inference": {
+                    "default": "empirical_search",
+                    "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "hypothesis_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "requested_budget": {
+                    "default": 0,
+                    "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "research_intent": {
+                    "enum": [
+                      "DIAGNOSE",
+                      "MATHEMATICAL_ANALYSIS",
+                      "CONTROL_SEARCH",
+                      "DESIGN_MODIFICATION",
+                      "NMPC_EXECUTION",
+                      "RL_TRAINING",
+                      "PHYSICAL_VALIDATION",
+                      "SELECT",
+                      "STOP"
+                    ],
+                    "type": "string"
+                  },
+                  "selected_candidate": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source."
+                  },
+                  "selected_method": {
+                    "description": "Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected_variables": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "version": {
+                    "const": "research_decision_v1",
+                    "default": "research_decision_v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "hypothesis_id",
+                  "research_intent",
+                  "selected_method"
+                ],
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Submit the selected diagnose action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.",
+            "properties": {
+              "action": {
+                "description": "Property action",
+                "enum": [
+                  "diagnose"
+                ],
+                "type": "string"
+              },
+              "decision": {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/ResearchDecision"
+                      },
+                      {
+                        "properties": {
+                          "research_intent": {
+                            "const": "DIAGNOSE"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "selected_method": {
+                          "enum": [
+                            "braking",
+                            "controllability",
+                            "controlled-capability-sensitivity-v1",
+                            "design_sensitivity",
+                            "endpoint",
+                            "equilibrium",
+                            "fixed_input_structure_v1",
+                            "input_sensitivity",
+                            "instantaneous_braking_v1",
+                            "linearization",
+                            "mujoco-nonlinear-task-capability-v1",
+                            "mujoco-reoptimized-structure-response-v1",
+                            "mujoco_direct_control_v1",
+                            "native_dynamics_v1",
+                            "sampled-affine-conic-minimax-v1",
+                            "short_input_response_v1",
+                            "task_capability",
+                            "trajectory_feasibility"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "selected_method"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "selected_candidate": {
+                          "$ref": "#/$defs/EvidenceRef"
+                        }
+                      },
+                      "required": [
+                        "selected_candidate"
+                      ]
+                    }
+                  }
+                ],
+                "description": "Property decision"
+              },
+              "diagnostic": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/LocalDiagnostic"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property diagnostic"
+              },
+              "expected_observation": {
+                "description": "Property expected_observation",
+                "minLength": 1,
+                "type": "string"
+              },
+              "experience_disposition": {
+                "additionalProperties": {
+                  "enum": [
+                    "adopted",
+                    "rejected",
+                    "context_only"
+                  ],
+                  "type": "string"
+                },
+                "description": "Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.",
+                "type": "object"
+              },
+              "fixed_conditions": {
+                "description": "Property fixed_conditions",
+                "minLength": 1,
+                "type": "string"
+              },
+              "hypothesis": {
+                "description": "Property hypothesis",
+                "minLength": 1,
+                "type": "string"
+              },
+              "interpretation": {
+                "description": "Property interpretation",
+                "minLength": 1,
+                "type": "string"
+              },
+              "next_step": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "adjust_training",
+                      "revise_design",
+                      "diagnose",
+                      "stop"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property next_step"
+              },
+              "stopping_condition": {
+                "description": "Property stopping_condition",
+                "minLength": 1,
+                "type": "string"
+              },
+              "supporting_evidence": {
+                "description": "Property supporting_evidence",
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "type": "array"
+              },
+              "weakening_observation": {
+                "description": "Property weakening_observation",
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "action",
+              "hypothesis",
+              "expected_observation",
+              "weakening_observation",
+              "fixed_conditions",
+              "stopping_condition",
+              "interpretation",
+              "decision"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.",
+          "name": "experience_retrieve",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "entry_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property entry_id",
+                "title": "Entry Id"
+              },
+              "failure_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property failure_type",
+                "title": "Failure Type"
+              },
+              "key": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property key",
+                "title": "Key"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property kind",
+                "title": "Kind"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                "title": "Limit"
+              },
+              "operation": {
+                "default": "search",
+                "description": "Property operation",
+                "enum": [
+                  "search",
+                  "read"
+                ],
+                "title": "Operation",
+                "type": "string"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property revision",
+                "title": "Revision"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property structure",
+                "title": "Structure"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property task",
+                "title": "Task"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property version",
+                "title": "Version"
+              }
+            },
+            "required": [],
+            "title": "ExperienceQuery",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.",
+          "name": "evidence_read",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "title": "Artifact Id",
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "default": "application/json",
+                    "title": "Media Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifact_id"
+                ],
+                "title": "EvidenceRef",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "if": {},
+            "properties": {
+              "count": {
+                "default": 20,
+                "description": "Property count",
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "start": {
+                "default": 0,
+                "description": "Property start",
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "view": {
+                "default": "full",
+                "description": "Property view",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set"
+                ],
+                "title": "View",
+                "type": "string"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "then": {
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "view": {
+                        "const": "fields"
+                      }
+                    },
+                    "required": [
+                      "view"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "fields": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "fields"
+                    ]
+                  }
+                }
+              ]
+            },
+            "title": "EvidenceQuery",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Recall saved research by stable step number, or page through history. Details support precise JSON Pointers. Navigation grants no formal SELECT/STOP evidence credit.",
+          "name": "research_recall",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "fields": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property fields",
+                "title": "Fields"
+              },
+              "limit": {
+                "default": 8,
+                "description": "Property limit",
+                "maximum": 10,
+                "minimum": 1,
+                "title": "Limit",
+                "type": "integer"
+              },
+              "offset": {
+                "default": 0,
+                "description": "Property offset",
+                "minimum": 0,
+                "title": "Offset",
+                "type": "integer"
+              },
+              "pointer": {
+                "default": "",
+                "description": "JSON Pointer relative to the original Plan or tool feedback result; details only.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "step": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Stable Store step number. Omit to page through the trace.",
+                "title": "Step"
+              },
+              "trace": {
+                "default": "actions",
+                "description": "Property trace",
+                "enum": [
+                  "actions",
+                  "milestones"
+                ],
+                "title": "Trace",
+                "type": "string"
+              },
+              "view": {
+                "default": "summary",
+                "description": "Property view",
+                "enum": [
+                  "summary",
+                  "details"
+                ],
+                "title": "View",
+                "type": "string"
+              }
+            },
+            "required": [],
+            "title": "ResearchRecallQuery",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Select a tool and action; load its Schema on the next request. No scientific execution or evidence credit.",
+          "name": "research_route",
+          "parameters": {
+            "additionalProperties": false,
+            "description": "Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.",
+            "properties": {
+              "action": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+                "title": "Action"
+              },
+              "tool": {
+                "description": "Property tool",
+                "enum": [
+                  "research_plan",
+                  "experience_retrieve",
+                  "evidence_read",
+                  "research_recall",
+                  "research_analysis",
+                  "research_investigate"
+                ],
+                "title": "Tool",
+                "type": "string"
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "title": "ResearchRouteQuery",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.",
+          "name": "research_analysis",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "title": "Artifact Id",
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "default": "application/json",
+                    "title": "Media Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifact_id"
+                ],
+                "title": "EvidenceRef",
+                "type": "object"
+              },
+              "LocalControlSearchSettings": {
+                "additionalProperties": false,
+                "properties": {
+                  "active_coefficients": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "integer"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.",
+                    "title": "Active Coefficients"
+                  },
+                  "coefficient_limit_n": {
+                    "default": 2.0,
+                    "exclusiveMinimum": 0,
+                    "title": "Coefficient Limit N",
+                    "type": "number"
+                  },
+                  "correction_window_s": {
+                    "anyOf": [
+                      {
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "prefixItems": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ],
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Correction Window S"
+                  },
+                  "difference_step_n": {
+                    "default": 0.01,
+                    "exclusiveMinimum": 0,
+                    "title": "Difference Step N",
+                    "type": "number"
+                  },
+                  "evaluation_requests": {
+                    "default": 24,
+                    "description": "Search callback cap, not mathematical charges or integration steps. Plan control_search callbacks request physical replay; Native research_analysis callbacks integrate cloned native trajectories. Actual costs and independent validation are recorded separately.",
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "title": "Evaluation Requests",
+                    "type": "integer"
+                  },
+                  "initial_radius_n": {
+                    "default": 0.1,
+                    "exclusiveMinimum": 0,
+                    "title": "Initial Radius N",
+                    "type": "number"
+                  },
+                  "iterations": {
+                    "default": 16,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "title": "Iterations",
+                    "type": "integer"
+                  },
+                  "knots_s": {
+                    "items": {
+                      "type": "number"
+                    },
+                    "maxItems": 4,
+                    "minItems": 2,
+                    "title": "Knots S",
+                    "type": "array"
+                  },
+                  "method": {
+                    "default": "response",
+                    "enum": [
+                      "response",
+                      "pattern"
+                    ],
+                    "title": "Method",
+                    "type": "string"
+                  },
+                  "minimum_radius_n": {
+                    "default": 0.0001,
+                    "exclusiveMinimum": 0,
+                    "title": "Minimum Radius N",
+                    "type": "number"
+                  },
+                  "safety_margin_fraction": {
+                    "default": 0.0,
+                    "description": "Optional v2 local model target margin inside every original norm bound; original physical acceptance is unchanged. Zero preserves boundary-seeking legacy behavior.",
+                    "exclusiveMaximum": 0.5,
+                    "minimum": 0,
+                    "title": "Safety Margin Fraction",
+                    "type": "number"
+                  },
+                  "version": {
+                    "default": "local_control_search_v1",
+                    "enum": [
+                      "local_control_search_v1",
+                      "local_control_search_v2"
+                    ],
+                    "title": "Version",
+                    "type": "string"
+                  }
+                },
+                "title": "LocalControlSearchSettings",
+                "type": "object"
+              },
+              "NativeControlOptimization": {
+                "additionalProperties": false,
+                "properties": {
+                  "failed_replays": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "title": "Failed Replays",
+                    "type": "array"
+                  },
+                  "resume_from": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "settings": {
+                    "$ref": "#/$defs/LocalControlSearchSettings"
+                  },
+                  "source": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                },
+                "required": [
+                  "source",
+                  "settings"
+                ],
+                "title": "NativeControlOptimization",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Selected method mujoco-nonlinear-task-capability-v1. Frozen identity and protocol are bound by the program; submit scientific variables only. {\"method\":\"mujoco-nonlinear-task-capability-v1\",\"scientific_purpose\":\"Finite-budget nonlinear task capability\",\"operating_points\":[{\"operating_point\":\"standardized_initial_pretension\",\"readiness\":\"frozen_initialization_available\",\"required_sources\":[],\"coverage\":\"Frozen time-zero initialization; does not diagnose the observed terminal state.\"}],\"available_source_references\":[],\"unavailable_sources\":[],\"saved_state_requirements\":\"Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.\",\"coverage\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[27,28,29,30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[27,28,29,30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"}],\"scientific_scope\":{\"computes\":\"Limited-budget mathematical diagnostic; automatic physical ranking has not been validated.\",\"model_sources\":[],\"operating_points\":[\"standardized_initial_pretension\"],\"legal_sources\":\"Exact owned candidate, model, physical input bounds, state provenance and frozen task/protocol; source admission remains mandatory.\",\"task_quantities\":[{\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"},{\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[27,28,29,30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"},{\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"status\":\"diagnostic\",\"analyzed_indices\":[27,28,29,30],\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\"}],\"full_task_supported\":false,\"inference\":\"Model-scoped mathematical evidence only after actual computation and validation. An intent or accepted request establishes no scientific result.\",\"missing_evidence\":[\"control_optimization.source\",\"control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)\"],\"requires_mathematical_execution\":true,\"physical_acceptance\":\"Independent registered task evaluation is required; no static, local or optimizer result substitutes for it.\"},\"limitations\":[\"Limited-budget mathematical diagnostic; automatic physical ranking has not been validated.\",\"Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.\",\"Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.\",\"Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer.\"],\"deterministic_method_applicability\":\"requires_parameters\",\"execution_status\":\"conditional_on_admission\",\"admission\":\"Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.\"}",
+            "if": {},
+            "properties": {
+              "control_optimization": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/NativeControlOptimization"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property control_optimization"
+              },
+              "execution": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property execution"
+              },
+              "operating_point": {
+                "description": "Property operating_point",
+                "enum": [
+                  "standardized_initial_pretension"
+                ],
+                "title": "Operating Point",
+                "type": "string"
+              },
+              "saved_state": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property saved_state"
+              },
+              "update_id": {
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property update_id",
+                "title": "Update Id"
+              }
+            },
+            "required": [
+              "control_optimization",
+              "operating_point"
+            ],
+            "then": {
+              "allOf": [
+                {
+                  "else": {
+                    "properties": {
+                      "execution": {
+                        "type": "null"
+                      },
+                      "saved_state": {
+                        "type": "null"
+                      },
+                      "update_id": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "if": {
+                    "properties": {
+                      "operating_point": {
+                        "const": "saved_state"
+                      }
+                    },
+                    "required": [
+                      "operating_point"
+                    ]
+                  },
+                  "then": {
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "execution": {
+                            "type": "null"
+                          },
+                          "saved_state": {
+                            "$ref": "#/$defs/EvidenceRef"
+                          },
+                          "update_id": {
+                            "type": "null"
+                          }
+                        },
+                        "required": [
+                          "saved_state"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "execution": {
+                            "$ref": "#/$defs/EvidenceRef"
+                          },
+                          "saved_state": {
+                            "type": "null"
+                          },
+                          "update_id": {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "execution",
+                          "update_id"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "title": "AnalysisRequest",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Read-only investigation of saved results: provide a question and result references; exact reads and authorized experience_queries are optional. No candidate is needed to read existing evidence. This does not execute research_plan(diagnose) or candidate-bound research_analysis. Returns compact findings and an interpretation_query; internal reads give no SELECT/STOP credit.",
+          "name": "research_investigate",
+          "parameters": {
+            "$defs": {
+              "EvidenceQuery": {
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "view": {
+                          "const": "fields"
+                        }
+                      },
+                      "required": [
+                        "view"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fields": {
+                          "minItems": 1
+                        }
+                      },
+                      "required": [
+                        "fields"
+                      ]
+                    }
+                  }
+                ],
+                "properties": {
+                  "count": {
+                    "default": 20,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "title": "Count",
+                    "type": "integer"
+                  },
+                  "fields": {
+                    "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 32,
+                    "title": "Fields",
+                    "type": "array"
+                  },
+                  "pointer": {
+                    "default": "",
+                    "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                    "title": "Pointer",
+                    "type": "string"
+                  },
+                  "reference": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "start": {
+                    "default": 0,
+                    "minimum": 0,
+                    "title": "Start",
+                    "type": "integer"
+                  },
+                  "view": {
+                    "default": "full",
+                    "enum": [
+                      "full",
+                      "summary",
+                      "fields",
+                      "range",
+                      "capabilities",
+                      "mathematical_capabilities",
+                      "working_set"
+                    ],
+                    "title": "View",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reference"
+                ],
+                "title": "EvidenceQuery",
+                "type": "object"
+              },
+              "EvidenceRef": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "title": "Artifact Id",
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "default": "application/json",
+                    "title": "Media Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "artifact_id"
+                ],
+                "title": "EvidenceRef",
+                "type": "object"
+              },
+              "ExperienceQuery": {
+                "additionalProperties": false,
+                "properties": {
+                  "entry_id": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Entry Id"
+                  },
+                  "failure_type": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Failure Type"
+                  },
+                  "key": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Key"
+                  },
+                  "kind": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Kind"
+                  },
+                  "limit": {
+                    "anyOf": [
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                    "title": "Limit"
+                  },
+                  "operation": {
+                    "default": "search",
+                    "enum": [
+                      "search",
+                      "read"
+                    ],
+                    "title": "Operation",
+                    "type": "string"
+                  },
+                  "revision": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Revision"
+                  },
+                  "structure": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Structure"
+                  },
+                  "task": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Task"
+                  },
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Version"
+                  }
+                },
+                "title": "ExperienceQuery",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "constraints": {
+                "description": "Property constraints",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Constraints",
+                "type": "array"
+              },
+              "experience_queries": {
+                "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+                "items": {
+                  "$ref": "#/$defs/ExperienceQuery"
+                },
+                "maxItems": 8,
+                "title": "Experience Queries",
+                "type": "array"
+              },
+              "focus": {
+                "description": "Property focus",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Focus",
+                "type": "array"
+              },
+              "question": {
+                "description": "Property question",
+                "minLength": 1,
+                "title": "Question",
+                "type": "string"
+              },
+              "reads": {
+                "description": "Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit",
+                "items": {
+                  "$ref": "#/$defs/EvidenceQuery"
+                },
+                "title": "Reads",
+                "type": "array"
+              },
+              "references": {
+                "description": "Property references",
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "minItems": 1,
+                "title": "References",
+                "type": "array"
+              }
+            },
+            "required": [
+              "question",
+              "references"
+            ],
+            "title": "InvestigationRequest",
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ],
+    "scope": "Original request excerpt, including dynamic tool loading. Other wire fields remain in the source artifact; its candidate may differ from the five-point fixture."
   }
 }

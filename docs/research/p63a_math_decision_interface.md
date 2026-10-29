@@ -21,7 +21,7 @@
 
 ## L0 与 L1 交付实例
 
-[完整机器可读实例](p63a_interface_examples.json) 包含实际生成候选、最终 L0、L1 两个段长行、完整 T1/T2 请求及 Reporter/Main handoff。所有实例 ID 都来自本轮隔离的离线 fixture Store，不能作为未来 Study 的候选所有权或科学引用。
+[完整机器可读实例](p63a_interface_examples.json) 包含实际生成候选、派生 L0 投影、L1 两个段长行、完整 T1/T2 请求及 Reporter/Main handoff。P6.3-B0 已明确 `/l0_kind`：此 `/l0` 没有动态工具目录，不是完整 Provider wire。新增 `/mock_provider_request` 单独复用实际保存的 Mock HTTP L0 与 tools 摘录，五类 capabilities 均有动作，来源 request ref 和 Store 保留；其候选与五点 fixture 不同。所有实例 ID 都来自隔离的离线 fixture Store，不能作为未来 Study 的候选所有权或科学引用。
 
 实例冻结 `bf7-shared-reach-v1-central_high@1.0.0`，有效任务 identity 为 `52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8`，与历史 M1 central_high 相同。它是新生成的合法工程候选，不继承历史成功结构、控制或任务接受。选用该条件和两段长仅用于接口验证。
 
@@ -35,7 +35,8 @@ L0 新增字段的实际内容（下列是摘录，完整对象见 JSON `/l0/mat
   "parameters": {
     "total": 39,
     "continuous_authorized": 2,
-    "categories": ["controller", "discretization", "geometry", "routing", "segment", "tendon", "topology"]
+    "categories": ["segment"],
+    "registered_categories": ["controller", "discretization", "geometry", "routing", "segment", "tendon", "topology"]
   },
   "metrics": [
     {"metric_id": "terminal_error_m", "unit": "m"},
@@ -56,7 +57,7 @@ L0 新增字段的实际内容（下列是摘录，完整对象见 JSON `/l0/mat
 }
 ```
 
-完整 L0 还包含候选/任务绑定、每方法 missing、wall_cost=unknown、所有方法目录查询和推断边界。约 2.3 KB 紧凑 JSON。完整参数表留在 L1，其他方法继续通过既有目录发现。没有候选时明确 `requires_owned_candidate`。此 fixture 没有正式数学 scope，末尾还测试了预算耗尽，因此显示 unauthorized 与真实 missing，而非伪装 ready。正式授权、参数准备和预算是独立条件。
+派生 L0 的数学字段还包含候选/任务绑定、每方法 missing、wall_cost=unknown、所有方法目录查询和推断边界。完整参数表留在 L1，其他方法继续通过既有目录发现。没有候选时明确 `requires_owned_candidate`。此 fixture 没有正式数学 scope，末尾还测试了预算耗尽，因此显示 unauthorized 与真实 missing，而非伪装 ready。正式授权、参数准备和预算是独立条件。P6.3-B0 将 categories 限定为当前 Study 获准且有效的连续参数类别；registered_categories 单列全部注册类别，原域和授权规则未改。
 
 L1 由 `family_analysis_parameters` → 原 `parameter_capabilities`、当前 `TaskAdapter.analysis_requirements` 和已有 methods 合成：
 

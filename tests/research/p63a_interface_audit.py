@@ -1,9 +1,10 @@
 """Read existing offline fixtures and historical sources; never start a Worker.
 
-Run the focused test module first. Output contains synthetic interface examples,
+Reuse a completed fixture via --fixture-store. Output contains synthetic interface examples,
 not scientific evidence, and scoped historical code-availability observations.
 """
 import json
+import argparse
 from pathlib import Path
 import subprocess
 
@@ -59,19 +60,27 @@ def historical_support():
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--fixture-store',type=Path,help='Read an existing completed fixture; never rerun its calculations')
+    parser.add_argument('--wire-store',type=Path,help='Read an existing Mock HTTP request; copied as a separate exact excerpt')
+    parser.add_argument('--examples-only',action='store_true',help='Leave the historical nine-task audit unchanged')
+    args=parser.parse_args()
     h=None
-    for root in sorted((ROOT/'runs').glob('p63a-fixture-*'),key=lambda p:p.stat().st_mtime,reverse=True):
+    roots=([args.fixture_store] if args.fixture_store else
+        sorted((ROOT/'runs').glob('p63a-fixture-*'),key=lambda p:p.stat().st_mtime,reverse=True))
+    for root in roots:
         if not (root/'platform.sqlite').is_file():continue
         candidate_host=Host(root,root.name);s=state(candidate_host)
         if len(s.get('analysis_results',[]))==6 and reporter.entries(candidate_host):
             h=candidate_host;break
-    if h is None:raise ValueError('Run test_p63a_math_interface first; completed fixture required')
+    if h is None:raise ValueError('Pass --fixture-store pointing to an existing completed fixture')
     s=state(h);refs=s['analysis_results'];base=h.store.artifact(refs[0])['candidate']
     view=mathematical_method_view(h,base);research=view['research_opportunities']
     report_ref,saved=reporter.entries(h)[-1]
     brief=agent_decision_brief(h)
     example=dict(label='OFFLINE SYNTHETIC INTERFACE FIXTURE; NOT SCIENTIFIC EVIDENCE',
         fixture_store=str(h.store.root),candidate=base,
+        l0_kind='derived_projection_without_dynamic_tool_directory; not a complete Provider wire',
         l0=information_flow_brief(brief,research_decision_brief_v3(brief)),
         l1={**research,'parameters':[p for p in research['parameters'] if p['parameter_id'] in ('segments.0.length_m','segments.1.length_m')]},
         requests=dict(T1=h.store.artifact(refs[0])['requested_operation'],T2=h.store.artifact(refs[-1])['requested_operation']),
@@ -79,8 +88,17 @@ def main():
         accounting=dict(synthetic_mathematical_admissions=s['mathematical_evaluations'],
             ledger=h.store.remaining()['used'],real_provider_requests=0,real_mathematical_workers=0,
             real_physical_workers=0,NMPC=0,RL=0))
+    if args.wire_store:
+        wire_host=Host(args.wire_store,args.wire_store.name)
+        event=next(e for e in reversed(wire_host.store.events(wire_host.run_id)) if e['kind']=='r3_request')
+        metadata=wire_host.store.artifact(event['outputs'][0]);wire=wire_host.store.artifact(metadata['request'])
+        delivered=json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']
+        example['mock_provider_request']=dict(label='Exact recorded Mock HTTP L0 and tool Schema excerpt; no live Provider',
+            source_store=str(wire_host.store.root),source_reference=metadata['request'],
+            model=wire['model'],l0=delivered,tools=wire['tools'],
+            scope='Original request excerpt, including dynamic tool loading. Other wire fields remain in the source artifact; its candidate may differ from the five-point fixture.')
     atomic_json(ROOT/'docs/research/p63a_interface_examples.json',example)
-    atomic_json(ROOT/'docs/research/p63a_tool_support.json',historical_support())
+    if not args.examples_only:atomic_json(ROOT/'docs/research/p63a_tool_support.json',historical_support())
     print(json.dumps(dict(examples='docs/research/p63a_interface_examples.json',matrix='docs/research/p63a_tool_support.json',
         fixture=h.run_id,real_executions=0)))
 

@@ -362,13 +362,15 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
 def mathematical_opportunity_summary(view):
     """L0 discovery only; the complete parameter table stays in L1."""
     research=view['research_opportunities'];rows=research['parameters']
+    authorized=[p for p in rows if p['study_authorized'] and p['continuous_perturbation']
+        and p['effective_in_current_execution']]
     linked={link['method'] for p in rows for link in p['method_links']}
     linked.update(m['method'] for m in research['metrics'] if 'method' in m)
     return dict(version=research['version'],candidate=view['candidate'],
         task_binding=research['task_binding'],
-        parameters=dict(total=len(rows),continuous_authorized=sum(
-            bool(p['continuous_perturbation'] and p['study_authorized']) for p in rows),
-            categories=sorted({p['category'] for p in rows})),
+        parameters=dict(total=len(rows),continuous_authorized=len(authorized),
+            categories=sorted({p['category'] for p in authorized}),
+            registered_categories=sorted({p['category'] for p in rows})),
         metrics=[dict(metric_id=m['metric_id'],unit=m.get('unit',m.get('constraint',{}).get('signal',{}).get('units')))
             for m in research['metrics']],
         methods=[dict(method=k,status=m['planning_status'],missing=m['missing'],
