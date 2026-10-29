@@ -352,7 +352,9 @@ def quantitative_facts(value, reference):
     replay=trajectory.get('replay') or {}
     if replay.get('records'):
         facts['replay_checks']={k:v for k,v in replay.items() if k not in ('records','states','outputs') and not isinstance(v,(dict,list))}
-        facts['sampled_constraints']=dict(checked_samples=len(replay['records']),
+        times=sorted({r['absolute_time_s'] for r in replay['records']})
+        facts['sampled_constraints']=dict(checked_constraint_sample_records=len(replay['records']),
+            checked_unique_times_s=times,checked_time_range_s=[min(times),max(times)],
             failed_samples=[dict(constraint_id=r['constraint_id'],time_s=r['absolute_time_s'],
                 value=r['value'],unit=r.get('units'),violation=r.get('violation'),
                 source=dict(reference=reference,pointer=f'/trajectory/replay/records/{i}'))

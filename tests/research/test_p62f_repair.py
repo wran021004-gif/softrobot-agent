@@ -48,6 +48,9 @@ class RepairTests(unittest.TestCase):
         self.assertIn('not force',q['operating_point']['residual_semantics'])
         self.assertEqual({r['constraint_id'] for r in q['sampled_constraints']['failed_samples']},
             {'holding_max_error_m','holding_max_speed_m_s'})
+        self.assertEqual(q['sampled_constraints']['checked_constraint_sample_records'],13)
+        self.assertEqual(len(q['sampled_constraints']['checked_unique_times_s']),6)
+        self.assertEqual(q['sampled_constraints']['checked_time_range_s'],[.3,.35000000000000003])
         self.assertLess(len(json.dumps(payload)),35000)
         for m in result['metrics']:
             self.assertEqual(reporter.read_evidence(self.h,m['source'],record_read=False),m['value'])
