@@ -1145,8 +1145,10 @@ def current_research_state(host, brief, intent, trace):
         q=item.get('query') or {}
         if item['status']=='success' and q.get('reference')==ref and q.get('view')=='mathematical_capabilities' and q.get('pointer','').startswith('/methods/'):
             methods_read.append(q['pointer'].split('/')[2])
+    from tools.research.state import protected,readable_results
+    provenance_readable=ref and (not (closeout or protected(host)) or ref in readable_results(s,host))
     return dict(phase=phase,object=dict(candidate=ref,origin=owner,
-            provenance_query=dict(reference=ref,view='full',pointer='/provenance') if ref else None,
+            provenance_query=dict(reference=ref,view='full',pointer='/provenance') if provenance_readable else None,
             compiled=bool(candidate.get('compiled')),control_initialized=bool(candidate.get('control_initialized')),
             mathematical_result=bool(candidate.get('mathematically_evaluated')),
             independently_evaluated=bool(candidate.get('physically_evaluated')),
@@ -1335,9 +1337,14 @@ def agent_decision_brief(host):
         brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)
     brief['current_research_state']=current_research_state(host,brief,intent,trace)
+    if not brief['current_research_state']['object']['provenance_query']:
+        for key in ('provenance_query','parameters_query'):brief['current_candidate'].pop(key,None)
     if brief.get('selected_mathematical_method'):
         from tools.research.task_constraints import mathematical_action_view
         brief['analysis_handoff']=mathematical_action_view(brief['selected_mathematical_method'])
+        guide=brief['selected_mathematical_method'].get('operating_point_guidance',{})
+        brief['analysis_handoff']['operating_point_sources']={k:guide[k] for k in
+            ('operating_points','available_source_references','unavailable_sources') if k in guide}
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
@@ -1465,6 +1472,9 @@ def information_flow_brief(brief, delivered):
             'required_sources','missing','planning_status','formal_execution_authorized','execution_status','estimated_evaluations','request_template_query')}
         continuation['analysis_handoff'].update(tool='research_analysis',loaded=loaded.get('tool')=='research_analysis',
             remaining_scientific_fields=handoff.get('remaining_scientific_fields',[]),
+            remaining_scientific_fields_scope='Top-level required fields in the current Provider Schema only; conditional sources are listed separately. All original AnalysisRequest admission applies.',
+            conditional_scientific_inputs=handoff.get('conditional_scientific_inputs',[]),
+            operating_point_sources=handoff.get('operating_point_sources',{}),
             next='Submit scientific variables directly to loaded research_analysis; source, parameter and budget admission still applies.' if loaded.get('tool')=='research_analysis' else 'research_analysis is not loaded; consult current tool directory and method prerequisites.')
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):

@@ -1070,7 +1070,12 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             handoff=boundary.research_packet['research'].get('analysis_handoff')
             if handoff:
                 analysis_tool=registry.get('research_analysis')
-                handoff['remaining_scientific_fields']=(analysis_tool.tool_spec['inputSchema']['json'].get('required',[]) if analysis_tool else [])
+                schema=analysis_tool.tool_spec['inputSchema']['json'] if analysis_tool else {}
+                handoff['remaining_scientific_fields']=schema.get('required',[])
+                handoff['conditional_scientific_inputs']=([dict(when=dict(operating_point='saved_state'),
+                    exactly_one_of=[['saved_state'],['execution','update_id']],
+                    rule='Use an exact candidate-bound state source. Other operating points must omit these sources; a legal point enum does not imply a saved source exists.')]
+                    if 'saved_state' in schema.get('properties',{}).get('operating_point',{}).get('enum',[]) else [])
             if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
                 boundary.research_packet['research']['generation_contract']=dict(
                     family_space_identity=s['spec']['family_space_identity'],

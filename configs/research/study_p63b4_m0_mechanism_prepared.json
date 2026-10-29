@@ -1,0 +1,129 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "initial_structure_strategy": "agent_choice",
+  "study_id": "p63b4-m0-mechanism-20261029",
+  "base_commit": "58d5a793223c2c71b145abd3f19a351eb508c7f7",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: Operator M0 fixed_input_structure_v1 only, three mathematical evaluations, zero Provider/independent physics; no scientific Worker until separate approval of the exact prepared request and Study identity.",
+  "mode": "engineering_numerical",
+  "task": "../../tasks/bf7_shared_reach_v1_central_high.json",
+  "control": "control.json",
+  "runtime": "runtime_p63b1_sol_none.json",
+  "evidence_destination": "evidence/p63b4_m0_mechanism_20261029",
+  "capabilities": [
+    "analysis"
+  ],
+  "allowed_plan_actions": [
+    "diagnose",
+    "stop"
+  ],
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "cells_per_segment": 12
+  },
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "provider_reserve_policy": "last_requests_v2",
+    "public_operations": 8,
+    "protected_public_operations": 0,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 3,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "physical_replay_limit": 0,
+  "reserve_rl_evaluation": false,
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "native_control_limits": {
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "knots_s": 4
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.0.length_m"
+    ]
+  },
+  "knowledge": {
+    "mode": "off"
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 4,
+      "evidence": 3
+    },
+    "architecture": "english_decision_v1",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "bound_scientific_variables_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    }
+  },
+  "scoring_window_s": 0.6,
+  "analysis_protocol": {
+    "windows_s": [
+      0.06,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.54,
+      0.58
+    ]
+  },
+  "execution_instructions": "Operator-defined M0 engineering pilot only; no Main autonomy claim and no Provider requests. One fixed_input_structure_v1 request at the frozen initial named qpos/qvel with fixed candidate pretension and +/-0.001 m in segments.0.length_m. Preparation is not execution authorization. Preserve original request admission, numerical costs and model-scoped conclusions; no independent task acceptance, retries, alternate structure or optimizer is prescribed."
+}
