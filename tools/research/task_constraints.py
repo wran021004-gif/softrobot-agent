@@ -146,11 +146,13 @@ def mathematical_method_view(host, reference):
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
         if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
             request.update(model_source='mujoco',operating_point='standardized_initial_pretension')
-            required.append('Frozen initialization needs no saved source; optional saved_state OR execution + update_id uses operating_point=saved_state')
-            if key!='mujoco_direct_control_v1':required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
+            required.append('operating_point: frozen initialization OR saved_state with exact saved_state / execution + update_id source')
+            if key=='native_dynamics_v1':required.append('Optional native.tensions_n; otherwise use the selected point input')
+            elif key=='fixed_input_structure_v1':required.append('Optional native={tensions_n,horizon_s}; fixed across structure comparisons')
+            elif key=='short_input_response_v1':required.append('Optional native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
         if key=='mujoco_direct_control_v1':
             required.append('control_optimization={source,settings}; v2 settings require explicit correction_window_s and knots_s. Window starts at the selected native state and ends at the frozen task deadline, covering all required samples.')
-        if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
+        if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; choose a legal continuous variable and owned same-task comparable single-parameter candidates; fixed input is not reoptimized capability')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
         if row.get('capability_method'):request['capability_method']=CONIC
         if key==SENSITIVITY:required.append('optimal_sensitivity={variable,steps,model_results baseline first}; validated stencil required')
@@ -168,6 +170,7 @@ def mathematical_method_view(host, reference):
                 ([] if authorization['registered_study_scope_authorized'] is True else ['formal_study_math_scope_required'])+
                 (['study_stopped'] if s['research_status']=='stopped' else ['protected_closeout'] if closed else []),
             estimated_evaluations=row['evaluations'],wall_cost='unknown',
+            estimated_evaluation_range=row.get('evaluation_range',[row['evaluations'],row['evaluations']]),
             cost_scope=row.get('evaluation_rule','Model preparation and internal solver attempts are distinct; see original receipts.'),
             limitations=row['limitations'],prerequisites=row['prerequisites'],applicability=row,
             required_parameters=required,request_template=request,
@@ -285,6 +288,21 @@ def mathematical_method_view(host, reference):
 
         methods[method]=item
     for method,item in methods.items():
+        template=item['request_template']
+        points=analysis_operating_points(method,item['operation'])
+        item['already_bound']={k:template[k] for k in ('candidate','protocol','operation','capability_method') if k in template}
+        if template.get('model_source')=='mujoco':item['already_bound']['model_source']='mujoco'
+        if len(points)==1 and points[0]!='saved_state':item['already_bound']['operating_point']=points[0]
+        item['required_sources']=item['prerequisites']
+        if method=='fixed_input_structure_v1':
+            item['required_sources']=['Current owned candidate and same-task legal comparable single-parameter structure candidates; Main must select them.',
+                'Frozen initial state or exact candidate-bound saved_state / execution + update_id; equal physical inputs and comparison conditions.']
+        elif method=='design_sensitivity':
+            item['required_sources']=['Current candidate, minus_candidate and plus_candidate for one legal continuous variable; fixed physical input.']
+        elif method in (T1,'mujoco_direct_control_v1'):
+            item['required_sources']=['Current candidate and a legal initialized or explicitly rebound control_optimization.source; Main chooses settings.']
+        elif method==T2:item['required_sources']=['Comparable completed same-task T1 results; original stencil admission applies.']
+        item['request_template_query']={**item['detail_query'],'pointer':item['detail_query']['pointer']+'/request_template'}
         item['scientific_scope']=dict(computes=item['description'],
             model_sources=item.get('model_sources'),operating_points=analysis_operating_points(method,item['operation']),
             legal_sources='Exact owned candidate, model, physical input bounds, state provenance and frozen task/protocol; source admission remains mandatory.',
@@ -304,6 +322,34 @@ def mathematical_method_view(host, reference):
         research_opportunities=mathematical_research_view(spec,c,reference,requirements,methods),
         scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
+
+
+def mathematical_action_view(detail):
+    """Prioritize action fields of one original registered method; no new catalog."""
+    import json
+    keys=('method','operation','scientific_purpose','description','planning_status','missing',
+        'required_parameters','required_sources','estimated_evaluations','estimated_evaluation_range','wall_cost',
+        'cost_scope','formal_execution_authorized','execution_status','request_template_query')
+    result={k:detail[k] for k in keys if k in detail}
+    row=detail['applicability']
+    result['applicability']={k:row[k] for k in ('status','model','task_applicable','reasons') if k in row}
+    result['applicability'].update(task_family=detail['task_family'],kernel_supported=detail['kernel_supported'])
+    result['limitations']=['Mechanism diagnostics and task sensitivities remain model-scoped; independent task evaluation alone establishes acceptance.']
+    query=detail['detail_query']
+    fields=list(detail)
+    result['full_detail_queries']=[{**query,'fields':fields[i:i+32]} for i in range(0,len(fields),32)]
+    result['query_rule']='Keep view=mathematical_capabilities for all derived subpaths and fields. Explicit fields retrieve the original method object.'
+    if len(json.dumps(detail['request_template'],ensure_ascii=False).encode())<=1000:
+        result['request_template']=detail['request_template']
+    result['next_submission']=dict(tool='research_plan',action='diagnose',
+        available=detail['formal_execution_authorized'] and detail['planning_status'] not in ('unauthorized','unsupported','insufficient_budget','blocked'),
+        after_completed_diagnose='research_analysis; original source, parameter and budget admission applies.')
+    result['already_bound']=dict(fields=list(detail['already_bound']),
+        query={**query,'pointer':query['pointer']+'/already_bound'})
+    # Put the executable entry before large source/template objects in the
+    # existing selected-facts handoff projection as well as the direct response.
+    result={'next_submission':result.pop('next_submission'),**result}
+    return result
 
 
 def mathematical_research_view(spec, candidate, reference, requirements, methods):
@@ -419,7 +465,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     """Candidates for existing operations, using the same execution applicability gate."""
     from types import SimpleNamespace
     from typing import get_args
-    from tools.research.contracts import AnalysisRequest,NativeAnalysisOptions
+    from tools.research.contracts import AnalysisRequest,NativeAnalysisOptions,NativeStructureResponse
     from schemas.platform_analysis import TaskAnalysisProtocol
     from schemas.platform import SessionInput
     configuration=SessionInput.model_validate(configuration)
@@ -436,6 +482,12 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             scoring_window_s=p.windows_s[0] if p.windows_s else None,
             native=NativeAnalysisOptions() if native else None,control_optimization=None)
         parameters=[]
+        if operation=='fixed_input_structure_v1':
+            parameters=['structure_response.variable: choose a legal continuous structure variable',
+                'structure_response.candidates: select owned same-task legal comparable single-parameter candidates']
+        if operation=='design_sensitivity':
+            parameters=['design_sensitivity.variable','design_sensitivity.step',
+                'design_sensitivity.minus_candidate','design_sensitivity.plus_candidate']
         if operation=='mujoco_direct_control_v1':
             # Probe only required coverage, not a fabricated executable source or search settings.
             start=(exact_point or {}).get('actual_time_s',0.)
@@ -448,7 +500,11 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             reasons.append('Exact saved state required.')
         planning='unsupported' if reasons else 'requires_parameters' if parameters else 'ready'
         count=3 if operation in ('design_sensitivity','fixed_input_structure_v1') else 1
-        budget=None if remaining_evaluations is None else remaining_evaluations>=count
+        evaluation_range=[count,count]
+        if operation=='fixed_input_structure_v1':
+            comparison=NativeStructureResponse.model_json_schema()['properties']['candidates']
+            evaluation_range=[1+comparison['minItems'],1+comparison['maxItems']]
+        budget=None if remaining_evaluations is None else remaining_evaluations>=evaluation_range[0]
         if budget is False:reasons.append('Insufficient mathematical evaluation budget.')
         rows.append(dict(operation=operation,status='not_applicable' if reasons else 'requires_parameters' if parameters else applicability['status'],
             planning_status='unsupported' if planning=='unsupported' else 'insufficient_budget' if budget is False else planning,
@@ -460,11 +516,11 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             category='native_control_diagnostic' if operation=='mujoco_direct_control_v1' else 'task_capability_estimate' if operation=='task_capability' else 'sampled_feasibility' if sampled else 'diagnostic',
             control='bounded native sequence reoptimization' if operation=='mujoco_direct_control_v1' else 'reoptimized; optional fixed baseline replay' if operation=='task_capability' else
                 'bounded sequence search' if sampled or operation in ('endpoint','braking') else 'operating-point diagnostic',
-            prerequisites=['candidate','frozen protocol',point]+(['paired structure candidates'] if operation=='design_sensitivity' else []),
+            prerequisites=['candidate','frozen protocol',point]+(['paired structure candidates'] if operation in ('design_sensitivity','fixed_input_structure_v1') else []),
             time_scope='aligned post-step samples over actual remaining horizon' if sampled else
                 'static operating point' if static else 'declared local scoring window or exact instant',
             coverage=applicability['constraint_coverage'],full_task_supported=applicability['full_task_supported'],
-            budget_allowed=budget,evaluations=count,wall_cost='unknown',
+            budget_allowed=budget,evaluations=count,evaluation_range=evaluation_range,wall_cost='unknown',
             limitations=['Model-scoped calculation; independent physical acceptance required.',
                 'Final admission checks candidate, exact state, numerical time budget and constructed outputs.']))
     if mathematical_methods:

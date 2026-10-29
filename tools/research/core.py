@@ -38,6 +38,9 @@ def read_tool_evidence(host,query,*,record_read=True):
     if q.view=='full' and not q.pointer:
         return read_evidence(host,query,record_read=record_read)
     value=read_evidence(host,query,record_read=False)
+    if q.view=='mathematical_capabilities' and q.pointer.startswith('/methods/') and q.pointer.count('/')==2:
+        from tools.research.task_constraints import mathematical_action_view
+        return _record_evidence_read(host,q,state(host),value if q.fields else mathematical_action_view(value),record_read)
     body=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
     if len(body)<=4096:
         return _record_evidence_read(host,q,state(host),value,record_read)

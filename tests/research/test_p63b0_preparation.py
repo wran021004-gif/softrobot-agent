@@ -75,7 +75,7 @@ class PreparationTests(unittest.TestCase):
                 ('research_plan',plan),None])
             self.assertIsNotNone(agent.selected_analysis(h,None))
             schema=next(t['function']['parameters'] for t in wires[-1]['tools'] if t['function']['name']=='research_analysis')
-            payload=dict(operating_point='standardized_initial_pretension',control_optimization=request['control_optimization'])
+            payload=dict(control_optimization=request['control_optimization'])
             Draft202012Validator(schema).validate(payload)
             bound=agent.bind_selected_analysis_request(h,payload,tool_use_id='offline-b0-binding')
             self.assertEqual(bound['candidate'],candidate);self.assertEqual(bound['protocol'],spec['analysis_protocol'])
@@ -103,8 +103,7 @@ class PreparationTests(unittest.TestCase):
             method=mathematical_method_view(h,candidate)['methods'][T2]
             self.assertEqual(method['planning_status'],'ready');self.assertTrue(method['executable'])
             schema=agent.selected_analysis_schema(T2,method,bound=True)
-            payload=dict(operating_point='standardized_initial_pretension',
-                nonlinear_response=method['request_template']['nonlinear_response'])
+            payload=dict(nonlinear_response=method['request_template']['nonlinear_response'])
             Draft202012Validator(schema).validate(payload)
         self.assertEqual(state(h),before)
 

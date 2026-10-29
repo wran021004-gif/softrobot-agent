@@ -554,7 +554,8 @@ def working_set(host,current):
             profile_identity=c.get('profile_identity'),current_profile_identity=s['profile']['identity'],
             executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'],
             resolved_facts=resolved_candidate_facts(c,candidate),
-            parameters_query=dict(reference=candidate,pointer='/parameters'),
+            parameters_query=dict(reference=candidate,view='full',pointer='/parameters'),
+            provenance_query=dict(reference=candidate,view='full',pointer='/provenance'),
             structure=dict(segments=sum(p['kind']=='flexible_segment' for p in c['configuration']['robot']['structure']['data']['components']),
                 tendons=len(c['configuration']['robot']['structure']['data']['tendons'])),
             generated=True,compiled=True,control_initialized=bool(controls),control_sources=controls,
@@ -730,7 +731,7 @@ def decision_brief(current):
         'tool_readiness','all_fresh_results','control_initialization_methods')
     brief={k:deepcopy(current[k]) for k in keys if k in current}
     ws=current['evidence_working_set'];feedback=current['decision_feedback']
-    anchor=next(iter(ws['source_references']),current.get('structure_domain'))
+    anchor=current.get('structure_domain') or next(iter(ws['source_references']),None)
     brief['evidence_access']=dict(reference=anchor,view='working_set',pointer='',
         scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage, source_references or citation_eligibility. Original references support full/fields/range reads.')
     brief['citation_eligibility']=dict(query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
@@ -825,7 +826,7 @@ def tool_continuation(host):
     for event in host.store.events(host.run_id):
         if event['kind']=='research_tool_route':
             route=host.store.artifact(event['outputs'][0])
-            selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],
+            selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],sequence=event['sequence'],
                 source=event['outputs'][0],status='selected_not_submitted')
             if route['tool']=='research_plan':
                 plan_action=route['action'];plan_selection=deepcopy(selection)
@@ -1103,6 +1104,59 @@ def controller_capabilities(host):
         patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned')
 
 
+def current_research_state(host, brief, intent, trace):
+    """Describe existing provenance/receipts; never select a scientific direction."""
+    s=state(host);candidate=brief.get('current_candidate') or {};ref=candidate.get('candidate')
+    provenance=host.store.artifact(ref).get('provenance',{}) if ref else {}
+    owner=provenance.get('decision_owner')
+    if owner not in ('Main','Operator','historical'):
+        owner=('Main' if provenance.get('origin')=='model' and provenance.get('plan') in s.get('plans',[]) else
+            'historical' if provenance.get('origin') in ('engineering_history_materialization','initial_controller_reference') else 'unknown')
+    completed=[]
+    for key,label in (('compiled','legal_candidate_compiled'),('control_initialized','control_initialized'),
+            ('mathematically_evaluated','mathematical_result_recorded'),('physically_evaluated','independent_task_evaluated')):
+        if candidate.get(key):completed.append(label)
+    if brief.get('experience_read_progress'):completed.append('Knowledge_read_receipt_recorded')
+    latest=intent.get('latest_decision') or {};hypothesis=latest.get('agent_hypothesis') or {}
+    if hypothesis.get('hypothesis'):completed.append('Main_hypothesis_recorded')
+    if latest.get('action')=='diagnose' and latest.get('execution_status')=='completed':completed.append('diagnose_plan_completed')
+    continuation=brief.get('tool_continuation') or {};selection=continuation.get('selection') or {}
+    rows=trace['recent'];last=rows[-1] if rows else {}
+    status=('request_rejected' if last.get('execution_status') in ('rejected','failed') else
+        'pending' if last.get('execution_status')=='pending' else 'request_submitted' if last else None)
+    if last.get('result_references'):
+        physical=[*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+        status='physical_result_recorded' if any(r in physical for r in last['result_references']) else 'mathematical_result_recorded'
+    source=last.get('source')
+    if selection.get('status')=='selected_not_submitted' and selection.get('sequence',0)>last.get('step',0):
+        status='tool_selected_not_submitted';source=selection.get('source')
+    closeout=brief['budget'].get('closeout',{}).get('next_request_will_protect',False)
+    phase='pending' if s.get('pending') else 'budget_closeout' if closeout else 'research'
+    if s.get('pending'):status='pending'
+    unresolved=[]
+    if hypothesis.get('weakening_observation') and not latest.get('actual_result'):
+        unresolved.append(dict(text=hypothesis['weakening_observation'][:240],source=latest['plan_reference'],
+            scope='Main falsification target; unresolved until Main assesses evidence'))
+    if last.get('execution_status') in ('rejected','failed'):
+        outcome=last['outcome']
+        unresolved.append(dict(tool_feedback=outcome.get('error') or outcome.get('error_code') or outcome.get('status'),source=last['source']))
+    methods_read=[]
+    for item in continuation.get('recent',[]):
+        q=item.get('query') or {}
+        if item['status']=='success' and q.get('reference')==ref and q.get('view')=='mathematical_capabilities' and q.get('pointer','').startswith('/methods/'):
+            methods_read.append(q['pointer'].split('/')[2])
+    return dict(phase=phase,object=dict(candidate=ref,origin=owner,
+            provenance_query=dict(reference=ref,view='full',pointer='/provenance') if ref else None,
+            compiled=bool(candidate.get('compiled')),control_initialized=bool(candidate.get('control_initialized')),
+            mathematical_result=bool(candidate.get('mathematically_evaluated')),
+            independently_evaluated=bool(candidate.get('physically_evaluated')),
+            task_acceptance='accepted' if candidate.get('accepted') else 'not_accepted' if candidate.get('physically_evaluated') else 'unmeasured'),
+        completed=completed,methods_read=sorted(set(methods_read)),
+        last_effective_action=dict(status=status or phase,action=selection.get('action') if status=='tool_selected_not_submitted' else last.get('action'),source=source),
+        unresolved=unresolved,
+        scope='Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence.')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -1194,6 +1248,7 @@ def agent_decision_brief(host):
                 'query':dict(reference=anchor,view='working_set',pointer='/control_result_links/'+str(i),fields=fields)})
             if len(sources)==3:break
         facts.update(control_sources=sources,
+            parameters_query=row['parameters_query'],provenance_query=row['provenance_query'],
             control_source_status='complete_sequence_recorded' if any(r.get('full_control_sequence') for _,r in relevant) else 'no_complete_bound_sequence_recorded',
             details_query=dict(reference=anchor,view='working_set',pointer='/candidate_index/'+str(ws['candidate_index'].index(row))),
             control_source_scope='Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.')
@@ -1279,6 +1334,10 @@ def agent_decision_brief(host):
         brief['milestone_trace']['action_total']=trace['total']
         brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)
+    brief['current_research_state']=current_research_state(host,brief,intent,trace)
+    if brief.get('selected_mathematical_method'):
+        from tools.research.task_constraints import mathematical_action_view
+        brief['analysis_handoff']=mathematical_action_view(brief['selected_mathematical_method'])
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
@@ -1343,6 +1402,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
             task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),
             pending_feedback=brief.get('pending_feedback_delivery')),
+        current_research_state=brief.get('current_research_state'),analysis_handoff=brief.get('analysis_handoff'),
         verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
@@ -1392,6 +1452,20 @@ def information_flow_brief(brief, delivered):
             instruction='This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.')
         if loaded['plan_action']=='generate' and value.get('generation_contract'):
             continuation['direct_plan']['generation_inputs']=value['generation_contract']['generation_inputs']
+        if loaded['plan_action']=='diagnose':
+            continuation['direct_plan'].update(status='tool_selected_not_submitted' if
+                (continuation.get('plan_selection') or {}).get('status')=='selected_not_submitted' else 'loaded',
+                scientific_fields=['hypothesis','decision.selected_candidate','decision.selected_method',
+                    'expected_observation','weakening_observation','fixed_conditions'],
+                current_hypothesis=hypothesis.get('hypothesis'),candidate=current.get('current_candidate'),
+                instruction='Diagnose is loaded; tool selection has not submitted scientific choices. Submit research_plan(action=diagnose) directly with your hypothesis, candidate and registered method; no research_route call is needed.')
+    handoff=value.get('analysis_handoff')
+    if handoff:
+        continuation['analysis_handoff']={k:handoff[k] for k in ('method','operation','already_bound','required_parameters',
+            'required_sources','missing','planning_status','formal_execution_authorized','execution_status','estimated_evaluations','request_template_query')}
+        continuation['analysis_handoff'].update(tool='research_analysis',loaded=loaded.get('tool')=='research_analysis',
+            remaining_scientific_fields=handoff.get('remaining_scientific_fields',[]),
+            next='Submit scientific variables directly to loaded research_analysis; source, parameter and budget admission still applies.' if loaded.get('tool')=='research_analysis' else 'research_analysis is not loaded; consult current tool directory and method prerequisites.')
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source
@@ -1463,7 +1537,8 @@ def information_flow_brief(brief, delivered):
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     return dict(version='research_information_flow_v1',
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
-        research_focus=focus,verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
+        research_focus=focus,current_research_state=value.get('current_research_state'),
+        verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
         research_trace=trace,
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),

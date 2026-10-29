@@ -161,7 +161,7 @@ class MathInterfaceTests(unittest.TestCase):
                 direction_id='length0',variables={'segments.0.length_m':1.},coordinate_unit='m',
                 coordinates=[0.,-.005,.005],t1_results=[ref]*3)])))]
         for method,payload in payloads:
-            detail=view['methods'][method];payload['operating_point']='standardized_initial_pretension'
+            detail=view['methods'][method]
             schema=provider_schema(agent.selected_analysis_schema(method,detail,bound=True))
             Draft202012Validator.check_schema(schema);Draft202012Validator(schema).validate(payload)
             self.assertFalse({'allOf','anyOf','oneOf','not'} & schema.keys())

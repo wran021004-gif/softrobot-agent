@@ -319,11 +319,17 @@ def selected_analysis_schema(method, detail, *, bound=False):
         points=analysis_operating_points(method,operation)
         schema['properties']['operating_point']={**schema['properties']['operating_point'],'enum':points}
         schema['properties']['operating_point'].pop('default',None)
+        if len(points)==1 and points[0]!='saved_state':
+            schema['properties'].pop('operating_point')
+            schema['required'].remove('operating_point')
         if operation not in ('linearization','controllability'):schema['properties'].pop('scoring_window_s',None)
         schema['allOf']=[{'if':{'properties':{'operating_point':{'const':'saved_state'}},'required':['operating_point']},
             'then':{'oneOf':[{'required':['saved_state'],'properties':{'saved_state':{'$ref':'#/$defs/EvidenceRef'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
                 {'required':['execution','update_id'],'properties':{'execution':{'$ref':'#/$defs/EvidenceRef'},'update_id':{'type':'integer','minimum':0},'saved_state':{'type':'null'}}}]},
             'else':{'properties':{k:{'type':'null'} for k in ('saved_state','execution','update_id')}}}]
+        if len(points)==1 and points[0]!='saved_state':
+            schema.pop('allOf')
+            for key in ('saved_state','execution','update_id'):schema['properties'].pop(key,None)
         if 'scoring_window_s' in schema['properties'] and template.get('protocol'):
             windows=template['protocol']['windows_s']
             schema['properties']['scoring_window_s']['anyOf']=[{'type':'number','enum':windows},{'type':'null'}]
@@ -380,6 +386,11 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id):
         frozen['model_source']='mujoco';sources['model_source']=dict(source=detail['detail_query'],pointer='/request_template/model_source')
     if 'capability_method' in template:
         frozen['capability_method']=template['capability_method'];sources['capability_method']=dict(source=detail['detail_query'],pointer='/request_template/capability_method')
+    from tools.research.task_constraints import analysis_operating_points
+    points=analysis_operating_points(method,detail['operation'])
+    if len(points)==1 and points[0]!='saved_state':
+        frozen['operating_point']=points[0]
+        sources['operating_point']=dict(source='AnalysisRequest.validate_operating_point',method=method,legal_options=points)
     full={**deepcopy(payload),**frozen}
     audit=record(host,'analysis_request_binding',dict(version=spec['research_decisions']['analysis_interface'],tool_use_id=tool_use_id,
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
@@ -826,7 +837,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
-            ('experience_retrieve','Search curated procedural guidance, then read one exact entry/revision. Historical guidance never grants current scientific evidence or action permission.',ExperienceQuery,'experience'),
+            ('experience_retrieve','Search curated procedural guidance, then execute a result entry read_query exactly. A retrieval receipt artifact ID is not an entry_id. Historical guidance never grants scientific evidence or action permission.',ExperienceQuery,'experience'),
             ('evidence_read','Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.',EvidenceQuery,'evidence')]]
     if recent_policy:
         from tools.research.contracts import ResearchRecallQuery
@@ -1056,6 +1067,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             loaded=load_selected_tool_schema(host,registry,directory)
             boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
                 tool_loading='Submit an already loaded tool directly. Use research_route only to switch tool/action; direct reads preserve the loaded Plan. Selection alone executes nothing.')
+            handoff=boundary.research_packet['research'].get('analysis_handoff')
+            if handoff:
+                analysis_tool=registry.get('research_analysis')
+                handoff['remaining_scientific_fields']=(analysis_tool.tool_spec['inputSchema']['json'].get('required',[]) if analysis_tool else [])
             if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
                 boundary.research_packet['research']['generation_contract']=dict(
                     family_space_identity=s['spec']['family_space_identity'],
