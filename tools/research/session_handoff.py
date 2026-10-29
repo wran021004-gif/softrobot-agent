@@ -446,9 +446,27 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
     # Reporter and read-only Provider probes share accounting, not SDK history.
     # The caller already blocks unsettled/unconsumed Provider outcomes. Unknown
     # purposes still require an anchor; only known non-SDK requests are excluded.
+    events=host.store.events(host.run_id)
+    sends=[e for e in events if e['kind']=='r3_request']
+    if (s.get('spec',{}).get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='on_demand_tools_v3'
+            and len(sends)==1 and not s.get('pending')):
+        from tools.research.provider import received,model_messages
+        send=sends[0];row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])
+        repaired=any(e['kind']=='implementation_binding' and e['sequence']>send['sequence'] for e in events)
+        if repaired and row and row['receipt'] and reception and reception['http_status']==400:
+            receipt=json.loads(row['receipt']);body=json.loads(host.store.artifact(reception['body'],raw=True))
+            wire=host.store.artifact(host.store.artifact(send['outputs'][0])['request'])['messages']
+            normalized=[{k:v for k,v in m.items() if k!='tracking_id'} for m in agent.messages]
+            if (receipt['execution_status']=='failed' and body.get('error',{}).get('code')=='invalid_function_parameters'
+                    and normalized==[dict(role='user',content=[dict(text=INVOCATION_PROMPT)])]
+                    and wire[-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
+                    and model_messages(host,agent.messages,wire[0]['content'])==wire[:-1]):
+                # No model output or tool exists to replay. Resume the exact
+                # saved prompt only after explicit binding of the Schema fix.
+                return 'rejected_initial_request'
     if agent.messages or any(e['kind']=='r3_request' and
             host.store.artifact(e['outputs'][0]).get('purpose') not in ('reporter','provider_validation')
-            for e in host.store.events(host.run_id)):
+            for e in events):
         raise ValueError('SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR')
     return 'empty'
 

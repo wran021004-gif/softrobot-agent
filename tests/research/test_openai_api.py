@@ -5,11 +5,12 @@ import json
 import os
 import unittest
 from unittest.mock import patch
+from openai import BadRequestError
 import httpx
 from tools.platform_tasks import compile_input
 from tools.platform_registry import registry
 from tools.research.config import ROOT, resolve
-from tools.research.provider import credential, request_settings, discover_models, LiveBoundary
+from tools.research.provider import credential, request_settings, discover_models, LiveBoundary, record
 from tools.research.state import state, update
 from tests.research.test_harness_v2 import v2_host
 
@@ -56,6 +57,7 @@ class OpenAIAPITests(unittest.TestCase):
         path.write_text(json.dumps(dict(base_url=p['base_url'],api_key='official-key-fixture')),encoding='utf8')
         r['credentials_reference']=str(path);spec['runtime']=r
         spec['research_decisions']['role_policy']=dict(version='research_roles_v3',main=dict(reasoning='none'),reporter=dict(reasoning='none'))
+        spec['research_decisions']['tool_schema_policy']=dict(version='on_demand_tools_v3')
         update(h,spec=spec,pilot={**s['pilot'],'provider':p})
         sends=[]
         def reply(request):
@@ -64,21 +66,30 @@ class OpenAIAPITests(unittest.TestCase):
             self.assertEqual(request.headers['authorization'],'Bearer official-key-fixture')
             self.assertEqual(wire['store'],False);self.assertEqual(wire['reasoning_effort'],'none')
             self.assertNotIn('thinking',wire);self.assertNotIn('api_key',wire)
-            message=dict(role='assistant',content='Synthetic fixture feedback consumed.')
             if len(sends)==1:
+                return httpx.Response(400,json=dict(error=dict(code='invalid_function_parameters',
+                    type='invalid_request_error',message='Synthetic rejected initial Schema.')))
+            message=dict(role='assistant',content='Synthetic fixture feedback consumed.')
+            if len(sends)==2:
                 message.update(content=None,tool_calls=[dict(id='official-call-fixture',type='function',
                     function=dict(name='research_route',arguments='{"tool":"evidence_read"}'))])
             else:
-                self.assertEqual(len(sends),2)
+                self.assertEqual(len(sends),3)
                 self.assertTrue(any(m.get('tool_call_id')=='official-call-fixture' for m in wire['messages']))
                 self.assertFalse(any('provider_output' in m for m in wire['messages']))
             return httpx.Response(200,json=dict(model=p['model'],choices=[dict(index=0,
-                finish_reason='tool_calls' if len(sends)==1 else 'stop',message=message)]))
+                finish_reason='tool_calls' if len(sends)==2 else 'stop',message=message)]))
         with patch('tools.research.core.guard'),patch('tools.research.agent.guard'), \
                 patch.dict(os.environ,r['threads']),patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(reply)):
+            with self.assertRaises(BadRequestError):
+                asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=2))
+            self.assertEqual(len(sends),1)
+            with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):
+                asyncio.run(converse(h,session_handoff=False,restore_only=True))
+            record(h,'implementation_binding',dict(scope='Explicit offline Schema repair fixture.'),status='committed')
             asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=2,pause_after_completed_invocations=1))
-        self.assertEqual(len(sends),2)
-        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+        self.assertEqual(len(sends),3)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],3)
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
 
 

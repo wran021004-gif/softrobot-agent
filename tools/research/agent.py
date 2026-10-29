@@ -852,6 +852,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             for name,spec in definitions.items():registry[name].tool_spec=deepcopy(spec)
         return restored
     agent=build_session()
+    rejected_initial=False
     from tools.research.session_handoff import unmatched, recover_feedback, trusted_history, INVOCATION_PROMPT
     try:
         if recover_incomplete:
@@ -872,7 +873,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             from tools.research.session_handoff import reconcile
             agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=not reporter_saved or intra_reporter)
         else:
-            trusted_history(host,agent,allow_incomplete=not reporter_saved or intra_reporter)
+            rejected_initial=trusted_history(host,agent,allow_incomplete=not reporter_saved or intra_reporter)=='rejected_initial_request'
         await complete_reports(host,boundary.inner,recover_only=True)
         if unmatched(agent.messages):await recover_feedback(host,agent)
         continuation=state(host).get('pending_authorized_continuation')
@@ -1108,9 +1109,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 # Public SDK continuation resumes the durable unsent prompt or
                 # paired feedback. Adding another prompt would change a saved
                 # request's hash and prevent exact response replay.
-                resume=bool(state(host)['pilot'].get('unconsumed_response') or (agent.messages
+                resume=bool(rejected_initial or state(host)['pilot'].get('unconsumed_response') or (agent.messages
                     and agent.messages[-1]['role']=='user'
                     and any('toolResult' in b for b in agent.messages[-1]['content'])))
+                rejected_initial=False
                 result=await agent.invoke_async(None if resume else INVOCATION_PROMPT)
             except Exception as exc:
                 cause=exc;seen=set()
