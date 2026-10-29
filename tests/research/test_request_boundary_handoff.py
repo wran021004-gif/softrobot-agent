@@ -255,11 +255,11 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         self.assertEqual(old_plan['description'],'Explicit synthetic older Plan description')
         self.assertEqual(new_plan['description'],PLAN_TOOL_DESCRIPTION)
         from tools.research.contracts import PLAN_RESEARCH_INTENTS
-        constraints=[r for r in new_plan['parameters']['allOf'] if 'research_intent' in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
+        constraints=[r for r in new_plan['parameters']['then']['allOf'] if 'research_intent' in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
         projected={a:r['then']['properties']['decision']['properties']['research_intent']['const']
             for r in constraints for a in r['if']['properties']['action']['enum']}
         self.assertEqual(projected,{a:PLAN_RESEARCH_INTENTS[a] for a in new_plan['parameters']['properties']['action']['enum']})
-        self.assertNotEqual(old_plan['parameters']['allOf'],new_plan['parameters']['allOf'])
+        self.assertNotEqual(old_plan['parameters']['then']['allOf'],new_plan['parameters']['then']['allOf'])
 
     def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
         h=self.provision();sent=[];update(h,count_closeout=True)

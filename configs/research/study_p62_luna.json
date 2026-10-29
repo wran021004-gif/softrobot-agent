@@ -1,0 +1,215 @@
+{
+  "evaluation_version": 1,
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    0,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "execution_allowances": {
+    "simulation_s": null,
+    "evaluation_s": null,
+    "profile_s": null,
+    "construction_s": null
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "segments.near.length_m": [
+      0.152,
+      0.168
+    ],
+    "segments.near.young_pa": [
+      6120000.0,
+      8279999.999999999
+    ],
+    "segments.near.sections.0.semi_y_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.near.sections.0.semi_z_m": [
+      0.00722,
+      0.007980000000000001
+    ],
+    "segments.distal1.length_m": [
+      0.1045,
+      0.1155
+    ],
+    "segments.distal1.young_pa": [
+      4590000.0,
+      6209999.999999999
+    ],
+    "segments.distal1.sections.0.height_z_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.distal1.sections.0.width_y_m": [
+      0.012634999999999999,
+      0.013965
+    ],
+    "segments.distal1.sections.1.height_z_m": [
+      0.008122499999999998,
+      0.0089775
+    ],
+    "segments.distal1.sections.1.width_y_m": [
+      0.01083,
+      0.011970000000000001
+    ]
+  },
+  "analysis_cap_s": null,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "standalone_watchdog_s": null,
+  "study_id": "p62-luna-20261029",
+  "authorization": "Explicit P6.2 user authorization 2026-10-29: luna arm, ten shared Provider requests maximum (Main 7, Reporter 3), zero new science, no retries or replacement grant.",
+  "base_commit": "7a2287325a882cb70b933d3ea07db909c58237f2",
+  "robot": "D:\\softrobot-agent\\.worktrees\\s142-reach-hold-autonomous\\configs\\research\\robot.json",
+  "task": "D:\\softrobot-agent\\.worktrees\\s142-reach-hold-autonomous\\tasks\\reach_hold.json",
+  "runtime": "runtime_p5_luna_none.json",
+  "mode": "engineering_investigation",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "runs/research/p62-luna-20261029",
+  "capabilities": [
+    "investigation"
+  ],
+  "topology_scope": {
+    "flexible_segments": 2,
+    "independent_ideal_tensions": 6
+  },
+  "budgets": {
+    "provider_requests": 10,
+    "protected_provider_requests": 0,
+    "public_operations": 80,
+    "protected_public_operations": 0,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 0,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "nmpc_execution_cap_s": null,
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": 4096,
+    "seconds_per_trial": null,
+    "training_actions": 8192,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "supplied_evidence": [],
+  "allowed_plan_actions": [
+    "diagnose",
+    "stop"
+  ],
+  "scoring_window_s": 0.35,
+  "execution_instructions": "This is a read-only investigation of the sealed S142 reach-and-hold study, not a new autonomous design study. Use the authoritative CURRENT_RESEARCH_PACKET, Reporter findings and recoverable references to understand the mathematical and physical failures. Prefer Reporter investigation for detailed scientific evidence. You may autonomously choose relevant read-only tools, inspect curated English Knowledge, and articulate a justified next research judgment, but do not launch science or claim historical evidence passes this new test. Explain reliable conclusions, competing hypotheses and unresolved questions. Use already delivered reports without repeating identical reads. You will continue across SDK handoff from the same Store; do not restart the investigation. New mathematics, physics, NMPC and RL are all forbidden. Shared allowance is ten Provider sends, Main at most seven, Reporter at most three, failures included. The audit pauses between windows. End an invocation with a concise evidence-based assessment when enough is known; no formal STOP is required for this audit.",
+  "range_status": "Editable conservative study choices, not universal physical validity limits. Density, viscosity, routes, station locations and angles fixed.",
+  "control": "D:\\softrobot-agent\\.worktrees\\s142-reach-hold-autonomous\\configs\\research\\control.json",
+  "validation_profiles": {},
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": [],
+    "architecture": "english_decision_v2",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "bound_scientific_variables_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    }
+  },
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "S142 explicit user authorization for registered T1/PATH, subject to applicability, original task coverage, bounded-input witness checks and accounting for every internal subproblem.",
+    "controlled-capability-sensitivity-v1": "S142 explicit user authorization for registered T2, subject to exact matching controlled model stencils, model validity and accounting for all model preparations, capability and dual-face solves."
+  },
+  "physical_replay_limit": 0
+}
