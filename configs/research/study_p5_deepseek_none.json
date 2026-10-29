@@ -1,0 +1,145 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_base_only_tracking_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "p5-m5-deepseek-none-20261029-a01",
+  "base_commit": "cb125d4a48173eb7b256afa95cde8afd3a19314c",
+  "authorization": "Explicit user approval in this conversation on 2026-10-29: run DeepSeek Flash none first, then GPT-5.6 Luna none for comparison. This single arm is limited to nine shared Provider requests including Reporter, with the last three closeout-only; no automatic network retries, model fallback, Echo requests, PPO or budget resets. At most two mathematical evaluations and two independent physical launches under the unchanged frozen M5/BF5 task and native limits. Preserve all failures and unknown outcomes. Stop at the finite limit; no additional Study may replace this arm.",
+  "task": "../../tasks/bf5_position_tool_axis_v1.json",
+  "control": "control_bf5_tool_axis.json",
+  "evidence_destination": "runs/research/p5-m5-deepseek-none-20261029-a01",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ],
+    "cells_per_segment": 12
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.3.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "windows_s": [
+      0.1,
+      0.3,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.58
+    ]
+  },
+  "scoring_window_s": 0.6,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "control_search",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "control_search",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 100,
+    "iterations": 16,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": [],
+    "architecture": "english_decision_v2",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "bound_scientific_variables_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "on_demand_tools_v3"
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    }
+  },
+  "mode": "formal_research",
+  "runtime": "runtime_harness_v2.json",
+  "initial_structure_strategy": "agent_choice",
+  "physical_replay_limit": 2,
+  "budgets": {
+    "provider_reserve_policy": "last_requests_v2",
+    "provider_requests": 9,
+    "protected_provider_requests": 3,
+    "public_operations": 80,
+    "protected_public_operations": 12,
+    "physical_launches": 2,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 2,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "execution_instructions": "Start from the frozen canonical task and Base-only family domain. Choose and submit useful research actions autonomously using the available typed tools. Routing selects a tool; submit research_plan to perform a Plan. Use English for all new decisions and scientific interpretations. Read exact feedback and distinguish local mathematical diagnostics from independent task evaluation. Historical guidance grants no current evidence or permission. Stop and select the first complete independently accepted result after the required full read; otherwise stop truthfully within the original budget. No NMPC, PPO, automatic retries or extra success confirmations.\nThe full frozen parameter domain has already been supplied below. It is available for your decision without a prerequisite repeated read. Choose any useful legal research action autonomously; no specific structure or method is prescribed.\nSUPPLIED_STARTING_BOUNDARY\n{\"version\":\"p5_shared_starting_boundary_v1\",\"source\":{\"study\":\"p4-m5-none-20261029-a01\",\"state_identity\":\"4090243c87d7cf8c66a48caea0b858f324cb70e037ae8eb30a7e548cf4bc5fbb\",\"request_boundary\":\"After the fourth P4 request and its successful full FamilySpace read.\",\"read_only\":true,\"authorization_transferred\":false,\"budget_scope\":\"The source budget is historical only. Each new comparison Study has its own explicitly approved nine-request shared ledger, last three closeout-only.\"},\"current_intent\":null,\"candidate_status\":{\"generated_valid\":0,\"control_sources_initialized\":0,\"mathematical_evaluations\":0,\"independent_physical_evaluations\":0,\"has_executable_candidate\":false,\"task_passed\":false,\"has_measured_task_feedback\":false},\"full_family_space_read\":{\"items\":[{\"delivery\":\"exact_feedback\",\"feedback_reference\":{\"artifact_id\":\"1d93e9d7c3eedcb6ccd69c9fa90d8b9a33b524e42c4fb107e680ed73c565799a\",\"media_type\":\"application/json\"},\"original_result_query\":{\"pointer\":\"/result\",\"reference\":{\"artifact_id\":\"1d93e9d7c3eedcb6ccd69c9fa90d8b9a33b524e42c4fb107e680ed73c565799a\",\"media_type\":\"application/json\"},\"view\":\"full\"},\"query\":{\"pointer\":\"\",\"reference\":{\"artifact_id\":\"21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b\",\"media_type\":\"application/json\"},\"view\":\"full\"},\"result\":{\"content\":[{\"text\":\"{\\\"actuator_defaults\\\":{\\\"limits_m\\\":[-0.015,0.015],\\\"rule\\\":\\\"independent_displacement_ideal_tension_v1\\\",\\\"velocity_limit_m_s\\\":0.025},\\\"assembly\\\":{\\\"components\\\":[{\\\"connection\\\":{\\\"part\\\":\\\"fixed_base\\\",\\\"position_m\\\":[0.0,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":0.0},\\\"id\\\":\\\"segment_0\\\",\\\"interpolation\\\":\\\"step\\\",\\\"kind\\\":\\\"flexible_segment\\\",\\\"length_m\\\":0.16,\\\"natural_curvature_rad_m\\\":[0.0,0.0],\\\"physics\\\":{\\\"bending_ei_nm2\\\":null,\\\"bending_viscosity_nm2_s\\\":[0.0005,0.0007],\\\"density_kg_m3\\\":1100.0,\\\"line_density_kg_m\\\":null,\\\"mode\\\":\\\"material\\\",\\\"young_pa\\\":7200000.0},\\\"sections\\\":[{\\\"s\\\":0.0,\\\"section\\\":{\\\"angle_rad\\\":0.35,\\\"holes_yz_m\\\":[],\\\"kind\\\":\\\"ellipse\\\",\\\"outer_yz_m\\\":[],\\\"parameters\\\":{\\\"semi_y_m\\\":0.0095,\\\"semi_z_m\\\":0.0076}}}]},{\\\"com_local_m\\\":[0.0,0.0,0.0],\\\"connection\\\":{\\\"part\\\":\\\"segment_0\\\",\\\"position_m\\\":[0.0,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":1.0},\\\"envelope_halfsize_m\\\":[0.002,0.025,0.025],\\\"guide_holes\\\":{},\\\"hole_radius_m\\\":0.0015,\\\"id\\\":\\\"mid_guide\\\",\\\"inertia_com_local_kg_m2\\\":[[4e-07,0.0,0.0],[0.0,2e-07,0.0],[0.0,0.0,2e-07]],\\\"kind\\\":\\\"guide\\\",\\\"mass_kg\\\":0.002},{\\\"com_local_m\\\":[0.006,0.0,0.0],\\\"connection\\\":{\\\"part\\\":\\\"mid_guide\\\",\\\"position_m\\\":[0.002,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":0.0},\\\"envelope_halfsize_m\\\":[0.006,0.006,0.006],\\\"guide_holes\\\":{},\\\"hole_radius_m\\\":0.0,\\\"id\\\":\\\"connector\\\",\\\"inertia_com_local_kg_m2\\\":[[5e-08,0.0,0.0],[0.0,7e-08,0.0],[0.0,0.0,7e-08]],\\\"kind\\\":\\\"rigid_connector\\\",\\\"mass_kg\\\":0.003},{\\\"connection\\\":{\\\"part\\\":\\\"connector\\\",\\\"position_m\\\":[0.012,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":0.0},\\\"id\\\":\\\"segment_1\\\",\\\"interpolation\\\":\\\"linear\\\",\\\"kind\\\":\\\"flexible_segment\\\",\\\"length_m\\\":0.11,\\\"natural_curvature_rad_m\\\":[0.0,0.0],\\\"physics\\\":{\\\"bending_ei_nm2\\\":null,\\\"bending_viscosity_nm2_s\\\":[0.0003,0.0004],\\\"density_kg_m3\\\":1050.0,\\\"line_density_kg_m\\\":null,\\\"mode\\\":\\\"material\\\",\\\"young_pa\\\":5400000.0},\\\"sections\\\":[{\\\"s\\\":0.0,\\\"section\\\":{\\\"angle_rad\\\":-0.25,\\\"holes_yz_m\\\":[],\\\"kind\\\":\\\"rectangle\\\",\\\"outer_yz_m\\\":[],\\\"parameters\\\":{\\\"height_z_m\\\":0.0095,\\\"width_y_m\\\":0.0133}}},{\\\"s\\\":1.0,\\\"section\\\":{\\\"angle_rad\\\":0.15000000000000002,\\\"holes_yz_m\\\":[],\\\"kind\\\":\\\"rectangle\\\",\\\"outer_yz_m\\\":[],\\\"parameters\\\":{\\\"height_z_m\\\":0.008549999999999999,\\\"width_y_m\\\":0.0114}}}]},{\\\"com_local_m\\\":[0.007,0.001,-0.002],\\\"connection\\\":{\\\"part\\\":\\\"segment_1\\\",\\\"position_m\\\":[0.0,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":1.0},\\\"envelope_halfsize_m\\\":[0.009,0.009,0.008],\\\"guide_holes\\\":{},\\\"hole_radius_m\\\":0.0,\\\"id\\\":\\\"payload\\\",\\\"inertia_com_local_kg_m2\\\":[[6e-07,1e-07,0.0],[1e-07,8e-07,1e-07],[0.0,1e-07,9e-07]],\\\"kind\\\":\\\"payload\\\",\\\"mass_kg\\\":0.01}],\\\"mesh\\\":{\\\"cells\\\":{\\\"segment_0\\\":12,\\\"segment_1\\\":12},\\\"coordinates\\\":\\\"two_principal_bending_angles_per_cell\\\",\\\"model\\\":\\\"serial_bending_cells_v1\\\",\\\"version\\\":\\\"serial_bending_discretization_v1\\\"},\\\"provenance\\\":{\\\"ancestry\\\":\\\"Physical prototypes retained from family_space_v1; no source file is loaded to recover physics\\\",\\\"rule\\\":\\\"root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment\\\",\\\"source\\\":\\\"Frozen SI serial-family prototypes owned by family_space_v2.json\\\"},\\\"tip\\\":{\\\"part\\\":\\\"payload\\\",\\\"position_m\\\":[0.014,0.0,0.0],\\\"quaternion_wxyz\\\":[1.0,0.0,0.0,0.0],\\\"s\\\":0.0}},\\\"assumptions\\\":[\\\"SI; serial bending only; external frictionless straight tendon spans\\\",\\\"One independent ideal tension per tendon; guide holes have fixed supplied inertia\\\",\\\"Task environment owns mount and forces; assembly prototypes own connector, guide and payload\\\",\\\"Clearance checks cover route stations and guide holes; swept self-collision is not validated\\\"],\\\"conditional_rules\\\":\\\"base_only_consecutive_spans_v1\\\",\\\"control_domains\\\":{\\\"holding_tip_speed_weight\\\":{\\\"default\\\":0.0,\\\"maximum\\\":1.0,\\\"minimum\\\":0.0},\\\"terminal_tip_speed_weight\\\":{\\\"default\\\":0.0,\\\"maximum\\\":1.0,\\\"minimum\\\":0.0}},\\\"executable_segment_counts\\\":[2],\\\"executable_tendon_count_bounds\\\":[6,6],\\\"family_id\\\":\\\"base_only_serial_external_tendons_bf4_tracking_s3_v1\\\",\\\"routing_domains\\\":{\\\"anchor_s\\\":{\\\"default\\\":1.0,\\\"maximum\\\":1.0,\\\"minimum\\\":0.8},\\\"angular_offset_rad\\\":{\\\"default\\\":0.0,\\\"maximum\\\":3.141592653589793,\\\"minimum\\\":-3.141592653589793},\\\"guide_s\\\":{\\\"default\\\":0.5,\\\"maximum\\\":0.75,\\\"minimum\\\":0.15},\\\"phase_rad\\\":{\\\"default\\\":0.0,\\\"maximum\\\":6.283185307179586,\\\"minimum\\\":-6.283185307179586},\\\"radius_m\\\":{\\\"default\\\":0.018,\\\"maximum\\\":0.023,\\\"minimum\\\":0.014}},\\\"segment_count_bounds\\\":[1,9],\\\"segment_domain\\\":{\\\"length_m\\\":{\\\"default\\\":0.14,\\\"maximum\\\":0.24,\\\"minimum\\\":0.06},\\\"section_dimensions_m\\\":{\\\"circle\\\":{\\\"radius_m\\\":{\\\"default\\\":0.008,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"ellipse\\\":{\\\"semi_y_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003},\\\"semi_z_m\\\":{\\\"default\\\":0.0076,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"rectangle\\\":{\\\"height_z_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006},\\\"width_y_m\\\":{\\\"default\\\":0.0133,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006}},\\\"tube\\\":{\\\"inner_radius_m\\\":{\\\"default\\\":0.003,\\\"maximum\\\":0.004,\\\"minimum\\\":0.001},\\\"outer_radius_m\\\":{\\\"default\\\":0.009,\\\"maximum\\\":0.012,\\\"minimum\\\":0.005}}},\\\"young_pa\\\":{\\\"default\\\":7000000.0,\\\"maximum\\\":15000000.0,\\\"minimum\\\":2000000.0}},\\\"segment_domains\\\":{\\\"0\\\":{\\\"length_m\\\":{\\\"default\\\":0.16,\\\"maximum\\\":0.24,\\\"minimum\\\":0.08},\\\"section_dimensions_m\\\":{\\\"circle\\\":{\\\"radius_m\\\":{\\\"default\\\":0.008,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"ellipse\\\":{\\\"semi_y_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003},\\\"semi_z_m\\\":{\\\"default\\\":0.0076,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"rectangle\\\":{\\\"height_z_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006},\\\"width_y_m\\\":{\\\"default\\\":0.0133,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006}},\\\"tube\\\":{\\\"inner_radius_m\\\":{\\\"default\\\":0.003,\\\"maximum\\\":0.004,\\\"minimum\\\":0.001},\\\"outer_radius_m\\\":{\\\"default\\\":0.009,\\\"maximum\\\":0.012,\\\"minimum\\\":0.005}}},\\\"young_pa\\\":{\\\"default\\\":7200000.0,\\\"maximum\\\":15000000.0,\\\"minimum\\\":2000000.0}},\\\"1\\\":{\\\"length_m\\\":{\\\"default\\\":0.11,\\\"maximum\\\":0.2,\\\"minimum\\\":0.06},\\\"section_dimensions_m\\\":{\\\"circle\\\":{\\\"radius_m\\\":{\\\"default\\\":0.008,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"ellipse\\\":{\\\"semi_y_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003},\\\"semi_z_m\\\":{\\\"default\\\":0.0076,\\\"maximum\\\":0.012,\\\"minimum\\\":0.003}},\\\"rectangle\\\":{\\\"height_z_m\\\":{\\\"default\\\":0.0095,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006},\\\"width_y_m\\\":{\\\"default\\\":0.0133,\\\"maximum\\\":0.018,\\\"minimum\\\":0.006}},\\\"tube\\\":{\\\"inner_radius_m\\\":{\\\"default\\\":0.003,\\\"maximum\\\":0.004,\\\"minimum\\\":0.001},\\\"outer_radius_m\\\":{\\\"default\\\":0.009,\\\"maximum\\\":0.012,\\\"minimum\\\":0.005}}},\\\"young_pa\\\":{\\\"default\\\":5400000.0,\\\"maximum\\\":15000000.0,\\\"minimum\\\":2000000.0}}},\\\"serial_assembly\\\":{\\\"cell_count_bounds\\\":[12,12],\\\"connector\\\":\\\"connector\\\",\\\"default_cells\\\":12,\\\"guide\\\":\\\"mid_guide\\\",\\\"payload\\\":\\\"payload\\\",\\\"repeated_segment\\\":\\\"segment_1\\\",\\\"root_segment\\\":\\\"segment_0\\\",\\\"version\\\":\\\"repeat_serial_prototypes_v1\\\"},\\\"tendon_count_bounds\\\":[1,12],\\\"tendon_domains\\\":{\\\"diameter_m\\\":{\\\"default\\\":0.001,\\\"maximum\\\":0.0012,\\\"minimum\\\":0.0005},\\\"force_limit_n\\\":{\\\"default\\\":8.0,\\\"maximum\\\":8.0,\\\"minimum\\\":1.0},\\\"length_servo_gain_n_m\\\":{\\\"default\\\":900.0,\\\"maximum\\\":1500.0,\\\"minimum\\\":300.0},\\\"pretension_n\\\":{\\\"default\\\":0.2,\\\"maximum\\\":1.0,\\\"minimum\\\":0.0}},\\\"unsupported\\\":[\\\"8-12 tendons: declared, not execution validated\\\",\\\"polygon section domain not granted in this example\\\",\\\"axial extension\\\",\\\"shear\\\",\\\"twist\\\",\\\"friction\\\",\\\"swept self-collision\\\",\\\"High segment-count dynamics and controller compatibility require candidate-specific validation\\\"],\\\"version\\\":\\\"serial_family_space_v2\\\"}\"}],\"status\":\"success\",\"toolUseId\":\"call_00_flgqTtDy1H2JQ57Mafja2910\"},\"status\":\"success\",\"tool\":\"evidence_read\",\"tool_id\":\"call_00_flgqTtDy1H2JQ57Mafja2910\"}],\"omitted_tools\":0,\"scope\":\"Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.\",\"total_tools\":1,\"version\":\"pending_feedback_delivery_v1\"},\"scope\":\"Read-only prior domain feedback at the P4 fourth-request cutoff. No candidate, successful result, future event, scientific permission or budget transfers. This is supplied context, not a current-Study tool invocation.\"}"
+}

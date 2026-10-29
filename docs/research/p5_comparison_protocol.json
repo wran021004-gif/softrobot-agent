@@ -1,0 +1,71 @@
+{
+  "authorization": "User explicitly approved these sequential real-model comparison tests.",
+  "arms": [
+    {
+      "arm": "deepseek",
+      "study": "p5-m5-deepseek-none-20261029-a01",
+      "path": "configs\\research\\study_p5_deepseek_none.json",
+      "task": "5bf2dfd66aa0e480abae53b1d502677b06891339c40573cae8af00d8296db3ab",
+      "family_space": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+      "instructions": "d21e02574b13ba660cc631cadeaeac2fde67ebd6ef49a589355369dd557fa654",
+      "budgets": {
+        "provider_requests": 9,
+        "protected_provider_requests": 3,
+        "public_operations": 80,
+        "protected_public_operations": 12,
+        "physical_launches": 2,
+        "local_solves": 0,
+        "local_solve_s": null,
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "mathematical_evaluations": 2,
+        "numerical_s": null,
+        "activity_s": null,
+        "delivery_reserve_s": null,
+        "provider_reserve_policy": "last_requests_v2"
+      }
+    },
+    {
+      "arm": "luna",
+      "study": "p5-m5-luna-none-20261029-a01",
+      "path": "configs\\research\\study_p5_luna_none.json",
+      "task": "5bf2dfd66aa0e480abae53b1d502677b06891339c40573cae8af00d8296db3ab",
+      "family_space": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+      "instructions": "d21e02574b13ba660cc631cadeaeac2fde67ebd6ef49a589355369dd557fa654",
+      "budgets": {
+        "provider_requests": 9,
+        "protected_provider_requests": 3,
+        "public_operations": 80,
+        "protected_public_operations": 12,
+        "physical_launches": 2,
+        "local_solves": 0,
+        "local_solve_s": null,
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "mathematical_evaluations": 2,
+        "numerical_s": null,
+        "activity_s": null,
+        "delivery_reserve_s": null,
+        "provider_reserve_policy": "last_requests_v2"
+      }
+    }
+  ],
+  "total_provider_ceiling": 18,
+  "per_arm_shared_ceiling": 9,
+  "per_arm_closeout_reserve": 3,
+  "per_arm_maximum_exploration": 6,
+  "source_boundary_identity": "5cf5b456262d3e41d500007c65d4b224c391b4cf34553a45e18d409a80c1c1ef",
+  "automatic_retries": 0,
+  "echo_requests": 0,
+  "handoff_mode": "Original SDK history in one durable session per arm; automatic session handoff disabled equally. ChatGPT real continuation is tested directly without claiming prior handoff admission.",
+  "fairness_limitations": [
+    "Distinct native Provider wire parameters and output limits; scientific instructions, domain, tools and resource counts are held equal.",
+    "Single sequential trajectory per model is descriptive evidence, not a statistical model-quality ranking."
+  ],
+  "first_window_shared_requests": 4,
+  "new_formal_studies": 2,
+  "continuation_rule": "Inspect the first four shared requests. Continue within the same original ledger when a valid scientific action occurred or there is concrete progress toward one. Stop repeated reading/routing when the complete required domain and schema are already available. Any error or unknown Provider outcome stops that arm without retry or model replacement.",
+  "source_store": "Stopped P4 is read-only; its remaining request and grant are never reused.",
+  "scientific_scope": "Original M5/BF5 and FamilySpace; per arm at most two mathematical evaluations, two physical launches and original native caps. No PPO, new solvers, or relaxed acceptance.",
+  "gateway_contract_source": "https://developers.openai.com/api/docs/models/gpt-5.6-luna"
+}
