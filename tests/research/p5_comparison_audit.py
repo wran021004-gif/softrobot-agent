@@ -13,6 +13,7 @@ def decoded_feedback(host, saved):
     text=next((b['text'] for b in blocks if 'text' in b),'')
     try:value=json.loads(text)
     except ValueError:return dict(status=saved['result']['status'],message=text)
+    if not isinstance(value,dict):return dict(status=saved['result']['status'],result=value)
     if value.get('wrapper_reference'):
         wrapper=value['wrapper_reference'];value=host.store.artifact(wrapper)
         result=value.get('result',{})
@@ -61,6 +62,7 @@ def audit(arm):
             assert hashlib.sha256(raw).hexdigest()==reception['body']['artifact_id']
             message=body.get('choices',[{}])[0].get('message',{})
             row.update(http_status=reception['http_status'],response_reference=reception['body'],
+                response_model=body.get('model'),
                 usage=reception.get('usage'),money=reception.get('money'),error=body.get('error'),
                 assistant_text=message.get('content'),
                 tool_calls=[dict(id=c['id'],name=c['function']['name'],arguments=json.loads(c['function']['arguments']))

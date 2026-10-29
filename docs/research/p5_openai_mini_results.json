@@ -1,0 +1,1087 @@
+{
+  "arm": "openai-mini",
+  "study_id": "p5-m5-openai-mini-none-20261029-a01",
+  "execution_commit": "4f9e44aba8e61815996355677de84320957a293b",
+  "source_authority": "Explicit user approval in this conversation on 2026-10-29 to run the same real autonomy test using the official OpenAI API gpt-5.4-mini and inspect D4. One new model cohort only, nine shared Provider requests including Reporter, last three closeout-only; original M5/BF5 task, two mathematical evaluations and two physical launches, original native count caps. No Echo requests, automatic retries, fallback, PPO, task relaxation or budget reset. D4 is an observed result, never a promised outcome. User reports a shared daily 2,500,000-token allowance for the mini-model group; this is not an additional Study grant and is not independently verified. Prior cohorts remain sealed.",
+  "rows": [
+    {
+      "number": 1,
+      "request_id": "r3-request-068269e4e1984b28b936034370815567",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 30284,
+      "request_reference": {
+        "artifact_id": "c5d55be51520cc1546cdebc096cdf9081b267766bbf66a692abfbeda3eeaaa09",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "507860c1bdb115b1b654bcb222e3936e0e3280287ea64b69dc42c13ef33afd37",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [],
+      "tool_result_delivery": [],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 400,
+      "response_reference": {
+        "artifact_id": "ff7047430e80b7d6205be2516f2c5ecbdbc0e2eceba1fd91186fc970108d3b5e",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": null,
+      "usage": null,
+      "money": null,
+      "error": {
+        "message": "Invalid schema for function 'research_plan': schema must have type 'object' and not have 'oneOf'/'anyOf'/'allOf'/'enum'/'const'/'not' at the top level.",
+        "type": "invalid_request_error",
+        "param": "tools[0].function.parameters",
+        "code": "invalid_function_parameters"
+      },
+      "assistant_text": null,
+      "tool_calls": [],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": []
+    },
+    {
+      "number": 2,
+      "request_id": "r3-request-3a4e3bd3941d4c2b975f5be982990128",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 30292,
+      "request_reference": {
+        "artifact_id": "ba24afb894e7a1c9a776e146b9745d1344db5f3599a13bd241b7fccfb2a9abf6",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "5cd0c19c5cc10620a9b673415f1d1511963c487706ca326fd545961f4817e198",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [],
+      "tool_result_delivery": [],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "78ac4892f48354ed9ae0c23839d89c8c6033bd55ba202293e4730d614b87753a",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 23,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 6678,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 6701
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "name": "research_route",
+          "arguments": {
+            "tool": "research_plan",
+            "action": "generate"
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_route",
+          "tool_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "reference": {
+            "artifact_id": "7098b279a53d19e9c7cff6212a0c015df420caefdb334e06449908cfcd725b06",
+            "media_type": "application/json"
+          },
+          "status": "success",
+          "result": {
+            "scientific_execution_started": false,
+            "tool": "research_plan",
+            "action": "generate",
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "request_id": "r3-request-d64b7f7b6973469e90b52b4afdd3a194",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 33151,
+      "request_reference": {
+        "artifact_id": "8e1339d60b0f64f2683a1d8094b5c20fdf47675f2218fde41e06682157dfca80",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "5cd0c19c5cc10620a9b673415f1d1511963c487706ca326fd545961f4817e198",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "f1c4c84f3e815b10c7363118564c2dffe8b32a3a183e9148232aa0b0a5b37b4d",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 601,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 7392,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4608
+        },
+        "total_tokens": 7993
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "name": "research_plan",
+          "arguments": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "position_tool_axis_h1",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v2",
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "next_step": "revise_design",
+            "hypothesis": "A more favorable base-only serial family candidate can be generated by preserving the frozen two-segment structure while modifying routing and geometry within the allowed bounds to better align the tool axis with the target world axis and target position.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "The generated candidate will remain admissible under the frozen family constraints and provide a basis for subsequent evaluation or control initialization toward the target pose.",
+            "weakening_observation": "Generation fails, violates the frozen bounds, or produces a candidate that is structurally incompatible with the task’s two-segment base-only serial family.",
+            "fixed_conditions": "Keep the family space identity fixed to the supplied serial family space; retain two segments and six tendons; do not assume any unsupported physics beyond the frozen domain.",
+            "stopping_condition": "Stop after this generation if no admissible candidate can be produced or if the next admissible step requires evidence not yet read.",
+            "interpretation": "This is a design-modification search step, not a claim of task success. Any later acceptance must come from independent evaluation on the generated candidate.",
+            "generation": {
+              "version": "serial_family_generation_v2",
+              "family_space_identity": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "segment_count": 2,
+              "tendon_count": 6,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 6,
+                  "phase_rad": 0,
+                  "radius_m": 0.019,
+                  "guide_s": [
+                    0.5,
+                    0.55,
+                    0.6,
+                    0.65,
+                    0.7,
+                    0.75
+                  ],
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0,
+                  "anchor_angle_offset_rad": 0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000,
+                  "cells": 12
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000,
+                  "cells": 12
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "force_limit_n": 8,
+                "length_servo_gain_n_m": 900,
+                "pretension_n": 0.2
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0,
+                "terminal_tip_speed_weight": 0
+              },
+              "route_overrides": {}
+            }
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "reference": {
+            "artifact_id": "3d7fd57990acceceedcd027ae85a974897725c1137bee28aba122294ad934f6e",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "request_id": "r3-request-43694fbc89c74e4f9d58996d43a2f807",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 40979,
+      "request_reference": {
+        "artifact_id": "cd8967a4030a4148f5bc601c9c71576b1e38d3aae7ab3db5641316043e4c81cf",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "5cd0c19c5cc10620a9b673415f1d1511963c487706ca326fd545961f4817e198",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "6b03a0553a2fc675f3b2e2bca01461e73c50a2307f5a261547329cabf68e2708",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 20,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 9328,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4608
+        },
+        "total_tokens": 9348
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "name": "research_route",
+          "arguments": {
+            "tool": "evidence_read"
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_route",
+          "tool_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "reference": {
+            "artifact_id": "d18fccc1e25865170aacad9e92fd50381eac35571a6e4d869581fc9af0e8ef18",
+            "media_type": "application/json"
+          },
+          "status": "success",
+          "result": {
+            "scientific_execution_started": false,
+            "tool": "evidence_read",
+            "action": null,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "request_id": "r3-request-e70a21c0d8f74ef88b9182b23b43d7af",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 41508,
+      "request_reference": {
+        "artifact_id": "61122b3c7d2d559a29428a6e2d68a5e2396c13b62a6f88a3ed24c5edb5818d76",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "5cd0c19c5cc10620a9b673415f1d1511963c487706ca326fd545961f4817e198",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "identity": "5e86a1c7465aa9cf5f0f9c8ea9099b864402cdd0584968222b4674070660705b",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm",
+        "call_geHvIjXcFZroGk1UKnmLOzX1"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 400,
+      "response_reference": {
+        "artifact_id": "ef053c592c8098fd13663d36f3ecaa9def152a593cfdc0a7a0ffcc46b83c9dfa",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": null,
+      "usage": null,
+      "money": null,
+      "error": {
+        "message": "Invalid schema for function 'evidence_read': schema must have type 'object' and not have 'oneOf'/'anyOf'/'allOf'/'enum'/'const'/'not' at the top level.",
+        "type": "invalid_request_error",
+        "param": "tools[1].function.parameters",
+        "code": "invalid_function_parameters"
+      },
+      "assistant_text": null,
+      "tool_calls": [],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": []
+    },
+    {
+      "number": 6,
+      "request_id": "r3-request-b33dbb6de27649a98ace4ab1a3b14719",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 41496,
+      "request_reference": {
+        "artifact_id": "60818adb6f39effd003dbbfaf9ae20586f0efffa6f542f29c4f7aef201a0bd2f",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "5cd0c19c5cc10620a9b673415f1d1511963c487706ca326fd545961f4817e198",
+          "actions": [
+            "generate"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "identity": "a972528a09c54ac48ca0108a678d1771b922a1d1a628a9f5e5ab52c0f8dbddd1",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "identity": "c16e77ca71637b34f8a7208a1894606fd6f0384aa9485d80447469a27bd93a29",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm",
+        "call_geHvIjXcFZroGk1UKnmLOzX1"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "94b046c914c3570e73f57a517af73cfb0e2a121c8d4137af06cdcd5a61d9989b",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 79,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 9283,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4608
+        },
+        "total_tokens": 9362
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_9WcbHVpb70l74J2WYHH4pV8s",
+          "name": "evidence_read",
+          "arguments": {
+            "reference": {
+              "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+              "media_type": "application/json"
+            },
+            "pointer": "/citation_eligibility",
+            "view": "working_set"
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "evidence_read",
+          "tool_id": "call_9WcbHVpb70l74J2WYHH4pV8s",
+          "reference": {
+            "artifact_id": "22dea35e5983d2796e43d64aa82ab88af1217be9823aaac7b1e377310c7c08b3",
+            "media_type": "application/json"
+          },
+          "status": "success",
+          "result": []
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "request_id": "r3-request-b1c13cfb5f48475bae8cc2a34e985e37",
+      "purpose": "conversation",
+      "phase": "closeout",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 36429,
+      "request_reference": {
+        "artifact_id": "68d675e91737a49de71e580793669b8941b5ec805db70c5e32c6e1e9142dbffb",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "e0748d36d7599105d8cebcb661e2470454f6e2aaee2c49ef5dfd0fae372a908b",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "identity": "7ab5b065ebcfe826780049d6b7635a50497f1b6475506de6ee4b3422d88300b1",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "identity": "9a545fc9305217aeee7074e5d16592162b3dc175255be4e5b68017d2f5bf205b",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm",
+        "call_geHvIjXcFZroGk1UKnmLOzX1",
+        "call_9WcbHVpb70l74J2WYHH4pV8s"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_9WcbHVpb70l74J2WYHH4pV8s",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "a06660b9d6fb77320856e059367581fe91271e8efe3fd8bab58d37727e9df7a2",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 348,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 8579,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 2560
+        },
+        "total_tokens": 8927
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_HwB59n8wgQqGlvXW6apN8HER",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "stop_after_unregistered_evidence_check",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "evidence_read_citation_eligibility_check",
+              "selected_candidate": null,
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "The current evidence set does not yet contain a registered, independently accepted result for the task, so the only truthful action is to stop rather than claim success.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "The system will accept the stop action or report only that no further admissible evidence-backed progress is available.",
+            "weakening_observation": "If a registered passing result were already present and readable, then stopping would be unnecessary and premature.",
+            "fixed_conditions": "Use only the supplied frozen family-space evidence and the current recorded feedback; do not infer task acceptance from unregistered reads.",
+            "stopping_condition": "Stop now because no independently accepted passing result has been established.",
+            "interpretation": "This is a truthful closeout decision based on the exact feedback: the prior read was rejected for unregistered evidence, and the current working-set citation_eligibility read returned empty.",
+            "experience_disposition": {
+              "22dea35e5983d2796e43d64aa82ab88af1217be9823aaac7b1e377310c7c08b3": "context_only"
+            }
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_HwB59n8wgQqGlvXW6apN8HER",
+          "reference": {
+            "artifact_id": "6df050e2070b31d4b7e826804e286579ed74ebb4cb2b4224a9d81964ca19b9f0",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "request_id": "r3-request-44dc5b715ca04d13bdeff91d6c3f9377",
+      "purpose": "conversation",
+      "phase": "closeout",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 42790,
+      "request_reference": {
+        "artifact_id": "cec1bce1cadb6df4f2aa9d508de70408b78f145b840a6e515ba2a534bc13d3af",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "e0748d36d7599105d8cebcb661e2470454f6e2aaee2c49ef5dfd0fae372a908b",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "identity": "7ab5b065ebcfe826780049d6b7635a50497f1b6475506de6ee4b3422d88300b1",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "identity": "9a545fc9305217aeee7074e5d16592162b3dc175255be4e5b68017d2f5bf205b",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm",
+        "call_geHvIjXcFZroGk1UKnmLOzX1",
+        "call_9WcbHVpb70l74J2WYHH4pV8s",
+        "call_HwB59n8wgQqGlvXW6apN8HER"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_9WcbHVpb70l74J2WYHH4pV8s",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_HwB59n8wgQqGlvXW6apN8HER",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "6f5290389cf0f03404e40a2379481434435ec27448ecc94d4194deb4be3b16cb",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 267,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 10165,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4608
+        },
+        "total_tokens": 10432
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_LKqydaLIp6pzYZzL6RsYICBh",
+          "name": "research_plan",
+          "arguments": {
+            "action": "stop",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "truthful_closeout_after_feedback",
+              "claimed_inference": "empirical_search",
+              "research_intent": "STOP",
+              "selected_method": "recorded_feedback_only",
+              "selected_candidate": null,
+              "requested_budget": 0
+            },
+            "next_step": "stop",
+            "hypothesis": "Given the recorded feedback, no registered evidence-backed passing result has been established, so the truthful action is to stop.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "21318db517b2a2a701cc65e51716b9edd1ef64e41b8e80339c1a95af9f38f64b",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "The closeout attempt will either be accepted as a truthful stop or remain an error without any new scientific claim.",
+            "weakening_observation": "If a fresh registered passing result were available and read, then stopping would not be the first complete accepted result.",
+            "fixed_conditions": "Use only the supplied packet and the exact feedback already recorded; do not assert task success or independent acceptance.",
+            "stopping_condition": "Stop now because no independently accepted result is present.",
+            "interpretation": "This is a non-claim closeout, not a success report."
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_plan",
+          "tool_id": "call_LKqydaLIp6pzYZzL6RsYICBh",
+          "reference": {
+            "artifact_id": "7d3558a17ea009576c903306a1d8b8adf4f2a58c42a3a866a6b38c76a7aec7cc",
+            "media_type": "application/json"
+          },
+          "status": "error",
+          "result": {
+            "status": "rejected",
+            "error_code": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "reason": "UNREGISTERED_RESEARCH_EVIDENCE",
+            "field": "supporting_evidence",
+            "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+            "scientific_execution_started": false
+          }
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "request_id": "r3-request-672c365a729f46dbb4326d19115af1ea",
+      "purpose": "conversation",
+      "phase": "closeout",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "none",
+      "thinking": null,
+      "input_bytes": 46780,
+      "request_reference": {
+        "artifact_id": "249d01062b259ba0d124740cde29f974bb4abdeb3257a5d20d09aefa692e9a8f",
+        "media_type": "application/json"
+      },
+      "schemas": [
+        {
+          "name": "research_plan",
+          "identity": "e0748d36d7599105d8cebcb661e2470454f6e2aaee2c49ef5dfd0fae372a908b",
+          "actions": [
+            "stop"
+          ]
+        },
+        {
+          "name": "evidence_read",
+          "identity": "7ab5b065ebcfe826780049d6b7635a50497f1b6475506de6ee4b3422d88300b1",
+          "actions": null
+        },
+        {
+          "name": "research_route",
+          "identity": "9a545fc9305217aeee7074e5d16592162b3dc175255be4e5b68017d2f5bf205b",
+          "actions": null
+        }
+      ],
+      "returned_tool_ids": [
+        "call_oW4mE7X60SksJAdoptNbm2Cv",
+        "call_wrOkyHYeqFeDONzwbqo7WJMm",
+        "call_geHvIjXcFZroGk1UKnmLOzX1",
+        "call_9WcbHVpb70l74J2WYHH4pV8s",
+        "call_HwB59n8wgQqGlvXW6apN8HER",
+        "call_LKqydaLIp6pzYZzL6RsYICBh"
+      ],
+      "tool_result_delivery": [
+        {
+          "call_id": "call_oW4mE7X60SksJAdoptNbm2Cv",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_wrOkyHYeqFeDONzwbqo7WJMm",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_geHvIjXcFZroGk1UKnmLOzX1",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_9WcbHVpb70l74J2WYHH4pV8s",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_HwB59n8wgQqGlvXW6apN8HER",
+          "exact_saved_text": true
+        },
+        {
+          "call_id": "call_LKqydaLIp6pzYZzL6RsYICBh",
+          "exact_saved_text": true
+        }
+      ],
+      "native_function_arguments_exact": true,
+      "charged_provider_requests": 1,
+      "http_status": 200,
+      "response_reference": {
+        "artifact_id": "ffc14a86fb98e26cbaf17c12546b0634ad00384692146152587577bfaf780cee",
+        "media_type": "application/octet-stream"
+      },
+      "response_model": "gpt-5.4-mini-2026-03-17",
+      "usage": {
+        "completion_tokens": 20,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens": 11128,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 6656
+        },
+        "total_tokens": 11148
+      },
+      "money": null,
+      "error": null,
+      "assistant_text": null,
+      "tool_calls": [
+        {
+          "id": "call_J6CTAVURdHTMQ3UflrgwD2Bq",
+          "name": "research_route",
+          "arguments": {
+            "tool": "evidence_read"
+          }
+        }
+      ],
+      "native_output_item_types": [],
+      "recovery_verified": {
+        "request_semantics": true,
+        "exact_gateway_response_bytes": true,
+        "settled_receipt": true
+      },
+      "feedback": [
+        {
+          "tool": "research_route",
+          "tool_id": "call_J6CTAVURdHTMQ3UflrgwD2Bq",
+          "reference": {
+            "artifact_id": "41ff5b9af85f1df5671019699fc013f17df801f48eb68f0bc6d64d25460108dd",
+            "media_type": "application/json"
+          },
+          "status": "success",
+          "result": {
+            "scientific_execution_started": false,
+            "tool": "evidence_read",
+            "action": null,
+            "scope": "Selection only. The next request loads this Schema; original validation, authorization and budget checks still apply."
+          }
+        }
+      ]
+    }
+  ],
+  "requests": 9,
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 9,
+      "tool_calls": 80,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 9,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 20.029999999984284
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 0,
+      "tool_calls": 73,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "usage_complete": false,
+  "known_usage_subtotal": {
+    "prompt_tokens": 62553,
+    "completion_tokens": 1358,
+    "total_tokens": 63911
+  },
+  "total_usage": null,
+  "money": null,
+  "money_status": "unknown",
+  "reporter_requests": 0,
+  "candidates": [],
+  "control_initializations": [],
+  "mathematical_evaluations": 0,
+  "physical_results": 0,
+  "pending_provider_requests": 0,
+  "pending_science": null,
+  "unconsumed_response": null,
+  "research_status": "stopped",
+  "final_disposition": {
+    "artifact_id": "bdcb8fa82216fa2e9d5199cc4a33d267ff375c5c755254f1c83abea6f8763d1b",
+    "media_type": "application/json"
+  },
+  "final_disposition_content": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "Original nine-request official gpt-5.4-mini test exhausted, including two preserved official API Schema rejections. No admitted scientific Plan, candidate, mathematical or independent physical result. Model STOP attempts were rejected. No additional inference or replacement Study is authorized.",
+    "selected": null
+  },
+  "source_store_unchanged": true,
+  "limitations": [
+    "Usage missing on any attempt remains unknown; known_usage_subtotal is not an exact whole-arm total.",
+    "Canonical request semantics and exact Gateway/Provider HTTP response bodies are retained locally; upstream SSE is not separately archived.",
+    "Gateway HTTP 200 implies its response.completed-only path returned; local HTTP 400 is not a second upstream inference.",
+    "No opaque reasoning, credentials, full request, or full response is exported by this audit."
+  ],
+  "assessment": {
+    "D1": "not_achieved_no_admitted_scientific_plan",
+    "D2": "not_achieved_no_candidate_or_new_scientific_result",
+    "D3": "not_achieved_no_new_scientific_result_consumed",
+    "D4": "not_achieved_no_independent_evaluation_or_accepted_select_stop",
+    "scope": "Observed finite run with two engineering Schema failures; not a general model-capability judgment."
+  }
+}

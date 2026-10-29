@@ -8,7 +8,7 @@
 |---|---|---|---|
 | DeepSeek API | configs/research/runtime_harness_v2.json | ~/.codex/.env 中的 DEEPSEEK_API_KEY | 真实工具闭环及自主生成已通过 |
 | ChatGPT Gateway | configs/research/runtime_p5_luna_none.json | ~/.softrobot-agent/chatgpt-api.json；OAuth 由原 Gateway 管理 | gpt-5.6-luna none 真实工具闭环及自主生成已通过 |
-| 官方 OpenAI API | configs/research/runtime_openai_api.json | ~/.softrobot-agent/openai-api.json | 新 Key 目录读取成功，130 个模型可见；gpt-5.4-mini 真实测试单独记录 |
+| 官方 OpenAI API | configs/research/runtime_openai_api.json | ~/.softrobot-agent/openai-api.json | 130 个模型可见；gpt-5.4-mini 的真实推理和工具闭环通过，科研测试未达 D4 |
 
 官方 API 密钥填写文件：
 
@@ -37,6 +37,7 @@
 此入口当前使用 Chat Completions，不将仅支持 Responses 工具的型号声称为已兼容。
 
 后续可以直接说“这次用 DeepSeek”“这次用 ChatGPT Gateway”或“这次用官方 OpenAI API”，并指定模型及预算。
+目录核验与用户授权的 mini 测试结果见 [mini 实测报告](p5_openai_mini_acceptance.md)，不把其他目录型号声称为已逐一实测。
 最初配置阶段只运行离线测试。后续目录检查、短文本验证脚本错误与用户授权的 mini Study 分别保留，不能将其混成配置阶段的零请求。
 官方 API 配置与原 Provider 回归覆盖正式输入编译、
 空 Key 提前报错、独立凭据与端点、真实 SDK/Mock function call ID 接续及共享计费。未安装新依赖。
