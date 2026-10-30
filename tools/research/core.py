@@ -578,6 +578,11 @@ def initial_structure_action(host):
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     from tools.research.scientific_intent import enabled as question_enabled
+    from tools.research.structure_intent import compile_search,enabled as structure_enabled
+    search=value.get('search') or {}
+    if value.get('action')=='search' and (search.get('version')=='scientific_structure_search_v1' or
+            structure_enabled(state(host)['spec']) and 'research_goal' in search):
+        value=compile_search(host,value,request_id)
     if question_enabled(state(host)['spec']) and value.get('action')=='diagnose' and value.get('decision'):
         value={**value,'decision':{'selected_method':'scientific_question',**value['decision']}}
     if state(host)['spec'].get('mode') == 'engineering_numerical':

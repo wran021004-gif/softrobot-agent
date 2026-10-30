@@ -40,8 +40,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     schema=Plan.model_json_schema()
     from tools.research.scientific_intent import enabled as question_enabled
     scientific_question = question_enabled(study or {})
+    from tools.research.structure_intent import enabled as structure_enabled
+    structure_intent=structure_enabled(study or {}) and 'search' in actions
     if scientific_question:
         decision=schema['$defs']['ResearchDecision']
+        decision['properties']['selected_candidate']['description']+=' For diagnose, place the owned candidate here at decision.selected_candidate; there is no top-level selected_candidate field.'
         decision['required'].remove('selected_method')
         decision['properties']['selected_method']['description']='Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.'
         schema['$defs']['ControlSeedRequest']['properties']['method']['description']=(
@@ -54,6 +57,24 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
+    if structure_intent:
+        from tools.research.contracts import ScientificStructureSearch
+        intent_schema=ScientificStructureSearch.model_json_schema()
+        properties=intent_schema['properties'];grant=study['family_search']
+        properties['design_variable_groups']['items']['enum']=[g for g in grant['variable_groups'] if g!='control']
+        for name in ('segment_counts','tendon_counts'):
+            for branch in properties[name]['anyOf']:
+                if branch.get('type')=='array':branch['items']['enum']=grant[name]
+        schema['$defs'].update(intent_schema.pop('$defs'))
+        schema['$defs']['ScientificStructureSearch']=intent_schema
+        schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/ScientificStructureSearch'},{'type':'null'}]
+        decision=schema['$defs']['ResearchDecision']
+        decision['required'].remove('research_intent')
+        if actions==['search']:
+            decision['properties'].pop('research_intent')
+            decision['properties'].pop('selected_method')
+            decision['properties'].pop('requested_budget')
+            decision['required']=[k for k in decision['required'] if k not in ('selected_method','requested_budget')]
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
@@ -64,9 +85,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['properties']['decision']={'$ref':'#/$defs/ResearchDecision'}
     schema['allOf']=[]
     for intent in dict.fromkeys(PLAN_RESEARCH_INTENTS[a] for a in actions):
-        owners=[a for a in actions if PLAN_RESEARCH_INTENTS[a]==intent]
+        owners=[a for a in actions if PLAN_RESEARCH_INTENTS[a]==intent and not (structure_intent and a=='search')]
+        if not owners:continue
         schema['allOf'].append({'if':{'properties':{'action':{'enum':owners}}},
             'then':{'properties':{'decision':{'properties':{'research_intent':{'const':intent}}}}}})
+        if structure_intent:schema['allOf'][-1]['then']['properties']['decision']['required']=['research_intent']
     for field in dict.fromkeys(payloads.values()):
         owners=[a for a in actions if payloads.get(a)==field or field in PLAN_OPTIONAL_PAYLOADS.get(a,())]
         if not owners:continue
@@ -85,8 +108,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     schema['allOf'].append({'if':{'properties':{'action':{'not':{'enum':['select','confirm']}}}},
         'then':{'properties':{'revise_selection':{'const':False}}}})
     if decision_required:
-        if scientific_question and any(a!='diagnose' for a in actions):
-            schema['allOf'].append({'if':{'properties':{'action':{'enum':[a for a in actions if a!='diagnose']}}},
+        if scientific_question and any(a!='diagnose' and not (structure_intent and a=='search') for a in actions):
+            schema['allOf'].append({'if':{'properties':{'action':{'enum':[a for a in actions if a!='diagnose' and not (structure_intent and a=='search')]}}},
                 'then':{'properties':{'decision':{'required':['selected_method']}}}})
         if scientific_question and 'diagnose' in actions:
             schema['allOf'].append({'if':{'properties':{'action':{'enum':['diagnose']}}},
@@ -436,9 +459,9 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
         field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources})
     if scientific_question is not None:
-        from tools.research.contracts import ScientificQuestion
+        from tools.research.scientific_intent import question_schema
         audit_input.update(raw_main_input=deepcopy(scientific_question),
-            provider_schema=ScientificQuestion.model_json_schema(),internal_binding_schema=schema,
+            provider_schema=question_schema(spec),internal_binding_schema=schema,
             compiled_variables=deepcopy(payload))
         audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
@@ -494,7 +517,10 @@ def error_feedback(host, use, exc, before):
     full=record(host,'tool_request_error',dict(tool_use=use,error=type(exc).__name__,message=str(exc),traceback=traceback.format_exc()))
     counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','local_solves','admitted_training_stages'))
     message=str(exc);code=message.split(':',1)[0].split('\n',1)[0]
-    field=None;expected=message[:300];refs=[]
+    field=None;expected=message[:300];refs=[];contract=None;issues=[]
+    if hasattr(exc,'issues'):
+        contract='ScientificStructureSearch';issues=exc.issues
+        field=issues[0]['field'];expected=issues[0]['reason'];message=str(exc)
     if hasattr(exc,'errors'):
         errors=exc.errors(include_url=False,include_context=False,include_input=False)
         search=use.get('input',{}).get('search')
@@ -508,6 +534,11 @@ def error_feedback(host, use, exc, before):
         field='.'.join(map(str,errors[0]['loc'])) or None
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']
+        from tools.research.structure_intent import contract_issues
+        contract,issues=contract_issues(use.get('input',{}),errors)
+        message='; '.join(i['field']+': '+i['reason'] for i in issues)
+        if contract and issues:
+            field=issues[0]['field'];expected=issues[0].get('expected',issues[0]['reason'])
     elif isinstance(exc,SchemaValidationError):
         # Keep the exact validator dump in Store; send a field-specific repair
         # instead of Schema internals on the focused-tool correction turn.
@@ -518,6 +549,9 @@ def error_feedback(host, use, exc, before):
         code='TOOL_SCHEMA_'+str(exc.validator).upper();expected=exc.message
         if field=='decision.selected_candidate' and use.get('name')=='research_plan' and use.get('input',{}).get('action')=='diagnose':
             code='SELECTED_ANALYSIS_CANDIDATE_REQUIRED';message=code+': '+exc.message
+        if (use.get('input',{}).get('search') or {}).get('version')=='scientific_structure_search_v1' or 'research_goal' in (use.get('input',{}).get('search') or {}):
+            contract='ScientificStructureSearch'
+            issues=[dict(field=field,error_type=str(exc.validator),reason=exc.message)]
     hints={
         'SELECTED_ANALYSIS_CANDIDATE_REQUIRED':('decision.selected_candidate','Choose an exact owned candidate reference from the current candidate index, then resubmit the diagnose Plan with that reference. Method selection is not settled and research_analysis is unavailable until this identity is explicit; no candidate is inferred.'),
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
@@ -540,6 +574,8 @@ def error_feedback(host, use, exc, before):
         hints['the Main Agent must receive the complete evidence_read result']=formal_hint
     for marker,(f,hint) in hints.items():
         if marker in message:code=marker;field=f;expected=hint
+    if use.get('input',{}).get('action')=='diagnose' and 'selected_candidate' in use.get('input',{}):
+        field='selected_candidate';expected='Move this owned candidate reference to decision.selected_candidate; omit the top-level field.'
     if code=='TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE':
         entry=next((r for r in s['pilot'].get('tool_directory',[]) if r['tool']==use['input'].get('tool')),None)
         field='action'
@@ -639,6 +675,7 @@ def error_feedback(host, use, exc, before):
     worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
         reason=message[:1000],
+        **(dict(contract=contract,issues=issues) if contract else {}),
         worker_started=worker_started,
         charged_method_counts={k:s.get(k,0)-before.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations')},
         evidence_navigation=getattr(exc,'evidence_navigation',None),
@@ -1075,20 +1112,20 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
         from tools.research.evidence_policy import english_native
         if 'research' in current:
+            from tools.research.scientific_intent import enabled as question_enabled
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
                 diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
-            if s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v1':
+            if question_enabled(s['spec']):
                 native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)
-            from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan
+            from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema
             question_mode=question_enabled(s['spec'])
             selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
             if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
-                from tools.research.contracts import ScientificQuestion
                 tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                    'inputSchema':{'json':ScientificQuestion.model_json_schema()}}
+                    'inputSchema':{'json':question_schema(s['spec'])}}
                 agent.tool_registry.registry['research_analysis']=tool
             elif selected:
                 method,detail=selected

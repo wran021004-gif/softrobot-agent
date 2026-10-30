@@ -185,6 +185,10 @@ def retrieve(host,query,*,reader='agent'):
         evidence_role='context_only',
         reader=reader,scientific_evidence=False,scope='Historical procedural guidance, not current Study scientific evidence; transfer analytical principles only, not historical task values or control results. Cross-task validity is unverified; no acceptance or action authorization')
     if q.operation=='search':record['read_guidance']='Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.'
+    from tools.research.structure_intent import enabled as structure_enabled
+    if structure_enabled(state(host)['spec']):
+        record['filter_values']={name:sorted({r[name] for r in entries(host)}) for name in ('kind','task','structure','failure_type','version')}
+        record['prior_read_progress']=read_progress(host)
     if q.operation=='search' and not rows:
         from tools.research.evidence_policy import english_sources
         eligible=[r for r in entries(host) if not english_sources(state(host)['spec']) or english_source_ready(r)]

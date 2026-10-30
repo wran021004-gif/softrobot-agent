@@ -556,12 +556,14 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy','language_policy','evidence_read_policy'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','structure_search_interface','conversation_policy','tool_schema_policy','language_policy','evidence_read_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         validate_conversation_policy(decisions)
-        if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2','scientific_question_v1')
+        if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2','scientific_question_v1','scientific_question_v2')
                 or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')):
             raise ValueError('VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED')
+        if 'structure_search_interface' in decisions and (decisions['structure_search_interface']!='scientific_structure_search_v1' or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')):
+            raise ValueError('VERSIONED_ENGLISH_STRUCTURE_SEARCH_INTERFACE_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
                 raise ValueError('BOUNDED_RESEARCH_CONTEXT_LIMIT_REQUIRED')

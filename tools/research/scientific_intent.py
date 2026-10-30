@@ -5,7 +5,7 @@ No optimizer, state machine, source ledger or execution admission lives here.
 from copy import deepcopy
 
 from tools.platform_store import plain
-from tools.research.contracts import ScientificQuestion, LocalControlSearchSettings
+from tools.research.contracts import ScientificQuestion, ScientificQuestionV2, ScientificControlEffort, LocalControlSearchSettings
 from tools.research.state import state, protected
 from tools.research.nonlinear_capability import T1, T2
 
@@ -13,7 +13,41 @@ INTERFACE = 'scientific_question_v1'
 
 
 def enabled(spec):
-    return spec.get('research_decisions',{}).get('analysis_interface') == INTERFACE
+    return spec.get('research_decisions',{}).get('analysis_interface') in (INTERFACE,'scientific_question_v2')
+
+
+def question_contract(spec):
+    return ScientificQuestionV2 if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2' else ScientificQuestion
+
+
+def question_schema(spec):
+    schema=question_contract(spec).model_json_schema()
+    if question_contract(spec) is ScientificQuestionV2:
+        for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
+        schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
+    return schema
+
+
+def control_settings(spec, effort, *, window=None, channels=None):
+    """Shared v2 effort mapping; original LocalControlSearchSettings is final authority."""
+    q=ScientificControlEffort.model_validate(effort)
+    duration=spec['analysis_protocol']['duration_s'];a,b=window or (0.,duration)
+    if not 0<=a<b<=duration:raise ValueError('LOCAL_WINDOW_MUST_BE_INSIDE_FROZEN_TASK')
+    if window is not None and q.knot_count<3:raise ValueError('LOCAL_WINDOW_REQUIRES_INTERIOR_KNOT_AND_ZERO_ENDPOINTS')
+    domain=LocalControlSearchSettings.model_json_schema()['properties']
+    limits=spec.get('native_control_limits',{})
+    iterations=q.iterations if q.iterations is not None else min(q.evaluation_requests,limits.get('iterations',domain['iterations']['maximum']),domain['iterations']['maximum'])
+    settings=dict(version='local_control_search_v2',method=q.method,
+        knots_s=[a+(b-a)*i/(q.knot_count-1) for i in range(q.knot_count)],
+        correction_window_s=[0.,duration],iterations=iterations,evaluation_requests=q.evaluation_requests)
+    settings['knots_s'][-1]=b
+    if window is not None:
+        settings['active_coefficients']=list(range(channels,(q.knot_count-1)*channels))
+    result=LocalControlSearchSettings.model_validate(settings)
+    for name,limit in limits.items():
+        actual=len(result.knots_s) if name=='knots_s' else getattr(result,name)
+        if actual>limit:raise ValueError('ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT: '+name)
+    return result
 
 
 def completed_question_plan(host):
@@ -34,7 +68,7 @@ def compile_question(host, payload, *, tool_use_id):
     from tools.research.design import verify_candidate
     from tools.research.optimal_capability import family_analysis_parameters
     try:
-        question = ScientificQuestion.model_validate(payload)
+        question = question_contract(state(host)['spec']).model_validate(payload)
     except ValidationError as exc:
         return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_INPUT',issues=[
             dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
@@ -101,9 +135,14 @@ def compile_question(host, payload, *, tool_use_id):
     if method==T1:
         if q.source_selection.comparison_candidates or q.source_selection.t1_results:
             return feedback('unsupported','CONTROL_SEARCH_REQUIRES_A_CONTROL_SOURCE_NOT_STRUCTURAL_EVIDENCE')
+        effort=getattr(q,'control_search_effort',None)
+        if isinstance(q,ScientificQuestionV2) and (effort is None or q.search_strategy is not None or q.requested_budget is not None):
+            return feedback('needs_choice','USE_CONTROL_SEARCH_EFFORT_WITH_INDEPENDENT_KNOT_ITERATION_AND_CALLBACK_FIELDS',fields=['control_search_effort'])
         plan_budget = intent['agent_hypothesis']['decision'].get('requested_budget',0)
         budget = q.requested_budget if q.requested_budget is not None else plan_budget or None
-        missing = [name for name in ('control_scope','search_strategy') if getattr(q,name) is None]
+        if effort:budget=effort.evaluation_requests
+        missing = [name for name in ('control_scope',) if getattr(q,name) is None]
+        if not effort and q.search_strategy is None:missing.append('search_strategy')
         if budget is None:missing.append('requested_budget')
         if missing:
             return feedback('needs_choice','CONTROL_SEARCH_SCIENTIFIC_CHOICES_REQUIRED',fields=missing,
@@ -148,6 +187,13 @@ def compile_question(host, payload, *, tool_use_id):
         settings = dict(version='local_control_search_v2',method=q.search_strategy,knots_s=knots,
             correction_window_s=[0.,duration],evaluation_requests=budget)
         if active is not None:settings['active_coefficients']=active
+        if effort:
+            try:
+                settings=plain(control_settings(spec,effort,window=q.control_scope.window_s if q.control_scope.mode=='time_window' else None,
+                    channels=len(c['configuration']['robot']['structure']['data']['tendons'])))
+                knots=settings['knots_s']
+            except ValueError as exc:
+                return feedback('needs_choice','SEARCH_SETTINGS_OUTSIDE_ORIGINAL_CONTRACT',field='control_search_effort',reason_detail=str(exc))
         try:defaults = LocalControlSearchSettings.model_validate(settings)
         except ValidationError as exc:
             return feedback('needs_choice','SEARCH_SETTINGS_OUTSIDE_ORIGINAL_CONTRACT',
@@ -158,7 +204,7 @@ def compile_question(host, payload, *, tool_use_id):
                 return feedback('blocked','ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT',field=name,requested=actual,maximum=limit)
         compiled = dict(control_optimization=dict(source=legal[0],settings=settings))
     else:
-        if q.control_scope or q.search_strategy or q.source_selection.control_source:
+        if q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or q.source_selection.control_source:
             return feedback('unsupported','STRUCTURAL_COMPARISON_REUSES_FIXED_INPUT_OR_SAVED_T1_SETTINGS')
         path = q.parameter_paths[0]
         if method==T2:

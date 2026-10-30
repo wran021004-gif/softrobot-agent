@@ -335,6 +335,43 @@ class ScientificQuestion(Contract):
     response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05,description='Fixed-input native short response horizon, not full-task capability or acceptance.')
 
 
+_CONTROL_DOMAIN = LocalControlSearchSettings.model_json_schema()['properties']
+
+
+class ScientificControlEffort(Contract):
+    """Scientific effort, compiled to the existing LocalControlSearchSettings."""
+    method: Literal['pattern','response']
+    knot_count: int = Field(default=4,strict=True,ge=_CONTROL_DOMAIN['knots_s']['minItems'],le=_CONTROL_DOMAIN['knots_s']['maxItems'],description='Uniform knots over the chosen adjustment window. Evaluation always covers the complete frozen task. Local windows require at least one interior knot; endpoint corrections remain zero.')
+    iterations: int | None = Field(default=None,strict=True,ge=_CONTROL_DOMAIN['iterations']['minimum'],le=_CONTROL_DOMAIN['iterations']['maximum'],description='Independent iteration cap. If omitted: min(callback cap, frozen Study iteration cap, original contract maximum). Early convergence can use fewer callbacks/iterations.')
+    evaluation_requests: int = Field(strict=True,ge=_CONTROL_DOMAIN['evaluation_requests']['minimum'],le=_CONTROL_DOMAIN['evaluation_requests']['maximum'],description='Maximum Native rollout callbacks per condition; separate from iterations and formal mathematical evaluation charges.')
+
+
+class ScientificQuestionV2(ScientificQuestion):
+    version: Literal['scientific_question_v2'] = 'scientific_question_v2'
+    control_search_effort: ScientificControlEffort | None = None
+
+
+class StructureSearchEffort(Contract):
+    max_proposals: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_proposals']['maximum'])
+    max_evaluations: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_evaluations']['maximum'],description='Condition analysis entries, not Native callbacks. Must cover every frozen condition for at least one structure.')
+
+
+class ScientificStructureSearch(Contract):
+    version: Literal['scientific_structure_search_v1'] = 'scientific_structure_search_v1'
+    research_goal: Literal['structure_control_codesign','structural_capability_screening']
+    design_variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing']] = Field(min_length=1,description='Real structure groups only. Control reoptimization is specified separately by control_treatment.')
+    evaluation_model: Literal['native_mujoco','mathematical_proxy']
+    control_treatment: Literal['reoptimized','not_optimized']
+    structure_search_effort: StructureSearchEffort
+    control_search_effort: ScientificControlEffort | None = None
+    initial_tension_n: FiniteFloat | None = Field(default=None,ge=0,description='Native common absolute initial tension. Omit only to use the unique frozen tendon pretension default; if unavailable an explicit choice is required.')
+    proxy_objective: Literal['task_violation','target_equilibrium_residual','held_position_min_eigenvalue'] | None = Field(default=None,description='Required for mathematical_proxy; never substituted for Native task capability.')
+    segment_counts: list[StrictInt] | None = Field(default=None,description='Omit for frozen singleton topology. Explicit out-of-domain choices are rejected, never clamped.')
+    tendon_counts: list[StrictInt] | None = None
+    span_strategies: list[str] | None = Field(default=None,description='Omit to explore legal strategies when spans is selected, otherwise retain original whole_chain search default.')
+    section_types: list[str] = Field(default_factory=list,description='Omit to retain original prototype section kinds; dimension changes still use frozen domains.')
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned structure candidate reference, not a control sequence. operation and model_source must match a registered mathematical_capabilities method.')
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
