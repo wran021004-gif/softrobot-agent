@@ -1,0 +1,2721 @@
+{
+  "milestone": "P6.3-C3",
+  "scope": "Actual one-Study read-only audit; raw Provider bodies/opaque reasoning, credentials and Knowledge bodies are excluded.",
+  "study_id": "p63c3-m3-scientific-intent-sol-20261030",
+  "store": "C:\\Users\\gugugaga\\Documents\\Codex\\2026-10-30\\files-pasted-by-the-user-p6\\work\\softrobot-c3\\runs\\research\\p63c3-m3-scientific-intent-sol-20261030",
+  "baseline": "2581e01a9e17461224bc712f5e4cbe26e04685af",
+  "actual_window_freeze": "f095b9c6a234f73db8bab8cfcea6f68079f54312",
+  "actual_window_resolved_identity": "3865f9de72fd99783055533b55993579c052e33002bd37341fc41e185ace314d",
+  "source_configuration": "configs/research/study_p63c3_m3_scientific_intent_sol.json",
+  "task": {
+    "trace": "memory/cases/m3_research_v1/success_trace.json",
+    "task": "tasks/reach_hold_b3_050.json",
+    "protocol_level": "development_draft",
+    "formal_benchmark_approved": false,
+    "target_m": [
+      0.29,
+      -0.035,
+      0.19
+    ],
+    "duration_s": 0.5,
+    "holding_window_s": 0.05,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "period_s": 0.01,
+    "timestep_s": 0.0005,
+    "exact_original_value_comparisons": {
+      "canonical_task": true,
+      "protocol": true,
+      "family": true,
+      "robot_structure": true,
+      "task": true,
+      "seed": true,
+      "backend": true,
+      "dynamics_model": true,
+      "discretization": true,
+      "controller": true
+    }
+  },
+  "preparation": {
+    "study_id": "p63c3-m3-scientific-intent-sol-20261030",
+    "store": "C:\\Users\\gugugaga\\Documents\\Codex\\2026-10-30\\files-pasted-by-the-user-p6\\work\\softrobot-c3\\runs\\research\\p63c3-m3-scientific-intent-sol-20261030",
+    "freeze": "5bbd371d50bfc5e23ee9e415458da9ef0bc0bda5",
+    "resolved_identity": "065ca6a7d2065d4425cb83391cf11f6b6807f5708b7ae041253ef8914a24b5a3",
+    "authorization": {
+      "artifact_id": "03e9c872e93b47cfbdb694fb1403eb09ab37416f453de2cafa73b9bc7df7cac2",
+      "media_type": "application/json"
+    },
+    "live_handoff_admission": {
+      "artifact_id": "779f8c55ca922a46bbb2852d24f50de5fdf193ea567c38389a98562d0e026495",
+      "media_type": "application/json"
+    },
+    "environment_admission": {
+      "artifact_id": "783dabc98086212c9b8be4929ebeab6b784ed34366667e0ad2203760c9bdcd72",
+      "media_type": "application/json"
+    },
+    "operator_preparation": {
+      "artifact_id": "d056e7f0ade3201dbc8d84b4e1176d6ece89424103c16ee6c0f999f8475848d0",
+      "media_type": "application/json"
+    },
+    "decision_owner": "operator",
+    "exact_M3_value_comparisons": {
+      "canonical_task": true,
+      "protocol": true,
+      "family": true,
+      "robot_structure": true,
+      "task": true,
+      "seed": true,
+      "backend": true,
+      "dynamics_model": true,
+      "discretization": true,
+      "controller": true
+    },
+    "candidate": {
+      "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+      "media_type": "application/json"
+    },
+    "generation_request": {
+      "control_weights": {},
+      "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+      "route_overrides": {},
+      "segment_count": 2,
+      "segments": {
+        "0": {
+          "cells": 12,
+          "length_m": null,
+          "sections": null,
+          "young_pa": null
+        },
+        "1": {
+          "cells": 12,
+          "length_m": null,
+          "sections": null,
+          "young_pa": null
+        }
+      },
+      "spans": [],
+      "strategy": "polar_consecutive_spans_v1",
+      "tendon_count": 6,
+      "tendon_parameters": {},
+      "version": "serial_family_generation_v2"
+    },
+    "control_source": {
+      "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+      "media_type": "application/json"
+    },
+    "control_task_acceptance": "unmeasured",
+    "control_grid": {
+      "points": 51,
+      "intervals": 50,
+      "start": 0.0,
+      "end": 0.5
+    },
+    "initial_tensions_n": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "tendon_order": [
+      "tendon_0",
+      "tendon_1",
+      "tendon_2",
+      "tendon_3",
+      "tendon_4",
+      "tendon_5"
+    ],
+    "tension_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "gateway_health": {
+      "status": "ok",
+      "account_status": "connected",
+      "plan_usage": true
+    },
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 1,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 0,
+      "protected_provider_requests": 1,
+      "protected_public_operations": 2,
+      "provider_requests": 12,
+      "provider_reserve_policy": "last_requests_v2",
+      "public_operations": 32
+    },
+    "native_control_limits": {
+      "evaluation_requests": 8,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "provider": {
+      "model": "gpt-5.6-sol",
+      "reasoning": "none"
+    },
+    "counts_before_live": {
+      "main_plans": 0,
+      "math": 0,
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.0
+      }
+    },
+    "imported_scientific_results": []
+  },
+  "budget_addenda": {
+    "pre_live_1_to_3": {
+      "study_id": "p63c3-m3-scientific-intent-sol-20261030",
+      "addendum": {
+        "artifact_id": "dc9fbf7ac8eed09b821181ed60bd2d933139c6fe3461787eda43530492871e4d",
+        "media_type": "application/json"
+      },
+      "authorization": {
+        "artifact_id": "7046a993870ccf13eb5be7fcac138472beee61d7fce90fae569aee53944ea2cb",
+        "media_type": "application/json"
+      },
+      "freeze": "f095b9c6a234f73db8bab8cfcea6f68079f54312",
+      "resolved_identity": "3865f9de72fd99783055533b55993579c052e33002bd37341fc41e185ace314d",
+      "previous_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "budget": {
+        "provider_requests": 12,
+        "protected_provider_requests": 1,
+        "public_operations": 32,
+        "protected_public_operations": 2,
+        "physical_launches": 0,
+        "local_solves": 0,
+        "local_solve_s": null,
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "mathematical_evaluations": 3,
+        "numerical_s": null,
+        "activity_s": null,
+        "delivery_reserve_s": null,
+        "provider_reserve_policy": "last_requests_v2"
+      },
+      "native_control_limits": {
+        "evaluation_requests": 8,
+        "iterations": 100,
+        "knots_s": 4
+      },
+      "scientific_profile_unchanged": true,
+      "existing_candidates_sources_and_consumption_retained": true
+    },
+    "post_window_3_to_12": {
+      "study_id": "p63c3-m3-scientific-intent-sol-20261030",
+      "addendum": {
+        "artifact_id": "ca3f74a400e34d06cb8b44282412aa928fc0b59ad404740883daa7711ed97a3b",
+        "media_type": "application/json"
+      },
+      "authorization": {
+        "artifact_id": "b7da648a218e9e163707f30233b09ee7997e74f48ec13ba3bbf54b2381a00f45",
+        "media_type": "application/json"
+      },
+      "resolved_identity": "3af8fab236be03ebf3f6e03c49130e4e23c25ccd5594ecb364fb351be9cd50f9",
+      "actual_window_freeze": "f095b9c6a234f73db8bab8cfcea6f68079f54312",
+      "post_window_binding": "e5346084abf87b9d514faae6d6bcc83eccdae0f3",
+      "math_ceiling": 12,
+      "math_used": 1,
+      "ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 12,
+          "tool_calls": 32,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 11,
+          "model_calls": 12,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 138.21444459995837
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 21,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "actual_window_math_ceiling": 3,
+      "no_additional_provider_request": true,
+      "original_science_and_consumption_retained": true
+    },
+    "interpretation": "All twelve actual Provider requests saw ceiling=3; math used=1 and remaining=2. The later ceiling=12 was applied only at the settled boundary and sent to no new Provider request."
+  },
+  "offline_validation": {
+    "tests": 3,
+    "passed": 3,
+    "seconds": 71.126,
+    "git_diff_check": "passed"
+  },
+  "checkpoint_A": {
+    "provider_requests": 6,
+    "math": 1,
+    "reporter_requests": 1,
+    "pause": {
+      "reference": {
+        "artifact_id": "d2a06cd4716e624b075f037ea54d4331604382d4ebb784757632b45b6b241242",
+        "media_type": "application/json"
+      },
+      "boundary": "provider_request_limit",
+      "budgets_preserved": true,
+      "next_request_sent": false
+    },
+    "outcome": "Native computed; unsupported closed-loop question rejected without substitution; Main independently corrected semantics; original task/source/applicability admitted. Continue same Study within six remaining Provider requests."
+  },
+  "actual_scientific_question_schema": {
+    "first_request": 4,
+    "wire_reference": {
+      "artifact_id": "4d8373aa315d62802c11352c0448b1b82d54861c386ce0747ad48e3a0ad37927",
+      "media_type": "application/json"
+    },
+    "schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "ScientificControlScope": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "description": "C2 finite search parameterization: full_task adjusts all tendon channels with two independent endpoint knots over the frozen task; time_window adjusts all channels with one triangular pulse per channel and zero endpoint corrections. Choose a scope only when this parameterization answers the question; arbitrary waveform or channel-subset search is not adapted.",
+              "enum": [
+                "full_task",
+                "time_window"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "window_s": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Only control corrections inside this interval; evaluation still covers the complete frozen task.",
+              "title": "Window S"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "ScientificControlScope",
+          "type": "object"
+        },
+        "ScientificSources": {
+          "additionalProperties": false,
+          "properties": {
+            "comparison_candidates": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "maxItems": 2,
+              "title": "Comparison Candidates",
+              "type": "array"
+            },
+            "control_source": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "t1_results": {
+              "description": "Saved comparable T1 evidence, baseline/minus/plus. Does not request new T1 calculations.",
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "maxItems": 3,
+              "title": "T1 Results",
+              "type": "array"
+            }
+          },
+          "title": "ScientificSources",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Scientific choices only; the completed Plan owns hypothesis and candidate.",
+      "properties": {
+        "control_scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScientificControlScope"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Property control_scope"
+        },
+        "effect_semantics": {
+          "anyOf": [
+            {
+              "enum": [
+                "mechanism_effect",
+                "fixed_input_response",
+                "reoptimized_task_capability",
+                "closed_loop_performance",
+                "re_equilibrated_passive_response"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "mechanism_effect: Jacobian/compliance/drive mechanisms; fixed_input_response: structure response with unchanged input; reoptimized_task_capability: task response after control reoptimization (finite budget here); closed_loop_performance: complete feedback execution; re_equilibrated_passive_response: passive response after solving a new equilibrium. Unsupported semantics are never substituted.",
+          "title": "Effect Semantics"
+        },
+        "fixed_input": {
+          "anyOf": [
+            {
+              "enum": [
+                "frozen_initial_tensions",
+                "constant_tensions"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fixed-input structure comparison only: retain frozen initial pretensions or supply a constant absolute tension vector.",
+          "title": "Fixed Input"
+        },
+        "focus_metric": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Registered task constraint ID or native observable; focus does not remove any frozen acceptance constraint.",
+          "title": "Focus Metric"
+        },
+        "parameter_paths": {
+          "description": "Actual registered physical design paths. C2 supports one independent continuous path per structural question.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Parameter Paths",
+          "type": "array"
+        },
+        "question_type": {
+          "description": "Property question_type",
+          "enum": [
+            "control_feasibility",
+            "structure_parameter_effect"
+          ],
+          "title": "Question Type",
+          "type": "string"
+        },
+        "requested_budget": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum native rollout callbacks for this T1 search; original model/rollout/physics charges still apply. T2 uses one aggregation evaluation and references prior charges.",
+          "title": "Requested Budget"
+        },
+        "response_horizon_s": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 0.05,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fixed-input native short response horizon, not full-task capability or acceptance.",
+          "title": "Response Horizon S"
+        },
+        "search_strategy": {
+          "anyOf": [
+            {
+              "enum": [
+                "response",
+                "pattern"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Finite local response or pattern search; neither certifies a global optimum.",
+          "title": "Search Strategy"
+        },
+        "source_selection": {
+          "$ref": "#/$defs/ScientificSources"
+        },
+        "tensions_n": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Property tensions_n",
+          "title": "Tensions N"
+        },
+        "version": {
+          "const": "scientific_question_v1",
+          "default": "scientific_question_v1",
+          "description": "Property version",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question_type"
+      ],
+      "title": "ScientificQuestion",
+      "type": "object"
+    }
+  },
+  "diagnose_schema": {
+    "request": 3,
+    "wire_reference": {
+      "artifact_id": "7cfddf9e345786cd0efe645ebb435ae817dcafbb53c8ab6c71dc40a0501138e2",
+      "media_type": "application/json"
+    },
+    "selected_method_required": false
+  },
+  "raw_main_diagnose": {
+    "tool": "research_plan",
+    "input": {
+      "action": "diagnose",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "H1_initialized_schedule_satisfies_reach_hold",
+        "requested_budget": 1,
+        "research_intent": "DIAGNOSE",
+        "selected_candidate": {
+          "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+          "media_type": "application/json"
+        },
+        "selected_method": "trajectory_feasibility",
+        "selected_variables": [
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "version": "research_decision_v1"
+      },
+      "expected_observation": "A full-horizon trajectory-feasibility evaluation reports terminal_error_m <= 0.01, holding_max_error_m <= 0.01, and holding_max_speed_m_s <= 0.02 without numerical failure.",
+      "experience_disposition": {
+        "research-bounded-continuation@2": "adopted"
+      },
+      "fixed_conditions": "Keep candidate fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de, initialized source d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a, target [0.29,-0.035,0.19] m, 0.01 m reach and hold position limits, 0.02 m/s hold speed limit, 0.05 s hold window, 0.5 s duration, 0.01 s control and sample periods, 0.0005 s timestep, original physics inputs, and original source and budget admission unchanged.",
+      "hypothesis": "Under the frozen original Reach/Hold task, executing the initialized full control sequence on the candidate with the full task model and complete 0.5 s horizon will satisfy all three evaluator limits: terminal error at most 0.01 m, final-window maximum position error at most 0.01 m, and final-window maximum translational tip speed at most 0.02 m/s.",
+      "interpretation": "This is a falsifiable schedule-specific test. Passing mathematical evidence would support H1 at the model scope but would not itself establish independent task acceptance. Failure would identify the violated frozen conditions and weaken only H1, not prove structural infeasibility or global control optimality.",
+      "stopping_condition": "After one admitted complete-horizon mathematical evaluation, judge H1 from all three metrics. If all pass, formally read the exact fresh result before any acceptance decision; if any fail, do not infer global infeasibility and decide whether remaining budget justifies a bounded same-candidate diagnostic or STOP.",
+      "weakening_observation": "Any reported metric exceeds its frozen limit, or numerical failure prevents complete-horizon evaluation; such a result weakens this schedule-specific hypothesis but does not establish global infeasibility of the structure or task."
+    },
+    "tool_use_id": "call_4OsD8uGW5D33X4xUWQJVC0OE",
+    "input_reference": {
+      "artifact_id": "0b7ff0f1a79476baa57c4c83007a06248547f317bfc8990d0372846f2cafced6",
+      "media_type": "application/json"
+    },
+    "feedback_reference": {
+      "artifact_id": "f54929b4b19d5a8e3554a237b2c131c5dd5c5d9cb76e8754b05d2ca356d38977",
+      "media_type": "application/json"
+    },
+    "feedback_status": "success",
+    "feedback_summary": {
+      "execution_feedback": {
+        "status": "read_only_diagnosis_completed",
+        "new_scientific_computations": 0,
+        "selected_method_status": "intent_only; not dispatched by diagnose",
+        "executable_request_submitted": false,
+        "execution_entry": {
+          "tool": "research_analysis",
+          "methods_query": {
+            "reference": {
+              "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+              "media_type": "application/json"
+            },
+            "view": "mathematical_capabilities",
+            "pointer": "/methods"
+          },
+          "candidate_required": false,
+          "request": "Submit a ScientificQuestion to research_analysis. Candidate and hypothesis are bound from this Plan; no registered method name is required.",
+          "interface": "scientific_question_v1"
+        }
+      }
+    }
+  },
+  "raw_scientific_questions": [
+    {
+      "tool": "research_analysis",
+      "input": {
+        "control_scope": {
+          "mode": "full_task"
+        },
+        "effect_semantics": "closed_loop_performance",
+        "focus_metric": "terminal_error_m",
+        "question_type": "control_feasibility",
+        "requested_budget": 8,
+        "search_strategy": "response",
+        "source_selection": {
+          "control_source": {
+            "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "tool_use_id": "call_vAbKWmhYjs5rCcPulGGmg7OM",
+      "input_reference": {
+        "artifact_id": "c3510f138cd001e8f008494d8979aeebc22c4825ca9323d34572f4280e21a4a1",
+        "media_type": "application/json"
+      },
+      "feedback_reference": {
+        "artifact_id": "a12802db3a2176dd697d83b6e6d4ee12e70a1b6d5bff42aa9367460ffa44b3fd",
+        "media_type": "application/json"
+      },
+      "feedback_status": "success",
+      "feedback_summary": {
+        "status": "unsupported",
+        "reason": "CONTROL_FEASIBILITY_REQUIRES_CONTROL_REOPTIMIZATION",
+        "scientific_execution_started": false
+      }
+    },
+    {
+      "tool": "research_analysis",
+      "input": {
+        "control_scope": {
+          "mode": "full_task"
+        },
+        "effect_semantics": "reoptimized_task_capability",
+        "focus_metric": "terminal_error_m",
+        "question_type": "control_feasibility",
+        "requested_budget": 8,
+        "search_strategy": "response",
+        "source_selection": {
+          "control_source": {
+            "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "tool_use_id": "call_eHeZ0bYvWxrzHkNz8uITEHbu",
+      "input_reference": {
+        "artifact_id": "3c2609403bc4170166b89235b3dbcc3ae9dd1176fa190814669e89ac4b4cc51a",
+        "media_type": "application/json"
+      },
+      "feedback_reference": {
+        "artifact_id": "1c512f02f0632b8176a02ad1fe2692b78ffe7b20d2443366b107bc2406816815",
+        "media_type": "application/json"
+      },
+      "feedback_status": "success",
+      "feedback_summary": {
+        "scientific_result_status": "computed",
+        "scientific_result_reference": {
+          "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+          "media_type": "application/json"
+        },
+        "operation_outcome": {
+          "candidate": {
+            "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+            "media_type": "application/json"
+          },
+          "reference": {
+            "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+            "media_type": "application/json"
+          },
+          "status": "computed"
+        },
+        "interpretation_status": "deferred"
+      }
+    }
+  ],
+  "compilation": {
+    "binding_reference": {
+      "artifact_id": "c8932f10d1acaf3d4a70ae1cfbdca7602b83c76e898ce946f511b4b1a0e88298",
+      "media_type": "application/json"
+    },
+    "raw_main_input": {
+      "control_scope": {
+        "mode": "full_task"
+      },
+      "effect_semantics": "reoptimized_task_capability",
+      "focus_metric": "terminal_error_m",
+      "question_type": "control_feasibility",
+      "requested_budget": 8,
+      "search_strategy": "response",
+      "source_selection": {
+        "control_source": {
+          "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "compiled_variables": {
+      "control_optimization": {
+        "settings": {
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "evaluation_requests": 8,
+          "knots_s": [
+            0.0,
+            0.5
+          ],
+          "method": "response",
+          "version": "local_control_search_v2"
+        },
+        "source": {
+          "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "full_request": {
+      "candidate": {
+        "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+        "media_type": "application/json"
+      },
+      "control_optimization": {
+        "settings": {
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "evaluation_requests": 8,
+          "knots_s": [
+            0.0,
+            0.5
+          ],
+          "method": "response",
+          "version": "local_control_search_v2"
+        },
+        "source": {
+          "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+          "media_type": "application/json"
+        }
+      },
+      "model_source": "mujoco",
+      "operating_point": "standardized_initial_pretension",
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.16,
+          "segment_1": 0.11,
+          "segment_2": 0.14,
+          "segment_3": 0.14,
+          "segment_4": 0.14,
+          "segment_5": 0.14,
+          "segment_6": 0.14,
+          "segment_7": 0.14,
+          "segment_8": 0.14
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 0.5,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.01,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          0.1,
+          0.2,
+          0.48
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.05,
+          0.1,
+          0.5
+        ]
+      }
+    },
+    "field_sources": {
+      "candidate": {
+        "pointer": "/original_plan/decision/selected_candidate",
+        "reference": {
+          "artifact_id": "e0921d84eb7a3d15b3a6dadc8bf1873abb6e8ead3e6f244b1367c2016a562bf3",
+          "media_type": "application/json"
+        }
+      },
+      "control_optimization": {
+        "plan_reference": {
+          "artifact_id": "e0921d84eb7a3d15b3a6dadc8bf1873abb6e8ead3e6f244b1367c2016a562bf3",
+          "media_type": "application/json"
+        },
+        "source": "Deterministic ScientificQuestion compilation",
+        "tool_use_id": "call_eHeZ0bYvWxrzHkNz8uITEHbu"
+      },
+      "model_source": {
+        "pointer": "/request_template/model_source",
+        "source": {
+          "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+          "reference": {
+            "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities"
+        }
+      },
+      "operating_point": {
+        "legal_options": [
+          "standardized_initial_pretension"
+        ],
+        "method": "mujoco-nonlinear-task-capability-v1",
+        "source": "AnalysisRequest.validate_operating_point"
+      },
+      "operation": {
+        "pointer": "/operation",
+        "source": {
+          "pointer": "/methods/mujoco-nonlinear-task-capability-v1",
+          "reference": {
+            "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities"
+        }
+      },
+      "protocol": {
+        "freeze": "f095b9c6a234f73db8bab8cfcea6f68079f54312",
+        "pointer": "/spec/analysis_protocol",
+        "source": "frozen Study",
+        "study_id": "p63c3-m3-scientific-intent-sol-20261030"
+      }
+    }
+  },
+  "original_admission": {
+    "status": "applicable",
+    "applicability": {
+      "status": "applicable",
+      "reasons": [],
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [
+            50
+          ],
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay."
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay."
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay."
+        }
+      ],
+      "full_task_supported": false,
+      "execution_support": "independent_full_replay_required",
+      "model_assessment": {
+        "model_id": "model.mujoco_native",
+        "model_version": "1.0.0",
+        "representation_id": "native_named_hinges_v1",
+        "relevant_assumptions": [
+          "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+          "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+          "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+          "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+        ],
+        "uses": {
+          "native_numerics": {
+            "status": "ACCEPT",
+            "reasons": []
+          }
+        }
+      },
+      "horizon": {
+        "task_duration_s": 0.5,
+        "origin": 0.0,
+        "analysis_window_s": [
+          0.0,
+          0.5
+        ],
+        "period_s": 0.01,
+        "state_time_s": 0.0,
+        "task_deadline_s": 0.5,
+        "legal_correction_window_s": [
+          0.0,
+          0.5
+        ],
+        "earliest_required_sample_s": 0.45,
+        "covers_required_samples": true,
+        "state_requirement": "Frozen standardized initialization is at 0 s. A later origin requires an exact owned native checkpoint or verified measured prefix; a correction window does not move the initial state.",
+        "interpretation": "Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance."
+      }
+    },
+    "request_file": "C:\\Users\\gugugaga\\Documents\\Codex\\2026-10-30\\files-pasted-by-the-user-p6\\work\\softrobot-c3\\runs\\research\\p63c3-m3-scientific-intent-sol-20261030\\analyses\\74771b8bab9e474a8a191ecc1bfb1cdf\\request.json",
+    "boundary": {
+      "termination_confirmed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "worker_started": true,
+      "elapsed_s": 1.7754446000035387
+    },
+    "lifecycle": {
+      "pid": 198960,
+      "job_name": "Local\\softrobot-worker-01c44771f41b43f58f75e2ad68ad6bdd",
+      "command": [
+        "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+        "-m",
+        "tools.research.execution_worker",
+        "C:\\Users\\gugugaga\\Documents\\Codex\\2026-10-30\\files-pasted-by-the-user-p6\\work\\softrobot-c3\\runs\\research\\p63c3-m3-scientific-intent-sol-20261030\\analyses\\74771b8bab9e474a8a191ecc1bfb1cdf\\request.json"
+      ],
+      "started_unix": 1793336967.5509384
+    }
+  },
+  "science_result": {
+    "reference": {
+      "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+      "media_type": "application/json"
+    },
+    "status": "computed",
+    "task_acceptance": "unmeasured",
+    "J": 20.353796633408546,
+    "initial_J": 20.451754937763166,
+    "improvement": 0.09795830435461994,
+    "initial_metrics": {
+      "holding_max_position_error_m": 0.12531739147659965,
+      "holding_max_speed_m_s": 0.4290350987552633,
+      "normalized_gap": 20.451754937763166,
+      "returned_array_gap_interval": [
+        20.451754937763145,
+        20.451754937763184
+      ],
+      "signed_maximum_excess": 20.451754937763166,
+      "sum_normalized_excess": 42.12619658182339,
+      "terminal_position_error_m": 0.11142702496400263,
+      "worst_constraint": {
+        "constraint_id": "holding_max_speed_m_s",
+        "kind": "holding_speed",
+        "limit": 0.02,
+        "normalized_signed_excess": 20.451754937763166,
+        "time_s": 0.45000000000000034,
+        "unit": "m/s",
+        "value": 0.4290350987552633
+      }
+    },
+    "best_metrics": {
+      "holding_max_position_error_m": 0.12539360133832111,
+      "holding_max_speed_m_s": 0.4270759326681709,
+      "normalized_gap": 20.353796633408546,
+      "returned_array_gap_interval": [
+        20.353796633408525,
+        20.353796633408564
+      ],
+      "signed_maximum_excess": 20.353796633408546,
+      "sum_normalized_excess": 42.049556093672564,
+      "terminal_position_error_m": 0.11156399326431908,
+      "worst_constraint": {
+        "constraint_id": "holding_max_speed_m_s",
+        "kind": "holding_speed",
+        "limit": 0.02,
+        "normalized_signed_excess": 20.353796633408546,
+        "time_s": 0.45000000000000034,
+        "unit": "m/s",
+        "value": 0.4270759326681709
+      }
+    },
+    "stop_reason": "evaluation_request_budget",
+    "search_quality": {
+      "active_coefficients": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "convergence": "unresolved",
+      "finite_budget_observations_retained": true,
+      "global_optimality": "not_established",
+      "initialization": "candidate-owned frozen zero state and original absolute-tension sequence",
+      "initialization_pointer": "/native_dynamics/original_schedule",
+      "numerical_inner_solver": {
+        "last_local_solver": null,
+        "stop_reason": "evaluation_request_budget"
+      },
+      "search_dimension": 12,
+      "solver_pointer": "/native_dynamics/optimization"
+    },
+    "best_control": {
+      "coefficients_n": [
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "label": "finite_difference",
+      "rollout": "native-rollout-3",
+      "schedule_pointer": "/native_dynamics/optimized_schedule",
+      "source": {
+        "candidate": {
+          "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+          "media_type": "application/json"
+        },
+        "inherited_acceptance": false,
+        "method": "mujoco_nonlinear_task_capability_v1",
+        "settings": {
+          "coefficient_limit_n": 2.0,
+          "correction_window_s": [
+            0.0,
+            0.5
+          ],
+          "difference_step_n": 0.01,
+          "evaluation_requests": 8,
+          "initial_radius_n": 0.1,
+          "iterations": 16,
+          "knots_s": [
+            0.0,
+            0.5
+          ],
+          "method": "response",
+          "minimum_radius_n": 0.0001,
+          "version": "local_control_search_v2"
+        },
+        "source": {
+          "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+          "media_type": "application/json"
+        },
+        "state_provenance": {
+          "inherited_acceptance": false,
+          "initialization": "frozen_task_initializer_and_candidate_pretension"
+        }
+      }
+    },
+    "cost": {
+      "completed_response_steps": 0,
+      "forward_evaluations": 809,
+      "kernel_wall_s": 0.7648435999872163,
+      "mechanics_evaluations": 0,
+      "model_builds": 1,
+      "optimization_evaluations": 8,
+      "optimization_iterations": 1,
+      "physics_step_attempts": 8000,
+      "physics_steps": 8000,
+      "rollouts": 8
+    },
+    "charged_analysis_evaluations": 1,
+    "charged_numerical_s": 1.7754446000035387,
+    "limitations": [
+      "Best found signed J under the recorded algorithm, initialization and budget; no global nonlinear optimum.",
+      "Structural secants are finite-budget responses, not gradients or KKT/envelope derivatives.",
+      "Independent replay uses the same MuJoCo dynamics; no hardware, cross-model or other-controller transfer."
+    ]
+  },
+  "result_delivery": {
+    "first_main_request": 7,
+    "actual_packet": {
+      "reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "status": "computed",
+      "conclusion": "diagnostic",
+      "task_acceptance": "unmeasured",
+      "observations": [
+        {
+          "constraint_id": "holding_max_error_m",
+          "value": 0.12539360133832111,
+          "unit": "m",
+          "threshold": 0.01,
+          "passed": false,
+          "scope": "model_sample",
+          "time_s": 0.45000000000000034,
+          "source": {
+            "reference": {
+              "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/optimization/best/outputs"
+          }
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "value": 0.4270759326681709,
+          "unit": "m/s",
+          "threshold": 0.02,
+          "passed": false,
+          "scope": "model_sample",
+          "time_s": 0.45000000000000034,
+          "source": {
+            "reference": {
+              "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/optimization/best/outputs"
+          }
+        },
+        {
+          "constraint_id": "terminal_error_m",
+          "value": 0.11156399326431908,
+          "unit": "m",
+          "threshold": 0.01,
+          "passed": false,
+          "scope": "model_sample",
+          "time_s": 0.5000000000000003,
+          "source": {
+            "reference": {
+              "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/optimization/best/outputs"
+          }
+        }
+      ],
+      "observation_scope": "Only saved supported outputs; unmeasured constraints remain unresolved. No independent task acceptance is inferred.",
+      "quantities": {
+        "J": 20.353796633408546,
+        "initial_J": 20.451754937763166,
+        "improvement": 0.09795830435461994,
+        "evidence_level": "finite_budget_observation",
+        "stop_reason": "evaluation_request_budget"
+      },
+      "directional_quantities": [],
+      "reliability": {
+        "convergence": "unresolved",
+        "global_optimality": "not_established"
+      },
+      "scientific_scope": {
+        "model": {
+          "model_id": "model.mujoco_native",
+          "model_version": "1.0.0",
+          "relevant_assumptions": [
+            "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+            "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+            "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+            "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+          ],
+          "representation_id": "native_named_hinges_v1"
+        },
+        "horizon": {
+          "interpretation": "Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.",
+          "origin": 0.0,
+          "period_s": 0.01,
+          "task_duration_s": 0.5
+        },
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "native_numerical_checks"
+      },
+      "unresolved": [
+        "Full 0-to-duration replay and independent frozen acceptance remain required."
+      ],
+      "detail_query": {
+        "reference": {
+          "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+          "media_type": "application/json"
+        },
+        "view": "working_set",
+        "pointer": "/mathematical_decision_view"
+      }
+    },
+    "repeated_index_reads": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "post_result_raw_plans": [],
+    "post_result_stop_requests": [],
+    "post_result_main_visible_text": false,
+    "note": "Requests 7-11 retained exploration phase, loaded ScientificQuestion and two unused math evaluations. Request 12 was protected closeout. All six reads returned the correct result reference."
+  },
+  "requests": [
+    {
+      "number": 1,
+      "request_id": "r3-request-28d5f5abc942488b8c97e8ecb5159c13",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "9574fb61c5409cacc3812a268ec4c810ca78fcee43f0dfb5a746ca77afee3c66",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "019dd10265e8728c0e9a9a35b6024a6b5c07dcbdb68f983bfa377ed332635a32",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "c1df79eeab00a6d66ce5db0cd72e5a0c44ad09977017259709609edaf65fd1ed",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 110,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 7240,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 7350
+      },
+      "elapsed_s": 14.01600000000326,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "precise_or_absent",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "fields": [
+              "source",
+              "source_kind",
+              "origin_kind",
+              "origin_status",
+              "initialized",
+              "full_control_sequence",
+              "task_acceptance",
+              "trajectory_query",
+              "execution_references"
+            ],
+            "pointer": "/control_result_links/0",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_Ay3lEbxhRwOOGAlzbc0e2CBS",
+          "input_reference": {
+            "artifact_id": "4f8ca3f2bc5ca30973e716c7523d1d130e78967fecb5d53e5e1b881738df2fc9",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "44fa4b6e5d13d439086916e35cecd40406f49756e547d6e04feb7c87bbafe6fb",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {}
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 12,
+        "model_closeout_reserve": 1,
+        "public_operations": 32,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 3,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": false,
+      "delivered_result_reference": null,
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": false,
+        "status": "requires_completed_candidate_bound_diagnose",
+        "already_bound": [
+          "frozen task and protocol"
+        ],
+        "next": "Complete diagnose with your hypothesis and owned candidate first."
+      }
+    },
+    {
+      "number": 2,
+      "request_id": "r3-request-926347e504774cf692c22355f819fce5",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "917dc0f52517092d209a2bbbe9b3eb1a64a46653f15a183f8d74ac6da957dc67",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "60a0160f0363591e897e1aa36ba995195585170fb4e6dea75ef242f7c7760c0f",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "8a0b766d863be38d6f2113e193d561d2a764a3b22ec6215fce1b76f7b8bd5b7d",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 34,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 7815,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 7849
+      },
+      "elapsed_s": 6.73399999999674,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "precise_or_absent",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "experience_retrieve",
+          "input": {
+            "entry_id": "research-bounded-continuation",
+            "operation": "read",
+            "revision": "2"
+          },
+          "tool_use_id": "call_qxDkSYseDaR4Z6L0ztWBrtDf",
+          "input_reference": {
+            "artifact_id": "9a61ca2da3befd583faab73dc17395672cf7a37299748449d35c3656f05a2ba9",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "c9c7f8e13d229f36ba7b67a1b722213312d76c004eaa91bd59f25077cf68ba86",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "knowledge_body_omitted": true,
+            "body_kept_in_original_store": true
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 11,
+        "model_closeout_reserve": 1,
+        "public_operations": 31,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 3,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": false,
+      "delivered_result_reference": null,
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": false,
+        "status": "requires_completed_candidate_bound_diagnose",
+        "already_bound": [
+          "frozen task and protocol"
+        ],
+        "next": "Complete diagnose with your hypothesis and owned candidate first."
+      }
+    },
+    {
+      "number": 3,
+      "request_id": "r3-request-848fd82d44314fdabd05db9be7ea3a9d",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "dbd9f4af2380effc34eb2feb7203e201abfb2b69036aefafd27db2d5e2f0ce15",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "7cfddf9e345786cd0efe645ebb435ae817dcafbb53c8ab6c71dc40a0501138e2",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "dd05ad262e24cd9b5c033b5083b49b0b634e61cb0d88fbb71683d33fbb3f5876",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 627,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9159,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9786
+      },
+      "elapsed_s": 19.23399999999674,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "precise_or_absent",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "research_plan",
+          "input": {
+            "action": "diagnose",
+            "decision": {
+              "claimed_inference": "empirical_search",
+              "hypothesis_id": "H1_initialized_schedule_satisfies_reach_hold",
+              "requested_budget": 1,
+              "research_intent": "DIAGNOSE",
+              "selected_candidate": {
+                "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+                "media_type": "application/json"
+              },
+              "selected_method": "trajectory_feasibility",
+              "selected_variables": [
+                "terminal_error_m",
+                "holding_max_error_m",
+                "holding_max_speed_m_s"
+              ],
+              "version": "research_decision_v1"
+            },
+            "expected_observation": "A full-horizon trajectory-feasibility evaluation reports terminal_error_m <= 0.01, holding_max_error_m <= 0.01, and holding_max_speed_m_s <= 0.02 without numerical failure.",
+            "experience_disposition": {
+              "research-bounded-continuation@2": "adopted"
+            },
+            "fixed_conditions": "Keep candidate fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de, initialized source d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a, target [0.29,-0.035,0.19] m, 0.01 m reach and hold position limits, 0.02 m/s hold speed limit, 0.05 s hold window, 0.5 s duration, 0.01 s control and sample periods, 0.0005 s timestep, original physics inputs, and original source and budget admission unchanged.",
+            "hypothesis": "Under the frozen original Reach/Hold task, executing the initialized full control sequence on the candidate with the full task model and complete 0.5 s horizon will satisfy all three evaluator limits: terminal error at most 0.01 m, final-window maximum position error at most 0.01 m, and final-window maximum translational tip speed at most 0.02 m/s.",
+            "interpretation": "This is a falsifiable schedule-specific test. Passing mathematical evidence would support H1 at the model scope but would not itself establish independent task acceptance. Failure would identify the violated frozen conditions and weaken only H1, not prove structural infeasibility or global control optimality.",
+            "stopping_condition": "After one admitted complete-horizon mathematical evaluation, judge H1 from all three metrics. If all pass, formally read the exact fresh result before any acceptance decision; if any fail, do not infer global infeasibility and decide whether remaining budget justifies a bounded same-candidate diagnostic or STOP.",
+            "weakening_observation": "Any reported metric exceeds its frozen limit, or numerical failure prevents complete-horizon evaluation; such a result weakens this schedule-specific hypothesis but does not establish global infeasibility of the structure or task."
+          },
+          "tool_use_id": "call_4OsD8uGW5D33X4xUWQJVC0OE",
+          "input_reference": {
+            "artifact_id": "0b7ff0f1a79476baa57c4c83007a06248547f317bfc8990d0372846f2cafced6",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "f54929b4b19d5a8e3554a237b2c131c5dd5c5d9cb76e8754b05d2ca356d38977",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "execution_feedback": {
+              "status": "read_only_diagnosis_completed",
+              "new_scientific_computations": 0,
+              "selected_method_status": "intent_only; not dispatched by diagnose",
+              "executable_request_submitted": false,
+              "execution_entry": {
+                "tool": "research_analysis",
+                "methods_query": {
+                  "reference": {
+                    "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+                    "media_type": "application/json"
+                  },
+                  "view": "mathematical_capabilities",
+                  "pointer": "/methods"
+                },
+                "candidate_required": false,
+                "request": "Submit a ScientificQuestion to research_analysis. Candidate and hypothesis are bound from this Plan; no registered method name is required.",
+                "interface": "scientific_question_v1"
+              }
+            }
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 10,
+        "model_closeout_reserve": 1,
+        "public_operations": 30,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 3,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": false,
+      "delivered_result_reference": null,
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": false,
+        "status": "requires_completed_candidate_bound_diagnose",
+        "already_bound": [
+          "frozen task and protocol"
+        ],
+        "next": "Complete diagnose with your hypothesis and owned candidate first."
+      }
+    },
+    {
+      "number": 4,
+      "request_id": "r3-request-20a97461b7cd4e6692d029565efb783f",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "935bddf4cadd31deabcdf27d8dd17efd2e106c98b80e6f9bd3766ba485b40407",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "4d8373aa315d62802c11352c0448b1b82d54861c386ce0747ad48e3a0ad37927",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "a6cf6e076af284f4d818ccb6c46d0f5656db5810699b315027a8d1e828b97cba",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 114,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9441,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9555
+      },
+      "elapsed_s": 9.875,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "research_analysis",
+          "input": {
+            "control_scope": {
+              "mode": "full_task"
+            },
+            "effect_semantics": "closed_loop_performance",
+            "focus_metric": "terminal_error_m",
+            "question_type": "control_feasibility",
+            "requested_budget": 8,
+            "search_strategy": "response",
+            "source_selection": {
+              "control_source": {
+                "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+                "media_type": "application/json"
+              }
+            }
+          },
+          "tool_use_id": "call_vAbKWmhYjs5rCcPulGGmg7OM",
+          "input_reference": {
+            "artifact_id": "c3510f138cd001e8f008494d8979aeebc22c4825ca9323d34572f4280e21a4a1",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "a12802db3a2176dd697d83b6e6d4ee12e70a1b6d5bff42aa9367460ffa44b3fd",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "status": "unsupported",
+            "reason": "CONTROL_FEASIBILITY_REQUIRES_CONTROL_REOPTIMIZATION",
+            "scientific_execution_started": false
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 9,
+        "model_closeout_reserve": 1,
+        "public_operations": 29,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 3,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": null,
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 5,
+      "request_id": "r3-request-f86e16b95d774d978b0430191d595adc",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "8a4d0295c56869ce920cd565a0c72c98fed20f32594a2d0e238b9db1b8c4d615",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "84c86dab9baf7cf1ee3037bcbf007f81b96b44ef6287f70db5339be0fe2abde4",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "fde62d455bed10ce44c6046bbba30f9825edf48c518b5830407679fbe4cc813e",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 115,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 9750,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 9865
+      },
+      "elapsed_s": 9.437000000005355,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "research_analysis",
+          "input": {
+            "control_scope": {
+              "mode": "full_task"
+            },
+            "effect_semantics": "reoptimized_task_capability",
+            "focus_metric": "terminal_error_m",
+            "question_type": "control_feasibility",
+            "requested_budget": 8,
+            "search_strategy": "response",
+            "source_selection": {
+              "control_source": {
+                "artifact_id": "d69f942eda05f4063906ba71f513e3c12c4b885bc9d36bda90a3f8541d63ac6a",
+                "media_type": "application/json"
+              }
+            }
+          },
+          "tool_use_id": "call_eHeZ0bYvWxrzHkNz8uITEHbu",
+          "input_reference": {
+            "artifact_id": "3c2609403bc4170166b89235b3dbcc3ae9dd1176fa190814669e89ac4b4cc51a",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "1c512f02f0632b8176a02ad1fe2692b78ffe7b20d2443366b107bc2406816815",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "scientific_result_status": "computed",
+            "scientific_result_reference": {
+              "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+              "media_type": "application/json"
+            },
+            "operation_outcome": {
+              "candidate": {
+                "artifact_id": "fc7509609aa206a0ba8d5e3b0ca10de518b922f27fda4c59aa6ccf25ada5d3de",
+                "media_type": "application/json"
+              },
+              "reference": {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              },
+              "status": "computed"
+            },
+            "interpretation_status": "deferred"
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 8,
+        "model_closeout_reserve": 1,
+        "public_operations": 28,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 3,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": null,
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 6,
+      "request_id": "r3-request-ddb68e00a9784ee0979bb715c9b672a3",
+      "purpose": "reporter",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "f81d11900c299a4480c138ddc59879c25f87e34d77d5c9bf3c74a99141d5c618",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "2ff062b9d80ddafee207f3350c6db5a34c51d1525da88031b23d1ae5e7ead253",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "89e77137ebff01f72487ce29df01994d97f801e609aa4121036b9cec7259b4c9",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 573,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 7356,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 7929
+      },
+      "elapsed_s": 19.421999999991385,
+      "money": null,
+      "visible_tools": [],
+      "analysis_schema_kind": null,
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": []
+    },
+    {
+      "number": 7,
+      "request_id": "r3-request-e7656fcba55b4bd7ac1a5fe50f488919",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "7abf40c8c80495252e4c19e0b1cda848f7d8965d29ad81a663e720e26b4498d5",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "2168118239a77db383e90bb148bf435456fc4bf37bcb360fe640dbebb906cc0d",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "7a2550ef9247ea9e240e5afd22be713da3d3d4e6d8d9dde2b6d7c65908d14405",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 13884,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 13962
+      },
+      "elapsed_s": 9.60999999998603,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_4vm3qVgl9NVUb98Tflv2evCK",
+          "input_reference": {
+            "artifact_id": "aca790bf751582d233e283efa87527d0a065cd1ec1fd4b6e988f7463a7024955",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "16399f66e3c94dd5ec74cd5e731af3a58a49d7b05ce26aae5d59bdd9b21cb02c",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 6,
+        "model_closeout_reserve": 1,
+        "public_operations": 27,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 8,
+      "request_id": "r3-request-634aaa74856f469f815594ca2c2195dd",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "75053bf91f3edc9184ac4f691401c98fe6ff51deedd459c3de0f719cc51b2278",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "99f67fb2f9abe29e4f44571f8fb0c638ee6d65f7490c68e90598908cb08b8b2e",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "88a0c9917207aeb68c96e246d366e160b1b7092cf24b163d385d02f5758c841d",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 13618,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 13696
+      },
+      "elapsed_s": 8.21899999998277,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_e76xkMVVf5C0BybKm25pwvxR",
+          "input_reference": {
+            "artifact_id": "23176583c7fb6b1fef7bd3b82419e9ac4a5442abeefbc237417e707d8b114ac9",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "4ba6e5bce31dc3679ad0e7200e465ce3182c41dec6bcb8cc6c66e766a99e1dce",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 5,
+        "model_closeout_reserve": 1,
+        "public_operations": 26,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 9,
+      "request_id": "r3-request-5f94776515aa4900b1d70c7ffec1439e",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "254235dcc10287693fa6b2c37a73fb8c54c8fefe31fb3de8a9d37168d882c5ee",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "d54b5cc2d78ab07e0afeaf0999f3c12e0f9786869ffed33b9fe7116d8a42c8cb",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "841b186e34ca6914a35e40cac7d2b404eae2dd59df5a8ae8bebe252140bca745",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 13682,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 13760
+      },
+      "elapsed_s": 8.562999999994645,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_qL09IlXKsI9nTh7N0rcaEmc2",
+          "input_reference": {
+            "artifact_id": "76a86819ff383fbbcd56a55970648f897da76eb40df8760b6b1ffc23f2cbdceb",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "9cc274197bcf78b11cdffb4a09a23ed5f90884dd9c1636ce59e331e4fa05a94e",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 4,
+        "model_closeout_reserve": 1,
+        "public_operations": 25,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 10,
+      "request_id": "r3-request-061772e94bd645978145d5f11e3fc2a3",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "efd375a5a315cb9d9ef1c2b203c883b529c4d90652bb35a6dd4b21333c934d57",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "d9cd45a3c94f77baf13e517f1c908bf1900a0e229feb3c5cc2368e20803d56cb",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "881b308fa4258c590a622fce0cd1035c01a594b6bee1e37177ac3f3d037af4a6",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 13750,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 13828
+      },
+      "elapsed_s": 11.796999999991385,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_nWJk1FCUX16n0W7wa71LPYwU",
+          "input_reference": {
+            "artifact_id": "0278f43066ac47b0fd35d87eabe95e86f147d48793cd8c0c01ba633313729096",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "4c66e8fe203c41b1fabb34b303e263cf995fea29fe60954c3134cbb2cadc140c",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 3,
+        "model_closeout_reserve": 1,
+        "public_operations": 24,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 11,
+      "request_id": "r3-request-b26617b939e447c19af9c3089fd78e3b",
+      "purpose": "conversation",
+      "phase": "exploration",
+      "event_reference": {
+        "artifact_id": "9fb2e165a5f9df41a8bad0cb9fd0cf7903336546395d2faeee4da630cbb5023f",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "f5dd8ba394996a299822e132bd3435e1eccf3060c493e131daf48f3d6238496f",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "0b71c497af7dd18bfb73c67b85bbb38bf25d430f6d334e7ee5d7bc8f7fcb292e",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 13815,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 13893
+      },
+      "elapsed_s": 10.65700000000652,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "experience_retrieve",
+        "evidence_read",
+        "research_recall",
+        "research_route",
+        "research_analysis",
+        "research_investigate"
+      ],
+      "analysis_schema_kind": "ScientificQuestion",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_yzwSOWSbmbKSfj7eKewjESz4",
+          "input_reference": {
+            "artifact_id": "e4385313fe2e7bfadf5a95663322e173b91d3cd8082de0ca2df6404f157f7bb1",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "189b4fc611ffaaa0f6650141439e320dddd275233c5b9264bd80c1ce2e2c1abc",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 2,
+        "model_closeout_reserve": 1,
+        "public_operations": 23,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": false,
+          "next_request_will_protect": false,
+          "reason": null
+        }
+      },
+      "scientific_question_loaded": true,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": true,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    },
+    {
+      "number": 12,
+      "request_id": "r3-request-8bca0355a32e4028aaea78945186d80a",
+      "purpose": "conversation",
+      "phase": "closeout",
+      "event_reference": {
+        "artifact_id": "c195e915316ad286735a62e12f9af58146feae5124e23d6619589301703d4ac4",
+        "media_type": "application/json"
+      },
+      "wire_reference": {
+        "artifact_id": "18fa9b7a7b468a43a68feec93390122880d77fdaa866fc13fd8d51a65d20c571",
+        "media_type": "application/json"
+      },
+      "response_reference": {
+        "artifact_id": "07b08c083246e978c93f7f3667edfedf4e0377458169d7c6ff3008ddf9062ca1",
+        "media_type": "application/octet-stream"
+      },
+      "model": "gpt-5.6-sol",
+      "http_status": 200,
+      "usage": {
+        "completion_tokens": 78,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens": 10608,
+        "prompt_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 10686
+      },
+      "elapsed_s": 8.875,
+      "money": null,
+      "visible_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_route"
+      ],
+      "analysis_schema_kind": "precise_or_absent",
+      "reasoning_setting": {
+        "reasoning_effort": "none"
+      },
+      "main_visible_text_present": false,
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input": {
+            "pointer": "/all_fresh_results",
+            "reference": {
+              "artifact_id": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+              "media_type": "application/json"
+            },
+            "view": "working_set"
+          },
+          "tool_use_id": "call_JMhGsGRkdOvTIT1hd52AbC39",
+          "input_reference": {
+            "artifact_id": "02cc09494d1f413845786503e6a04838c98ef55ea294fe5a49d0215bf8e53c99",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "9f0d5728637ebdb571c84ab9ba5b74d11d43ce6a3bf4617aba441129a7c8677a",
+            "media_type": "application/json"
+          },
+          "feedback_status": "success",
+          "feedback_summary": {
+            "returned_exact_result_references": [
+              {
+                "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+                "media_type": "application/json"
+              }
+            ]
+          }
+        }
+      ],
+      "delivered_budget": {
+        "model_calls": 1,
+        "model_closeout_reserve": 1,
+        "public_operations": 22,
+        "public_closeout_reserve": 2,
+        "physical": 0,
+        "mathematical": 2,
+        "closeout": {
+          "active": true,
+          "next_request_will_protect": true,
+          "reason": "Existing success/count/resource protection"
+        }
+      },
+      "scientific_question_loaded": false,
+      "delivered_result_reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      },
+      "delivered_handoff": {
+        "tool": "research_analysis",
+        "interface": "scientific_question_v1",
+        "loaded": false,
+        "status": "diagnose_completed",
+        "already_bound": [
+          "hypothesis",
+          "candidate",
+          "frozen task and protocol"
+        ],
+        "next": "Submit scientific question fields to the loaded tool. Original execution admission applies."
+      }
+    }
+  ],
+  "cost": {
+    "provider_total": 12,
+    "main_requests": 11,
+    "reporter_requests": 1,
+    "provider_usage": {
+      "prompt_tokens": 130118,
+      "completion_tokens": 2041,
+      "total_tokens": 132159,
+      "reasoning_tokens": 0
+    },
+    "provider_elapsed_s": 136.43899999995483,
+    "money": "unknown; not inferred from tokens",
+    "shared_ledger_used": {
+      "model_calls": 12,
+      "tool_calls": 11,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 138.21444459995837
+    },
+    "numerical_s": 2.348083899996709,
+    "construction_numerical_s": 0.4332423000014387,
+    "native_models": 1,
+    "math_workers": 1,
+    "rollouts": 8,
+    "callbacks": 8,
+    "physics_steps": 8000,
+    "physics_step_attempts": 8000,
+    "independent_replay": 0,
+    "NMPC": 0,
+    "PPO": 0,
+    "T2_new_experiments": 0
+  },
+  "conclusion": {
+    "A1": {
+      "status": "passed",
+      "scope": "Main proposed a falsifiable schedule-specific hypothesis and independently submitted/repaired a concrete control-reoptimization question; optional legacy trajectory_feasibility label was still voluntarily filled."
+    },
+    "A2": {
+      "status": "passed",
+      "scope": "Original contract/source/applicability admitted; one real Native worker returned computed with actual costs."
+    },
+    "A3": {
+      "status": "not_passed",
+      "scope": "No result-grounded next Plan, hypothesis judgement or autonomous STOP. Repeated exact index reads despite working tool/schema/result delivery and unused mathematics. This is a bounded observation of the configured Sol/none Main, not a general model incapability proof."
+    },
+    "mathematical_task_proxy": "all_three_constraints_still_violated",
+    "optimizer_convergence": "unresolved",
+    "global_optimum": "not_established",
+    "independent_task_acceptance": "unmeasured",
+    "supervisor_stop": "provider_request_boundary; not Main STOP",
+    "no_new_provider_after_expansion": true,
+    "no_second_study": true,
+    "no_C4": true
+  },
+  "state_at_end": {
+    "research_status": "ready",
+    "pending": null,
+    "unconsumed_response": null,
+    "unsealed_calls": 0,
+    "math_used": 1,
+    "authorized_math_ceiling": 12,
+    "provider_used": 12,
+    "provider_ceiling": 12,
+    "source_candidates_retained": true
+  },
+  "original_event_references": [
+    {
+      "kind": "formal_study_authorization",
+      "reference": {
+        "artifact_id": "03e9c872e93b47cfbdb694fb1403eb09ab37416f453de2cafa73b9bc7df7cac2",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "implementation_binding",
+      "reference": {
+        "artifact_id": "9b2204d83d2812ade14d7961d64e9ebba3c523f3db57a384a382d64e1402ad99",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "scientific_budget_extension",
+      "reference": {
+        "artifact_id": "dc9fbf7ac8eed09b821181ed60bd2d933139c6fe3461787eda43530492871e4d",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "formal_study_authorization",
+      "reference": {
+        "artifact_id": "7046a993870ccf13eb5be7fcac138472beee61d7fce90fae569aee53944ea2cb",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "implementation_binding",
+      "reference": {
+        "artifact_id": "f75a9adf1ed666562c4e15b0a521edfe2c2db599c44f8178ad5d37dc10c1a009",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "analysis_request_binding_validated",
+      "reference": {
+        "artifact_id": "59d0af915c28722b9f11e62c3e0f5533c2947497f00aec0712399169d01c3cab",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "candidate_analysis_result",
+      "reference": {
+        "artifact_id": "cc2669b0044aadfb4921c018d14d317ed1b9dd75a4cbab3e85b08db50c643c73",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "scientific_budget_extension",
+      "reference": {
+        "artifact_id": "ca3f74a400e34d06cb8b44282412aa928fc0b59ad404740883daa7711ed97a3b",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "formal_study_authorization",
+      "reference": {
+        "artifact_id": "b7da648a218e9e163707f30233b09ee7997e74f48ec13ba3bbf54b2381a00f45",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "kind": "implementation_binding",
+      "reference": {
+        "artifact_id": "a73f7eabca719206b6bbeaacc91569a3c8629b0bc209d13029a8c28960c92ddd",
+        "media_type": "application/json"
+      }
+    }
+  ]
+}
