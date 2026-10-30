@@ -13,7 +13,12 @@ INTERFACE = 'scientific_question_v1'
 
 
 def enabled(spec):
-    return spec.get('research_decisions',{}).get('analysis_interface') == INTERFACE
+    return spec.get('research_decisions',{}).get('analysis_interface') in (INTERFACE,'scientific_question_v2')
+
+
+def question_contract(spec):
+    from tools.research.contracts import ScientificQuestionV2
+    return ScientificQuestionV2 if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2' else ScientificQuestion
 
 
 def completed_question_plan(host):
@@ -28,6 +33,8 @@ def completed_question_plan(host):
 
 def compile_question(host, payload, *, tool_use_id):
     """Return actionable preparation/choice feedback or the original full contract."""
+    if state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
+        return compile_v2(host,payload,tool_use_id=tool_use_id)
     from pydantic import ValidationError
     from tools.research.task_constraints import mathematical_method_view
     from tools.research.agent import bind_selected_analysis_request
@@ -221,3 +228,80 @@ def compile_question(host, payload, *, tool_use_id):
     return dict(status='ready',method=method,request=full,scientific_execution_started=False,
         execution_admission='Original analysis.dispatch owns final source, applicability, authorization and budget admission.',
         limitations=detail['limitations'],cost_scope=detail['cost_scope'])
+
+
+def compile_v2(host, payload, *, tool_use_id):
+    """Resolve one opt-in M0/M1 question, retaining the original binding audit."""
+    from pydantic import ValidationError
+    from tools.research.contracts import ScientificQuestionV2
+    from tools.research.task_constraints import mathematical_method_view
+    from tools.research.design import verify_candidate
+    from tools.research.agent import bind_selected_analysis_request
+    from tools.research.structure_research import METHOD, EVALUATIONS, parameters, prepare_context
+    try:q=ScientificQuestionV2.model_validate(payload)
+    except ValidationError as exc:
+        return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V2_INPUT',issues=[
+            dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
+    def feedback(status,reason,**extra):
+        return dict(status=status,reason=reason,question=plain(q),scientific_execution_started=False,**extra)
+    s=state(host);spec=s['spec']
+    if protected(host) or s['research_status']=='stopped':return feedback('blocked','ORIGINAL_PROTECTED_CLOSEOUT_OR_STOP')
+    intent=completed_question_plan(host)
+    if not intent:return feedback('needs_prerequisite','COMPLETED_CANDIDATE_BOUND_DIAGNOSE_REQUIRED',
+        preparation=dict(tool='research_plan',action='diagnose',fields=['hypothesis','decision.selected_candidate']))
+    if q.effect_semantics!='mechanism_effect':
+        reasons=dict(fixed_input_response='Use existing V1 fixed_input_structure_v1 short-response contract; V2 M0/M1 only reads instantaneous mechanisms.',
+            reoptimized_task_capability='M2 needs existing saved T1/T2 or controlled Conic model stencils and their original source/search admission.',
+            closed_loop_performance='Requires independent complete feedback execution and frozen task evaluation; no native mechanism derivative adapted.',
+            re_equilibrated_passive_response='Requires qualified passive equilibrium, actual unilateral active set and KKT regularity; PHS kernel is read-only/unadapted.')
+        return feedback('unsupported','V2_EFFECT_NOT_IMPLEMENTED',detail=reasons[q.effect_semantics])
+    if q.control_treatment!='fixed_absolute_tensions':return feedback('unsupported','MECHANISM_REQUIRES_FIXED_ABSOLUTE_TENSIONS')
+    if q.operating_point in ('re_equilibrated','preserved_physical_state'):
+        return feedback('unsupported','WORKING_POINT_MAPPING_NOT_IMPLEMENTED',
+            detail='Joint coordinates, Cartesian pose, re-equilibrium and preserved physical state are distinct mappings.')
+    if q.operating_point=='frozen_task_initial_state' and (q.saved_state or q.execution or q.update_id is not None):
+        return feedback('needs_choice','FROZEN_INITIAL_STATE_CANNOT_USE_SAVED_STATE_SOURCE')
+    candidate=intent['candidate'];c=verify_candidate(host,candidate)
+    view=mathematical_method_view(host,candidate);detail=view['methods'].get(METHOD)
+    if not detail or detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):
+        return feedback('blocked','ORIGINAL_MECHANISM_ADMISSION_REQUIRED',missing=detail['missing'] if detail else ['V2 method grant'])
+    rows=parameters(spec,c);paths=q.parameter_paths or (intent['agent_hypothesis']['decision'].get('selected_variables') or [])
+    if not paths and q.parameter_group:
+        matches=[r['parameter_id'] for r in rows if r['continuous_perturbation'] and r['study_authorized'] and
+            (q.parameter_group=='segment_lengths' and r['category']=='segment' and r['parameter_id'].endswith('.length_m') or
+             q.parameter_group==r['category'])]
+        if len(matches)==1:paths=matches
+        elif q.operation in ('differentiate','optimize'):
+            return feedback('needs_choice','SELECT_ONE_EFFECTIVE_PARAMETER_FROM_GROUP',choices=dict(parameter_paths=matches))
+    if q.operation in ('differentiate','optimize') and len(paths)!=1:
+        return feedback('needs_choice','ONE_REGISTERED_PARAMETER_REQUIRED',choices=dict(parameter_paths=[
+            r['parameter_id'] for r in rows if r['continuous_perturbation'] and r['study_authorized'] and r['category']=='segment' and r['parameter_id'].endswith('.length_m')]))
+    selected=next((r for r in rows if paths and r['parameter_id']==paths[0]),None)
+    if q.operation in ('differentiate','optimize') and selected and selected['continuous_perturbation'] and not selected['study_authorized']:
+        return feedback('blocked','ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED')
+    if q.parameter_group and selected and not (q.parameter_group=='segment_lengths' and selected['category']=='segment' and
+            selected['parameter_id'].endswith('.length_m') or q.parameter_group==selected['category']):
+        return feedback('needs_choice','PARAMETER_PATH_AND_GROUP_DISAGREE')
+    budget=q.requested_budget or intent['agent_hypothesis']['decision'].get('requested_budget')
+    needed=EVALUATIONS[q.operation]
+    if not budget:return feedback('needs_choice','EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED',required_evaluations=needed)
+    if budget<needed or spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)<needed:
+        return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed)
+    if isinstance(q.target,str):
+        constraints={r['constraint']['constraint_id'] for r in view['research_opportunities']['metrics'] if r.get('constraint')}
+        return feedback('unsupported','TASK_TARGET_REQUIRES_M2_TASK_RESPONSE' if q.target in constraints else 'UNREGISTERED_TARGET')
+    from tools.research.contracts import MechanismStudy
+    study=MechanismStudy(operation=q.operation,target=q.target,parameter_path=paths[0] if paths else None,
+        point_semantics=q.operating_point,max_evaluations=min(budget,6),comparison_candidates=q.comparison_candidates)
+    try:prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
+    except ValueError as exc:return feedback('unsupported',str(exc))
+    saved=bool(q.saved_state or q.execution)
+    compiled=dict(operating_point='saved_state' if saved else 'standardized_initial_pretension',mechanism_study=plain(study))
+    if q.tensions_n is not None:compiled['native']=dict(tensions_n=q.tensions_n)
+    for name in ('saved_state','execution','update_id'):
+        if getattr(q,name) is not None:compiled[name]=plain(getattr(q,name))
+    full=bind_selected_analysis_request(host,compiled,tool_use_id=tool_use_id,
+        selection=(METHOD,detail),scientific_question=payload)
+    return dict(status='ready',method=METHOD,request=full,scientific_execution_started=False,
+        hypothesis=q.hypothesis or intent['agent_hypothesis'].get('hypothesis'),
+        required_evaluations=needed,limitations=detail['limitations'],cost_scope=detail['cost_scope'])

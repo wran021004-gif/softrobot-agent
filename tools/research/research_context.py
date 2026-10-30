@@ -514,7 +514,7 @@ def mathematical_read_progress(host, candidate, coverage, intent):
     if selected:names=[selected,*[k for k in names if k!=selected]]
     events=host.store.events(host.run_id)
     bindings=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='analysis_request_binding']
-    compiled=[b for b in bindings if b.get('version')=='scientific_question_v1' and
+    compiled=[b for b in bindings if b.get('version') in ('scientific_question_v1','scientific_question_v2') and
         b['full_request']['candidate']==candidate and (b.get('field_sources',{}).get('candidate') or {}).get('reference')==latest.get('plan_reference')]
     if compiled:
         selected=compiled[-1]['method'];names=[selected,*[k for k in names if k!=selected and k!=decision.get('selected_method')]]
@@ -1534,6 +1534,14 @@ def agent_decision_brief(host):
             for item in discovery['unavailable_examples']:item.pop('detail_query',None)
             discovery.update(catalog_read_status='deferred_by_original_candidate_read_admission',
                 legal_evidence_query=brief['stop_result_index']['query'])
+    if candidate and s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
+        from tools.research.structure_research import discovery
+        direction_ref=next((r for r in reversed(s.get('analysis_results',[])) if
+            host.store.artifact(r).get('candidate')==candidate and
+            host.store.artifact(r).get('status')=='computed' and
+            host.store.artifact(r).get('structure_research',{}).get('structure_direction')),None)
+        brief['mathematical_research']=discovery(s['spec'],host.store.artifact(candidate),candidate,
+            latest_direction=dict(reference=direction_ref,pointer='/structure_research/structure_direction') if direction_ref else None)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
@@ -1564,7 +1572,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         active=[r for r in matching if r.get('status') in ('available','preflight_eligible','prerequisites_only')]
         direct=action in ('generate','search','diagnose','stop')
         actions.append(dict(action=action,status='available' if active or (not matching and direct) else 'conditional',
-            reason=('Candidate-bound diagnose records a hypothesis and candidate for ScientificQuestion; no solver selection is required.' if action=='diagnose' and brief.get('analysis_interface')=='scientific_question_v1' else
+            reason=('Candidate-bound diagnose records a hypothesis and candidate for ScientificQuestion; no solver selection is required.' if action=='diagnose' and brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2') else
                 'Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.'
                 if action=='diagnose' else 'Full request admission and budget checks apply.' if active or (not matching and direct)
                 else 'A suitable candidate, source, read, or other prerequisite is required.'),
@@ -1585,7 +1593,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',
             methods_at='mathematical_research',
             reason=('Protected closeout or no mathematical allowance.' if blocked else
-                'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface')=='scientific_question_v1' else
+                'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2') else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
     interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
@@ -1690,7 +1698,7 @@ def information_flow_brief(brief, delivered):
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source
-    if brief.get('analysis_interface')=='scientific_question_v1':
+    if brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2'):
         if continuation.get('control_initialization_handoff'):
             continuation['control_initialization_handoff']['next']=(
                 'Use the new initialization result as the legal control source, not the structure candidate. '
@@ -1702,7 +1710,7 @@ def information_flow_brief(brief, delivered):
             continuation['direct_plan'].update(scientific_fields=['hypothesis','decision.selected_candidate'],
                 instruction='Your diagnose is complete; submit ScientificQuestion directly to research_analysis.' if settled else
                     'Submit diagnose with your hypothesis and owned candidate; a solver name is not required. After completion submit ScientificQuestion directly to research_analysis.')
-        continuation['analysis_handoff']=dict(tool='research_analysis',interface='scientific_question_v1',
+        continuation['analysis_handoff']=dict(tool='research_analysis',interface=brief['analysis_interface'],
             loaded=loaded.get('tool')=='research_analysis',
             status='diagnose_completed' if settled else 'requires_completed_candidate_bound_diagnose',
             already_bound=['hypothesis','candidate','frozen task and protocol'] if settled else ['frozen task and protocol'],
@@ -2054,6 +2062,7 @@ def mathematical_decision_view(card):
     if summary.get('native_analysis'):
         result['cost_scope']='Costs belong to owning_study, unknown if unrecorded. Native physics_steps includes prefix reconstruction and rollouts; callbacks are not additional rollouts. Independent physical replay is separate.'
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
+    if summary.get('structure_research'):result['structure_research']=summary['structure_research']
     for key in ('nonlinear_capability','nonlinear_response'):
         if summary.get(key):result[key]=summary[key]
     if summary.get('nonlinear_response'):

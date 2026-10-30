@@ -71,6 +71,15 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     p=q.protocol
     inp=SessionInput.model_validate(configuration)
     requirements=describe_analysis_requirements(inp,binding)
+    if q.mechanism_study:
+        from tools.research.structure_research import calculate as mechanism_calculate
+        assessed=model_assessment(inp,requirements,q.operation,model_source=q.model_source)
+        fit=check_analysis_applicability(requirements,q,assessed,exact_point=exact_point)
+        if fit['status']=='not_applicable':
+            return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,
+                task_acceptance='unmeasured'),requirements,fit,q)
+        return scoped_result(mechanism_calculate(configuration,binding,q,exact_point,design_context,
+            checkpoint=checkpoint),requirements,fit,q)
     if q.model_source=='mujoco':
         from tools.research.native_analysis import calculate as native_calculate
         assessment=model_assessment(inp,requirements,q.operation,model_source=q.model_source)
@@ -245,7 +254,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if result.get('native_dynamics'):
+        if result.get('structure_research'):
+            conclusion,verification,pointer='diagnostic','local_mechanism_numerical_observation','/structure_research'
+            interpretation='Instantaneous native mechanism and controlled structural finite differences only; candidate proposal is not task success or a strict descent certificate.'
+        elif result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
             if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
@@ -328,6 +340,13 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
+    if q.mechanism_study:
+        from tools.research.research_context import mathematics_authorization
+        current=state(host);spec=current['spec']
+        if (spec.get('research_decisions',{}).get('analysis_interface')!='scientific_question_v2' or
+                not spec.get('mathematical_methods',{}).get('mechanism_structure_v1') or
+                mathematics_authorization(host,current)['registered_study_scope_authorized'] is not True):
+            return dict(status='not_applicable',reason='EXPLICIT_V2_FROZEN_MECHANISM_GRANT_AND_SCOPE_REQUIRED',task_acceptance='unmeasured')
     from tools.research.nonlinear_capability import METHODS, saved_context
     if q.operation in METHODS and ('analysis' not in state(host)['spec']['capabilities'] or
             not state(host)['spec'].get('mathematical_methods',{}).get(METHODS[q.operation])):
@@ -353,6 +372,10 @@ def dispatch(host,query,key,*,guard,origin='model'):
         if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
         raise
     sensitivity_context=None;preparation_s=0.
+    if q.mechanism_study:
+        from tools.research.structure_research import prepare_context
+        sensitivity_context=prepare_context(state(host)['spec'],c,q.mechanism_study,
+            [(plain(r),verify_candidate(host,r)) for r in q.mechanism_study.comparison_candidates])
     if q.nonlinear_response:
         if admission(host)['admitted']<1:raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
         started_preparation=time.perf_counter()
@@ -393,6 +416,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
     count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
     if q.structure_response:count=1+len(q.structure_response.candidates)
+    if q.mechanism_study:
+        from tools.research.structure_research import EVALUATIONS
+        count=EVALUATIONS[q.mechanism_study.operation]
     if method_fit:count=method_fit['expected_mathematical_evaluations']
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
@@ -696,6 +722,9 @@ def compact_result(value, reference):
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
         summary['native_analysis']=decision_summary(value)
+    if value.get('structure_research'):
+        from tools.research.structure_research import summary as mechanism_summary
+        summary['structure_research']=mechanism_summary(value,reference)
     return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
 
@@ -765,6 +794,9 @@ def decision_result(value, reference):
     from tools.research.capability import nonlinear_summary
     result.update(nonlinear_summary(value,reference))
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
+    if value.get('structure_research'):
+        from tools.research.structure_research import summary as mechanism_summary
+        result['structure_research']=mechanism_summary(value,reference)
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
         result['native_analysis']=decision_summary(value)

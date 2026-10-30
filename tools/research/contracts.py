@@ -336,9 +336,60 @@ class ScientificQuestion(Contract):
     response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05,description='Fixed-input native short response horizon, not full-task capability or acceptance.')
 
 
+class MechanismTarget(Contract):
+    quantity: Literal['tip_jacobian','tendon_jacobian','input_force_map','mass_matrix',
+        'tip_acceleration_input_map','drive_singular_values','drive_directions',
+        'instantaneous_braking','tendon_row_projection','mass_balance_residual']
+    reduction: Literal['identity','norm','minimum','maximum','directional_norm'] = 'identity'
+    direction_world: tuple[FiniteFloat,FiniteFloat,FiniteFloat] | None = None
+    goal: Literal['increase','decrease'] = 'increase'
+
+    @model_validator(mode='after')
+    def directional(self):
+        if (self.reduction=='directional_norm') != (self.direction_world is not None):
+            raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_DIRECTION_ONLY')
+        if self.direction_world is not None and abs(sum(x*x for x in self.direction_world)-1)>1e-8:
+            raise ValueError('UNIT_WORLD_DIRECTION_REQUIRED')
+        if self.reduction=='directional_norm' and self.quantity not in ('tip_jacobian','tip_acceleration_input_map'):
+            raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_VECTOR_MAP')
+        return self
+
+
+class ScientificQuestionV2(Contract):
+    """Versioned scientific choices; diagnose owns candidate, task and hypothesis."""
+    version: Literal['scientific_question_v2'] = 'scientific_question_v2'
+    operation: Literal['inspect','differentiate','optimize','compare']
+    effect_semantics: Literal['mechanism_effect','fixed_input_response','reoptimized_task_capability',
+        'closed_loop_performance','re_equilibrated_passive_response']
+    parameter_group: Literal['segment_lengths','routing','material_geometry'] | None = None
+    parameter_paths: list[str] = Field(default_factory=list,max_length=1)
+    target: MechanismTarget | str = Field(description='Registered mechanism composition, or a frozen task constraint ID. Task response targets require M2 and return an explicit unsupported reason in M0/M1.')
+    hypothesis: str | None = None
+    operating_point: Literal['frozen_task_initial_state','same_generalized_coordinates',
+        're_equilibrated','preserved_physical_state']
+    control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop']
+    tensions_n: list[FiniteFloat] | None = None
+    saved_state: EvidenceRef | None = None
+    execution: EvidenceRef | None = None
+    update_id: StrictInt | None = Field(default=None,ge=0)
+    comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
+    requested_budget: StrictInt | None = Field(default=None,ge=1,le=6,
+        description='Maximum model/mechanics evaluations, charged to the existing mathematical allowance. inspect=1, compare=2, two-scale differentiate=5, checked local optimize=6. No rollout or control search.')
+
+
+class MechanismStudy(Contract):
+    operation: Literal['inspect','differentiate','optimize','compare']
+    target: MechanismTarget
+    parameter_path: str | None = None
+    point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates']
+    max_evaluations: StrictInt = Field(ge=1,le=6)
+    comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned structure candidate reference, not a control sequence. operation and model_source must match a registered mathematical_capabilities method.')
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1']
+    mechanism_study: MechanismStudy | None = None
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
     nonlinear_response: NonlinearStructureResponse | None = None
@@ -358,7 +409,7 @@ class AnalysisRequest(Contract):
     @staticmethod
     def validate_operating_point(operation, operating_point, *, optimal_sensitivity=False):
         """Shared point restrictions for full validation and method discovery."""
-        native_operation=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
+        native_operation=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1')
         if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1') and operating_point!='standardized_initial_pretension':
             raise ValueError('NONLINEAR_CAPABILITY_REQUIRES_OWN_FROZEN_INITIALIZATION')
         if native_operation and operating_point not in ('saved_state','standardized_initial_pretension'):
@@ -375,7 +426,14 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
-        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1')
+        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1')
+        if (self.operation=='mechanism_structure_v1') != (self.mechanism_study is not None):
+            raise ValueError('MECHANISM_OPERATION_REQUIRES_VERSIONED_STUDY')
+        if self.mechanism_study:
+            if (self.mechanism_study.point_semantics=='frozen_task_initial_state' and self.operating_point!='standardized_initial_pretension'):
+                raise ValueError('FROZEN_INITIAL_MECHANISM_REQUIRES_INITIAL_POINT')
+            if self.native != NativeAnalysisOptions(tensions_n=self.native.tensions_n):
+                raise ValueError('MECHANISM_STUDY_HAS_NO_ROLLOUT_OR_INPUT_DIFFERENCE_OPTIONS')
         self.validate_operating_point(self.operation,self.operating_point,optimal_sensitivity=self.optimal_sensitivity is not None)
         if (self.model_source=='mujoco')!=native_operation:
             raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
@@ -417,7 +475,7 @@ class AnalysisRequest(Contract):
             if getattr(self,key) is None:value.pop(key,None)
         if self.model_source=='controller':value.pop('model_source',None)
         if self.model_source!='mujoco':value.pop('native',None)
-        for key in ('structure_response','control_optimization','nonlinear_response'):
+        for key in ('structure_response','control_optimization','nonlinear_response','mechanism_study'):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 

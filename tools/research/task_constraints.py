@@ -1,4 +1,5 @@
 """Pure task translation and existing local-tool applicability; no Store or solver."""
+from copy import deepcopy
 from schemas.platform import Binding, Payload
 from tools.platform_store import plain
 from tools.research_tasks import task_adapter
@@ -16,6 +17,7 @@ SCIENTIFIC_INTERPRETATION = dict(
     horizon_scope='Instantaneous dynamics, local sensitivity or single-time braking authority does not establish complete finite-horizon task feasibility or infeasibility.')
 
 METHOD_MEANINGS = {
+    'mechanism_structure_v1': ('Native mechanism and structural direction', 'Registered instantaneous native mechanism compositions and two-scale legal length perturbations at explicit state/input semantics; proposal only, never complete task improvement or a strict gradient.'),
     'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
     'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
     'equilibrium': ('Static input construction', 'Bounded local static target construction. Static balance cannot establish holding-window maximum speed or identify a structure-versus-dynamic-control cause. Solver failure is not structural infeasibility; matched dynamic execution and independent evaluation remain necessary.'),
@@ -305,6 +307,23 @@ def mathematical_method_view(host, reference):
             item['sensitivity_evidence']='Per-sample fixed-control and best-found reoptimized secants when source rollout arrays exist. V2 directions optionally bind validation_coordinates and validation_t1_results excluded from the fitted stencil. Multiple scales share the same baseline; active-time switches and failed prediction checks remain unresolved.'
 
         methods[method]=item
+    if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
+        from tools.research.structure_research import METHOD
+        item=deepcopy(methods['native_dynamics_v1'])
+        authorized=bool(item['study_authorized'] and spec.get('mathematical_methods',{}).get(METHOD))
+        item.update(method=METHOD,operation=METHOD,method_version=METHOD,
+            scientific_purpose=METHOD_MEANINGS[METHOD][0],description=METHOD_MEANINGS[METHOD][1],
+            study_authorized=authorized,formal_execution_authorized=authorized and item['formal_scope_authorized'],
+            estimated_evaluations=1,estimated_evaluation_range=[1,6],
+            cost_scope='inspect=1, compare=2, differentiate=5, checked local optimize=6 model/mechanics attempts in the shared mathematical allowance; no integration except an explicitly saved prefix reconstruction.',
+            required_parameters=['ScientificQuestionV2 operation, effect_semantics, registered target, point/control semantics and evaluation cap; candidate and task come from diagnose.'],
+            request_template=dict(candidate=reference,operation=METHOD,model_source='mujoco',
+                operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
+            detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+METHOD))
+        if not authorized:
+            item['planning_status']='unauthorized';item['execution_status']='blocked'
+            item['missing']=[*item['missing'],'explicit_frozen_mechanism_method_grant_required']
+        methods[METHOD]=item
     for method,item in methods.items():
         item['generic_operations']=generic_operations(method)
         template=item['request_template']
@@ -337,7 +356,16 @@ def mathematical_method_view(host, reference):
         if (intent.get('action')=='diagnose' and intent.get('execution_status')=='completed'
                 and decision.get('selected_candidate')==reference and selected in methods and binding_error is None):
             methods[selected]['operating_point_guidance']=selected_operating_point_guidance(host,reference,selected,methods[selected])
-    return dict(**readiness,candidate=reference,methods=methods,
+    extra={}
+    if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
+        from tools.research.structure_research import parameters,discovery,EVALUATIONS
+        from extensions.math_analysis.mechanism_registry import catalog
+        extra['structure_research']=dict(**discovery(spec,c,reference),mechanisms=catalog(),parameters=parameters(spec,c),
+            evaluation_caps=EVALUATIONS,method_query=methods['mechanism_structure_v1']['detail_query'],
+            differentiation='Native two-scale central finite differences for one effective segment length; no strict derivative or descent certificate.',
+            supported_parameter_scope='segment_lengths',
+            other_methods_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods'))
+    return dict(**readiness,candidate=reference,methods=methods,**extra,
         operation_categories=dict(OPERATION_CATEGORIES),
         capability_statuses=dict(CAPABILITY_STATUS_MEANINGS),
         capability_inventory=capability_inventory(methods,reference),
@@ -513,6 +541,12 @@ def mathematical_opportunity_summary(view, *, observations=(), latest_result=Non
 
 def mathematical_catalog(view):
     """Small per-method facts; full instructions and native schemas stay reachable."""
+    if view.get('structure_research'):
+        d=view['structure_research'];method=view['methods']['mechanism_structure_v1']
+        return dict(candidate=view['candidate'],operation_categories=d['operations'],
+            status=method['planning_status'],formal_scope_authorized=method['formal_scope_authorized'],
+            detail_query=d['details_query'],mechanism_categories=d['mechanism_categories'],
+            effective_parameter_groups=d['effective_parameter_groups'],methods={})
     from tools.research.optimal_capability import SENSITIVITY
     rows={}
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
@@ -559,7 +593,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     p=TaskAnalysisProtocol.model_validate(protocol)
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
-        if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):continue
+        if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1'):continue
         native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')

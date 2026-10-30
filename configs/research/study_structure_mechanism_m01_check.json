@@ -1,0 +1,151 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "initial_structure_strategy": "agent_choice",
+  "study_id": "structure-mechanism-m01-check-20261030",
+  "base_commit": "25374a3",
+  "authorization": "User-authorized Softrobot-Agent A M0/M1: one bounded native mechanism/length check, at most six model/mechanics attempts, zero integration, Provider, control search or physical evaluation.",
+  "mode": "engineering_numerical",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_p63b1_sol_none.json",
+  "evidence_destination": "evidence/structure_mechanism_m01",
+  "capabilities": [
+    "analysis"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "diagnose",
+    "stop"
+  ],
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      4
+    ]
+  },
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "provider_reserve_policy": "last_requests_v2",
+    "public_operations": 16,
+    "protected_public_operations": 0,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 6,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "physical_replay_limit": 0,
+  "reserve_rl_evaluation": false,
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "mathematical_methods": {
+    "mechanism_structure_v1": "User-authorized bounded M0/M1 native mechanism check only; no task acceptance or strict gradient."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m"
+    ]
+  },
+  "knowledge": {
+    "mode": "off",
+    "allow_benchmark_answers": false,
+    "allowed_kinds": []
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 4,
+      "evidence": 3
+    },
+    "architecture": "english_decision_v1",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "scientific_question_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    }
+  },
+  "scoring_window_s": 0.5,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.48
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "execution_instructions": "One operator-owned engineering numerical check, not an autonomous research Study. Generate one registered reach_free candidate, record diagnose, submit one V2 checked local mechanism direction. Six native models maximum, zero integration/Provider/control search. Keep costs and source evidence. Stop after inspection."
+}

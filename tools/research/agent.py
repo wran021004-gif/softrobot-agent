@@ -312,6 +312,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
     schema=AnalysisRequest.model_json_schema();operation=detail['operation']
     common={'candidate','operation','model_source','operating_point','saved_state','execution','update_id','protocol','scoring_window_s'}
     extra={
+        'mechanism_structure_v1':{'native','mechanism_study'},
         'native_dynamics_v1':{'native'},'short_input_response_v1':{'native'},
         'fixed_input_structure_v1':{'native','structure_response'},
         'mujoco_direct_control_v1':{'control_optimization'},
@@ -439,9 +440,9 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
         field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources})
     if scientific_question is not None:
-        from tools.research.contracts import ScientificQuestion
+        from tools.research.scientific_intent import question_contract
         audit_input.update(raw_main_input=deepcopy(scientific_question),
-            provider_schema=ScientificQuestion.model_json_schema(),internal_binding_schema=schema,
+            provider_schema=question_contract(spec).model_json_schema(),internal_binding_schema=schema,
             compiled_variables=deepcopy(payload))
         audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
@@ -1081,7 +1082,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
                 diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
-            if s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v1':
+            from tools.research.scientific_intent import enabled as question_enabled
+            if question_enabled(s['spec']):
                 native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)
@@ -1089,9 +1091,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             question_mode=question_enabled(s['spec'])
             selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
             if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
-                from tools.research.contracts import ScientificQuestion
+                from tools.research.scientific_intent import question_contract
                 tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                    'inputSchema':{'json':ScientificQuestion.model_json_schema()}}
+                    'inputSchema':{'json':question_contract(s['spec']).model_json_schema()}}
                 agent.tool_registry.registry['research_analysis']=tool
             elif selected:
                 method,detail=selected

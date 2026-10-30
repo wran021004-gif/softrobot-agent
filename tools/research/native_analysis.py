@@ -114,7 +114,7 @@ def applicability(requirements, query, assessed, point):
         return dict(status='not_applicable' if reasons else 'applicable',reasons=reasons,
             constraint_coverage=[],full_task_supported=False,execution_support='saved_evidence_only',model_assessment=assessed,
             horizon=dict(task_duration_s=requirements.duration_s,interpretation='Aggregate existing complete T1 evidence; no new integration.'))
-    horizon=0. if query.operation=='native_dynamics_v1' else query.native.horizon_s
+    horizon=0. if query.operation in ('native_dynamics_v1','mechanism_structure_v1') else query.native.horizon_s
     if not initial and (query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay'))):
         reasons.append('Exact native integration checkpoint required; a GVS state cannot substitute.')
     if query.operation in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):

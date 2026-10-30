@@ -548,6 +548,23 @@ def result_card(host, reference):
         mathematics=MathematicalEvidence(claim=value['scoped_claim'],
             claim_source=_location(reference,'/scoped_claim'),
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
+        if value.get('structure_research'):
+            from schemas.research_reporting import MathematicalQuantity
+            raw=value['structure_research'];quantities=[]
+            for i,row in enumerate(raw['records']):
+                observation=row['observation']
+                if isinstance(observation['value'],(int,float)):
+                    quantities.append(MathematicalQuantity(name='mechanism_probe_'+str(i),value=observation['value'],
+                        unit=observation['unit'],status='unverified_estimate',control_reoptimization='fixed_control',
+                        source=_location(reference,f'/structure_research/records/{i}/observation/value')))
+            direction=raw.get('structure_direction')
+            if direction:
+                quantities.append(MathematicalQuantity(name='suggested_parameter_delta',value=direction['delta'],
+                    unit=direction['parameter_unit'],status='unverified_estimate',
+                    structural_parameters=[direction['parameter_path']],control_reoptimization='fixed_control',
+                    source=_location(reference,'/structure_research/structure_direction/delta')))
+            mathematics=mathematics.model_copy(update=dict(problem_definition=_location(reference,'/structure_research'),quantities=quantities))
+            details.append(_location(reference,'/structure_research'))
         if value.get('native_analysis'):
             from schemas.research_reporting import MathematicalQuantity
             if value['operation'] in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):

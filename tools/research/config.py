@@ -243,7 +243,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     methods=study.pop('mathematical_methods',None)
     if methods is not None:
         if (not isinstance(methods,dict) or not methods or
-                set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1','mujoco-nonlinear-task-capability-v1','mujoco-reoptimized-structure-response-v1'} or
+                set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1','mujoco-nonlinear-task-capability-v1','mujoco-reoptimized-structure-response-v1','mechanism_structure_v1'} or
                 any(not isinstance(v,str) or not v.strip() for v in methods.values())):
             raise ValueError('EXPLICIT_VERSIONED_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     decisions=study.pop('research_decisions',None)
@@ -559,7 +559,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy','language_policy','evidence_read_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         validate_conversation_policy(decisions)
-        if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2','scientific_question_v1')
+        if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2','scientific_question_v1','scientific_question_v2')
                 or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')):
             raise ValueError('VERSIONED_ENGLISH_ANALYSIS_INTERFACE_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():

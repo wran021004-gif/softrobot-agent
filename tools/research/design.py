@@ -218,9 +218,42 @@ def final_generation_request(spec, candidate):
     return request
 
 
+def family_configuration(base_configuration, space, request, owner):
+    """Existing family materialization, shared by formal generation and math probes.
+
+    Returns a validated configuration; does not register a candidate or run GVS.
+    """
+    from extensions.tendon_family.family_space import parse_build
+    build=parse_build(dict(space=space,request=plain(request)))
+    robot,mesh,physics=family.generate_family(build)
+    cfg=deepcopy(base_configuration);cfg['run_id']=owner
+    cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
+    cfg['robot']['structure']['data']=robot
+    cfg['policy']['discretization']['data']=mesh
+    serial=build.request.version=='serial_family_generation_v2'
+    cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
+        parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
+    for key,d in build.space.control_domains.items():
+        cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
+    if serial:
+        from tools.research.config import patch
+        control=cfg['policy']['controller']['parameters']['data']
+        for field,edits in (('recipe',build.request.controller_recipe),('solver',build.request.controller_solver)):
+            if field=='recipe' and cfg['policy']['controller']['extension_id']=='controller.gvs_nmpc':
+                from extensions.tendon_family.contracts import GVSTrajectoryParameters
+                for key in edits:
+                    if key not in control[field] and key in GVSTrajectoryParameters.model_fields:
+                        control[field][key]=GVSTrajectoryParameters.model_fields[key].default
+            if edits:control[field]=patch(control[field],edits)
+    initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
+    cfg['task']['initializer']['parameters']['data']=initial
+    cfg=plain(SessionInput.model_validate(cfg))
+    return cfg,build,physics
+
+
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
-    from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration
+    from extensions.tendon_family.family_space import UnsupportedGeneration
     from extensions.tendon_family.gvs_profile import mathematical_numerical
     from tools.platform_tasks import compile_input
     s=state(host);spec=s['spec']
@@ -237,37 +270,16 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
                 if segment.get('cells',level['cells_per_segment'])!=level['cells_per_segment']:
                     raise ValueError('SCREENING_MESH_CONFLICT')
                 segment['cells']=level['cells_per_segment']
-        build=parse_build(dict(space=spec['family_space'],request=plain(request)))
-        robot,mesh,physics=family.generate_family(build)
-        cfg=deepcopy(s['base_configuration']);cfg['run_id']=host.run_id
-        cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
-        cfg['robot']['structure']['data']=robot
-        cfg['policy']['discretization']['data']=mesh
+        cfg,build,physics=family_configuration(s['base_configuration'],spec['family_space'],request,host.run_id)
+        robot=cfg['robot']['structure']['data'];mesh=cfg['policy']['discretization']['data']
+        initial=cfg['task']['initializer']['parameters']['data']
         if spec.get('fixed_structure_reference'):
             from tools.research.config import same_robot_structure
             if not same_robot_structure(cfg,host.store.artifact(spec['fixed_structure_reference'])['configuration']):
                 raise ValueError('FROZEN_REFERENCE_STRUCTURE_REQUIRED')
-        serial=build.request.version=='serial_family_generation_v2'
-        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
-            parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
-        for key,d in build.space.control_domains.items():
-            cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
-        if serial:
-            from tools.research.config import patch
-            control=cfg['policy']['controller']['parameters']['data']
-            for field,edits in (('recipe',build.request.controller_recipe),('solver',build.request.controller_solver)):
-                if field=='recipe' and cfg['policy']['controller']['extension_id']=='controller.gvs_nmpc':
-                    from extensions.tendon_family.contracts import GVSTrajectoryParameters
-                    for key in edits:
-                        if key not in control[field] and key in GVSTrajectoryParameters.model_fields:
-                            control[field][key]=GVSTrajectoryParameters.model_fields[key].default
-                if edits:control[field]=patch(control[field],edits)
         if (spec.get('nmpc_replan_period_s') is not None and
                 cfg['policy']['controller']['parameters']['data']['recipe'].get('replan_period_s')!=spec['nmpc_replan_period_s']):
             raise ValueError('FROZEN_STUDY_NMPC_REPLAN_PERIOD')
-        initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
-        cfg['task']['initializer']['parameters']['data']=initial
-        cfg=plain(SessionInput.model_validate(cfg))
         compile_input(cfg,host.reg)
         numerical=mathematical_numerical(SessionInput.model_validate(cfg))
         identity=family_candidate_identity(cfg,s)
