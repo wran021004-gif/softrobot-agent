@@ -90,14 +90,15 @@ def selected_evidence_facts(parsed, query, limit):
     return facts
 
 
-def feedback_delivery(host, tool_ids, *, compact=False):
+def feedback_delivery(host, tool_ids, *, compact=False, db=None):
     """Project the verified last tool round, without synthesizing SDK messages."""
     from tools.research.research_context import compact_evidence
     rows=[];remaining=6000 if compact else 16000
+    spec=(host.store.session(host.run_id,db)['state'] if db is not None else state(host))['spec']
     originals={}
-    for event in host.store.events(host.run_id):
+    for event in host.store.events(host.run_id,db=db):
         if event['kind']=='model_original_tool_feedback':
-            value=host.store.artifact(event['outputs'][0])
+            value=host.store.artifact(event['outputs'][0],db=db)
             originals[value['tool_use']['toolUseId']]=(event['outputs'][0],value)
     for key in tool_ids:
         reference,value=originals[key];result=value['result']
@@ -109,27 +110,27 @@ def feedback_delivery(host, tool_ids, *, compact=False):
             row['query_summary']={k:query[k] for k in ('action','operation','model_source','operating_point') if k in query}
             row['original_input_query']=dict(reference=reference,view='full',pointer='/tool_use/input')
         from tools.research.config import bounded_evidence_enabled
-        certificate_read=bounded_evidence_enabled(state(host)['spec']) and value['tool_use']['name']=='evidence_read' and value['tool_use']['input'].get('view')=='acceptance_certificate'
+        certificate_read=bounded_evidence_enabled(spec) and value['tool_use']['name']=='evidence_read' and value['tool_use']['input'].get('view')=='acceptance_certificate'
         if compact and len(json.dumps(rows+[row]).encode())>10000 and not certificate_read:
             break
         size=len(json.dumps(result,separators=(',',':')).encode())
         query=value['tool_use']['input']
-        default_view='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
+        default_view='summary' if spec.get('research_decisions',{}).get('context_limits') else 'full'
         whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success'
             and query.get('view',default_view)=='full' and not query.get('pointer'))
         from tools.research.config import bounded_evidence_enabled,evidence_feedback_limit
-        bounded=bounded_evidence_enabled(state(host)['spec'])
+        bounded=bounded_evidence_enabled(spec)
         certificate=(bounded and value['tool_use']['name']=='evidence_read' and result['status']=='success'
             and query.get('view')=='acceptance_certificate' and not query.get('pointer'))
         payload_size=len(''.join(b.get('text','') for b in result['content']).encode('utf-8'))
-        if bounded:whole_read=whole_read and payload_size<=evidence_feedback_limit(state(host)['spec'])
-        certificate=certificate and payload_size<=evidence_feedback_limit(state(host)['spec'])
+        if bounded:whole_read=whole_read and payload_size<=evidence_feedback_limit(spec)
+        certificate=certificate and payload_size<=evidence_feedback_limit(spec)
         short_experience=False
         if value['tool_use']['name']=='experience_retrieve' and result['status']=='success' and query.get('operation')=='read':
             from tools.research.config import information_flow_v1
             parsed=json.loads(''.join(b.get('text','') for b in result['content']))
             entries=parsed.get('results',[])
-            body_types=(str,dict) if information_flow_v1(state(host)['spec']) else (str,)
+            body_types=(str,dict) if information_flow_v1(spec) else (str,)
             short_experience=(len(entries)==1 and isinstance(entries[0].get('content'),body_types)
                 and entries[0].get('status')!='source_unavailable' and size<=8192)
         # A deliberate whole-result read is the formal SELECT interface. It is
@@ -555,7 +556,7 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
         s=host.store.session(host.run_id,db)['state'];safe_boundary(host,s,db,agent.messages,boundary=boundary)
         prior=s['pilot'].get('handoff_preparation')
         if prior:
-            value=host.store.artifact(prior)
+            value=host.store.artifact(prior,db=db)
             if value['source_state_identity']!=state_identity(s) or value.get('boundary_identity',value.get('completed_boundary_identity'))!=digest(agent.messages):
                 raise ValueError('PREPARATION_STATE_CHANGED_KEEP_OLD_SESSION')
             preparation=prior
@@ -574,10 +575,10 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
                 value['boundary_identity']=value.pop('completed_boundary_identity')
                 value['boundary']=value.pop('completed_boundary')
                 value['invocation_completed']=False
-                anchor=next(host.store.artifact(e['outputs'][0]) for e in reversed(host.store.events(host.run_id))
+                anchor=next(host.store.artifact(e['outputs'][0],db=db) for e in reversed(host.store.events(host.run_id,db=db))
                     if e['kind']=='request_feedback_boundary')
                 from tools.research.config import conversation_policy
-                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'],compact=bool(conversation_policy(s['spec'])))
+                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'],compact=bool(conversation_policy(s['spec'])),db=db)
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
             host.store.update_state(db,host.run_id,s)

@@ -193,9 +193,11 @@ class Store:
         db.execute('UPDATE events SET body=? WHERE seq=?', (encode(event), row.lastrowid))
         return event_id
 
-    def events(self, run_id, parent=None):
-        with self.connect(True) as db:
-            rows = [json.loads(r[0]) for r in db.execute('SELECT body FROM events WHERE run_id=? ORDER BY seq', (run_id,))]
+    def events(self, run_id, parent=None, *, db=None):
+        if db is None:
+            with self.connect(True) as conn:
+                return self.events(run_id, parent, db=conn)
+        rows = [json.loads(r[0]) for r in db.execute('SELECT body FROM events WHERE run_id=? ORDER BY seq', (run_id,))]
         if parent:
             selected = {parent}
             for row in rows:

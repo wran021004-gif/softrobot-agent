@@ -14,6 +14,26 @@ from tests.research.test_s125_contract import cold_host
 
 
 class RequestBoundaryHandoffTests(unittest.TestCase):
+    def test_large_request_feedback_handoff_uses_transaction_reads(self):
+        h=self.provision();sent=[]
+        # Larger than SQLite's default 2000 KiB cache. Rollback-journal cache
+        # spilling exposes cross-connection reads after the snapshot INSERT.
+        update(h,offline_handoff_lock_fixture='x'*(3*1024*1024))
+        original=state(h)['pilot']['framework_session_id']
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+        self.assertEqual(len(sent),2)
+        self.assertNotEqual(state(h)['pilot']['framework_session_id'],original)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+        self.assertIsNone(state(h)['pending'])
+        self.assertEqual(state(h)['offline_handoff_lock_fixture'],'x'*(3*1024*1024))
+        event=next(e for e in h.store.events(h.run_id) if e['kind']=='session_handoff' and e['status']=='committed')
+        preparation=h.store.artifact(event['outputs'][0])
+        self.assertEqual(preparation['pending_feedback_delivery']['items'][0]['tool_id'],'fixture-read-priors')
+        self.assertEqual(preparation['pending_feedback_delivery']['items'][0]['status'],'success')
+
     def test_settled_initial_connect_failure_resumes_without_duplicate_prompt(self):
         from tools.platform_store import zero
         from tools.research.provider import pending, CALLER
