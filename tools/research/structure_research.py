@@ -56,15 +56,47 @@ def prepare_context(spec, candidate, study, comparisons):
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
 
 
-def discovery(spec, candidate, reference, *, latest_direction=None, formal_candidate_created=False):
-    rows=parameters(spec,candidate)
+def discovery(spec, candidate, reference, *, latest_direction=None, formal_candidate_created=False,
+              method_detail=None, remaining_evaluations=None, execution_block=None):
+    rows=parameters(spec,candidate);detail=method_detail or {}
+    minima=[1+len(set(stencil(r)['coordinates'])) for r in rows if r['mechanism_differentiation']['supported']]
+    minimum=dict(inspect=1,compare=2,differentiate=min(minima) if minima else None,
+        optimize=min(minima)+1 if minima else None)
+    unavailable=execution_block or (detail.get('planning_status') if detail.get('planning_status') in
+        ('unauthorized','unsupported','insufficient_budget','blocked') else None)
+    operations={}
+    for operation,count in minimum.items():
+        reason=unavailable or ('no_effective_authorized_continuous_parameter' if count is None else
+            'insufficient_budget' if remaining_evaluations is not None and remaining_evaluations<count else None)
+        ready=bool(detail and not reason)
+        operations[operation]=dict(can_prepare=ready,execution_status='blocked' if reason else
+            'conditional_on_original_request_admission' if ready else 'not_checked',reason=reason,
+            minimum_evaluations=count,inputs_required=True)
     return dict(version='structure_mechanism_discovery_v2',candidate=reference,operations=list(OPERATIONS),
+        operation_admission=operations,remaining_evaluations=remaining_evaluations,
+        method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
         effective_parameter_groups=sorted({r['category'] for r in rows if r['mechanism_differentiation']['supported']}),
-        evidenced_direction=bool(latest_direction),direction_query=latest_direction,
+        evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,
         details_query=dict(reference=reference,view='mathematical_capabilities',pointer='/structure_research'),
         task_scope='Instantaneous mechanism; full task improvement unmeasured. Short responses use the existing M1 methods.')
+
+
+def matches_direction(spec, baseline, generated, direction):
+    """Compare actual resolved generation parameters, not Plan citations or prose."""
+    from tools.research.design import set_parameter
+    if baseline['task_identity']!=generated['task_identity']:return False
+    rows={r['parameter_id']:r for r in parameters(spec,baseline)}
+    changes=direction.get('parameter_changes') or [dict(parameter_path=direction.get('parameter_path'),
+        suggested_value=direction.get('suggested_value'))]
+    expected=resolved_request(spec['family_space'],baseline['parameters'])
+    for change in changes:
+        path=change['parameter_path'];value=change['suggested_value'];row=rows.get(path)
+        if not row or not row['mechanism_differentiation']['supported'] or value is None:return False
+        if not row['minimum']<=value<=row['maximum']:return False
+        set_parameter(expected,path,value)
+    return expected==resolved_request(spec['family_space'],generated['parameters'])
 
 
 def physical_changes(base, changed):

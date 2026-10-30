@@ -1535,22 +1535,49 @@ def agent_decision_brief(host):
             discovery.update(catalog_read_status='deferred_by_original_candidate_read_admission',
                 legal_evidence_query=brief['stop_result_index']['query'])
     if candidate and s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
-        from tools.research.structure_research import discovery
-        direction_ref=next((r for r in reversed(s.get('analysis_results',[])) if
-            host.store.artifact(r).get('status')=='computed' and
-            host.store.artifact(r).get('structure_research',{}).get('structure_direction')),None)
-        generated=[]
-        if direction_ref:
-            for ref in s['candidates'].values():
-                plan=host.store.artifact(ref).get('provenance',{}).get('plan')
-                if plan and direction_ref in host.store.artifact(plan).get('original_plan',{}).get('supporting_evidence',[]):generated.append(ref)
-        brief['mechanism_research']=discovery(s['spec'],host.store.artifact(candidate),candidate,
-            latest_direction=dict(reference=direction_ref,pointer='/structure_research/structure_direction') if direction_ref else None,
-            formal_candidate_created=bool(generated))
-        brief['mechanism_research'].update(direction_candidate=host.store.artifact(direction_ref).get('candidate') if direction_ref else None,
-            formal_candidate_query=dict(reference=generated[-1]) if generated else None)
+        brief['mechanism_research']=mechanism_direction_view(host,candidate,view,
+            execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
+
+
+def mechanism_direction_view(host, candidate, view, *, execution_block=None):
+    """Project owned directions and original generation provenance; no new state."""
+    from tools.research.structure_research import discovery,matches_direction,METHOD
+    from tools.research.design import verify_candidate
+    s=state(host);directions={}
+    for ref in s.get('analysis_results',[]):
+        raw=host.store.artifact(ref);direction=raw.get('structure_research',{}).get('structure_direction')
+        if raw.get('status')=='computed' and direction and direction.get('candidate',raw.get('candidate'))==raw.get('candidate'):
+            directions[ref['artifact_id']]=(ref,raw)
+    own=[(ref,raw) for ref,raw in directions.values() if raw.get('candidate')==candidate]
+    latest=own[-1][0] if own else None
+    current=verify_candidate(host,candidate);origin_plan=current.get('provenance',{}).get('plan')
+    cited=[];generated=[];adopted=[];relations=[]
+    for plan_ref in s.get('plans',[]):
+        plan=host.store.artifact(plan_ref).get('original_plan',{})
+        if plan.get('action') not in ('generate','propose'):continue
+        for ref in plan.get('supporting_evidence',[]):
+            item=directions.get(ref['artifact_id'])
+            if item is None or not (ref==latest or plan_ref==origin_plan):continue
+            _,raw=item;source=verify_candidate(host,raw['candidate'])
+            children=[r for r in s['candidates'].values() if host.store.artifact(r).get('provenance',{}).get('plan')==plan_ref]
+            matches=[r for r in children if matches_direction(s['spec'],source,verify_candidate(host,r),raw['structure_research']['structure_direction'])]
+            cited.append(plan_ref);generated.extend(children);adopted.extend(matches)
+            relations.append(dict(direction_source=dict(reference=ref,pointer='/structure_research/structure_direction'),
+                direction_candidate=raw['candidate'],relation='current_candidate_direction' if raw['candidate']==candidate else 'historical_parent_direction',
+                generation_plan=dict(reference=plan_ref),formal_candidates=children,suggestion_adopted_by=matches))
+    result=discovery(s['spec'],current,candidate,
+        latest_direction=dict(reference=latest,pointer='/structure_research/structure_direction') if latest else None,
+        formal_candidate_created=bool(generated),method_detail=view['methods'].get(METHOD),
+        remaining_evaluations=view['remaining_evaluations'],execution_block=execution_block)
+    result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
+        suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
+        formal_candidate_query=dict(reference=generated[-1]) if generated else None,
+        historical_directions=[dict(candidate=raw['candidate'],relation='other_candidate_history',
+            query=dict(reference=ref,pointer='/structure_research/structure_direction'))
+            for ref,raw in list(directions.values())[::-1] if raw.get('candidate')!=candidate][:2])
+    return result
 
 
 def research_decision_brief_v3(brief, *, complete_interpretations=False):
