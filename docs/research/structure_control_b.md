@@ -93,3 +93,91 @@ V1/V2/A+ and Conic-initialization cases, 11 B0/B cases, two analytic Tracking Co
 scope checks and one original multi-scale L0 case. Initial evidence-list and
 Tracking fixture configuration errors were corrected and affected cases rerun;
 these involved no robot integration. Historical A/A+/Benchmark paths are unchanged.
+
+
+## Completed real chain and limits
+
+The actual frozen calculation source is local `6665aee`; the caller-only Plan
+field repair is `451ccf2`. The initial missing selected_method was rejected before
+any Native worker or math reservation. The same Store/costs were retained.
+A later compiler tightening prevents named Native best_found_J and Conic
+optimal_task_violation targets from selecting each other's model. The actual
+registered holding-speed question and all recorded numerical results are unchanged.
+
+A+ source `9f10bffc...` supplies the original M0 direction, without rerunning any
+of its five probes or the other A+ checks. On the same original reach_free task,
+width .01330 -> .01324 m increases the recorded directional acceleration bound
+1764.2736013 -> 1764.3282843 m/s^2. The original M0 two-scale derivatives were
+-911.4080628 / -911.4080877 (m/s^2)/m. Current baseline/child physical configurations
+were matched to the historical source via ordinary resolved generation parameters.
+Three original generation Plans cite the source; only the suggested child matches
+all suggested values with all other parameters unchanged. No historical direction
+is projected as the current candidate's own fresh result.
+
+| Width m | Same absolute initial sequence, M1 signed J | Matched T1 best-found J, M2 |
+| --- | ---: | ---: |
+| .01330 baseline | 20.0575055741 | 19.6348983293 |
+| .01324 suggested | 20.0204768689 | 19.5963522212 |
+| .01336 opposite | 20.0944288051 | 19.6733184839 |
+
+The full-task M1 central secant is +616.2661355 J/m, and M2 is
++641.3855220 J/m. These remain separate from the M0 acceleration derivative and
+from the original T1 control-coefficient derivatives. The observed signs both
+favor narrowing in this one small neighborhood. T2 nevertheless reports
+**unresolved**, with CONTROL_SEARCH_QUALITY_UNRESOLVED_AT_LIMIT_OR_FAILURE.
+All three had exactly 3 callbacks and one response update; actual opportunity
+counts match, but one iteration does not solve the control optimum. The same
+holding-speed sample at .45 s remains worst, no per-constraint active-time switches
+were recorded, and no tension saturation occurred (.1 to .2 N). Best speed remains
+about .412 m/s against .02 m/s, far from task satisfaction. No independent replay
+or acceptance claim was made.
+
+A narrower section changes inertia and stiffness together. Increased instantaneous
+directional authority, transient fixed-control response and finite-budget control
+adaptation can cooperate or compete. The observed agreement is not an isolated
+causal proof; another control basis or better-converged search could reverse it.
+The historical six-tendon H length experiment is a concrete counterexample to
+assuming universal agreement: Conic preferred shortening, Native fixed-control
+secants were positive, while Native reoptimized secants changed sign across scales.
+H's conditional affine envelope regularity was unresolved. Those facts were read
+without new H solves and are never merged with this four-tendon width gradient.
+
+The original Reporter investigate path assembled the historical M0 and new T2
+fixed facts. Its report was explicitly read, then a scripted Main stop Plan cited
+all new results. Provider interpretation was left deferred; the competing physical
+hypotheses above are scope-limited analysis of recorded facts, not new Reporter
+numbers or an autonomous LLM discovery claim. Production Main remains free to
+adopt/reject, fund another diagnosis, change control or stop.
+
+Actual new scientific cost: 3 native models, 9 full .5 s rollouts, 9000 integration
+steps, 912 forwards, 3 existing SLSQP response-step calculations (3 iterations each),
+3 T1 math units plus 1 T2 aggregation. T2 added zero native model/rollout/step.
+T1 charged worker time 4.2813054 s, T2 1.3941243 s; total numerical time including
+preparation/source construction is 7.4811151 s. There were no Provider requests or
+independent task evaluations. Final directed coverage is 47 unique cases, after
+adding the scripted Plan schema regression; compileall/diff checks also passed.
+
+## Cross-task and passive audit
+
+A fresh existing BF4 timed Tracking task, its existing backend conversion adapter
+and Tracking control/reference configuration compiled through the same V2 M0 and
+actual S7 parameter rows. Tracking uses zero Reach/Hold-only absolute speed weights,
+and its real timed_tracking constraint arrays are retained. Native T1/T2 Tracking
+remains explicitly unsupported. Two original analytic Tracking Conic tests checked
+timed sensitivity and complete-horizon witness scope; no endpoint proxy was used.
+No fresh robot Tracking solve or replay was run. The historical Tracking execution
+summary is a valid failure (.01820 m max tracking error against .004 m), read only;
+it is not new evidence for the B structure or an implemented closed-loop derivative.
+
+Read-only passive source at `research/phs2d-inverse-passive-design@9d6d160` confirms
+reusable geometric row-space primitives, while passive sensitivity requires its
+actual qualified equilibrium, unilateral active set, LICQ, strict complementarity,
+material-point binding and KKT conditioning/re-equilibrium checks. It remains
+source_available_unadapted; no passive suite or PHS system was merged or run.
+M3 NMPC/RL hypergradients and contact/hybrid task derivatives remain unsupported.
+
+Repository evidence is readable JSON from the original Store: complete T1/T2
+results, generation/control records, Reporter delivery, stop Plan, costs and
+cross-task audit. The unchanged standard core.export archive is also delivered
+locally for full source/ledger reproduction; there is no second evidence system.
+The historical A/A+/H/Tracking files and frozen Benchmark tasks were not modified.

@@ -375,7 +375,10 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
     paths=q.parameter_paths or intent['agent_hypothesis']['decision'].get('selected_variables') or []
     sources=q.source_selection
     if sources.model_results and sources.t1_results:return feedback('needs_choice','SELECT_CONIC_MODELS_OR_NATIVE_T1_NOT_A_MIXED_GRADIENT')
+    if q.target=='best_found_J' and sources.model_results or q.target=='optimal_task_violation' and sources.t1_results:
+        return feedback('needs_choice','NAMED_VALUE_AND_MODEL_SEMANTICS_DISAGREE')
     if q.operation=='optimize':
+        if q.target=='optimal_task_violation':return feedback('needs_choice','FINITE_NATIVE_SEARCH_DOES_NOT_RETURN_A_CONIC_OPTIMAL_VALUE')
         if paths:return feedback('needs_prerequisite','GENERATE_CONTRAST_THEN_OPTIMIZE_CONTROL_PER_CANDIDATE',
             preparation=dict(tool='research_plan',action='generate'),automatic_T1=False)
         if sources.model_results or sources.t1_results:return feedback('unsupported','CONTROL_OPTIMIZATION_REQUIRES_A_BOUND_CONTROL_SOURCE')
@@ -389,6 +392,7 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
         return feedback('unsupported','SAVED_M2_REUSES_MATCHED_RECORDED_SEARCH_SETTINGS')
     if not paths:
         if q.operation!='inspect':return feedback('needs_choice','M2_STRUCTURAL_PARAMETER_PATH_REQUIRED')
+        if q.target=='best_found_J':return feedback('needs_prerequisite','NATIVE_BEST_FOUND_REQUIRES_SAVED_T1_OR_EXPLICIT_CONTROL_SEARCH')
         if sources.model_results or sources.t1_results:return feedback('needs_choice','STRUCTURAL_SOURCES_REQUIRE_A_REGISTERED_PATH')
         return compile_v1(host,dict(question_type='bounded_control_initialization'),tool_use_id=tool_use_id,source_question=payload)
     from tools.research.structure_research import parameters,group_matches
@@ -398,7 +402,7 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
             return feedback('unsupported','M2_REQUIRES_EFFECTIVE_AUTHORIZED_CONTINUOUS_PARAMETER',path=path)
         if q.parameter_group and not group_matches(rows[path],q.parameter_group):return feedback('needs_choice','PARAMETER_PATH_AND_GROUP_DISAGREE')
     conic=view['methods'].get(SENSITIVITY,{});model_choices=[]
-    if len(paths)==1 and not sources.t1_results:
+    if len(paths)==1 and not sources.t1_results and q.target!='best_found_J':
         for row in conic.get('readiness',{}).get('variables',[]):
             if row['variable']!=paths[0]:continue
             for ready in row.get('ready_stencils',[]):
@@ -412,7 +416,7 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
     if model_choices:
         request,needed=model_choices[0];method=SENSITIVITY
         compiled=dict(model_source='gvs',operating_point=request['operating_point'],optimal_sensitivity=request['optimal_sensitivity'])
-    elif sources.model_results:
+    elif sources.model_results or q.target=='optimal_task_violation':
         if conic.get('planning_status') in ('unauthorized','blocked','insufficient_budget','unsupported'):
             return feedback('blocked','ORIGINAL_M2_METHOD_ADMISSION_BLOCKED',missing=conic.get('missing'),method=SENSITIVITY)
         return feedback('needs_prerequisite','ADMITTED_SAVED_CONIC_MODEL_STENCIL_REQUIRED',

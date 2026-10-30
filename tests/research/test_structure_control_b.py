@@ -208,6 +208,10 @@ class JointSemanticsTests(unittest.TestCase):
         h,c=prepare()
         r=self.compile(h,m2_question(control_treatment='fixed_absolute_tensions'))
         self.assertEqual(r['reason'],'M2_REQUIRES_EXPLICIT_REOPTIMIZED_CONTROL_TREATMENT')
+        self.assertEqual(self.compile(h,m2_question(target='optimal_task_violation',source_selection=dict(t1_results=[c])))['reason'],
+            'NAMED_VALUE_AND_MODEL_SEMANTICS_DISAGREE')
+        self.assertEqual(self.compile(h,m2_question(target='best_found_J',source_selection=dict(model_results=[c])))['reason'],
+            'NAMED_VALUE_AND_MODEL_SEMANTICS_DISAGREE')
         for semantics in ('closed_loop_performance','re_equilibrated_passive_response'):
             q=mechanism_question();q['effect_semantics']=semantics
             self.assertEqual(self.compile(h,q)['status'],'unsupported')
