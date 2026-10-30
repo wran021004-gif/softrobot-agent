@@ -1535,6 +1535,10 @@ def agent_decision_brief(host):
             discovery.update(catalog_read_status='deferred_by_original_candidate_read_admission',
                 legal_evidence_query=brief['stop_result_index']['query'])
     if candidate and s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
+        catalog=brief.get('mathematical_capabilities') or {}
+        if catalog.get('methods'):
+            brief['mathematical_capabilities']={k:v for k,v in catalog.items() if k not in ('methods','model_sources','limitations','cost_scope')}
+            brief['mathematical_capabilities']['method_count']=len(catalog['methods'])
         brief['mechanism_research']=mechanism_direction_view(host,candidate,view,
             execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
@@ -1546,11 +1550,11 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
     from tools.research.structure_research import discovery,matches_direction,METHOD
     from tools.research.design import verify_candidate
     s=state(host);directions={}
-    for ref in s.get('analysis_results',[]):
+    for ref in [*s.get('analysis_results',[]),*s.get('research_mathematics',[])]:
         raw=host.store.artifact(ref);direction=raw.get('structure_research',{}).get('structure_direction')
         if raw.get('status')=='computed' and direction and direction.get('candidate',raw.get('candidate'))==raw.get('candidate'):
             directions[ref['artifact_id']]=(ref,raw)
-    own=[(ref,raw) for ref,raw in directions.values() if raw.get('candidate')==candidate]
+    own=[(ref,raw) for ref,raw in directions.values() if ref in s.get('analysis_results',[]) and raw.get('candidate')==candidate]
     latest=own[-1][0] if own else None
     current=verify_candidate(host,candidate);origin_plan=current.get('provenance',{}).get('plan')
     cited=[];generated=[];adopted=[];relations=[]
@@ -1560,12 +1564,13 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
         for ref in plan.get('supporting_evidence',[]):
             item=directions.get(ref['artifact_id'])
             if item is None or not (ref==latest or plan_ref==origin_plan):continue
-            _,raw=item;source=verify_candidate(host,raw['candidate'])
+            _,raw=item
+            source=(verify_candidate(host,raw['candidate']) if ref in s.get('analysis_results',[]) else host.store.artifact(raw['candidate']))
             children=[r for r in s['candidates'].values() if host.store.artifact(r).get('provenance',{}).get('plan')==plan_ref]
             matches=[r for r in children if matches_direction(s['spec'],source,verify_candidate(host,r),raw['structure_research']['structure_direction'])]
             cited.append(plan_ref);generated.extend(children);adopted.extend(matches)
             relations.append(dict(direction_source=dict(reference=ref,pointer='/structure_research/structure_direction'),
-                direction_candidate=raw['candidate'],relation='current_candidate_direction' if raw['candidate']==candidate else 'historical_parent_direction',
+                direction_candidate=raw['candidate'],relation='current_candidate_direction' if ref==latest else 'historical_parent_direction',
                 generation_plan=dict(reference=plan_ref),formal_candidates=children,suggestion_adopted_by=matches))
     result=discovery(s['spec'],current,candidate,
         latest_direction=dict(reference=latest,pointer='/structure_research/structure_direction') if latest else None,
@@ -1574,9 +1579,9 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
     result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
         suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
         formal_candidate_query=dict(reference=generated[-1]) if generated else None,
-        historical_directions=[dict(candidate=raw['candidate'],relation='other_candidate_history',
+        historical_directions=[dict(candidate=raw['candidate'],relation='declared_historical_mathematics' if ref not in s.get('analysis_results',[]) else 'other_candidate_history',
             query=dict(reference=ref,pointer='/structure_research/structure_direction'))
-            for ref,raw in list(directions.values())[::-1] if raw.get('candidate')!=candidate][:2])
+            for ref,raw in list(directions.values())[::-1] if ref not in s.get('analysis_results',[]) or raw.get('candidate')!=candidate][:2])
     return result
 
 

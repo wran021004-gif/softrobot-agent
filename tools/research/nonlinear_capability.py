@@ -310,6 +310,15 @@ def comparison_summary(result):
             evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',change_significance='unresolved_without_error_bound',
             followup_hypothesis='Recheck the observed lower J with an independent control initialization' if lower else 'Check another legal step or initialization',
             detail_pointer='/nonlinear_response/directions/'+str(i) if 'directions' in result else '/nonlinear_response'))
+        fixed=d.get('fixed_control',{}).get('central');optimized=d.get('reoptimized',{}).get('central')
+        if fixed is not None and optimized is not None:
+            rows[-1]['effect_comparison']=dict(fixed_control_secant=fixed,reoptimized_best_found_secant=optimized,
+                secant_unit=d.get('secant_unit'),same_observed_sign=bool(fixed*optimized>0) if fixed and optimized else None,
+                control_condition='Identical recorded absolute initial sequence for M1; matched finite-budget settings for M2.',
+                active_constraints=[r.get('worst_constraint') for r in facts],
+                input_saturation=[r.get('input_saturation') for r in facts],
+                search_quality_reasons=d.get('reasons',[]),
+                interpretation='Competing observed effects; control solve quality may explain differences. No mixed gradient or structural optimum.')
         if d.get('task_sensitivity'):
             rows[-1]['task_sensitivity']={k:dict(status=v['status'],reasons=v.get('reasons',[]),
                 maximum_validation_error_over_threshold=max((r['maximum_error_over_threshold'] for r in v.get('validation',[])),default=None),

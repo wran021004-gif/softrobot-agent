@@ -258,12 +258,15 @@ def compile_v2(host, payload, *, tool_use_id):
     intent=completed_question_plan(host)
     if not intent:return feedback('needs_prerequisite','COMPLETED_CANDIDATE_BOUND_DIAGNOSE_REQUIRED',
         preparation=dict(tool='research_plan',action='diagnose',fields=['hypothesis','decision.selected_candidate']))
+    if q.effect_semantics=='reoptimized_task_capability':
+        return compile_reoptimized(host,q,payload,tool_use_id=tool_use_id,intent=intent)
     if q.effect_semantics not in ('mechanism_effect','fixed_input_response'):
         return feedback('unsupported','V2_EFFECT_NOT_IMPLEMENTED',detail={
-            'reoptimized_task_capability':'M2 reuses existing T1/T2 or controlled Conic source/model stencils and original search admission.',
             'closed_loop_performance':'Requires complete feedback execution and independent frozen task evaluation; no closed-loop derivative adapted.',
             're_equilibrated_passive_response':'Requires qualified passive equilibrium, unilateral active set and KKT regularity; no passive adapter.'}[q.effect_semantics])
     if q.control_treatment!='fixed_absolute_tensions':return feedback('unsupported','FIXED_ABSOLUTE_TENSIONS_REQUIRED')
+    if q.control_scope or q.search_strategy or any(plain(q.source_selection).values()):
+        return feedback('unsupported','M0_AND_SHORT_M1_REQUIRE_POINT_INPUTS_NOT_CONTROL_SEARCH_OR_M2_SOURCES')
     if q.operating_point in ('re_equilibrated','preserved_physical_state'):
         return feedback('unsupported','WORKING_POINT_MAPPING_NOT_IMPLEMENTED')
     saved=bool(q.saved_state or q.execution)
@@ -349,3 +352,119 @@ def compile_v2(host, payload, *, tool_use_id):
     return dict(status='ready',method=METHOD,request=full,scientific_execution_started=False,
         hypothesis=q.hypothesis or intent['agent_hypothesis'].get('hypothesis'),required_evaluations=needed,
         minimum_evaluations=context['minimum_evaluations'],limitations=detail['limitations'],cost_scope=detail['cost_scope'])
+
+
+def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
+    """Select admitted saved Conic/T1 sources; never generate models or run T1."""
+    from tools.research.task_constraints import mathematical_method_view
+    from tools.research.agent import bind_selected_analysis_request
+    from tools.research.optimal_capability import CONIC,SENSITIVITY,family_parameters
+    from tools.research.design import verify_candidate,parameter_value
+    candidate=intent['candidate'];c=verify_candidate(host,candidate);s=state(host);spec=s['spec']
+    view=mathematical_method_view(host,candidate)
+    def feedback(status,reason,**extra):
+        return dict(status=status,reason=reason,scientific_execution_started=False,**extra)
+    if q.control_treatment!='reoptimized':return feedback('needs_choice','M2_REQUIRES_EXPLICIT_REOPTIMIZED_CONTROL_TREATMENT')
+    if q.operating_point!='frozen_task_initial_state' or q.saved_state or q.execution or q.update_id is not None:
+        return feedback('unsupported','M2_REQUIRES_COMPLETE_FROZEN_INITIAL_TASK_AND_MATCHED_CONTROL_SOURCES')
+    if q.tensions_n is not None or q.response_horizon_s is not None or q.comparison_candidates or q.source_selection.comparison_candidates:
+        return feedback('unsupported','M2_USES_FULL_TASK_MODEL_OR_SAVED_T1_NOT_SHORT_FIXED_INPUT_FIELDS')
+    metrics={r['constraint']['constraint_id'] for r in view['research_opportunities']['metrics'] if r.get('constraint')}
+    if not isinstance(q.target,str) or q.target not in metrics|{'best_found_J','optimal_task_violation'}:
+        return feedback('needs_choice','M2_REQUIRES_REGISTERED_TASK_CONSTRAINT_OR_TASK_VIOLATION',choices=sorted(metrics))
+    paths=q.parameter_paths or intent['agent_hypothesis']['decision'].get('selected_variables') or []
+    sources=q.source_selection
+    if sources.model_results and sources.t1_results:return feedback('needs_choice','SELECT_CONIC_MODELS_OR_NATIVE_T1_NOT_A_MIXED_GRADIENT')
+    if q.operation=='optimize':
+        if paths:return feedback('needs_prerequisite','GENERATE_CONTRAST_THEN_OPTIMIZE_CONTROL_PER_CANDIDATE',
+            preparation=dict(tool='research_plan',action='generate'),automatic_T1=False)
+        if sources.model_results or sources.t1_results:return feedback('unsupported','CONTROL_OPTIMIZATION_REQUIRES_A_BOUND_CONTROL_SOURCE')
+        legacy=dict(question_type='control_feasibility',effect_semantics='reoptimized_task_capability',
+            source_selection=dict(control_source=plain(sources.control_source)) if sources.control_source else {})
+        for key in ('control_scope','search_strategy','requested_budget'):
+            if getattr(q,key) is not None:legacy[key]=plain(getattr(q,key))
+        if q.target in metrics:legacy['focus_metric']=q.target
+        return compile_v1(host,legacy,tool_use_id=tool_use_id,source_question=payload)
+    if q.control_scope or q.search_strategy or sources.control_source:
+        return feedback('unsupported','SAVED_M2_REUSES_MATCHED_RECORDED_SEARCH_SETTINGS')
+    if not paths:
+        if q.operation!='inspect':return feedback('needs_choice','M2_STRUCTURAL_PARAMETER_PATH_REQUIRED')
+        if sources.model_results or sources.t1_results:return feedback('needs_choice','STRUCTURAL_SOURCES_REQUIRE_A_REGISTERED_PATH')
+        return compile_v1(host,dict(question_type='bounded_control_initialization'),tool_use_id=tool_use_id,source_question=payload)
+    from tools.research.structure_research import parameters,group_matches
+    rows={r['parameter_id']:r for r in parameters(spec,c)}
+    for path in paths:
+        if path not in rows or not rows[path]['mechanism_differentiation']['supported']:
+            return feedback('unsupported','M2_REQUIRES_EFFECTIVE_AUTHORIZED_CONTINUOUS_PARAMETER',path=path)
+        if q.parameter_group and not group_matches(rows[path],q.parameter_group):return feedback('needs_choice','PARAMETER_PATH_AND_GROUP_DISAGREE')
+    conic=view['methods'].get(SENSITIVITY,{});model_choices=[]
+    if len(paths)==1 and not sources.t1_results:
+        for row in conic.get('readiness',{}).get('variables',[]):
+            if row['variable']!=paths[0]:continue
+            for ready in row.get('ready_stencils',[]):
+                request=ready['request']
+                if ready['admission']['status']!='admissible':continue
+                if sources.model_results and request['optimal_sensitivity']['model_results']!=[plain(ref) for ref in sources.model_results]:continue
+                model_choices.append((request,ready['admission']['expected_mathematical_evaluations']))
+    method=None;compiled=None;needed=None
+    if len(model_choices)>1:
+        return feedback('needs_choice','SELECT_COMPARABLE_CONIC_MODEL_STENCIL',choices=[r['optimal_sensitivity'] for r,_ in model_choices])
+    if model_choices:
+        request,needed=model_choices[0];method=SENSITIVITY
+        compiled=dict(model_source='gvs',operating_point=request['operating_point'],optimal_sensitivity=request['optimal_sensitivity'])
+    elif sources.model_results:
+        if conic.get('planning_status') in ('unauthorized','blocked','insufficient_budget','unsupported'):
+            return feedback('blocked','ORIGINAL_M2_METHOD_ADMISSION_BLOCKED',missing=conic.get('missing'),method=SENSITIVITY)
+        return feedback('needs_prerequisite','ADMITTED_SAVED_CONIC_MODEL_STENCIL_REQUIRED',
+            missing=conic.get('missing'),detail_query=conic.get('detail_query'),preparation=conic.get('readiness',{}).get('model_preparation'))
+    else:
+        detail=view['methods'].get(T2,{})
+        if (not detail or detail.get('planning_status')=='unauthorized') and not sources.t1_results and conic.get('formal_execution_authorized'):
+            return feedback('needs_prerequisite','ADMITTED_SAVED_CONIC_MODEL_STENCIL_REQUIRED',
+                detail_query=conic.get('detail_query'),preparation=conic.get('readiness',{}).get('model_preparation'),automatic_T1=False)
+        if not detail or detail.get('planning_status') in ('unauthorized','blocked','insufficient_budget'):
+            return feedback('blocked','ORIGINAL_M2_METHOD_ADMISSION_BLOCKED',missing=detail.get('missing',['Native T2 method grant']),method=T2)
+        if detail.get('planning_status')=='unsupported':
+            return feedback('unsupported','ORIGINAL_NATIVE_T2_TASK_UNSUPPORTED',missing=detail['missing'],
+                conic_detail_query=conic.get('detail_query'),task_constraints=sorted(metrics))
+        selected=[plain(ref) for ref in sources.t1_results];choices=[]
+        for path in paths:
+            found=[r for r in detail.get('ready_requests',[]) if r['nonlinear_response']['variable']==path and
+                (not selected or r['nonlinear_response']['t1_results'][0]==selected[0] and
+                    all(ref in selected for ref in r['nonlinear_response']['t1_results']))]
+            if not found:return feedback('needs_prerequisite','COMPARABLE_COMPLETED_BASELINE_MINUS_PLUS_T1_REQUIRED',
+                missing=['matched frozen task, state, absolute initial sequence, search settings and finite budget'],
+                preparation=[dict(tool='research_plan',action='generate',parameter_path=path),
+                    dict(tool='research_plan',action='initialize_control'),dict(tool='research_plan',action='diagnose')],
+                next_question='Choose reoptimized_task_capability/optimize for each candidate only if you decide to fund its original control search.',
+                conic_detail_query=conic.get('detail_query'),detail_query=detail.get('detail_query'),automatic_T1=False)
+            if len(found)>1 and not selected:return feedback('needs_choice','MULTIPLE_COMPARABLE_T1_STENCILS',
+                choices=[r['nonlinear_response'] for r in found])
+            choices.extend(found)
+        refs=[ref for r in choices for ref in r['nonlinear_response']['t1_results']]
+        if selected and any(ref not in refs for ref in selected):return feedback('needs_choice','SELECTED_T1_SOURCES_NOT_IN_THE_REQUESTED_STENCIL')
+        if len({r['nonlinear_response']['t1_results'][0]['artifact_id'] for r in choices})!=1:
+            return feedback('needs_choice','M2_PATHS_REQUIRE_ONE_SHARED_MATCHED_BASELINE')
+        if len(choices)==1:response=choices[0]['nonlinear_response']
+        else:
+            directions=[]
+            for i,r in enumerate(choices):
+                request=r['nonlinear_response'];path=request['variable'];refs=request['t1_results']
+                base=host.store.artifact(refs[0]);minus=host.store.artifact(refs[1])
+                a=family_parameters(spec,verify_candidate(host,base['candidate']),path)[0]
+                b=family_parameters(spec,verify_candidate(host,minus['candidate']),path)[0]
+                h=parameter_value(a,path)-parameter_value(b,path)
+                directions.append(dict(direction_id=path+'/'+str(i),variables={path:1.},coordinate_unit=request['unit'],
+                    coordinates=[0.,-h,h],t1_results=refs))
+            response=dict(version='nonlinear_response_v2',directions=directions)
+        method=T2;needed=1;compiled=dict(nonlinear_response=response)
+    detail=view['methods'][method]
+    if detail['planning_status'] in ('unauthorized','blocked','insufficient_budget','unsupported'):
+        return feedback('blocked','ORIGINAL_M2_METHOD_ADMISSION_BLOCKED',missing=detail['missing'],method=method)
+    if (q.requested_budget is not None and q.requested_budget<needed) or view['remaining_evaluations']<needed:
+        return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed)
+    full=bind_selected_analysis_request(host,compiled,tool_use_id=tool_use_id,selection=(method,detail),scientific_question=payload)
+    return dict(status='ready',method=method,request=full,required_evaluations=needed,scientific_execution_started=False,
+        effect_scope='Conditional affine optimal capability sensitivity' if method==SENSITIVITY else
+            'Saved matched finite-budget Native structural secants; fixed-control and reoptimized effects remain separate.',
+        strict_optimal_value_gradient=False,automatic_T1=False,limitations=detail['limitations'])

@@ -325,6 +325,8 @@ def mathematical_method_view(host, reference):
             item['planning_status']='unauthorized';item['execution_status']='blocked'
             item['missing']=[*item['missing'],'explicit_frozen_mechanism_method_grant_required']
         methods[METHOD]=item
+        methods['native_dynamics_v1']['frontend_role']='internal_mechanism_source'
+        item['internal_mechanics_query']=methods['native_dynamics_v1']['detail_query']
     for method,item in methods.items():
         item['generic_operations']=generic_operations(method)
         template=item['request_template']
@@ -494,6 +496,7 @@ def mathematical_opportunity_summary(view, *, observations=(), latest_result=Non
             linked.setdefault(link['method'],set()).update(link['metric_ids'])
     ranked=[];unavailable={};unavailable_examples=[]
     for key,detail in view['methods'].items():
+        if detail.get('frontend_role')=='internal_mechanism_source':continue
         status=detail['planning_status']
         # These are the original gate's verdicts, not a second applicability test.
         if execution_block or status in ('unauthorized','unsupported','insufficient_budget','blocked'):

@@ -377,6 +377,13 @@ class MechanismTarget(Contract):
         return result
 
 
+class ScientificSourcesV2(ScientificSources):
+    t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=9,
+        description='Comparable saved Native T1 results, baseline first; may select explicit shared-baseline paths/scales. No new search is requested.')
+    model_results: list[EvidenceRef] = Field(default_factory=list,max_length=5,
+        description='Saved Conic-compatible model stencil, baseline first. Original optimal sensitivity admission determines its validity.')
+
+
 class ScientificQuestionV2(Contract):
     """Versioned scientific choices; diagnose owns candidate, task and hypothesis."""
     version: Literal['scientific_question_v2'] = 'scientific_question_v2'
@@ -387,6 +394,9 @@ class ScientificQuestionV2(Contract):
     parameter_paths: list[str] = Field(default_factory=list,max_length=2)
     target: MechanismTarget | str = Field(description='Registered mechanism composition, or a frozen task constraint ID. Short task response targets use existing M1 methods; complete reoptimized task response remains M2.')
     hypothesis: str | None = None
+    source_selection: ScientificSourcesV2 = Field(default_factory=ScientificSourcesV2)
+    control_scope: ScientificControlScope | None = None
+    search_strategy: Literal['response','pattern'] | None = None
     operating_point: Literal['frozen_task_initial_state','same_generalized_coordinates',
         'fixed_generalized_pose','saved_native_state','re_equilibrated','preserved_physical_state']
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop']
@@ -396,7 +406,7 @@ class ScientificQuestionV2(Contract):
     update_id: StrictInt | None = Field(default=None,ge=0)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
     requested_budget: StrictInt | None = Field(default=None,ge=1,le=64,
-        description='Maximum original mathematical evaluations for this question. Mechanism cost depends on selected paths, central/one-sided stencils and bounded local search. Fixed-input short responses retain their original accounting.')
+        description='Maximum original mathematical evaluations for this question. Mechanism cost depends on selected paths, central/one-sided stencils and bounded local search. Fixed-input short responses retain original accounting. For explicit control optimization this caps Native callbacks; saved M2 aggregation never requests new T1 rollouts.')
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1,
         description='Bounded neighborhood in normalized parameter coordinates, used by the existing SciPy local optimizer.')
     response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05)

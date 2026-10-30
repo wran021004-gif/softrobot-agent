@@ -257,9 +257,7 @@ def sensitivity_summary(value):
         reliability=dict(numerical_optimality=[r['result']['optimality_status'] for r in value.get('numerical_optimality',[])],
             regularity_pointer='/optimal_sensitivity/regularity',envelope=value.get('envelope_sensitivity')),
         scope=value['model_scope'],strict_gradient='unavailable',cost=value.get('computation_cost'),
-        unsupported_inferences=value['unsupported_inferences']+[
-            'Shortening length necessarily improves holding speed.',
-            'Numerically flat modulus means stiffness has no physical effect.'],
+        unsupported_inferences=value['unsupported_inferences'],
         physical_failure_relation=dict(status='not_assessed',reason='No aligned physical evidence assessed in this numerical kernel.'),
         unresolved=['General near-optimal dual-face extrema may be unresolved; inspect each status.',
             'Finite differences do not establish a strict gradient or nonlinear performance.'],
@@ -288,7 +286,11 @@ def compact_nonlinear_directions(result):
             ids=groups[key]['source_direction_ids'];groups[key]=dict(row,source_direction_ids=ids)
         groups[key].setdefault('source_direction_ids',[]).append(row.get('direction_id'))
         groups[key]['_step']=min(direction.get('step',float('inf')),groups[key].get('_step',float('inf')))
-    for row in groups.values():row.pop('_step',None)
+    for row in groups.values():
+        row.pop('_step',None)
+        if row.get('effect_comparison'):
+            row['effect_comparison']={k:v for k,v in row['effect_comparison'].items() if k in
+                ('fixed_control_secant','reoptimized_best_found_secant','secant_unit','same_observed_sign')}
     return list(groups.values())
 
 

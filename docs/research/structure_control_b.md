@@ -55,3 +55,41 @@ budget if flat, conflicting, incomplete or unresolved. No A/A+ model is rerun.
 Also read the existing P6.3-H length Conic/Native contrasts and Tracking evidence
 without rerunning their solvers or rewriting artifacts. These provide independent
 historical comparisons, not fresh acceptance or current owned T1 sources.
+
+
+## Implemented interface and cleanup
+
+ScientificQuestionV2 now reuses existing source/control-scope types. Explicit
+control optimization compiles to original T1; structural M2 chooses an admitted
+Conic stencil first, or explicitly selected/matched saved Native T1. One or two
+independent physical paths and explicit shared-baseline scales use the existing
+T2 v1/v2 contracts; coupled directions remain available through the original
+explicit NonlinearResponseDirection contract. M3/passive equilibrium remain
+non-executable. M1 short response retains its original kernel and limited horizon;
+full fixed-sequence M1 facts are also read from admitted T1 initial rollouts.
+Control coefficient sensitivity remains a separate original T1 result.
+
+T2 comparison facts now explicitly separate fixed-control and best-found
+reoptimized secants, signs, active constraints, saturation and unresolved search
+quality. L0 keeps the key values and existing detail queries; L1/L2 retain the full
+source facts. The V2 default menu treats old native_dynamics_v1 as an internal
+mechanics source and removes a duplicate per-method catalog dump. Removed the
+unreachable V2 M2-unsupported metadata and two parameter-specific Conic view
+sentences; generic kernel limitations remain authoritative. No independent kernel,
+Harness, Store, Reporter, native control or optimization algorithm was replaced.
+No zero-reference computational kernel was found that justified deletion.
+
+B's real check imports A+ M0 through the existing historical mathematics contract.
+Historical source ownership is never relabeled as a current candidate direction.
+Full resolved generation parameters verify the suggested child; baseline and
+opposite contrasts cite the same source without being classified as adoptions.
+M0 has no fresh execution grant in this check. Native Response has one predefined
+coefficient and is an intentionally narrow finite search, not full control authority.
+The original task is .5 s at .0005 s timestep, so the fixed 9-callback cap implies
+at most 9000 new integration steps. No independent acceptance is requested.
+
+Directed validation before the real check covers 46 unique tests: 32 original
+V1/V2/A+ and Conic-initialization cases, 11 B0/B cases, two analytic Tracking Conic
+scope checks and one original multi-scale L0 case. Initial evidence-list and
+Tracking fixture configuration errors were corrected and affected cases rerun;
+these involved no robot integration. Historical A/A+/Benchmark paths are unchanged.

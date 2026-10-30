@@ -302,7 +302,7 @@ class MechanismQuestionV2Tests(unittest.TestCase):
     def test_semantics_discrete_groups_budget_and_no_silent_substitution(self):
         h,c=self.prepare()
         with patch('extensions.tendon_family.mujoco_analysis.NativeModel',side_effect=AssertionError('NO_NATIVE_WORK')):
-            for semantics in ('reoptimized_task_capability','closed_loop_performance','re_equilibrated_passive_response'):
+            for semantics in ('closed_loop_performance','re_equilibrated_passive_response'):
                 q=mechanism_question();q['effect_semantics']=semantics
                 self.assertEqual(self.compile(h,q)['status'],'unsupported')
             for path in ('segment_count','tendon_count','segments.0.cells','tendon_parameters.length_servo_gain_n_m'):
