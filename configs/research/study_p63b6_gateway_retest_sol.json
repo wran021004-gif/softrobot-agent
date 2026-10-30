@@ -1,0 +1,145 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "initial_structure_strategy": "agent_choice",
+  "study_id": "p63b6-m-native-sol-gateway-20261030",
+  "base_commit": "172ad585a3037251c80ce5296720abcee0184ce2",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: current user follow-up authorizes gateway repair and one new independent Sol/none M retest with the previously specified ceilings. Exact identity, budgets and original formal Study/handoff records required before Provider or science; no replay or budget reset of the failed B6 Study.",
+  "mode": "formal_research",
+  "task": "../../tasks/bf7_shared_reach_v1_central_high.json",
+  "control": "control.json",
+  "runtime": "runtime_p63b1_sol_none.json",
+  "evidence_destination": "evidence/p63b6_gateway_retest_20261030",
+  "capabilities": [
+    "analysis",
+    "control_correction"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "diagnose",
+    "stop"
+  ],
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "cells_per_segment": 12
+  },
+  "budgets": {
+    "provider_requests": 12,
+    "protected_provider_requests": 1,
+    "provider_reserve_policy": "last_requests_v2",
+    "public_operations": 32,
+    "protected_public_operations": 2,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 4,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "physical_replay_limit": 0,
+  "reserve_rl_evaluation": false,
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "native_control_limits": {
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "knots_s": 4
+  },
+  "mathematical_methods": {
+    "mujoco-nonlinear-task-capability-v1": "B6 single bounded Native mathematics scope authorized by the user task; effective only with the exact formal Study authorization record. Original candidate/task/source/applicability admission and shared four-evaluation allowance; unchanged Native limits. Main independently selects methods and settings without a prescribed order.",
+    "mujoco-reoptimized-structure-response-v1": "B6 single bounded Native mathematics scope authorized by the user task; effective only with the exact formal Study authorization record. Original candidate/task/source/applicability admission and shared four-evaluation allowance; unchanged Native limits. Main independently selects methods and settings without a prescribed order."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "segments.*.sections.*.parameters.*",
+      "spans.*.radius_m",
+      "spans.*.phase_rad"
+    ]
+  },
+  "knowledge": {
+    "mode": "enabled",
+    "allow_benchmark_answers": true,
+    "allowed_kinds": [
+      "procedure",
+      "success_case"
+    ]
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 4,
+      "evidence": 3
+    },
+    "architecture": "english_decision_v1",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "bound_scientific_variables_v2",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    }
+  },
+  "scoring_window_s": 0.6,
+  "analysis_protocol": {
+    "windows_s": [
+      0.06,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.2,
+      0.4,
+      0.54,
+      0.58
+    ]
+  },
+  "execution_instructions": "You are Main in the independent B6 gateway-retest M Study, within the current explicitly authorized single bounded window. Operator supplied two engineering inputs: one legal task-unmeasured structure baseline and its full default control sequence from the original initialize_control baseline. Both retain Operator provenance; neither is your original research achievement or an evaluated result. Inspect their exact current-Study references. Independently choose the scientific hypothesis, applicable registered MuJoCo Native method, mathematical settings, actual parameters and next research direction. You may choose Native mechanism analysis, fixed-input structural response or nonlinear task capability, without a required order. Use only direct original MuJoCo Native dynamics, matrices and rollouts as mathematical numerical evidence. Do not substitute GVS, SoRoSim, reduced or learned surrogate predictions. The existing controller/configuration and execution binding metadata do not constitute such numerical evidence. All MuJoCo outcomes are simulation references, never hardware truth. If a new candidate has no control source, you may use research_plan initialize_control; use its returned source and resubmit diagnose before research_analysis. No method, correction direction or scientific parameter is prescribed by preparation. Diagnose binds your own choice; original Contract, source and applicability admission remain mandatory. Interpret actual results and make a justified next decision or truthful STOP. M1 requires your formal scientific choice; M2 requires an actual Native mathematical Worker readable result; M3 requires a result-grounded next decision. HTTP 200, legal requests, Operator initial control and computed alone do not establish this loop.\nKnowledge remains enabled with all nine registered success_case traces and procedures available via experience_retrieve, without injecting bodies or importing candidates, controls or results. B4, B5 and M0 Stores are independent historical experiments; no M0 mathematical result is imported. Reporter retains its existing accounted source-linked role. Preserve model scope, finite search uncertainty and frozen independent acceptance. Do not infer a global optimum, strict gradient, infeasibility, hardware performance or task acceptance from finite model calculations.\nResource caps: Provider 12 including Reporter, failures and one protected closeout; public operations 32 including two protected; shared mathematics 4. Native per-request callbacks at most 24, iterations at most 3, knots at most 4. All actual Native builds, rollouts, callbacks, integration steps and numerical wall time retain original accounting. Independent physics, NMPC, RL and offline NLP/BDF are zero. Retrieve the complete fresh-result index with its advertised query before STOP. Preparation alone creates no authorization record. The user explicitly authorized this independent gateway-retest single window; execute only after the original formal Study and live-handoff records are registered. Stop at the frozen caps without another window."
+}

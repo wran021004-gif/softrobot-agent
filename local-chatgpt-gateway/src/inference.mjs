@@ -9,8 +9,11 @@ export function completedResponse(response) {
   if (output.some(i => !['message','function_call','reasoning'].includes(i.type))) {
     throw new ChatGPTError('subscription_sharing_unsupported_capability','Unsupported output item; no tool was executed.',false);
   }
+  if (output.some(i => i.status && i.status !== 'completed')) {
+    throw new ChatGPTError('invalid_stream','Incomplete output item.',true);
+  }
   const tool_calls=output.filter(i => i.type === 'function_call').map(i => {
-    if ((i.namespace && i.namespace !== 'research') || !i.call_id || !i.name || typeof i.arguments !== 'string' || (i.status && i.status !== 'completed')) {
+    if ((i.namespace && i.namespace !== 'research') || !i.call_id || !i.name || typeof i.arguments !== 'string') {
       throw new ChatGPTError('invalid_stream','Incomplete function call.',true);
     }
     return {id:i.call_id,type:'function',function:{name:i.name,arguments:i.arguments}};
@@ -32,9 +35,19 @@ export async function streamResponse(accessToken, options, signal, createClient 
     const {signal:ignored,onDelta,...body}=options;
     const stream=await client.responses.create({...body,store:false,stream:true,
       include:['reasoning.encrypted_content']},{signal:requestSignal,headers:{accept:'text/event-stream'}});
+    const completedItems=new Map();
     for await (const event of stream) {
       requestSignal.throwIfAborted();
-      if (event.type === 'response.completed') return completedResponse(event.response);
+      if (event.type === 'response.output_item.done') completedItems.set(event.output_index,event.item);
+      if (event.type === 'response.completed') {
+        // Some streams omit the output list on the terminal event. Only exact
+        // completed items may fill it, and only after the response itself completes.
+        const output=event.response.output?.length ? event.response.output
+          : [...completedItems].sort(([a],[b])=>a-b).map(([,item])=>item);
+        return {...completedResponse({...event.response,output}),gateway_completion:{
+          output_source:event.response.output?.length ? 'terminal_output' : 'completed_item_events',
+          terminal_output_items:event.response.output?.length ?? 0,completed_item_events:completedItems.size}};
+      }
       if (event.type === 'response.incomplete') throw new ChatGPTError('response_incomplete','Response stopped before completion.',true);
       if (event.type === 'response.failed' || event.type === 'error') throw apiError(event.response ?? event,200);
     }

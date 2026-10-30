@@ -36,6 +36,11 @@ requests always set store:false and stream:true, with no previous_response_id.
 Only a terminal response.completed is successful. Incomplete streams, policy errors
 and interruptions never produce successful tool calls. Usage is passed through when
 present; missing usage is unknown. No prices or cheapest model ordering are inferred.
+When the terminal event omits its output list, exact `response.output_item.done`
+items are retained in output-index order, but released only after a successful
+`response.completed`. Deltas alone, interrupted/incomplete responses and genuine
+empty output remain errors. `gateway_completion` reports only the output source
+and item counts, without logging text, arguments, reasoning or credentials.
 
 These mappings follow [plan-usage restrictions](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations)
 and [models/inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference),

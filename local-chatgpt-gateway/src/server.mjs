@@ -74,10 +74,11 @@ export function createGateway({ client, apiKey }) {
         if (!models.some(model => model.slug === options.model)) fail(400, 'model_not_found', 'Choose a model returned by GET /v1/models for the active ChatGPT account.');
         // DevKit resolves only after response.completed, never after just a text delta.
         const result = await client.streamResponse({ ...options, signal });
-        if (!result.text?.trim() && !result.tool_calls?.length) fail(502, 'empty_response', 'The completed response contained no text.');
+        if (!result.text?.trim() && !result.tool_calls?.length) fail(502, 'empty_response',
+          'The completed response contained no text or function calls. Completed output items: '+(result.provider_output?.length ?? 0)+'.');
         send(200, {
           id: `chatcmpl-local-${randomUUID()}`, object: 'chat.completion', created: Math.floor(Date.now() / 1000),
-          ...(result.usage ? {usage:result.usage} : {}), model: options.model, choices: [{ index: 0, message: { role: 'assistant', content: result.text || null, ...(result.tool_calls?.length ? {tool_calls:result.tool_calls} : {}), ...(result.provider_output ? {provider_output:result.provider_output} : {}) }, finish_reason: result.tool_calls?.length ? 'tool_calls' : 'stop' }],
+          ...(result.usage ? {usage:result.usage} : {}), ...(result.gateway_completion ? {gateway_completion:result.gateway_completion} : {}), model: options.model, choices: [{ index: 0, message: { role: 'assistant', content: result.text || null, ...(result.tool_calls?.length ? {tool_calls:result.tool_calls} : {}), ...(result.provider_output ? {provider_output:result.provider_output} : {}) }, finish_reason: result.tool_calls?.length ? 'tool_calls' : 'stop' }],
         });
       } else fail(404, 'not_found', 'Unknown route or HTTP method.');
     } catch (error) {

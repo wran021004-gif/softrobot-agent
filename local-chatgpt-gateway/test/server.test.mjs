@@ -15,12 +15,16 @@ test('HTTP to Responses tool call, original reasoning and result continuation',a
     const output=upstream.length===1 ? [{type:'reasoning',summary:[],encrypted_content:'opaque-fixture'},
       {type:'function_call',namespace:'research',name:'read',call_id:'exact-call',arguments:'{}',status:'completed'}]
       : [{type:'message',role:'assistant',content:[{type:'output_text',text:'Feedback consumed.'}]}];
-    return (async function*(){yield {type:'response.completed',response:{status:'completed',output}};})();
+    return (async function*(){
+      if(upstream.length===1)for(const [output_index,item] of output.entries())yield {type:'response.output_item.done',output_index,item};
+      yield {type:'response.completed',response:{status:'completed',output:upstream.length===1 ? [] : output}};
+    })();
   }}}))});
   const request={model:'actual-model',reasoning_effort:'medium',tools:[{type:'function',function:{name:'read',parameters:{type:'object',properties:{}}}}],
     messages:[{role:'user',content:'Read the evidence.'}]};
   const first=await (await f.post(request)).json();
   assert.equal(first.choices[0].finish_reason,'tool_calls');assert.equal(first.choices[0].message.tool_calls[0].id,'exact-call');
+  assert.equal(first.gateway_completion.output_source,'completed_item_events');
   const second=await (await f.post({...request,messages:[...request.messages,first.choices[0].message,
     {role:'tool',tool_call_id:'exact-call',content:'Exact evidence fixture.'}]})).json();
   assert.equal(second.choices[0].message.content,'Feedback consumed.');
