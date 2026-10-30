@@ -1628,6 +1628,12 @@ def information_flow_brief(brief, delivered):
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source
     if brief.get('analysis_interface')=='scientific_question_v1':
+        if continuation.get('control_initialization_handoff'):
+            continuation['control_initialization_handoff']['next']=(
+                'Use the new initialization result as the legal control source, not the structure candidate. '
+                'Initialization superseded the latest diagnose: submit a new candidate-bound diagnose Plan with your hypothesis; '
+                'no underlying mathematical method name is required. After diagnose completes, submit ScientificQuestion directly '
+                'to research_analysis. Original AnalysisRequest and execution admission still apply; initialization is not a mathematical result.')
         settled=intent.get('action')=='diagnose' and intent.get('execution_status')=='completed' and bool(intent.get('candidate'))
         if continuation.get('direct_plan',{}).get('action')=='diagnose':
             continuation['direct_plan'].update(scientific_fields=['hypothesis','decision.selected_candidate'],

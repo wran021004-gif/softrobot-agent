@@ -44,6 +44,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         decision=schema['$defs']['ResearchDecision']
         decision['required'].remove('selected_method')
         decision['properties']['selected_method']['description']='Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.'
+        schema['$defs']['ControlSeedRequest']['properties']['method']['description']=(
+            'baseline with only candidate uses candidate pretensions over the full frozen task grid, without task evaluation. '
+            'Use the returned legal control source, never the structure candidate, when source selection is needed. '
+            'Initialization supersedes the latest diagnose: submit a new candidate-bound diagnose Plan with your hypothesis; '
+            'no underlying mathematical method name is required. Then submit ScientificQuestion directly to research_analysis. '
+            'Original AnalysisRequest and execution admission still apply.')
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'

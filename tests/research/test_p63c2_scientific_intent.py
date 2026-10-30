@@ -238,5 +238,33 @@ class ScientificIntentTests(unittest.TestCase):
         self.assertEqual(len([e for e in events if e['kind']=='original_research_plan']),1)
         self.assertEqual(h.store.remaining()['used']['worker_calls'],0)
 
+    def test_c3_three_handoff_nodes_deliver_question_semantics_without_solver_choice(self):
+        from tests.research.test_information_flow import packet
+        from tests.research.test_p63b5_native_entry import plan
+        h=question_host();c=generate(h)
+        initialize=plan(c,'initialize_control')
+        diagnose_plan=plan(c);diagnose_plan['decision'].pop('selected_method')
+        wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='initialize_control')),
+            ('research_plan',initialize),('research_route',dict(tool='research_plan',action='diagnose')),
+            ('research_plan',diagnose_plan),None])
+        before=packet(wires[0])['tool_continuation']
+        self.assertEqual(before['direct_plan']['action'],'diagnose')
+        self.assertNotIn('decision.selected_method',before['direct_plan']['scientific_fields'])
+        self.assertIn('solver name is not required',before['direct_plan']['instruction'])
+        init_schema=next(t['function']['parameters'] for t in wires[1]['tools'] if t['function']['name']=='research_plan')
+        description=init_schema['$defs']['ControlSeedRequest']['properties']['method']['description']
+        self.assertIn('ScientificQuestion',description);self.assertNotIn('candidate and method',description)
+        after=packet(wires[2])['tool_continuation']['control_initialization_handoff']
+        self.assertTrue(after['control_sources']);self.assertEqual(after['task_acceptance'],'unmeasured')
+        self.assertIn('new candidate-bound diagnose',after['next']);self.assertIn('ScientificQuestion',after['next'])
+        self.assertNotIn('registered method',after['next'])
+        diagnose_schema=next(t['function']['parameters'] for t in wires[3]['tools'] if t['function']['name']=='research_plan')
+        self.assertNotIn('selected_method',diagnose_schema['$defs']['ResearchDecision']['required'])
+        final=packet(wires[4])['tool_continuation']['analysis_handoff']
+        self.assertTrue(final['loaded']);self.assertEqual(final['status'],'diagnose_completed')
+        final_schema=next(t['function']['parameters'] for t in wires[4]['tools'] if t['function']['name']=='research_analysis')
+        self.assertIn('question_type',final_schema['properties']);self.assertNotIn('operation',final_schema['properties'])
+        self.assertEqual(state(h)['mathematical_evaluations'],0);self.assertEqual(state(h)['analysis_results'],[])
+
 
 if __name__=='__main__':unittest.main()
