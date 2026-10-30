@@ -123,3 +123,38 @@ A check, historical Benchmark or autonomous Study is run. Results and actual
 costs are recorded in `evidence/structure_mechanism_aplus/validation.json`.
 The preexisting family-summary size assertion is outside this change; its known
 baseline failure remains recorded in A evidence without unrelated restructuring.
+
+
+## Completed bounded verification
+
+38 unique directed offline tests passed across ScientificIntent (13), V2 mechanism
+(8), new A+ (6), native task sensitivity (7) and existing T1/T2 math interface (4).
+Affected fixture failures were corrected and rerun. No historical summary-size
+assertion or full Benchmark was rerun. The synthetic handoff preserves its raw
+mathematical result, generation Plan, baseline/generated parameters and generated
+configuration in `evidence/structure_mechanism_aplus/synthetic_handoff.json`.
+
+The real frozen numerical source is `9c101ac`. All three predeclared checks
+computed, observed actual compiled physical changes and passed two-scale tests:
+
+| Actual path | Metric | Baseline | Physical secants (coarse, fine) | Relative disagreement | Suggested value |
+| --- | --- | ---: | --- | ---: | ---: |
+| segments.1.sections.0.parameters.width_y_m | max acceleration along [0,.6,.8], m/s^2 | 1764.2736012876333 | -911.40806284, -911.40808768 (m/s^2)/m | 2.725e-8 | .01324 m |
+| segments.1.physical_parameters.density_kg_m3 | same directional acceleration bound | 1764.2736012876333 | -.07498479353, -.07498307268 (m/s^2)/(kg/m^3) | 2.295e-5 | 1040 kg/m^3 |
+| spans.0.phase_rad | channel-0 signed directional drive, m/s^2/N | 94.51597565837949 | 126.66523975, 126.91567886 (m/s^2/N)/rad | .0019733 | .06283185307179551 rad |
+
+These are **locally supported mechanism proposals**, not verified task benefits.
+There was one baseline formal candidate, and mathematics created zero candidates.
+Main adoption was demonstrated only with the explicitly synthetic fixture.
+Actual cost: 15 native builds, 15 mechanics, 48 forwards, zero integration/rollouts;
+15 shared math evaluations, 7.3523966 s charged worker numerical time, 7.7648668 s
+total numerical time including preparation/construction. Kernel time was
+3.9897925 s. Provider and independent task evaluations were zero.
+
+The first final-report assembly rejected multiple results in result_summary mode.
+A reporting-only correction used the existing investigation mode, with new
+NativeModel/workers/Provider disabled while replaying saved receipts. No numerical
+result, failed attempt or charge was reset. The final unit-label cleanup adds
+parentheses around compound derivative-unit denominators; frozen raw labels and
+numbers remain unchanged. `validation_notes.json` records these boundaries.
+The standard immutable archive and every manifest member were verified.

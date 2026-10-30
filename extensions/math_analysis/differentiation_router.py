@@ -70,7 +70,7 @@ def differentiate(parameter, baseline, evaluate, *, goal):
     improvements=[p for p in probes if preference*(p['value']-y0)>signal_floor]
     selected=min(improvements,key=lambda p:abs(p['normalized_coordinate']-origin)) if resolved and improvements else None
     return dict(**plan,samples=samples,derivatives=derivatives,normalized_derivatives=normalized,
-        derivative_unit='('+baseline['observation']['unit']+')/'+parameter['unit'],
+        derivative_unit='('+baseline['observation']['unit']+')/('+parameter['unit']+')',
         normalized_derivative_unit=baseline['observation']['unit']+'/normalized_coordinate',
         consistency=dict(same_direction=bool(a*b>0),relative_difference=relative,tolerance=.1,
             observed_change=float(observed_change),signal_floor=signal_floor,passed=resolved,

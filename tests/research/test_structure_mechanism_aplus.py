@@ -117,6 +117,7 @@ class AplusTests(unittest.TestCase):
         def log(v):return dict(record_index=1,observation=dict(value=float(np.log(v)),unit='1'))
         r=differentiate(row,log(1e6),log,goal='increase')
         np.testing.assert_allclose(r['derivatives'],[1e-6]*2,rtol=1e-10)
+        self.assertEqual(r['derivative_unit'],'(1)/(Pa)')
         row.update(current_value=1e6,minimum=0.,maximum=2e6)
         def cusp(v):return dict(record_index=1,observation=dict(value=abs(v-1e6),unit='1'))
         self.assertEqual(differentiate(row,cusp(1e6),cusp,goal='increase')['direction_status'],'unresolved')
