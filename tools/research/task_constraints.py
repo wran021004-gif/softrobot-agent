@@ -2,6 +2,8 @@
 from schemas.platform import Binding, Payload
 from tools.platform_store import plain
 from tools.research_tasks import task_adapter
+from tools.research.math_capability_catalog import (OPERATION_CATEGORIES, CAPABILITY_STATUS_MEANINGS,
+    capability_inventory, generic_operations, parameter_sensitivity_scope)
 
 SCIENTIFIC_INTERPRETATION = dict(
     version='scientific_interpretation_v1',
@@ -298,6 +300,7 @@ def mathematical_method_view(host, reference):
 
         methods[method]=item
     for method,item in methods.items():
+        item['generic_operations']=generic_operations(method)
         template=item['request_template']
         points=analysis_operating_points(method,item['operation'])
         item['already_bound']={k:template[k] for k in ('candidate','protocol','operation','capability_method') if k in template}
@@ -329,6 +332,9 @@ def mathematical_method_view(host, reference):
                 and decision.get('selected_candidate')==reference and selected in methods and binding_error is None):
             methods[selected]['operating_point_guidance']=selected_operating_point_guidance(host,reference,selected,methods[selected])
     return dict(**readiness,candidate=reference,methods=methods,
+        operation_categories=dict(OPERATION_CATEGORIES),
+        capability_statuses=dict(CAPABILITY_STATUS_MEANINGS),
+        capability_inventory=capability_inventory(methods,reference),
         research_opportunities=mathematical_research_view(spec,c,reference,requirements,methods),
         scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
@@ -407,7 +413,8 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
                 planning_status=detail['planning_status'],request_query=detail['detail_query'],
                 **(dict(source_method=T1,source_request_query=methods[T1]['detail_query']) if method==T2 and T1 in methods else {}),
                 scope='Saved comparable T1 contrasts' if method==T2 else 'See method coverage and original admission'))
-        rows.append({**parameter,'method_links':links})
+        rows.append({**parameter,'method_links':links,
+            'sensitivity_scope':parameter_sensitivity_scope(parameter)})
     return dict(version='candidate_mathematical_research_v1',candidate=reference,
         task_binding={**requirements.binding, 'task_family':candidate['configuration']['task']['family'],
             'canonical_task_identity':candidate.get('task_identity'),
@@ -456,6 +463,7 @@ def mathematical_catalog(view):
             'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits',
             'registered','authorized','applicable','executable') if k in row}
         item['detail_pointer']='/methods/'+row['method']
+        item['generic_operations']=generic_operations(row['method'])
         item['request_template_query']={**row['detail_query'],
             'fields':[k for k in ('candidate','operation','request_template','required_parameters',
                 'formal_execution_authorized','missing','execution_limits','cost_scope','action_prerequisites') if k in row]}
@@ -471,6 +479,8 @@ def mathematical_catalog(view):
         rows[row['method']]=item
     binding=next(iter(view['methods'].values()))
     return dict(version='mathematical_capability_catalog_v1',listed_methods_implemented=True,candidate=view['candidate'],task_identity=binding['task_identity'],task_family=binding['task_family'],
+        operation_categories=dict(OPERATION_CATEGORIES),
+        capability_inventory_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/capability_inventory'),
         detail_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/methods'),
         schema_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/analysis_request_schema'),
         formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],cost_scope=shared_cost,
