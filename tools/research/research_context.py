@@ -1205,6 +1205,70 @@ def current_research_state(host, brief, intent, trace, coverage=None):
         scope='Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence.')
 
 
+def mathematical_discovery_observations(host, current, candidate):
+    """Read existing scoped results and frozen-task observations, without a solve.
+
+    Native extrema reuse the original task proxy on saved outputs. This is a
+    descriptive read: no integration, score optimization or acceptance credit.
+    """
+    from tools.research.evidence_views import result_card
+    from tools.research.nonlinear_capability import sampled_constraints
+    from schemas.platform_analysis import TaskAnalysisRequirement
+    s=state(host);observations=[];latest=None
+    for reference in reversed(s.get('analysis_results',[])):
+        raw=host.store.artifact(reference)
+        if raw.get('candidate')!=candidate or raw.get('status')!='computed' or not raw.get('scoped_claim'):continue
+        card=plain(result_card(host,reference));summary=card['deterministic_summary']
+        outputs=(raw.get('native_dynamics',{}).get('optimization',{}).get('best') or {}).get('outputs')
+        if outputs:
+            samples=sampled_constraints(outputs,TaskAnalysisRequirement.model_validate(raw['task_analysis']))
+            for key in dict.fromkeys(r['constraint_id'] for r in samples):
+                r=max((r for r in samples if r['constraint_id']==key),key=lambda r:r['normalized_signed_excess'])
+                observations.append(dict(constraint_id=key,value=r['value'],unit=r['units'],threshold=r['limit'],
+                    passed=r['normalized_signed_excess']<=0,scope='model_sample',time_s=r['time_s'],
+                    source=dict(reference=reference,pointer='/native_dynamics/optimization/best/outputs')))
+        else:
+            constraints={c['constraint_id'] for c in raw.get('task_analysis',{}).get('constraints',[])}
+            observations=[dict(constraint_id=r['name'],value=r['value'],unit=r['unit'],threshold=r['threshold'],
+                passed=r['passed'],scope=r['scope'],source=r['source']) for r in card['metrics'] if r['name'] in constraints]
+        observed={r['constraint_id'] for r in observations}
+        for i,c in enumerate(raw.get('task_analysis',{}).get('constraints',[])):
+            if c['constraint_id'] not in observed:
+                observations.append(dict(constraint_id=c['constraint_id'],passed=None,scope='unmeasured',
+                    source=dict(reference=reference,pointer='/task_analysis/constraints/'+str(i))))
+        nonlinear=summary.get('nonlinear_capability') or summary.get('nonlinear_response')
+        latest=dict(reference=reference,operation=summary['operation'],status=summary['status'],
+            conclusion=summary['conclusion'],task_acceptance=raw.get('task_acceptance','unmeasured'),
+            observations=observations[:4],
+            observation_scope='Only saved supported outputs; unmeasured constraints remain unresolved. No independent task acceptance is inferred.',
+            quantities={k:nonlinear[k] for k in ('J','initial_J','improvement','direction_status','evidence_level','stop_reason') if k in nonlinear} if nonlinear else
+                (card.get('mathematics') or {}).get('quantities',[])[:4],
+            directional_quantities=(card.get('mathematics') or {}).get('quantities',[])[:4] if summary.get('nonlinear_response') else [],
+            reliability={k:v for k,v in (raw.get('nonlinear_capability',{}).get('search_quality') or {}).items()
+                if k in ('global_optimality','convergence')},
+            scientific_scope=dict(model=raw['scoped_claim'].get('model_declaration'),
+                horizon={k:v for k,v in raw['scoped_claim'].get('horizon',{}).items() if k in
+                    ('task_duration_s','analysis_horizon_s','remaining_task_s','origin','period_s','interpretation')},
+                claim_kind=summary['evidence_summary']['claim_kind'],verification_status=summary['evidence_summary']['verification_status']),
+            unresolved=summary['decision_relevance']['unresolved_questions'][:2],
+            detail_query=dict(reference=reference,view='working_set',pointer='/mathematical_decision_view'))
+        break
+    # A measured failure stays a physical observation, distinct from a model
+    # sample. Do not borrow a different candidate's or historical task outcome.
+    physical=(current.get('latest_scientific_feedback') or {}).get('physical_diagnostic')
+    best=current.get('best_valid') or {}
+    if not physical and not best.get('historical_only'):physical=best.get('physical_diagnostic')
+    if physical and physical.get('candidate_reference')==candidate and physical.get('valid_complete'):
+        measured=[]
+        for sample in physical.get('critical_samples',[]):
+            for r in sample['constraints']:
+                if r['normalized_excess']>0 and r['constraint'] not in [m['constraint_id'] for m in measured]:
+                    measured.append(dict(constraint_id=r['constraint'],passed=False,scope='physical_task',
+                        source=dict(reference=r.get('raw_reference',sample['raw_reference']),pointer=r['raw_pointer'])))
+        if measured:observations=measured
+    return observations,latest
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -1304,11 +1368,19 @@ def agent_decision_brief(host):
         from tools.research.task_constraints import mathematical_method_view, mathematical_catalog, mathematical_opportunity_summary
         view=mathematical_method_view(host,candidate)
         brief['mathematical_capabilities']=mathematical_catalog(view)
-        brief['mathematical_research']=mathematical_opportunity_summary(view)
         selected=((intent['latest_decision'] or {}).get('agent_hypothesis',{}).get('decision') or {}).get('selected_method')
         if selected in view['methods']:brief['selected_mathematical_method']=view['methods'][selected]
     else:
+        from tools.research.math_capability_catalog import OPERATION_CATEGORIES, capability_inventory
+        inventory=capability_inventory()
         brief['mathematical_research']=dict(status='requires_owned_candidate',
+            operation_categories=list(OPERATION_CATEGORIES),methods=[],
+            known_capabilities=dict(formally_integrated=sum(r['has_formal_execution_entry'] for r in inventory.values()),
+                unintegrated=sum(not r['has_formal_execution_entry'] for r in inventory.values())),
+            parameters_query=dict(reference=s['family_space_reference'],view='full') if s.get('family_space_reference') else None,
+            full_catalog_query=dict(reference=s['family_space_reference'],view='mathematical_capabilities',pointer='/capability_inventory') if s.get('family_space_reference') else None,
+            model_capabilities_query=dict(reference=brief['evidence_access']['reference'],view='working_set',pointer='/method_scope'),
+            initial_entries=[dict(tool='research_plan',action=a,request_admission='not_checked') for a in brief['actions'] if a in ('generate','search')],
             query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/research_opportunities")')
         brief['mathematical_capabilities']=dict(status='candidate_selection_required',
             query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/methods/<method>")')
@@ -1391,6 +1463,17 @@ def agent_decision_brief(host):
         guide=brief['selected_mathematical_method'].get('operating_point_guidance',{})
         brief['analysis_handoff']['operating_point_sources']={k:guide[k] for k in
             ('operating_points','available_source_references','unavailable_sources') if k in guide}
+    if candidate:
+        observations,latest_math=mathematical_discovery_observations(host,current,candidate)
+        brief['mathematical_research']=mathematical_opportunity_summary(view,observations=observations,
+            latest_result=latest_math,control_sources=brief['current_candidate']['control_sources'],
+            execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
+        if not brief['current_research_state']['object']['provenance_query']:
+            discovery=brief['mathematical_research']
+            for key in ('method_directory_query','full_catalog_query','detail_query'):discovery.pop(key,None)
+            for item in discovery['unavailable_examples']:item.pop('detail_query',None)
+            discovery.update(catalog_read_status='deferred_by_original_candidate_read_admission',
+                legal_evidence_query=brief['stop_result_index']['query'])
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
@@ -1434,13 +1517,12 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
                 methods_query=dict(reference=candidate['candidate'],view='mathematical_capabilities',pointer='/methods') if candidate.get('candidate') else None,
                 required_fields=['decision.selected_candidate','decision.selected_method'],
                 scope='Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here.')
-    methods=[dict(method=k,status=v.get('planning_status'),execution_status=v.get('execution_status'),estimated_evaluations=v.get('estimated_evaluations'))
-        for k,v in catalog.get('methods',{}).items()]
     if 'analysis' in (brief.get('capabilities') or []):
         science=(brief.get('budget') or {}).get('science_budget') or {}
         closed=(brief.get('budget') or {}).get('closeout',{}).get('next_request_will_protect')
         blocked=closed or science.get('remaining_mathematical',0)<1
-        actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',methods=methods,
+        actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',
+            methods_at='mathematical_research',
             reason=('Protected closeout or no mathematical allowance.' if blocked else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
@@ -1473,6 +1555,14 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             public_operations=public.get('remaining_total'),public_closeout_reserve=public.get('reserved_for_closeout'),
             physical= science.get('remaining_physical'),mathematical=science.get('remaining_mathematical'),
             closeout=budget.get('closeout')))
+    math_result=(brief.get('mathematical_research') or {}).get('latest_result') or {}
+    if math_result:
+        reference=math_result['reference']
+        result['verified_facts']=[f for f in result['verified_facts'] if (f.get('source') or {}).get('reference')!=reference]
+        result['verified_facts'].append(dict(result_reference=reference,facts_at='mathematical_research.latest_result'))
+        latest=result['research_state']['latest_result']
+        if latest.get('reference')==reference:
+            latest.pop('scientific_scope',None);latest['facts_at']='mathematical_research.latest_result'
     if brief.get('experience_guidance'):
         result['experience_guidance']=brief['experience_guidance']
     if brief.get('experience_read_progress'):
@@ -1551,6 +1641,11 @@ def information_flow_brief(brief, delivered):
     for result in brief.get('additional_mathematical_evidence',[]):
         for quantity in (result.get('mathematics') or {}).get('quantities',[])[:3]:
             if quantity.get('source') and quantity not in facts:facts.append(quantity)
+    math_result=(value.get('mathematical_research') or {}).get('latest_result') or {}
+    if math_result:
+        reference=math_result['reference']
+        facts=[f for f in facts if f.get('result_reference')!=reference and (f.get('source') or {}).get('reference')!=reference]
+        facts.append(dict(result_reference=reference,facts_at='mathematical_research.latest_result'))
     groups={
         'Design':('generate','propose','search'),
         'Control':('initialize_control','control_search','execute','research_rl'),

@@ -112,6 +112,11 @@ def mathematical_method_view(host, reference):
     from tools.research.design import verify_candidate
     from tools.research.research_context import mathematics_authorization
     s=state(host);spec=s['spec'];c=host.store.artifact(reference)
+    if reference==s.get('family_space_reference'):
+        return dict(candidate=None,methods={},operation_categories=dict(OPERATION_CATEGORIES),
+            capability_statuses=dict(CAPABILITY_STATUS_MEANINGS),
+            capability_inventory=capability_inventory(reference=reference),
+            scope='Static C0 discovery at the frozen domain anchor. Candidate applicability and request admission are unassessed; use an owned candidate for formal method templates.')
     if reference not in s.get('candidates',{}).values():raise ValueError('OWNED_RESOLVED_CANDIDATE_REQUIRED')
     try:verify_candidate(host,reference);binding_error=None
     except ValueError as exc:binding_error=str(exc)
@@ -431,26 +436,78 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
             'No registered arbitrary mechanism metric is inferred from a task score.'])
 
 
-def mathematical_opportunity_summary(view):
-    """L0 discovery only; the complete parameter table stays in L1."""
+def mathematical_opportunity_summary(view, *, observations=(), latest_result=None,
+                                    control_sources=(), execution_block=None):
+    """Bounded discovery from original applicability, never request admission.
+
+    Relevance orders overlapping constraints and distinct scientific operation/
+    model scopes. It neither diagnoses a cause nor selects a Plan or input.
+    """
     research=view['research_opportunities'];rows=research['parameters']
     authorized=[p for p in rows if p['study_authorized'] and p['continuous_perturbation']
         and p['effective_in_current_execution']]
-    linked={link['method'] for p in rows for link in p['method_links']}
-    linked.update(m['method'] for m in research['metrics'] if 'method' in m)
+    constraints={m['metric_id']:m['constraint'] for m in research['metrics'] if 'constraint' in m}
+    failed=[r for r in observations if r.get('passed') is False]
+    focus=failed or list(observations) or [dict(constraint_id=k,passed=None) for k in constraints]
+    ids={r['constraint_id'] for r in focus if r['constraint_id'] in constraints}
+    signals={constraints[k]['signal']['name'] for k in ids}
+    linked={}
+    for parameter in rows:
+        for link in parameter['method_links']:
+            linked.setdefault(link['method'],set()).update(link['metric_ids'])
+    ranked=[];unavailable={};unavailable_examples=[]
+    for key,detail in view['methods'].items():
+        status=detail['planning_status']
+        # These are the original gate's verdicts, not a second applicability test.
+        if execution_block or status in ('unauthorized','unsupported','insufficient_budget','blocked'):
+            reason=execution_block or status;unavailable[reason]=unavailable.get(reason,0)+1
+            if not unavailable_examples:
+                unavailable_examples.append(dict(method=key,status=reason,
+                    reasons=[execution_block] if execution_block else detail['missing'][:2],detail_query=detail['detail_query']))
+            continue
+        coverage={r['constraint_id'] for r in detail['coverage'] if r.get('status')!='not_applicable'}
+        overlap=ids & (coverage | linked.get(key,set()))
+        outputs=set(detail['applicability'].get('required_outputs',[]))
+        rank=(len(overlap),bool(coverage and detail['full_task_supported']),len(signals & outputs),status=='ready')
+        ranked.append((rank,key,detail,overlap))
+    methods=[];seen=set()
+    for _,key,detail,overlap in sorted(ranked,key=lambda r:r[0],reverse=True):
+        categories=detail['generic_operations'];scope=detail['applicability'].get('model')
+        kind=(tuple(sorted(categories)),scope,bool(detail['coverage'] and detail['full_task_supported']))
+        if kind in seen:continue
+        seen.add(kind)
+        guide=detail.get('control_input_guidance') or {}
+        sources=guide.get('recorded_sources',[]) or [r for r in control_sources
+            if r.get('full_control_sequence') and not r.get('requires_initialization')]
+        missing=list(dict.fromkeys(detail['missing']))
+        if guide and not sources:missing.insert(0,'legal_control_source')
+        methods.append(dict(method=key,purpose=detail['scientific_purpose'],
+            generic_operations=categories,status=detail['planning_status'],
+            execution_status=detail['execution_status'],readiness='request_preparation_available' if detail['planning_status']=='ready' and not missing else 'requires_inputs',
+            request_admission='not_checked',missing=missing[:3],
+            preparation={k:guide['baseline_initialization'][k] for k in ('tool','action')} if guide and not sources else None,
+            recorded_control_source_available=bool(sources) if guide else None,
+            related_constraints=sorted(overlap),
+            coverage='full_task_model' if detail['coverage'] and detail['full_task_supported'] else 'diagnostic_or_partial',
+            estimated_evaluations=detail['estimated_evaluations'],wall_cost=detail['wall_cost'],
+            detail_query=detail['detail_query']))
+        if len(methods)==4:break
     return dict(version=research['version'],candidate=view['candidate'],
-        task_binding=research['task_binding'],
+        task_binding={k:research['task_binding'].get(k) for k in ('task_family','condition_id')},
+        operation_categories=list(OPERATION_CATEGORIES),
+        status='research_requests_can_be_prepared' if methods else 'no_new_mathematical_request_available',
+        current_focus=[dict(constraint_id=r['constraint_id'],signal=constraints[r['constraint_id']]['signal']['name'],
+            status='violated' if r.get('passed') is False else 'satisfied_observation' if r.get('passed') is True else 'unmeasured',
+            evidence_scope=r.get('scope','unmeasured'),source=r.get('source')) for r in focus if r['constraint_id'] in constraints][:3],
+        latest_result=latest_result,unavailable_status_counts=unavailable,unavailable_examples=unavailable_examples,
         parameters=dict(total=len(rows),continuous_authorized=len(authorized),
             categories=sorted({p['category'] for p in authorized}),
             registered_categories=sorted({p['category'] for p in rows})),
-        metrics=[dict(metric_id=m['metric_id'],unit=m.get('unit',m.get('constraint',{}).get('signal',{}).get('units')))
-            for m in research['metrics']],
-        methods=[dict(method=k,status=m['planning_status'],missing=m['missing'],
-            estimated_evaluations=m['estimated_evaluations'],wall_cost=m['wall_cost'])
-            for k,m in research['methods'].items() if k in linked],
+        methods=methods,
         method_directory_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/methods'),
+        full_catalog_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/capability_inventory'),
         detail_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/research_opportunities'),
-        scope='Candidate-bound discovery, not execution permission. Main chooses the research route; use L1 for units, domains, coverage, costs and exact method requests.')
+        scope='Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies.')
 
 
 def mathematical_catalog(view):

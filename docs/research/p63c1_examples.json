@@ -1,0 +1,2298 @@
+{
+  "scope": "Offline engineering/saved-state projection only",
+  "examples": {
+    "mock_wire_source_ready": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "research_requests_can_be_prepared",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "unsupported": 5,
+          "unauthorized": 2
+        },
+        "unavailable_examples": [
+          {
+            "method": "linearization",
+            "status": "unsupported",
+            "reasons": [
+              "Positive aligned horizon within actual remaining task time is required."
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/linearization"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [
+          {
+            "method": "trajectory_feasibility",
+            "purpose": "Sampled feasible sequence",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/trajectory_feasibility"
+            }
+          },
+          {
+            "method": "task_capability",
+            "purpose": "Best found task violation",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize",
+              "compare"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/task_capability"
+            }
+          },
+          {
+            "method": "mujoco_direct_control_v1",
+            "purpose": "MuJoCo-direct bounded sequence optimization",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize"
+            ],
+            "status": "requires_parameters",
+            "execution_status": "conditional_on_admission",
+            "readiness": "requires_inputs",
+            "request_admission": "not_checked",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "preparation": null,
+            "recorded_control_source_available": true,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco_direct_control_v1"
+            }
+          },
+          {
+            "method": "braking",
+            "purpose": "Bounded terminal braking",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/braking"
+            }
+          }
+        ],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 5609,
+      "l0_bytes": 22143,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_registered_method_and_authorization",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "362a126b447ff5639690b877a3ff99b50b230efde7caa9bb0fb2aabe419e4d34",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "unauthorized": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "no_new_mathematical_request_available",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "unauthorized": 18
+        },
+        "unavailable_examples": [
+          {
+            "method": "equilibrium",
+            "status": "unauthorized",
+            "reasons": [
+              "formal_study_math_scope_required"
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/equilibrium"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 2352,
+      "l0_bytes": 14753,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_registered_method_and_authorization",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "fc23b734a70471446cb28f83d6f79fa4897bd40b6d32b4355f0699b52224e801",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "budget_exhausted": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "no_new_mathematical_request_available",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "insufficient_budget": 11,
+          "unsupported": 5,
+          "unauthorized": 2
+        },
+        "unavailable_examples": [
+          {
+            "method": "equilibrium",
+            "status": "insufficient_budget",
+            "reasons": [
+              "Insufficient mathematical evaluation budget."
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/equilibrium"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 2415,
+      "l0_bytes": 14742,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "insufficient_mathematical_budget",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "ec9945c37ad352b2649d1ab182d515335a722e67ed5e2d78aa601cdb98275bf7",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "blocked",
+          "methods_at": "mathematical_research",
+          "reason": "Protected closeout or no mathematical allowance.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "protected_closeout": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "ebeef60b06aa823e0f2fbaff3a20450c30ae206d9199a8302027da60f5b55d6d",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "no_new_mathematical_request_available",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "protected_closeout": 18
+        },
+        "unavailable_examples": [
+          {
+            "method": "equilibrium",
+            "status": "protected_closeout",
+            "reasons": [
+              "protected_closeout"
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "ebeef60b06aa823e0f2fbaff3a20450c30ae206d9199a8302027da60f5b55d6d",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/equilibrium"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "ebeef60b06aa823e0f2fbaff3a20450c30ae206d9199a8302027da60f5b55d6d",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "ebeef60b06aa823e0f2fbaff3a20450c30ae206d9199a8302027da60f5b55d6d",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "ebeef60b06aa823e0f2fbaff3a20450c30ae206d9199a8302027da60f5b55d6d",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 2350,
+      "l0_bytes": 10704,
+      "action_menu": [
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "blocked",
+          "methods_at": "mathematical_research",
+          "reason": "Protected closeout or no mathematical allowance.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "computed_math": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "research_requests_can_be_prepared",
+        "current_focus": [
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "violated",
+            "evidence_scope": "model_sample",
+            "source": {
+              "reference": {
+                "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/optimization/best/outputs"
+            }
+          }
+        ],
+        "latest_result": {
+          "reference": {
+            "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+            "media_type": "application/json"
+          },
+          "operation": "mujoco_nonlinear_task_capability_v1",
+          "status": "computed",
+          "conclusion": "diagnostic",
+          "task_acceptance": "unmeasured",
+          "observations": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "value": 0.0010000000000000009,
+              "unit": "m",
+              "threshold": 0.01,
+              "passed": true,
+              "scope": "model_sample",
+              "time_s": 0.54,
+              "source": {
+                "reference": {
+                  "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+                  "media_type": "application/json"
+                },
+                "pointer": "/native_dynamics/optimization/best/outputs"
+              }
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "value": 0.045,
+              "unit": "m/s",
+              "threshold": 0.03,
+              "passed": false,
+              "scope": "model_sample",
+              "time_s": 0.54,
+              "source": {
+                "reference": {
+                  "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+                  "media_type": "application/json"
+                },
+                "pointer": "/native_dynamics/optimization/best/outputs"
+              }
+            },
+            {
+              "constraint_id": "terminal_error_m",
+              "value": 0.0010000000000000009,
+              "unit": "m",
+              "threshold": 0.01,
+              "passed": true,
+              "scope": "model_sample",
+              "time_s": 0.6,
+              "source": {
+                "reference": {
+                  "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+                  "media_type": "application/json"
+                },
+                "pointer": "/native_dynamics/optimization/best/outputs"
+              }
+            }
+          ],
+          "observation_scope": "Only saved supported outputs; unmeasured constraints remain unresolved. No independent task acceptance is inferred.",
+          "quantities": {
+            "J": 0.5,
+            "initial_J": 0.7,
+            "improvement": 0.19999999999999996,
+            "evidence_level": "finite_budget_observation",
+            "stop_reason": "iteration_limit"
+          },
+          "directional_quantities": [],
+          "reliability": {
+            "convergence": "unresolved",
+            "global_optimality": "not_established"
+          },
+          "scientific_scope": {
+            "model": {
+              "model_id": "model.mujoco_native",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+                "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+                "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+                "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+              ],
+              "representation_id": "native_named_hinges_v1"
+            },
+            "horizon": {
+              "interpretation": "Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.",
+              "origin": 0.0,
+              "period_s": 0.02,
+              "task_duration_s": 0.6
+            },
+            "claim_kind": "NUMERICAL_DIAGNOSTIC",
+            "verification_status": "native_numerical_checks"
+          },
+          "unresolved": [
+            "Synthetic numbers establish no scientific result"
+          ],
+          "detail_query": {
+            "reference": {
+              "artifact_id": "6310b85300ce5acca2ebfd0bb7733663889c9cbaadfe124e3db9f5758160bd51",
+              "media_type": "application/json"
+            },
+            "view": "working_set",
+            "pointer": "/mathematical_decision_view"
+          }
+        },
+        "unavailable_status_counts": {
+          "unsupported": 5,
+          "unauthorized": 2
+        },
+        "unavailable_examples": [
+          {
+            "method": "linearization",
+            "status": "unsupported",
+            "reasons": [
+              "Positive aligned horizon within actual remaining task time is required."
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/linearization"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [
+          {
+            "method": "trajectory_feasibility",
+            "purpose": "Sampled feasible sequence",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_speed_m_s"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/trajectory_feasibility"
+            }
+          },
+          {
+            "method": "task_capability",
+            "purpose": "Best found task violation",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize",
+              "compare"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_speed_m_s"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/task_capability"
+            }
+          },
+          {
+            "method": "braking",
+            "purpose": "Bounded terminal braking",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_speed_m_s"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/braking"
+            }
+          },
+          {
+            "method": "mujoco_direct_control_v1",
+            "purpose": "MuJoCo-direct bounded sequence optimization",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize"
+            ],
+            "status": "requires_parameters",
+            "execution_status": "conditional_on_admission",
+            "readiness": "requires_inputs",
+            "request_admission": "not_checked",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "preparation": null,
+            "recorded_control_source_available": true,
+            "related_constraints": [
+              "holding_max_speed_m_s"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco_direct_control_v1"
+            }
+          }
+        ],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 8240,
+      "l0_bytes": 32375,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_registered_method_and_authorization",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "0f26a8f01cb83b88c55a265c638e89bb4959fde22a8360ea3de51153ce9ab7ec",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "candidate_without_source": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "research_requests_can_be_prepared",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "unsupported": 5,
+          "unauthorized": 2
+        },
+        "unavailable_examples": [
+          {
+            "method": "linearization",
+            "status": "unsupported",
+            "reasons": [
+              "Positive aligned horizon within actual remaining task time is required."
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/linearization"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [
+          {
+            "method": "trajectory_feasibility",
+            "purpose": "Sampled feasible sequence",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/trajectory_feasibility"
+            }
+          },
+          {
+            "method": "task_capability",
+            "purpose": "Best found task violation",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize",
+              "compare"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/task_capability"
+            }
+          },
+          {
+            "method": "mujoco_direct_control_v1",
+            "purpose": "MuJoCo-direct bounded sequence optimization",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize"
+            ],
+            "status": "requires_parameters",
+            "execution_status": "conditional_on_admission",
+            "readiness": "requires_inputs",
+            "request_admission": "not_checked",
+            "missing": [
+              "legal_control_source",
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "preparation": {
+              "tool": "research_plan",
+              "action": "initialize_control"
+            },
+            "recorded_control_source_available": false,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco_direct_control_v1"
+            }
+          },
+          {
+            "method": "braking",
+            "purpose": "Bounded terminal braking",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/braking"
+            }
+          }
+        ],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 5687,
+      "l0_bytes": 17303,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_registered_method_and_authorization",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "candidate_with_source": {
+      "mathematical_research": {
+        "version": "candidate_mathematical_research_v1",
+        "candidate": {
+          "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+          "media_type": "application/json"
+        },
+        "task_binding": {
+          "task_family": "task.reach",
+          "condition_id": null
+        },
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "status": "research_requests_can_be_prepared",
+        "current_focus": [
+          {
+            "constraint_id": "terminal_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "status": "unmeasured",
+            "evidence_scope": "unmeasured",
+            "source": null
+          }
+        ],
+        "latest_result": null,
+        "unavailable_status_counts": {
+          "unsupported": 5,
+          "unauthorized": 2
+        },
+        "unavailable_examples": [
+          {
+            "method": "linearization",
+            "status": "unsupported",
+            "reasons": [
+              "Positive aligned horizon within actual remaining task time is required."
+            ],
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/linearization"
+            }
+          }
+        ],
+        "parameters": {
+          "total": 39,
+          "continuous_authorized": 2,
+          "categories": [
+            "segment"
+          ],
+          "registered_categories": [
+            "controller",
+            "discretization",
+            "geometry",
+            "routing",
+            "segment",
+            "tendon",
+            "topology"
+          ]
+        },
+        "methods": [
+          {
+            "method": "trajectory_feasibility",
+            "purpose": "Sampled feasible sequence",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/trajectory_feasibility"
+            }
+          },
+          {
+            "method": "task_capability",
+            "purpose": "Best found task violation",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize",
+              "compare"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "full_task_model",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/task_capability"
+            }
+          },
+          {
+            "method": "mujoco_direct_control_v1",
+            "purpose": "MuJoCo-direct bounded sequence optimization",
+            "generic_operations": [
+              "solve",
+              "differentiate_optimize"
+            ],
+            "status": "requires_parameters",
+            "execution_status": "conditional_on_admission",
+            "readiness": "requires_inputs",
+            "request_admission": "not_checked",
+            "missing": [
+              "control_optimization.source",
+              "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+            ],
+            "preparation": null,
+            "recorded_control_source_available": true,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/mujoco_direct_control_v1"
+            }
+          },
+          {
+            "method": "braking",
+            "purpose": "Bounded terminal braking",
+            "generic_operations": [
+              "solve",
+              "analyze"
+            ],
+            "status": "ready",
+            "execution_status": "conditional_on_admission",
+            "readiness": "request_preparation_available",
+            "request_admission": "not_checked",
+            "missing": [],
+            "preparation": null,
+            "recorded_control_source_available": null,
+            "related_constraints": [
+              "holding_max_error_m",
+              "holding_max_speed_m_s",
+              "terminal_error_m"
+            ],
+            "coverage": "diagnostic_or_partial",
+            "estimated_evaluations": 1,
+            "wall_cost": "unknown",
+            "detail_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods/braking"
+            }
+          }
+        ],
+        "method_directory_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/methods"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "detail_query": {
+          "reference": {
+            "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/research_opportunities"
+        },
+        "scope": "Display order reflects constraint coverage, not cause or a required route. Other methods remain discoverable. Original authorization, source, scientific-input and budget admission still applies."
+      },
+      "mathematical_research_bytes": 5609,
+      "l0_bytes": 18010,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_registered_method_and_authorization",
+            "candidate_query": {
+              "reference": {
+                "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+                "media_type": "application/json"
+              },
+              "view": "working_set",
+              "pointer": "/candidate_index/0"
+            },
+            "methods_query": {
+              "reference": {
+                "artifact_id": "2f1d026c9b4142bd0358ed492264553d293155f2333b4ca03282af2fa5024875",
+                "media_type": "application/json"
+              },
+              "view": "mathematical_capabilities",
+              "pointer": "/methods"
+            },
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "no_candidate": {
+      "mathematical_research": {
+        "status": "requires_owned_candidate",
+        "operation_categories": [
+          "inspect",
+          "solve",
+          "analyze",
+          "differentiate_optimize",
+          "compare"
+        ],
+        "methods": [],
+        "known_capabilities": {
+          "formally_integrated": 18,
+          "unintegrated": 9
+        },
+        "parameters_query": {
+          "reference": {
+            "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+            "media_type": "application/json"
+          },
+          "view": "full"
+        },
+        "full_catalog_query": {
+          "reference": {
+            "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+            "media_type": "application/json"
+          },
+          "view": "mathematical_capabilities",
+          "pointer": "/capability_inventory"
+        },
+        "model_capabilities_query": {
+          "reference": {
+            "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/method_scope"
+        },
+        "initial_entries": [
+          {
+            "tool": "research_plan",
+            "action": "generate",
+            "request_admission": "not_checked"
+          }
+        ],
+        "query_format": "evidence_read(reference=<owned candidate>, view=\"mathematical_capabilities\", pointer=\"/research_opportunities\")"
+      },
+      "mathematical_research_bytes": 1070,
+      "l0_bytes": 10428,
+      "action_menu": [
+        {
+          "action": "generate",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "initialize_control",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "physical_replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "control_search",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "execute",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "mechanics",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "replay",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "refine",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "diagnose",
+          "status": "available",
+          "reason": "Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation.",
+          "read_only_investigation": {
+            "tool": "research_investigate",
+            "scientific_execution": false
+          },
+          "analysis_selection": {
+            "status": "requires_owned_candidate",
+            "candidate_query": null,
+            "methods_query": null,
+            "required_fields": [
+              "decision.selected_candidate",
+              "decision.selected_method"
+            ],
+            "scope": "Method selection only; research_analysis separately checks registration, authorization, sources and budget. No candidate or hypothesis is selected here."
+          }
+        },
+        {
+          "action": "select",
+          "status": "conditional",
+          "reason": "A suitable candidate, source, read, or other prerequisite is required.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "stop",
+          "status": "available",
+          "reason": "Full request admission and budget checks apply.",
+          "cost": "See remaining allowances; exact cost depends on the requested operation."
+        },
+        {
+          "action": "research_analysis",
+          "status": "conditional",
+          "methods_at": "mathematical_research",
+          "reason": "Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.",
+          "cost": "Uses the shared mathematical allowance; inspect the method detail."
+        }
+      ]
+    },
+    "saved_b6_read_only": {
+      "latest_result": {
+        "reference": {
+          "artifact_id": "a0658019fde980f3e501b74b1ab100ada84e4da6ae6799e73435ed0dc0598517",
+          "media_type": "application/json"
+        },
+        "operation": "mujoco_nonlinear_task_capability_v1",
+        "status": "computed",
+        "conclusion": "diagnostic",
+        "task_acceptance": "unmeasured",
+        "observations": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "value": 0.12269234347898597,
+            "unit": "m",
+            "threshold": 0.01,
+            "passed": false,
+            "scope": "model_sample",
+            "time_s": 0.6000000000000004,
+            "source": {
+              "reference": {
+                "artifact_id": "a0658019fde980f3e501b74b1ab100ada84e4da6ae6799e73435ed0dc0598517",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/optimization/best/outputs"
+            }
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "value": 0.3331442296553496,
+            "unit": "m/s",
+            "threshold": 0.03,
+            "passed": false,
+            "scope": "model_sample",
+            "time_s": 0.6000000000000004,
+            "source": {
+              "reference": {
+                "artifact_id": "a0658019fde980f3e501b74b1ab100ada84e4da6ae6799e73435ed0dc0598517",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/optimization/best/outputs"
+            }
+          },
+          {
+            "constraint_id": "terminal_error_m",
+            "value": 0.12269234347898597,
+            "unit": "m",
+            "threshold": 0.01,
+            "passed": false,
+            "scope": "model_sample",
+            "time_s": 0.6000000000000004,
+            "source": {
+              "reference": {
+                "artifact_id": "a0658019fde980f3e501b74b1ab100ada84e4da6ae6799e73435ed0dc0598517",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/optimization/best/outputs"
+            }
+          }
+        ],
+        "observation_scope": "Only saved supported outputs; unmeasured constraints remain unresolved. No independent task acceptance is inferred.",
+        "quantities": {
+          "J": 11.269234347898596,
+          "initial_J": 13.45390642085818,
+          "improvement": 2.184672072959584,
+          "evidence_level": "finite_budget_observation",
+          "stop_reason": "evaluation_request_budget"
+        },
+        "directional_quantities": [],
+        "reliability": {
+          "convergence": "unresolved",
+          "global_optimality": "not_established"
+        },
+        "scientific_scope": {
+          "model": {
+            "model_id": "model.mujoco_native",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+              "Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.",
+              "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+              "Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation."
+            ],
+            "representation_id": "native_named_hinges_v1"
+          },
+          "horizon": {
+            "interpretation": "Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.",
+            "origin": 0.0,
+            "period_s": 0.02,
+            "task_duration_s": 0.6
+          },
+          "claim_kind": "NUMERICAL_DIAGNOSTIC",
+          "verification_status": "native_numerical_checks"
+        },
+        "unresolved": [
+          "Full 0-to-duration replay and independent frozen acceptance remain required."
+        ],
+        "detail_query": {
+          "reference": {
+            "artifact_id": "a0658019fde980f3e501b74b1ab100ada84e4da6ae6799e73435ed0dc0598517",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/mathematical_decision_view"
+        }
+      },
+      "scope": "Read original B6 result through an isolated presentation fixture. No current execution permission or new Main decision is implied."
+    }
+  },
+  "baseline": "6634b88633ba24c268de193fe85e5e9666af9668",
+  "size_comparison": {
+    "scope": "Pure v3 JSON projections of the same synthetic state; not token counts, live Main behavior or runtime benchmark",
+    "cases": {
+      "no_candidate": {
+        "c0_l0_bytes": 9074,
+        "c1_l0_bytes": 9947,
+        "c0_math_bytes": 170,
+        "c1_math_bytes": 1019
+      },
+      "candidate_without_source": {
+        "c0_l0_bytes": 15622,
+        "c1_l0_bytes": 16486,
+        "c0_math_bytes": 2346,
+        "c1_math_bytes": 5395
+      },
+      "candidate_with_source": {
+        "c0_l0_bytes": 16364,
+        "c1_l0_bytes": 17154,
+        "c0_math_bytes": 2346,
+        "c1_math_bytes": 5321
+      },
+      "computed_math": {
+        "c0_l0_bytes": 19222,
+        "c1_l0_bytes": 21952,
+        "c0_math_bytes": 2346,
+        "c1_math_bytes": 7837
+      }
+    }
+  }
+}
