@@ -1537,11 +1537,18 @@ def agent_decision_brief(host):
     if candidate and s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
         from tools.research.structure_research import discovery
         direction_ref=next((r for r in reversed(s.get('analysis_results',[])) if
-            host.store.artifact(r).get('candidate')==candidate and
             host.store.artifact(r).get('status')=='computed' and
             host.store.artifact(r).get('structure_research',{}).get('structure_direction')),None)
-        brief['mathematical_research']=discovery(s['spec'],host.store.artifact(candidate),candidate,
-            latest_direction=dict(reference=direction_ref,pointer='/structure_research/structure_direction') if direction_ref else None)
+        generated=[]
+        if direction_ref:
+            for ref in s['candidates'].values():
+                plan=host.store.artifact(ref).get('provenance',{}).get('plan')
+                if plan and direction_ref in host.store.artifact(plan).get('original_plan',{}).get('supporting_evidence',[]):generated.append(ref)
+        brief['mechanism_research']=discovery(s['spec'],host.store.artifact(candidate),candidate,
+            latest_direction=dict(reference=direction_ref,pointer='/structure_research/structure_direction') if direction_ref else None,
+            formal_candidate_created=bool(generated))
+        brief['mechanism_research'].update(direction_candidate=host.store.artifact(direction_ref).get('candidate') if direction_ref else None,
+            formal_candidate_query=dict(reference=generated[-1]) if generated else None)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
 
@@ -1608,7 +1615,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),
             pending_feedback=brief.get('pending_feedback_delivery')),
         current_research_state=brief.get('current_research_state'),analysis_handoff=brief.get('analysis_handoff'),
-        verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),
+        verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),mechanism_research=brief.get('mechanism_research'),
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
             interpretation_query=report.get('restore_query'),
@@ -1800,7 +1807,7 @@ def information_flow_brief(brief, delivered):
     return dict(version='research_information_flow_v1',
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),
-        verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
+        verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),mechanism_research=value.get('mechanism_research'),
         research_trace=trace,**(dict(post_result_decision=post_result) if post_result else {}),
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
@@ -1951,6 +1958,9 @@ def compact_scientific_delivery(brief,*,decision_only=False,complete_interpretat
         math_views += [(f['mathematics'],f['result']['reference']) for r in brief.get('latest_reports',[])
             for f in r.get('findings',[]) if f.get('mathematics')]
         for math,ref in math_views:
+            if math.get('structure_research'):
+                math['quantities']=[q for q in math.get('quantities',[]) if q.get('name')=='mechanism_probe_0' or q.get('name','').startswith('suggested_parameter_delta')]
+                math['mechanism_detail_query']=dict(reference=ref,view='working_set',pointer='/mathematical_decision_view/structure_research')
             if math.get('nonlinear_response') or math.get('nonlinear_capability'):
                 key='nonlinear_response' if math.get('nonlinear_response') else 'nonlinear_capability'
                 compact=math[key];cost=math.get('cost')

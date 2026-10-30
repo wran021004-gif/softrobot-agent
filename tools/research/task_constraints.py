@@ -17,7 +17,7 @@ SCIENTIFIC_INTERPRETATION = dict(
     horizon_scope='Instantaneous dynamics, local sensitivity or single-time braking authority does not establish complete finite-horizon task feasibility or infeasibility.')
 
 METHOD_MEANINGS = {
-    'mechanism_structure_v1': ('Native mechanism and structural direction', 'Registered instantaneous native mechanism compositions and two-scale legal length perturbations at explicit state/input semantics; proposal only, never complete task improvement or a strict gradient.'),
+    'mechanism_structure_v1': ('Native mechanism and structural direction', 'Registered instantaneous native mechanism compositions and normalized two-scale legal continuous structural perturbations at explicit state/input semantics; bounded local proposals only, never complete task improvement or a strict gradient.'),
     'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
     'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
     'equilibrium': ('Static input construction', 'Bounded local static target construction. Static balance cannot establish holding-window maximum speed or identify a structure-versus-dynamic-control cause. Solver failure is not structural infeasibility; matched dynamic execution and independent evaluation remain necessary.'),
@@ -100,6 +100,7 @@ def selected_operating_point_guidance(host, reference, method, detail):
                 'Declared model operating point; no measured terminal state is implied.'))
     return dict(method=method,scientific_purpose=detail['scientific_purpose'],operating_points=points,
         available_source_references=sources,unavailable_sources=unavailable,
+        key_state_selection='For speed/braking hypotheses prefer an actual recorded interval before hold, with nonzero velocity or a large measured task violation. Main reads the cited trajectory, selects its update_id, and original native_point admission verifies the source; time-zero zero-speed braking is not substituted.',
         saved_state_requirements='Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.',
         coverage=detail['coverage'],scientific_scope=detail.get('scientific_scope'),limitations=[detail['description'],*detail['limitations']],
         deterministic_method_applicability=detail['applicability']['status'],execution_status=detail['execution_status'],
@@ -314,8 +315,8 @@ def mathematical_method_view(host, reference):
         item.update(method=METHOD,operation=METHOD,method_version=METHOD,
             scientific_purpose=METHOD_MEANINGS[METHOD][0],description=METHOD_MEANINGS[METHOD][1],
             study_authorized=authorized,formal_execution_authorized=authorized and item['formal_scope_authorized'],
-            estimated_evaluations=1,estimated_evaluation_range=[1,6],
-            cost_scope='inspect=1, compare=2, differentiate=5, checked local optimize=6 model/mechanics attempts in the shared mathematical allowance; no integration except an explicitly saved prefix reconstruction.',
+            estimated_evaluations=1,estimated_evaluation_range=[1,64],
+            cost_scope='Shared allowance: inspect=1, compare=2; differentiated paths use one common baseline plus their actual two-scale central/one-sided probes, plus a two-path joint check. optimize reserves its explicit bounded SciPy search cap. Saved prefix reconstruction has its original native cost.',
             required_parameters=['ScientificQuestionV2 operation, effect_semantics, registered target, point/control semantics and evaluation cap; candidate and task come from diagnose.'],
             request_template=dict(candidate=reference,operation=METHOD,model_source='mujoco',
                 operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
@@ -358,12 +359,19 @@ def mathematical_method_view(host, reference):
             methods[selected]['operating_point_guidance']=selected_operating_point_guidance(host,reference,selected,methods[selected])
     extra={}
     if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
-        from tools.research.structure_research import parameters,discovery,EVALUATIONS
+        from tools.research.structure_research import parameters,discovery
         from extensions.math_analysis.mechanism_registry import catalog
         extra['structure_research']=dict(**discovery(spec,c,reference),mechanisms=catalog(),parameters=parameters(spec,c),
-            evaluation_caps=EVALUATIONS,method_query=methods['mechanism_structure_v1']['detail_query'],
-            differentiation='Native two-scale central finite differences for one effective segment length; no strict derivative or descent certificate.',
-            supported_parameter_scope='segment_lengths',
+            evaluation_rule='One common baseline, actual stencil coordinates per selected effective path, one joint check for two paths; bounded local SciPy search uses the requested cap.',method_query=methods['mechanism_structure_v1']['detail_query'],
+            differentiation='Normalized linear/log coordinates; central or legal one-sided two-scale native differences, at most two actual continuous physical parameters. No strict derivative or descent certificate.',
+            unsupported_parameter_kinds=dict(undeclared='Only the selected frozen FamilySpace generates parameter domains; absent density/damping fields are not assumed available.',
+                controller='Controller weights and numerical resolution are outside structural mechanisms.',input_set='Tension limits change the feasible input set and require separate semantics.',
+                topology='Counts/topology require discrete comparison; not ordinary differentiation.'),
+            working_point_semantics=dict(frozen_task_initial_state='Each structure uses its task initializer and the same absolute tensions.',
+                fixed_generalized_pose='Same named qpos, zero velocity; no Cartesian-pose or equilibrium mapping.',
+                same_generalized_coordinates='Same named qpos/qvel, reset solver history.',
+                saved_native_state='Actual owned checkpoint/prefix for baseline; perturbed structures transfer named qpos/qvel with reset history. Not preserved Cartesian physical state.'),
+            working_point_sources=selected_operating_point_guidance(host,reference,'mechanism_structure_v1',methods['mechanism_structure_v1']),
             other_methods_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods'))
     return dict(**readiness,candidate=reference,methods=methods,**extra,
         operation_categories=dict(OPERATION_CATEGORIES),
@@ -541,12 +549,6 @@ def mathematical_opportunity_summary(view, *, observations=(), latest_result=Non
 
 def mathematical_catalog(view):
     """Small per-method facts; full instructions and native schemas stay reachable."""
-    if view.get('structure_research'):
-        d=view['structure_research'];method=view['methods']['mechanism_structure_v1']
-        return dict(candidate=view['candidate'],operation_categories=d['operations'],
-            status=method['planning_status'],formal_scope_authorized=method['formal_scope_authorized'],
-            detail_query=d['details_query'],mechanism_categories=d['mechanism_categories'],
-            effective_parameter_groups=d['effective_parameter_groups'],methods={})
     from tools.research.optimal_capability import SENSITIVITY
     rows={}
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'

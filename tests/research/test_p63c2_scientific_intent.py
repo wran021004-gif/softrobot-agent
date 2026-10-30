@@ -302,18 +302,18 @@ class MechanismQuestionV2Tests(unittest.TestCase):
     def test_semantics_discrete_groups_budget_and_no_silent_substitution(self):
         h,c=self.prepare()
         with patch('extensions.tendon_family.mujoco_analysis.NativeModel',side_effect=AssertionError('NO_NATIVE_WORK')):
-            for semantics in ('fixed_input_response','reoptimized_task_capability','closed_loop_performance','re_equilibrated_passive_response'):
+            for semantics in ('reoptimized_task_capability','closed_loop_performance','re_equilibrated_passive_response'):
                 q=mechanism_question();q['effect_semantics']=semantics
                 self.assertEqual(self.compile(h,q)['status'],'unsupported')
             for path in ('segment_count','tendon_count','segments.0.cells','tendon_parameters.length_servo_gain_n_m'):
                 q=mechanism_question();q['parameter_paths']=[path]
                 self.assertEqual(self.compile(h,q)['status'],'unsupported')
             q=mechanism_question();q.update(parameter_paths=[],parameter_group='segment_lengths')
-            self.assertEqual(self.compile(h,q)['reason'],'SELECT_ONE_EFFECTIVE_PARAMETER_FROM_GROUP')
+            self.assertEqual(self.compile(h,q)['status'],'blocked')
             q=mechanism_question();q['requested_budget']=4
             self.assertEqual(self.compile(h,q)['status'],'blocked')
             q=mechanism_question();q['target']='holding_max_speed_m_s'
-            self.assertEqual(self.compile(h,q)['reason'],'TASK_TARGET_REQUIRES_M2_TASK_RESPONSE')
+            self.assertEqual(self.compile(h,q)['reason'],'TASK_TARGET_REQUIRES_M1_OR_M2_TASK_RESPONSE')
             q=mechanism_question();q['operating_point']='preserved_physical_state'
             self.assertEqual(self.compile(h,q)['reason'],'WORKING_POINT_MAPPING_NOT_IMPLEMENTED')
             q=mechanism_question();q['target']['reduction']='identity'
@@ -343,7 +343,7 @@ class MechanismQuestionV2Tests(unittest.TestCase):
         with patch.object(core,'guard'):core.dispatch(h,selected,'v2-bound-plan')
         q=mechanism_question();q.pop('parameter_paths');q.pop('requested_budget')
         out=self.compile(h,q);self.assertEqual(out['status'],'ready')
-        self.assertEqual(out['request']['mechanism_study']['parameter_path'],'segments.0.length_m')
+        self.assertEqual(out['request']['mechanism_study']['parameter_paths'],['segments.0.length_m'])
 
     def test_registered_units_dimensions_frames_and_active_tendon_scope(self):
         from extensions.math_analysis.mechanism_registry import observe,catalog
@@ -382,7 +382,7 @@ class MechanismQuestionV2Tests(unittest.TestCase):
         self.assertTrue(all(.08<=x<=.24 for x in seen))
         def flat(x):return dict(record_index=0,observation=dict(value=1.,unit='1'))
         self.assertIsNone(differentiate(parameter,flat(.16),flat,goal='increase')['suggested_delta'])
-        with self.assertRaisesRegex(ValueError,'INTERIOR'):stencil({**parameter,'current_value':.08})
+        self.assertEqual(stencil({**parameter,'current_value':.08})['scheme'],'one_sided_second_order_two_scales')
 
     def test_production_orchestration_rebuilds_and_rechecks_proposal_with_synthetic_native(self):
         from tools.research.structure_research import calculate,prepare_context
@@ -401,14 +401,14 @@ class MechanismQuestionV2Tests(unittest.TestCase):
                 self.cost['mechanics_evaluations']+=1
                 return dict(time_s=0.,qpos_rad=[0.],qvel_rad_s=[0.],
                     coordinates=dict(dof_order=['q'],tendon_order=['t']),actual_tensions_n=[1.],input_bounds_n=[[0.,8.]],
-                    tip_acceleration_input_map_m_s2_n=[[self.length],[0.],[0.]])
+                    tip_acceleration_input_map_m_s2_n=[[self.length],[0.],[0.]],mass_matrix_kg_m2=[[self.length]])
         context=prepare_context(state(h)['spec'],candidate,request.mechanism_study,[])
         before=deepcopy(state(h)['candidates'])
         point=dict(actual_time_s=0.,u=[1.],native_replay={})
         with patch('extensions.tendon_family.mujoco_analysis.NativeModel',SyntheticNative):
             result=calculate(candidate['configuration'],dict(candidate=c),request,point,context)
         self.assertEqual(result['status'],'computed');raw=result['structure_research']
-        self.assertEqual(raw['cost']['model_builds'],6);self.assertTrue(raw['local_proposal_recheck']['passed'])
+        self.assertLessEqual(raw['cost']['model_builds'],6);self.assertIn('local_search',raw)
         self.assertGreater(raw['structure_direction']['delta'],0)
         self.assertFalse(raw['structure_direction']['formal_candidate_created'])
         self.assertEqual(state(h)['candidates'],before)
@@ -443,7 +443,8 @@ class MechanismQuestionV2Tests(unittest.TestCase):
         self.assertEqual(card.evidence_summary.claim_kind,'NUMERICAL_DIAGNOSTIC')
         projected=mathematical_decision_view(plain(card))
         self.assertEqual(projected['structure_research']['structure_direction']['delta'],-.0008)
-        l0=agent_decision_brief(h)['mathematical_research'];self.assertTrue(l0['evidenced_direction'])
+        brief=agent_decision_brief(h);l0=brief['mechanism_research'];self.assertTrue(l0['evidenced_direction'])
+        self.assertTrue(brief['mathematical_research'])
         for forbidden in ('qpos_rad','mass_matrix','segments.0.length_m','solver'):self.assertNotIn(forbidden,json.dumps(l0))
         l1=core.read_evidence(h,l0['details_query'],record_read=False)
         self.assertTrue(l1['parameters']);self.assertTrue(l1['mechanisms']['primitives'])

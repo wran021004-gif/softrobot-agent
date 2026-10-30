@@ -559,10 +559,11 @@ def result_card(host, reference):
                         source=_location(reference,f'/structure_research/records/{i}/observation/value')))
             direction=raw.get('structure_direction')
             if direction:
-                quantities.append(MathematicalQuantity(name='suggested_parameter_delta',value=direction['delta'],
-                    unit=direction['parameter_unit'],status='unverified_estimate',
-                    structural_parameters=[direction['parameter_path']],control_reoptimization='fixed_control',
-                    source=_location(reference,'/structure_research/structure_direction/delta')))
+                changes=direction.get('parameter_changes') or [dict(parameter_path=direction['parameter_path'],unit=direction['parameter_unit'],delta=direction['delta'])]
+                for i,change in enumerate(changes):
+                    quantities.append(MathematicalQuantity(name='suggested_parameter_delta/'+change['parameter_path'],value=change['delta'],
+                        unit=change['unit'],status='unverified_estimate',structural_parameters=[change['parameter_path']],control_reoptimization='fixed_control',
+                        source=_location(reference,'/structure_research/structure_direction/'+('parameter_changes/'+str(i)+'/delta' if direction.get('parameter_changes') else 'delta'))))
             mathematics=mathematics.model_copy(update=dict(problem_definition=_location(reference,'/structure_research'),quantities=quantities))
             details.append(_location(reference,'/structure_research'))
         if value.get('native_analysis'):

@@ -339,20 +339,42 @@ class ScientificQuestion(Contract):
 class MechanismTarget(Contract):
     quantity: Literal['tip_jacobian','tendon_jacobian','input_force_map','mass_matrix',
         'tip_acceleration_input_map','drive_singular_values','drive_directions',
-        'instantaneous_braking','tendon_row_projection','mass_balance_residual']
-    reduction: Literal['identity','norm','minimum','maximum','directional_norm'] = 'identity'
+        'instantaneous_braking','tendon_row_projection','mass_balance_residual',
+        'directional_acceleration_bounds','directional_drive','input_force_directions',
+        'directional_tendon_row_residual','motion_decoupling','total_mass','body_inertia_trace',
+        'joint_stiffness','joint_damping']
+    reduction: Literal['identity','norm','minimum','maximum','directional_norm','generalized_projection','direction_cosine'] = 'identity'
     direction_world: tuple[FiniteFloat,FiniteFloat,FiniteFloat] | None = None
+    tendon_channel: StrictInt | None = Field(default=None,ge=0)
+    direction_generalized: list[FiniteFloat] | None = None
     goal: Literal['increase','decrease'] = 'increase'
 
     @model_validator(mode='after')
     def directional(self):
-        if (self.reduction=='directional_norm') != (self.direction_world is not None):
+        directional=self.quantity in ('directional_acceleration_bounds','directional_drive','directional_tendon_row_residual','motion_decoupling')
+        if (self.reduction=='directional_norm' or directional) != (self.direction_world is not None):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_DIRECTION_ONLY')
         if self.direction_world is not None and abs(sum(x*x for x in self.direction_world)-1)>1e-8:
             raise ValueError('UNIT_WORLD_DIRECTION_REQUIRED')
         if self.reduction=='directional_norm' and self.quantity not in ('tip_jacobian','tip_acceleration_input_map'):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_VECTOR_MAP')
+        generalized=self.reduction in ('generalized_projection','direction_cosine')
+        if generalized != (self.direction_generalized is not None):
+            raise ValueError('GENERALIZED_PROJECTION_REQUIRES_EXPLICIT_UNIT_HINGE_DIRECTION')
+        if self.direction_generalized is not None and abs(sum(x*x for x in self.direction_generalized)-1)>1e-8:
+            raise ValueError('UNIT_GENERALIZED_DIRECTION_REQUIRED')
+        if generalized and (self.quantity!='input_force_map' or self.tendon_channel is None):
+            raise ValueError('GENERALIZED_DIRECTION_REQUIRES_ONE_ACTIVE_FORCE_CHANNEL')
+        if self.tendon_channel is not None and self.quantity not in ('input_force_map','input_force_directions','directional_drive'):
+            raise ValueError('TENDON_CHANNEL_REQUIRES_CHANNEL_MAP')
         return self
+
+    @model_serializer(mode='wrap')
+    def legacy_target(self,handler):
+        result=handler(self)
+        for key in ('tendon_channel','direction_generalized'):
+            if getattr(self,key) is None:result.pop(key,None)
+        return result
 
 
 class ScientificQuestionV2(Contract):
@@ -361,29 +383,51 @@ class ScientificQuestionV2(Contract):
     operation: Literal['inspect','differentiate','optimize','compare']
     effect_semantics: Literal['mechanism_effect','fixed_input_response','reoptimized_task_capability',
         'closed_loop_performance','re_equilibrated_passive_response']
-    parameter_group: Literal['segment_lengths','routing','material_geometry'] | None = None
-    parameter_paths: list[str] = Field(default_factory=list,max_length=1)
-    target: MechanismTarget | str = Field(description='Registered mechanism composition, or a frozen task constraint ID. Task response targets require M2 and return an explicit unsupported reason in M0/M1.')
+    parameter_group: str | None = Field(default=None,description='Actual capability category; segment_lengths is retained as a legacy selector.')
+    parameter_paths: list[str] = Field(default_factory=list,max_length=2)
+    target: MechanismTarget | str = Field(description='Registered mechanism composition, or a frozen task constraint ID. Short task response targets use existing M1 methods; complete reoptimized task response remains M2.')
     hypothesis: str | None = None
     operating_point: Literal['frozen_task_initial_state','same_generalized_coordinates',
-        're_equilibrated','preserved_physical_state']
+        'fixed_generalized_pose','saved_native_state','re_equilibrated','preserved_physical_state']
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop']
     tensions_n: list[FiniteFloat] | None = None
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
     update_id: StrictInt | None = Field(default=None,ge=0)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
-    requested_budget: StrictInt | None = Field(default=None,ge=1,le=6,
-        description='Maximum model/mechanics evaluations, charged to the existing mathematical allowance. inspect=1, compare=2, two-scale differentiate=5, checked local optimize=6. No rollout or control search.')
+    requested_budget: StrictInt | None = Field(default=None,ge=1,le=64,
+        description='Maximum original mathematical evaluations for this question. Mechanism cost depends on selected paths, central/one-sided stencils and bounded local search. Fixed-input short responses retain their original accounting.')
+    local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1,
+        description='Bounded neighborhood in normalized parameter coordinates, used by the existing SciPy local optimizer.')
+    response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05)
 
 
 class MechanismStudy(Contract):
     operation: Literal['inspect','differentiate','optimize','compare']
     target: MechanismTarget
     parameter_path: str | None = None
-    point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates']
-    max_evaluations: StrictInt = Field(ge=1,le=6)
+    parameter_paths: list[str] = Field(default_factory=list,max_length=2)
+    point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']
+    max_evaluations: StrictInt = Field(ge=1,le=64)
+    local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
+
+    @property
+    def paths(self):
+        return self.parameter_paths or ([self.parameter_path] if self.parameter_path else [])
+
+    @model_validator(mode='after')
+    def unambiguous_paths(self):
+        if self.parameter_path and self.parameter_paths:raise ValueError('USE_LEGACY_PATH_OR_SELECTED_PATHS_NOT_BOTH')
+        if len(set(self.paths))!=len(self.paths):raise ValueError('DISTINCT_PARAMETER_PATHS_REQUIRED')
+        return self
+
+    @model_serializer(mode='wrap')
+    def legacy_request(self,handler):
+        value=handler(self)
+        if not self.parameter_paths:value.pop('parameter_paths',None)
+        if self.local_radius_fraction==.02:value.pop('local_radius_fraction',None)
+        return value
 
 
 class AnalysisRequest(Contract):
@@ -432,6 +476,8 @@ class AnalysisRequest(Contract):
         if self.mechanism_study:
             if (self.mechanism_study.point_semantics=='frozen_task_initial_state' and self.operating_point!='standardized_initial_pretension'):
                 raise ValueError('FROZEN_INITIAL_MECHANISM_REQUIRES_INITIAL_POINT')
+            if self.mechanism_study.point_semantics=='saved_native_state' and self.operating_point!='saved_state':
+                raise ValueError('SAVED_NATIVE_MECHANISM_REQUIRES_REAL_STATE_SOURCE')
             if self.native != NativeAnalysisOptions(tensions_n=self.native.tensions_n):
                 raise ValueError('MECHANISM_STUDY_HAS_NO_ROLLOUT_OR_INPUT_DIFFERENCE_OPTIONS')
         self.validate_operating_point(self.operation,self.operating_point,optimal_sensitivity=self.optimal_sensitivity is not None)

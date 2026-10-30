@@ -417,8 +417,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
     if q.structure_response:count=1+len(q.structure_response.candidates)
     if q.mechanism_study:
-        from tools.research.structure_research import EVALUATIONS
-        count=EVALUATIONS[q.mechanism_study.operation]
+        count=sensitivity_context['evaluations']
     if method_fit:count=method_fit['expected_mathematical_evaluations']
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
@@ -636,7 +635,7 @@ def scientific_status(value):
     status=value.get('status')
     boundary=value.get('boundary') or {}
     cost=next(((value.get(k) or {}).get('cost') for k in
-        ('native_dynamics','native_progress','native_diagnostic') if (value.get(k) or {}).get('cost')),None)
+        ('native_dynamics','native_progress','native_diagnostic','structure_research') if (value.get(k) or {}).get('cost')),None)
     native=value.get('nonlinear_capability') or {}
     j=native.get('J')
     finite_j=isinstance(j,(int,float)) and not isinstance(j,bool) and math.isfinite(j)
