@@ -361,7 +361,7 @@ class ScientificStructureSearch(Contract):
     research_goal: Literal['structure_control_codesign','structural_capability_screening']
     design_variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing']] = Field(min_length=1,description='Real structure groups only. Control reoptimization is specified separately by control_treatment.')
     evaluation_model: Literal['native_mujoco','mathematical_proxy']
-    control_treatment: Literal['reoptimized','not_optimized']
+    control_treatment: Literal['reoptimized','not_optimized','proxy_optimized'] = Field(description='reoptimized: fresh Native control optimization. not_optimized: static/held-input proxy. proxy_optimized: the registered CONIC task_violation optimizes affine-model controls, not Native dynamics.')
     structure_search_effort: StructureSearchEffort
     control_search_effort: ScientificControlEffort | None = None
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0,description='Native common absolute initial tension. Omit only to use the unique frozen tendon pretension default; if unavailable an explicit choice is required.')

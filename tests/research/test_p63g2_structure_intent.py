@@ -102,6 +102,16 @@ class StructureIntentTests(unittest.TestCase):
         compiled=compile_search(h,plan,'offline-proxy')
         self.assertEqual(FamilyMixedSearch.model_validate(compiled['search']).evaluation_mode,'mathematical_proxy')
         self.assertNotIn('control_settings',compiled['search'])
+        with self.assertRaises(StructureChoiceError):
+            compile_search(h,search_plan(research_goal='structural_capability_screening',evaluation_model='mathematical_proxy',
+                control_treatment='not_optimized',proxy_objective='task_violation',control_search_effort=None),'no-hidden-proxy-control-optimization')
+        from tools.research.optimal_capability import CONIC
+        spec=deepcopy(state(h)['spec']);spec['mathematical_methods'][CONIC]='OFFLINE explicit proxy admission fixture, no solve'
+        update(h,spec=spec)
+        proxy=compile_search(h,search_plan(research_goal='structural_capability_screening',evaluation_model='mathematical_proxy',
+            control_treatment='proxy_optimized',proxy_objective='task_violation',control_search_effort=None),'explicit-proxy-control-scope')
+        parsed=FamilyMixedSearch.model_validate(proxy['search'])
+        self.assertEqual(parsed.evaluation_mode,'mathematical_proxy');self.assertIsNone(parsed.control_settings)
         wires=run_fixture(h,[('experience_retrieve',dict(operation='search',kind='control')),
             ('experience_retrieve',dict(operation='read',entry_id='research-bounded-continuation',revision='2')),
             ('experience_retrieve',dict(operation='read',entry_id='research-bounded-continuation',revision='2')),None])

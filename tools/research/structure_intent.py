@@ -41,9 +41,10 @@ def compile_search(host, value, request_id):
     native=q.evaluation_model=='native_mujoco'
     if native and (q.research_goal!='structure_control_codesign' or q.control_treatment!='reoptimized' or q.proxy_objective is not None):
         issue('control_treatment','Native task codesign requires reoptimized control and no proxy objective')
-    if not native and (q.control_treatment!='not_optimized' or q.research_goal!='structural_capability_screening' or q.proxy_objective is None
+    proxy_treatment='proxy_optimized' if q.proxy_objective=='task_violation' else 'not_optimized'
+    if not native and (q.control_treatment!=proxy_treatment or q.research_goal!='structural_capability_screening' or q.proxy_objective is None
             or q.control_search_effort is not None or q.initial_tension_n is not None):
-        issue('evaluation_model','Mathematical proxy requires explicit proxy_objective, structural_capability_screening and not_optimized; no Native control effort')
+        issue('evaluation_model','Mathematical proxy requires explicit proxy_objective and structural_capability_screening; task_violation uses proxy_optimized, static/held-input proxies use not_optimized; no Native control effort')
     if native and q.control_search_effort is None:issue('control_search_effort','Choose method, knot count and independent callback/iteration effort')
     tension=q.initial_tension_n
     if native and tension is None:

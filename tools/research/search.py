@@ -161,7 +161,7 @@ def request_guidance(spec):
             required=['research_goal','design_variable_groups','evaluation_model','control_treatment','structure_search_effort'],
             structural_groups=[g for g in grant['variable_groups'] if g!='control'],
             native='structure_control_codesign + native_mujoco + reoptimized, with control_search_effort; full frozen task and every constraint retained.',
-            proxy='structural_capability_screening + mathematical_proxy + not_optimized, with explicit proxy_objective. No model substitution.',
+            proxy='structural_capability_screening + mathematical_proxy, explicit proxy_objective. CONIC task_violation requires proxy_optimized (affine-model control solve); static/held-input objectives require not_optimized. No Native substitution.',
             program_bound=['FamilySpace identity','singleton topology','exact final screening fidelity','Native operating point','internal research_intent'],
             control_effort='method, knot_count, iterations and evaluation_requests are separate choices; omitted iterations=min(callback cap, original/Study iteration caps). Original settings own numerical limits and termination.',
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),

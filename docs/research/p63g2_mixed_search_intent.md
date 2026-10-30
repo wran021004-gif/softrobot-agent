@@ -17,7 +17,7 @@ Main 填写原 Plan 的假设、依据、预期/削弱观察、固定条件和�
 
 冻结空间只有唯一段/腱计数时自动绑定；显式越界则拒绝。唯一 FamilySpace identity、原 method、唯一与最终离散一致的 screening fidelity、Native 起点 `standardized_initial_pretension`、完整 `task_violation` 目标和内部 `MATHEMATICAL_ANALYSIS` 分类由程序绑定。新精确 Schema 不展示 `research_intent`、内部 method 或重复 requested_budget；假设和用户选择保留，原请求与编译后的 Plan/准入存于原 Store 的 `structure_search_intent_binding`。
 
-结构变量枚举不再含 `control`；逐结构控制重优化由 `control_treatment=reoptimized` 单独表达。Native 与数学代理不互换：代理必须明确选择 `structural_capability_screening/not_optimized/proxy_objective`，不接受 Native effort。省略 Native 预张力只使用冻结 tendon-domain 的唯一默认值；无该来源则要求选择。实际张力、来源、模型和预算仍由原合同及 Worker 检查。
+结构变量枚举不再含 `control`；逐结构控制重优化由 `control_treatment=reoptimized` 单独表达。Native 与数学代理不互换：代理必须明确选择 `structural_capability_screening/proxy_objective`；静力/保持输入代理用 `not_optimized`，CONIC task_violation 的仿射模型控制求解用 `proxy_optimized`，不接受 Native effort。省略 Native 预张力只使用冻结 tendon-domain 的唯一默认值；无该来源则要求选择。实际张力、来源、模型和预算仍由原合同及 Worker 检查。
 
 原 mixed search 的初始化语义未改变：previous candidate 只为段参数提供 seed，未完整继承其路由和控制；未选的路由/span 使用原 search defaults。该范围明确写入指引和编译记录，不能把重新构建的搜索基点误称为原候选原样续算。
 
@@ -45,6 +45,8 @@ diagnose Schema/反馈明确 `decision.selected_candidate` 所有权，不引入
 使用原 G1 第 20、21、29、46、59、62、65、67 次保存输入，覆盖起点/变量组、联合分支和五 knot。原 DB 以 SQLite mode=ro/query_only 读取且 mtime 不变，未重试任何旧失败科学请求；八份原输入及其原事件引用提取为可提交的离线 fixture，后续回归不依赖私有 Store 路径。实际 SDK/Mock wire 证明加载的是 `ScientificStructureSearch`，无需内部分类；可省略版本默认值，编译后通过原 Plan/数学准入。非法五 knot 的字段纠错实际进入下一请求，科学评价数保持 0。代理仍按原代理合同解析，未改成 Native。
 
 小规模真实测试使用新隔离 fixture 和原 search.run_search/Native Worker，不是 M3 科研成果或历史成功答案。最近一次：1 build、2 rollouts、1200 physics steps、123 forward evaluations、1 次正式数学评价；worker_started/termination_confirmed=true，returncode=0，wall 1.2010049 s，kernel 0.1355643 s。开发期间共运行两次这种小型真实接入测试，合计 2 builds、4 rollouts、2400 steps；所有 Provider wire 测试均为 Mock，无真实模型请求。未运行九项历史实验或全仓回归。
+
+短窗口关闭后复核代理控制语义：CONIC task_violation 必须显式 proxy_optimized，静力/保持输入代理仍为 not_optimized，不能暗示 CONIC 没有控制求解。修正后新合同五项再次通过（22.174 s），补充“显式授权的 CONIC 仍保持代理、无 Native effort”定向断言后单项通过（7.941 s）。没有新科学 Worker 或真实 Provider 请求；真实窗口仍冻结在原 e86097d，不声称其验证了这项末尾修正。
 
 ## 短窗口冻结计划
 
