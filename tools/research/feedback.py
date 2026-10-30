@@ -101,7 +101,7 @@ def search_feedback(host, reference):
                 source_search=reference,
                 physical_design_identity=value.get('physical_design_identity'),
                 decision_binding='For a new generate Plan the source_candidate is historical supporting evidence, not an executable selected_candidate. The new candidate is returned only after Main submits generation; choose its later control adaptation explicitly.',
-                note='Copy exact physical choices; cite source search/candidate and evidence actually used in the new plan. Screening evidence is not transferred to the new candidate.')
+                note='Copy exact physical choices; supporting_evidence uses the registered source candidate and underlying mathematical results actually used. source_search is navigation only, not registered scientific evidence. Screening evidence is not transferred to the new candidate.')
     fixed=None
     if result.get('comparison_summary') is not None:
         from collections import Counter
@@ -116,7 +116,10 @@ def search_feedback(host, reference):
             search_scope_query=dict(reference=result['search_state'],view='full',pointer='/problem'),
             independent_task_acceptance='unmeasured',scientific_citation_eligible=False)
         checkpoint=host.store.artifact(result['search_state']);query=checkpoint['problem']['query']
-        fixed['search_scope']={k:query[k] for k in ('groups','segment_count','tendon_count','span_strategy','objective','evaluation_mode','screening_fidelity','max_proposals','max_evaluations') if k in query}
+        fixed['method']=query.get('method',fixed['method'])
+        fixed['search_scope']={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','span_strategies','section_types','bounds','step','minimum_step','initial_tension_n','previous_candidate_ref','objective','evaluation_mode','operating_point','screening_fidelity','max_proposals','max_evaluations','stop_score') if k in query}
+        fixed['search_scope']['resolved_domains']=checkpoint['problem'].get('domains')
+        if not fixed['best_mathematical']:fixed['control_search_settings']=query.get('control_settings')
         fixed['cost']=dict(known_attributed_numerical_s=sum(row['mathematical_numerical_s'] for row in result['evaluated'] if row.get('mathematical_numerical_s') is not None),
             rows_without_numerical_cost=sum(row.get('mathematical_numerical_s') is None for row in result['evaluated']),
             outer_elapsed_s=result.get('resource_use',{}).get('elapsed_s'),
@@ -147,13 +150,16 @@ def native_mathematical_fact(host, reference, *, control_source=None, condition_
                 source_pointer='/native_dynamics/optimization/best/measure/'+name,
                 threshold_pointer='/task_analysis/constraints/'+str(list(constraints).index(key))+'/radius'))
     request=value.get('requested_operation') or {};binding=value.get('binding') or {}
+    from tools.research.evidence_policy import registered_references,citation_role
+    citation=dict(registered=reference in registered_references(host),role=citation_role(host,reference),
+        scope='Registration only; original inference, task, model and candidate admission still applies. No independent acceptance or formal reading credit.')
     profile=candidate.get('profile_identity');current=state(host)['profile']['identity']
     return dict(reference=reference,candidate=value['candidate'],control_source=control_source or value.get('control_schedule_reference'),
         condition_id=condition_id,status=value['status'],J=measure.get('signed_maximum_excess'),
         metrics=metrics,valid_complete=bool(value['status']=='computed' and (best.get('task_gap') or {}).get('valid_complete')),
         method=value.get('operation'),model_source=request.get('model_source'),task_identity=binding.get('canonical_task_identity') or binding.get('task_identity'),
         model_identity=value.get('model_identity'),profile_identity=profile,
-        scientific_observation_available=True,executable_under_current_profile=profile==current,
+        citation=citation,scientific_observation_available=True,executable_under_current_profile=profile==current,
         current_profile_requires_new_construction=profile!=current,
         control_binding='Original candidate-bound source only; a new candidate requires original initialization/adaptation checks.',
         control_search_settings=(request.get('control_optimization') or {}).get('settings'),

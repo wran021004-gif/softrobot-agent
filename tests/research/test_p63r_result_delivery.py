@@ -79,6 +79,8 @@ class ScientificResultDeliveryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'OLD_EVALUATION_PROFILE'):verify_candidate(self.h,self.c)
         recipe=value['final_materialization'];self.assertEqual(recipe['action'],'generate')
         self.assertIn(analysis,recipe['supporting_evidence'])
+        self.assertEqual(recipe['source_search'],ref)
+        self.assertNotIn(ref,recipe['supporting_evidence'])
         self.assertTrue(all(r in registered_references(self.h) for r in recipe['supporting_evidence']))
         from tools.research.contracts import Plan
         from tools.research.evidence_policy import admit_decision
@@ -118,3 +120,21 @@ class ScientificResultDeliveryTests(unittest.TestCase):
                     self.assertIn(key,delivered)
                 self.assertLess(len(json.dumps(wire).encode()),1048576)
                 self.assertEqual(state(h)['physical_replays'],[])
+
+    def test_compiled_search_scope_and_registered_math_are_direct_facts(self):
+        ref,analysis,_=fixture(self.h,self.c,-.05)
+        query=dict(variable_groups=['lengths','routing'],segment_counts=[2],tendon_counts=[6],
+            span_strategies=['whole_chain'],section_types=['ellipse','rectangle'],bounds={},
+            initial_tension_n=0.,previous_candidate_ref=None,max_proposals=64,max_evaluations=64,method='bounded_mixed_coordinate_v1')
+        value=deepcopy(self.h.store.artifact(ref))
+        domains={'length_m':[.08,.2],'routing.radius_m':[.014,.023]}
+        value['result']['search_state']=save(self.h,dict(problem=dict(query=query,domains=domains)))
+        actual=search_feedback(self.h,save(self.h,value))['fixed_result']
+        for key in ('variable_groups','segment_counts','tendon_counts','span_strategies','section_types','bounds','initial_tension_n','previous_candidate_ref'):
+            self.assertEqual(actual['search_scope'][key],query[key])
+        self.assertEqual(actual['search_scope']['resolved_domains'],domains)
+        fact=actual['best_mathematical'][0]
+        self.assertTrue(fact['citation']['registered'])
+        self.assertEqual(fact['citation']['role'],'scientific_result')
+        self.assertIn(analysis,registered_references(self.h))
+        self.assertFalse(actual['scientific_citation_eligible'])

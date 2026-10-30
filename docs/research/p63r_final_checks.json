@@ -1,0 +1,110 @@
+{
+  "schema": "p63r_final_continuity_checks_v1",
+  "checks": {
+    "sqlite_integrity": true,
+    "authorized_end_condition": true,
+    "truthful_engineering_block": true,
+    "within_original_provider_ceiling": true,
+    "provider_ledger_consistent": true,
+    "same_model": true,
+    "same_reasoning": true,
+    "original_searches_retained": true,
+    "original_94_math_retained": true,
+    "original_cost_receipts_retained": true,
+    "original_controls_retained": true,
+    "original_candidates_retained": true,
+    "original_spec_and_budget_unchanged": true,
+    "no_pending": true,
+    "no_unconsumed_response": true,
+    "all_unsealed_calls_explicitly_accounted": true,
+    "all_native_terminations_confirmed": true,
+    "g3_database_unchanged": true,
+    "only_authorized_production": true
+  },
+  "study_id": "p63v1-m3-autonomous-feasibility-sol-20261030",
+  "provider": 32,
+  "r2_added_provider": 8,
+  "math": 155,
+  "physical": 0,
+  "status": "ready",
+  "freeze": "b0f0faad1fc20e7adbabe60846f0ac4fa8c52c81",
+  "profile": {
+    "identity": "110df6ab2fcf55bd870ce2673645395cdb58dd6620a3c0ecad9cc4070d596e49",
+    "version": 3
+  },
+  "profile_history": [
+    {
+      "identity": "129b92061af5952017ab7cb6c371f92804e48ab1db379fc45d6814c3a6be301a",
+      "version": 1
+    },
+    {
+      "identity": "a28aa9589dd683d67b34833611ebcea424b493b29628f4a7a79c05c34e32c76e",
+      "version": 2
+    },
+    {
+      "identity": "110df6ab2fcf55bd870ce2673645395cdb58dd6620a3c0ecad9cc4070d596e49",
+      "version": 3
+    }
+  ],
+  "selected": null,
+  "success_gate": null,
+  "final_disposition": null,
+  "actual_stop": false,
+  "engineering_block": {
+    "schema": "p63r_confirmed_provider_block_v1",
+    "study_id": "p63v1-m3-autonomous-feasibility-sol-20261030",
+    "request_id": "r3-request-001b8413ac4740c2b57234712c4525cf",
+    "request_number": 32,
+    "purpose": "reporter",
+    "receipt_status": "unknown",
+    "response_saved": false,
+    "original_recovery_error": "UNKNOWN_PROVIDER_SEND_INSPECT_BEFORE_REPEAT",
+    "original_bind_rule": "UNSEALED_RESERVATION_BLOCKS_BIND",
+    "root_cause": "Read-only monitoring embedded p63v1_audit via runpy without closing its read transaction. Concurrent response archival commit timed out and rolled back. The original response bytes are not present in Store; the runner has ended.",
+    "monitor_fix": "Close original audit db explicitly before opening a new audit connection; retain read-only snapshot and retry read contention.",
+    "runner_ended": true,
+    "no_resend": true,
+    "no_manual_settlement": true,
+    "no_identity_changes": true,
+    "main_stop": false,
+    "formal_select": false,
+    "provider": 32,
+    "remaining_original_total": 48,
+    "math": 155,
+    "physical": 0,
+    "status": "ready",
+    "profile": {
+      "identity": "110df6ab2fcf55bd870ce2673645395cdb58dd6620a3c0ecad9cc4070d596e49",
+      "version": 3
+    },
+    "freeze": "b0f0faad1fc20e7adbabe60846f0ac4fa8c52c81",
+    "state_identity": "745070bf1fbc790c5d27a440a239559a4b106c5fd0bf643cb2c3f60dd0f8d56d",
+    "scientific_state_unchanged": true,
+    "scope": "Engineering block, not scientific infeasibility or Main STOP. Unknown Provider response/cost requires external evidence before any future original recovery; no automatic retry.",
+    "record_reference": {
+      "artifact_id": "7125e3833da379f3f05c5bd712ae46b8ca39aed708a359ac3c0cbac88cdf870f",
+      "media_type": "application/json"
+    },
+    "full_proof_source": {
+      "path": "runs\\p63r_provider_block.json",
+      "sha256": "01426bc0793e58f5d87c2796ad827c8629c539722123a6da8e0c1116db593a7c",
+      "full_diagnostics_in": "P63-R-original-run.zip/run-diagnostics/"
+    }
+  },
+  "unsealed_calls": [
+    {
+      "request": "r3-request-001b8413ac4740c2b57234712c4525cf",
+      "status": "unknown"
+    }
+  ],
+  "changed_production_files": [
+    "tools/platform_store.py",
+    "tools/research/agent.py",
+    "tools/research/budget.py",
+    "tools/research/evidence_policy.py",
+    "tools/research/feedback.py",
+    "tools/research/research_context.py",
+    "tools/research/task_constraints.py"
+  ],
+  "scope": "Read-only checks. No Provider, Worker, replay or scientific choice."
+}

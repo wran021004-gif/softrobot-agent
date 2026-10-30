@@ -1,0 +1,513 @@
+{
+  "schema": "p63r_scope_followup_validation_v1",
+  "real_provider_requests": 0,
+  "scientific_workers": 0,
+  "regression_before": {
+    "result": "failed as expected",
+    "reason": "KeyError variable_groups",
+    "log": "runs/p63r_scope_regression_before.log"
+  },
+  "tests": [
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_search_has_exact_metrics_thresholds_sources_counts_and_cost",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_search_has_exact_metrics_thresholds_sources_counts_and_cost(self):\n        search,analysis,source=fixture(self.h,self.c,-.05)\n        value=search_feedback(self.h,search);fixed=value['fixed_result'];fact=fixed['best_mathematical'][0]\n        self.assertEqual((fact['candidate'],fact['reference'],fact['control_source'],fact['J']),(self.c,analysis,source,-.05))\n        self.assertEqual([x['limit'] for x in fact['metrics']],[.01,.01,.02])\n        self.assertTrue(all(x['signed_excess']<0 for x in fact['metrics']))\n        self.assertEqual(fixed['status_counts']['computed'],1);self.assertFalse(fixed['scientific_citation_eligible'])\n        self.assertEqual(fixed['results_query']['pointer'],'/result/comparison_summary')\n        self.assertEqual(fact['cost']['native']['rollouts'],3)\n        self.assertFalse(fact['independent_evaluation_executed']);self.assertFalse(fact['formal_acceptance_read_credit'])",
+      "key_assertions": [
+        "self.assertEqual((fact['candidate'],fact['reference'],fact['control_source'],fact['J']),(self.c,analysis,source,-.05))",
+        "self.assertEqual([x['limit'] for x in fact['metrics']],[.01,.01,.02])",
+        "self.assertTrue(all(x['signed_excess']<0 for x in fact['metrics']))",
+        "self.assertEqual(fixed['status_counts']['computed'],1);self.assertFalse(fixed['scientific_citation_eligible'])",
+        "self.assertEqual(fixed['results_query']['pointer'],'/result/comparison_summary')",
+        "self.assertEqual(fact['cost']['native']['rollouts'],3)",
+        "self.assertFalse(fact['independent_evaluation_executed']);self.assertFalse(fact['formal_acceptance_read_credit'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_latest_worse_and_last_incomplete_keep_first_best",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_latest_worse_and_last_incomplete_keep_first_best(self):\n        first,a,_=fixture(self.h,self.c,-.05);second,_,_=fixture(self.h,self.c,-.02)\n        third,_,_=fixture(self.h,self.c,-1.,status='execution_incomplete')\n        value=scientific_result_delivery(self.h)\n        self.assertEqual(value['latest_search']['reference'],third)\n        self.assertEqual(value['study_best_mathematical'][0]['search_reference'],first)\n        self.assertEqual(value['study_best_mathematical'][0]['fact']['reference'],a)\n        self.assertEqual(value['latest_search']['fixed_result']['status_counts']['execution_incomplete'],1)",
+      "key_assertions": [
+        "self.assertEqual(value['latest_search']['reference'],third)",
+        "self.assertEqual(value['study_best_mathematical'][0]['search_reference'],first)",
+        "self.assertEqual(value['study_best_mathematical'][0]['fact']['reference'],a)",
+        "self.assertEqual(value['latest_search']['fixed_result']['status_counts']['execution_incomplete'],1)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_incomparable_profiles_are_not_ranked_together",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_incomparable_profiles_are_not_ranked_together(self):\n        fixture(self.h,self.c,-.05)\n        c=deepcopy(self.h.store.artifact(self.c));c['profile_identity']='different-profile'\n        other=save(self.h,c);fixture(self.h,other,-.08)\n        self.assertEqual(len(scientific_result_delivery(self.h)['study_best_mathematical']),2)",
+      "key_assertions": [
+        "self.assertEqual(len(scientific_result_delivery(self.h)['study_best_mathematical']),2)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_old_profile_observable_but_cannot_execute_and_recipe_is_legal",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_old_profile_observable_but_cannot_execute_and_recipe_is_legal(self):\n        ref,analysis,_=fixture(self.h,self.c,-.05);s=state(self.h)\n        profile=deepcopy(s['profile']);profile['identity']='offline-new-profile';update(self.h,profile=profile)\n        value=search_feedback(self.h,ref);fact=value['fixed_result']['best_mathematical'][0]\n        self.assertTrue(fact['scientific_observation_available']);self.assertFalse(fact['executable_under_current_profile'])\n        self.assertTrue(fact['current_profile_requires_new_construction'])\n        with self.assertRaisesRegex(ValueError,'OLD_EVALUATION_PROFILE'):verify_candidate(self.h,self.c)\n        recipe=value['final_materialization'];self.assertEqual(recipe['action'],'generate')\n        self.assertIn(analysis,recipe['supporting_evidence'])\n        self.assertEqual(recipe['source_search'],ref)\n        self.assertNotIn(ref,recipe['supporting_evidence'])\n        self.assertTrue(all(r in registered_references(self.h) for r in recipe['supporting_evidence']))\n        from tools.research.contracts import Plan\n        from tools.research.evidence_policy import admit_decision\n        from tests.research.test_p63g2_structure_intent import search_plan\n        plan=search_plan();plan.pop('search');plan.update(action='generate',generation=recipe['generation'],\n            supporting_evidence=recipe['supporting_evidence'])\n        # The historical candidate is evidence, not an executable new selection.\n        plan['decision'].update(selected_candidate=None,research_intent='DESIGN_MODIFICATION',selected_method='generate')\n        self.assertEqual(admit_decision(self.h,Plan.model_validate(plan))['claimed_inference'],'empirical_search')",
+      "key_assertions": [
+        "self.assertTrue(fact['scientific_observation_available']);self.assertFalse(fact['executable_under_current_profile'])",
+        "self.assertTrue(fact['current_profile_requires_new_construction'])",
+        "with self.assertRaisesRegex(ValueError,'OLD_EVALUATION_PROFILE'):verify_candidate(self.h,self.c)",
+        "recipe=value['final_materialization'];self.assertEqual(recipe['action'],'generate')",
+        "self.assertIn(analysis,recipe['supporting_evidence'])",
+        "self.assertEqual(recipe['source_search'],ref)",
+        "self.assertNotIn(ref,recipe['supporting_evidence'])",
+        "self.assertTrue(all(r in registered_references(self.h) for r in recipe['supporting_evidence']))",
+        "self.assertEqual(admit_decision(self.h,Plan.model_validate(plan))['claimed_inference'],'empirical_search')"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_view_does_not_register_search_or_change_state",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_view_does_not_register_search_or_change_state(self):\n        ref,_,_=fixture(self.h,self.c,-.05);before=deepcopy(state(self.h));known=registered_references(self.h)\n        scientific_result_delivery(self.h)\n        self.assertEqual(state(self.h),before);self.assertEqual(registered_references(self.h),known)\n        self.assertNotIn(ref,known);self.assertNotEqual(citation_role(self.h,ref),'independent_evaluation')",
+      "key_assertions": [
+        "self.assertEqual(state(self.h),before);self.assertEqual(registered_references(self.h),known)",
+        "self.assertNotIn(ref,known);self.assertNotEqual(citation_role(self.h,ref),'independent_evaluation')"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_hash_checked_sparse_read_preserves_types_and_missing_fields",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_hash_checked_sparse_read_preserves_types_and_missing_fields(self):\n        ref=save(self.h,dict(a=dict(b=[1,True,None]),false=False,number=1.5,unused=[0]*10000))\n        self.assertEqual(self.h.store.artifact(ref,paths=('a.b','false','number','missing')),\n            dict(a=dict(b=[1,True,None]),false=False,number=1.5))\n        with self.assertRaises(ValueError):self.h.store.artifact(ref,raw=True,paths=('a',))",
+      "key_assertions": [
+        "self.assertEqual(self.h.store.artifact(ref,paths=('a.b','false','number','missing')),",
+        "with self.assertRaises(ValueError):self.h.store.artifact(ref,raw=True,paths=('a',))"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_actual_sdk_mock_wire_keeps_fact_card_and_existing_fields",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_actual_sdk_mock_wire_keeps_fact_card_and_existing_fields(self):\n        fixture(self.h,self.c,-.05);facts=scientific_result_delivery(self.h)\n        for status in ('available','unavailable','skipped'):\n            with self.subTest(reporter=status):\n                h=g3_host();generate(h);original=decision_packet(h)\n                projected=deepcopy(original);projected['research']['scientific_results']=facts\n                projected['research']['latest_reports']=[dict(report_reference=save(h,dict(offline_report=status)),\n                    reporter_status=status,result_references=[],findings=[],interpretations=[],unresolved=[])]\n                with patch('tools.research.agent.decision_packet',return_value=projected):\n                    wire=run_fixture(h,[None])[0]\n                delivered=packet(wire)\n                self.assertEqual(delivered['scientific_results'],facts)\n                self.assertEqual(delivered['reporter_findings'][0]['status'],status)\n                for key in ('research_trace','tool_continuation','knowledge','budget','capabilities','research_focus','evidence_access'):\n                    self.assertIn(key,delivered)\n                self.assertLess(len(json.dumps(wire).encode()),1048576)\n                self.assertEqual(state(h)['physical_replays'],[])",
+      "key_assertions": [
+        "self.assertEqual(delivered['scientific_results'],facts)",
+        "self.assertEqual(delivered['reporter_findings'][0]['status'],status)",
+        "self.assertIn(key,delivered)",
+        "self.assertLess(len(json.dumps(wire).encode()),1048576)",
+        "self.assertEqual(state(h)['physical_replays'],[])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63r_result_delivery.ScientificResultDeliveryTests.test_compiled_search_scope_and_registered_math_are_direct_facts",
+      "input_source": "tests\\research\\test_p63r_result_delivery.py",
+      "source_sha256": "91f5eb4412ad3ca6dfd73d9e73ba19fcd429caf42e826d76e0dcaa80b6e72def",
+      "test_input_and_assertions": "def test_compiled_search_scope_and_registered_math_are_direct_facts(self):\n        ref,analysis,_=fixture(self.h,self.c,-.05)\n        query=dict(variable_groups=['lengths','routing'],segment_counts=[2],tendon_counts=[6],\n            span_strategies=['whole_chain'],section_types=['ellipse','rectangle'],bounds={},\n            initial_tension_n=0.,previous_candidate_ref=None,max_proposals=64,max_evaluations=64,method='bounded_mixed_coordinate_v1')\n        value=deepcopy(self.h.store.artifact(ref))\n        domains={'length_m':[.08,.2],'routing.radius_m':[.014,.023]}\n        value['result']['search_state']=save(self.h,dict(problem=dict(query=query,domains=domains)))\n        actual=search_feedback(self.h,save(self.h,value))['fixed_result']\n        for key in ('variable_groups','segment_counts','tendon_counts','span_strategies','section_types','bounds','initial_tension_n','previous_candidate_ref'):\n            self.assertEqual(actual['search_scope'][key],query[key])\n        self.assertEqual(actual['search_scope']['resolved_domains'],domains)\n        fact=actual['best_mathematical'][0]\n        self.assertTrue(fact['citation']['registered'])\n        self.assertEqual(fact['citation']['role'],'scientific_result')\n        self.assertIn(analysis,registered_references(self.h))\n        self.assertFalse(actual['scientific_citation_eligible'])",
+      "key_assertions": [
+        "self.assertEqual(actual['search_scope'][key],query[key])",
+        "self.assertEqual(actual['search_scope']['resolved_domains'],domains)",
+        "self.assertTrue(fact['citation']['registered'])",
+        "self.assertEqual(fact['citation']['role'],'scientific_result')",
+        "self.assertIn(analysis,registered_references(self.h))",
+        "self.assertFalse(actual['scientific_citation_eligible'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g_bounded_evidence.BoundedEvidenceTests.test_real_f2_large_result_bounded_on_actual_mock_wire_and_old_contract_unchanged",
+      "input_source": "tests\\research\\test_p63g_bounded_evidence.py",
+      "source_sha256": "fe4faf613ff7bc79d34b672388fd83a8ad5b985de174d194e0d8b811ecbd2bca",
+      "test_input_and_assertions": "def test_real_f2_large_result_bounded_on_actual_mock_wire_and_old_contract_unchanged(self):\n        audit=read(ROOT/'docs/research/p63f2_live_audit.json')\n        original=Host(audit['store'],audit['study_id']);connect=original.store.connect\n        original.store.connect=lambda readonly=False:connect(True)\n        before=original.store.db.stat().st_mtime_ns\n        rawref=audit['results'][0]['reference'];raw=original.store.artifact(rawref)\n        h=bounded_host()\n        # Preserve original bytes/identity in an isolated OFFLINE fixture. This is\n        # never the G1 Store or a claimed current-Study scientific computation.\n        for ref in (raw['candidate'],raw['native_dynamics']['optimized_schedule']['provenance']['source'],raw['control_schedule_reference']):\n            self.assertEqual(save(h,original.store.artifact(ref),'offline_g0_original_source'),ref)\n        self.assertEqual(save(h,raw,'offline_g0_F2_read_fixture'),rawref)\n        report=plain(reporter.assemble(h,[rawref]));report['interpretations']=[dict(kind='unresolved_question',text='OFFLINE source-linked interpretation remains visible.',sources=[dict(reference=rawref,pointer='/nonlinear_capability')])]\n        reporter._save(h,report,status='available')\n        wires=run_fixture(h,[('evidence_read',dict(reference=rawref,view='full')),None])\n        event=next(e for e in h.store.events(h.run_id) if e['kind']=='model_original_tool_feedback')\n        output=json.loads(h.store.artifact(event['outputs'][0])['result']['content'][0]['text'])\n        self.assertEqual(output['status'],'raw_result_not_delivered')\n        self.assertLess(len(json.dumps(output).encode()),evidence_feedback_limit(state(h)['spec']))\n        self.assertNotIn('native_dynamics',output)\n        self.assertTrue(output.get('fixed_facts') or output.get('fixed_facts_at'))\n        self.assertLess(len(json.dumps(wires[1],separators=(',',':')).encode()),1048576)\n        self.assertEqual(packet(wires[1])['reporter_findings'][0]['interpretations'][0]['text'],report['interpretations'][0]['text'])\n        self.assertFalse(read_coverage(h)[0]['full_artifact'])\n        self.assertNotIn(rawref,state(h).get('evaluation_reads',[]))\n        self.assertEqual(core.read_tool_evidence(original,dict(reference=rawref,view='full'),record_read=False),raw)\n        self.assertEqual(original.store.db.stat().st_mtime_ns,before)",
+      "key_assertions": [
+        "self.assertEqual(save(h,original.store.artifact(ref),'offline_g0_original_source'),ref)",
+        "self.assertEqual(save(h,raw,'offline_g0_F2_read_fixture'),rawref)",
+        "self.assertEqual(output['status'],'raw_result_not_delivered')",
+        "self.assertLess(len(json.dumps(output).encode()),evidence_feedback_limit(state(h)['spec']))",
+        "self.assertNotIn('native_dynamics',output)",
+        "self.assertTrue(output.get('fixed_facts') or output.get('fixed_facts_at'))",
+        "self.assertLess(len(json.dumps(wires[1],separators=(',',':')).encode()),1048576)",
+        "self.assertEqual(packet(wires[1])['reporter_findings'][0]['interpretations'][0]['text'],report['interpretations'][0]['text'])",
+        "self.assertFalse(read_coverage(h)[0]['full_artifact'])",
+        "self.assertNotIn(rawref,state(h).get('evaluation_reads',[]))",
+        "self.assertEqual(core.read_tool_evidence(original,dict(reference=rawref,view='full'),record_read=False),raw)",
+        "self.assertEqual(original.store.db.stat().st_mtime_ns,before)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g_bounded_evidence.BoundedEvidenceTests.test_acceptance_certificate_actual_delivery_then_formal_select",
+      "input_source": "tests\\research\\test_p63g_bounded_evidence.py",
+      "source_sha256": "fe4faf613ff7bc79d34b672388fd83a8ad5b985de174d194e0d8b811ecbd2bca",
+      "test_input_and_assertions": "def test_acceptance_certificate_actual_delivery_then_formal_select(self):\n        h=bounded_host();candidate,ref=self.physical(h)\n        original=deepcopy(h.store.artifact(ref));certificate=acceptance_certificate(h,ref)\n        self.assertTrue(certificate['complete_acceptance_view'],certificate)\n        self.assertEqual(certificate['acceptance'],original['acceptance'])\n        self.assertLess(len(json.dumps(certificate).encode()),evidence_feedback_limit(state(h)['spec']))\n        self.assertFalse(eligibility(h,ref,selection=True)['eligible'])\n        # Generating/locally returning a certificate alone does not prove delivery.\n        core.read_tool_evidence(h,dict(reference=ref,view='acceptance_certificate'))\n        self.assertFalse(eligibility(h,ref,selection=True)['eligible'])\n        select=dict(action='select',selected_execution=ref,hypothesis='OFFLINE exact passing result can be selected.',\n            expected_observation='All original conditions pass.',weakening_observation='Any original admission fails.',\n            fixed_conditions='Exact independently evaluated fixture.',stopping_condition='Select this exact passing result.',\n            interpretation='Fabricated perfect motion only; not research evidence.',supporting_evidence=[ref],\n            decision=dict(hypothesis_id='offline-g0-select',research_intent='SELECT',selected_method='physical_replay',\n                selected_candidate=candidate,claimed_inference='observed_task_pass',requested_budget=0))\n        wires=run_fixture(h,[('evidence_read',dict(reference=ref,view='acceptance_certificate')),\n            ('research_route',dict(tool='research_plan',action='select')),('research_plan',select)])\n        rows=read_coverage(h);self.assertTrue(rows[0]['formal_acceptance_view']);self.assertFalse(rows[0]['full_artifact'])\n        self.assertEqual(state(h)['selected'],ref)\n        self.assertEqual(state(h)['research_status'],'stopped')\n        self.assertEqual(h.store.artifact(ref),original)\n        self.assertIn('acceptance_certificate',json.dumps(wires[0]['tools']))\n        self.assertTrue(all(len(json.dumps(w).encode())<1048576 for w in wires))",
+      "key_assertions": [
+        "self.assertTrue(certificate['complete_acceptance_view'],certificate)",
+        "self.assertEqual(certificate['acceptance'],original['acceptance'])",
+        "self.assertLess(len(json.dumps(certificate).encode()),evidence_feedback_limit(state(h)['spec']))",
+        "self.assertFalse(eligibility(h,ref,selection=True)['eligible'])",
+        "self.assertFalse(eligibility(h,ref,selection=True)['eligible'])",
+        "rows=read_coverage(h);self.assertTrue(rows[0]['formal_acceptance_view']);self.assertFalse(rows[0]['full_artifact'])",
+        "self.assertEqual(state(h)['selected'],ref)",
+        "self.assertEqual(state(h)['research_status'],'stopped')",
+        "self.assertEqual(h.store.artifact(ref),original)",
+        "self.assertIn('acceptance_certificate',json.dumps(wires[0]['tools']))",
+        "self.assertTrue(all(len(json.dumps(w).encode())<1048576 for w in wires))"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g_bounded_evidence.BoundedEvidenceTests.test_invalid_failed_historical_wrong_fidelity_cannot_select",
+      "input_source": "tests\\research\\test_p63g_bounded_evidence.py",
+      "source_sha256": "fe4faf613ff7bc79d34b672388fd83a8ad5b985de174d194e0d8b811ecbd2bca",
+      "test_input_and_assertions": "def test_invalid_failed_historical_wrong_fidelity_cannot_select(self):\n        h=bounded_host();_,ref=self.physical(h);raw=h.store.artifact(ref)\n        variants=[]\n        for label in ('failed','invalid','historical','wrong_fidelity'):\n            value=deepcopy(raw)\n            if label=='failed':\n                value['acceptance']['accepted']=False;value['acceptance']['status']='valid_failure'\n                value['acceptance']['components']['holding_speed'].update(value=1.,passed=False)\n            elif label=='invalid':value['acceptance']['components'].pop('holding_coverage')\n            elif label=='historical':value['owning_study']='other-study';value['imported_historical_evidence']=True\n            else:value['profile_identity']='wrong-profile'\n            other=save(h,value,'offline_g0_'+label);update(h,physical_replays=[*state(h)['physical_replays'],other])\n            view=acceptance_certificate(h,other)\n            self.assertEqual(view['acceptance'],value['acceptance'])\n            # Explicit marker is still insufficient; every original gate remains.\n            update(h,evaluation_reads=[other])\n            self.assertFalse(eligibility(h,other,selection=True)['eligible'])\n            variants.append((label,other))\n        run_fixture(h,[*[('evidence_read',dict(reference=ref,view='acceptance_certificate')) for _,ref in variants],None],limit=len(variants)+1)\n        for label,ref in variants:\n            choice=eligibility(h,ref,selection=True)\n            self.assertFalse(choice['eligible'],(label,choice))\n            if label=='historical':self.assertTrue(any('historical' in r for r in choice['reasons']))\n            if label in ('failed','wrong_fidelity'):self.assertTrue(any('did not pass' in r for r in choice['reasons']))\n        schema=agent.evidence_query_schema({})\n        self.assertNotIn('acceptance_certificate',schema['properties']['view']['enum'])",
+      "key_assertions": [
+        "self.assertEqual(view['acceptance'],value['acceptance'])",
+        "self.assertFalse(eligibility(h,other,selection=True)['eligible'])",
+        "self.assertFalse(choice['eligible'],(label,choice))",
+        "if label=='historical':self.assertTrue(any('historical' in r for r in choice['reasons']))",
+        "if label in ('failed','wrong_fidelity'):self.assertTrue(any('did not pass' in r for r in choice['reasons']))",
+        "self.assertNotIn('acceptance_certificate',schema['properties']['view']['enum'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g_bounded_evidence.BoundedEvidenceTests.test_stop_uses_all_result_references_without_reading_raw_arrays",
+      "input_source": "tests\\research\\test_p63g_bounded_evidence.py",
+      "source_sha256": "fe4faf613ff7bc79d34b672388fd83a8ad5b985de174d194e0d8b811ecbd2bca",
+      "test_input_and_assertions": "def test_stop_uses_all_result_references_without_reading_raw_arrays(self):\n        h=bounded_host();c=generate(h);ref=offline_dispatch(h,t1_request(h,c),'offline-g0-math')['reference']\n        query=dict(reference=state(h)['family_space_reference'],view='working_set',pointer='/all_fresh_results')\n        stop=dict(action='stop',hypothesis='OFFLINE bounded fixture closure.',expected_observation='Result remains a finite model diagnostic.',\n            weakening_observation='No independent passing result.',fixed_conditions='Frozen fixture.',stopping_condition='End this offline fixture.',\n            interpretation='The synthetic mathematical observation establishes no physical acceptance or global infeasibility.',supporting_evidence=[ref],\n            decision=dict(hypothesis_id='offline-g0-stop',research_intent='STOP',selected_method='evidence_based_closure',\n                selected_candidate=c,claimed_inference='empirical_search',requested_budget=0))\n        run_fixture(h,[('evidence_read',query),('research_route',dict(tool='research_plan',action='stop')),('research_plan',stop)])\n        self.assertEqual(state(h)['research_status'],'stopped')\n        self.assertTrue(all(not r['full_artifact'] for r in read_coverage(h)))",
+      "key_assertions": [
+        "self.assertEqual(state(h)['research_status'],'stopped')",
+        "self.assertTrue(all(not r['full_artifact'] for r in read_coverage(h)))"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g_bounded_evidence.BoundedEvidenceTests.test_all_original_conditions_still_required_after_certificate_delivery",
+      "input_source": "tests\\research\\test_p63g_bounded_evidence.py",
+      "source_sha256": "fe4faf613ff7bc79d34b672388fd83a8ad5b985de174d194e0d8b811ecbd2bca",
+      "test_input_and_assertions": "def test_all_original_conditions_still_required_after_certificate_delivery(self):\n        from tests.research.test_cross_task_integration import fixture_directory,fixture_host,plan\n        from tools.research.conditions import joint_assessment\n        with fixture_directory() as folder:\n            template=state(bounded_host())['spec']['research_decisions']\n            from tools.research.config import resolve,role_provider\n            def mock_config(path):\n                spec=resolve(path);spec['research_decisions']=deepcopy(template)\n                spec['budgets']['provider_requests']=12\n                spec['configuration']['policy']['budget']['model_calls']=12\n                spec['runtime']['provider']=role_provider(spec,spec['runtime']['provider'],'conversation')\n                spec['configuration']['policy']['model']=deepcopy(spec['runtime']['provider'])\n                return spec\n            with patch('tests.research.test_cross_task_integration.resolve',side_effect=mock_config):\n                h=fixture_host(folder,'study_multicondition_public.json')\n            spec=deepcopy(state(h)['spec']);spec['mode']='formal_research'\n            update(h,spec=spec,pilot={**state(h)['pilot'],'session_handoff_live_admitted':True,'session_handoff_boundary':'request_feedback'})\n            results=[]\n            with patch('tools.research.core.guard'),patch('tools.research.state.guard'),patch('tools.research.physical_replay.guard'):\n                c=core.dispatch(h,plan('generate',generation=dict(version='serial_family_generation_v2',\n                    family_space_identity=spec['family_space_identity'],segment_count=2,tendon_count=6)),'offline-g0-joint-generate')['result']['candidate']\n                for i,condition in enumerate(spec['task_conditions']):\n                    seed=core.dispatch(h,plan('initialize_control',c,control_seed=dict(candidate=c,condition_id=condition['condition_id'],tensions_n=[[.2]*6])),'offline-g0-joint-seed-'+str(i))['result']\n                    with patch('tools.service_execution._run_contained',side_effect=perfect_tracking_worker):\n                        result=core.dispatch(h,plan('physical_replay',seed['candidate'],physical_replay=dict(candidate=seed['candidate'],source=seed['source'])),'offline-g0-joint-replay-'+str(i))['result']\n                    results.append(result['reference'])\n            run_fixture(h,[*[('evidence_read',dict(reference=ref,view='acceptance_certificate')) for ref in results],None],limit=len(results)+1)\n            self.assertFalse(eligibility(h,results[:1],selection=True)['eligible'])\n            choice=eligibility(h,results,selection=True)\n            self.assertTrue(choice['eligible'],choice)\n            self.assertEqual(joint_assessment(h,results)['condition_results'],results)",
+      "key_assertions": [
+        "self.assertFalse(eligibility(h,results[:1],selection=True)['eligible'])",
+        "self.assertTrue(choice['eligible'],choice)",
+        "self.assertEqual(joint_assessment(h,results)['condition_results'],results)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_instantaneous_braking_never_whole_task",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_instantaneous_braking_never_whole_task(self):\n        r=summarize_evidence(model(),REF)\n        self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')\n        self.assertFalse(check_inference(r,'whole_horizon_from_instantaneous_braking')['allowed'])\n        self.assertFalse(check_inference(r,'observed_task_pass')['allowed'])",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+        "self.assertFalse(check_inference(r,'whole_horizon_from_instantaneous_braking')['allowed'])",
+        "self.assertFalse(check_inference(r,'observed_task_pass')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_static_sensitivity_cannot_predict_readapted_dynamics",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_static_sensitivity_cannot_predict_readapted_dynamics(self):\n        r=summarize_evidence(model(verification='perturbed_equilibria_checked'),REF)\n        self.assertFalse(check_inference(r,'adapted_dynamic_improvement_from_static_sensitivity')['allowed'])",
+      "key_assertions": [
+        "self.assertFalse(check_inference(r,'adapted_dynamic_improvement_from_static_sensitivity')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_unreliable_kkt_or_failed_solver_is_not_exclusion",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_unreliable_kkt_or_failed_solver_is_not_exclusion(self):\n        for value in [dict(status='failed',solver_status='failed'),dict(kkt={'reliability':'solver_unresolved'})]:\n            r=summarize_evidence(value,REF)\n            self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')\n            self.assertFalse(check_inference(r,'structural_infeasibility')['allowed'])",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+        "self.assertFalse(check_inference(r,'structural_infeasibility')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_refinement_failure_downgrades_coarse_witness",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_refinement_failure_downgrades_coarse_witness(self):\n        value=model('feasible_witness','independent_discrete_replay_passed');original=deepcopy(value)\n        for refined in [dict(complete=True,original_task_satisfied=False),dict(complete=False),{}]:\n            r=summarize_evidence(value,REF,refinement=refined)\n            self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')\n            self.assertFalse(check_inference(r,'model_sampled_feasibility')['allowed'])\n        self.assertEqual(original,value)",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+        "self.assertFalse(check_inference(r,'model_sampled_feasibility')['allowed'])",
+        "self.assertEqual(original,value)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_no_unknown_candidate_descent_guarantee",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_no_unknown_candidate_descent_guarantee(self):\n        value=model('feasible_witness','independent_discrete_replay_passed');value['prospective_guarantee']=True\n        r=summarize_evidence(value,REF)\n        self.assertFalse(r['prospective_guarantee'])\n        self.assertFalse(check_inference(r,'unvisited_simulation_descent_guarantee')['allowed'])\n        with self.assertRaises(ValueError):EvidenceSummary.model_validate({**r,'prospective_guarantee':True})",
+      "key_assertions": [
+        "self.assertFalse(r['prospective_guarantee'])",
+        "self.assertFalse(check_inference(r,'unvisited_simulation_descent_guarantee')['allowed'])",
+        "with self.assertRaises(ValueError):EvidenceSummary.model_validate({**r,'prospective_guarantee':True})"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_missing_model_certificate_does_not_block_legal_search",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_missing_model_certificate_does_not_block_legal_search(self):\n        r=summarize_evidence({},None)\n        self.assertTrue(check_inference(r,'empirical_search',legal_candidate=True)['allowed'])\n        self.assertFalse(check_inference(r,'empirical_search',legal_candidate=False)['allowed'])",
+      "key_assertions": [
+        "self.assertTrue(check_inference(r,'empirical_search',legal_candidate=True)['allowed'])",
+        "self.assertFalse(check_inference(r,'empirical_search',legal_candidate=False)['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_physical_success_cannot_transfer_between_tasks_designs_models",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_physical_success_cannot_transfer_between_tasks_designs_models(self):\n        r=summarize_evidence(physical(),REF)\n        keys=('task_identity','candidate_identity','model_identity','design_identity','operating_point','covered_samples')\n        target={k:r[k] for k in keys}\n        self.assertTrue(check_inference(r,'observed_task_pass',target=target)['allowed'])\n        for k in keys:\n            with self.subTest(field=k):\n                self.assertFalse(check_inference(r,'observed_task_pass',target={**target,k:'changed'})['allowed'])",
+      "key_assertions": [
+        "self.assertTrue(check_inference(r,'observed_task_pass',target=target)['allowed'])",
+        "self.assertFalse(check_inference(r,'observed_task_pass',target={**target,k:'changed'})['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_invalid_physical_observation_does_not_pass",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_invalid_physical_observation_does_not_pass(self):\n        r=summarize_evidence(physical(valid=False),REF)\n        self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')\n        self.assertFalse(check_inference(r,'observed_task_pass')['allowed'])",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+        "self.assertFalse(check_inference(r,'observed_task_pass')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_scoped_model_witness_and_exclusion_remain_scoped",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_scoped_model_witness_and_exclusion_remain_scoped(self):\n        for conclusion,status,kind,inference in [\n                ('feasible_witness','kernel_independent_checks_passed','MODEL_WITNESS','model_sampled_feasibility'),\n                ('model_infeasibility_certificate','kernel_separating_lower_bound_verified','MODEL_EXCLUSION','model_input_box_exclusion')]:\n            r=summarize_evidence(model(conclusion,status),REF)\n            self.assertEqual(r['claim_kind'],kind);self.assertTrue(check_inference(r,inference)['allowed'])\n            self.assertFalse(check_inference(r,'global_nonlinear_infeasibility')['allowed'])",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],kind);self.assertTrue(check_inference(r,inference)['allowed'])",
+        "self.assertFalse(check_inference(r,'global_nonlinear_infeasibility')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_missing_reference_pointer_or_identity_never_certifies",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_missing_reference_pointer_or_identity_never_certifies(self):\n        value=model('feasible_witness','kernel_independent_checks_passed')\n        self.assertEqual(summarize_evidence(value,None)['claim_kind'],'UNVERIFIED_HYPOTHESIS')\n        del value['raw']\n        self.assertEqual(summarize_evidence(value,REF)['claim_kind'],'NUMERICAL_DIAGNOSTIC')\n        value=model('feasible_witness','kernel_independent_checks_passed');value['scoped_claim']['model_identity']=None\n        self.assertEqual(summarize_evidence(value,REF)['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+      "key_assertions": [
+        "self.assertEqual(summarize_evidence(value,None)['claim_kind'],'UNVERIFIED_HYPOTHESIS')",
+        "self.assertEqual(summarize_evidence(value,REF)['claim_kind'],'NUMERICAL_DIAGNOSTIC')",
+        "self.assertEqual(summarize_evidence(value,REF)['claim_kind'],'NUMERICAL_DIAGNOSTIC')"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_catalog_describes_hypotheses_not_causes",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_catalog_describes_hypotheses_not_causes(self):\n        catalog=hypothesis_catalog();self.assertEqual(len(catalog),5)\n        for entry in catalog.values():\n            self.assertEqual(entry['claim_kind'],'UNVERIFIED_HYPOTHESIS');self.assertIsNone(entry['probability'])\n            self.assertTrue(entry['discriminating_experiments']);self.assertIn('identified_root_cause',entry['forbidden_inferences'])",
+      "key_assertions": [
+        "catalog=hypothesis_catalog();self.assertEqual(len(catalog),5)",
+        "self.assertEqual(entry['claim_kind'],'UNVERIFIED_HYPOTHESIS');self.assertIsNone(entry['probability'])",
+        "self.assertTrue(entry['discriminating_experiments']);self.assertIn('identified_root_cause',entry['forbidden_inferences'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_paired_comparison_requires_same_metrics_and_task",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_paired_comparison_requires_same_metrics_and_task(self):\n        a=summarize_evidence(physical(),REF)\n        b=summarize_evidence(physical(passed=False),dict(artifact_id='b'*64))\n        self.assertTrue(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])\n        b['covered_samples']['components']['holding_speed']['limit']=2.\n        self.assertFalse(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])\n        b['task_identity']='other'\n        self.assertFalse(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])",
+      "key_assertions": [
+        "self.assertTrue(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])",
+        "self.assertFalse(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])",
+        "self.assertFalse(check_inference(paired_evidence(a,b,REF),'paired_observed_difference')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_statistics_record_method_samples_uncertainty_without_population_claim",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_statistics_record_method_samples_uncertainty_without_population_claim(self):\n        r=statistical_evidence([REF],'synthetic_method',{'standard_error':.1},REF)\n        self.assertEqual(r['claim_kind'],'STATISTICAL_EVIDENCE');self.assertEqual(r['covered_samples']['count'],1)\n        self.assertFalse(check_inference(r,'population_superiority')['allowed'])\n        self.assertFalse(check_inference(statistical_evidence([],None,{},REF),'reported_sample_statistic')['allowed'])",
+      "key_assertions": [
+        "self.assertEqual(r['claim_kind'],'STATISTICAL_EVIDENCE');self.assertEqual(r['covered_samples']['count'],1)",
+        "self.assertFalse(check_inference(r,'population_superiority')['allowed'])",
+        "self.assertFalse(check_inference(statistical_evidence([],None,{},REF),'reported_sample_statistic')['allowed'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_evidence_policy.EvidencePolicyTests.test_existing_math_results_are_unmodified_with_additive_views",
+      "input_source": "tests\\research\\test_evidence_policy.py",
+      "source_sha256": "df1eb890ddad48ddd001371e4f9439cecdf9f5ac9d638b7c4bea0f5be7e896e9",
+      "test_input_and_assertions": "def test_existing_math_results_are_unmodified_with_additive_views(self):\n        task_fixtures.TaskAnalysisTests.setUpClass();fixture=task_fixtures.TaskAnalysisTests();fixture.setUp()\n        value=fixture.compute_fixture();original=deepcopy(value)\n        compact=analysis.compact_result(value,REF);decision=analysis.decision_result(value,REF)\n        self.assertEqual(value,original);self.assertEqual(compact['scoped_claim'],original['scoped_claim'])\n        # F2 keeps inference strength in the decision view and retrieves repeated\n        # operating-point/configuration/coverage from the original scope pointer.\n        self.assertEqual({k:v for k,v in compact['evidence_summary'].items() if k not in\n            ('operating_point','covered_samples','assumptions')},decision['evidence_summary'])\n        self.assertEqual(compact['evidence_summary']['claim_kind'],'MODEL_WITNESS')",
+      "key_assertions": [
+        "self.assertEqual(value,original);self.assertEqual(compact['scoped_claim'],original['scoped_claim'])",
+        "self.assertEqual({k:v for k,v in compact['evidence_summary'].items() if k not in",
+        "self.assertEqual(compact['evidence_summary']['claim_kind'],'MODEL_WITNESS')"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_g2_diagnose_explicit_codesign_wire_original_search_admission",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_g2_diagnose_explicit_codesign_wire_original_search_admission(self):\n        h=g3_host();c=generate(h)\n        with patch('tools.research.core.run_search',return_value=dict(status='OFFLINE_ADMISSION_FIXTURE_ONLY')) as worker:\n            wires=run_fixture(h,[('research_plan',diagnosis(c,'structure_control_codesign')),\n                ('research_plan',search_plan()),None])\n        worker.assert_called_once()\n        self.assertIn('next_research_action',schema(wires[0],'research_plan')['properties'])\n        self.assertIn('ScientificStructureSearch',schema(wires[1],'research_plan')['$defs'])\n        self.assertFalse(any(t['function']['name']=='research_analysis' for t in wires[1]['tools']))\n        handoff=packet(wires[1])['tool_continuation']\n        self.assertEqual(handoff['loaded']['plan_action'],'search')\n        self.assertEqual(handoff['direct_plan']['action'],'search')\n        self.assertNotIn('analysis_handoff',handoff)\n        self.assertNotIn('Submit ScientificQuestion',json.dumps(handoff))\n        bindings=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='structure_search_intent_binding']\n        q=bindings[0]['compiled_plan']['search']\n        self.assertEqual((len(q['control_settings']['knots_s']),q['control_settings']['iterations'],q['control_settings']['evaluation_requests']),(4,80,120))\n        plans=[h.store.artifact(r) for r in state(h)['plans']]\n        self.assertEqual(plans[-1]['admission']['admitted'],2)\n        self.assertEqual(state(h)['mathematical_evaluations'],0)",
+      "key_assertions": [
+        "worker.assert_called_once()",
+        "self.assertIn('next_research_action',schema(wires[0],'research_plan')['properties'])",
+        "self.assertIn('ScientificStructureSearch',schema(wires[1],'research_plan')['$defs'])",
+        "self.assertFalse(any(t['function']['name']=='research_analysis' for t in wires[1]['tools']))",
+        "self.assertEqual(handoff['loaded']['plan_action'],'search')",
+        "self.assertEqual(handoff['direct_plan']['action'],'search')",
+        "self.assertNotIn('analysis_handoff',handoff)",
+        "self.assertNotIn('Submit ScientificQuestion',json.dumps(handoff))",
+        "self.assertEqual((len(q['control_settings']['knots_s']),q['control_settings']['iterations'],q['control_settings']['evaluation_requests']),(4,80,120))",
+        "self.assertEqual(plans[-1]['admission']['admitted'],2)",
+        "self.assertEqual(state(h)['mathematical_evaluations'],0)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_neutral_choice_then_explicit_route_and_no_automatic_science",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_neutral_choice_then_explicit_route_and_no_automatic_science(self):\n        h=g3_host();c=generate(h)\n        wires=run_fixture(h,[('research_plan',diagnosis(c)),\n            ('research_route',dict(tool='research_plan',action='search')),None])\n        names={t['function']['name'] for t in wires[1]['tools']}\n        self.assertNotIn('research_analysis',names);self.assertNotIn('research_plan',names)\n        self.assertIsNone(packet(wires[1])['tool_continuation']['scientific_action_handoff']['diagnose_choice'])\n        self.assertIn('ScientificStructureSearch',schema(wires[2],'research_plan')['$defs'])\n        self.assertEqual(state(h)['analysis_results'],[]);self.assertEqual(state(h)['search_results'],[])",
+      "key_assertions": [
+        "self.assertNotIn('research_analysis',names);self.assertNotIn('research_plan',names)",
+        "self.assertIsNone(packet(wires[1])['tool_continuation']['scientific_action_handoff']['diagnose_choice'])",
+        "self.assertIn('ScientificStructureSearch',schema(wires[2],'research_plan')['$defs'])",
+        "self.assertEqual(state(h)['analysis_results'],[]);self.assertEqual(state(h)['search_results'],[])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_parameter_and_control_choices_load_v3_with_matching_feedback",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_parameter_and_control_choices_load_v3_with_matching_feedback(self):\n        for choice in ('single_parameter_effect','control_feasibility'):\n            with self.subTest(choice=choice):\n                h=g3_host();c=generate(h)\n                wires=run_fixture(h,[('research_plan',diagnosis(c,choice)),None])\n                q=schema(wires[1],'research_analysis');Draft202012Validator.check_schema(q)\n                self.assertEqual(q['properties']['version']['const'],'scientific_question_v3')\n                self.assertIn('parameter_group',q['properties']);self.assertNotIn('parameter_paths',q['properties'])\n                continuation=packet(wires[1])['tool_continuation']\n                self.assertEqual(continuation['analysis_handoff']['interface'],'scientific_question_v3')\n                self.assertTrue(continuation['analysis_handoff']['parameter_catalog'])\n                feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='model_original_tool_feedback'][0]\n                result=json.loads(feedback['result']['content'][0]['text'])\n                self.assertEqual(result['execution_feedback']['execution_entry']['interface'],'scientific_question_v3')",
+      "key_assertions": [
+        "self.assertEqual(q['properties']['version']['const'],'scientific_question_v3')",
+        "self.assertIn('parameter_group',q['properties']);self.assertNotIn('parameter_paths',q['properties'])",
+        "self.assertEqual(continuation['analysis_handoff']['interface'],'scientific_question_v3')",
+        "self.assertTrue(continuation['analysis_handoff']['parameter_catalog'])",
+        "self.assertEqual(result['execution_feedback']['execution_entry']['interface'],'scientific_question_v3')"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_three_exact_g2_bad_requests_prioritize_operation_over_parameter",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_three_exact_g2_bad_requests_prioritize_operation_over_parameter(self):\n        h=provision();c=generate(h);diagnose(h,c,'scientific_question');before=deepcopy(state(h))\n        for n in (6,8,10):\n            q=saved_input(n)\n            result=compile_question(h,q,tool_use_id='g2-replay-'+str(n))\n            self.assertEqual(result['reason'],'SCIENTIFIC_OPERATION_MISMATCH')\n            self.assertEqual(result['status'],'needs_choice');self.assertFalse(result['scientific_execution_started'])\n            self.assertFalse(result['scientific_result_produced']);self.assertNotIn('request',result)\n        self.assertEqual(state(h),before)",
+      "key_assertions": [
+        "self.assertEqual(result['reason'],'SCIENTIFIC_OPERATION_MISMATCH')",
+        "self.assertEqual(result['status'],'needs_choice');self.assertFalse(result['scientific_execution_started'])",
+        "self.assertFalse(result['scientific_result_produced']);self.assertNotIn('request',result)",
+        "self.assertEqual(state(h),before)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_registry_groups_and_no_arbitrary_parameter_or_t1_creation",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_registry_groups_and_no_arbitrary_parameter_or_t1_creation(self):\n        h=g3_host();c=generate(h);diagnose(h,c,'scientific_question')\n        rows=parameter_catalog(state(h)['spec'],h.store.artifact(c))\n        for r in rows:\n            self.assertIn('unit',r);self.assertIn('validity',r);self.assertFalse(r['parameter_id'].startswith('/'))\n        q=dict(version='scientific_question_v3',question_type='structure_parameter_effect',\n            effect_semantics='reoptimized_task_capability',parameter_group='lengths')\n        before=deepcopy(state(h));result=compile_question(h,q,tool_use_id='group')\n        self.assertEqual(result['reason'],'REGISTERED_PHYSICAL_PARAMETER_REQUIRED')\n        self.assertGreaterEqual(len([r for r in result['choices']['parameters'] if r['selectable']]),2)\n        for bad in ('/parameters/geometry','/parameters/spans/0/anchor_angle_offset_rad','/spans/0/guide_angle_offset_rad','segments.0.cells','tendon_parameters.length_servo_gain_n_m'):\n            result=compile_question(h,{**q,'parameter_id':bad},tool_use_id='bad-id')\n            self.assertEqual(result['reason'],'REGISTERED_EFFECTIVE_CONTINUOUS_PARAMETER_REQUIRED')\n        result=compile_question(h,{**q,'parameter_id':'segments.0.length_m'},tool_use_id='valid-id')\n        self.assertEqual(result['status'],'needs_prerequisite');self.assertIn('T1',result['reason'])\n        self.assertEqual(state(h),before)",
+      "key_assertions": [
+        "self.assertIn('unit',r);self.assertIn('validity',r);self.assertFalse(r['parameter_id'].startswith('/'))",
+        "self.assertEqual(result['reason'],'REGISTERED_PHYSICAL_PARAMETER_REQUIRED')",
+        "self.assertGreaterEqual(len([r for r in result['choices']['parameters'] if r['selectable']]),2)",
+        "self.assertEqual(result['reason'],'REGISTERED_EFFECTIVE_CONTINUOUS_PARAMETER_REQUIRED')",
+        "self.assertEqual(result['status'],'needs_prerequisite');self.assertIn('T1',result['reason'])",
+        "self.assertEqual(state(h),before)"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_group_selection_and_semantic_repair_are_delivered_in_actual_wire",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_group_selection_and_semantic_repair_are_delivered_in_actual_wire(self):\n        h=g3_host();c=generate(h)\n        query=dict(version='scientific_question_v3',question_type='structure_parameter_effect',\n            effect_semantics='reoptimized_task_capability',parameter_group='lengths')\n        mismatch={**query,'parameter_id':'/parameters/geometry','control_search_effort':dict(method='pattern',iterations=80,evaluation_requests=120)}\n        wires=run_fixture(h,[('research_plan',diagnosis(c,'single_parameter_effect')),\n            ('research_analysis',query),('research_analysis',mismatch),None])\n        self.assertIn('REGISTERED_PHYSICAL_PARAMETER_REQUIRED',json.dumps(packet(wires[2])))\n        self.assertIn('SCIENTIFIC_OPERATION_MISMATCH',json.dumps(packet(wires[3])))\n        self.assertEqual(state(h)['analysis_results'],[])",
+      "key_assertions": [
+        "self.assertIn('REGISTERED_PHYSICAL_PARAMETER_REQUIRED',json.dumps(packet(wires[2])))",
+        "self.assertIn('SCIENTIFIC_OPERATION_MISMATCH',json.dumps(packet(wires[3])))",
+        "self.assertEqual(state(h)['analysis_results'],[])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_v3_uses_comparable_saved_t1_without_creating_structures_or_search",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_v3_uses_comparable_saved_t1_without_creating_structures_or_search(self):\n        h=g3_host();cs=[generate(h,x) for x in ((.16,.11),(.155,.11),(.165,.11))]\n        refs=[offline_dispatch(h,t1_request(h,c),'g3-synthetic-t1-'+str(i))['reference'] for i,c in enumerate(cs)]\n        diagnose(h,cs[0],'scientific_question');before=deepcopy(state(h))\n        result=compile_question(h,dict(version='scientific_question_v3',question_type='structure_parameter_effect',\n            effect_semantics='reoptimized_task_capability',parameter_group='lengths',parameter_id='segments.0.length_m'),tool_use_id='g3-saved-t2')\n        self.assertEqual(result['status'],'ready')\n        self.assertEqual(result['request']['nonlinear_response']['t1_results'],refs)\n        self.assertEqual(state(h)['candidates'],before['candidates'])\n        self.assertEqual(state(h)['mathematical_evaluations'],before['mathematical_evaluations'])\n        self.assertEqual(state(h)['search_results'],before['search_results'])",
+      "key_assertions": [
+        "self.assertEqual(result['status'],'ready')",
+        "self.assertEqual(result['request']['nonlinear_response']['t1_results'],refs)",
+        "self.assertEqual(state(h)['candidates'],before['candidates'])",
+        "self.assertEqual(state(h)['mathematical_evaluations'],before['mathematical_evaluations'])",
+        "self.assertEqual(state(h)['search_results'],before['search_results'])"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    },
+    {
+      "test": "tests.research.test_p63g3_action_handoff.ActionHandoffTests.test_legacy_study_cannot_opt_in_through_a_plan",
+      "input_source": "tests\\research\\test_p63g3_action_handoff.py",
+      "source_sha256": "b52e80bfb057eb0984f2b40b4bc24e1af21696f3f66b926ea076f71791d92aa2",
+      "test_input_and_assertions": "def test_legacy_study_cannot_opt_in_through_a_plan(self):\n        h=provision();c=generate(h)\n        with self.assertRaisesRegex(ValueError,'VERSIONED_AVAILABLE'):\n            core.dispatch(h,diagnosis(c,'structure_control_codesign'),'legacy-illegal')",
+      "key_assertions": [
+        "with self.assertRaisesRegex(ValueError,'VERSIONED_AVAILABLE'):"
+      ],
+      "result": "passed",
+      "log": "runs/p63r_scope_fix_tests.log"
+    }
+  ],
+  "related_tests_passed": 35,
+  "elapsed_s": 122.672,
+  "prior_distinct_tests_passed": 88,
+  "total_distinct_tests_passed": 89,
+  "science_admission_unchanged": true,
+  "original_store_not_migrated_due_unknown_provider": true,
+  "notes": "Synthetic fixtures/Mock HTTP and retained historical evidence only. A truthful unknown Provider block is retained in the actual V1."
+}

@@ -1,5 +1,5 @@
 """Explicit offline V1 clone/SDK recovery probe. Never opens a live transport."""
-import argparse,asyncio,json,os,shutil,sqlite3,time
+import argparse,asyncio,json,os,shutil,sqlite3,time,zipfile
 from pathlib import Path
 from contextlib import ExitStack
 from copy import deepcopy
@@ -16,25 +16,41 @@ RUN='p63v1-m3-autonomous-feasibility-sol-20261030'
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--migrate',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--migrate',action='store_true')
+    parser.add_argument('--expected-provider',type=int,default=24);parser.add_argument('--expected-math',type=int,default=94)
+    parser.add_argument('--expect-scope',action='store_true')
+    parser.add_argument('--source-store',type=Path,help='Explicit immutable pre-R checkpoint for offline testing only; never a live replacement')
+    parser.add_argument('--configuration-archive',type=Path,help='Original matching archive when the offline checkpoint contains only DB/SDK')
+    args=parser.parse_args()
     for key in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS'):os.environ[key]='1'
-    original=ROOT/'runs/research'/RUN;clone=ROOT/'runs'/('p63r-offline-recovery-'+str(time.time_ns()))
+    original=args.source_store.resolve() if args.source_store else ROOT/'runs/research'/RUN
+    clone=ROOT/'runs'/('p63r-offline-recovery-'+str(time.time_ns()))
     clone.mkdir();stamp=original.joinpath('platform.sqlite').stat()
     source=sqlite3.connect(original.joinpath('platform.sqlite').as_uri()+'?mode=ro',uri=True)
     before=json.loads(source.execute('select state from sessions').fetchone()[0])
-    assert before['research_status']=='ready' and before['pilot']['live_model_requests']==24
-    assert len(before['analysis_results'])==94 and not before['pending'] and not before['pilot'].get('unconsumed_response')
+    stored_root=json.loads(source.execute("select value from meta where key='root'").fetchone()[0])
+    assert before['research_status']=='ready' and before['pilot']['live_model_requests']==args.expected_provider
+    assert len(before['analysis_results'])==args.expected_math and not before['pending'] and not before['pilot'].get('unconsumed_response')
     with sqlite3.connect(clone/'platform.sqlite') as destination:source.backup(destination)
     source.close();shutil.copytree(session_storage_path(original/'framework_sessions'),session_storage_path(clone/'framework_sessions'))
-    for name in ('framework_configuration.json','implementation_freeze.json','resolved_configuration.json'):
-        shutil.copy2(original/name,clone/name)
+    if args.configuration_archive:
+        assert args.source_store,'Configuration archive is only for an explicit offline checkpoint'
+        with zipfile.ZipFile(args.configuration_archive) as archive:
+            freeze=json.loads(archive.read(RUN+'/implementation_freeze.json'))
+            assert freeze==dict(commit=before['freeze'],profile=before['profile'])
+            assert json.loads(archive.read(RUN+'/resolved_configuration.json'))==before['spec']
+            for name in ('framework_configuration.json','implementation_freeze.json','resolved_configuration.json'):
+                (clone/name).write_bytes(archive.read(RUN+'/'+name))
+    else:
+        for name in ('framework_configuration.json','implementation_freeze.json','resolved_configuration.json'):
+            shutil.copy2(original/name,clone/name)
     h=Host(clone,RUN,actor='explicit-offline-recovery-fixture');assert state(h)==before
     sent=[];times={};phase={'allow_http':False}
     handoff_stages=[]
     def clone_transaction(store,db):
         # Fixture-only isolation, not a migrated grant. No original Store write.
         assert store.root==clone and store.db==clone/'platform.sqlite'
-        assert json.loads(db.execute("select value from meta where key='root'").fetchone()[0])==str(original)
+        assert json.loads(db.execute("select value from meta where key='root'").fetchone()[0])==stored_root
     def offline_guard(host,*args,**kwargs):assert host.store.root==clone
     def respond(request):
         assert phase['allow_http'],'Restore-only must not send even a Mock Provider request'
@@ -64,11 +80,11 @@ def main():
             assert migrated['profile']['science_hashes']==before['profile']['science_hashes']
         expected_profile=deepcopy(state(h)['profile'])
         start=time.perf_counter();asyncio.run(converse(h,restore_only=True));times['sdk_restore_s']=time.perf_counter()-start
-        restored=state(h);assert restored['pilot']['live_model_requests']==24 and restored['analysis_results']==before['analysis_results']
+        restored=state(h);assert restored['pilot']['live_model_requests']==args.expected_provider and restored['analysis_results']==before['analysis_results']
         assert not sent and not restored['pending'] and not restored['pilot'].get('unconsumed_response')
         phase['allow_http']=True
         start=time.perf_counter();asyncio.run(converse(h,max_new_provider_requests=1));times['one_mock_converse_s']=time.perf_counter()-start
-    after=state(h);assert len(sent)==1 and after['pilot']['live_model_requests']==25
+    after=state(h);assert len(sent)==1 and after['pilot']['live_model_requests']==args.expected_provider+1
     for key in ('analysis_results','candidates','control_initializations','search_results','analysis_costs','numerical_s','physical_replays'):
         assert after[key]==before[key],key
     assert after['profile']==expected_profile
@@ -77,7 +93,17 @@ def main():
     research=packet['research'];delivery=research['scientific_results'];latest=delivery['latest_search']['fixed_result']['best_mathematical'][0]
     best=delivery['study_best_mathematical'][0]['fact']
     assert best['candidate']['artifact_id']=='37eec2e5967481d61cd78c00c1e0b723212171e310afe200e72c2957766a2734'
-    assert best['J']==-.014355323230259676 and latest['J']==-.0069635885347172355
+    assert best['J']==-.014355323230259676
+    if args.expect_scope:
+        raw=h.store.artifact(before['search_results'][-1])['result']
+        problem=h.store.artifact(raw['search_state'])['problem'];query=problem['query']
+        scope=delivery['latest_search']['fixed_result']['search_scope']
+        for key in ('variable_groups','segment_counts','tendon_counts','span_strategies','section_types','bounds','initial_tension_n','previous_candidate_ref'):
+            assert scope[key]==query[key],key
+        assert scope['resolved_domains']==problem['domains']
+        assert latest['citation']['registered'] and latest['citation']['role']=='scientific_result'
+        assert latest['J']==next(iter(raw['best_native_candidate']['evidence']['conditions'].values()))['J']
+    else:assert latest['J']==-.0069635885347172355
     assert len(best['metrics'])==len(latest['metrics'])==3 and not best['executable_under_current_profile']
     for key in ('research_trace','tool_continuation','knowledge','budget','capabilities','research_focus','evidence_access'):assert key in research,key
     assert len(json.dumps(wire).encode())<1048576
@@ -88,12 +114,13 @@ def main():
     with sqlite3.connect(original.joinpath('platform.sqlite').as_uri()+'?mode=ro',uri=True) as db:
         assert json.loads(db.execute('select state from sessions').fetchone()[0])==before
     result=dict(schema='p63r_isolated_recovery_probe_v1',original=str(original),clone=str(clone),
-        fixture_only=True,real_provider_requests=0,scientific_workers=0,source_unchanged=True,
-        source_provider=24,clone_mock_provider=25,math_preserved=94,searches_preserved=before['search_results'],
+        fixture_only=True,configuration_archive=str(args.configuration_archive) if args.configuration_archive else None,
+        real_provider_requests=0,scientific_workers=0,source_unchanged=True,
+        source_provider=args.expected_provider,clone_mock_provider=args.expected_provider+1,math_preserved=args.expected_math,searches_preserved=before['search_results'],
         profile_before=before['profile'],profile_after=expected_profile,migration=migration,
         sdk_restore_events=[e['outputs'][0] for e in recoveries],
         mock_wire_bytes=len(json.dumps(wire).encode()),timings=times,handoff_stages=handoff_stages,latest_search=delivery['latest_search']['reference'],
-        latest_best=latest,study_best=best,original_fields_preserved=True,worker_reexecutions=0,
+        latest_best=latest,study_best=best,scope_fields_verified=args.expect_scope,original_fields_preserved=True,worker_reexecutions=0,
         original_provider_retransmissions=0,notes='Only the isolated clone uses patched root/guard/credentials and Mock HTTP. These patches grant no live authorization and are never used by R2.')
     (ROOT/'runs/p63r_recovery_probe.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     (ROOT/'runs/p63r_recovery_mock_wire.json').write_text(json.dumps(wire,indent=2)+'\n',encoding='utf-8')

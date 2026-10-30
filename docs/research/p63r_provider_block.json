@@ -1,0 +1,41 @@
+{
+  "schema": "p63r_confirmed_provider_block_v1",
+  "study_id": "p63v1-m3-autonomous-feasibility-sol-20261030",
+  "request_id": "r3-request-001b8413ac4740c2b57234712c4525cf",
+  "request_number": 32,
+  "purpose": "reporter",
+  "receipt_status": "unknown",
+  "response_saved": false,
+  "original_recovery_error": "UNKNOWN_PROVIDER_SEND_INSPECT_BEFORE_REPEAT",
+  "original_bind_rule": "UNSEALED_RESERVATION_BLOCKS_BIND",
+  "root_cause": "Read-only monitoring embedded p63v1_audit via runpy without closing its read transaction. Concurrent response archival commit timed out and rolled back. The original response bytes are not present in Store; the runner has ended.",
+  "monitor_fix": "Close original audit db explicitly before opening a new audit connection; retain read-only snapshot and retry read contention.",
+  "runner_ended": true,
+  "no_resend": true,
+  "no_manual_settlement": true,
+  "no_identity_changes": true,
+  "main_stop": false,
+  "formal_select": false,
+  "provider": 32,
+  "remaining_original_total": 48,
+  "math": 155,
+  "physical": 0,
+  "status": "ready",
+  "profile": {
+    "identity": "110df6ab2fcf55bd870ce2673645395cdb58dd6620a3c0ecad9cc4070d596e49",
+    "version": 3
+  },
+  "freeze": "b0f0faad1fc20e7adbabe60846f0ac4fa8c52c81",
+  "state_identity": "745070bf1fbc790c5d27a440a239559a4b106c5fd0bf643cb2c3f60dd0f8d56d",
+  "scientific_state_unchanged": true,
+  "scope": "Engineering block, not scientific infeasibility or Main STOP. Unknown Provider response/cost requires external evidence before any future original recovery; no automatic retry.",
+  "record_reference": {
+    "artifact_id": "7125e3833da379f3f05c5bd712ae46b8ca39aed708a359ac3c0cbac88cdf870f",
+    "media_type": "application/json"
+  },
+  "full_proof_source": {
+    "path": "runs\\p63r_provider_block.json",
+    "sha256": "01426bc0793e58f5d87c2796ad827c8629c539722123a6da8e0c1116db593a7c",
+    "full_diagnostics_in": "P63-R-original-run.zip/run-diagnostics/"
+  }
+}

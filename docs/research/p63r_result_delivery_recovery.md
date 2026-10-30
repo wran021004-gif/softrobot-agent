@@ -1,9 +1,12 @@
-# P6.3 R0/R1：结果交付与同 Study 恢复准备
+# P6.3 R0/R1/R2：结果交付、原恢复与同 Study 接续
 
 基线为 `32cab42a011750138504b9d63b8f218f2df3a486`，独立分支
-`codex/p6-3v-result-delivery-recovery`。V1 原 Store 保持
-`p63v1-m3-autonomous-feasibility-sol-20261030`，准备期间真实 Provider 仍为 24/80，
-数学结果 94、两轮 Mixed Search、独立 Replay 0。没有新建或重跑科学 Study。
+`codex/p6-3v-result-delivery-recovery`。唯一 V1 为
+`p63v1-m3-autonomous-feasibility-sol-20261030`。经隔离恢复验收后从原 24/80 接续到
+32/80，数学结果由 94 增至 155（137 computed、18 incomplete），完成一轮新搜索。
+没有新建 Study 或重放旧两轮搜索。实际 Main 已收到原两轮最佳结果；独立 Replay、
+正式物理通过、SELECT 均为 0。运行最终因第 32 次 Reporter 响应未能入库而受原恢复
+门槛阻断，属于工程中断，不是 Main STOP 或科学不可行结论。
 
 ## 缺口定位
 
@@ -82,5 +85,98 @@ bind/migrate 路径，在隔离副本先审计新版本、全部科学哈希和�
 
 ## R2 状态
 
-本节在原 Study 接续后补入实际 Provider wire、Main 科研决策、物理结果、SELECT/STOP
-与累计费用。当前仅记录工程准备，不冒充完成自主研究。
+实际过程、科研结果和工程阻断见下文。原始 Store 保持 ready 和一项 unknown Provider
+回执，不以人工封口伪装成合法 STOP；原 80 次总额度及所有历史科学身份保持。
+
+## R1 提交后迁移与恢复验收
+
+修复冻结为 `b0f0faad1fc20e7adbabe60846f0ac4fa8c52c81`。隔离副本使用原 bind，
+Profile v2 → v3，完整保留 v1/v2、94 项数学结果、两轮搜索、候选、控制和费用，
+科学源码哈希相同。SDK restore-only 14.673 s；原 handoff 从 before_prepare 到
+committed 12.680 s，其中写快照约 0.012 s、独立验证约 11.827 s；一次 Mock converse
+总计 200.051 s（含两次决策构造及交接），正文 103406 bytes。fixture patch 不授予
+源码、任务或来源真实执行资格。完整原结果见 `p63r_recovery_validation.json`。
+
+原 Store 的原 bind 也完成相同 v3 迁移，全部逐项保持检查通过。启动驱动在迁移
+提交后因未写入的 physical_replay_launches 零次字段使用下标触发 KeyError，尚未
+启动 converse 或发送 Provider；保留错误日志后，从只读迁移前副本核对全部科学/
+费用身份，用 get 审计缺省字段并接续已提交迁移，没有重复 bind 或手改身份。
+驱动错误不计为 Main 决策或 Provider 故障。见 `p63r_live_migration.json`。
+
+R2 已按用户新授权在原 Store 通过原 converse 接续，起始仍为 24/80，总新增上限
+56，模型和科学提示词沿原冻结配置。后续实际 wire、Main 科研及结论另行补入。
+
+## R2 首次实际交付与字段回归
+
+第 25 次请求的实际 HTTP 200 wire 为 102250 bytes。两轮最佳 C/M/U/J、三项指标、
+阈值和旧 Profile 不可直接执行的状态已直接进入 Main。Main 提出新 Profile 下的
+联合结构与控制搜索，并明确不把旧候选当作当前可执行候选；但其支持证据包含
+未注册的两轮搜索汇总，原准入以 UNREGISTERED_RESEARCH_EVIDENCE 拒绝，未启动科学计算。
+
+第 26 次 Main 自行清空全部 supporting_evidence，提交 64 proposal / 64 evaluation
+的有界搜索后获原准入接受。清空也移除了本来可引用的底层已注册数学结果，故不能
+将这次恢复描述为完全正确地理解引用资格。其假设为新 Profile 上的结构控制协同
+搜索；搜索组仍为 lengths/materials/sections/routing，使用 response 控制优化、
+4 个 knot、100 iterations、1000 callbacks、initial_tension_n=0，未指定旧候选作
+previous_candidate。以上是 Main 的实际选择，Operator 未替其选择结构或物理复验。
+
+对真实 wire 的进一步核对发现，搜索范围投影使用了旧的单数字段名，而实际编译
+查询使用 variable_groups/segment_counts/tendon_counts/span_strategies 等名称。
+因此最佳数值已交付，但直接范围字段尚不完整，不能将 R0 声称为完全通过。新增
+小型合成回归 test_compiled_search_scope_and_registered_math_are_direct_facts 在当前
+冻结上以 KeyError variable_groups 如实失败，日志 p63r_scope_regression_before.log。
+本轮正在运行的 Native 批次保持原冻结；待其及对应 Reporter 封口后，在无 pending、
+无未消费响应、无未封口调用的边界记录工程暂停，再修正这一个投影并按原版本和
+隔离恢复验证接续。暂停不属于 Main STOP，不重置原 Study 或任何预算。
+
+## 第三轮结果与真实工程阻断
+
+第三轮因 proposal_budget_exhausted 封口：64 proposals、61 legally_constructed、
+61 actual_mathematical_evaluations，53 computed、8 execution_incomplete；外层耗时
+4087.543 s。重复或裁剪后无变化的提案由原搜索机制跳过。当前 Profile v3 的最佳
+数学 J 为 -0.011897791151900927，terminal/hold-position 为 0.009881022088480991 m，
+hold-speed 为 0.01955035395638464 m/s，阈值分别为 0.01 m、0.01 m、0.02 m/s。
+完整 C/M/U 和指标指针见 p63r_blocked_scope_projection.json。不同 Profile 分组展示，
+不与 v1 的最佳 -0.014355323230259676 混排。这些都没有独立任务验收资格。
+
+Reporter 依原优先级解释关键结果、跳过常规重复结果，累计 Provider 达 32
+（Main 16、Reporter 16；本轮新增 Main 2、Reporter 6）。第 32 次请求
+`r3-request-001b8413ac4740c2b57234712c4525cf` 的原响应在归档首个事务提交时发生
+database is locked，事务回滚，Store 中没有响应原始字节。原边界保留 unknown 请求，
+运行驱动退出。故障由 Operator 的只读监控脚本引入：runpy 嵌入原 p63v1_audit 后，
+未显式关闭其 BEGIN 读事务，随后另开连接读 wire；遗留读锁妨碍真实响应归档。
+这是本轮执行失误，不归因于 Main 科研选择。监控现已在新连接前显式关闭原连接。
+
+在生产代码仍为 b0f0faa 时，实际调用原 core.recover 得到
+UNKNOWN_PROVIDER_SEND_INSPECT_BEFORE_REPEAT；原 converse(restore_only=True) 得到
+UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND。两者没有发送新请求或改动科学状态。
+原 bind 也要求 UNSEALED_RESERVATION_BLOCKS_BIND，故没有对原 Store 强行迁移。
+没有手工 settle、填补响应、修改 Profile 或重发未知请求。请求结果的不确定性不能
+由本地安全推断消除，本轮按用户允许的真实工程阻断条件结束；不自动续发余下 48 次。
+
+实际 Store 仍冻结于 b0f0faa、Profile v3，保留 v1/v2/v3 全部身份；后续交付字段修复
+仅在已结束的运行之外实施。35 项针对性回归通过，连同先前测试共 89 项不同测试；
+输入、断言、结果和红灯日志见 p63r_scope_validation.json。对当前第三轮结果的修正
+投影已只读核对全部范围、resolved_domains 和已注册底层数学引用，未改 Store；
+但不能声称此修正已到达真实 Main，或声称真实 Main 已收到第三轮结果后作出决策。
+后续隔离 Mock 验收使用完整保留的接续前 24/94 Store/SDK 检查点，不把副本作为新 Study。
+
+约新增 5 次 Provider 的只读检查点实际记录于总数 32；锁竞争造成监控晚于阈值 29。
+新增 15/30 次检查点未到达，不伪造。所有 Native Worker 均确认终止，数学 pending 和
+未消费响应均为空；唯一未封口调用是上述 unknown Reporter 请求。原 G3 数据库、
+原 94 数学结果/费用、原两轮 Search、旧候选/控制、任务和预算均逐项保持。
+
+## 费用与研究限制
+
+已保存响应合计 279098 tokens（prompt 265649、completion 13449）；缺失第 32 次
+响应的 tokens 和收费未知，不当作零。原请求计数保留 32/80，未知调用占用保留。
+Provider 货币费用未提供。保存的 mathematical numerical_s 为 7132.6343315000995 s，
+construction 为 76.89217760012252 s，control-initialization 为 43.13034969998989 s。
+已报告 Native kernel wall 为 6689.246085399936 s、rollouts 69464、physics steps
+69464000；18 项 incomplete 缺少详细 Native 成本，缺项保持未知。外层搜索时间、
+Worker 和 kernel 时间存在重叠，不能再次相加为总费用。完整账本见 p63r_live_audit.json。
+
+本轮证明旧最佳关键数字可进入真实 Main 并保留原科研上下文，也暴露了引用理解错误、
+直接范围字段遗漏和监控连接生命周期缺陷。没有验证出自主独立复验、正式通过或合法
+Main 收尾。未来只有获得未知请求的外部确证并走原恢复/绑定机制后才能继续；当前
+保留冻结代码与完整证据供审计，不擅自扩展预算或开展第二轮任务。
