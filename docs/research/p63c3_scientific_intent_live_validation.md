@@ -37,13 +37,15 @@ analysis_protocol 按值一致。Reach/Hold 时长 0.50 s，最后 0.05 s 保持
 [新冻结配置](../../configs/research/study_p63c3_m3_scientific_intent_sol.json)：
 `p63c3-m3-scientific-intent-sol-20261030`。沿用原 Sol/none Gateway 与 Reporter 策略、
 英文架构和按需工具，启用 scientific_question_v1。Provider 总上限 12（含 Reporter/失败/最后
-1 次保护），公共操作 32（含 2 次保护），数学 1，Native callbacks≤8；原 iterations≤100、knots≤4。
+1 次保护），公共操作 32（含 2 次保护），数学 **3**，Native 每次 callbacks≤8、累计≤24；原 iterations≤100、knots≤4。
 独立 Replay、NMPC、RL、T2 新实验、NLP/BDF 均为 0。C2 实际数值默认值不改变。
 
 先最多 6 次真实 Provider 请求到 C3-A 监督检查点，只读审查后决定是否在同一冻结额度内继续。
 没有预填 ScientificQuestion 或替 Main 选择假设、控制范围、策略或下一实验。
 
-已知观察限制：原 count 保护在唯一数学额度用尽后进入收尾，只允许现有证据读取和 STOP/SELECT。
-本轮不修改预算/状态路由；如该限制影响 A3，将与模型行动未完成分别记录，强制 STOP 不算自主 STOP。
+最初准备的数学上限为 1。首次真实请求之前，用户明确选择提高至 3 次，
+以保留首个结果后的研究行动空间；在同一 Study 记录授权补充与显式绑定，保留原配置、候选、source、计账和所有事件。
+Provider、公共操作和其他科学上限均未增加。原 count 保护仍在全部数学额度用尽后进入收尾；
+如它影响 A3，将与模型行动未完成分别记录，强制 STOP 不算自主 STOP。未修改预算或状态路由实现。
 
 真实准备、运行、逐轮事件与 A1/A2/A3 判定将在同一 Study 结束后补充；不自动追加第二个 Study。
