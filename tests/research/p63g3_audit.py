@@ -89,6 +89,78 @@ out['worker_records']=[dict(kind=kind,folder=str(folder.relative_to(root)),bound
 out['search_schemas']=[dict(provider_request=r['number'],wire_reference=r['wire_reference'],schema=t['function']['parameters'])
     for r in requests for t in art(r['wire_reference']).get('tools',[]) if t['function']['name']=='research_plan' and t['function']['parameters']['properties']['action'].get('enum')==['search']]
 atomic_json(ROOT/'runs/g3_readonly_audit.json',out)
+from collections import Counter
+p=out
+schemas=[]
+for r in p['requests']:
+    wire=art(r['wire_reference'])
+    for t in wire.get('tools',[]):
+        item=next((s for s in schemas if s['function']==t['function']),None)
+        if item is None:item=dict(function=t['function'],provider_requests=[]);schemas.append(item)
+        item['provider_requests'].append(r['number'])
+    for t in r['tools']:
+        if not t.get('feedback_reference'):continue
+        raw=art(t['feedback_reference'])['result']
+        body=json.loads(''.join(b.get('text','') for b in raw.get('content',[])))
+        if isinstance(body,dict):
+            for k in ('field','expected','issues','contract','error_code','scientific_result_produced','choices'):
+                if k in body:t['feedback_summary'][k]=body[k]
+for r in p['results']:
+    raw=art(r['reference'])
+    r.update(boundary=raw.get('boundary'),error=raw.get('error'),reason=raw.get('reason'),
+        recorded_native_cost=raw.get('native_dynamics',{}).get('cost'))
+roles=Counter(r['purpose'] for r in p['requests']);usage=Counter()
+for r in p['requests']:
+    for k in ('prompt_tokens','completion_tokens','total_tokens'):usage[k]+=(r.get('usage') or {}).get(k,0)
+    usage['reasoning_tokens']+=((r.get('usage') or {}).get('completion_tokens_details') or {}).get('reasoning_tokens',0)
+prep=p.get('preparation') or {}
+main_results=[r for r in p['results'] if r['reference']!=prep.get('math_result')]
+search_results=[r for r in main_results if r['origin']=='model_search']
+codesign_requests=[r for r in p['requests'] if any(t['tool']=='research_plan' and t['feedback_status']=='success' and t['input'].get('next_research_action')=='structure_control_codesign' for t in r['tools'])]
+next_wire=[]
+for r in codesign_requests:
+    following=next((w for w in p['requests'] if w['number']>r['number'] and w['purpose']=='conversation'),None)
+    next_wire.append(dict(diagnose_request=r['number'],next_request=following['number'] if following else None,
+        wire_reference=following['wire_reference'] if following else None,
+        search_schema_loaded=bool(following and any(t['function']['name']=='research_plan' and
+            'ScientificStructureSearch' in json.dumps(t['function']['parameters']) for t in art(following['wire_reference']).get('tools',[])))))
+cost=Counter()
+for w in p['worker_records']:
+    for k,v in (w['native_cost'] or w['result'].get('cost') or {}).items():
+        if isinstance(v,(int,float)):cost[k]+=v
+p.update(schema='p63g3_live_audit_v1',scope='One new Study only. Operator preparation and offline fixture science are excluded from Main execution. No original G2 Store or allowance is reused.',
+    actual_tool_schemas=schemas,
+    provider_totals=dict(roles=dict(roles),requests=len(p['requests']),ceiling=16,usage=dict(usage),
+        elapsed_s=sum(r.get('elapsed_s') or 0 for r in p['requests']),max_input_bytes=max((r['input_bytes'] for r in p['requests']),default=0),
+        monetary_cost='unknown: not supplied',all_http_200=all(r['http_status']==200 for r in p['requests'])),
+    scientific_cost_totals=dict(cost),ownership=dict(operator_preparation_math=1,operator_preparation_physical=1,
+        operator_preparation_reporter=prep.get('provider_after_reporter'),main_math=len(main_results),main_search_math=len(search_results),
+        main_physical=max(0,len(p['independent_results'])-1),main_searches=len(p['search_results'])),
+    next_codesign_wires=next_wire,
+    acceptance=dict(explicit_codesign_selected=bool(codesign_requests),next_search_schema_loaded=any(r['search_schema_loaded'] for r in next_wire),
+        search_plan_admitted=any(r['original_plan']['action']=='search' for r in p['plans']),
+        original_search_worker_started=any((r['boundary'] or {}).get('worker_started') for r in search_results),
+        original_search_worker_completed=any((r['boundary'] or {}).get('termination_confirmed') and (r['boundary'] or {}).get('returncode')==0 for r in search_results),
+        search_mathematical_results=len(search_results),global_feasibility_or_task_acceptance_claimed=False))
+p['main_search_outcomes']=dict(status_counts=dict(Counter(r['status'] for r in search_results)),
+    charged_worker_wall_s=sum(r.get('charged_numerical_s') or 0 for r in search_results),
+    detailed_native_cost_missing=sum(r['recorded_native_cost'] is None for r in search_results),
+    cost_scope='Scientific cost counters sum reported native costs only. Missing detailed counters for incomplete Workers are unknown, not zero; all charged Worker wall time and formal evaluation charges are retained.',
+    original_failure_reasons=dict(Counter(r['reason'] for r in search_results if r['reason'])))
+p['publication']=dict(local_frozen_implementation='e082a4ae2525cc4d12806fdce11a53a265a997f3',
+    published_implementation='e06603b1e1f3c2b186535ee2f7df9815cdf19afb',
+    identical_implementation_tree='933b8b4c5a7a6c8e0d14e0947a5b1c6f2c05cfd7',
+    method='GitHub connector Git-data publication because direct git transport was unavailable; commit metadata differs, exact source tree agrees. Original local commits are retained in the delivered incremental bundle.')
+p['local_runner_boundaries']=dict(initial_preflight='No Main request sent until original frozen single-thread environment was set.',
+    closeout='Original engineering_closeout after settled receipts. Subsequent SDK continuation blocked before r3_request by SEALED_STOP_OR_PENDING_WORK_BLOCKS_SEND; APIConnectionError wraps that local guard. No new actual Provider request, outstanding receipt or worker.')
+g2=Path(r'C:/Users/gugugaga/Documents/Codex/2026-10-30/files-pasted-by-the-user-p6/work/softrobot-g2/runs/research/p63g2-m3-mixed-search-sol-20261030/platform.sqlite')
+stamp=dict(size=g2.stat().st_size,mtime_ns=g2.stat().st_mtime_ns)
+before=json.loads((ROOT/'runs/g3_g2_store_stamp_before.json').read_text())
+assert before==stamp
+p['g2_store_unchanged']=dict(before=before,after=stamp,unchanged=True)
+dest=ROOT/'docs/research/p63g3_live_audit.json'
+dest.write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
 print(json.dumps(dict(requests=[dict(number=r['number'],purpose=r['purpose'],http=r['http_status'],tools=[dict(tool=t['tool'],status=t['feedback_status'],input=t['input']) for t in r['tools']],delivered_post_result=bool(r.get('post_result_decision'))) for r in requests],
     results=[dict(reference=r['reference'],status=r['status'],operation=r['operation'],J=r['nonlinear_capability'].get('J'),callbacks=r['nonlinear_capability'].get('callbacks')) for r in results],
     status=s['research_status'],used=used,pending=s.get('pending'),unsealed_calls=out['unsealed_calls']),ensure_ascii=False,indent=2))
