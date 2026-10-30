@@ -292,6 +292,9 @@ def admit_decision(host,plan):
         from tools.research.task_constraints import registered_analysis_method_names
         if d.selected_method in registered_analysis_method_names():
             raise ValueError('SELECTED_ANALYSIS_CANDIDATE_REQUIRED: decision.selected_candidate must explicitly name an owned candidate before mathematical method selection can settle; no candidate is inferred.')
+    if (s['spec']['research_decisions'].get('analysis_interface')=='scientific_question_v1'
+            and plan.action=='diagnose' and d.selected_candidate is None):
+        raise ValueError('SCIENTIFIC_QUESTION_CANDIDATE_REQUIRED: choose an owned candidate in the diagnose Plan')
     actual=plan.candidate
     if plan.control_seed:actual=plan.control_seed.candidate
     if plan.control_search:actual=plan.control_search.candidate

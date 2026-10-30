@@ -1504,7 +1504,8 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         active=[r for r in matching if r.get('status') in ('available','preflight_eligible','prerequisites_only')]
         direct=action in ('generate','search','diagnose','stop')
         actions.append(dict(action=action,status='available' if active or (not matching and direct) else 'conditional',
-            reason=('Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.'
+            reason=('Candidate-bound diagnose records a hypothesis and candidate for ScientificQuestion; no solver selection is required.' if action=='diagnose' and brief.get('analysis_interface')=='scientific_question_v1' else
+                'Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.'
                 if action=='diagnose' else 'Full request admission and budget checks apply.' if active or (not matching and direct)
                 else 'A suitable candidate, source, read, or other prerequisite is required.'),
             cost='See remaining allowances; exact cost depends on the requested operation.'))
@@ -1524,6 +1525,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',
             methods_at='mathematical_research',
             reason=('Protected closeout or no mathematical allowance.' if blocked else
+                'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface')=='scientific_question_v1' else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
     interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
@@ -1625,6 +1627,17 @@ def information_flow_brief(brief, delivered):
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source
+    if brief.get('analysis_interface')=='scientific_question_v1':
+        settled=intent.get('action')=='diagnose' and intent.get('execution_status')=='completed' and bool(intent.get('candidate'))
+        if continuation.get('direct_plan',{}).get('action')=='diagnose':
+            continuation['direct_plan'].update(scientific_fields=['hypothesis','decision.selected_candidate'],
+                instruction='Your diagnose is complete; submit ScientificQuestion directly to research_analysis.' if settled else
+                    'Submit diagnose with your hypothesis and owned candidate; a solver name is not required. After completion submit ScientificQuestion directly to research_analysis.')
+        continuation['analysis_handoff']=dict(tool='research_analysis',interface='scientific_question_v1',
+            loaded=loaded.get('tool')=='research_analysis',
+            status='diagnose_completed' if settled else 'requires_completed_candidate_bound_diagnose',
+            already_bound=['hypothesis','candidate','frozen task and protocol'] if settled else ['frozen task and protocol'],
+            next='Submit scientific question fields to the loaded tool. Original execution admission applies.' if settled else 'Complete diagnose with your hypothesis and owned candidate first.')
     reports=brief.get('latest_reports',[])
     findings=[]
     for report in reports:

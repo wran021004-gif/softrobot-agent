@@ -31,10 +31,19 @@ DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed dec
     'use research_analysis when offered and obtain exact method details through evidence_read. '
     'Only independent evaluation establishes acceptance. SELECT requires the Main Agent to read the full fresh passing result. '
     'For STOP, retrieve and cite the complete new result index.')
+QUESTION_PLAN_DESCRIPTION=('Record a scientific hypothesis and an owned candidate through diagnose; no mathematical solver name is required. '
+    'Then submit ScientificQuestion directly to research_analysis. Other Plan payloads retain their original contracts. '
+    'Only independent evaluation establishes task acceptance. SELECT requires a public read of the exact fresh passing result; STOP requires the complete new result index.')
 def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False,study=None):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
+    from tools.research.scientific_intent import enabled as question_enabled
+    scientific_question = question_enabled(study or {})
+    if scientific_question:
+        decision=schema['$defs']['ResearchDecision']
+        decision['required'].remove('selected_method')
+        decision['properties']['selected_method']['description']='Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.'
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
@@ -70,6 +79,13 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     schema['allOf'].append({'if':{'properties':{'action':{'not':{'enum':['select','confirm']}}}},
         'then':{'properties':{'revise_selection':{'const':False}}}})
     if decision_required:
+        if scientific_question and any(a!='diagnose' for a in actions):
+            schema['allOf'].append({'if':{'properties':{'action':{'enum':[a for a in actions if a!='diagnose']}}},
+                'then':{'properties':{'decision':{'required':['selected_method']}}}})
+        if scientific_question and 'diagnose' in actions:
+            schema['allOf'].append({'if':{'properties':{'action':{'enum':['diagnose']}}},
+                'then':{'properties':{'decision':{'required':['selected_candidate'],
+                    'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
         bound=[a for a in actions if a in ('execute','initialize_control','control_search','physical_replay')]
         schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
             'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
@@ -372,13 +388,13 @@ def selected_analysis_schema(method, detail, *, bound=False):
     return schema
 
 
-def bind_selected_analysis_request(host, payload, *, tool_use_id):
+def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None, scientific_question=None):
     """One audited boundary from Main variables to the unchanged full contract."""
     from jsonschema import Draft202012Validator
     from tools.research.contracts import AnalysisRequest
     from tools.research.design import verify_candidate
     from tools.research.research_context import research_intent
-    selection=selected_analysis(host,None)
+    selection=selection or selected_analysis(host,None)
     if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
     method,detail=selection
     intent=research_intent(host)['latest_decision']
@@ -404,9 +420,17 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id):
         frozen['operating_point']=points[0]
         sources['operating_point']=dict(source='AnalysisRequest.validate_operating_point',method=method,legal_options=points)
     full={**deepcopy(payload),**frozen}
-    audit=record(host,'analysis_request_binding',dict(version=spec['research_decisions']['analysis_interface'],tool_use_id=tool_use_id,
+    audit_input=dict(version=spec['research_decisions']['analysis_interface'],tool_use_id=tool_use_id,
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
-        field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources}))
+        field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources})
+    if scientific_question is not None:
+        from tools.research.contracts import ScientificQuestion
+        audit_input.update(raw_main_input=deepcopy(scientific_question),
+            provider_schema=ScientificQuestion.model_json_schema(),internal_binding_schema=schema,
+            compiled_variables=deepcopy(payload))
+        audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
+            tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
+    audit=record(host,'analysis_request_binding',audit_input)
     # Pydantic first preserves exact scientific error codes, even if the compact
     # schema could reject the same point. Neither validator changes Main input.
     AnalysisRequest.model_validate(full)
@@ -780,7 +804,11 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='analysis':
                     payload=use['input']
-                    if english_native(before['spec']):
+                    from tools.research.scientific_intent import enabled as question_enabled, compile_question
+                    compilation=compile_question(host,payload,tool_use_id=use['toolUseId']) if question_enabled(before['spec']) else None
+                    if compilation is not None:
+                        payload=compilation.get('request')
+                    elif english_native(before['spec']):
                         selection=selected_analysis(host,None)
                         if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
                         method,detail=selection
@@ -790,7 +818,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                             schema=selected_analysis_schema(method,detail)
                             validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
-                    value=analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
+                    value=compilation if compilation is not None and compilation['status']!='ready' else analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':
                     from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -814,7 +842,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 original=value
-                if kind not in ('evidence','investigate','experience','recall','route') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                if (kind not in ('evidence','investigate','experience','recall','route')
+                        and not (kind=='analysis' and compilation is not None and compilation['status']!='ready')
+                        and state(host)['spec'].get('research_decisions',{}).get('context_limits')):
                     from tools.research.research_context import tool_feedback
                     value=tool_feedback(host,value)
                 if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
@@ -866,7 +896,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
         schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')),
-            diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')
+            diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=state(host)['spec'])
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics. model_source selects the reduced provider or native MuJoCo methods independently of control. saved_state or execution plus update_id selects a source-bound state; native methods support standardized_initial_pretension from frozen initialization, or a complete native checkpoint or verified measured prefix. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
@@ -949,7 +979,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 current=decision_packet(host)['research']
                 native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
                     decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'),
-                    diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
+                    diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=state(host)['spec'])}}
                 # Restore the authorized tools removed by the previous closeout.
                 for tool in native:
                     if tool is not native[1]:agent.tool_registry.registry[tool.tool_name]=tool
@@ -1027,11 +1057,20 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
                 family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
-                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2')}}
+                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
+            if s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v1':
+                native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)
-            selected=selected_analysis(host,current['research']) if tool and enabled(s['spec'],'analysis') else None
-            if selected:
+            from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan
+            question_mode=question_enabled(s['spec'])
+            selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
+            if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
+                from tools.research.contracts import ScientificQuestion
+                tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
+                    'inputSchema':{'json':ScientificQuestion.model_json_schema()}}
+                agent.tool_registry.registry['research_analysis']=tool
+            elif selected:
                 method,detail=selected
                 tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
                     'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}

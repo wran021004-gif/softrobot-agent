@@ -538,6 +538,9 @@ def initial_structure_action(host):
 
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
+    from tools.research.scientific_intent import enabled as question_enabled
+    if question_enabled(state(host)['spec']) and value.get('action')=='diagnose' and value.get('decision'):
+        value={**value,'decision':{'selected_method':'scientific_question',**value['decision']}}
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         origin='engineering'
     plan=Plan.model_validate(value)
@@ -687,6 +690,10 @@ def dispatch(host, value, request_id, origin='model'):
                     candidate_required=candidate is None,
                     request='To execute mathematics, choose an owned candidate and submit the registered method request_template with required_parameters. '
                         'For other actions submit the matching research_plan payload. A method label or requested_budget alone starts no computation.')
+                if question_enabled(s['spec']):
+                    result['execution_feedback']['execution_entry'].update(
+                        interface='scientific_question_v1',
+                        request='Submit a ScientificQuestion to research_analysis. Candidate and hypothesis are bound from this Plan; no registered method name is required.')
         elif plan.action in ('select','confirm'):
             from tools.research.feedback import eligibility, result_view, confirmation_progress
             choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)

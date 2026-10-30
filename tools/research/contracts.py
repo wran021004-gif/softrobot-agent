@@ -308,6 +308,33 @@ class NonlinearStructureResponse(Contract):
         return value
 
 
+class ScientificControlScope(Contract):
+    mode: Literal['full_task','time_window'] = Field(description='C2 finite search parameterization: full_task adjusts all tendon channels with two independent endpoint knots over the frozen task; time_window adjusts all channels with one triangular pulse per channel and zero endpoint corrections. Choose a scope only when this parameterization answers the question; arbitrary waveform or channel-subset search is not adapted.')
+    window_s: tuple[FiniteFloat,FiniteFloat] | None = Field(default=None,description='Only control corrections inside this interval; evaluation still covers the complete frozen task.')
+
+
+class ScientificSources(Contract):
+    control_source: EvidenceRef | None = None
+    comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=2)
+    t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3,description='Saved comparable T1 evidence, baseline/minus/plus. Does not request new T1 calculations.')
+
+
+class ScientificQuestion(Contract):
+    """Scientific choices only; the completed Plan owns hypothesis and candidate."""
+    version: Literal['scientific_question_v1'] = 'scientific_question_v1'
+    question_type: Literal['control_feasibility','structure_parameter_effect']
+    effect_semantics: Literal['mechanism_effect','fixed_input_response','reoptimized_task_capability','closed_loop_performance','re_equilibrated_passive_response'] | None = Field(default=None,description='mechanism_effect: Jacobian/compliance/drive mechanisms; fixed_input_response: structure response with unchanged input; reoptimized_task_capability: task response after control reoptimization (finite budget here); closed_loop_performance: complete feedback execution; re_equilibrated_passive_response: passive response after solving a new equilibrium. Unsupported semantics are never substituted.')
+    parameter_paths: list[str] = Field(default_factory=list,max_length=8,description='Actual registered physical design paths. C2 supports one independent continuous path per structural question.')
+    focus_metric: str | None = Field(default=None,description='Registered task constraint ID or native observable; focus does not remove any frozen acceptance constraint.')
+    control_scope: ScientificControlScope | None = None
+    search_strategy: Literal['response','pattern'] | None = Field(default=None,description='Finite local response or pattern search; neither certifies a global optimum.')
+    requested_budget: StrictInt | None = Field(default=None,ge=1,le=1000,description='Maximum native rollout callbacks for this T1 search; original model/rollout/physics charges still apply. T2 uses one aggregation evaluation and references prior charges.')
+    source_selection: ScientificSources = Field(default_factory=ScientificSources)
+    fixed_input: Literal['frozen_initial_tensions','constant_tensions'] | None = Field(default=None,description='Fixed-input structure comparison only: retain frozen initial pretensions or supply a constant absolute tension vector.')
+    tensions_n: list[FiniteFloat] | None = None
+    response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05,description='Fixed-input native short response horizon, not full-task capability or acceptance.')
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned structure candidate reference, not a control sequence. operation and model_source must match a registered mathematical_capabilities method.')
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1']
