@@ -405,7 +405,7 @@ def confirmed_tool_deliveries(host):
     """Reuse confirmed Provider wires for exact tool feedback and summary markers."""
     import json
     from tools.research.session_handoff import packet_feedback
-    events=host.store.events(host.run_id);deliveries={};summaries=set()
+    events=host.store.events(host.run_id);deliveries={};summaries={}
     confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
     for event in events:
         if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
@@ -420,7 +420,7 @@ def confirmed_tool_deliveries(host):
                 for item in delivery.get('items',[]):
                     if item['delivery']=='exact_feedback':
                         deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
-                    else:summaries.add(item['tool_id'])
+                    else:summaries.setdefault(item['tool_id'],[]).append(item.get('facts',{}))
     return deliveries,summaries
 
 
@@ -449,9 +449,14 @@ def read_coverage(host):
                 elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
             complete=provided and q.view in ('full','fields','range') and delivered==expected
         except (ValueError,KeyError,IndexError,TypeError):continue
+        retained=delivered if provided and isinstance(delivered,dict) else {}
+        if q.view=='mathematical_capabilities':
+            for facts in summaries.get(use['toolUseId'],[]):
+                retained={**retained,**facts.get('selected_value',{})}
+            retained={k:v for k,v in retained.items() if isinstance(delivered,dict) and k in delivered and v==delivered[k]}
         query=plain(q);classification='new_query'
         for prior in reversed(rows):
-            if query==prior['query'] and prior['successfully_provided']:
+            if query==prior['query'] and (prior['successfully_provided'] or prior.get('confirmed_field_identities')):
                 classification='exact_repeat' if prior['delivery_identity']==digest(delivered) else 'changed_content';break
             if plain(q.reference)!=prior['query']['reference'] or not prior['complete_data']:continue
             p=prior['query'];prefix=p['pointer']
@@ -467,12 +472,56 @@ def read_coverage(host):
         rows.append(dict(query=query,owning_study=host.run_id,tool_call_id=use['toolUseId'],feedback_reference=event['outputs'][0],
             retrieval_view=q.view in ('working_set','mathematical_capabilities','capabilities'),delivery_identity=digest(delivered),
             source_state_identity=saved.get('source_state_identity'),
+            **(dict(confirmed_field_identities={k:digest(v) for k,v in retained.items()}) if q.view=='mathematical_capabilities' else {}),
             delivery_status=('complete_fields' if complete else 'summary_or_derived_view') if provided else
                 'summary_only' if use['toolUseId'] in summaries else 'not_confirmed_in_provider_request',
             successfully_provided=provided,complete_data=complete,item_count=len(delivered.get('items',[])) if q.view=='range' and isinstance(delivered,dict) else None,
             full_artifact=complete and q.view=='full' and not q.pointer,
             classification=classification))
     return rows
+
+
+def mathematical_read_progress(host, candidate, coverage, intent):
+    """Current-candidate delivery facts from existing receipts/wires; no saved memory."""
+    from tools.research.task_constraints import mathematical_method_view,mathematical_action_view
+    latest=intent.get('latest_decision') or {};decision=(latest.get('agent_hypothesis') or {}).get('decision') or {}
+    selected=decision.get('selected_method') if latest.get('candidate')==candidate else None
+    reads=[r for r in coverage if r['query']['reference']==candidate and
+        r['query']['view']=='mathematical_capabilities' and r['query']['pointer'].startswith('/methods/')]
+    names=list(dict.fromkeys(r['query']['pointer'].split('/')[2] for r in reversed(reads)))
+    if selected:names=[selected,*[k for k in names if k!=selected]]
+    if not names:return []
+    methods=mathematical_method_view(host,candidate)['methods'];events=host.store.events(host.run_id)
+    bindings=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='analysis_request_binding']
+    feedback={host.store.artifact(e['outputs'][0])['tool_use']['toolUseId']:host.store.artifact(e['outputs'][0])['result']['status']
+        for e in events if e['kind']=='model_original_tool_feedback'}
+    progress=[]
+    for name in names[:3]:
+        if name not in methods:continue
+        detail=methods[name];action=mathematical_action_view(detail);fields={};template=False;confirmed=False
+        for row in reads:
+            if row['query']['pointer'].split('/')[2]!=name:continue
+            hashes=row.get('confirmed_field_identities',{})
+            confirmed=confirmed or row['successfully_provided'] or row['delivery_status']=='summary_only'
+            if row['query']['pointer']=='/methods/'+name:fields.update(hashes)
+            if row['query']['pointer']=='/methods/'+name+'/request_template':
+                template=template or row['successfully_provided'] or all(hashes.get(k)==digest(v) for k,v in detail['request_template'].items())
+        core=['method','scientific_purpose','planning_status','missing','next_submission','request_template_query',
+            'required_parameters','estimated_evaluations','limitations']+(['scientific_inputs'] if 'scientific_inputs' in action else [])
+        delivered=all(k in fields for k in core)
+        changed=[k for k,v in fields.items() if k in action and v!=digest(action[k])]
+        matching=[b for b in bindings if b['method']==name and b['full_request']['candidate']==candidate]
+        result=any((v:=host.store.artifact(r)).get('candidate')==candidate and v.get('operation')==detail['operation']
+            for r in state(host).get('analysis_results',[]))
+        progress.append(dict(method=name,selected=selected==name,
+            action_view='delivered' if delivered else 'summary_only' if confirmed else 'unconfirmed',
+            control_source_prerequisites=('delivered' if 'scientific_inputs' in fields else 'unconfirmed') if 'scientific_inputs' in action else 'not_required',
+            request_template='delivered' if template else 'unconfirmed',
+            diagnose='completed' if selected==name and latest.get('action')=='diagnose' and latest.get('execution_status')=='completed' else 'not_submitted',
+            mathematical_request='result_recorded' if result else 'rejected' if matching and feedback.get(matching[-1]['tool_use_id'])=='error' else 'submitted' if matching else 'not_submitted',
+            relevant_content='changed_fields' if changed else 'delivered_fields_unchanged' if fields else 'unconfirmed',changed_fields=changed,
+            scope='Confirmed action-field delivery, not full method text, understanding or scientific evidence. Rechecks remain optional.'))
+    return progress
 
 
 def ordered_candidates(host,s):
@@ -771,7 +820,7 @@ def decision_brief(current):
         read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
             classification=r['classification'],content_identity=r['delivery_identity'],
             source_state_identity=r['source_state_identity'],
-            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'state changed; queried content change unverified')
+            source_state_status=('unchanged' if r['source_state_identity']==ws['source_state_identity'] else 'Query content change unverified; counters alone do not require rereading')
                 if r['source_state_identity'] else 'immutable source or unrecorded state') for r in ws['read_coverage'][-3:]],
         full_list_query=dict(reference=anchor,view='working_set',pointer='/read_coverage'),
         rule='Exact repeats refer to previously delivered unchanged content. A changed whole-session identity alone does not require rereading: Provider counters, read markers and handoff metadata also change it. Read for a specific missing fact or to verify a relevant change. Dynamic views may change. For control identity use current_candidate.control_sources queries; read trajectories/ranges for needed detail. Rechecks remain allowed; delivery is not understanding.')
@@ -1104,7 +1153,7 @@ def controller_capabilities(host):
         patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned')
 
 
-def current_research_state(host, brief, intent, trace):
+def current_research_state(host, brief, intent, trace, coverage=None):
     """Describe existing provenance/receipts; never select a scientific direction."""
     s=state(host);candidate=brief.get('current_candidate') or {};ref=candidate.get('candidate')
     provenance=host.store.artifact(ref).get('provenance',{}) if ref else {}
@@ -1140,11 +1189,7 @@ def current_research_state(host, brief, intent, trace):
     if last.get('execution_status') in ('rejected','failed'):
         outcome=last['outcome']
         unresolved.append(dict(tool_feedback=outcome.get('error') or outcome.get('error_code') or outcome.get('status'),source=last['source']))
-    methods_read=[]
-    for item in continuation.get('recent',[]):
-        q=item.get('query') or {}
-        if item['status']=='success' and q.get('reference')==ref and q.get('view')=='mathematical_capabilities' and q.get('pointer','').startswith('/methods/'):
-            methods_read.append(q['pointer'].split('/')[2])
+    progress=mathematical_read_progress(host,ref,coverage if coverage is not None else read_coverage(host),intent) if ref else []
     from tools.research.state import protected,readable_results
     provenance_readable=ref and (not (closeout or protected(host)) or ref in readable_results(s,host))
     return dict(phase=phase,object=dict(candidate=ref,origin=owner,
@@ -1153,7 +1198,8 @@ def current_research_state(host, brief, intent, trace):
             mathematical_result=bool(candidate.get('mathematically_evaluated')),
             independently_evaluated=bool(candidate.get('physically_evaluated')),
             task_acceptance='accepted' if candidate.get('accepted') else 'not_accepted' if candidate.get('physically_evaluated') else 'unmeasured'),
-        completed=completed,methods_read=sorted(set(methods_read)),
+        completed=completed,methods_read=[r['method'] for r in progress if r['action_view']!='unconfirmed'],
+        mathematical_read_progress=progress,
         last_effective_action=dict(status=status or phase,action=selection.get('action') if status=='tool_selected_not_submitted' else last.get('action'),source=source),
         unresolved=unresolved,
         scope='Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence.')
@@ -1336,7 +1382,7 @@ def agent_decision_brief(host):
         brief['milestone_trace']['action_total']=trace['total']
         brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)
-    brief['current_research_state']=current_research_state(host,brief,intent,trace)
+    brief['current_research_state']=current_research_state(host,brief,intent,trace,current['evidence_working_set']['read_coverage'])
     if not brief['current_research_state']['object']['provenance_query']:
         for key in ('provenance_query','parameters_query'):brief['current_candidate'].pop(key,None)
     if brief.get('selected_mathematical_method'):
@@ -1470,16 +1516,21 @@ def information_flow_brief(brief, delivered):
                     'expected_observation','weakening_observation','fixed_conditions'],
                 current_hypothesis=hypothesis.get('hypothesis'),candidate=current.get('current_candidate'),
                 instruction='Diagnose is loaded; tool selection has not submitted scientific choices. Submit research_plan(action=diagnose) directly with your hypothesis, candidate and registered method; no research_route call is needed.')
+            if intent.get('action')=='diagnose' and intent.get('execution_status')=='completed' and loaded.get('tool')=='research_analysis':
+                continuation['direct_plan'].update(status='completed',instruction='Your diagnose is complete; submit scientific inputs to loaded research_analysis. A new Plan is optional when changing your research choice.')
     handoff=value.get('analysis_handoff')
     if handoff:
         continuation['analysis_handoff']={k:handoff[k] for k in ('method','operation','already_bound','required_parameters',
             'required_sources','missing','planning_status','formal_execution_authorized','execution_status','estimated_evaluations','request_template_query')}
         continuation['analysis_handoff'].update(tool='research_analysis',loaded=loaded.get('tool')=='research_analysis',
+            selected_method=(hypothesis.get('decision') or {}).get('selected_method'),
+            diagnose_status='completed' if intent.get('action')=='diagnose' and intent.get('execution_status')=='completed' else 'not_submitted',
             remaining_scientific_fields=handoff.get('remaining_scientific_fields',[]),
             remaining_scientific_fields_scope='Top-level required fields in the current Provider Schema only; conditional sources are listed separately. All original AnalysisRequest admission applies.',
             conditional_scientific_inputs=handoff.get('conditional_scientific_inputs',[]),
             operating_point_sources=handoff.get('operating_point_sources',{}),
             control_input_guidance=handoff.get('control_input_guidance'),
+            scientific_inputs=handoff.get('scientific_inputs'),
             next='Submit scientific variables directly to loaded research_analysis; source, parameter and budget admission still applies.' if loaded.get('tool')=='research_analysis' else 'research_analysis is not loaded; consult current tool directory and method prerequisites.')
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):

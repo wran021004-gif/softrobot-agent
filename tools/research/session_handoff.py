@@ -47,6 +47,19 @@ def initial_messages(study_id):
 
 def selected_evidence_facts(parsed, query, limit):
     """Keep bounded selected facts through handoff; full evidence stays in L2."""
+    if (query.get('view')=='mathematical_capabilities' and isinstance(parsed,dict)
+            and all(k in parsed for k in ('method','next_submission','request_template_query'))):
+        # A single method action has a small execution-facing projection. Keep
+        # its prerequisites before scalar navigation metadata within the same cap.
+        facts=dict(selected_value={},omitted_keys=list(parsed),
+            scope='Partial mathematical action fields; original query restores omitted fields. Delivery is not understanding or a complete method read.')
+        for key in ('method','scientific_purpose','planning_status','missing','next_submission',
+                'request_template_query','estimated_evaluations','scientific_inputs','required_parameters','limitations',
+                'required_sources','execution_status','already_bound'):
+            if key not in parsed:continue
+            candidate=deepcopy(facts);candidate['selected_value'][key]=parsed[key];candidate['omitted_keys'].remove(key)
+            if len(json.dumps(candidate).encode())<=limit:facts=candidate
+        return facts
     if isinstance(parsed,dict) and parsed.get('policy')=='main_evidence_navigation_v1':
         # Preserve usable exact queries before navigation metadata. This remains
         # a partial navigation view, never a scientific or complete-read fact.

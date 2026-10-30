@@ -341,6 +341,15 @@ def mathematical_action_view(detail):
         'required_parameters','required_sources','estimated_evaluations','estimated_evaluation_range','wall_cost',
         'cost_scope','formal_execution_authorized','execution_status','request_template_query','control_input_guidance')
     result={k:detail[k] for k in keys if k in detail}
+    if detail.get('control_input_guidance'):
+        guide=detail['control_input_guidance'];point=detail['action_prerequisites']['initial_state']
+        result['scientific_inputs']=dict(
+            control_source=dict(references=guide['recorded_sources'],role='Complete candidate/task/channel/grid/bounds-bound control sequence, not structure; unmeasured initialization is not scientific evidence.'),
+            correction_window_s=dict(form='[start_s,end_s], not a duration scalar',
+                required_interval_s=point['legal_correction_window_s'],source='native_control.window_facts: frozen task and native state'),
+            knots_s='Main chooses ordered legal knot times within the interval. Later knots do not shorten the full T1 computation window. Control correction interval, knots and Reach/Hold scoring window are distinct.',
+            method_margin='pattern requires safety_margin_fraction=0; positive margin requires compatible v2 response.',
+            per_request_limits=detail.get('execution_limits'))
     row=detail['applicability']
     result['applicability']={k:row[k] for k in ('status','model','task_applicable','reasons') if k in row}
     result['applicability'].update(task_family=detail['task_family'],kernel_supported=detail['kernel_supported'])

@@ -211,7 +211,7 @@ def load_selected_tool_schema(host, registry, directory):
     route=host.store.artifact(route_ref) if route_ref else {};name=route.get('tool')
     # Main already chose the mathematical method in the completed diagnosis.
     # Loading its existing scientific-variable tool needs no redundant route.
-    if name=='research_plan' and route.get('action')=='diagnose' and 'research_analysis' in registry:
+    if (not name or (name=='research_plan' and route.get('action')=='diagnose')) and 'research_analysis' in registry:
         name='research_analysis'
     selected=registry.get(name)
     if selected and name=='research_plan':
@@ -237,13 +237,23 @@ def load_selected_tool_schema(host, registry, directory):
     policy=s['spec'].get('research_decisions',{}).get('tool_schema_policy',{}).get('version')
     if policy in ('on_demand_tools_v2','on_demand_tools_v3','research_information_flow_v1'):
         # Retrieval must not unload the already chosen Plan. With no prior Plan,
-        # expose generate (or closeout STOP), without choosing/submitting it.
+        # expose an action matching the current owned object, without submitting it.
         plan=registry.get('research_plan')
         entry=next((r for r in directory if r['tool']=='research_plan'),None)
         if plan and entry and (name!='research_plan' or (selected is None and policy in ('on_demand_tools_v3','research_information_flow_v1'))):
             from tools.research.research_context import tool_continuation
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
+            if (chosen not in entry['actions'] and 'diagnose' in entry['actions'] and not protected(host)
+                    and 'analysis' in s['spec'].get('capabilities',[])
+                    and s['spec']['budgets']['mathematical_evaluations']>s.get('mathematical_evaluations',0)):
+                from tools.research.research_context import decision_candidate,research_intent
+                from tools.research.task_constraints import mathematical_method_view
+                candidate=decision_candidate(host,{},research_intent(host))
+                if candidate and any(m['formal_execution_authorized'] and m['planning_status'] not in
+                        ('unauthorized','unsupported','insufficient_budget','blocked')
+                        for m in mathematical_method_view(host,candidate)['methods'].values()):
+                    action='diagnose'
             plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':plan_schema([action],decision_required=True,
                 family_version=s['spec'].get('family_space',{}).get('version'),
                 diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',
