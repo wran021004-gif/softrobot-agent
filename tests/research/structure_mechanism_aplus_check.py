@@ -83,7 +83,7 @@ def main():
     for row in summaries:
         assert row['cost'].get('evaluation_attempts',0)<=5
         assert row['cost'].get('physics_steps',0)==row['cost'].get('rollouts',0)==0
-    report=reporter.assemble(h,refs)
+    report=reporter.assemble(h,refs,question='What do the three predeclared directional mechanism checks establish, and what remains unverified?')
     assert all(r.mathematics.claim.conclusion=='diagnostic' for r in report.results)
     validation=dict(scope=scope,task_environment='reach_free',checks=summaries,
         status='passed' if all(r['status']=='computed' and r['model_effect_observed'] for r in summaries) else 'incomplete',
