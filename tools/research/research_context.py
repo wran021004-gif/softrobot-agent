@@ -6,6 +6,7 @@ from tools.state_io import digest
 from tools.research.state import state, save, update
 from tools.research.feedback import task_gap
 from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog, comparable_task, citation_inventory
+from tools.research.scientific_intent import INTERFACES
 
 
 def import_history(host):
@@ -514,7 +515,7 @@ def mathematical_read_progress(host, candidate, coverage, intent):
     if selected:names=[selected,*[k for k in names if k!=selected]]
     events=host.store.events(host.run_id)
     bindings=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='analysis_request_binding']
-    compiled=[b for b in bindings if b.get('version') in ('scientific_question_v1','scientific_question_v2') and
+    compiled=[b for b in bindings if b.get('version') in INTERFACES and
         b['full_request']['candidate']==candidate and (b.get('field_sources',{}).get('candidate') or {}).get('reference')==latest.get('plan_reference')]
     if compiled:
         selected=compiled[-1]['method'];names=[selected,*[k for k in names if k!=selected and k!=decision.get('selected_method')]]
@@ -942,7 +943,7 @@ def research_intent(host):
             candidate=plan_candidate(plan) or result.get('candidate'),
             agent_hypothesis={k:deepcopy(plan.get(k)) for k in ('hypothesis','decision',
                 'expected_observation','weakening_observation','fixed_conditions',
-                'interpretation','stopping_condition','supporting_evidence')},
+                'interpretation','stopping_condition','supporting_evidence','next_research_action')},
             scope='Previous Agent intent and interpretation; not confirmed scientific facts',
             execution_status=receipt['execution_status'] if receipt else 'pending',
             actual_result=result.get('reference'),failure=output.get('error') or output.get('message'))
@@ -1440,6 +1441,12 @@ def agent_decision_brief(host):
     brief['scientific_execution']=dict(pending={k:s['pending'][k] for k in ('kind','worker_request_id') if k in s['pending']} if s.get('pending') else None,
         scope='Receipts/results establish execution. Plan selected_method is intent; read-only diagnosis starts no selected mathematical worker. Independent evaluation alone establishes task acceptance.')
     brief['analysis_interface']=s['spec'].get('research_decisions',{}).get('analysis_interface')
+    from tools.research.scientific_intent import explicit_actions, scientific_actions, parameter_catalog, completed_question_plan
+    if explicit_actions(s['spec']):
+        brief['scientific_actions']=scientific_actions(s['spec'])
+        diagnosis=completed_question_plan(host)
+        if diagnosis:
+            brief['scientific_parameter_catalog']=parameter_catalog(s['spec'],host.store.artifact(diagnosis['candidate']))
     from tools.research.config import bounded_evidence_enabled
     brief['bounded_evidence']=bounded_evidence_enabled(s['spec'])
     selected=current_reports(host)[-2:]
@@ -1564,7 +1571,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         active=[r for r in matching if r.get('status') in ('available','preflight_eligible','prerequisites_only')]
         direct=action in ('generate','search','diagnose','stop')
         actions.append(dict(action=action,status='available' if active or (not matching and direct) else 'conditional',
-            reason=('Candidate-bound diagnose records a hypothesis and candidate for ScientificQuestion; no solver selection is required.' if action=='diagnose' and brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2') else
+            reason=('Candidate-bound diagnose records a hypothesis and candidate for ScientificQuestion; no solver selection is required.' if action=='diagnose' and brief.get('analysis_interface') in INTERFACES else
                 'Candidate-bound diagnose selects an owned candidate and registered method; legacy read-only diagnose follows its frozen contract. research_investigate only reads saved evidence.'
                 if action=='diagnose' else 'Full request admission and budget checks apply.' if active or (not matching and direct)
                 else 'A suitable candidate, source, read, or other prerequisite is required.'),
@@ -1585,7 +1592,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',
             methods_at='mathematical_research',
             reason=('Protected closeout or no mathematical allowance.' if blocked else
-                'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2') else
+                'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface') in INTERFACES else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
     interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
@@ -1690,7 +1697,7 @@ def information_flow_brief(brief, delivered):
     for key,source in (('pending_execution',current.get('pending')),
             ('pending_feedback',current.get('pending_feedback')),('lifecycle',value.get('lifecycle'))):
         if source:continuation[key]=source
-    if brief.get('analysis_interface') in ('scientific_question_v1','scientific_question_v2'):
+    if brief.get('analysis_interface') in INTERFACES:
         if continuation.get('control_initialization_handoff'):
             continuation['control_initialization_handoff']['next']=(
                 'Use the new initialization result as the legal control source, not the structure candidate. '
@@ -1787,6 +1794,32 @@ def information_flow_brief(brief, delivered):
             interpretations_at='reporter_findings',interpretation_role='Non-authoritative source-linked explanations; fixed facts remain available without Reporter.',
             read_progress_at='evidence_access.stop_index.read_progress',legal_actions_at='capabilities',remaining_resources_at='budget',
             decision='Assess the original hypothesis and choose further evidence, a new hypothesis or legal research action, or a justified STOP. No outcome or next action is selected by this projection.')
+    if brief.get('scientific_actions'):
+        continuation.pop('analysis_handoff',None)
+        settled=intent.get('action')=='diagnose' and intent.get('execution_status')=='completed'
+        choice=hypothesis.get('next_research_action') if settled else None
+        entry=next((r for r in brief['scientific_actions'] if r['scientific_goal']==choice),None)
+        continuation['scientific_action_handoff']=dict(diagnose_choice=choice,
+            status='result_completed' if post_result else 'diagnose_completed' if settled else 'requires_candidate_bound_diagnose',
+            loaded=loaded,choices=brief['scientific_actions'],selection_executes_science=False,
+            next='Submit scientific choices to the loaded interface; selection alone produces no scientific result.' if entry and loaded.get('tool')==entry['tool'] else
+                'Choose an action with research_route or record next_research_action in a new diagnose. Main owns the research choice.')
+        if loaded.get('tool')=='research_analysis':
+            continuation['analysis_handoff']=dict(tool='research_analysis',interface=brief['analysis_interface'],loaded=True,
+                status='result_completed' if post_result else 'diagnose_completed' if settled else 'requires_completed_candidate_bound_diagnose',
+                parameter_catalog=brief.get('scientific_parameter_catalog',[]),
+                next='Select a parameter group and registered physical parameter for effects, or control scope and effort for current-structure T1. T2 only reuses saved comparable T1 evidence.')
+            if post_result:
+                continuation['analysis_handoff'].update(result_reference=math_result['reference'],
+                    next='Interpret the completed result at post_result_decision; Main chooses whether to pursue a new scientific question.')
+        if continuation.get('direct_plan',{}).get('action')=='diagnose':
+            continuation['direct_plan'].update(scientific_fields=['hypothesis','decision.selected_candidate','next_research_action'],
+                instruction='Record hypothesis and candidate; optionally choose next_research_action. No action is inferred from hypothesis or method text; omitted choice keeps discovery neutral.')
+        continuation.pop('control_initialization_handoff',None)
+        for category in capabilities:
+            for row in category['actions']:
+                if row['action']=='diagnose':row['reason']='Record hypothesis/candidate and optionally next_research_action; loads an interface only.'
+                if row['action']=='research_analysis':row['reason']='Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.'
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     return dict(version='research_information_flow_v1',

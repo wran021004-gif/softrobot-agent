@@ -579,6 +579,11 @@ def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     from tools.research.scientific_intent import enabled as question_enabled
     from tools.research.structure_intent import compile_search,enabled as structure_enabled
+    from tools.research.scientific_intent import explicit_actions, action_entry, scientific_actions
+    if value.get('next_research_action') is not None:
+        entry=action_entry(state(host)['spec'],value['next_research_action'])
+        if not explicit_actions(state(host)['spec']) or not entry or not entry['available']:
+            raise ValueError('VERSIONED_AVAILABLE_SCIENTIFIC_ACTION_REQUIRED')
     search=value.get('search') or {}
     if value.get('action')=='search' and (search.get('version')=='scientific_structure_search_v1' or
             structure_enabled(state(host)['spec']) and 'research_goal' in search):
@@ -736,8 +741,13 @@ def dispatch(host, value, request_id, origin='model'):
                         'For other actions submit the matching research_plan payload. A method label or requested_budget alone starts no computation.')
                 if question_enabled(s['spec']):
                     result['execution_feedback']['execution_entry'].update(
-                        interface='scientific_question_v1',
+                        interface=s['spec']['research_decisions']['analysis_interface'],
                         request='Submit a ScientificQuestion to research_analysis. Candidate and hypothesis are bound from this Plan; no registered method name is required.')
+                if explicit_actions(s['spec']):
+                    entry=action_entry(s['spec'],plan.next_research_action)
+                    result['execution_feedback']['execution_entry']=(
+                        dict(**entry,request='The next request loads this interface; submit scientific choices explicitly. No scientific execution or result yet.') if entry else
+                        dict(tool='research_route',choices=scientific_actions(s['spec']),request='Choose a scientific action explicitly; diagnose does not select an execution tool.'))
         elif plan.action in ('select','confirm'):
             from tools.research.feedback import eligibility, result_view, confirmation_progress
             choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)

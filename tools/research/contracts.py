@@ -351,6 +351,13 @@ class ScientificQuestionV2(ScientificQuestion):
     control_search_effort: ScientificControlEffort | None = None
 
 
+class ScientificQuestionV3(ScientificQuestionV2):
+    """Registry-backed physical selection; v1/v2 retain their path contract."""
+    version: Literal['scientific_question_v3'] = 'scientific_question_v3'
+    parameter_group: Literal['lengths','materials','routing','sections'] | None = None
+    parameter_id: str | None = Field(default=None,description='Choose an exact ID from the candidate parameter catalog in the selected group. Evidence JSON Pointers are not parameter IDs. A group alone requests choices and starts no computation.')
+
+
 class StructureSearchEffort(Contract):
     max_proposals: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_proposals']['maximum'])
     max_evaluations: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_evaluations']['maximum'],description='Condition analysis entries, not Native callbacks. Must cover every frozen condition for at least one structure.')
@@ -648,6 +655,7 @@ class Plan(Contract):
     decision: ResearchDecision | None = None
     control_search: ControlSearchRequest | None = None
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
+    next_research_action: Literal['structure_control_codesign','single_parameter_effect','control_feasibility'] | None = Field(default=None,description='Diagnose only, scientific_question_v3 Study: explicitly choose the next scientific interface. Loads its Schema only; does not execute or choose variables/budget. Omit to keep action discovery neutral.')
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
     expected_observation: str = Field(min_length=1)
@@ -679,10 +687,13 @@ class Plan(Contract):
             result.pop('generation',None)
         for key in ('decision','control_search','control_seed'):
             if getattr(self,key) is None:result.pop(key,None)
+        if self.next_research_action is None:result.pop('next_research_action',None)
         return result
 
     @model_validator(mode='after')
     def required(self):
+        if self.next_research_action is not None and (self.action!='diagnose' or self.diagnostic is not None):
+            raise ValueError('NEXT_RESEARCH_ACTION_REQUIRES_READ_ONLY_DIAGNOSE')
         if isinstance(self.selected_execution,list) and (self.action!='select' or len(self.selected_execution) not in (2,3)):
             raise ValueError('JOINT_SELECT_REQUIRES_TWO_OR_THREE_RESULTS')
         if self.revise_selection and self.action not in ('confirm','select'):

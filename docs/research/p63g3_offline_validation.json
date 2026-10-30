@@ -1,0 +1,793 @@
+{
+  "schema": "p63g3_offline_validation_v1",
+  "baseline": "9bc46c8307ea5362aa1a5f0f4cde85d1b4bcf1ce",
+  "unique_related_tests_passed": 46,
+  "groups": [
+    {
+      "tests": "test_p63c2_scientific_intent + G2 StructureIntentTests",
+      "passed": 18,
+      "elapsed_s": 96.425
+    },
+    {
+      "tests": "test_p63c1_math_discovery + test_p63g_bounded_evidence + G2 RealNativeSearchTest",
+      "passed": 14,
+      "elapsed_s": 94.847
+    },
+    {
+      "tests": "test_math_capability_catalog",
+      "passed": 6,
+      "elapsed_s": 12.753
+    },
+    {
+      "tests": "test_p63g3_action_handoff",
+      "passed": 8,
+      "elapsed_s": 64.235
+    }
+  ],
+  "final_wire_regression": {
+    "passed": 11,
+    "elapsed_s": 104.614,
+    "log": "runs/g3_final_wire_tests.log"
+  },
+  "excluded_check": {
+    "test": "test_c1_method_context.MethodContextTests",
+    "status": "not_run_missing_external_archive",
+    "missing": "evidence/mujoco_c1_autonomous/immutable_artifacts.tar.gz"
+  },
+  "real_worker": {
+    "study": "p63a-fixture-a2acb269",
+    "result": {
+      "artifact_id": "332215fd5d96692a59747a140ab662f120cf87979ae85d873076ec930d6aba0b",
+      "media_type": "application/json"
+    },
+    "boundary": {
+      "elapsed_s": 1.216893999982858,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "timed_out": false,
+      "worker_started": true
+    },
+    "cost": {
+      "completed_response_steps": 0,
+      "forward_evaluations": 123,
+      "kernel_wall_s": 0.14948480000020936,
+      "mechanics_evaluations": 0,
+      "model_builds": 1,
+      "optimization_evaluations": 2,
+      "optimization_iterations": 1,
+      "physics_step_attempts": 1200,
+      "physics_steps": 1200,
+      "rollouts": 2
+    },
+    "ownership": "offline test fixture, never Main science"
+  },
+  "g2_store": {
+    "path": "C:\\Users\\gugugaga\\Documents\\Codex\\2026-10-30\\files-pasted-by-the-user-p6\\work\\softrobot-g2\\runs\\research\\p63g2-m3-mixed-search-sol-20261030\\platform.sqlite",
+    "sqlite_mode": "ro",
+    "query_only": true,
+    "before": {
+      "size": 7823360,
+      "mtime_ns": 1793354248362170300
+    },
+    "after": {
+      "size": 7823360,
+      "mtime_ns": 1793354248362170300
+    },
+    "unchanged": true
+  },
+  "g2_original_requests": [
+    {
+      "number": 3,
+      "wire_reference": {
+        "artifact_id": "7103cc7143fe6ee76639ed4e09b13317cf931867a70289a35f21dd3d98422509",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "experience_retrieve",
+          "input_reference": {
+            "artifact_id": "8eb007def2db1499c22b06d445cbc79952ebb52625e8e89b7ba526ed3706701c",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "1fdd6b917ae6cc8873a426c7862cadf2dc955e7adb027760fd0dccde563bc864",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "wire_reference": {
+        "artifact_id": "53ae39c81ad252b4d84da539ea6d51dd00c32aacec6492f39bda013b0f214c72",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "research_plan",
+          "input_reference": {
+            "artifact_id": "df43e4031919c7a2f2de7bbcf71c06da093de2bc9c336855534e0cf51670ca89",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "565eeea067cfdd55f866df5b8ebbeaacb8cd3318b7d01bf91c1f9214fb74ab9a",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "wire_reference": {
+        "artifact_id": "d2db180907d0a65f6ee5970659bb606fb4bf0e8b4bfb5ecccfc44873e5d8f6ff",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "research_plan",
+          "input_reference": {
+            "artifact_id": "eff05e5e39069a9e79a43e45bc838e8254b1b2d7c86c8e0cb9066783ee22eb5d",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "3861148f841ff1a02bdefe84af771361556ef1b48102d4e86a40527b2d45392b",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "wire_reference": {
+        "artifact_id": "87defde91d9095e9b8bf34d7b07d9f146db45d94f174ef5a74f663d278175ae5",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_analysis",
+          "plan_action": null,
+          "version": {
+            "const": "scientific_question_v2",
+            "default": "scientific_question_v2",
+            "description": "Property version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "research_analysis",
+          "input_reference": {
+            "artifact_id": "2076bce432c5a660eb3dba655d3e7fd2848be5c2db820adb637f6977a381e32b",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "648391dc222dbdeee7bae2fb4959c44b517dcf726840fae36fa2e97015a23ab4",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "wire_reference": {
+        "artifact_id": "3de2c65c18fc7611eabb9795784d58d3cdbd449ef49227848e38ae71a094d4e6",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_analysis",
+          "plan_action": null,
+          "version": {
+            "const": "scientific_question_v2",
+            "default": "scientific_question_v2",
+            "description": "Property version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input_reference": {
+            "artifact_id": "088475b3b0e00de31a9030f208d9e22adc63c4caf8253c56ce749d90d76889e4",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "ae942d5d34aa010648c0b35fa60f2df0f68c34963b2da1405453116569e6b869",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "wire_reference": {
+        "artifact_id": "d6cb45003e969fc0bb8d8086e38bbf990fffa5fdedbc8446d4f2e0db8307a986",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_analysis",
+          "plan_action": null,
+          "version": {
+            "const": "scientific_question_v2",
+            "default": "scientific_question_v2",
+            "description": "Property version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "research_analysis",
+          "input_reference": {
+            "artifact_id": "d47bb55b10c18dabcf08188974f8fd9376b2762859b7123abc9fbc35c21211e7",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "6ecb1073a9bfd78897eefde47ccab336a572b8683983b24b8a0ba3b5e2603eef",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "wire_reference": {
+        "artifact_id": "8840d0bd680c7c5b07ff8841fd27748ba0deef49524554e7cc7d505a7655b763",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_analysis",
+          "plan_action": null,
+          "version": {
+            "const": "scientific_question_v2",
+            "default": "scientific_question_v2",
+            "description": "Property version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "evidence_read",
+          "input_reference": {
+            "artifact_id": "a0ff4a647e12fb7b38d04b8d4cf68f6e254576d0b020e8682a63b4f23f738296",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "8b9fe87f3829231783b16e0854ea8f45072806f248be95ae3d47b2eaa2841d94",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "wire_reference": {
+        "artifact_id": "353c598c8ad6179fd4d085d6c6bb903fca453e880936a52f664c6fbe4aef4c89",
+        "media_type": "application/json"
+      },
+      "tool_schemas": [
+        {
+          "name": "research_plan",
+          "plan_action": {
+            "description": "Property action",
+            "enum": [
+              "diagnose"
+            ],
+            "type": "string"
+          },
+          "version": null
+        },
+        {
+          "name": "experience_retrieve",
+          "plan_action": null,
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property version",
+            "title": "Version"
+          }
+        },
+        {
+          "name": "evidence_read",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_recall",
+          "plan_action": null,
+          "version": null
+        },
+        {
+          "name": "research_route",
+          "plan_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+            "title": "Action"
+          },
+          "version": null
+        },
+        {
+          "name": "research_analysis",
+          "plan_action": null,
+          "version": {
+            "const": "scientific_question_v2",
+            "default": "scientific_question_v2",
+            "description": "Property version",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        {
+          "name": "research_investigate",
+          "plan_action": null,
+          "version": null
+        }
+      ],
+      "tools": [
+        {
+          "tool": "research_analysis",
+          "input_reference": {
+            "artifact_id": "4b93f059be09d5d994c45b95b4e2adb33b9fe7e31cfe07aefeabf891cc06ac1b",
+            "media_type": "application/json"
+          },
+          "feedback_reference": {
+            "artifact_id": "ae5c0f07e2a2145f221be5eeffaf0c159c89a50f23a0810eed92381c3072e9c3",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    }
+  ],
+  "real_provider_requests_in_offline_tests": 0,
+  "git_diff_check": "passed"
+}

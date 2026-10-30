@@ -5,26 +5,76 @@ No optimizer, state machine, source ledger or execution admission lives here.
 from copy import deepcopy
 
 from tools.platform_store import plain
-from tools.research.contracts import ScientificQuestion, ScientificQuestionV2, ScientificControlEffort, LocalControlSearchSettings
+from tools.research.contracts import ScientificQuestion, ScientificQuestionV2, ScientificQuestionV3, ScientificControlEffort, LocalControlSearchSettings
 from tools.research.state import state, protected
 from tools.research.nonlinear_capability import T1, T2
 
 INTERFACE = 'scientific_question_v1'
+INTERFACES = (INTERFACE,'scientific_question_v2','scientific_question_v3')
+
+
+def explicit_actions(spec):
+    return spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v3'
+
+
+def scientific_actions(spec):
+    """Small action projection of existing interfaces, never an execution registry."""
+    return [dict(scientific_goal='structure_control_codesign',tool='research_plan',action='search',
+        interface=spec.get('research_decisions',{}).get('structure_search_interface'),available='search' in spec.get('allowed_plan_actions',[]) and
+            'search' in spec.get('capabilities',[]) and spec.get('research_decisions',{}).get('structure_search_interface')=='scientific_structure_search_v1',
+        scope='Generate new structures and reoptimize control per structure; Main chooses variables and effort.'),
+        dict(scientific_goal='single_parameter_effect',tool='research_analysis',
+            interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
+            scope='One registered continuous physical parameter: fixed-input comparison, or T2 aggregation of comparable saved T1 results. No new T1 or structures.'),
+        dict(scientific_goal='control_feasibility',tool='research_analysis',
+            interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
+            scope='Native T1 optimizes control on the current structure; independent replay establishes acceptance.')]
+
+
+def action_entry(spec, choice):
+    return next((r for r in scientific_actions(spec) if r['scientific_goal']==choice),None)
+
+
+def parameter_catalog(spec, candidate, group=None, method=None):
+    """Project actual authoritative FamilySpace rows, including original admission."""
+    from tools.research.optimal_capability import family_analysis_parameters
+    if not spec.get('family_space') or not candidate.get('generation_version'):return []
+    rows=[]
+    for row in family_analysis_parameters(spec,candidate):
+        path=row['parameter_id']
+        kind=('routing' if row['category']=='routing' else 'lengths' if path.endswith('.length_m') else
+            'sections' if '.sections.' in path or path.endswith('.section_angle_rad') else
+            'materials' if path.startswith('segments.') and (path.endswith('.young_pa') or '.physical_parameters.' in path) else None)
+        if not kind or group and kind!=group:continue
+        legal=row['continuous_perturbation'] and row['effective_in_current_execution'] and '*' not in path
+        methods=row['applicable_mathematical_methods']
+        rows.append(dict(parameter_group=kind,parameter_id=path,physical_meaning=path.rsplit('.',1)[-1].replace('_',' '),
+            physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
+            effective=row['effective_in_current_execution'],continuous=row['continuous_perturbation'],
+            selectable=bool(legal and (method in methods if method else methods)),applicable_methods=methods,
+            validity=row['analysis_reason'],study_authorized=row['study_authorized']))
+    return rows
 
 
 def enabled(spec):
-    return spec.get('research_decisions',{}).get('analysis_interface') in (INTERFACE,'scientific_question_v2')
+    return spec.get('research_decisions',{}).get('analysis_interface') in INTERFACES
 
 
 def question_contract(spec):
-    return ScientificQuestionV2 if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2' else ScientificQuestion
+    return {'scientific_question_v2':ScientificQuestionV2,'scientific_question_v3':ScientificQuestionV3}.get(spec.get('research_decisions',{}).get('analysis_interface'),ScientificQuestion)
 
 
-def question_schema(spec):
+def question_schema(spec, candidate=None):
     schema=question_contract(spec).model_json_schema()
-    if question_contract(spec) is ScientificQuestionV2:
+    if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
+    if explicit_actions(spec):
+        schema['properties'].pop('parameter_paths')
+        schema['properties']['effect_semantics']['description']='fixed_input_response compares unchanged input; reoptimized_task_capability aggregates already saved comparable T1 results and performs no new control or structure search.'
+        if candidate:
+            rows=parameter_catalog(spec,candidate)
+            schema['properties']['parameter_id']['anyOf'][0]['enum']=[r['parameter_id'] for r in rows if r['selectable']]
     return schema
 
 
@@ -83,7 +133,18 @@ def compile_question(host, payload, *, tool_use_id):
         return feedback('needs_prerequisite','COMPLETED_CANDIDATE_BOUND_DIAGNOSE_REQUIRED',
             preparation=dict(tool='research_plan',action='diagnose',fields=['hypothesis','decision.selected_candidate']))
     candidate = intent['candidate']
-    if q.question_type=='structure_parameter_effect' and not q.parameter_paths and intent['agent_hypothesis']['decision'].get('selected_variables'):
+    if (q.question_type=='structure_parameter_effect' and
+            (q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or
+             q.source_selection.control_source or q.requested_budget is not None)):
+        return feedback('needs_choice','SCIENTIFIC_OPERATION_MISMATCH',
+            scientific_result_produced=False,
+            explanation='Structural effect analysis reuses fixed input or comparable saved T1 results; it does not search new structures or run new T1 optimization.',
+            choices=[dict(scientific_goal='structure_control_codesign',tool='research_plan',action='search'),
+                dict(scientific_goal='single_parameter_effect',tool='research_analysis',
+                    prerequisites=['registered_parameter','comparable_saved_evidence'])])
+    if explicit_actions(spec) and ('parameter_paths' in payload or 'search_strategy' in payload or 'requested_budget' in payload):
+        return feedback('needs_choice','USE_VERSIONED_SCIENTIFIC_SELECTION_FIELDS',fields=['parameter_group','parameter_id','control_search_effort'])
+    if not explicit_actions(spec) and q.question_type=='structure_parameter_effect' and not q.parameter_paths and intent['agent_hypothesis']['decision'].get('selected_variables'):
         q = q.model_copy(update={'parameter_paths':intent['agent_hypothesis']['decision']['selected_variables']})
     try:
         c = verify_candidate(host,candidate)
@@ -93,7 +154,7 @@ def compile_question(host, payload, *, tool_use_id):
     if q.question_type=='control_feasibility':
         if q.effect_semantics not in (None,'reoptimized_task_capability'):
             return feedback('unsupported','CONTROL_FEASIBILITY_REQUIRES_CONTROL_REOPTIMIZATION')
-        if q.parameter_paths or q.fixed_input or q.tensions_n is not None or q.response_horizon_s is not None:
+        if q.parameter_paths or getattr(q,'parameter_group',None) or getattr(q,'parameter_id',None) or q.fixed_input or q.tensions_n is not None or q.response_horizon_s is not None:
             return feedback('unsupported','STRUCTURAL_OR_FIXED_INPUT_FIELDS_DO_NOT_DESCRIBE_CONTROL_FEASIBILITY')
         method = T1
     else:
@@ -106,13 +167,23 @@ def compile_question(host, payload, *, tool_use_id):
             return feedback('unsupported','SCIENTIFIC_SEMANTICS_NOT_ADAPTED',
                 missing_capability=q.effect_semantics,
                 detail_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/capability_inventory'))
+        method = 'fixed_input_structure_v1' if q.effect_semantics=='fixed_input_response' else T2
+        if explicit_actions(spec):
+            rows=parameter_catalog(spec,c,q.parameter_group,method)
+            if q.parameter_group is None:
+                return feedback('needs_choice','PARAMETER_GROUP_REQUIRED',choices=dict(parameter_groups=sorted({r['parameter_group'] for r in rows if r['selectable']})))
+            if q.parameter_id is None:
+                return feedback('needs_choice','REGISTERED_PHYSICAL_PARAMETER_REQUIRED',choices=dict(parameters=rows))
+            if not any(r['parameter_id']==q.parameter_id for r in rows):
+                return feedback('unsupported','REGISTERED_EFFECTIVE_CONTINUOUS_PARAMETER_REQUIRED',
+                    field='parameter_id',choices=dict(parameters=rows))
+            q=q.model_copy(update={'parameter_paths':[q.parameter_id]})
         if not q.parameter_paths:
             return feedback('needs_choice','REGISTERED_PARAMETER_PATH_REQUIRED',
                 choices=dict(parameter_paths=[r['parameter_id'] for r in family_analysis_parameters(spec,c)
                     if r['continuous_perturbation'] and r['effective_in_current_execution']]))
         if len(q.parameter_paths)!=1:
             return feedback('unsupported','C2_SUPPORTS_ONE_INDEPENDENT_CONTINUOUS_PATH_PER_QUESTION')
-        method = 'fixed_input_structure_v1' if q.effect_semantics=='fixed_input_response' else T2
         rows = {r['parameter_id']:r for r in family_analysis_parameters(spec,c)}
         row = rows.get(q.parameter_paths[0])
         if not row or not row['continuous_perturbation'] or not row['effective_in_current_execution']:

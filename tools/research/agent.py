@@ -40,6 +40,9 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     schema=Plan.model_json_schema()
     from tools.research.scientific_intent import enabled as question_enabled
     scientific_question = question_enabled(study or {})
+    from tools.research.scientific_intent import explicit_actions
+    if not explicit_actions(study or {}) or 'diagnose' not in actions:
+        schema['properties'].pop('next_research_action')
     from tools.research.structure_intent import enabled as structure_enabled
     structure_intent=structure_enabled(study or {}) and 'search' in actions
     if scientific_question:
@@ -53,6 +56,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             'Initialization supersedes the latest diagnose: submit a new candidate-bound diagnose Plan with your hypothesis; '
             'no underlying mathematical method name is required. Then submit ScientificQuestion directly to research_analysis. '
             'Original AnalysisRequest and execution admission still apply.')
+        if explicit_actions(study or {}):
+            schema['$defs']['ControlSeedRequest']['properties']['method']['description']='baseline uses candidate pretensions over the full frozen task grid without evaluation. Use the returned control source, not candidate. Initialization supersedes the latest diagnose; record a new hypothesis/candidate and optionally next_research_action. Main chooses the subsequent research action.'
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
@@ -128,6 +133,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         if len(actions)!=1:raise ValueError('FOCUSED_PLAN_REQUIRES_ONE_ACTION')
         common=set(schema['required'])|{'supporting_evidence','experience_disposition','next_step'}
         keep=common|allowed
+        if actions[0]=='diagnose' and explicit_actions(study or {}):keep.add('next_research_action')
         if actions[0]=='stop':keep.add('stop_reason')
         if actions[0] in ('select','confirm'):keep.add('revise_selection')
         schema['properties']={k:v for k,v in schema['properties'].items() if k in keep}
@@ -258,9 +264,18 @@ def load_selected_tool_schema(host, registry, directory):
     from tools.research.contracts import ResearchRouteQuery
     s=state(host);route_ref=s['pilot'].get('tool_route')
     route=host.store.artifact(route_ref) if route_ref else {};name=route.get('tool')
-    # Main already chose the mathematical method in the completed diagnosis.
-    # Loading its existing scientific-variable tool needs no redundant route.
-    if (not name or (name=='research_plan' and route.get('action')=='diagnose')) and 'research_analysis' in registry:
+    from tools.research.scientific_intent import explicit_actions, completed_question_plan, action_entry
+    explicit=explicit_actions(s['spec']);diagnosis=completed_question_plan(host) if explicit else None
+    if diagnosis:
+        events=host.store.events(host.run_id)
+        plan_seq=next(e['sequence'] for e in events if diagnosis['plan_reference'] in e['outputs'])
+        route_seq=max((e['sequence'] for e in events if route_ref and route_ref in e['outputs']),default=-1)
+        if plan_seq>route_seq:
+            choice=diagnosis['agent_hypothesis'].get('next_research_action')
+            route=action_entry(s['spec'],choice) or {};name=route.get('tool')
+    # Frozen legacy interfaces retain their implicit mathematical continuation.
+    # v3 uses only a later explicit route or the completed Plan's typed choice.
+    if not explicit and (not name or (name=='research_plan' and route.get('action')=='diagnose')) and 'research_analysis' in registry:
         name='research_analysis'
     selected=registry.get(name)
     if selected and name=='research_plan':
@@ -289,7 +304,7 @@ def load_selected_tool_schema(host, registry, directory):
         # expose an action matching the current owned object, without submitting it.
         plan=registry.get('research_plan')
         entry=next((r for r in directory if r['tool']=='research_plan'),None)
-        if plan and entry and (name!='research_plan' or (selected is None and policy in ('on_demand_tools_v3','research_information_flow_v1'))):
+        if plan and entry and not (explicit and diagnosis and not name) and (name!='research_plan' or (selected is None and policy in ('on_demand_tools_v3','research_information_flow_v1'))):
             from tools.research.research_context import tool_continuation
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
@@ -461,7 +476,7 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
     if scientific_question is not None:
         from tools.research.scientific_intent import question_schema
         audit_input.update(raw_main_input=deepcopy(scientific_question),
-            provider_schema=question_schema(spec),internal_binding_schema=schema,
+            provider_schema=question_schema(spec,verify_candidate(host,candidate)),internal_binding_schema=schema,
             compiled_variables=deepcopy(payload))
         audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
@@ -850,7 +865,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         def run(use,**kwargs):
             before=state(host)
             try:
-                if on_demand and kind!='route':
+                from tools.research.scientific_intent import enabled as question_enabled
+                # The scientific compiler validates its versioned contract and
+                # operation semantics before candidate parameter membership.
+                if on_demand and kind!='route' and not (kind=='analysis' and question_enabled(before['spec'])):
                     from jsonschema import Draft202012Validator
                     Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
                 from tools.research.evidence_policy import english_native
@@ -1118,6 +1136,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
             if question_enabled(s['spec']):
                 native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
+                from tools.research.scientific_intent import explicit_actions
+                if explicit_actions(s['spec']):
+                    native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
         if english_native(s['spec']):
             tool=next((t for t in native if t.tool_name=='research_analysis'),None)
             from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema
@@ -1125,7 +1146,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
             if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
                 tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                    'inputSchema':{'json':question_schema(s['spec'])}}
+                    'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']))}}
                 agent.tool_registry.registry['research_analysis']=tool
             elif selected:
                 method,detail=selected

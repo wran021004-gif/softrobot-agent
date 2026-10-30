@@ -234,8 +234,9 @@ def mathematical_method_view(host, reference):
                     scope='Measured applied NMPC tensions only, exact candidate/task/channels/grid/bounds; acceptance is not inherited.')
                 break
             methods[key]['cost_scope']='Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.'
-            if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v2':
-                methods[key]['cost_scope']+=' ScientificQuestion v2 control_search_effort independently selects method, knot_count, iterations and callback cap. Uniform knot times cover the chosen adjustment window; evaluation covers the full frozen task. Omitted iterations=min(callback cap, original/Study iteration caps); original early termination still applies.'
+            from tools.research.scientific_intent import question_contract, ScientificQuestionV2
+            if issubclass(question_contract(spec),ScientificQuestionV2):
+                methods[key]['cost_scope']+=' control_search_effort independently selects method, knot_count, iterations and callback cap. Uniform knot times cover the chosen adjustment window; evaluation covers the full frozen task. Omitted iterations=min(callback cap, original/Study iteration caps); original early termination still applies.'
             else:
                 methods[key]['cost_scope']+=' ScientificQuestion full_task uses two endpoint knots and original default 16 iterations. For richer existing search, research_plan(action=control_search) accepts LocalControlSearchSettings with up to four knots and 100 iterations, under the frozen grant; its callbacks are independent physical replays, with backend charges, rather than Native mathematical rollouts. Neither interface changes task constraints or makes focus_metric an objective override.'
             methods[key]['supported_task_families']=['task.reach','task.tracking:timed','task.position_tool_axis','task.oriented_tracking']
@@ -424,7 +425,9 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
                 scope='Saved comparable T1 contrasts' if method==T2 else 'See method coverage and original admission'))
         rows.append({**parameter,'method_links':links,
             'sensitivity_scope':parameter_sensitivity_scope(parameter)})
+    from tools.research.scientific_intent import explicit_actions, scientific_actions, parameter_catalog
     return dict(version='candidate_mathematical_research_v1',candidate=reference,
+        **(dict(scientific_actions=scientific_actions(spec),parameter_catalog=parameter_catalog(spec,candidate)) if explicit_actions(spec) else {}),
         task_binding={**requirements.binding, 'task_family':candidate['configuration']['task']['family'],
             'canonical_task_identity':candidate.get('task_identity'),
             'condition_id':candidate.get('condition_id')},protocol=spec['analysis_protocol'],
