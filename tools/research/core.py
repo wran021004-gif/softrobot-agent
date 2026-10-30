@@ -28,16 +28,25 @@ def read_tool_evidence(host,query,*,record_read=True):
     """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
     from tools.research.contracts import EvidenceQuery
     spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
+    from tools.research.config import bounded_evidence_enabled,evidence_feedback_limit
+    bounded=bounded_evidence_enabled(spec)
     if decisions.get('context_limits'):
         query={'view':'summary',**query}
-    if decisions.get('role_policy',{}).get('version') not in ('research_roles_v2','research_roles_v3') and record_read:
+    if decisions.get('role_policy',{}).get('version') not in ('research_roles_v2','research_roles_v3') and record_read and not bounded:
         return read_evidence(host,query,record_read=record_read)
     q=EvidenceQuery.model_validate(query)
     # A complete root full read is the explicit SELECT interface. Existing
     # delivery coverage checks still require the actual whole result on wire.
-    if q.view=='full' and not q.pointer:
+    if q.view=='full' and not q.pointer and not bounded:
         return read_evidence(host,query,record_read=record_read)
     value=read_evidence(host,query,record_read=False)
+    size=len(json.dumps(value,separators=(',',':')).encode('utf-8'))
+    if bounded and (q.view=='acceptance_certificate' or q.view=='full' and not q.pointer) and size<=evidence_feedback_limit(spec):
+        return _record_evidence_read(host,q,state(host),value,record_read)
+    if q.view=='acceptance_certificate':
+        return dict(status='acceptance_certificate_not_delivered',reference=plain(q.reference),complete_acceptance_view=False,
+            reason='Complete acceptance view exceeds the single-feedback byte allowance; no formal read credit.',
+            detail_query=dict(reference=plain(q.reference),view='fields',fields=['acceptance','candidate','source_reference']))
     if record_read and q.view=='working_set' and q.pointer=='/all_fresh_results':
         from tools.research.research_context import read_coverage,result_index_progress
         progress=result_index_progress(value,read_coverage(host))
@@ -83,6 +92,21 @@ def read_tool_evidence(host,query,*,record_read=True):
         if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
             index['entries'].pop();break
     index['remaining_entries']=len(entries)-len(index['entries'])
+    if bounded:
+        index.update(status='raw_result_not_delivered',full_result_delivered=False,
+            notice='Raw data remains unchanged in Store. This response grants no whole-result or formal acceptance read credit. Use bounded fields/range/pointers for a specific question.',
+            acceptance_query=dict(reference=plain(q.reference),view='acceptance_certificate'))
+        if q.view=='full' and not q.pointer:
+            from tools.research.evidence_views import result_card
+            from tools.research.research_context import mathematical_decision_view
+            try:
+                card=plain(result_card(host,plain(q.reference)))
+                index['fixed_facts']=dict(metrics=card['metrics'],mathematics=mathematical_decision_view(card),
+                    evidence_scope=card['evidence_summary'])
+            except (KeyError,ValueError):pass  # Non-result JSON retains exact navigation.
+            if len(json.dumps(index,separators=(',',':')).encode())>evidence_feedback_limit(spec):
+                index.pop('fixed_facts',None)
+                index['fixed_facts_at']='Current Research Packet verified_facts and mathematical_research; detailed source queries above.'
     return index
 
 
@@ -100,6 +124,11 @@ def read_evidence(host, query, *, record_read=True):
         except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact') from exc
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
+    if q.view=='acceptance_certificate':
+        from tools.research.config import bounded_evidence_enabled
+        if not bounded_evidence_enabled(s['spec']):raise ValueError('ACCEPTANCE_CERTIFICATE_REQUIRES_VERSIONED_STUDY_OPT_IN')
+        from tools.research.evidence_views import acceptance_certificate
+        return _record_evidence_read(host,q,s,acceptance_certificate(host,plain(q.reference)),record_read)
     # Reuse only exact static projections of the verified Store content. Dynamic
     # views and summaries (whose navigation can change) are recomputed normally.
     cacheable=q.view in ('full','fields','range')
@@ -271,7 +300,8 @@ def _record_evidence_read(host,q,s,value,record_read):
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
-        if ((english_native(s['spec']) and q.pointer=='' and q.view=='full')
+        if ((english_native(s['spec']) and q.pointer=='' and (q.view=='full' or
+                q.view=='acceptance_certificate' and value.get('complete_acceptance_view') is True))
                 or (not english_native(s['spec']) and q.pointer in ('','/acceptance','/episodes') and q.view in ('full','summary'))):
             update(host,evaluation_reads=[*s.get('evaluation_reads',[]),plain(q.reference)])
         update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])

@@ -443,6 +443,9 @@ def read_coverage(host):
             if q.view=='working_set' and q.pointer=='/all_fresh_results' and isinstance(delivered,dict) and delivered.get('index_kind')=='all_fresh_results':
                 delivered=delivered['results']
             expected=None
+            if q.view=='acceptance_certificate':
+                from tools.research.core import read_evidence
+                expected=read_evidence(host,plain(q),record_read=False)
             if q.view in ('full','summary','fields','range'):
                 expected=host.store.artifact(q.reference)
                 if isinstance(expected,bytes):expected=json.loads(expected)
@@ -451,6 +454,7 @@ def read_coverage(host):
                 if q.view=='fields':expected={k:expected[k] for k in q.fields}
                 elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
             complete=provided and q.view in ('full','fields','range') and delivered==expected
+            certificate=provided and q.view=='acceptance_certificate' and delivered==expected and expected.get('complete_acceptance_view') is True
         except (ValueError,KeyError,IndexError,TypeError):continue
         retained=delivered if provided and isinstance(delivered,dict) else {}
         if q.view=='mathematical_capabilities':
@@ -476,10 +480,11 @@ def read_coverage(host):
             retrieval_view=q.view in ('working_set','mathematical_capabilities','capabilities'),delivery_identity=digest(delivered),
             source_state_identity=saved.get('source_state_identity'),
             **(dict(confirmed_field_identities={k:digest(v) for k,v in retained.items()}) if q.view=='mathematical_capabilities' else {}),
-            delivery_status=('complete_fields' if complete else 'summary_or_derived_view') if provided else
+            delivery_status=('complete_acceptance_certificate' if certificate else 'complete_fields' if complete else 'summary_or_derived_view') if provided else
                 'summary_only' if use['toolUseId'] in summaries else 'not_confirmed_in_provider_request',
             successfully_provided=provided,complete_data=complete,item_count=len(delivered.get('items',[])) if q.view=='range' and isinstance(delivered,dict) else None,
             full_artifact=complete and q.view=='full' and not q.pointer,
+            **(dict(formal_acceptance_view=certificate) if q.view=='acceptance_certificate' else {}),
             classification=classification))
     return rows
 
@@ -494,6 +499,7 @@ def result_index_progress(references, coverage):
     return dict(status=status,last_confirmed_read=confirmed[-1]['classification'] if confirmed else None,
         current_index_confirmed=bool(same),pending_confirmation=bool(reads and not reads[-1]['successfully_provided']),
         result_count=len(references),complete_body_reads=bodies,unread_bodies=[r for r in references if r not in bodies],
+        **(dict(formal_acceptance_reads=[r['query']['reference'] for r in coverage if r.get('formal_acceptance_view')]) if any(r.get('formal_acceptance_view') for r in coverage) else {}),
         scope='Index delivery is not a full scientific result read or independent SELECT qualification.')
 
 
@@ -1275,6 +1281,12 @@ def mathematical_discovery_observations(host, current, candidate):
             unresolved=summary['decision_relevance']['unresolved_questions'][:2],
             detail_query=dict(reference=reference,view='working_set',pointer='/mathematical_decision_view'))
         search=raw.get('native_dynamics',{}).get('optimization',{})
+        optimized=raw.get('native_dynamics',{}).get('optimized_schedule',{})
+        if optimized:
+            latest['actual_experiment']=dict(operation=raw['operation'],
+                initial_control_source=optimized.get('provenance',{}).get('source'),
+                evaluated_optimized_control_query=dict(reference=reference,view='full',pointer='/native_dynamics/optimized_schedule/provenance'),
+                scope='Control reoptimization evaluates changed inputs; it is distinct from an independent test of the initial schedule. The Main Plan owns the original hypothesis.')
         dimension=search.get('search_dimension')
         if dimension is not None:
             latest['search_cost']=dict(active_coefficients=dimension,first_complete_response_callbacks=dimension+2,
@@ -1315,6 +1327,17 @@ def agent_decision_brief(host):
         brief['tool_continuation']=tool_continuation(host)
     from tools.research.session_handoff import pending_feedback_delivery
     delivery=pending_feedback_delivery(host)
+    from tools.research.config import bounded_evidence_enabled
+    if not delivery and bounded_evidence_enabled(state(host)['spec']):
+        # After a pass the SDK stays in its current session and may offload a
+        # certificate. Reuse the existing exact-feedback channel until real wire
+        # confirms it; never restore a blocked raw array as a formal read.
+        pending_certificates={r['query']['reference']['artifact_id']:r['tool_call_id']
+            for r in current['evidence_working_set']['read_coverage']
+            if r['query']['view']=='acceptance_certificate' and not r['successfully_provided']}
+        if pending_certificates:
+            from tools.research.session_handoff import feedback_delivery
+            delivery=feedback_delivery(host,list(pending_certificates.values()),compact=True)
     if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
     if s['spec'].get('start_mode')=='family_space' and s['spec'].get('initial_structure_strategy') in (None,'agent_choice'):
@@ -1417,6 +1440,8 @@ def agent_decision_brief(host):
     brief['scientific_execution']=dict(pending={k:s['pending'][k] for k in ('kind','worker_request_id') if k in s['pending']} if s.get('pending') else None,
         scope='Receipts/results establish execution. Plan selected_method is intent; read-only diagnosis starts no selected mathematical worker. Independent evaluation alone establishes task acceptance.')
     brief['analysis_interface']=s['spec'].get('research_decisions',{}).get('analysis_interface')
+    from tools.research.config import bounded_evidence_enabled
+    brief['bounded_evidence']=bounded_evidence_enabled(s['spec'])
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     for report in brief['latest_reports']:
@@ -1613,6 +1638,9 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             current_intent=brief.get('research_intent',{}).get('latest_decision'),
             current_control=brief.get('current_candidate'),
             lifecycle=brief.get('probe_lifecycle'))
+    if brief.get('bounded_evidence'):
+        result['evidence_access']['select_requirement']='Read acceptance_certificate for each exact fresh independently evaluated passing result; only complete deterministic certificate delivery on actual Provider wire or an exact full result read qualifies. Original source, fidelity, condition and confirmation admission still applies.'
+        result['evidence_access']['acceptance_query_format']=dict(reference='<independent result reference>',view='acceptance_certificate')
     return result
 
 

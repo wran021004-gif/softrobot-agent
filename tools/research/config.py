@@ -23,7 +23,21 @@ def information_flow_v1(spec):
     return tool_schema_policy(spec)=={'version':'research_information_flow_v1'}
 
 
+def bounded_evidence_enabled(spec):
+    return spec.get('research_decisions',{}).get('evidence_read_policy')=={'version':'bounded_scientific_evidence_v1'}
+
+
+def evidence_feedback_limit(spec):
+    """One feedback uses at most 1/32 of the existing request byte capacity."""
+    provider=spec['runtime']['provider']
+    return max(1,((provider.get('model_capabilities') or {}).get('max_request_bytes') or provider['context_bytes'])//32)
+
+
 def validate_conversation_policy(decisions):
+    evidence=decisions.get('evidence_read_policy')
+    if evidence is not None and (evidence!={'version':'bounded_scientific_evidence_v1'} or
+            decisions.get('tool_schema_policy')!={'version':'research_information_flow_v1'}):
+        raise ValueError('VERSIONED_BOUNDED_EVIDENCE_REQUIRES_INFORMATION_FLOW')
     tools=decisions.get('tool_schema_policy')
     if tools is not None and (tools not in ({'version':'on_demand_tools_v1'},{'version':'on_demand_tools_v2'},{'version':'on_demand_tools_v3'},{'version':'research_information_flow_v1'})
             or decisions.get('architecture') not in ('english_decision_v1','english_decision_v2')
@@ -542,7 +556,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy','language_policy'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background','role_policy','architecture','handoff_policy','analysis_interface','conversation_policy','tool_schema_policy','language_policy','evidence_read_policy'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         validate_conversation_policy(decisions)
         if 'analysis_interface' in decisions and (decisions['analysis_interface'] not in ('bound_scientific_variables_v1','bound_scientific_variables_v2','scientific_question_v1')

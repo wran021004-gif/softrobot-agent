@@ -521,7 +521,9 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
         from tools.research.evidence_policy import english_native
         if english_native(s['spec']):
             from tools.research.research_context import read_coverage
-            if not any(r['query']['reference']==ref and r['full_artifact'] and r['successfully_provided'] for r in read_coverage(host)):
+            from tools.research.config import bounded_evidence_enabled
+            if not any(r['query']['reference']==ref and (r['full_artifact'] or
+                    bounded_evidence_enabled(s['spec']) and r.get('formal_acceptance_view')) and r['successfully_provided'] for r in read_coverage(host)):
                 reasons.append('the Main Agent must receive the complete evidence_read result before selection or confirmation')
         if not v['fresh_current_study']:
             reasons.append('historical or imported result is not fresh development evidence')

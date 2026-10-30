@@ -108,13 +108,22 @@ def feedback_delivery(host, tool_ids, *, compact=False):
             query=row.pop('query')
             row['query_summary']={k:query[k] for k in ('action','operation','model_source','operating_point') if k in query}
             row['original_input_query']=dict(reference=reference,view='full',pointer='/tool_use/input')
-        if compact and len(json.dumps(rows+[row]).encode())>10000:
+        from tools.research.config import bounded_evidence_enabled
+        certificate_read=bounded_evidence_enabled(state(host)['spec']) and value['tool_use']['name']=='evidence_read' and value['tool_use']['input'].get('view')=='acceptance_certificate'
+        if compact and len(json.dumps(rows+[row]).encode())>10000 and not certificate_read:
             break
         size=len(json.dumps(result,separators=(',',':')).encode())
         query=value['tool_use']['input']
         default_view='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
         whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success'
             and query.get('view',default_view)=='full' and not query.get('pointer'))
+        from tools.research.config import bounded_evidence_enabled,evidence_feedback_limit
+        bounded=bounded_evidence_enabled(state(host)['spec'])
+        certificate=(bounded and value['tool_use']['name']=='evidence_read' and result['status']=='success'
+            and query.get('view')=='acceptance_certificate' and not query.get('pointer'))
+        payload_size=len(''.join(b.get('text','') for b in result['content']).encode('utf-8'))
+        if bounded:whole_read=whole_read and payload_size<=evidence_feedback_limit(state(host)['spec'])
+        certificate=certificate and payload_size<=evidence_feedback_limit(state(host)['spec'])
         short_experience=False
         if value['tool_use']['name']=='experience_retrieve' and result['status']=='success' and query.get('operation')=='read':
             from tools.research.config import information_flow_v1
@@ -128,7 +137,7 @@ def feedback_delivery(host, tool_ids, *, compact=False):
         # still applies to the actual complete request. Ordinary reads stay small.
         # One explicitly requested short card survives rotation exactly. Search,
         # unavailable sources and large guidance retain ordinary bounded delivery.
-        if whole_read or short_experience or size<=min(2000 if compact else 6000,remaining):
+        if whole_read or certificate or short_experience or size<=min(2000 if compact else 6000,remaining):
             row.update(delivery='exact_feedback',result=result);remaining-=size
         else:
             try:parsed=json.loads(''.join(b.get('text','') for b in result['content']))

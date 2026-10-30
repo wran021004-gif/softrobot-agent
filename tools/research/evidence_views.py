@@ -21,6 +21,57 @@ def _location(reference, pointer=''):
     return EvidenceLocation(reference=reference, pointer=pointer)
 
 
+def acceptance_certificate(host, reference):
+    """Complete original task-acceptance contract, without copying trajectories.
+
+    Unsupported contracts keep strict whole-result admission. This projection
+    runs no evaluator and grants no read credit until its exact delivery on wire.
+    """
+    from tools.research.state import state
+    from tools.research.feedback import result_view
+    from tools.research_tasks import _source_issue,_outcome_issue,assemble_acceptance
+    from tools.state_io import digest
+    s=state(host);raw=host.store.artifact(reference);acceptance=raw.get('acceptance') or {}
+    if acceptance.get('contract')!='research.task_acceptance' or not acceptance.get('components') or not raw.get('candidate'):
+        return dict(status='acceptance_certificate_not_supported',reference=reference,complete_acceptance_view=False,
+            reason='No complete registered physical task-acceptance contract; mathematics and unsupported evaluation types retain original strict admission.')
+    candidate=host.store.artifact(raw['candidate']);cfg=candidate['configuration']
+    view=result_view(host,reference)
+    issues=[v for v in (_source_issue(acceptance),_outcome_issue(acceptance)) if v]
+    if acceptance.get('task_identity')!=digest(cfg['task']):issues.append('ACCEPTANCE_TASK_IDENTITY_MISMATCH')
+    sources=acceptance.get('sources',{})
+    if (raw.get('evaluation_reference')!=sources.get('evaluation') or raw.get('profile_reference')!=sources.get('profile') or
+            not sources.get('profile') or host.store.artifact(sources['profile'])!=raw.get('profile') or
+            raw.get('profile',{}).get('task')!=cfg['task']):issues.append('ACCEPTANCE_SOURCE_BINDING_MISMATCH')
+    if not issues:
+        motion_ref=view['evaluation_evidence'].get('trajectory')
+        motion=host.store.artifact(motion_ref) if motion_ref else None
+        if motion is None and raw.get('raw_reference'):
+            motion=host.store.artifact(raw['raw_reference']).get('samples')
+        original=assemble_acceptance(cfg,host.store.artifact(sources['evaluation']),host.store.artifact(sources['profile']),
+            evaluation_reference=sources['evaluation'],profile_reference=sources['profile'],motion=motion,protocol_id=acceptance['protocol_id'])
+        if original!=acceptance:issues.append('ACCEPTANCE_DIFFERS_FROM_ORIGINAL_EVALUATOR_AND_PROFILE')
+    return dict(version='formal_acceptance_view_v1',status='acceptance_certificate',reference=reference,
+        complete_acceptance_view=not issues and view['complete'],validation_issues=issues,
+        owning_study=raw.get('evaluation_owner') or raw.get('study') or raw.get('owning_study'),current_study=host.run_id,
+        candidate=raw['candidate'],configuration_reference=candidate['configuration_reference'],
+        source_control=view['controller'],solution_identity=view['solution_identity_sha256'],
+        physical_model=dict(backend=cfg['policy']['backend'],dynamics_model=cfg['policy']['dynamics_model'],
+            discretization=cfg['policy']['discretization'],mathematical_model_identity=raw.get('mathematical_model_identity'),
+            execution_model_identity=raw.get('execution_model_identity'),profile_identity=raw.get('profile_identity')),
+        frozen_task=dict(canonical_identity=s['spec'].get('canonical_task_identity'),effective_identity=acceptance.get('task_identity'),
+            definition_query=dict(reference=candidate['configuration_reference'],view='full',pointer='/task'),evaluator=cfg['task']['evaluator']),
+        execution=dict(execution_id=raw.get('execution_id'),complete=view['complete'],task_performance=view['task_performance'],
+            fresh_current_study=view['fresh_current_study'],role=view['role']),
+        condition_id=candidate.get('condition_id'),structure_candidate=candidate.get('structure_candidate'),
+        sampling_coverage={k:raw['profile'][k] for k in ('complete','sampled_settling','tracking_sampling_complete','tool_axis_sampling_complete') if k in raw.get('profile',{})},
+        acceptance=deepcopy(acceptance),
+        detailed_evidence=dict(result=dict(reference=reference,view='full'),evaluation=sources.get('evaluation'),
+            profile=sources.get('profile'),simulation=raw.get('raw_reference'),trajectory=view['evaluation_evidence'].get('trajectory')),
+        limitations=['Independent registered model execution only; no hardware, cross-model, repeatability or global optimum claim.',
+            'Historical/imported evidence, failing or invalid outcomes, incomplete conditions and wrong fidelity remain ineligible under original SELECT/confirm admission.'])
+
+
 def diagnostic_relations(host, reference):
     """L1 only: relate the selected candidate's saved evidence, without solving."""
     from tools.research.state import state

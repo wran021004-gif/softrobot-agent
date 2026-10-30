@@ -186,7 +186,11 @@ def evidence_query_schema(study):
     """Project the canonical evidence query through the shared wire adapter."""
     from tools.research.contracts import EvidenceQuery
     from tools.research.provider import provider_schema
-    return provider_schema(EvidenceQuery.model_json_schema())
+    from tools.research.config import bounded_evidence_enabled
+    schema=EvidenceQuery.model_json_schema()
+    if not bounded_evidence_enabled(study):schema['properties']['view']['enum'].remove('acceptance_certificate')
+    else:schema['properties']['view']['description']='acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit.'
+    return provider_schema(schema)
 
 
 def tool_directory(host, registry):
@@ -266,6 +270,8 @@ def load_selected_tool_schema(host, registry, directory):
             from tools.research.research_context import tool_continuation
             chosen=tool_continuation(host).get('plan_action')
             action=chosen if chosen in entry['actions'] else ('generate' if 'generate' in entry['actions'] else 'stop')
+            from tools.research.config import bounded_evidence_enabled
+            if bounded_evidence_enabled(s['spec']) and action not in entry['actions']:action=entry['actions'][0]
             if (chosen not in entry['actions'] and 'diagnose' in entry['actions'] and not protected(host)
                     and 'analysis' in s['spec'].get('capabilities',[])
                     and s['spec']['budgets']['mathematical_evaluations']>s.get('mathematical_evaluations',0)):
@@ -527,6 +533,11 @@ def error_feedback(host, use, exc, before):
         'VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED':('control_seed.response_evidence','Use computed, numerically verified input_sensitivity bound to this candidate, model, task, operating point and tendon order'),
         'STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS':('supporting_evidence','Explicitly cite the complete current research.all_fresh_results index and explain the conclusions'),
         'ENGINEERING_TOOL_UNAVAILABLE':('action','Choose an available operation from current packet; engine failure is not scientific infeasibility')}
+    from tools.research.config import bounded_evidence_enabled
+    if bounded_evidence_enabled(s['spec']):
+        formal_hint=('selected_execution','Read acceptance_certificate for this exact independent evaluation. Its complete validated view must reach the next real Provider request before SELECT; a local marker or partial preview is insufficient.')
+        hints['explicit evidence_read of this completed evaluation required']=formal_hint
+        hints['the Main Agent must receive the complete evidence_read result']=formal_hint
     for marker,(f,hint) in hints.items():
         if marker in message:code=marker;field=f;expected=hint
     if code=='TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE':
@@ -1056,6 +1067,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
             tool=agent.tool_registry.registry.get(name)
             if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
+            from tools.research.config import bounded_evidence_enabled
+            if tool and name=='evidence_read' and bounded_evidence_enabled(s['spec']):
+                tool.tool_spec['description']='Read exact named facts via fields/range/JSON pointers. Large raw reads return bounded facts/navigation. For formal SELECT read the complete acceptance_certificate of each independently evaluated result; actual delivery and original admission are required. STOP uses the complete fresh result-reference index.'
         current=decision_packet(host)
         from tools.research.experience import knowledge_enabled
         if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
@@ -1094,7 +1108,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         if not on_demand:record(host,'model_decision_packet',delivered)
         agent.system_prompt=instructions
         boundary.research_packet=deepcopy(delivered)
-        if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
+        if (current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)) or
+                bounded_evidence_enabled(s['spec']) and protected(host)):
             permitted=closeout_operations(host)
             schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
