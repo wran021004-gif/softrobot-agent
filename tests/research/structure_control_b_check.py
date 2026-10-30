@@ -31,7 +31,8 @@ def plan(h,action,key,*,candidate=None,evidence=None,**fields):
         fixed_conditions='Original reach_free task, other structure, legal absolute initial controls and matched finite T1 settings.',
         stopping_condition='Three capped T1 calculations and one saved aggregation; no budget enlargement.',
         interpretation='Scripted Main tool choice in an authorized engineering check; no autonomous model or task acceptance.',
-        supporting_evidence=evidence or [],decision=dict(hypothesis_id='b-'+key,research_intent=PLAN_RESEARCH_INTENTS[action],selected_candidate=candidate),**fields)
+        supporting_evidence=evidence or [],decision=dict(hypothesis_id='b-'+key,research_intent=PLAN_RESEARCH_INTENTS[action],
+            selected_method='scientific_question' if action=='diagnose' else action,selected_candidate=candidate),**fields)
     return core.dispatch(h,value,'b-'+key,origin='engineering_preflight')
 
 

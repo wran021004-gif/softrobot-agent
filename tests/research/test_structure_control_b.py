@@ -15,6 +15,16 @@ from tests.research.test_information_flow import generation
 
 
 class DirectionProjectionTests(unittest.TestCase):
+    def test_scripted_main_plans_retain_original_required_decision_method(self):
+        from tools.research.contracts import Plan
+        from tests.research.structure_control_b_check import plan
+        def validate(host,value,key,**kw):return plain(Plan.model_validate(value))
+        with patch.object(core,'dispatch',side_effect=validate):
+            result=plan(None,'generate','schema-only',generation=dict(version='serial_family_generation_v2',
+                family_space_identity='a'*64,segment_count=2,tendon_count=4))
+            self.assertEqual(result['decision']['selected_method'],'generate')
+            self.assertEqual(plan(None,'stop','schema-stop')['decision']['selected_method'],'stop')
+
     def test_two_candidates_alternate_without_cross_candidate_direction(self):
         h,a=prepare();b=generate(h,(.17,.11));diagnose(h,a,'scientific_question')
         ar=execute_synthetic(h,a,mechanism_question())['reference']
