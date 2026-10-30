@@ -97,15 +97,117 @@ def search_feedback(host, reference):
         request=final_generation_request(state(host)['spec'],value)
         if request:
             materialization=dict(action='generate',generation=request,
-                supporting_evidence=[reference,candidate],source_candidate=candidate,
+                supporting_evidence=[candidate,*[v['analysis'] for v in best.get('evidence',{}).get('conditions',{}).values() if v.get('analysis')]],source_candidate=candidate,
+                source_search=reference,
                 physical_design_identity=value.get('physical_design_identity'),
+                decision_binding='For a new generate Plan the source_candidate is historical supporting evidence, not an executable selected_candidate. The new candidate is returned only after Main submits generation; choose its later control adaptation explicitly.',
                 note='Copy exact physical choices; cite source search/candidate and evidence actually used in the new plan. Screening evidence is not transferred to the new candidate.')
+    fixed=None
+    if result.get('comparison_summary') is not None:
+        from collections import Counter
+        conditions=best.get('evidence',{}).get('conditions',{})
+        statuses=Counter(v['status'] for row in result['comparison_summary'] for v in row['conditions'].values())
+        fixed=dict(plan=result.get('requesting_plan'),method=(best.get('lineage') or {}).get('search_method'),
+            actual_counts=result.get('resource_use'),status_counts={'computed':0,'execution_incomplete':0,'invalid':0,**statuses},
+            termination_reason=result.get('termination_reason'),
+            best_mathematical=[native_mathematical_fact(host,v['analysis'],control_source=v.get('control_source'),condition_id=cid)
+                for cid,v in conditions.items()],
+            results_query=dict(reference=reference,view='full',pointer='/result/comparison_summary'),
+            search_scope_query=dict(reference=result['search_state'],view='full',pointer='/problem'),
+            independent_task_acceptance='unmeasured',scientific_citation_eligible=False)
+        checkpoint=host.store.artifact(result['search_state']);query=checkpoint['problem']['query']
+        fixed['search_scope']={k:query[k] for k in ('groups','segment_count','tendon_count','span_strategy','objective','evaluation_mode','screening_fidelity','max_proposals','max_evaluations') if k in query}
+        fixed['cost']=dict(known_attributed_numerical_s=sum(row['mathematical_numerical_s'] for row in result['evaluated'] if row.get('mathematical_numerical_s') is not None),
+            rows_without_numerical_cost=sum(row.get('mathematical_numerical_s') is None for row in result['evaluated']),
+            outer_elapsed_s=result.get('resource_use',{}).get('elapsed_s'),
+            scope='Attributed saved receipts, not additional work; outer and inner wall times overlap.')
     return dict(reference=reference,status=result['status'],best_candidate=candidate,
         proxy_values=best.get('proxy_values'),final_materialization=materialization,
+        **(dict(fixed_result=fixed) if fixed else {}),
         lineage_pointer='/result/evaluated',task_acceptance='unmeasured',
         **(dict(score_semantics=result['score_semantics'],conditions=best.get('evidence',{}).get('conditions',{}),
             independent_validation='Read each condition result and independently replay its exact candidate and control source; every frozen condition must pass.')
             if result.get('comparison_summary') is not None else {}))
+
+
+def native_mathematical_fact(host, reference, *, control_source=None, condition_id=None):
+    """Recorded Native facts, not a new evaluation or a physical certificate."""
+    from tools.research.state import state
+    value=host.store.artifact(reference);candidate=host.store.artifact(value['candidate'])
+    native=value.get('native_dynamics') or {};optimization=native.get('optimization') or {}
+    best=optimization.get('best') or {};measure=best.get('measure') or {}
+    constraints={r['constraint_id']:r for r in (value.get('task_analysis') or {}).get('constraints',[])}
+    metrics=[]
+    for name,key in (('terminal_position_error_m','terminal_error_m'),
+            ('holding_max_position_error_m','holding_max_error_m'),('holding_max_speed_m_s','holding_max_speed_m_s')):
+        constraint=constraints.get(key) or {};limit=constraint.get('radius');observed=measure.get(name)
+        if observed is not None and limit is not None:
+            metrics.append(dict(name=name,value=observed,limit=limit,unit=constraint['signal']['units'],
+                signed_excess=observed-limit,normalized_signed_excess=observed/limit-1 if limit else None,
+                source_pointer='/native_dynamics/optimization/best/measure/'+name,
+                threshold_pointer='/task_analysis/constraints/'+str(list(constraints).index(key))+'/radius'))
+    request=value.get('requested_operation') or {};binding=value.get('binding') or {}
+    profile=candidate.get('profile_identity');current=state(host)['profile']['identity']
+    return dict(reference=reference,candidate=value['candidate'],control_source=control_source or value.get('control_schedule_reference'),
+        condition_id=condition_id,status=value['status'],J=measure.get('signed_maximum_excess'),
+        metrics=metrics,valid_complete=bool(value['status']=='computed' and (best.get('task_gap') or {}).get('valid_complete')),
+        method=value.get('operation'),model_source=request.get('model_source'),task_identity=binding.get('canonical_task_identity') or binding.get('task_identity'),
+        model_identity=value.get('model_identity'),profile_identity=profile,
+        scientific_observation_available=True,executable_under_current_profile=profile==current,
+        current_profile_requires_new_construction=profile!=current,
+        control_binding='Original candidate-bound source only; a new candidate requires original initialization/adaptation checks.',
+        control_search_settings=(request.get('control_optimization') or {}).get('settings'),
+        cost=dict(charged_numerical_s=value.get('charged_numerical_s'),native=native.get('cost')),
+        limitations=value.get('limitations'),task_acceptance='unmeasured',independent_evaluation_executed=False,
+        formal_acceptance_read_credit=False,details_query=dict(reference=reference,view='fields',
+            fields=['status','binding','native_analysis','task_analysis','charged_numerical_s']),
+        comparison_scope=dict(task=binding.get('canonical_task_identity') or binding.get('task_identity'),
+            profile=profile,method=value.get('operation'),model_source=request.get('model_source'),
+            protocol=(value.get('protocol') or {}).get('protocol_id'),
+            discretization=candidate['configuration']['policy']['discretization']))
+
+
+def scientific_result_delivery(host):
+    """Bounded deterministic L0 facts with distinct latest and comparable best."""
+    from tools.research.state import state
+    s=state(host);searches=[search_feedback(host,r) for r in s.get('search_results',[])]
+    # The legacy search reader keeps its fields; L0 gives J/source one owner.
+    searches=[{k:v for k,v in row.items() if k not in ('proxy_values','best_candidate')} for row in searches]
+    groups={};covered=set()
+    for search in searches:
+        fixed=search.get('fixed_result') or {}
+        for fact in fixed.get('best_mathematical',[]):
+            if not fact['valid_complete'] or not isinstance(fact['J'],(float,int)) or not math.isfinite(fact['J']):continue
+            key=digest(fact['comparison_scope'])
+            if key not in groups or fact['J']<groups[key]['fact']['J']:
+                groups[key]=dict(fact=fact,search=search)
+        raw=host.store.artifact(search['reference'])['result']
+        covered.update(v['analysis']['artifact_id'] for row in raw.get('comparison_summary',[]) for v in row['conditions'].values() if v.get('analysis'))
+    latest_evaluation=None
+    # Search owns its batch summary; standalone Native results share its fact card.
+    for ref in s.get('analysis_results',[]):
+        if ref['artifact_id'] in covered:continue
+        value=host.store.artifact(ref)
+        if not value.get('native_dynamics'):
+            from tools.research.analysis import decision_result
+            latest_evaluation=decision_result(value,ref);continue
+        fact=native_mathematical_fact(host,ref);latest_evaluation=fact
+        if fact['valid_complete'] and isinstance(fact['J'],(float,int)) and math.isfinite(fact['J']):
+            key=digest(fact['comparison_scope'])
+            if key not in groups or fact['J']<groups[key]['fact']['J']:groups[key]=dict(fact=fact,search=None)
+    latest=searches[-1] if searches else None
+    best=[]
+    for row in groups.values():
+        search=row['search'];fact=row['fact']
+        if search and latest and search['reference']==latest['reference']:
+            best.append(dict(facts_at='scientific_results.latest_search.fixed_result.best_mathematical',comparison_scope=fact['comparison_scope']))
+        else:
+            best.append(dict(fact=fact,search_reference=search['reference'] if search else None,
+                plan_reference=(search.get('fixed_result') or {}).get('plan') if search else None,
+                final_materialization=search['final_materialization'] if search else None))
+    return dict(version='scientific_result_delivery_v1',latest_search=latest,study_best_mathematical=best,
+        latest_evaluation=latest_evaluation,
+        scope='Finite saved observations grouped by task, profile, numerical method and discretization. Different groups are not ranked against each other; unequal optimization budgets establish no causal or global optimum claim. Search summaries grant no formal SELECT/read credit.')
 
 
 def solution_identity(host, result, candidate):

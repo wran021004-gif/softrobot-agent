@@ -312,7 +312,8 @@ def context(host):
     current=legacy_context(host)
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
-    if s['spec'].get('mode')!='engineering_numerical' and decision_budget(host)['closeout']['next_request_will_protect']:
+    current['budget']=decision_budget(host)
+    if s['spec'].get('mode')!='engineering_numerical' and current['budget']['closeout']['next_request_will_protect']:
         current['actions']=[] if s['research_status']=='stopped' else closeout_operations(host)['research_plan']
     if s['spec'].get('tool_readiness') or s.get('tool_failures'):
         from tools.research.tool_readiness import availability, MATLAB_ACTIONS
@@ -365,7 +366,6 @@ def context(host):
         actions=action_feedback(host,current),
         citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
     from tools.research.budget import decision_budget
-    current['budget']=decision_budget(host)
     from tools.research.rl import allocation_feedback
     training=allocation_feedback(host)
     current['training_budget_details']=training
@@ -504,7 +504,7 @@ def result_index_progress(references, coverage):
         scope='Index delivery is not a full scientific result read or independent SELECT qualification.')
 
 
-def mathematical_read_progress(host, candidate, coverage, intent):
+def mathematical_read_progress(host, candidate, coverage, intent, *, method_view=None):
     """Current-candidate delivery facts from existing receipts/wires; no saved memory."""
     from tools.research.task_constraints import mathematical_method_view,mathematical_action_view
     latest=intent.get('latest_decision') or {};decision=(latest.get('agent_hypothesis') or {}).get('decision') or {}
@@ -520,7 +520,7 @@ def mathematical_read_progress(host, candidate, coverage, intent):
     if compiled:
         selected=compiled[-1]['method'];names=[selected,*[k for k in names if k!=selected and k!=decision.get('selected_method')]]
     if not names:return []
-    methods=mathematical_method_view(host,candidate)['methods']
+    methods=(method_view if method_view is not None else mathematical_method_view(host,candidate))['methods']
     feedback={host.store.artifact(e['outputs'][0])['tool_use']['toolUseId']:host.store.artifact(e['outputs'][0])['result']['status']
         for e in events if e['kind']=='model_original_tool_feedback'}
     progress=[]
@@ -539,7 +539,7 @@ def mathematical_read_progress(host, candidate, coverage, intent):
         delivered=all(k in fields for k in core)
         changed=[k for k,v in fields.items() if k in action and v!=digest(action[k])]
         matching=[b for b in bindings if b['method']==name and b['full_request']['candidate']==candidate]
-        result=any((v:=host.store.artifact(r)).get('candidate')==candidate and v.get('operation')==detail['operation']
+        result=any((v:=host.store.artifact(r,paths=('candidate','operation'))).get('candidate')==candidate and v.get('operation')==detail['operation']
             for r in state(host).get('analysis_results',[]))
         progress.append(dict(method=name,selected=selected==name,
             selection_source='ScientificQuestion compilation' if compiled and selected==name else 'Main Plan or method read',
@@ -598,10 +598,10 @@ def working_set(host,current):
         c=host.store.artifact(candidate);results=[];math=[]
         controls=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==candidate]
         for ref in references:
-            value=host.store.artifact(ref)
+            value=host.store.artifact(ref,paths=('candidate','design_candidate'))
             if value.get('candidate',value.get('design_candidate'))!=candidate:continue
             if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])]:math.append(ref)
-            if ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:results.append((ref,value))
+            if ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:results.append((ref,host.store.artifact(ref)))
         sources=[e['source'] for e in current['control_search_starts'] if e['candidate']==candidate and e['source'] not in controls]
         sources=[*sources,*controls]
         for source in sources[-3:]:
@@ -710,7 +710,7 @@ def action_feedback(host,current):
     from tools.research.budget import protected, backend_capacity, decision_budget
     from tools.research.evidence_policy import registered_references
     s=state(host);rows=[];capacity=backend_capacity(host);known=registered_references(host)
-    closed=s['research_status']=='stopped' or protected(host) or decision_budget(host)['closeout']['next_request_will_protect']
+    closed=s['research_status']=='stopped' or protected(host) or (current.get('budget') or decision_budget(host))['closeout']['next_request_will_protect']
     for entry in current['control_search_starts']:
         candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
         for action in ('physical_replay','control_search'):
@@ -735,6 +735,12 @@ def action_feedback(host,current):
                 scope='Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative'))
     candidates=list({e['candidate']['artifact_id']:e['candidate'] for e in current['control_search_starts']}.values())
     candidates += [r for r in list(s.get('candidates',{}).values())[-3:] if r not in candidates]
+    # warm_start rejects every other source kind before reading a trajectory.
+    # Filter that invariant once, instead of decoding every large math result
+    # again for each candidate and initialization mode. Admission stays below.
+    warm_sources=[ref for ref in known if ref in s.get('mechanics_results',[]) or
+        host.store.artifact(ref,paths=('source_kind',)).get('source_kind') in ('verified_mathematical_trajectory',
+            'historical_mathematical_trajectory','independently_integrated_control_v1')]
     for candidate in candidates:
         from tools.research.contracts import MechanicsRequest
         from tools.research.mechanics import warm_start
@@ -767,7 +773,7 @@ def action_feedback(host,current):
         requirements=task_adapter(cfg).analysis_requirements({})
         applicable=all(c.kind=='norm_bound' and c.signal.name in ('tip_position','tip_velocity') for c in requirements.constraints)
         modes=MechanicsRequest.model_json_schema()['properties']['initialization']['enum'];warm=[]
-        for source in known:
+        for source in warm_sources:
             for mode in modes[2:]:
                 try:
                     request=MechanicsRequest(candidate=candidate,initialization=mode,warm_source=source)
@@ -781,8 +787,9 @@ def action_feedback(host,current):
             check_only='Mathematical checking uses the analysis allowance; it is not an optimized or physically accepted result',
             remaining_checks=['full_plan_admission','requested_budget','model/coordinate/state/substeps/grid preflight'],
             example=dict(action='mechanics',mechanics=dict(candidate=candidate,initialization=modes[0],check_only=False))))
-        references=[r for r in s.get('analysis_results',[]) if host.store.artifact(r).get('candidate')==candidate
-            and host.store.artifact(r).get('operation')=='input_sensitivity']
+        references=[r for r in s.get('analysis_results',[]) if
+            (value:=host.store.artifact(r,paths=('candidate','operation'))).get('candidate')==candidate
+            and value.get('operation')=='input_sensitivity']
         status='blocked';reason='verified_input_sensitivity_required';ref=None
         for ref in reversed(references):
             try:verified_input_response(host,candidate,ref);status='preflight_eligible';reason=None;break
@@ -1182,7 +1189,7 @@ def controller_capabilities(host):
         patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned')
 
 
-def current_research_state(host, brief, intent, trace, coverage=None):
+def current_research_state(host, brief, intent, trace, coverage=None, *, method_view=None):
     """Describe existing provenance/receipts; never select a scientific direction."""
     s=state(host);candidate=brief.get('current_candidate') or {};ref=candidate.get('candidate')
     provenance=host.store.artifact(ref).get('provenance',{}) if ref else {}
@@ -1218,7 +1225,7 @@ def current_research_state(host, brief, intent, trace, coverage=None):
     if last.get('execution_status') in ('rejected','failed'):
         outcome=last['outcome']
         unresolved.append(dict(tool_feedback=outcome.get('error') or outcome.get('error_code') or outcome.get('status'),source=last['source']))
-    progress=mathematical_read_progress(host,ref,coverage if coverage is not None else read_coverage(host),intent) if ref else []
+    progress=mathematical_read_progress(host,ref,coverage if coverage is not None else read_coverage(host),intent,method_view=method_view) if ref else []
     from tools.research.state import protected,readable_results
     provenance_readable=ref and (not (closeout or protected(host)) or ref in readable_results(s,host))
     return dict(phase=phase,object=dict(candidate=ref,origin=owner,
@@ -1245,8 +1252,9 @@ def mathematical_discovery_observations(host, current, candidate):
     from schemas.platform_analysis import TaskAnalysisRequirement
     s=state(host);observations=[];latest=None
     for reference in reversed(s.get('analysis_results',[])):
-        raw=host.store.artifact(reference)
+        raw=host.store.artifact(reference,paths=('candidate','status','scoped_claim'))
         if raw.get('candidate')!=candidate or raw.get('status')!='computed' or not raw.get('scoped_claim'):continue
+        raw=host.store.artifact(reference)
         card=plain(result_card(host,reference));summary=card['deterministic_summary']
         outputs=(raw.get('native_dynamics',{}).get('optimization',{}).get('best') or {}).get('outputs')
         if outputs:
@@ -1315,6 +1323,11 @@ def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
     current=context(host);brief=decision_brief(current)
+    from tools.research.feedback import scientific_result_delivery
+    brief['scientific_results']=scientific_result_delivery(host)
+    from tools.research.candidate_portfolio import ranking_key
+    physical=[r for r in current['observations'] if not r['historical_only'] and r['task_gap']['valid_complete']]
+    brief['scientific_results']['best_independent_physical']=min(physical,key=ranking_key) if physical else None
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
     if state(host).get('probe_lifecycle'):brief['probe_lifecycle']=state(host)['probe_lifecycle']
@@ -1419,7 +1432,7 @@ def agent_decision_brief(host):
             control_source_scope='Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.')
         brief['current_candidate']=facts
         from tools.research.task_constraints import mathematical_method_view, mathematical_catalog, mathematical_opportunity_summary
-        view=mathematical_method_view(host,candidate)
+        view=mathematical_method_view(host,candidate,budget_snapshot=brief['budget'])
         brief['mathematical_capabilities']=mathematical_catalog(view)
         selected=((intent['latest_decision'] or {}).get('agent_hypothesis',{}).get('decision') or {}).get('selected_method')
         if selected in view['methods']:brief['selected_mathematical_method']=view['methods'][selected]
@@ -1516,7 +1529,7 @@ def agent_decision_brief(host):
         brief['milestone_trace']['action_total']=trace['total']
         brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)
-    brief['current_research_state']=current_research_state(host,brief,intent,trace,current['evidence_working_set']['read_coverage'])
+    brief['current_research_state']=current_research_state(host,brief,intent,trace,current['evidence_working_set']['read_coverage'],method_view=view if candidate else None)
     if not brief['current_research_state']['object']['provenance_query']:
         for key in ('provenance_query','parameters_query'):brief['current_candidate'].pop(key,None)
     if brief.get('selected_mathematical_method'):
@@ -1601,6 +1614,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
         for i in (report.get('interpretations') or [])[:3]])
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
     result=dict(version='research_decision_brief_v3',
+        scientific_results=brief.get('scientific_results'),
         research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics') if k in task},
             task_conditions=(brief.get('task_conditions') or {}).get('frozen',[]),
             candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
@@ -1823,6 +1837,7 @@ def information_flow_brief(brief, delivered):
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     return dict(version='research_information_flow_v1',
+        scientific_results=value.get('scientific_results'),
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),
         verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),

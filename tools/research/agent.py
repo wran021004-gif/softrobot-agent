@@ -216,7 +216,7 @@ def evidence_query_schema(study):
     from tools.research.contracts import EvidenceQuery
     from tools.research.provider import provider_schema
     from tools.research.config import bounded_evidence_enabled
-    schema=EvidenceQuery.model_json_schema()
+    schema=deepcopy(EvidenceQuery.model_json_schema())
     if not bounded_evidence_enabled(study):schema['properties']['view']['enum'].remove('acceptance_certificate')
     else:schema['properties']['view']['description']='acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit.'
     return provider_schema(schema)

@@ -148,14 +148,29 @@ class Store:
         db.execute('INSERT OR IGNORE INTO artifacts VALUES (?,?,?)', (identity, media, body))
         return EvidenceRef(artifact_id=identity, media_type=media)
 
-    def artifact(self, ref, *, raw=False, db=None):
+    def artifact(self, ref, *, raw=False, db=None, paths=None):
+        """Hash-verified artifact; optional dot paths avoid decoding unrelated arrays."""
         ref = EvidenceRef.model_validate(ref)
         if db is None:
             with self.connect(True) as conn:
-                return self.artifact(ref, raw=raw, db=conn)
+                return self.artifact(ref, raw=raw, db=conn, paths=paths)
         row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
         if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
             raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)
+        if paths is not None:
+            if raw or row['media']!='application/json':raise ValueError('JSON_PATH_PROJECTION_REQUIRED')
+            result={}
+            if not paths:return result
+            # A multi-path extract parses once and retains JSON boolean types.
+            selected=[*paths,paths[0]]
+            args=[row['body'],*['$.'+path for path in selected]]
+            values=json.loads(db.execute('SELECT json_extract('+','.join('?' for _ in args)+')',args).fetchone()[0])
+            for path,value in zip(paths,values):
+                if value is None and db.execute('SELECT json_type(?,?)',(row['body'],'$.'+path)).fetchone()[0] is None:continue
+                target=result;keys=path.split('.')
+                for key in keys[:-1]:target=target.setdefault(key,{})
+                target[keys[-1]]=value
+            return result
         return row['body'] if raw else json.loads(row['body'])
 
     def session(self, run_id, db=None):

@@ -104,7 +104,7 @@ def selected_operating_point_guidance(host, reference, method, detail):
         admission='Parameter legality, available evidence, execution permission and scientific conclusions are separate; full original admission still applies.')
 
 
-def mathematical_method_view(host, reference):
+def mathematical_method_view(host, reference, *, budget_snapshot=None):
     """Existing candidate-bound read view: legacy T2 root plus all method details."""
     from tools.research.state import state, protected
     from tools.research.contracts import AnalysisRequest
@@ -129,7 +129,7 @@ def mathematical_method_view(host, reference):
             SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})
     models=[]
     for r in s.get('analysis_results',[]):
-        v=host.store.artifact(r)
+        v=host.store.artifact(r,paths=('candidate','implementation','status','model','protocol'))
         if (v.get('candidate')==reference and v.get('implementation')==s['freeze'] and
                 v.get('status')=='computed' and v.get('model') and v.get('protocol')==spec['analysis_protocol']):models.append(r)
     authorization=mathematics_authorization(host,s);methods={}
@@ -210,7 +210,7 @@ def mathematical_method_view(host, reference):
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
             from tools.research.native_control import window_facts
             from tools.research.budget import decision_budget
-            budget=decision_budget(host)['science_budget']
+            budget=(budget_snapshot if budget_snapshot is not None else decision_budget(host))['science_budget']
             methods[key]['action_prerequisites']=dict(candidate=reference,
                 initial_state=dict(operating_point='standardized_initial_pretension',**window_facts(requirements,dict(actual_time_s=0.))),
                 recorded_control_sources=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==reference][-3:],

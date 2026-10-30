@@ -85,7 +85,9 @@ def decision_budget(host):
         for e in host.store.events(host.run_id))
     reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host))
     public_total=remaining['tool_calls'];public_reserve=b.get('protected_public_operations',0)
-    native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r)).get('requested_operation',{}).get('model_source')=='mujoco']
+    native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r,paths=(
+        'requested_operation.model_source','status','native_dynamics.cost','nonlinear_response.cost',
+        'native_progress.cost','native_diagnostic.cost'))).get('requested_operation',{}).get('model_source')=='mujoco']
     native_costs=[]
     for r,v in native:
         for key in ('native_dynamics','nonlinear_response','native_progress','native_diagnostic'):
