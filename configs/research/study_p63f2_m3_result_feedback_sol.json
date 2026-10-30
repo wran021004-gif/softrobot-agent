@@ -1,0 +1,234 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "initial_structure_strategy": "agent_choice",
+  "study_id": "p63f2-m3-result-feedback-sol-20261030",
+  "base_commit": "f49014880525bfb510499050c4cb829a2dbb0567",
+  "authorization": "Explicit user P6.3-F0/F1/F2 and subsequent sleep-time authorization: one independent M3 Study, at most twenty real Provider requests total including Reporter/failures/protected closeout. Generous legal scientific count ceilings; no additional approval needed. Original scope-bound authorization, execution admission and all evidence/cost accounting apply. No second Study, automatic budget extension or merge.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_p63b1_sol_none.json",
+  "evidence_destination": "evidence/p63f2_m3_result_feedback_20261030",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "search",
+    "control_correction",
+    "control_search",
+    "physical_replay",
+    "replay",
+    "nmpc",
+    "prediction_diagnostic",
+    "rl"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "propose",
+    "initialize_control",
+    "control_search",
+    "execute",
+    "search",
+    "mechanics",
+    "replay",
+    "cross_replay",
+    "physical_replay",
+    "refine",
+    "matched_state",
+    "nmpc_prediction_diagnostic",
+    "diagnose",
+    "confirm",
+    "select",
+    "stop"
+  ],
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "budgets": {
+    "provider_requests": 20,
+    "protected_provider_requests": 1,
+    "provider_reserve_policy": "last_requests_v2",
+    "public_operations": 1000000,
+    "protected_public_operations": 2,
+    "physical_launches": 1000000,
+    "local_solves": 1000000,
+    "local_solve_s": null,
+    "offline_nlp": 1000000,
+    "bdf_replays": 1000000,
+    "mathematical_evaluations": 1000000,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "physical_replay_limit": null,
+  "reserve_rl_evaluation": false,
+  "nmpc_limits": {
+    "executions": 1000000
+  },
+  "rl_limits": {
+    "training_stages": 10,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 1000000,
+    "diagnostic_replays": 1000000,
+    "diagnostic_physics_steps": 1000000000
+  },
+  "native_control_limits": {
+    "evaluation_requests": 1000,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "User-authorized registered scientific research under original method/task/model/source/environment admission. No additional small Study cap. Preserve all original limitations, numerical charges and independent acceptance requirements.",
+    "controlled-capability-sensitivity-v1": "User-authorized registered scientific research under original method/task/model/source/environment admission. No additional small Study cap. Preserve all original limitations, numerical charges and independent acceptance requirements.",
+    "mujoco-nonlinear-task-capability-v1": "User-authorized registered scientific research under original method/task/model/source/environment admission. No additional small Study cap. Preserve all original limitations, numerical charges and independent acceptance requirements.",
+    "mujoco-reoptimized-structure-response-v1": "User-authorized registered scientific research under original method/task/model/source/environment admission. No additional small Study cap. Preserve all original limitations, numerical charges and independent acceptance requirements."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "segments.*.sections.*.parameters.*",
+      "spans.*.radius_m",
+      "spans.*.phase_rad"
+    ]
+  },
+  "knowledge": {
+    "mode": "enabled",
+    "allow_benchmark_answers": true,
+    "allowed_kinds": [
+      "procedure",
+      "success_case"
+    ]
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 4,
+      "evidence": 3
+    },
+    "architecture": "english_decision_v1",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "analysis_interface": "scientific_question_v1",
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    }
+  },
+  "scoring_window_s": 0.5,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.48
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "execution_instructions": "You are Main in an independent M3 development-draft research Study on the original frozen Reach/Hold task. Operator supplied a legal unevaluated initial structure and its full default control sequence through the original generator and initialize_control baseline. Their ownership is operator; they are not your scientific decisions or accepted results. No prior C3 scientific result is imported. Independently formulate falsifiable scientific hypotheses, choose applicable tools and conditions, obtain evidence, assess its scope and limitations, and decide subsequent research actions or a justified STOP. You may choose among the original registered lawful research operations; no route is prescribed. Mathematical optimization does not establish independent task acceptance. Preserve the frozen task, all thresholds, physical input bounds, source admission and exact cost ledger. Finite searches do not prove global optimality or infeasibility. Reporter interpretations are non-authoritative. The total Provider ceiling is twenty including Main, Reporter, failed sends and protected closeout. Required scientific counts are generous finite integers under the original count-mode schema; optional extra Study caps are absent. Use the actual remaining resources and original method technical contracts; Native callbacks allow the original maximum 1000 per search. All integrations, training and physical operations retain real accounting. Knowledge remains available through the existing policy. Retrieve and cite all fresh results for STOP; SELECT retains independent passing evidence and formal reading requirements. This is one Study only; stop within its frozen Provider window.",
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "evaluation_modes": [
+      "mathematical_proxy",
+      "mujoco_control"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing",
+      "control"
+    ],
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ],
+    "max_proposals": 128,
+    "max_evaluations": 128
+  }
+}

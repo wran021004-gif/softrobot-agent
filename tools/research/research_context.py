@@ -439,6 +439,9 @@ def read_coverage(host):
             q=EvidenceQuery.model_validate({'view':default,**use['input']})
             delivered=json.loads(''.join(b.get('text','') for b in result['content']))
             provided=any(content==''.join(b.get('text','') for b in result['content']) for content in deliveries.get(use['toolUseId'],[]))
+            # Index metadata describes this read, not a change in scientific content.
+            if q.view=='working_set' and q.pointer=='/all_fresh_results' and isinstance(delivered,dict) and delivered.get('index_kind')=='all_fresh_results':
+                delivered=delivered['results']
             expected=None
             if q.view in ('full','summary','fields','range'):
                 expected=host.store.artifact(q.reference)
@@ -481,6 +484,19 @@ def read_coverage(host):
     return rows
 
 
+def result_index_progress(references, coverage):
+    """Projection of original confirmed reads; index delivery grants no body credit."""
+    reads=[r for r in coverage if r['query']['view']=='working_set' and r['query']['pointer']=='/all_fresh_results']
+    confirmed=[r for r in reads if r['successfully_provided']]
+    same=[r for r in confirmed if r['delivery_identity']==digest(references)]
+    status='read_unchanged' if same else 'new_results' if confirmed else 'unread'
+    bodies=[ref for ref in references if any(r['query']['reference']==ref and r['full_artifact'] for r in coverage)]
+    return dict(status=status,last_confirmed_read=confirmed[-1]['classification'] if confirmed else None,
+        current_index_confirmed=bool(same),pending_confirmation=bool(reads and not reads[-1]['successfully_provided']),
+        result_count=len(references),complete_body_reads=bodies,unread_bodies=[r for r in references if r not in bodies],
+        scope='Index delivery is not a full scientific result read or independent SELECT qualification.')
+
+
 def mathematical_read_progress(host, candidate, coverage, intent):
     """Current-candidate delivery facts from existing receipts/wires; no saved memory."""
     from tools.research.task_constraints import mathematical_method_view,mathematical_action_view
@@ -490,9 +506,14 @@ def mathematical_read_progress(host, candidate, coverage, intent):
         r['query']['view']=='mathematical_capabilities' and r['query']['pointer'].startswith('/methods/')]
     names=list(dict.fromkeys(r['query']['pointer'].split('/')[2] for r in reversed(reads)))
     if selected:names=[selected,*[k for k in names if k!=selected]]
-    if not names:return []
-    methods=mathematical_method_view(host,candidate)['methods'];events=host.store.events(host.run_id)
+    events=host.store.events(host.run_id)
     bindings=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='analysis_request_binding']
+    compiled=[b for b in bindings if b.get('version')=='scientific_question_v1' and
+        b['full_request']['candidate']==candidate and (b.get('field_sources',{}).get('candidate') or {}).get('reference')==latest.get('plan_reference')]
+    if compiled:
+        selected=compiled[-1]['method'];names=[selected,*[k for k in names if k!=selected and k!=decision.get('selected_method')]]
+    if not names:return []
+    methods=mathematical_method_view(host,candidate)['methods']
     feedback={host.store.artifact(e['outputs'][0])['tool_use']['toolUseId']:host.store.artifact(e['outputs'][0])['result']['status']
         for e in events if e['kind']=='model_original_tool_feedback'}
     progress=[]
@@ -514,6 +535,7 @@ def mathematical_read_progress(host, candidate, coverage, intent):
         result=any((v:=host.store.artifact(r)).get('candidate')==candidate and v.get('operation')==detail['operation']
             for r in state(host).get('analysis_results',[]))
         progress.append(dict(method=name,selected=selected==name,
+            selection_source='ScientificQuestion compilation' if compiled and selected==name else 'Main Plan or method read',
             action_view='delivered' if delivered else 'summary_only' if confirmed else 'unconfirmed',
             control_source_prerequisites=('delivered' if 'scientific_inputs' in fields else 'unconfirmed') if 'scientific_inputs' in action else 'not_required',
             request_template='delivered' if template else 'unconfirmed',
@@ -1252,6 +1274,13 @@ def mathematical_discovery_observations(host, current, candidate):
                 claim_kind=summary['evidence_summary']['claim_kind'],verification_status=summary['evidence_summary']['verification_status']),
             unresolved=summary['decision_relevance']['unresolved_questions'][:2],
             detail_query=dict(reference=reference,view='working_set',pointer='/mathematical_decision_view'))
+        search=raw.get('native_dynamics',{}).get('optimization',{})
+        dimension=search.get('search_dimension')
+        if dimension is not None:
+            latest['search_cost']=dict(active_coefficients=dimension,first_complete_response_callbacks=dimension+2,
+                requested_callbacks=search.get('cost_feedback',{}).get('request_budget'),
+                completed_response_steps=raw.get('nonlinear_capability',{}).get('response_steps_completed'),
+                scope='One baseline + D finite-difference probes + one proposal for one response update. Clipping, inactive directions, failures and additional starts/updates change actual cost; saved callback counts are authoritative.')
         break
     # A measured failure stays a physical observation, distinct from a model
     # sample. Do not borrow a different candidate's or historical task outcome.
@@ -1429,6 +1458,7 @@ def agent_decision_brief(host):
         refs=brief.pop('all_fresh_results',[])
         brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,
             view='working_set',pointer='/all_fresh_results'),
+            read_progress=result_index_progress(refs,current['evidence_working_set']['read_coverage']),
             rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
         # Keep the compact registration rule/query in L0; the inventory stays in L1.
         ws=brief.get('evidence_working_set',{})
@@ -1468,6 +1498,11 @@ def agent_decision_brief(host):
         brief['mathematical_research']=mathematical_opportunity_summary(view,observations=observations,
             latest_result=latest_math,control_sources=brief['current_candidate']['control_sources'],
             execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
+        latest_intent=intent.get('latest_decision') or {}
+        if latest_math:
+            completed=next((r for r in reversed(trace['recent']) if latest_math['reference'] in r.get('result_references',[])),None)
+            if completed and (completed.get('prior_intent_source') or {}).get('reference')==latest_intent.get('plan_reference'):
+                brief['post_result_source']=completed['source']
         if not brief['current_research_state']['object']['provenance_query']:
             discovery=brief['mathematical_research']
             for key in ('method_directory_query','full_catalog_query','detail_query'):discovery.pop(key,None)
@@ -1713,13 +1748,24 @@ def information_flow_brief(brief, delivered):
     if hypothesis.get('weakening_observation'):
         focus['open_questions'].append(dict(text=hypothesis['weakening_observation'][:240],kind='Main falsification target excerpt',
             source=dict(reference=intent['plan_reference'],pointer='/original_plan/weakening_observation')))
+    post_result=None
+    if math_result and brief.get('post_result_source'):
+        continuation['analysis_handoff']=dict(tool='research_analysis',loaded=loaded.get('tool')=='research_analysis',
+            status='result_completed',result_reference=math_result['reference'],decision_at='post_result_decision')
+        if continuation.get('direct_plan',{}).get('action')=='diagnose':
+            continuation['direct_plan'].update(status='completed',instruction='Previous mathematical request completed; current decision context is post_result_decision. A new scientific request remains optional.')
+        post_result=dict(status='awaiting_Main_judgment',prior_Main_question_at='research_focus.formal_hypothesis',
+            completed_action=brief['post_result_source'],facts_and_limits_at='mathematical_research.latest_result',
+            interpretations_at='reporter_findings',interpretation_role='Non-authoritative source-linked explanations; fixed facts remain available without Reporter.',
+            read_progress_at='evidence_access.stop_index.read_progress',legal_actions_at='capabilities',remaining_resources_at='budget',
+            decision='Assess the original hypothesis and choose further evidence, a new hypothesis or legal research action, or a justified STOP. No outcome or next action is selected by this projection.')
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     return dict(version='research_information_flow_v1',
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),
         verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
-        research_trace=trace,
+        research_trace=trace,**(dict(post_result_decision=post_result) if post_result else {}),
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])

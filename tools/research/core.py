@@ -38,6 +38,15 @@ def read_tool_evidence(host,query,*,record_read=True):
     if q.view=='full' and not q.pointer:
         return read_evidence(host,query,record_read=record_read)
     value=read_evidence(host,query,record_read=False)
+    if record_read and q.view=='working_set' and q.pointer=='/all_fresh_results':
+        from tools.research.research_context import read_coverage,result_index_progress
+        progress=result_index_progress(value,read_coverage(host))
+        repeat=progress['current_index_confirmed']
+        return dict(index_kind='all_fresh_results',results=value,read_progress=progress,
+            this_read='exact_repeat' if repeat else 'changed_content' if progress['status']=='new_results' else 'first_delivery',
+            notice=('This index was already successfully delivered and the result list is unchanged. This read adds no new scientific information. '
+                'You may read a concrete result or independently judge the delivered facts.' if repeat else
+                'Result index returned; this is not a complete scientific result body read.'))
     if q.view=='mathematical_capabilities' and q.pointer.startswith('/methods/') and q.pointer.count('/')==2:
         from tools.research.task_constraints import mathematical_action_view
         return _record_evidence_read(host,q,state(host),value if q.fields else mathematical_action_view(value),record_read)

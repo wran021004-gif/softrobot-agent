@@ -79,7 +79,8 @@ class ActionInterfaceTests(unittest.TestCase):
             self.assertEqual(query['reference'],before['family_space_reference'])
             Draft202012Validator(schema).validate(query)
             self.assertEqual(set(schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']),{r['artifact_id'] for r in allowed})
-            self.assertEqual(feedback(h,'offline-use-0'),refs)
+            self.assertEqual(feedback(h,'offline-use-0')['results'],refs)
+            self.assertIn('not a complete scientific result body',feedback(h,'offline-use-0')['notice'])
             self.assertEqual(core.read_evidence(h,query,record_read=False),refs)
             with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ'):
                 core.read_evidence(h,dict(reference=candidate,view='full'),record_read=False)
