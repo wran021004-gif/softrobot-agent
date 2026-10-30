@@ -2,7 +2,7 @@
 
 基线 `a7bd7d73d9091cf85c1c108c85a239216198ea09`，独立分支
 `codex/p6-3b6-decision-action-live`。[B5 原始交付审查、Mock wire 和独立准备记录](p63b6_repair_preparation_audit.json)。
-本文件初始提交记录离线修复；单次真实运行结束后另行提交实际结果，不在运行中修改执行代码或冻结配置。
+初始提交记录离线修复；以下追加单次真实运行的实际结果。运行期间没有修改执行代码或冻结配置。
 
 ## 三处最小修复
 
@@ -80,3 +80,69 @@ Mock 仅为脚本夹具，绝非真实 Main 科研结果。NativeModel 构造和
 Main 自主选择科学问题、适用 Native 方法、合法参数/对照和结果后方向；不预设 T1/T2 顺序。
 数学数值只能来自原 MuJoCo Native 量、实际积分及注册内核，不能以 GVS/SoRoSim/降阶/学习代理
 预测替代。Native 构建、rollout、callbacks、积分及时间完整计账，结果始终是仿真参考，不是硬件真值。
+
+## 单次真实运行：首个 Provider 请求失败，未重试
+
+[实际 wire、失败回执、准确授权、原账本与最终状态](p63b6_m_live_audit.json)。代码经原 bind 冻结为
+`c3cfd9ba7e51ae34ba6eefe93f933e5c537e60f4`，兼容性通过。正式授权引用
+`e924b68c901db929976c283a8f3ce70c5bc97f853f982c88f2bfbfd00e0569fe`，Handoff 准入引用
+`c56d846d4e7ff0b503158acba611b3366fec534f1cb6efc546091b341adfa915`。
+授权来源是本条用户 B6 附件，原 Store 保留原文来源 SHA-256、准确 Study 身份和全部预算。
+Handoff 工程准入核对了与 B5 完全相同的 Provider 配置和既有真实连续反馈传输证据；没有向 Main
+导入旧科研结果。没有 models GET、smoke 推理、模型或 reasoning 切换。
+
+只调用了一次原入口：
+
+```powershell
+& D:/softrobot-agent/.f3-prestudy-env/Scripts/python.exe -m tools.research run --run-id p63b6-m-native-sol-20261030-r1 --session-handoff --max-new-provider-requests 12
+```
+
+| 请求 | 模型 / reasoning | HTTP / 原错误 | 原计费 | tokens / 金额 |
+| --- | --- | --- | --- | --- |
+| 1 | gpt-5.6-sol / none | 502；empty_response；retryable=false | 1 次 Provider，19.937 s | Provider 未返回 usage 或金额，均未知，不能记为 0 |
+
+原错误正文为：`The completed response contained no text.`。request_id 为
+`r3-request-391938ff2c07459b8d8f15229324e12f`，wire 引用和原 failed receipt 见审查 JSON。
+这是 Provider/网关完成响应失败；不能推断模型内部为何无内容，也不能将其归因于数学 Schema、
+source 准入或 Native 求解器。没有完整 Main 响应、工具动作、route、方法阅读、Plan 或分析绑定。
+
+原 CLI exit=1，请求已按失败结算，pending Provider=0、unconsumed_response=null、pending science=null、
+occupied resources 为空。原 research_status=ready；本次结束是 Provider 异常退出，既没有 Main
+STOP/SELECT，也没有 supervisor_pause，不能冒充科研停止。未重发已结算请求、恢复成第二个
+运行窗口、免除失败计费或以 Operator 补交数学请求。剩余额度不构成另一次执行许可。
+
+| 项目 | 实际使用 / 剩余 |
+| --- | --- |
+| Provider | 1/12；余 11 |
+| 公共操作 | 0/32；余 32 |
+| 共享数学 | 0/4；余 4 |
+| Reporter / Main Plan / 数学请求与结果 | 全 0 |
+| 数学 Worker / Native builds / callbacks / rollouts / physics_steps | 全 0 |
+| 独立物理 / NMPC / RL / NLP / BDF | 全 0 |
+| numerical_s / control_initialization_s | 0.4964591 / 0.1275775，均是原准备开销，未重置 |
+
+## 对照 B5 与最终五项判断
+
+| 观察 | B5 | B6 实际可观察结果 |
+| --- | --- | --- |
+| 默认 direct_plan | 前 10 次 generate | 首次真实 wire 为 diagnose，真实 Plan Schema action enum 也只有 diagnose |
+| 单方法阅读 | 4 次，含重复 3 次 | 0；Provider 先失败，不能解释为减少重复阅读 |
+| 正式 diagnose | 第 11 次 | 无 |
+| research_analysis / Native computed / 结果后决策 | 全 0 | 全 0，均尚未进入对应阶段 |
+
+1. **三处界面缺口**：离线 4 项验收通过。A 的 diagnose 默认已由首个真实 wire 验证；B/C 的首次
+   方法交付、稳定已读与窗口说明只在实际 Mock HTTP wire 中得到验证，本次真实 Provider 未进入
+   方法阅读，不能声称三处都经过完整真实交互验证。首个 L0 的 loaded.tool=null 指没有显式 route，
+   并非没有 Plan：direct_plan.action=diagnose 与实际 Plan Schema 一致。
+2. **是否更早行动、减少重复阅读**：入口默认已纠正；Main 的行动效率没有可比较的真实行为样本。
+   不能用一次传输失败与 B5 十二次正常响应作效率或严格因果比较。
+3. **M1/M2/M3**：本轮均未达到。没有自主正式 Plan、实际数学结果或数值证据驱动的后续判断。
+4. **M2 的真实断点**：Provider/网关 HTTP 502，发生在任何 Main 工具动作之前；不是本次观察到
+   的模型行动停滞、数学 Schema、来源准入或数学 Worker 故障，后三者根本未被真实请求检验。
+5. **Native 机制敏感性后续条件**：原方法、准入、单方法交付和执行入口具备离线工程准备条件，
+   未更改科学内核；但本轮尚未取得 Main 自主使用 Native 方法的真实新证据，无法据此确认自主
+   科研闭环或数值有效性。M0 的历史机制字段没有重算或导入本 M。任何未来实际数值仍限仿真参考。
+
+完整正式 Store、失败准备 Store、授权和原始请求均保留本地；仅提交源码、必要测试、准确配置与
+非敏感审查投影，不提交凭据、Knowledge 正文或 opaque Provider 输出。本轮真实窗口已经结束；
+提交并 push 新独立分支后停止，不合并、不增加试验。
