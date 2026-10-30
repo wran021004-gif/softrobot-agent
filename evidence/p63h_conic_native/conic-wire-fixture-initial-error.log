@@ -1,0 +1,113 @@
+test_mock_main_wire_requests_conic_without_solver_fields_or_automatic_native (tests.research.test_p63h_scientific_initialization.ScientificInitializationTests.test_mock_main_wire_requests_conic_without_solver_fields_or_automatic_native) ... exception=<APIConnectionError> | event loop cycle failed
+ERROR
+
+======================================================================
+ERROR: test_mock_main_wire_requests_conic_without_solver_fields_or_automatic_native (tests.research.test_p63h_scientific_initialization.ScientificInitializationTests.test_mock_main_wire_requests_conic_without_solver_fields_or_automatic_native)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_base_client.py", line 1709, in request
+    response = await self._send_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_client.py", line 1097, in _send_request
+    response = await self._send_with_auth_retry(request, stream=stream, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_client.py", line 1075, in _send_with_auth_retry
+    response = await super()._send_request(request, stream=stream, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_base_client.py", line 1628, in _send_request
+    return await self._client.send(request, stream=stream, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\Documents\Codex\2026-10-30\files-pasted-by-the-user-p6-2\work\softrobot-h\tools\research\agent.py", line 795, in handle_async_request
+    raise ValueError('SEALED_STOP_OR_PENDING_WORK_BLOCKS_SEND')
+ValueError: SEALED_STOP_OR_PENDING_WORK_BLOCKS_SEND
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 360, in event_loop_cycle
+    async for tool_event in tool_events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 1029, in _handle_tool_execution
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 451, in recurse_event_loop
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 302, in event_loop_cycle
+    async for model_event in model_events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 691, in _handle_model_execution
+    raise e
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 609, in _handle_model_execution
+    async for event in agent._middleware_registry.invoke(
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\_middleware\registry.py", line 167, in invoke
+    async for event in gen:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 740, in terminal
+    async for event in stream_messages(
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\streaming.py", line 572, in stream_messages
+    async for event in process_stream(chunks, start_time, cancel_signal):
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\streaming.py", line 460, in process_stream
+    async for chunk in chunks:
+  File "C:\Users\gugugaga\Documents\Codex\2026-10-30\files-pasted-by-the-user-p6-2\work\softrobot-h\tools\research\provider.py", line 402, in stream
+    async for item in super().stream(*args,**kwargs):
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\models\openai.py", line 736, in stream
+    response = await client.chat.completions.create(**request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2907, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_base_client.py", line 1992, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\openai\_base_client.py", line 1744, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\gugugaga\Documents\Codex\2026-10-30\files-pasted-by-the-user-p6-2\work\softrobot-h\tests\research\test_p63h_scientific_initialization.py", line 84, in test_mock_main_wire_requests_conic_without_solver_fields_or_automatic_native
+    wires=run_fixture(self.h,[('research_analysis',question),None])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\Documents\Codex\2026-10-30\files-pasted-by-the-user-p6-2\work\softrobot-h\tests\research\test_recent_round_tools.py", line 47, in run_fixture
+    asyncio.run(agent.converse(h,max_new_provider_requests=limit,pause_after_completed_invocations=1))
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\Documents\Codex\2026-10-30\files-pasted-by-the-user-p6-2\work\softrobot-h\tools\research\agent.py", line 1254, in converse
+    result=await agent.invoke_async(None if resume else INVOCATION_PROMPT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\agent\agent.py", line 1017, in invoke_async
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\agent\agent.py", line 1434, in stream_async
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\agent\agent.py", line 1578, in _run_loop
+    async for event in self._middleware_registry.invoke(
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\_middleware\registry.py", line 167, in invoke
+    async for event in gen:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\agent\agent.py", line 1733, in terminal
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\agent\agent.py", line 1788, in _execute_event_loop_cycle
+    async for event in events:
+  File "D:\softrobot-agent\.f3-prestudy-env\Lib\site-packages\strands\event_loop\event_loop.py", line 410, in event_loop_cycle
+    raise EventLoopException(e, invocation_state["request_state"]) from e
+strands.types.exceptions.EventLoopException: Connection error.
+
+----------------------------------------------------------------------
+Ran 1 test in 11.110s
+
+FAILED (errors=1)

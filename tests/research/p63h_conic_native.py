@@ -34,7 +34,7 @@ def host():
     return h
 
 
-def run_analysis(h, name, candidate, **fields):
+def run_analysis(h, name, candidate, *, allow_incomplete=False, **fields):
     query = dict(candidate=candidate, operating_point='standardized_initial_pretension',
         protocol=state(h)['spec']['analysis_protocol'], **fields)
     out = analysis.dispatch(h, query, 'p63h-'+name, guard=core.guard, origin='engineering_preflight')
@@ -43,8 +43,8 @@ def run_analysis(h, name, candidate, **fields):
     print(json.dumps(dict(stage=name, status=raw.get('status'), reference=out.get('reference'),
         J=raw.get('nonlinear_capability',{}).get('J'), reason=raw.get('reason'),
         charged_s=raw.get('charged_numerical_s')), allow_nan=False), flush=True)
-    if raw.get('status') != 'computed':
-        raise RuntimeError('Retain failed evidence and costs: '+name+' '+json.dumps(out))
+    if raw.get('status') != 'computed' and not allow_incomplete:
+        raise RuntimeError('Retain failed evidence and costs: '+name+' '+str(out.get('reference')))
     return out['reference'], raw
 
 
@@ -67,9 +67,9 @@ def settings(h):
         minimum_radius_n=.0001, evaluation_requests=200, iterations=60, safety_margin_fraction=0.)
 
 
-def native(h, name, candidate, source):
+def native(h, name, candidate, source, *, allow_incomplete=False):
     return run_analysis(h,name,candidate,operation=T1_OPERATION,model_source='mujoco',
-        control_optimization=dict(source=source, settings=settings(h)))
+        control_optimization=dict(source=source, settings=settings(h)),allow_incomplete=allow_incomplete)
 
 
 def h1(h):
@@ -94,9 +94,12 @@ def h1(h):
         info.update(conic_result=conic_ref,conic_source=seed['source'],conic_source_wall_s=time.perf_counter()-started)
         atomic_json(prepared,info)
     a, ar = native(h,'direct',candidate,info['baseline_source'])
-    b, br = native(h,'guided',candidate,info['conic_source'])
+    b, br = native(h,'guided',candidate,info['conic_source'],allow_incomplete=True)
     assert ar['requested_operation']['control_optimization']['settings']==br['requested_operation']['control_optimization']['settings']
-    for label,source in [('replay-direct',ar['control_schedule_reference']),('replay-guided',br['control_schedule_reference']),('replay-conic',info['conic_source'])]:
+    sources=[('replay-direct',ar['control_schedule_reference']),('replay-conic',info['conic_source'])]
+    if br.get('control_schedule_reference'):
+        sources.insert(1,('replay-guided',br['control_schedule_reference']))
+    for label,source in sources:
         replay(h,label,candidate,source)
     atomic_json(DEST/'h1-completed.json',dict(preparation=info,direct=a,guided=b,
         numerical_s=state(h)['numerical_s'],ledger=h.store.remaining(),mathematical_evaluations=state(h)['mathematical_evaluations']))
@@ -119,7 +122,9 @@ def h2(h, variable, step):
     # Predict first; only then measure Native responses. Same absolute pretensions,
     # algorithm and full callback cap as the saved base Direct Native result.
     for row in contrasts:
-        seed=physical_replay.seed_control(h,ControlSeedRequest(candidate=row['candidate'],method='baseline'),'p63h-'+row['label']+'-baseline')
+        existing=[e for e in state(h).get('control_initializations',[]) if e['candidate']==row['candidate']
+            and h.store.artifact(e['source']).get('provenance',{}).get('control_initialization')=='bounded_candidate_control_v1']
+        seed=existing[0] if existing else physical_replay.seed_control(h,ControlSeedRequest(candidate=row['candidate'],method='baseline'),'p63h-'+row['label']+'-baseline')
         original=h.store.artifact(seed['source'])['trajectory']['tensions_n']
         assert original==h.store.artifact(info['baseline_source'])['trajectory']['tensions_n']
         ref,raw=native(h,'native-'+row['label'],row['candidate'],seed['source'])

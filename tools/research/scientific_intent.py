@@ -33,6 +33,7 @@ def compile_question(host, payload, *, tool_use_id):
     from tools.research.agent import bind_selected_analysis_request
     from tools.research.design import verify_candidate
     from tools.research.optimal_capability import family_analysis_parameters
+    from tools.research.optimal_capability import CONIC
     try:
         question = ScientificQuestion.model_validate(payload)
     except ValidationError as exc:
@@ -56,7 +57,14 @@ def compile_question(host, payload, *, tool_use_id):
         view = mathematical_method_view(host,candidate)
     except (ValueError,KeyError) as exc:
         return feedback('needs_prerequisite',str(exc))
-    if q.question_type=='control_feasibility':
+    if q.question_type=='bounded_control_initialization':
+        if (q.effect_semantics is not None or q.parameter_paths or q.fixed_input or q.tensions_n is not None
+                or q.response_horizon_s is not None or q.control_scope or q.search_strategy
+                or q.requested_budget is not None or any(plain(q.source_selection).values())):
+            return feedback('unsupported','BOUNDED_INITIALIZATION_REQUIRES_LOCAL_AFFINE_SEQUENCE_SEMANTICS',
+                scope='Frozen initial GVS model, complete task and physical input box; no Native search, structural comparison or source transfer.')
+        method = CONIC
+    elif q.question_type=='control_feasibility':
         if q.effect_semantics not in (None,'reoptimized_task_capability'):
             return feedback('unsupported','CONTROL_FEASIBILITY_REQUIRES_CONTROL_REOPTIMIZATION')
         if q.parameter_paths or q.fixed_input or q.tensions_n is not None or q.response_horizon_s is not None:
@@ -98,7 +106,9 @@ def compile_question(host, payload, *, tool_use_id):
     if q.focus_metric and q.focus_metric not in metrics:
         return feedback('unsupported','FOCUS_MUST_NAME_A_REGISTERED_TASK_CONSTRAINT',
             field='focus_metric',choices=sorted(metrics))
-    if method==T1:
+    if method==CONIC:
+        compiled = dict(model_source='gvs',operating_point='standardized_initial_pretension')
+    elif method==T1:
         if q.source_selection.comparison_candidates or q.source_selection.t1_results:
             return feedback('unsupported','CONTROL_SEARCH_REQUIRES_A_CONTROL_SOURCE_NOT_STRUCTURAL_EVIDENCE')
         plan_budget = intent['agent_hypothesis']['decision'].get('requested_budget',0)

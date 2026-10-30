@@ -1,0 +1,35 @@
+{
+  "main_regression": {
+    "tests": 80,
+    "elapsed_s": 118.159,
+    "status": "passed",
+    "modules": [
+      "test_p63h_scientific_initialization",
+      "test_p63c2_scientific_intent",
+      "test_conic_capability",
+      "test_capability_sensitivity",
+      "test_s129_task_capability",
+      "test_native_control",
+      "test_nonlinear_capability",
+      "test_f3_control_handoff"
+    ]
+  },
+  "final_targeted": {
+    "tests": 5,
+    "elapsed_s": 13.223,
+    "status": "passed",
+    "modules": [
+      "test_p63h_scientific_initialization",
+      "test_p63h_cost_history"
+    ]
+  },
+  "distinct_tests": 82,
+  "notes": "Four initialization tests repeated after provider schema description refinement. Fixtures and the existing bounded GVS pair regression are separate from the original P6.3-H research Store and never used as H1/H2 scientific results.",
+  "conic_main_wire": {
+    "tests": 1,
+    "elapsed_s": 10.698,
+    "status": "passed",
+    "scope": "Mock HTTP and stub worker; original two evaluation charges retained; no numeric solve or automatic Native/source initialization."
+  },
+  "initial_fixture_error": "An extra wire test initially indexed an omitted optional control_optimization field in its stub, leaving a synthetic pending request; fixed to use get(), rerun passed. Initial fixture failure log retained. No production/scientific failure was hidden."
+}

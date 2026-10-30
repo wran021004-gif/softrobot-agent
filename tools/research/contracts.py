@@ -322,7 +322,8 @@ class ScientificSources(Contract):
 class ScientificQuestion(Contract):
     """Scientific choices only; the completed Plan owns hypothesis and candidate."""
     version: Literal['scientific_question_v1'] = 'scientific_question_v1'
-    question_type: Literal['control_feasibility','structure_parameter_effect']
+    question_type: Literal['control_feasibility','bounded_control_initialization','structure_parameter_effect'] = Field(
+        description='control_feasibility requests original finite-budget Native T1. bounded_control_initialization requests a bounded sequence in the frozen local affine GVS model, for optional later capability_sequence initialization; it does not run Native or establish physical acceptance. structure_parameter_effect compares structural evidence.')
     effect_semantics: Literal['mechanism_effect','fixed_input_response','reoptimized_task_capability','closed_loop_performance','re_equilibrated_passive_response'] | None = Field(default=None,description='mechanism_effect: Jacobian/compliance/drive mechanisms; fixed_input_response: structure response with unchanged input; reoptimized_task_capability: task response after control reoptimization (finite budget here); closed_loop_performance: complete feedback execution; re_equilibrated_passive_response: passive response after solving a new equilibrium. Unsupported semantics are never substituted.')
     parameter_paths: list[str] = Field(default_factory=list,max_length=8,description='Actual registered physical design paths. C2 supports one independent continuous path per structural question.')
     focus_metric: str | None = Field(default=None,description='Registered task constraint ID or native observable; focus does not remove any frozen acceptance constraint.')

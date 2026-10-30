@@ -33,6 +33,8 @@ DECISION_PLAN_DESCRIPTION=('Choose an available research action with a typed dec
     'For STOP, retrieve and cite the complete new result index.')
 QUESTION_PLAN_DESCRIPTION=('Record a scientific hypothesis and an owned candidate through diagnose; no mathematical solver name is required. '
     'Then submit ScientificQuestion directly to research_analysis. Other Plan payloads retain their original contracts. '
+    'bounded_control_initialization optionally computes a local affine bounded sequence; control_feasibility retains Native T1. '
+    'A Conic result may be explicitly passed to initialize_control(method=capability_sequence,response_evidence=result); Native remains a separate choice. '
     'Only independent evaluation establishes task acceptance. SELECT requires a public read of the exact fresh passing result; STOP requires the complete new result index.')
 def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False,study=None):
     """Advertise only executable action payloads and their reachable definitions."""
@@ -46,6 +48,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         decision['properties']['selected_method']['description']='Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.'
         schema['$defs']['ControlSeedRequest']['properties']['method']['description']=(
             'baseline with only candidate uses candidate pretensions over the full frozen task grid, without task evaluation. '
+            'capability_sequence with candidate and response_evidence uses an owned saved Conic sequence after original numerical and binding checks; no acceptance is inherited. '
             'Use the returned legal control source, never the structure candidate, when source selection is needed. '
             'Initialization supersedes the latest diagnose: submit a new candidate-bound diagnose Plan with your hypothesis; '
             'no underlying mathematical method name is required. Then submit ScientificQuestion directly to research_analysis. '
