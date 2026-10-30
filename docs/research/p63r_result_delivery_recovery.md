@@ -180,3 +180,28 @@ Worker 和 kernel 时间存在重叠，不能再次相加为总费用。完整�
 直接范围字段遗漏和监控连接生命周期缺陷。没有验证出自主独立复验、正式通过或合法
 Main 收尾。未来只有获得未知请求的外部确证并走原恢复/绑定机制后才能继续；当前
 保留冻结代码与完整证据供审计，不擅自扩展预算或开展第二轮任务。
+
+## 字段修复的最终隔离验收
+
+后续最小修复冻结为 `eafae8c6aeac19ba167477a6c83e755bf4f8787c`。使用接续前
+24/94 SQLite 与 SDK 检查点，并从原 P63-V1-original-run.zip 取回其匹配的三个
+配置文件；先逐值核对原 freeze/profile/spec，再只写入新隔离副本。原检查点的
+数据库与 SDK 均不改动。原 bind/restore-only 与一次 Mock Main 全部通过：副本
+24→25，真实 Provider 0、科学 Worker 0、旧请求重放 0，94 数学及两轮搜索保持。
+原 bind 为 0.870 s，SDK restore-only 14.208 s，handoff committed 12.902 s，
+一次 Mock converse 204.255 s。最终 Mock wire 为 105033 bytes，完整编译范围、
+resolved_domains、旧两轮最优指标与底层数学 registered/scientific_result 资格
+直接可见。完整输入/输出与时序见 p63r_scope_recovery_validation.json。
+
+真实 Store 仍保留 b0f0faa 和 unknown 回执，没有使用此副本替代真实 Study，
+也没有赋予旧候选新的科学身份。只读核对当前监听网关 PID 与原保留来源一致，
+源码哈希未变；其路由只有 health、models 和 chat/completions，没有历史响应
+读取接口，也不持久保存响应，且上游请求明确 store:false。没有额外 HTTP/Provider
+调用或认证改动。此项核对进一步确认无法从现有本地证据安全恢复第 32 次响应，
+详见 p63r_gateway_recovery_limits.json。
+
+## 原始证据与交付校验
+
+原 core.export 导出和完整原运行 ZIP 均已保存。原 SQLite integrity_check=ok；ZIP CRC 全部通过；原 70703 个 Store/SDK/Worker 文件的大小与时间戳保持，另有 24 份完整运行诊断逐字节核对通过。
+ZIP 大小 887478306 bytes，SHA-256 为 `3fa8dce8874172389642f5cf73d033f30b9b0f91fd262a696838e193a3aece34`；归档耗时 378.483 s。旧 G3/V 交付不覆盖。
+本轮独立分支保留修复和研究记录，附增量 Git bundle 保存实际 b0f0faa 科研冻结及后续修复的精确本地提交。GitHub API 提交元数据导致的 SHA 差异用 publication 映射记录，并逐次验证 tree 哈希一致；不 force push、不自动合并。
