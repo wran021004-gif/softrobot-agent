@@ -157,14 +157,10 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             params=plain(build.request);compile_input(cfg,registry())
         elif comparison is not None:cfg=comparison['configuration']
         if passive:
-            from pathlib import Path
-            from uuid import uuid4
             from extensions.tendon_family.passive import PassiveModel
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
             from extensions.tendon_family.compiler import resolve
-            from tools.paths import ROOT
-            folder=ROOT/'runs'/('mechanism-'+uuid4().hex[:8]);folder.mkdir(parents=True)
-            native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'],folder/'model.xml')
+            native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'])
             mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s)
             data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
         else:native=NativeModel(cfg)
@@ -205,6 +201,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         scope='Task initial state, fixed generalized pose and saved native state are distinct. Changed structures use named-coordinate transfer/reset, not equal Cartesian state, energy or equilibrium.',
         unsupported_conclusions=['full task improvement','task success','strict derivative','structural descent certificate',
             'passive constraint nullspace','hardware performance'])
+    if passive:
+        evidence['scope']='Each rebuilt legal assembly solves both frozen zero-load and selected loaded equilibria. Payout is fixed across load cases; hard equilibrium is separate from native soft-limit dynamics.'
+        evidence['unsupported_conclusions'].remove('passive constraint nullspace')
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
@@ -223,6 +222,15 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 if passive and study.target.quantity=='re_equilibrated_position_response':
                     from extensions.math_analysis.differentiation_router import re_equilibrated
                     response['implicit_sensitivity']=re_equilibrated(row,base,records,models,response,study)
+                if passive:
+                    branch=base['mechanics']['equilibrium']['equilibrium']
+                    changed=any(r['mechanics']['equilibrium']['equilibrium'][key]!=branch[key]
+                        for r in records[first:] for key in ('active','positive'))
+                    qualified=all(r['mechanics']['constraint_state']['qualified'] for r in [base,*records[first:]])
+                    response['branch_status']='active_set_switch' if changed else 'unqualified' if not qualified else 'same_active_set'
+                    if changed or not qualified:
+                        response.update(direction_status='directional_comparison',suggested_delta=None,selected_record_index=None)
+                        response['consistency'].update(passed=False,reason=response['branch_status'])
                 response.update(parameter_path=row['parameter_id'],parameter_unit=row['unit'],
                     model_effect_observed=any(r['compiled_physical_changes'] for r in records[first:]))
                 if not response['model_effect_observed']:
@@ -332,8 +340,16 @@ def summary(value, reference):
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
     sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]
+    for compact,row in zip(sensitivity,raw.get('parameter_sensitivities',[])):
+        if row.get('implicit_sensitivity'):
+            compact['implicit_sensitivity']={k:row['implicit_sensitivity'][k] for k in
+                ('status','baseline_included','relative_error','gradient_trustworthy','strict_derivative','reason') if k in row['implicit_sensitivity']}
+    constraint_state=raw.get('constraint_state')
+    if constraint_state:
+        constraint_state={k:v for k,v in constraint_state.items() if k!='native_soft_length_residual_m'}
+        constraint_state['native_soft_length_excess_m']=max(0.,max(raw['constraint_state']['native_soft_length_residual_m']))
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
-        physical_problem=raw.get('physical_problem'),constraint_state=raw.get('constraint_state'),point_binding=raw.get('point_binding'),
+        physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,

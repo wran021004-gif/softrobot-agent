@@ -303,6 +303,9 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
         resolved['capabilities']=dict(declarative=True,materialized=True,physically_compiled=True,
             gvs_basis_resolved=True,gvs_model_built=False,gvs_dynamics_evaluated=False,
             controller_update_tested=False,complete_task_evaluated=False)
+        if cfg['task'].get('physical_problem'):
+            resolved['capabilities']['gvs_basis_resolved']=False
+            resolved['controller_preparation']=dict(status='no_active_control',registered_acceptance='not_registered')
         if identity in s['candidates']:
             ref=s['candidates'][identity]
             save(host,dict(candidate=ref,request=plain(request),provenance=provenance),'candidate_reused')

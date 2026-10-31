@@ -276,6 +276,15 @@ def main_packet(host, packet):
     if continuation.get('pending_feedback'):
         from tools.research.session_handoff import main_feedback_projection
         continuation['pending_feedback']=main_feedback_projection(host,continuation['pending_feedback'])
+    if state(host)['spec'].get('canonical_task',{}).get('physical_problem'):
+        mathematical=research.get('mathematical_research') or {}
+        research['mathematical_research']={k:v for k,v in mathematical.items() if k in
+            ('status','candidate','latest_result','parameters','method_directory_query','detail_query')}
+        handoff=continuation.get('analysis_handoff')
+        if handoff:
+            handoff.pop('parameter_catalog',None)
+            handoff['parameter_query']=dict(reference=mathematical.get('candidate'),view='mathematical_capabilities',pointer='/structure_research/parameters')
+            handoff['next']='Choose a frozen load and registered constrained target; inspect, differentiate, optimize or compare. Main independently decides whether to generate a proposed structure.'
     seen={}
     def deduplicate(item,path):
         if isinstance(item,dict):

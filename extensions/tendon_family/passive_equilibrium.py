@@ -96,7 +96,7 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
         assumptions='native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium')
 
 
-def tangent(native,equilibrium,s,force,locations,increment=.1):
+def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1.,0.,0.)):
     if equilibrium['status']!='qualified_local_minimum':raise ValueError('QUALIFIED_EQUILIBRIUM_REQUIRED')
     problem=StaticProblem(native,s,force);q=np.array(equilibrium['qpos']);tension=np.array(equilibrium['tensions_n'])
     H,asym=problem.hessian(q,tension);d=problem.at(q);J=problem.jacobian(q);g=problem.constraint(q)
@@ -105,7 +105,7 @@ def tangent(native,equilibrium,s,force,locations,increment=.1):
     for loc in locations:
         JF=native.point(d,material_point(native.physics,loc))[1]
         for sign in (1,-1):
-            rhs=JF[0]*increment*sign;constraints=[]
+            rhs=np.asarray(direction_world)@JF*increment*sign;constraints=[]
             # Remove linearly dependent positive rows without changing their row space.
             if positive.any():
                 _,sv,V=np.linalg.svd(J[positive],full_matrices=False);A=V[sv>max(sv[0]*1e-8,1e-12)]
@@ -115,7 +115,7 @@ def tangent(native,equilibrium,s,force,locations,increment=.1):
             r=minimize(lambda x:500*x@H@x-1000*rhs@x,np.zeros(native.model.nv),jac=lambda x:1000*(H@x-rhs),
                 constraints=constraints,method='SLSQP',options=dict(ftol=1e-12,maxiter=200))
             problem.cost['QP_calls']+=1;problem.cost['optimizer_iterations']+=int(r.nit)
-            dx=float(JF[0]@r.x);tip=float(np.linalg.norm((Jtip@r.x)[:2]))
+            dx=float(np.asarray(direction_world)@JF@r.x);tip=float(np.linalg.norm((Jtip@r.x)[:2]))
             predictions.append(dict(s=loc,force_increment_n=sign*increment,point_dx_m=abs(dx),tip_xy_m=tip,ratio=tip/max(abs(dx),1e-15),
                 dq=r.x.tolist(),success=bool(r.success),iterations=int(r.nit),message=r.message))
     return dict(method='passive_constrained_compliance_v2',status='smooth_fixed_active_set' if equilibrium['LICQ'] and equilibrium['strict_complementarity'] else 'nonsmooth_or_degenerate',
@@ -157,6 +157,8 @@ def mechanics(native,condition,material_s):
             active_count=int(sum(active)),positive_count=int(sum(positive)),slack_count=int(sum(~active)),boundary_count=int(sum(active&~positive)),
             stationarity_inf_nm=eq['stationarity_inf_nm'],primal_violation_m=eq['primal_violation_m'],
             native_soft_reaction_inf_nm=float(np.max(abs(data.qfrc_constraint))),native_soft_length_residual_m=(data.ten_length-native.payout).tolist()),
+        feasible_cone=dict(equalities=J[positive].tolist(),inequalities=J[active&~positive].tolist(),
+            meaning='J_positive dq=0; J_boundary dq<=0. Slack rows impose no local motion equality.'),
         point_binding=dict(material_s=material_s,load=load.model_dump(mode='json'),frame='world'),
         components=dict(joint_stiffness_nm_rad=native.model.jnt_stiffness.tolist(),constraint_payout_m=native.payout.tolist()),registered_acceptance='not_registered')
 

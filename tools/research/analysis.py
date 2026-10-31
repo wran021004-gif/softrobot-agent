@@ -256,7 +256,7 @@ def scoped_result(result, requirements, applicability, query):
     elif result['status'] == 'computed':
         if result.get('structure_research'):
             conclusion,verification,pointer='diagnostic','local_mechanism_numerical_observation','/structure_research'
-            interpretation='Instantaneous native mechanism and controlled structural finite differences only; candidate proposal is not task success or a strict descent certificate.'
+            interpretation='Declared local native mechanism, constrained equilibrium or structural sensitivity only; candidate proposal is not task success or a strict descent certificate.'
         elif result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'

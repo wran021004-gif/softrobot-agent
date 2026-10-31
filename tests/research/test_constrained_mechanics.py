@@ -47,6 +47,7 @@ def prepared_host():
     (folder/'space.json').write_text(json.dumps(space),encoding='utf-8')
     cfg=json.loads((ROOT/'configs/research/study_s125_cold.json').read_text())
     cfg.update(study_id=name,task=str(folder/'task.json'),family_space=str(folder/'space.json'),control='control.json',
+        execution_instructions='Research the frozen passive assembly through mechanism_research. Choose load conditions, constrained observables, legal physical parameters and finite mathematical effort. Compare constrained motion and load compliance. Decide whether evidence supports a structural proposal; only you choose whether to generate it. Passive independent dynamic acceptance is not registered; do not claim SELECT eligibility. Use English.',
         mathematical_methods=dict(mechanism_structure_v1='Stage II authorized bounded real constrained mathematics'),
         family_sensitivity_variables=dict(version='family_sensitivity_v2',variables=['segments.*.young_pa','payout_lengths_m.*']))
     cfg['budgets']['mathematical_evaluations']=12
@@ -77,6 +78,95 @@ def passive_question(operation='inspect',quantity='tangent_compliance',budget=1)
 
 
 class ConstrainedMechanicsTests(unittest.TestCase):
+    def test_real_active_two_scale_native_path(self):
+        from tests.research.test_r3_b_stage1 import integrated_host,structure_question
+        from tools.research.scientific_intent import compile_question
+        from tools.research import analysis
+        from tools.research.state import state
+        h,c=integrated_host();q=structure_question()
+        request=compile_question(h,q,tool_use_id='real-active-difference')
+        self.assertEqual(request['status'],'ready',request)
+        result=analysis.dispatch(h,request['request'],'real-active-two-scale',guard=lambda *a:None,origin='engineering_preflight')
+        self.assertEqual(result['status'],'computed',result)
+        self.assertEqual(result['structure_research']['cost']['model_builds'],5)
+        self.assertEqual(result['structure_research']['cost']['physics_steps'],0)
+        (OUT/'active_two_scale.json').write_text(json.dumps(dict(scope='Real native worker, no synthetic numerical matrices',result=result),indent=2),encoding='utf-8')
+
+    def test_real_shared_worker_v4_feedback_and_generation(self):
+        from unittest.mock import patch
+        from tests.research.test_recent_round_tools import run_fixture
+        from tests.research.test_p63g3_action_handoff import diagnosis
+        from tests.research.test_information_flow import packet,generation
+        from tools.research.state import state
+        from tools.research.research_context import agent_decision_brief
+        h,c=prepared_host();spec=deepcopy(state(h)['spec'])
+        with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+            wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),
+                ('research_plan',diagnosis(c,'mechanism_research')),
+                ('research_analysis',passive_question(quantity='constraint_tip_row_residual')),
+                ('research_analysis',passive_question()),
+                ('research_analysis',passive_question('differentiate','re_equilibrated_position_response',5)),None])
+        s=state(h);self.assertEqual(s['spec'],spec);self.assertEqual(s['mathematical_evaluations'],7)
+        self.assertEqual(len(s['analysis_results']),3)
+        raw=h.store.artifact(s['analysis_results'][-1]);self.assertEqual(raw['status'],'computed',raw)
+        sensitivity=raw['structure_research']['parameter_sensitivities'][0]
+        self.assertTrue(sensitivity['consistency']['passed'],sensitivity)
+        self.assertTrue(sensitivity['implicit_sensitivity']['baseline_included'])
+        self.assertEqual(sensitivity['implicit_sensitivity']['status'],'regular_implicit_gradient',sensitivity)
+        self.assertEqual(raw['structure_research']['cost']['physics_steps'],0)
+        self.assertEqual(raw['structure_research']['cost']['equilibrium_solves'],10)
+        l0=packet(wires[-1]);latest=l0['mathematical_research']['latest_result']
+        self.assertEqual(latest['status'],'computed');self.assertEqual(latest['effect_semantics'],'re_equilibrated_passive_response')
+        self.assertEqual(latest['structure_research']['registered_acceptance'],'not_registered')
+        self.assertEqual(l0['reporter_findings'][-1]['status'],'unavailable')
+        direction=raw['structure_research']['structure_direction'];self.assertTrue(direction['proposal_only'])
+        p=generation(h);p['generation']=direction['generation_handoff']['generation'];p['supporting_evidence']=[s['analysis_results'][-1]]
+        p['decision']['selected_candidate']=c
+        with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+            generated=run_fixture(h,[('research_route',dict(tool='research_plan',action='generate')),('research_plan',p),None],id_offset=len(wires))
+        self.assertEqual(len(state(h)['candidates']),2)
+        attribution=agent_decision_brief(h)['mechanism_research']
+        self.assertTrue(attribution['suggestion_adopted']);self.assertTrue(attribution['formal_candidate_created'])
+        import re
+        for wire in wires+generated:
+            text=json.dumps(wire)
+            self.assertIsNone(re.search(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',text,re.I))
+            self.assertNotIn('x-research-',text)
+            tail=packet(wire)
+            self.assertNotIn('Jlength',json.dumps(tail));self.assertNotIn('KKT_condition',json.dumps(tail))
+        (OUT/'passive_wire.json').write_text(json.dumps(dict(scope='Actual SDK/Mock HTTP; numerical workers use real MuJoCo. Zero real Provider requests.',
+            question=passive_question('differentiate','re_equilibrated_position_response',5),wire=wires[-1],generation_wire=generated[-1]),indent=2),encoding='utf-8')
+        (OUT/'passive_sensitivity.json').write_text(json.dumps(dict(scope='Real compiled models and constrained equilibrium/KKT computations; not independent dynamic acceptance',
+            result=raw,study_cost=state(h)['analysis_costs']),indent=2),encoding='utf-8')
+
+    def test_domains_boundary_cone_and_unqualified_equilibrium(self):
+        from extensions.tendon_family.contracts import Design,ConstrainedPhysicalProblem
+        from extensions.tendon_family.passive_equilibrium import tangent,mechanics
+        from extensions.math_analysis.mechanism_registry import observe
+        from tools.research.contracts import PhysicalMechanismTarget,MechanismQuestionV2
+        from pydantic import ValidationError
+        space,request,design,mesh,physics,problem=physical_fixture()
+        invalid=deepcopy(design);invalid['fixed_payout_lengths_m']['tendon_0']=-1
+        with self.assertRaises(ValidationError):Design.model_validate(invalid)
+        old=deepcopy(request);oldspace=deepcopy(space);oldspace.pop('passive_payout_domains_m');old['family_space_identity']=digest(oldspace)
+        with self.assertRaisesRegex(ValueError,'PAYOUT_REQUIRES'):generate_family(dict(space=oldspace,request=old))
+        contact={**problem,'contact_mode':'frictional'}
+        with self.assertRaises(ValidationError):ConstrainedPhysicalProblem.model_validate(contact)
+        with self.assertRaises(ValidationError):MechanismQuestionV2.model_validate(passive_question()['structure'])
+        boundary=deepcopy(physics);boundary['fixed_payout_lengths_m']['tendon_0']=physics['reference_lengths_m'][0]
+        folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
+        native=PassiveModel(boundary,problem,folder/'model.xml')
+        record=mechanics(native,'unloaded',.5)
+        self.assertTrue(record['constraint_state']['qualified']);self.assertEqual(record['constraint_state']['boundary_count'],1)
+        self.assertIsNone(record['constrained_motion_subspace'])
+        response=tangent(native,record['equilibrium']['equilibrium'],.5,[0.,0.,0.],[.5],increment=.001,direction_world=(0.,1.,0.))
+        self.assertEqual(response['status'],'nonsmooth_or_degenerate');self.assertEqual(response['numerical_cost']['QP_calls'],2)
+        target=PhysicalMechanismTarget(quantity='tangent_compliance',reduction='norm')
+        self.assertEqual(observe(record,target)['status'],'not_applicable')
+        record['equilibrium']['equilibrium']['status']='unqualified'
+        with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,record['equilibrium']['equilibrium'],.5,0.,[.5])
+        (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium and directional QPs',mechanics=record,tangent=response),indent=2),encoding='utf-8')
+
     def test_real_passive_compilation_and_equilibrium(self):
         space,request,design,mesh,physics,problem=physical_fixture()
         folder=ROOT/'runs'/('stage2-numerics-'+uuid4().hex[:8]);folder.mkdir(parents=True)

@@ -41,6 +41,8 @@ def scientific_actions(spec):
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
             scope='inspect / differentiate / optimize / compare instantaneous mechanisms and explicit M1/M2 evidence. Main owns target, direction and adoption.'))
     for row in actions:
+        if spec.get('canonical_task',{}).get('physical_problem') and row['scientific_goal']!='mechanism_research':
+            row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.')
         row.setdefault('domain','structure_control' if row['scientific_goal']=='structure_control_codesign' else
             'control' if row['scientific_goal']=='control_feasibility' else 'structure')
     return actions
@@ -104,6 +106,17 @@ def question_schema(spec, candidate=None, action=None):
                 required=['operation','effect_semantics'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
+        if candidate and candidate['configuration']['task'].get('physical_problem'):
+            from extensions.math_analysis.mechanism_registry import CONSTRAINED
+            problem=candidate['configuration']['task']['physical_problem']
+            props=schema['$defs']['ScientificStructureV4']['properties']
+            props['physical_problem']={'type':'string','const':problem['mode']}
+            props['control_treatment']={'type':'string','const':'no_active_control'}
+            props['operating_point']={'type':'string','const':'re_equilibrated'}
+            props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
+            props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
+            schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':list(CONSTRAINED)}
+            schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
@@ -168,6 +181,8 @@ def compile_question(host, payload, *, tool_use_id):
                     isinstance(structure.get('target'),dict) and 'goal' not in structure['target']):
                 return dict(status='needs_choice',reason='EXPLICIT_MECHANISM_GOAL_REQUIRED',fields=['structure.target.goal'],scientific_execution_started=False)
             return compile_mechanism(host,structure,tool_use_id=tool_use_id,v4=True)
+        if spec.get('canonical_task',{}).get('physical_problem'):
+            return dict(status='unsupported',reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OPTIMIZATION',scientific_execution_started=False)
         if q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
         return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificQuestionV3,source_question=payload)
