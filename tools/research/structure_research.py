@@ -31,6 +31,12 @@ def group_matches(row, group):
 
 def prepare_context(spec, candidate, study, comparisons):
     """Read-only actual-domain/source admission before the existing reservation."""
+    problem=candidate['configuration']['task'].get('physical_problem')
+    if problem:
+        if study.point_semantics!='re_equilibrated' or study.load_condition not in [x['name'] for x in problem['loads']]:
+            raise ValueError('FROZEN_PASSIVE_LOAD_AND_RE_EQUILIBRATION_REQUIRED')
+        if study.target.quantity=='re_equilibrated_position_response' and study.effect_semantics!='re_equilibrated_passive_response':
+            raise ValueError('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
     rows={r['parameter_id']:r for r in parameters(spec,candidate)};selected=[]
     if study.operation in ('differentiate','optimize'):
         if spec.get('fixed_structure_reference'):raise ValueError('FROZEN_FIXED_STRUCTURE_FORBIDS_STRUCTURAL_PROBES')
@@ -165,7 +171,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             seed=None
             if records and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
-            mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s,seed)
+            mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed)
             from tools.research_tasks import task_adapter
             mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
             data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])

@@ -18,6 +18,10 @@ OUT=ROOT/'runs/stage2_validation'
 OUT.mkdir(parents=True,exist_ok=True)
 
 
+def summed_cost(*rows):
+    return {k:sum(row.get(k,0) for row in rows) for k in {key for row in rows for key in row}}
+
+
 def physical_fixture():
     space=plain(parse_space(json.loads((ROOT/'configs/research/family_space_s7.json').read_text())))
     request=dict(version='serial_family_generation_v2',family_space_identity=digest(space),
@@ -196,6 +200,11 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         from extensions.tendon_family.compiler import resolve
         boundary_design=deepcopy(design);boundary_design['fixed_payout_lengths_m']['tendon_0']=physics['reference_lengths_m'][0]
         boundary=resolve(boundary_design,mesh)
+        from tools.research.structure_research import prepare_context
+        from tools.research.contracts import MechanismStudy
+        wrong=MechanismStudy(operation='inspect',target=dict(quantity='tip_jacobian'),point_semantics='frozen_task_initial_state',max_evaluations=1)
+        with self.assertRaisesRegex(ValueError,'FROZEN_PASSIVE'):
+            prepare_context({},dict(configuration=dict(task=dict(physical_problem=problem))),wrong,[])
         folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
         native=PassiveModel(boundary,problem,folder/'model.xml')
         record=mechanics(native,'unloaded',.5)
@@ -205,6 +214,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(response['status'],'nonsmooth_or_degenerate');self.assertEqual(response['numerical_cost']['QP_calls'],2)
         target=PhysicalMechanismTarget(quantity='tangent_compliance',reduction='norm')
         self.assertEqual(observe(record,target)['status'],'not_applicable')
+        self.assertEqual(observe(record,dict(quantity='tip_jacobian',reduction='norm'))['status'],'computed')
         from extensions.tendon_family.passive_inverse import design_sensitivity
         models=[]
         for offset in (-1e-5,1e-5):
@@ -223,6 +233,8 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,rejected,.5,0.,[.5])
         (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium, directional QPs, active-set switch and capacity qualification failure',
             mechanics=record,tangent=response,active_set_switch=switch,incomparable=different,capacity_failure=candidate,
+            numerical_cost=summed_cost(native.cost,response['numerical_cost'],switch['numerical_cost'],
+                models[0].cost,models[1].cost,other.cost,capacity_model.cost,candidate['numerical_cost']),
             model_builds=5,physics_steps=0),indent=2),encoding='utf-8')
 
     def test_real_passive_compilation_and_equilibrium(self):
@@ -245,6 +257,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
             evidence=dict(scope='Real MuJoCo static hard-constraint equilibrium; no integration or formal acceptance',
                 design=design,mesh=mesh,physical_problem=problem,baseline=baseline,loaded=loaded,
                 native_limit_reaction_nm=data.qfrc_constraint.tolist(),native_soft_length_residual_m=(data.ten_length-native.payout).tolist(),
+                numerical_cost=summed_cost(native.cost,baseline['numerical_cost'],loaded['numerical_cost'],p.cost,dict(native_forward_calls=1)),
                 native_version=mujoco.__version__,model_builds=1,physics_steps=0,registered_acceptance='not_registered')
             (OUT/'real_equilibrium.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
 

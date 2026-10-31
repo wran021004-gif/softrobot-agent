@@ -372,6 +372,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     except (ValueError,KeyError) as exc:
         if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
         raise
+    if c['configuration']['task'].get('physical_problem') and (
+            q.operation!='mechanism_structure_v1' or q.native.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None):
+        return dict(status='not_applicable',reason='PASSIVE_MATHEMATICS_REQUIRES_NO_ACTIVE_INPUT_OR_SAVED_DYNAMIC_SOURCE',task_acceptance='unmeasured')
     sensitivity_context=None;preparation_s=0.
     if q.mechanism_study:
         from tools.research.structure_research import prepare_context
