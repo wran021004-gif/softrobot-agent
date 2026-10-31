@@ -64,7 +64,8 @@ CONSTRAINED = {
     'slack_margin':('m',['nu']), 'constrained_motion_subspace':('1',['nv','free']),
     'tangent_stiffness':('N*m/rad',['free','free']),
     'tangent_compliance':('m/N',['3','3']), 'material_point_force_response':('m/N',['3','3']),
-    're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2'])}
+    're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2']),
+    'directional_material_response':('m/N',['2','3'])}
 COMMON_GEOMETRY=('tip_jacobian','tendon_jacobian','joint_stiffness','joint_damping')
 for name,(unit,shape) in CONSTRAINED.items():
     PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame='world / named hinges / ordered fixed-payout tendons',
@@ -72,6 +73,9 @@ for name,(unit,shape) in CONSTRAINED.items():
         source='extensions.tendon_family.passive_equilibrium.mechanics',model='native hard unilateral equilibrium',
         validity='Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity.',
         meaning='Numerical local constrained observation, not independent dynamic task acceptance.')
+PRIMITIVES['directional_material_response'].update(
+    validity='Qualified equilibrium; positive rows are equalities and zero-multiplier active rows are inequalities. Two local +/-0.001 N QPs; not an ordinary gradient at a switching boundary.',
+    meaning='Two signed material-point response vectors per newton along the declared world force direction; finite-load nonlinear response remains unmeasured.')
 
 
 def catalog():

@@ -394,7 +394,7 @@ class MechanismTarget(Contract):
 
     @model_validator(mode='after')
     def directional(self):
-        directional=self.quantity in ('directional_acceleration_bounds','directional_drive','directional_tendon_row_residual','motion_decoupling')
+        directional=self.quantity in ('directional_acceleration_bounds','directional_drive','directional_tendon_row_residual','motion_decoupling','directional_material_response')
         if (self.reduction=='directional_norm' or directional) != (self.direction_world is not None):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_DIRECTION_ONLY')
         if self.direction_world is not None and abs(sum(x*x for x in self.direction_world)-1)>1e-8:
@@ -424,7 +424,7 @@ class PhysicalMechanismTarget(MechanismTarget):
     quantity: MechanismTarget.model_fields['quantity'].annotation | Literal[
         'constraint_length_jacobian','constraint_active_set','constraint_multiplier','slack_margin',
         'constrained_motion_subspace','tangent_stiffness','tangent_compliance','material_point_force_response',
-        're_equilibrated_position_response','constraint_tip_row_residual']
+        're_equilibrated_position_response','constraint_tip_row_residual','directional_material_response']
     material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
 
 

@@ -171,7 +171,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             seed=None
             if records and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
-            mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed)
+            mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed,
+                study.target.direction_world if study.target.quantity=='directional_material_response' else None)
             from tools.research_tasks import task_adapter
             mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
             data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
@@ -240,8 +241,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     changed=any(r['mechanics']['equilibrium']['equilibrium'][key]!=branch[key]
                         for r in records[first:] for key in ('active','positive'))
                     qualified=all(r['mechanics']['constraint_state']['qualified'] for r in [base,*records[first:]])
-                    response['branch_status']='active_set_switch' if changed else 'unqualified' if not qualified else 'same_active_set'
-                    if changed or not qualified:
+                    smooth=base['mechanics']['constraint_state']['status']=='smooth_fixed_active_set'
+                    response['branch_status']='active_set_switch' if changed else 'unqualified' if not qualified else 'nonsmooth_or_degenerate' if not smooth else 'same_active_set'
+                    if changed or not qualified or not smooth:
                         response.update(direction_status='directional_comparison',suggested_delta=None,selected_record_index=None)
                         response['consistency'].update(passed=False,reason=response['branch_status'])
                 response.update(parameter_path=row['parameter_id'],parameter_unit=row['unit'],

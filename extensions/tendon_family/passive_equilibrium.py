@@ -121,6 +121,7 @@ def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1
             problem.cost['QP_calls']+=1;problem.cost['optimizer_iterations']+=int(r.nit)
             dx=float(np.asarray(direction_world)@JF@r.x);tip=float(np.linalg.norm((Jtip@r.x)[:2]))
             predictions.append(dict(s=loc,force_increment_n=sign*increment,point_dx_m=abs(dx),tip_xy_m=tip,ratio=tip/max(abs(dx),1e-15),
+                point_response_m=(JF@r.x).tolist(),tip_response_m=(Jtip@r.x).tolist(),
                 dq=r.x.tolist(),success=bool(r.success),iterations=int(r.nit),message=r.message))
     return dict(method='passive_constrained_compliance_v2',status='smooth_fixed_active_set' if equilibrium['LICQ'] and equilibrium['strict_complementarity'] else 'nonsmooth_or_degenerate',
         includes_external_geometric_hessian=True,base_force_n=force,base_s=s,predictions=predictions,numerical_cost=problem.cost,
@@ -128,7 +129,7 @@ def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1
         caveat='finite increments are local extrapolations; slack activation and multiplier sign changes require nonlinear equilibrium solve')
 
 
-def mechanics(native,condition,material_s,initial=None):
+def mechanics(native,condition,material_s,initial=None,direction_world=None):
     """Registered observations at a real hard equilibrium; no task acceptance."""
     load=native.load(condition);unloaded=native.load(native.problem.baseline_load)
     baseline=solve(native,unloaded.material_s,unloaded.force_world_n,initial[0] if initial else None)
@@ -142,6 +143,9 @@ def mechanics(native,condition,material_s,initial=None):
     smooth=qualified and eq['LICQ'] and eq['strict_complementarity']
     Z=null_space(J[positive]);H=np.array(eq['H']);K=Z.T@H@Z
     C=Z@np.linalg.solve(K,Z.T) if smooth and K.size else np.zeros_like(H) if smooth else None
+    response=tangent(native,eq,load.material_s,load.force_world_n,[material_s],increment=.001,direction_world=direction_world) if qualified and direction_world is not None else None
+    if response:
+        for key,value in response['numerical_cost'].items():cost[key]+=value
     from .passive_inverse import row_match
     matched=row_match(J[positive],Jtip)
     data=p.at(q);native.apply_force(data,load.material_s,load.force_world_n);mujoco.mj_forward(native.model,data)
@@ -154,6 +158,8 @@ def mechanics(native,condition,material_s,initial=None):
         constrained_motion_subspace=Z.tolist() if smooth else None,tangent_stiffness=K.tolist() if smooth else None,
         tangent_compliance=(Jpoint@C@Jpoint.T).tolist() if C is not None else None,
         material_point_force_response=(Jpoint@C@Jpoint.T).tolist() if C is not None else None,
+        directional_material_response=(np.array([r['point_response_m'] for r in response['predictions']])/.001).tolist() if response and all(r['success'] for r in response['predictions']) else None,
+        directional_response=response,
         re_equilibrated_position_response=(point-basepoint).tolist() if qualified else None,
         constraint_tip_row_residual=matched['horizontal_row_residuals'],equilibrium=loaded,baseline_equilibrium=baseline,
         tip_jacobian_m_rad=Jtip.tolist(),tendon_jacobian_m_rad=J.tolist(),

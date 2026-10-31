@@ -207,14 +207,16 @@ class ConstrainedMechanicsTests(unittest.TestCase):
             prepare_context({},dict(configuration=dict(task=dict(physical_problem=problem))),wrong,[])
         folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
         native=PassiveModel(boundary,problem,folder/'model.xml')
-        record=mechanics(native,'unloaded',.5)
+        record=mechanics(native,'unloaded',.5,direction_world=(0.,1.,0.))
         self.assertTrue(record['constraint_state']['qualified']);self.assertEqual(record['constraint_state']['boundary_count'],1)
         self.assertIsNone(record['constrained_motion_subspace'])
-        response=tangent(native,record['equilibrium']['equilibrium'],.5,[0.,0.,0.],[.5],increment=.001,direction_world=(0.,1.,0.))
+        response=record['directional_response']
         self.assertEqual(response['status'],'nonsmooth_or_degenerate');self.assertEqual(response['numerical_cost']['QP_calls'],2)
         target=PhysicalMechanismTarget(quantity='tangent_compliance',reduction='norm')
         self.assertEqual(observe(record,target)['status'],'not_applicable')
         self.assertEqual(observe(record,dict(quantity='tip_jacobian',reduction='norm'))['status'],'computed')
+        observed=observe(record,dict(quantity='directional_material_response',direction_world=[0.,1.,0.],reduction='norm'))
+        self.assertEqual(observed['status'],'computed');self.assertGreater(observed['value'],0.)
         from extensions.tendon_family.passive_inverse import design_sensitivity
         models=[]
         for offset in (-1e-5,1e-5):
@@ -233,7 +235,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,rejected,.5,0.,[.5])
         (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium, directional QPs, active-set switch and capacity qualification failure',
             mechanics=record,tangent=response,active_set_switch=switch,incomparable=different,capacity_failure=candidate,
-            numerical_cost=summed_cost(native.cost,response['numerical_cost'],switch['numerical_cost'],
+            numerical_cost=summed_cost(native.cost,switch['numerical_cost'],
                 models[0].cost,models[1].cost,other.cost,capacity_model.cost,candidate['numerical_cost']),
             model_builds=5,physics_steps=0),indent=2),encoding='utf-8')
 
