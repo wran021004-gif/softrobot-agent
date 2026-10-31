@@ -19,6 +19,8 @@ def provider_schema(schema):
     Canonical Pydantic and focused-schema validation still run at the Host.
     """
     result=deepcopy(schema)
+    # Host-only exact selector bindings stay in the SDK/Store, outside model context.
+    result.pop('x-research-reference-choices',None)
     constraints={k:result.pop(k) for k in ('allOf','anyOf','oneOf','not') if k in result}
     if constraints:
         constraints.update({k:result.pop(k) for k in ('if','then','else') if k in result})

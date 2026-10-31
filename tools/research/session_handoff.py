@@ -726,7 +726,13 @@ async def recover_feedback(host,agent):
             value=host.store.artifact(receipt['output'])
             if use['name']=='research_plan':
                 from tools.research.contracts import Plan
-                if row['request_hash']!=digest(plain(Plan.model_validate(use['input']))):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                payload=use['input']
+                resolutions=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='plan_choice_resolution']
+                exact=[r for r in resolutions if r['tool_use_id']==key and r['original_input']==use['input']]
+                if exact:
+                    if any(r['expanded_plan']!=exact[0]['expanded_plan'] for r in exact):raise ValueError('CONFLICTING_SAVED_PLAN_CHOICE_BINDING')
+                    payload=exact[0]['expanded_plan']
+                if row['request_hash']!=digest(plain(Plan.model_validate(payload))):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             elif use['name']=='research_analysis':
                 # Recover the frozen request; a newer admission contract must not reinterpret it.
                 query=value['requested_operation']

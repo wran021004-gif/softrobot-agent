@@ -786,7 +786,7 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None):
+async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None,operator_request=None):
     from tools.research.config import conversation_policy, tool_schema_policy
     recent_policy=conversation_policy(state(host)['spec'])
     on_demand=bool(tool_schema_policy(state(host)['spec']))
@@ -873,7 +873,20 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
                 from tools.research.evidence_policy import english_native
                 if kind=='plan':
-                    value=dispatch(host,use['input'],'native-'+use['toolUseId'])
+                    payload=use['input']
+                    selection_schema=agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']
+                    if selection_schema.get('x-research-reference-choices'):
+                        from tools.research.object_choices import expand_references,bind_plan_selection
+                        payload=bind_plan_selection(host,expand_references(payload,selection_schema))
+                    if payload.get('action')=='physical_replay' and 'result_choice' in (payload.get('physical_replay') or {}):
+                        from tools.research.object_choices import expand_choice
+                        payload,selection=expand_choice(host,payload)
+                        record(host,'replay_choice_resolution',dict(tool_use_id=use['toolUseId'],
+                            selected_result=selection,expanded_plan=payload,scientific_execution_started=False))
+                    if payload!=use['input']:
+                        record(host,'plan_choice_resolution',dict(tool_use_id=use['toolUseId'],
+                            original_input=use['input'],expanded_plan=payload,scientific_execution_started=False))
+                    value=dispatch(host,payload,'native-'+use['toolUseId'])
                 elif kind=='analysis':
                     payload=use['input']
                     from tools.research.scientific_intent import enabled as question_enabled, compile_question
@@ -1098,8 +1111,13 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             for name in list(registry):
                 if name not in definitions:registry.pop(name)
             for name,definition in definitions.items():
+                parameters=deepcopy(definition['parameters'])
+                if name=='research_plan' and parameters.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
+                    from tools.research.object_choices import reference_choices
+                    offered=parameters['$defs']['EvidenceRef']['enum']
+                    parameters['x-research-reference-choices']={k:v for k,v in reference_choices(host).items() if k in offered}
                 registry[name].tool_spec=dict(name=name,description=definition.get('description',''),
-                    inputSchema={'json':definition['parameters']})
+                    inputSchema={'json':parameters})
             return
         remaining=host.store.remaining()['remaining']
         if remaining['model_calls']<1 or remaining['tool_calls']<2:
@@ -1220,6 +1238,32 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             if information_flow_v1(s['spec']):
                 from tools.research.research_context import information_flow_brief
                 boundary.research_packet['research']=information_flow_brief(current['research'],boundary.research_packet['research'])
+            if enabled(s['spec'],'physical_replay'):
+                from tools.research.object_choices import replay_choices,choice_schema
+                options=replay_choices(host,current['research'].get('scientific_results') or {})
+                boundary.research_packet['saved_replay_choices']=dict(options=options,
+                    scope='Bounded saved-result options. Main chooses; no physical execution or acceptance is implied. Other saved results remain queryable from Store.')
+                plan=registry.get('research_plan')
+                if options and plan and plan.tool_spec['inputSchema']['json']['properties']['action'].get('enum')==['physical_replay']:
+                    plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':choice_schema(plan.tool_spec['inputSchema']['json'],options)}}
+            plan=registry.get('research_plan')
+            if plan:
+                from tools.research.object_choices import reference_choices,reference_schema
+                choices=reference_choices(host);schema=plan.tool_spec['inputSchema']['json']
+                action=schema['properties']['action'].get('enum',[])
+                if len(action)==1:
+                    plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':reference_schema(schema,choices,action[0])}}
+                    from tools.research.research_context import ordered_candidates
+                    wanted=[*ordered_candidates(host,s)[-3:],
+                        *[r['candidate'] for r in boundary.research_packet.get('saved_replay_choices',{}).get('options',[])],
+                        *s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+                    boundary.research_packet['saved_object_choices']=[dict(choice=k,reference=v,
+                        **(host.store.artifact(v,paths=('acceptance','candidate')) if k.startswith('evaluation_') else {}))
+                        for k,v in choices.items() if v in wanted]
+                    boundary.research_packet['object_choice_rule']='Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.'
+            if operator_request:
+                boundary.research_packet['operator_request']=dict(reference=operator_request,
+                    instruction=host.store.artifact(operator_request))
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
