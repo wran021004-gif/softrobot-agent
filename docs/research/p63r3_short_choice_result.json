@@ -1,0 +1,155 @@
+{
+  "schema": "p63r3_actual_short_choice_outcome_v1",
+  "study_id": "p63v1-m3-autonomous-feasibility-sol-20261030",
+  "status": "stopped",
+  "provider": 42,
+  "mathematical_results": 155,
+  "physical_replays": 2,
+  "selected": {
+    "artifact_id": "e605a25d153213f4093689f61dab0d1a82282bb1790cc62f665bfc2b3b0e28ea",
+    "media_type": "application/json"
+  },
+  "selected_solution": {
+    "artifact_id": "ca7d59c1671b1dab0058cdaa84a4e35eef887b8769df9b3aac7fec90eafad87a",
+    "media_type": "application/json"
+  },
+  "final_disposition": {
+    "artifact_id": "5b037aa5b840f03f168653775aaea5ec1f336437c0fc7ee702ccf59b4561742d",
+    "media_type": "application/json"
+  },
+  "freeze": "70d7ca8f53e062ed084d5bbd9db4d58808ca5120",
+  "actual_choices": [
+    {
+      "tool_use_id": "call_bMFXpbANTyroU6LjJq6rc2zH",
+      "original_input": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H7_independent_replay_current_profile_passing_native_pair",
+          "version": "research_decision_v1"
+        },
+        "expected_observation": "The independent replay completes the frozen 0.5 s horizon with terminal position error at most 0.01 m, holding maximum position error at most 0.01 m, holding maximum speed at most 0.02 m/s, no force-bound violation, and no solver errors.",
+        "fixed_conditions": "Keep the frozen M3 target, 0.5 s horizon, 0.01 s control and sampling periods, 0.0005 s integration timestep, terminal and holding position limit of 0.01 m, holding speed limit of 0.02 m/s, physical input bounds, registered model family, current profile, fidelity, evaluator, and the exact candidate-bound control source of result_151 unchanged.",
+        "hypothesis": "The current-profile executable candidate-control pair bound to saved result_151 will satisfy every frozen M3 Reach/Hold constraint in an independent full-task physical replay. This is preferred over result_155 because result_151 is a complete native finite-budget pass on all three constraints, whereas result_155 already failed the same independent protocol.",
+        "interpretation": "A passing replay would provide the required independent full-task evidence for this exact executable candidate-control pair. A failure would show only that the saved native pass did not transfer to independent evaluation for this pair. The saved native margins are narrow, so transfer is uncertain, but this is the strongest eligible replay option currently exposed.",
+        "next_step": "diagnose",
+        "physical_replay": {
+          "result_choice": "result_151"
+        },
+        "stopping_condition": "Stop this replay at the protocol's duration or numerical-failure termination. If independently accepted, read its complete acceptance_certificate and proceed to formal SELECT; if it fails, diagnose the measured mismatch or resume bounded structure-control search without treating the finite failure as infeasibility.",
+        "weakening_observation": "Any incomplete or invalid execution, any force-bound or solver violation, or any terminal, holding-position, or holding-speed metric above its frozen threshold weakens or rejects this exact candidate-control pair; such an outcome does not establish structural infeasibility."
+      },
+      "expanded_plan": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H7_independent_replay_current_profile_passing_native_pair",
+          "requested_budget": 1,
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_candidate": {
+            "artifact_id": "4f8134b50fdb7eda6b92166c6142f45879ffb9987170c1fbdf927d8f79b25c8b",
+            "media_type": "application/json"
+          },
+          "selected_method": "saved_result_physical_replay",
+          "selected_variables": [],
+          "version": "research_decision_v1"
+        },
+        "expected_observation": "The independent replay completes the frozen 0.5 s horizon with terminal position error at most 0.01 m, holding maximum position error at most 0.01 m, holding maximum speed at most 0.02 m/s, no force-bound violation, and no solver errors.",
+        "fixed_conditions": "Keep the frozen M3 target, 0.5 s horizon, 0.01 s control and sampling periods, 0.0005 s integration timestep, terminal and holding position limit of 0.01 m, holding speed limit of 0.02 m/s, physical input bounds, registered model family, current profile, fidelity, evaluator, and the exact candidate-bound control source of result_151 unchanged.",
+        "hypothesis": "The current-profile executable candidate-control pair bound to saved result_151 will satisfy every frozen M3 Reach/Hold constraint in an independent full-task physical replay. This is preferred over result_155 because result_151 is a complete native finite-budget pass on all three constraints, whereas result_155 already failed the same independent protocol.",
+        "interpretation": "A passing replay would provide the required independent full-task evidence for this exact executable candidate-control pair. A failure would show only that the saved native pass did not transfer to independent evaluation for this pair. The saved native margins are narrow, so transfer is uncertain, but this is the strongest eligible replay option currently exposed.",
+        "next_step": "diagnose",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "4f8134b50fdb7eda6b92166c6142f45879ffb9987170c1fbdf927d8f79b25c8b",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "d2e5e3cd55edcae572265c7ef794c2bbdaa156ef5802b575694a1b074215beef",
+            "media_type": "application/json"
+          }
+        },
+        "stopping_condition": "Stop this replay at the protocol's duration or numerical-failure termination. If independently accepted, read its complete acceptance_certificate and proceed to formal SELECT; if it fails, diagnose the measured mismatch or resume bounded structure-control search without treating the finite failure as infeasibility.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "d2c9086b4dce1b0678feb4672bc3cf5d5dcf56def6234fd77b701f669c1e6511",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "Any incomplete or invalid execution, any force-bound or solver violation, or any terminal, holding-position, or holding-speed metric above its frozen threshold weakens or rejects this exact candidate-control pair; such an outcome does not establish structural infeasibility."
+      }
+    },
+    {
+      "tool_use_id": "call_EAkpsvYER1cVtMGtkAcGbYtl",
+      "original_input": {
+        "action": "select",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H7_independent_replay_current_profile_passing_native_pair",
+          "requested_budget": 0,
+          "research_intent": "SELECT",
+          "selected_method": "formal selection of the exact independently accepted candidate-control execution",
+          "selected_variables": [
+            "candidate structure",
+            "bound explicit control schedule",
+            "frozen M3 full-task evaluation"
+          ],
+          "version": "research_decision_v1"
+        },
+        "expected_observation": "Formal admission confirms that evaluation_2911 belongs to this Study, is fresh and complete, binds the legal candidate to its exact full control schedule and frozen task/profile, and passes every acceptance component.",
+        "experience_disposition": {
+          "research-bounded-continuation@2": "adopted"
+        },
+        "fixed_conditions": "Preserve the frozen target [0.29, -0.035, 0.19] m, 0.5 s horizon, 0.01 s control and sample periods, 0.0005 s timestep, 0.01 m terminal and holding-position limits, 0.02 m/s holding-speed limit, physical input bounds, registered MuJoCo model family, profile, evaluator, candidate, and bound control schedule exactly as certified.",
+        "hypothesis": "The exact candidate-control pair represented by evaluation_2911 is a legal executable solution satisfying every frozen M3 Reach/Hold constraint in independent full-task physical evaluation.",
+        "interpretation": "The complete acceptance certificate for evaluation_2911 reports a fresh current-Study independent execution, complete and valid, with terminal error 0.009881022088480991 m, holding maximum position error 0.009881022088480991 m, holding maximum speed 0.01955035395638464 m/s, zero force-bound violation, zero solver errors, complete holding coverage, and accepted status. This supports only the registered-model frozen-task execution, not hardware, cross-model, robustness, continuous-time, repeatability, or global-optimality claims.",
+        "next_step": "stop",
+        "selected_execution": "evaluation_2911",
+        "stopping_condition": "Complete formal SELECT only if the already read complete acceptance certificate for evaluation_2911 passes all admission checks; otherwise do not select and retain the observed evidence without inferring structural infeasibility.",
+        "weakening_observation": "Any identity, source, fidelity, completeness, freshness, force-bound, solver, terminal-error, holding-position, holding-speed, or acceptance mismatch would invalidate selection."
+      },
+      "expanded_plan": {
+        "action": "select",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H7_independent_replay_current_profile_passing_native_pair",
+          "requested_budget": 0,
+          "research_intent": "SELECT",
+          "selected_candidate": {
+            "artifact_id": "4f8134b50fdb7eda6b92166c6142f45879ffb9987170c1fbdf927d8f79b25c8b",
+            "media_type": "application/json"
+          },
+          "selected_method": "formal selection of the exact independently accepted candidate-control execution",
+          "selected_variables": [
+            "candidate structure",
+            "bound explicit control schedule",
+            "frozen M3 full-task evaluation"
+          ],
+          "version": "research_decision_v1"
+        },
+        "expected_observation": "Formal admission confirms that evaluation_2911 belongs to this Study, is fresh and complete, binds the legal candidate to its exact full control schedule and frozen task/profile, and passes every acceptance component.",
+        "experience_disposition": {
+          "research-bounded-continuation@2": "adopted"
+        },
+        "fixed_conditions": "Preserve the frozen target [0.29, -0.035, 0.19] m, 0.5 s horizon, 0.01 s control and sample periods, 0.0005 s timestep, 0.01 m terminal and holding-position limits, 0.02 m/s holding-speed limit, physical input bounds, registered MuJoCo model family, profile, evaluator, candidate, and bound control schedule exactly as certified.",
+        "hypothesis": "The exact candidate-control pair represented by evaluation_2911 is a legal executable solution satisfying every frozen M3 Reach/Hold constraint in independent full-task physical evaluation.",
+        "interpretation": "The complete acceptance certificate for evaluation_2911 reports a fresh current-Study independent execution, complete and valid, with terminal error 0.009881022088480991 m, holding maximum position error 0.009881022088480991 m, holding maximum speed 0.01955035395638464 m/s, zero force-bound violation, zero solver errors, complete holding coverage, and accepted status. This supports only the registered-model frozen-task execution, not hardware, cross-model, robustness, continuous-time, repeatability, or global-optimality claims.",
+        "next_step": "stop",
+        "selected_execution": {
+          "artifact_id": "e605a25d153213f4093689f61dab0d1a82282bb1790cc62f665bfc2b3b0e28ea",
+          "media_type": "application/json"
+        },
+        "stopping_condition": "Complete formal SELECT only if the already read complete acceptance certificate for evaluation_2911 passes all admission checks; otherwise do not select and retain the observed evidence without inferring structural infeasibility.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "e605a25d153213f4093689f61dab0d1a82282bb1790cc62f665bfc2b3b0e28ea",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "Any identity, source, fidelity, completeness, freshness, force-bound, solver, terminal-error, holding-position, holding-speed, or acceptance mismatch would invalidate selection."
+      }
+    }
+  ],
+  "operator_reconsideration_disclosed": true,
+  "all_historical_costs_retained": true
+}

@@ -2,7 +2,7 @@
 
 User requested simple selections instead of manually filled hashes for Replay,
 SELECT and related owned-object choices, and reopening the Replay decision before
-the first schema error. The same original Study is paused at 39/80 requests,
+the first schema error. The repair was admitted in the same original Study at 39/80 requests,
 155 mathematical results and one completed independent Replay (valid failure).
 
 ## Recorded cause
@@ -62,3 +62,23 @@ Seven focused synthetic tests pass, including actual SDK/Mock HTTP SELECT throug
 the public acceptance-certificate gate and automatic zero-confirmation closure.
 Synthetic values and Mock replies are not actual Study evidence. No broad test
 suite or additional scientific probe was run.
+
+## Actual same-Study outcome
+
+Main request 40 selected `result_151` directly, without any candidate, control or
+evidence hashes in its input. The host resolved its original 4f8134b5… candidate,
+d2e5e3cd… control and d2c9086b… mathematical result. Independent physical result
+e605a25d… passed the unchanged evaluator: terminal/holding position error
+0.009881022088480991 m, holding speed 0.01955035395638464 m/s, force-bound
+violation 0 N, solver errors 0. Main request 41 read its complete acceptance
+certificate. Main request 42 selected `evaluation_2911` directly; the host bound
+its candidate and supporting evidence and the original gate admitted SELECT.
+The Study automatically stopped with zero configured extra confirmations.
+
+Final counts: 42/80 Provider requests, 155 mathematical results (137 computed,
+18 incomplete), three original searches, two independent physical Replays
+(one valid failure and one accepted result), one Main SELECT. No extra scientific
+calculation was submitted by the operator. No voluntary Main STOP was fabricated.
+The explicit user-requested reconsideration remains recorded and prevents
+describing this as a wholly uninterrupted, intervention-free research trajectory.
+Original Store and SDK files, including every failed request and charge, remain.
