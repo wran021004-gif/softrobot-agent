@@ -172,6 +172,14 @@ class MaterialLoad(Contract):
     force_world_n: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
 
 
+class ConstrainedObservation(Contract):
+    name: Name
+    quantity: Literal['material_displacement','tip_displacement','displacement_ratio','maximum_tension','maximum_length_excess']
+    load_condition: Name
+    material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
+    maximum: FiniteFloat | None = Field(default=None,ge=0)
+
+
 class ConstrainedPhysicalProblem(Contract):
     """Frozen contact-free assembly/load problem; payout belongs to Design."""
     mode: Literal['passive_unilateral_equilibrium']
@@ -183,6 +191,7 @@ class ConstrainedPhysicalProblem(Contract):
     monitor_s: list[FiniteFloat] = Field(min_length=1)
     baseline_load: Name
     contact_mode: Literal['none'] = 'none'
+    observations: list[ConstrainedObservation] = Field(default_factory=list)
 
     @model_validator(mode='after')
     def physical_binding(self):
@@ -191,6 +200,8 @@ class ConstrainedPhysicalProblem(Contract):
         names=[x.name for x in self.loads]
         if len(set(names))!=len(names) or self.baseline_load not in names:raise ValueError('UNIQUE_FROZEN_LOAD_BINDINGS_REQUIRED')
         if any(not 0<=s<=1 for s in self.monitor_s):raise ValueError('MATERIAL_S_OUT_OF_RANGE')
+        if len({o.name for o in self.observations})!=len(self.observations) or any(o.load_condition not in names or o.material_s not in self.monitor_s for o in self.observations):
+            raise ValueError('UNIQUE_OBSERVATIONS_WITH_FROZEN_LOAD_AND_MONITOR_BINDING_REQUIRED')
         if not np.allclose(R.T@R,np.eye(3),atol=1e-10) or abs(np.linalg.det(R)-1)>1e-10:raise ValueError('PROPER_MOUNT_ROTATION_REQUIRED')
         if any(next(x for x in self.loads if x.name==self.baseline_load).force_world_n):raise ValueError('ZERO_LOAD_BASELINE_REQUIRED')
         return self

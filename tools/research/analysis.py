@@ -430,6 +430,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
         target_m=cfg['task']['goal']['data'].get('target_m'),task_reference=cfg['task']['goal'],source_identity=c['source_identity'],
         evaluation_profile_identity=c['profile_identity'])
+    if cfg['task'].get('physical_problem'):
+        binding.pop('tension_bounds_n');binding.pop('tension_limits_n')
+        binding['constraint_capacity_n']=[t['force_limit_n'] for t in design['tendons']]
     if q.model_source!='mujoco':
         from extensions.tendon_family.gvs_basis import resolve_basis
         basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']

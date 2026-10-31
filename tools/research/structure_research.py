@@ -165,6 +165,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             if records and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
             mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s,seed)
+            from tools.research_tasks import task_adapter
+            mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
             data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
         else:native=NativeModel(cfg)
         models.append(native)
@@ -210,7 +212,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
-            constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],registered_acceptance='not_registered')
+            constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
+            task_observations=base['mechanics']['task_observations'],registered_acceptance='not_registered')
         if study.operation=='compare':
             other=evaluate(comparison=context['comparisons'][0])
             evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
@@ -354,6 +357,7 @@ def summary(value, reference):
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
+        task_observations=raw.get('task_observations',[])[:4],
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,
         comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),

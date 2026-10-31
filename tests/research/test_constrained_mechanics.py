@@ -30,7 +30,10 @@ def physical_fixture():
     design,mesh,physics=generate_family(dict(space=space,request=request))
     problem=dict(mode='passive_unilateral_equilibrium',mount_position=[0.,0.,1.],mount_rotation=np.eye(3).tolist(),
         gravity=[0.,0.,0.],loads=[dict(name='unloaded',material_s=.5,force_world_n=[0.,0.,0.]),
-            dict(name='lateral',material_s=.5,force_world_n=[0.,.01,0.])],monitor_s=[.5],baseline_load='unloaded')
+            dict(name='lateral',material_s=.5,force_world_n=[0.,.01,0.])],monitor_s=[.5],baseline_load='unloaded',
+        observations=[dict(name='middle_response',quantity='material_displacement',load_condition='lateral',material_s=.5,maximum=.001),
+            dict(name='tip_motion',quantity='tip_displacement',load_condition='lateral',material_s=.5,maximum=.001),
+            dict(name='decoupling_ratio',quantity='displacement_ratio',load_condition='lateral',material_s=.5,maximum=2.)])
     return space,request,design,mesh,physics,problem
 
 
@@ -118,6 +121,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         l0=packet(wires[-1]);latest=l0['mathematical_research']['latest_result']
         self.assertEqual(latest['status'],'computed');self.assertEqual(latest['effect_semantics'],'re_equilibrated_passive_response')
         self.assertEqual(latest['structure_research']['registered_acceptance'],'not_registered')
+        self.assertEqual(len(latest['structure_research']['task_observations']),3)
         self.assertEqual(l0['reporter_findings'][-1]['status'],'unavailable')
         direction=raw['structure_research']['structure_direction'];self.assertTrue(direction['proposal_only'])
         p=generation(h);p['generation']=direction['generation_handoff']['generation'];p['supporting_evidence']=[s['analysis_results'][-1]]

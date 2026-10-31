@@ -29,7 +29,9 @@ class ResearchTaskAdapter:
         """
         if self.task.get('physical_problem'):
             return dict(contract='research.task_conditions',version='1.0.0',task_identity=digest(self.task),
-                conditions=[],missing=['Passive independent dynamic task evaluator is not registered.'],
+                conditions=[],mathematical_observations=[dict(condition_id=o['name'],metric=o['quantity'],limit=o.get('maximum'),
+                    load_condition=o['load_condition'],material_s=o.get('material_s',.5),scope='mathematical_equilibrium_only') for o in self.task['physical_problem'].get('observations',[])],
+                missing=['Passive independent dynamic task evaluator is not registered.'],
                 registered_acceptance='not_registered',physical_problem=self.task['physical_problem'],
                 authority='Frozen material-point and load definitions; mathematical diagnostics only.',continuous_time_guarantee=False)
         from schemas.platform import TaskConditionView
@@ -151,6 +153,25 @@ class ResearchTaskAdapter:
             control_period_s=self.task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
             lower=[0.]*len(tendons), upper=[t['force_limit_n'] for t in tendons],
             provenance=['/robot/structure/data/tendons', '/task/timing/control_period_s'])
+
+    def constrained_observations(self,mechanics):
+        """Frozen task metrics from both equilibria; never a SELECT evaluator."""
+        import numpy as np
+        problem=self.task['physical_problem'];rows=[]
+        eq=mechanics['equilibrium']['equilibrium'];base=mechanics['baseline_equilibrium']['equilibrium']
+        qualified=mechanics['constraint_state']['qualified']
+        delta=np.array(eq['positions'])-np.array(base['positions'])
+        for metric in problem.get('observations',[]):
+            if metric['load_condition']!=mechanics['point_binding']['load']['name']:continue
+            point=float(np.linalg.norm(delta[problem['monitor_s'].index(metric.get('material_s',.5))]));tip=float(np.linalg.norm(delta[-1]))
+            name=metric['quantity'];unit='1' if name=='displacement_ratio' else 'N' if name=='maximum_tension' else 'm'
+            value={'material_displacement':point,'tip_displacement':tip,'displacement_ratio':tip/point if point>1e-12 else None,
+                'maximum_tension':max(eq['tensions_n']),'maximum_length_excess':max(0.,max(eq['length_residual_m']))}[name] if qualified else None
+            limit=metric.get('maximum')
+            rows.append(dict(name=metric['name'],value=value,unit=unit,maximum=limit,
+                within_mathematical_limit=value<=limit if value is not None and limit is not None else None,
+                scope='Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.',registered_acceptance='not_registered'))
+        return rows
 
     def holding_start_s(self):
         if self.task['family']=='task.tracking':raise ValueError('TRACKING_HAS_NO_HOLDING_WINDOW')

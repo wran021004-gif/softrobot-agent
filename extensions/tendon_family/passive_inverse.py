@@ -55,9 +55,18 @@ def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force,*,re
         dq_du=((np.array(rp['equilibrium']['qpos'])-rm['equilibrium']['qpos'])/(2*step)).tolist(),
         dpositions_du=((np.array(rp['equilibrium']['positions'])-rm['equilibrium']['positions'])/(2*step)).tolist())
     if regular:
-        error=float(np.linalg.norm(np.array(result['resolved_comparison']['dq_du'])-result['dq_du'])/max(np.linalg.norm(result['dq_du']),1e-12))
+        difference=float(np.linalg.norm(np.array(result['resolved_comparison']['dq_du'])-result['dq_du']))
+        scale=max(np.linalg.norm(result['dq_du']),np.linalg.norm(result['resolved_comparison']['dq_du']))
+        # A nearly zero baseline derivative cannot be tested by relative error
+        # alone. Estimate the state FD noise from observed stationarity residuals
+        # and local reduced stiffness; this is not a rigorous error bound.
+        eig=[v for e in (equilibrium,rm['equilibrium'],rp['equilibrium']) for v in e['reduced_eigenvalues'] if v>0]
+        noise=sum(e['stationarity_inf_nm'] for e in (equilibrium,rm['equilibrium'],rp['equilibrium']))/max(min(eig,default=0),1e-12)/step
+        error=difference/max(np.linalg.norm(result['dq_du']),1e-12)
         result['gradient_relative_error']=error
-        result['gradient_trustworthy']=bool(same and rm['status']==rp['status']=='qualified_local_minimum' and error<.05)
+        result.update(gradient_absolute_error=difference,state_difference_noise_estimate=float(noise),
+            comparison_scope='Mixed absolute/relative numerical consistency; observed-residual stiffness noise estimate, no rigorous bound.')
+        result['gradient_trustworthy']=bool(same and rm['status']==rp['status']=='qualified_local_minimum' and difference<=.05*scale+noise)
     result['numerical_cost']={k:pm.cost[k]+pp.cost[k]+(p.cost[k] if regular else 0)+(rm['numerical_cost'][k]+rp['numerical_cost'][k] if resolved is None else 0) for k in pm.cost}
     if not same or not result.get('gradient_trustworthy',False):result['status']='directional_comparison'
     return result
