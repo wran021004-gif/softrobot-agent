@@ -119,6 +119,14 @@ def question_schema(spec, candidate=None, action=None):
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
             schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':[*CONSTRAINED,*COMMON_GEOMETRY]}
             schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
+        elif candidate:
+            from extensions.math_analysis.mechanism_registry import PRIMITIVES,CONSTRAINED
+            props=schema['$defs']['ScientificStructureV4']['properties']
+            for name in ('physical_problem','load_condition'):props.pop(name,None)
+            props['control_treatment']={'type':'string','enum':['fixed_absolute_tensions','reoptimized','closed_loop']}
+            target=schema['$defs']['PhysicalMechanismTarget']['properties']
+            target['quantity']={'type':'string','enum':[k for k in PRIMITIVES if k not in CONSTRAINED]}
+            target.pop('material_s',None)
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
