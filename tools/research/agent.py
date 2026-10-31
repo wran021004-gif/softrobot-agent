@@ -874,6 +874,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 if on_demand and kind!='route' and not (kind=='analysis' and question_enabled(before['spec'])):
                     from jsonschema import Draft202012Validator
                     Draft202012Validator(agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json']).validate(use['input'])
+                from tools.research.object_choices import main_context_enabled,expand_references
+                if main_context_enabled(before['spec']) and kind not in ('plan','route'):
+                    use={**use,'input':expand_references(use['input'],agent.tool_registry.registry[use['name']].tool_spec['inputSchema']['json'])}
                 from tools.research.evidence_policy import english_native
                 if kind=='plan':
                     payload=use['input']
@@ -886,6 +889,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         payload,selection=expand_choice(host,payload)
                         record(host,'replay_choice_resolution',dict(tool_use_id=use['toolUseId'],
                             selected_result=selection,expanded_plan=payload,scientific_execution_started=False))
+                    if main_context_enabled(before['spec']) and payload.get('action')=='generate':
+                        payload=deepcopy(payload)
+                        payload['generation'].setdefault('family_space_identity',before['spec']['family_space_identity'])
                     if payload!=use['input']:
                         record(host,'plan_choice_resolution',dict(tool_use_id=use['toolUseId'],
                             original_input=use['input'],expanded_plan=payload,scientific_execution_started=False))
@@ -1115,10 +1121,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 if name not in definitions:registry.pop(name)
             for name,definition in definitions.items():
                 parameters=deepcopy(definition['parameters'])
-                if name=='research_plan' and parameters.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
-                    from tools.research.object_choices import reference_choices
-                    offered=parameters['$defs']['EvidenceRef']['enum']
-                    parameters['x-research-reference-choices']={k:v for k,v in reference_choices(host).items() if k in offered}
+                if parameters.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
+                    from tools.research.object_choices import visible_references
+                    offered=parameters['$defs']['EvidenceRef'].get('enum')
+                    parameters['x-research-reference-choices']={k:v for k,v in visible_references(host).items() if offered is None or k in offered}
                 registry[name].tool_spec=dict(name=name,description=definition.get('description',''),
                     inputSchema={'json':parameters})
             return
@@ -1267,6 +1273,12 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             if operator_request:
                 boundary.research_packet['operator_request']=dict(reference=operator_request,
                     instruction=host.store.artifact(operator_request))
+            from tools.research.object_choices import main_context_enabled,main_tool_schema,visible_references,main_packet
+            if main_context_enabled(s['spec']):
+                choices=visible_references(host)
+                for tool in registry.values():
+                    tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
+                boundary.research_packet=main_packet(host,boundary.research_packet)
             # Record the actual L0 after dynamic tool selection; no extra model call.
             record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')

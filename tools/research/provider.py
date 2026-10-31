@@ -493,6 +493,10 @@ def live_model_class(boundary):
             elif getattr(boundary,'research_packet',None) is not None:
                 request['messages'].append(dict(role='user',content='CURRENT_RESEARCH_PACKET\n'+
                     json.dumps(boundary.research_packet,separators=(',',':'))))
+            if not saved:
+                from tools.research.object_choices import main_context_enabled,main_projection
+                if main_context_enabled(boundary.host.store.session(boundary.host.run_id)['state']['spec']):
+                    request=main_projection(boundary.host,request)
             return request
 
         async def stream(self,*args,**kwargs):

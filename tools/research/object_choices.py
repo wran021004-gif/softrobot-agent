@@ -2,6 +2,7 @@
 from copy import deepcopy
 import json
 import math
+import re
 
 from tools.research.state import state,readable_results
 
@@ -171,7 +172,7 @@ def choice_schema(schema, options):
     schema=deepcopy(schema)
     schema['properties']['physical_replay']=dict(type='object',additionalProperties=False,
         properties=dict(result_choice=dict(type='string',enum=[r['choice'] for r in options],
-            description='Choose exactly one saved result. Its candidate, control and supporting result are bound together. Options: '+json.dumps(options))),
+            description='Choose exactly one saved result from saved_replay_choices. Its candidate, control and supporting result are bound together.')),
         required=['result_choice'])
     schema['properties'].pop('supporting_evidence',None)
     schema['required']=[k for k in schema['required'] if k!='supporting_evidence']
@@ -194,3 +195,98 @@ def expand_choice(host, payload):
     value['decision'].update(selected_candidate=selected['candidate'],selected_method='saved_result_physical_replay',
         requested_budget=1,research_intent='PHYSICAL_VALIDATION',selected_variables=[])
     return value,selected
+
+
+def main_context_enabled(spec):
+    return spec.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='research_information_flow_v1'
+
+
+def visible_references(host):
+    """Append-only Store ordinals, shared by all Main tool/reference projections."""
+    choices=reference_choices(host)
+    known={ref['artifact_id'] for ref in choices.values()}
+    with host.store.connect(True) as db:
+        for ordinal,identity,media_type in db.execute('SELECT rowid,id,media FROM artifacts'):
+            if identity not in known:
+                choices['evidence_'+str(ordinal)]=dict(artifact_id=identity,media_type=media_type)
+    return choices
+
+
+def main_projection(host, value):
+    """Last-mile presentation only. Exact artifacts and SDK history stay in Store."""
+    choices=visible_references(host);aliases={ref['artifact_id']:name for name,ref in choices.items()}
+    identities=re.compile(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',re.I)
+    def project(item):
+        if isinstance(item,dict):
+            if 'artifact_id' in item:
+                alias=aliases.get(item['artifact_id'])
+                if alias:
+                    rest={k:project(v) for k,v in item.items() if k not in ('artifact_id','media_type')}
+                    return dict(reference=alias,**rest) if rest else alias
+            return {k:project(v) for k,v in item.items() if not k.startswith('x-research-') and not (
+                (k.endswith('_identity') or k in ('freeze','sha','sha256','identities')) and
+                identities.search(json.dumps(v)))}
+        if isinstance(item,list):return [project(v) for v in item]
+        if isinstance(item,str):
+            # Tool results and action arguments are JSON inside the SDK wire.
+            try:decoded=json.loads(item)
+            except (ValueError,TypeError):decoded=None
+            if isinstance(decoded,(dict,list)):return json.dumps(project(decoded),separators=(',',':'))
+            if item.startswith('CURRENT_RESEARCH_PACKET\n'):
+                return 'CURRENT_RESEARCH_PACKET\n'+json.dumps(project(json.loads(item.split('\n',1)[1])),separators=(',',':'))
+            return identities.sub(lambda match:aliases.get(match.group(0),'[internal identity]'),item)
+        return item
+    return project(value)
+
+
+def main_packet(host, packet):
+    """One fact owner in normal L0; replay/menu/history carry navigation only."""
+    value=deepcopy(packet);research=value.get('research',{})
+    replay=value.get('saved_replay_choices',{}).get('options',[])
+    for row in replay:
+        for key in ('result_reference','candidate','control_source','metrics','J'):
+            row.pop(key,None)
+        row['facts_at']='research.scientific_results (result '+row['choice']+')'
+    for row in value.get('saved_object_choices',[]):
+        row.pop('reference',None)
+    # Repeated numeric summaries in latest/trace/feedback are already durable.
+    latest=(research.get('mathematical_research') or {}).get('latest_result') or {}
+    if latest.get('structure_research'):
+        reference=latest['reference']
+        delivered=research.get('scientific_results') or {}
+        if (delivered.get('latest_evaluation') or {}).get('reference')==reference:
+            delivered['latest_evaluation']=dict(reference=reference,facts_at='mathematical_research.latest_result')
+        research['verified_facts']=[f for f in research.get('verified_facts',[]) if
+            f.get('result_reference')!=reference and (f.get('source') or {}).get('reference')!=reference]
+        research['verified_facts'].append(dict(result_reference=reference,facts_at='mathematical_research.latest_result'))
+        pending=(research.get('tool_continuation') or {}).get('pending_feedback') or {}
+        for row in pending.get('items',[]):
+            if row.get('tool')=='research_analysis' and row.get('status')=='success':
+                for key in ('result','facts'):row.pop(key,None)
+                row.update(delivery='fixed_facts_in_l0',facts_at='mathematical_research.latest_result')
+    seen={}
+    def deduplicate(item,path):
+        if isinstance(item,dict):
+            # Exact repeated scientific cards become navigation; distinct scopes
+            # and estimates keep their own content even when values coincide.
+            if item.get('reference') and any(k in item for k in ('metrics','J','structure_research')):
+                fingerprint=json.dumps(item,sort_keys=True)
+                if fingerprint in seen:return dict(reference=item['reference'],facts_at=seen[fingerprint])
+                seen[fingerprint]=path
+            return {k:deduplicate(v,path+'.'+k) for k,v in item.items()}
+        if isinstance(item,list):return [deduplicate(v,path+'['+str(i)+']') for i,v in enumerate(item)]
+        return item
+    value=deduplicate(value,'L0')
+    return main_projection(host,value)
+
+
+def main_tool_schema(schema, choices):
+    """Shared typed reference input projection; bindings remain SDK-only."""
+    schema=deepcopy(schema)
+    if 'EvidenceRef' in schema.get('$defs',{}):
+        schema['$defs']['EvidenceRef']=dict(type='string',pattern=r'^(candidate|evaluation|result|evidence)_[1-9][0-9]*$',
+            description='Use the stable short reference in the research packet or an evidence response.')
+        schema['x-research-reference-choices']=choices
+    if any('family_space_identity' in node.get('properties',{}) for node in schema.get('$defs',{}).values()):
+        remove_fields(schema,('family_space_identity',))
+    return schema

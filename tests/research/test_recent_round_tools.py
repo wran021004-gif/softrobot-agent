@@ -35,6 +35,13 @@ def run_fixture(h, responses, *, limit=None):
         message=dict(role='assistant',content='Offline fixture feedback consumed.')
         if use:
             name,payload=use
+            # Scripted fixtures use immutable refs for readability; emulate Main's
+            # actual advertised short-reference contract at the Mock HTTP edge.
+            definition=next((t['function']['parameters'] for t in wire.get('tools',[])
+                if t['function']['name']==name),{})
+            from tools.research.object_choices import main_projection
+            if definition.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
+                payload=main_projection(h,payload)
             message.update(content=None,tool_calls=[dict(id='offline-use-'+str(n),type='function',
                 function=dict(name=name,arguments=json.dumps(payload)))])
         return httpx.Response(200,json=dict(id='offline-response-'+str(n),object='chat.completion',created=1,
