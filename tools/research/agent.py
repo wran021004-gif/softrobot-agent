@@ -43,6 +43,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     from tools.research.scientific_intent import explicit_actions
     if not explicit_actions(study or {}) or 'diagnose' not in actions:
         schema['properties'].pop('next_research_action')
+    elif (study or {}).get('research_decisions',{}).get('analysis_interface')=='scientific_question_v3':
+        schema['properties']['next_research_action']['anyOf'][0]['enum'].remove('mechanism_research')
     from tools.research.structure_intent import enabled as structure_enabled
     structure_intent=structure_enabled(study or {}) and 'search' in actions
     if scientific_question:
@@ -347,6 +349,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
     schema=AnalysisRequest.model_json_schema();operation=detail['operation']
     common={'candidate','operation','model_source','operating_point','saved_state','execution','update_id','protocol','scoring_window_s'}
     extra={
+        'mechanism_structure_v1':{'native','mechanism_study'},
         'native_dynamics_v1':{'native'},'short_input_response_v1':{'native'},
         'fixed_input_structure_v1':{'native','structure_response'},
         'mujoco_direct_control_v1':{'control_optimization'},
@@ -370,7 +373,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
     if method in (CONIC,SENSITIVITY):
         schema['properties']['capability_method']={'type':'string','const':CONIC}
         schema['required'].append('capability_method')
-    required={'fixed_input_structure_v1':'structure_response','mujoco_direct_control_v1':'control_optimization',
+    required={'mechanism_structure_v1':'mechanism_study','fixed_input_structure_v1':'structure_response','mujoco_direct_control_v1':'control_optimization',
         'mujoco_nonlinear_task_capability_v1':'control_optimization',
         'mujoco_reoptimized_structure_response_v1':'nonlinear_response',
         'tendon_force_capability_v1':'tendon_force_direction','design_sensitivity':'design_sensitivity'}

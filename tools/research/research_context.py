@@ -1310,6 +1310,12 @@ def mathematical_discovery_observations(host, current, candidate):
             detail_query=dict(reference=reference,view='working_set',pointer='/mathematical_decision_view'))
         search=raw.get('native_dynamics',{}).get('optimization',{})
         optimized=raw.get('native_dynamics',{}).get('optimized_schedule',{})
+        if summary.get('structure_research'):
+            latest['quantities']=[]
+            latest['structure_research']=summary['structure_research']
+            latest['effect_semantics']=(raw.get('request',{}).get('mechanism_study') or {}).get('effect_semantics','mechanism_effect')
+            latest['actual_cost']=dict(evaluations=raw.get('charged_analysis_evaluations'),
+                numerical_s=raw.get('charged_numerical_s'),native=summary['structure_research']['cost'])
         if optimized:
             latest['actual_experiment']=dict(operation=raw['operation'],
                 initial_control_source=optimized.get('provenance',{}).get('source'),
@@ -1588,8 +1594,52 @@ def agent_decision_brief(host):
             for item in discovery['unavailable_examples']:item.pop('detail_query',None)
             discovery.update(catalog_read_status='deferred_by_original_candidate_read_admission',
                 legal_evidence_query=brief['stop_result_index']['query'])
+    from tools.research.scientific_intent import mechanism_interface
+    if candidate and mechanism_interface(s['spec']):
+        brief['mechanism_research']=mechanism_direction_view(host,candidate,view,
+            execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
     return compact_scientific_delivery(brief,decision_only=True,complete_interpretations=
         s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2')
+
+
+def mechanism_direction_view(host, candidate, view, *, execution_block=None):
+    """Project owned directions and original generation provenance; no new state."""
+    from tools.research.structure_research import discovery,matches_direction,METHOD
+    from tools.research.design import verify_candidate
+    s=state(host);directions={}
+    for ref in [*s.get('analysis_results',[]),*s.get('research_mathematics',[])]:
+        raw=host.store.artifact(ref);direction=raw.get('structure_research',{}).get('structure_direction')
+        if raw.get('status')=='computed' and direction and direction.get('candidate',raw.get('candidate'))==raw.get('candidate'):
+            directions[ref['artifact_id']]=(ref,raw)
+    own=[(ref,raw) for ref,raw in directions.values() if ref in s.get('analysis_results',[]) and raw.get('candidate')==candidate]
+    latest=own[-1][0] if own else None
+    current=verify_candidate(host,candidate);origin_plan=current.get('provenance',{}).get('plan')
+    cited=[];generated=[];adopted=[];relations=[]
+    for plan_ref in s.get('plans',[]):
+        plan=host.store.artifact(plan_ref).get('original_plan',{})
+        if plan.get('action') not in ('generate','propose'):continue
+        for ref in plan.get('supporting_evidence',[]):
+            item=directions.get(ref['artifact_id'])
+            if item is None or not (ref==latest or plan_ref==origin_plan):continue
+            _,raw=item
+            source=(verify_candidate(host,raw['candidate']) if ref in s.get('analysis_results',[]) else host.store.artifact(raw['candidate']))
+            children=[r for r in s['candidates'].values() if host.store.artifact(r).get('provenance',{}).get('plan')==plan_ref]
+            matches=[r for r in children if matches_direction(s['spec'],source,verify_candidate(host,r),raw['structure_research']['structure_direction'])]
+            cited.append(plan_ref);generated.extend(children);adopted.extend(matches)
+            relations.append(dict(direction_source=dict(reference=ref,pointer='/structure_research/structure_direction'),
+                direction_candidate=raw['candidate'],relation='current_candidate_direction' if ref==latest else 'historical_parent_direction',
+                generation_plan=dict(reference=plan_ref),formal_candidates=children,suggestion_adopted_by=matches))
+    result=discovery(s['spec'],current,candidate,
+        latest_direction=dict(reference=latest,pointer='/structure_research/structure_direction') if latest else None,
+        formal_candidate_created=bool(generated),method_detail=view['methods'].get(METHOD),
+        remaining_evaluations=view['remaining_evaluations'],execution_block=execution_block)
+    result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
+        suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
+        formal_candidate_query=dict(reference=generated[-1]) if generated else None,
+        historical_directions=[dict(candidate=raw['candidate'],relation='declared_historical_mathematics' if ref not in s.get('analysis_results',[]) else 'other_candidate_history',
+            query=dict(reference=ref,pointer='/structure_research/structure_direction'))
+            for ref,raw in list(directions.values())[::-1] if ref not in s.get('analysis_results',[]) or raw.get('candidate')!=candidate][:2])
+    return result
 
 
 def research_decision_brief_v3(brief, *, complete_interpretations=False):
@@ -1655,7 +1705,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),
             pending_feedback=brief.get('pending_feedback_delivery')),
         current_research_state=brief.get('current_research_state'),analysis_handoff=brief.get('analysis_handoff'),
-        verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),
+        verified_facts=facts[:8],mathematical_research=brief.get('mathematical_research'),mechanism_research=brief.get('mechanism_research'),
         reporter_summary=dict(status=report.get('reporter_status','unavailable'),
             report_reference=report.get('report_reference'),interpretations=interpretation,
             interpretation_query=report.get('restore_query'),
@@ -1874,7 +1924,7 @@ def information_flow_brief(brief, delivered):
         scientific_results=value.get('scientific_results'),
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),
-        verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),
+        verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),mechanism_research=value.get('mechanism_research'),
         research_trace=trace,**(dict(post_result_decision=post_result) if post_result else {}),
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
@@ -2139,6 +2189,9 @@ def mathematical_decision_view(card):
             'evidence_limits':card['evidence_summary']['unresolved']})
     if summary.get('native_analysis'):
         result['cost_scope']='Costs belong to owning_study, unknown if unrecorded. Native physics_steps includes prefix reconstruction and rollouts; callbacks are not additional rollouts. Independent physical replay is separate.'
+    if summary.get('structure_research'):
+        result['quantities']=[]
+        result['structure_research']=summary['structure_research']
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
     for key in ('nonlinear_capability','nonlinear_response'):
         if summary.get(key):result[key]=summary[key]
