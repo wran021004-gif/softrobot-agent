@@ -119,7 +119,8 @@ class MechanismQuestionV2Tests(unittest.TestCase):
         self.assertEqual(out['value'],2.);self.assertEqual(out['unit'],'m/s^2/N')
         self.assertEqual(observe(mechanics,dict(quantity='tendon_row_projection'))['value'],[0.]*3)
         self.assertEqual(observe(mechanics,dict(quantity='instantaneous_braking'))['status'],'not_applicable')
-        self.assertIn('not constraints',catalog()['unavailable']['passive_constraint_nullspace'])
+        self.assertIn('constrained_motion_subspace',catalog()['primitives'])
+        self.assertEqual(observe(mechanics,dict(quantity='constrained_motion_subspace'))['reason'],'MECHANISM_PHYSICAL_MODE_MISMATCH')
         for bad in (dict(quantity='__import__("os")'),dict(quantity='tip_jacobian',reduction='directional_norm',direction_world=[2.,0.,0.])):
             with self.assertRaises(ValueError):MechanismTarget.model_validate(bad)
         mechanics['mass_matrix_kg_m2']=[[1.]]

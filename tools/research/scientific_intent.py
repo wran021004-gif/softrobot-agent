@@ -43,6 +43,8 @@ def scientific_actions(spec):
     for row in actions:
         if spec.get('canonical_task',{}).get('physical_problem') and row['scientific_goal']!='mechanism_research':
             row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.')
+        elif spec.get('canonical_task',{}).get('physical_problem'):
+            row['scope']='Inspect, differentiate, optimize or compare frozen constrained geometry/equilibrium and load responses; Main owns structure adoption.'
         row.setdefault('domain','structure_control' if row['scientific_goal']=='structure_control_codesign' else
             'control' if row['scientific_goal']=='control_feasibility' else 'structure')
     return actions
@@ -107,7 +109,7 @@ def question_schema(spec, candidate=None, action=None):
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
         if candidate and candidate['configuration']['task'].get('physical_problem'):
-            from extensions.math_analysis.mechanism_registry import CONSTRAINED
+            from extensions.math_analysis.mechanism_registry import CONSTRAINED,COMMON_GEOMETRY
             problem=candidate['configuration']['task']['physical_problem']
             props=schema['$defs']['ScientificStructureV4']['properties']
             props['physical_problem']={'type':'string','const':problem['mode']}
@@ -115,7 +117,7 @@ def question_schema(spec, candidate=None, action=None):
             props['operating_point']={'type':'string','const':'re_equilibrated'}
             props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
-            schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':list(CONSTRAINED)}
+            schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':[*CONSTRAINED,*COMMON_GEOMETRY]}
             schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
@@ -551,8 +553,8 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
     if q.load_condition not in [x['name'] for x in problem['loads']]:return fail('SELECT_FROZEN_LOAD_CONDITION')
     if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
         return fail('PASSIVE_STATIC_QUESTION_CANNOT_BIND_ACTIVE_OR_DYNAMIC_CONTROL')
-    from extensions.math_analysis.mechanism_registry import CONSTRAINED
-    if isinstance(q.target,str) or q.target.quantity not in CONSTRAINED:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
+    from extensions.math_analysis.mechanism_registry import CONSTRAINED,COMMON_GEOMETRY
+    if isinstance(q.target,str) or q.target.quantity not in (*CONSTRAINED,*COMMON_GEOMETRY):return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
     if q.target.quantity=='re_equilibrated_position_response' and q.effect_semantics!='re_equilibrated_passive_response':return fail('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
     paths=q.parameter_paths
     if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETERS')

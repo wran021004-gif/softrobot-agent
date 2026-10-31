@@ -334,6 +334,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
         if cfg['task'].get('physical_problem'):
             ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and remaining>=1
             item.update(planning_status='ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
+                description='Shared geometry, qualified unilateral equilibrium, active sets and re-equilibrated structural response. No dynamic task acceptance.',
                 missing=[] if ready else ['original_scope_budget_or_candidate_admission'],
                 applicable=True,executable=ready,registered_acceptance='not_registered',
                 prerequisites=['Frozen passive assembly, load condition and material-point binding.'],

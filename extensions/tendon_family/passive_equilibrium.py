@@ -11,7 +11,7 @@ class StaticProblem:
         self.native=native;self.m=native.model;self.s=s;self.force=np.asarray(force if np.ndim(force) else [force,0.,0.],dtype=float)
         self.d=mujoco.MjData(self.m);self.last=None
         self.cost=dict(native_forward_calls=0,objective_calls=0,gradient_calls=0,constraint_calls=0,
-            constraint_jacobian_calls=0,hessian_columns=0,optimizer_iterations=0,QP_calls=0,equilibrium_solves=0,KKT_solves=0)
+            constraint_jacobian_calls=0,hessian_columns=0,optimizer_iterations=0,QP_calls=0,equilibrium_solves=0,KKT_solves=0,multiplier_fits=0)
 
     def at(self,q):
         q=np.asarray(q)
@@ -51,7 +51,8 @@ class StaticProblem:
         opts=self.native.protocol['static_solver'];g=self.constraint(q);J=self.jacobian(q);grad=self.gradient(q)
         active=(g>=-opts['active_tolerance_m'])&np.array(self.m.tendon_limited,dtype=bool)
         tension=np.zeros(self.m.ntendon)
-        if np.any(active):tension[active]=nnls(J[active].T,-grad,maxiter=1000)[0]
+        if np.any(active):
+            tension[active]=nnls(J[active].T,-grad,maxiter=1000)[0];self.cost['multiplier_fits']+=1
         residual=grad+J.T@tension;H,asym=self.hessian(q,tension)
         positive=tension>1e-7
         # Positive-definite on this larger subspace suffices on the critical cone.
@@ -155,6 +156,7 @@ def mechanics(native,condition,material_s,initial=None):
         material_point_force_response=(Jpoint@C@Jpoint.T).tolist() if C is not None else None,
         re_equilibrated_position_response=(point-basepoint).tolist() if qualified else None,
         constraint_tip_row_residual=matched['horizontal_row_residuals'],equilibrium=loaded,baseline_equilibrium=baseline,
+        tip_jacobian_m_rad=Jtip.tolist(),tendon_jacobian_m_rad=J.tolist(),
         constraint_state=dict(status='smooth_fixed_active_set' if smooth else 'nonsmooth_or_degenerate' if qualified else 'unqualified',
             qualified=qualified,LICQ=eq['LICQ'],strict_complementarity=eq['strict_complementarity'],
             optimizer_success=eq['optimizer_success'],solver_termination=eq['solver_termination'],
@@ -164,5 +166,6 @@ def mechanics(native,condition,material_s,initial=None):
         feasible_cone=dict(equalities=J[positive].tolist(),inequalities=J[active&~positive].tolist(),
             meaning='J_positive dq=0; J_boundary dq<=0. Slack rows impose no local motion equality.'),
         point_binding=dict(material_s=material_s,load=load.model_dump(mode='json'),frame='world'),
-        components=dict(joint_stiffness_nm_rad=native.model.jnt_stiffness.tolist(),constraint_payout_m=native.payout.tolist()),registered_acceptance='not_registered')
+        components=dict(joint_stiffness_nm_rad=native.model.jnt_stiffness.tolist(),joint_damping_nm_s_rad=native.model.dof_damping.tolist(),
+            constraint_payout_m=native.payout.tolist()),registered_acceptance='not_registered')
 

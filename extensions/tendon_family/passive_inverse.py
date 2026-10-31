@@ -1,8 +1,7 @@
 """Local inverse passive mechanics on native 3D equilibria; no Store or acceptance."""
 import numpy as np
-from scipy.linalg import null_space, eigh
 from .passive import material_point
-from .passive_equilibrium import StaticProblem, tangent, solve
+from .passive_equilibrium import StaticProblem, solve
 
 
 def row_match(Jlength,Jtip):

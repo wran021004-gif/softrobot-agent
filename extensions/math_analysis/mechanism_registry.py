@@ -65,6 +65,7 @@ CONSTRAINED = {
     'tangent_stiffness':('N*m/rad',['free','free']),
     'tangent_compliance':('m/N',['3','3']), 'material_point_force_response':('m/N',['3','3']),
     're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2'])}
+COMMON_GEOMETRY=('tip_jacobian','tendon_jacobian','joint_stiffness','joint_damping')
 for name,(unit,shape) in CONSTRAINED.items():
     PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame='world / named hinges / ordered fixed-payout tendons',
         parameter_dependencies=['geometry','routing','stiffness','payout','external_load'],
@@ -113,7 +114,7 @@ def observe(mechanics, target):
     target=PhysicalMechanismTarget.model_validate(target.model_dump() if hasattr(target,'model_dump') else target)
     meta=deepcopy(PRIMITIVES[target.quantity]);value=mechanics
     passive=mechanics.get('physical_problem')=='passive_unilateral_equilibrium'
-    if (target.quantity in CONSTRAINED)!=passive:
+    if target.quantity in CONSTRAINED and not passive or passive and target.quantity not in (*CONSTRAINED,*COMMON_GEOMETRY):
         return dict(status='not_applicable',reason='MECHANISM_PHYSICAL_MODE_MISMATCH',value=None,metadata=meta)
     if meta['field']:
         for key in meta['field'].split('/'):value=value[key]
@@ -146,6 +147,8 @@ def observe(mechanics, target):
         dof_order=mechanics['coordinates']['dof_order'],tendon_order=mechanics['coordinates']['tendon_order'],
         state=dict(time_s=mechanics['time_s'],qpos_rad=mechanics['qpos_rad'],qvel_rad_s=mechanics['qvel_rad_s']),
         physical_inputs=dict(tensions_n=mechanics['actual_tensions_n'],bounds_n=mechanics['input_bounds_n']))
-    if passive:meta.update(constraint_state=mechanics['constraint_state'],point_binding=mechanics['point_binding'])
+    if passive:meta.update(model='native unilateral fixed-payout assembly',source='extensions.tendon_family.passive_equilibrium.mechanics',
+        state_requirements='Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.',
+        constraint_state=mechanics['constraint_state'],point_binding=mechanics['point_binding'])
     return dict(status='computed',value=value,unit=meta['unit'],target=target.model_dump(),metadata=meta,
         source_pointer='/mechanics/'+meta['field'] if meta['field'] else '/mechanics')

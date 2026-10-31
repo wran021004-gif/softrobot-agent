@@ -75,7 +75,8 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
     return dict(version='structure_mechanism_discovery_v2',candidate=reference,operations=list(OPERATIONS),
         operation_admission=operations,remaining_evaluations=remaining_evaluations,
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
-        mechanism_categories=['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
+        mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
+            ['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
         effective_parameter_groups=sorted({r['category'] for r in rows if r['mechanism_differentiation']['supported']}),
         evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,

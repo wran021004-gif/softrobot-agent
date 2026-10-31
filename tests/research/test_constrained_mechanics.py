@@ -103,7 +103,8 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         from tools.research.state import state
         from tools.research.research_context import agent_decision_brief
         h,c=prepared_host();spec=deepcopy(state(h)['spec'])
-        with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+        with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')),\
+                patch('tools.research.reporter.interpretation_priority',return_value='stage2_new_mechanism_result'):
             wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),
                 ('research_plan',diagnosis(c,'mechanism_research')),
                 ('research_analysis',passive_question(quantity='constraint_tip_row_residual')),
@@ -123,6 +124,12 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(latest['structure_research']['registered_acceptance'],'not_registered')
         self.assertEqual(len(latest['structure_research']['task_observations']),3)
         self.assertEqual(l0['reporter_findings'][-1]['status'],'unavailable')
+        from tools.research.scientific_intent import compile_question
+        before=s['mathematical_evaluations']
+        for change in (dict(control_treatment='fixed_absolute_tensions'),dict(load_condition='unfrozen'),dict(effect_semantics='closed_loop_performance')):
+            q=passive_question();q['structure'].update(change)
+            self.assertEqual(compile_question(h,q,tool_use_id='unsupported-passive')['status'],'unsupported')
+        self.assertEqual(state(h)['mathematical_evaluations'],before)
         direction=raw['structure_research']['structure_direction'];self.assertTrue(direction['proposal_only'])
         p=generation(h);p['generation']=direction['generation_handoff']['generation'];p['supporting_evidence']=[s['analysis_results'][-1]]
         p['decision']['selected_candidate']=c
@@ -131,6 +138,11 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(len(state(h)['candidates']),2)
         attribution=agent_decision_brief(h)['mechanism_research']
         self.assertTrue(attribution['suggestion_adopted']);self.assertTrue(attribution['formal_candidate_created'])
+        from extensions.reference.implementation import evaluate_reach
+        from schemas.platform import TaskDefinition
+        with self.assertRaisesRegex(ValueError,'NOT_REGISTERED'):
+            evaluate_reach(TaskDefinition.model_validate(h.store.artifact(c)['configuration']['task']),None,None,None,None)
+        self.assertIsNone(state(h)['selected']);self.assertFalse(state(h)['physical_replays'])
         import re
         for wire in wires+generated:
             text=json.dumps(wire)
@@ -156,6 +168,12 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'PAYOUT_REQUIRES'):generate_family(dict(space=oldspace,request=old))
         contact={**problem,'contact_mode':'frictional'}
         with self.assertRaises(ValidationError):ConstrainedPhysicalProblem.model_validate(contact)
+        from schemas.platform import TaskDefinition
+        from tools.research.config import _reference
+        task=_reference(ROOT/'tasks/bf7_shared_reach_v1_central_high.json','task',dict(references={}))['task']
+        task['actuator_channels']=[]
+        with self.assertRaises(ValidationError):TaskDefinition.model_validate(task)
+        self.assertIsNotNone(TaskDefinition.model_validate({**task,'physical_problem':problem}))
         with self.assertRaises(ValidationError):MechanismQuestionV2.model_validate(passive_question()['structure'])
         boundary=deepcopy(physics);boundary['fixed_payout_lengths_m']['tendon_0']=physics['reference_lengths_m'][0]
         folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
