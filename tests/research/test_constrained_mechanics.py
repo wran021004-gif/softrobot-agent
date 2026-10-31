@@ -41,15 +41,18 @@ def physical_fixture():
     return space,request,design,mesh,physics,problem
 
 
-def prepared_host():
+def prepared_host(mode='passive_unilateral_equilibrium'):
     """Fresh frozen engineering Study, with original ledger and explicit grant."""
     from tools.research import core
     from tools.research.config import _reference
     from tools.research.state import state,save,update
     space,request,_,_,_,problem=physical_fixture()
+    if mode=='active_ideal_tension':
+        space.pop('passive_payout_domains_m');request.pop('payout_lengths_m');request['family_space_identity']=digest(space)
     name='stage2-constrained-'+uuid4().hex[:8];folder=ROOT/'runs'/name;folder.mkdir(parents=True)
     task=_reference(ROOT/'tasks/bf7_shared_reach_v1_central_high.json','task',dict(references={}))
-    task['task'].update(physical_problem=problem,actuator_channels=[],task_id=name)
+    task['task']['task_id']=name
+    if mode=='passive_unilateral_equilibrium':task['task'].update(physical_problem=problem,actuator_channels=[])
     (folder/'task.json').write_text(json.dumps(task),encoding='utf-8')
     (folder/'space.json').write_text(json.dumps(space),encoding='utf-8')
     cfg=json.loads((ROOT/'configs/research/study_s125_cold.json').read_text())
@@ -58,6 +61,9 @@ def prepared_host():
         mathematical_methods=dict(mechanism_structure_v1='Stage II authorized bounded real constrained mathematics'),
         family_sensitivity_variables=dict(version='family_sensitivity_v2',variables=['segments.*.young_pa','payout_lengths_m.*']))
     cfg['budgets']['mathematical_evaluations']=12
+    if mode=='active_ideal_tension':
+        cfg['family_sensitivity_variables']['variables']=['segments.*.length_m']
+        cfg['execution_instructions']='Inspect and differentiate the frozen active ideal-tension structure through mechanism_research. Choose legal parameters and finite effort. No independent dynamic task success is inferred. Use English.'
     cfg['research_decisions'].update(analysis_interface='scientific_question_v4',architecture='english_decision_v1',
         tool_schema_policy=dict(version='research_information_flow_v1'),conversation_policy=dict(version='recent_round_trace_v1',trace_limit=8),
         role_policy=dict(version='research_roles_v2',main=dict(thinking='disabled',reasoning_effort='none'),reporter=dict(thinking='enabled',reasoning_effort='low')),
@@ -86,11 +92,15 @@ def passive_question(operation='inspect',quantity='tangent_compliance',budget=1)
 
 class ConstrainedMechanicsTests(unittest.TestCase):
     def test_real_active_two_scale_native_path(self):
-        from tests.research.test_r3_b_stage1 import integrated_host,structure_question
+        from tests.research.test_r3_b_stage1 import structure_question
+        from tests.research.test_p63g3_action_handoff import diagnosis
+        from tools.research import core
+        from unittest.mock import patch
         from tools.research.scientific_intent import compile_question
         from tools.research import analysis
         from tools.research.state import state
-        h,c=integrated_host();q=structure_question()
+        h,c=prepared_host('active_ideal_tension');q=structure_question()
+        with patch.object(core,'guard'):core.dispatch(h,diagnosis(c,'mechanism_research'),'real-active-diagnose')
         request=compile_question(h,q,tool_use_id='real-active-difference')
         self.assertEqual(request['status'],'ready',request)
         result=analysis.dispatch(h,request['request'],'real-active-two-scale',guard=lambda *a:None,origin='engineering_preflight')
