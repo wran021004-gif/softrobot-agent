@@ -41,15 +41,18 @@ class PassiveModel:
         self.body_ids=[self.model.body(p['entity']).id for p in physics['parts']];self.base=self.model.body('fixed_base').id
         self.points=[material_point(physics,s) for s in problem.monitor_s]+[physics['tip']]
         if self.model.nu or self.model.nq!=self.model.nv:raise ValueError('PASSIVE_HINGES_WITHOUT_ACTIVE_CHANNELS_REQUIRED')
-        self.cost=dict(model_builds=1,native_forward_calls=0,physics_steps=0,rollouts=0)
+        self.cost=dict(model_builds=1,native_forward_calls=0,physics_steps=0,rollouts=0,
+            material_point_jacobian_calls=0,tendon_jacobian_extractions=0)
 
     def point(self,data,binding):
+        self.cost['material_point_jacobian_calls']+=1
         bid=self.base if binding['body']<0 else self.body_ids[binding['body']]
         pos=data.xpos[bid]+data.xmat[bid].reshape(3,3)@binding['position_m']
         J=np.zeros((3,self.model.nv));mujoco.mj_jac(self.model,data,J,None,pos,bid)
         return pos,J,bid
 
     def tendon_jac(self,data):
+        self.cost['tendon_jacobian_extractions']+=1
         J=np.zeros((self.model.ntendon,self.model.nv));m=self.model
         mujoco.mju_sparse2dense(J,data.ten_J,m.ten_J_rownnz,m.ten_J_rowadr,m.ten_J_colind)
         return J

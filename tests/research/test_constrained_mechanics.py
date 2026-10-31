@@ -113,10 +113,15 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         from tools.research.state import state
         from tools.research.research_context import agent_decision_brief
         h,c=prepared_host();spec=deepcopy(state(h)['spec'])
+        diagnose=diagnosis(c,'mechanism_research')
+        diagnose.update(hypothesis='A fixed-payout active set may limit tip motion while retaining material-point compliance.',
+            expected_observation='Qualified equilibria and measured constrained compliance under the frozen lateral load.',
+            weakening_observation='Unqualified equilibrium or no useful decoupling.',fixed_conditions='Same assembly, payout and frozen load bindings.',
+            interpretation='Local numerical mechanism evidence; independent dynamic acceptance remains unmeasured.')
         with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')),\
                 patch('tools.research.reporter.interpretation_priority',return_value='stage2_new_mechanism_result'):
             wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),
-                ('research_plan',diagnosis(c,'mechanism_research')),
+                ('research_plan',diagnose),
                 ('research_analysis',passive_question(quantity='constraint_tip_row_residual')),
                 ('research_analysis',passive_question()),
                 ('research_analysis',passive_question('differentiate','re_equilibrated_position_response',5)),None])
@@ -142,6 +147,9 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(state(h)['mathematical_evaluations'],before)
         direction=raw['structure_research']['structure_direction'];self.assertTrue(direction['proposal_only'])
         p=generation(h);p['generation']=direction['generation_handoff']['generation'];p['supporting_evidence']=[s['analysis_results'][-1]]
+        p.update(hypothesis='A small reduction of the registered modulus may increase the frozen material-point displacement.',
+            expected_observation='Legal rebuilt structure matching the numerical proposal.',weakening_observation='Invalid structure or failed later independent validation.',
+            fixed_conditions='All other frozen physical and assembly parameters.',interpretation='Adopt this local proposal for generation; task acceptance remains unmeasured.')
         p['decision']['selected_candidate']=c
         with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
             generated=run_fixture(h,[('research_route',dict(tool='research_plan',action='generate')),('research_plan',p),None],id_offset=len(wires))
@@ -208,7 +216,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         _,_,other_physics=generate_family(dict(space=space,request=shorter));other=PassiveModel(other_physics,problem)
         different=design_sensitivity(native,record['equilibrium']['equilibrium'],other,models[1],'topology',.01,.5,0.)
         self.assertEqual(different['reason'],'discrete_topology_change')
-        weak_design=deepcopy(design);weak_design['tendons'][0]['force_limit_n']=1e-6
+        weak_design=deepcopy(design);weak_design['tendons'][0].update(force_limit_n=1e-6,pretension_n=0.)
         capacity_model=PassiveModel(resolve(weak_design,mesh),problem)
         candidate=solve(capacity_model,.5,0.)
         rejected=candidate['equilibrium'];self.assertEqual(rejected['status'],'unqualified');self.assertFalse(rejected['capacity'])
