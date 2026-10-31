@@ -1,0 +1,35 @@
+{
+  "schema": "p63r3_monitor_validation_v1",
+  "tests": [
+    {
+      "test": "test_repeated_provider_reporter_main_sequence_with_separate_monitor",
+      "input_and_assertions": "def test_repeated_provider_reporter_main_sequence_with_separate_monitor(self):\n        h=g3_host();c=generate(h)\n        ref=offline_dispatch(h,t1_request(h,c),'synthetic-r3-monitor')['reference'];report=assemble(h,[ref])\n        payload=dict(id='SYNTHETIC-R3',object='chat.completion',created=1,\n            choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='Synthetic fixture only.'))],\n            usage=dict(prompt_tokens=3,completion_tokens=2,total_tokens=5))\n        raw=json.dumps(payload).encode();keys=[]\n        class Boundary(LiveBoundary):pass\n        def respond(request):return httpx.Response(200,content=raw)\n        process=subprocess.Popen([sys.executable,'-m','tests.research.p63r3_monitor',\n            '--database',str(h.store.db),'--samples','500','--interval','.002'],cwd=ROOT,\n            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,\n            creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))\n        self.addCleanup(lambda:process.kill() if process.poll() is None else None)\n        async def sequence():\n            for i in range(5):\n                for purpose in ('reporter','conversation'):\n                    b=Boundary(h,httpx.MockTransport(respond));b.purpose=purpose\n                    provider=role_provider(state(h)['spec'],state(h)['pilot']['provider'],purpose)\n                    wire=dict(**request_settings(provider),messages=[dict(role='user',content='Synthetic concurrency fixture')])\n                    response=await b.handle_async_request(httpx.Request('POST',provider['base_url'].rstrip('/')+'/chat/completions',json=wire))\n                    self.assertEqual(await response.aread(),raw)\n                    row=h.store.lookup(h.run_id,b.last_request);self.assertIsNotNone(row['receipt'])\n                    self.assertEqual(h.store.artifact(received(h,b.last_request)['body'],raw=True),raw)\n                    keys.append(b.last_request);b.consumed();await b.aclose()\n                    if purpose=='reporter':\n                        _save(h,report,status='unavailable',error='Synthetic fixture; no interpretation generated')\n                self.assertIn('research',decision_packet(h))\n        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_REAL_WORKER')):\n            asyncio.run(sequence())\n        stdout,stderr=process.communicate(timeout=30)\n        self.assertEqual(process.returncode,0,stderr);self.assertNotIn('database is locked',stdout+stderr)\n        observations=[json.loads(line) for line in stdout.splitlines()]\n        self.assertTrue(any(r.get('provider',0)>0 for r in observations))\n        self.assertEqual(len(keys),10);self.assertEqual(state(h)['pilot']['live_model_requests'],10)\n        self.assertFalse(state(h)['pilot'].get('unconsumed_response'))\n        with closing(sqlite3.connect(h.store.db,timeout=.1)) as db:\n            db.execute('BEGIN EXCLUSIVE');db.rollback()",
+      "key_assertions": [
+        "self.assertEqual(await response.aread(),raw)",
+        "row=h.store.lookup(h.run_id,b.last_request);self.assertIsNotNone(row['receipt'])",
+        "self.assertEqual(h.store.artifact(received(h,b.last_request)['body'],raw=True),raw)",
+        "self.assertIn('research',decision_packet(h))",
+        "self.assertEqual(process.returncode,0,stderr);self.assertNotIn('database is locked',stdout+stderr)",
+        "self.assertTrue(any(r.get('provider',0)>0 for r in observations))",
+        "self.assertEqual(len(keys),10);self.assertEqual(state(h)['pilot']['live_model_requests'],10)",
+        "self.assertFalse(state(h)['pilot'].get('unconsumed_response'))"
+      ],
+      "result": "passed"
+    },
+    {
+      "test": "test_monitor_failure_does_not_terminate_writer",
+      "input_and_assertions": "def test_monitor_failure_does_not_terminate_writer(self):\n        h=g3_host()\n        result=subprocess.run([sys.executable,'-m','tests.research.p63r3_monitor','--samples','0'],\n            cwd=ROOT,capture_output=True,text=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))\n        self.assertNotEqual(result.returncode,0)\n        with h.store.transaction() as db:h.store.put(db,dict(synthetic_writer_still_running=True))\n        self.assertEqual(state(h)['pilot']['live_model_requests'],0)",
+      "key_assertions": [
+        "self.assertNotEqual(result.returncode,0)",
+        "self.assertEqual(state(h)['pilot']['live_model_requests'],0)"
+      ],
+      "result": "passed"
+    }
+  ],
+  "real_provider_requests": 0,
+  "scientific_workers": 0,
+  "log": "runs/p63r3_monitor_tests.log",
+  "cycles": 5,
+  "mock_provider_requests": 10,
+  "passed": 2
+}

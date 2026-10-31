@@ -1,5 +1,6 @@
 """Read-only compact V1 checkpoint/final audit; no science or model requests."""
 import json,sqlite3
+from contextlib import closing
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -8,12 +9,16 @@ from tools.state_io import atomic_json,read
 
 RUN='p63v1-m3-autonomous-feasibility-sol-20261030'
 root=ROOT/'runs/research'/RUN
-db=sqlite3.connect((root/'platform.sqlite').as_uri()+'?mode=ro',uri=True)
-db.execute('PRAGMA query_only=ON');db.execute('BEGIN')
+def rows(sql,parameters=()):
+    # Full reports belong on offline snapshots or after the runner ends.
+    # No connection spans Python JSON parsing, reporting or another query.
+    with closing(sqlite3.connect((root/'platform.sqlite').as_uri()+'?mode=ro',uri=True)) as db:
+        db.execute('PRAGMA query_only=ON')
+        return db.execute(sql,parameters).fetchall()
 def art(ref):
-    return json.loads(db.execute('select body from artifacts where id=?',(ref['artifact_id'],)).fetchone()[0])
-s=json.loads(db.execute('select state from sessions').fetchone()[0])
-events=[json.loads(row[0]) for row in db.execute('select body from events order by seq')]
+    return json.loads(rows('select body from artifacts where id=?',(ref['artifact_id'],))[0][0])
+s=json.loads(rows('select state from sessions')[0][0])
+events=[json.loads(row[0]) for row in rows('select body from events order by seq')]
 def feedback_body(result):
     try:return json.loads(''.join(c.get('text','') for c in result.get('content',[])))
     except (ValueError,TypeError):return None
@@ -136,7 +141,7 @@ usage=Counter()
 for r in requests:
     for k in ('prompt_tokens','completion_tokens','total_tokens'):usage[k]+=(r.get('usage') or {}).get(k,0)
     usage['reasoning_tokens']+=((r.get('usage') or {}).get('completion_tokens_details') or {}).get('reasoning_tokens',0)
-calls=[dict(request_id=row[0],status=row[1],charged=json.loads(row[2]) if row[2] else None,receipt=bool(row[3])) for row in db.execute('select request_id,status,charged,receipt from calls')]
+calls=[dict(request_id=row[0],status=row[1],charged=json.loads(row[2]) if row[2] else None,receipt=bool(row[3])) for row in rows('select request_id,status,charged,receipt from calls')]
 generation_failures=[dict(reference=e['outputs'][0],reason=art(e['outputs'][0]).get('reason'),
     diagnostic={k:art(e['outputs'][0]).get('diagnostic',{}).get(k) for k in ('status','reason','check','error_code')})
     for e in events if e['kind']=='generation_failure']
