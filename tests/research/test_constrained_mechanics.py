@@ -48,7 +48,8 @@ def prepared_host(mode='passive_unilateral_equilibrium'):
     from tools.research.state import state,save,update
     space,request,_,_,_,problem=physical_fixture()
     if mode=='active_ideal_tension':
-        space.pop('passive_payout_domains_m');request.pop('payout_lengths_m');request['family_space_identity']=digest(space)
+        space.pop('passive_payout_domains_m')
+        request=resolved_request(space,dict(version='serial_family_generation_v2',family_space_identity=digest(space),segment_count=2,tendon_count=4))
     name='stage2-constrained-'+uuid4().hex[:8];folder=ROOT/'runs'/name;folder.mkdir(parents=True)
     task=_reference(ROOT/'tasks/bf7_shared_reach_v1_central_high.json','task',dict(references={}))
     task['task']['task_id']=name
