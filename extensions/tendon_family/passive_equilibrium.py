@@ -124,11 +124,11 @@ def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1
         caveat='finite increments are local extrapolations; slack activation and multiplier sign changes require nonlinear equilibrium solve')
 
 
-def mechanics(native,condition,material_s):
+def mechanics(native,condition,material_s,initial=None):
     """Registered observations at a real hard equilibrium; no task acceptance."""
     load=native.load(condition);unloaded=native.load(native.problem.baseline_load)
-    baseline=solve(native,unloaded.material_s,unloaded.force_world_n)
-    loaded=baseline if condition==native.problem.baseline_load else solve(native,load.material_s,load.force_world_n,baseline['equilibrium']['qpos'])
+    baseline=solve(native,unloaded.material_s,unloaded.force_world_n,initial[0] if initial else None)
+    loaded=baseline if condition==native.problem.baseline_load else solve(native,load.material_s,load.force_world_n,initial[1] if initial else baseline['equilibrium']['qpos'])
     cost={k:baseline['numerical_cost'][k]+(loaded['numerical_cost'][k] if loaded is not baseline else 0) for k in baseline['numerical_cost']}
     p=StaticProblem(native,load.material_s,load.force_world_n);eq=loaded['equilibrium'];q=np.array(eq['qpos'])
     data=p.at(q);point,Jpoint,_=native.point(data,material_point(native.physics,material_s));Jtip=native.point(data,native.physics['tip'])[1]

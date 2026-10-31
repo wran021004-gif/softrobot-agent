@@ -161,7 +161,10 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
             from extensions.tendon_family.compiler import resolve
             native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'])
-            mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s)
+            seed=None
+            if records and native.physics['dofs']==models[0].physics['dofs']:
+                seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
+            mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s,seed)
             data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
         else:native=NativeModel(cfg)
         models.append(native)
@@ -180,13 +183,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             u=point['u'] if query.native.tensions_n is None else query.native.tensions_n
             mechanics=native.mechanics(data,u)
         observation=observe(mechanics,study.target)
-        if observation['status']!='computed':raise ValueError(observation['reason'])
         record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
             configuration=cfg,observation=observation,mechanics=mechanics,state=data if passive else native.checkpoint(data),
             physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None)
         record['compiled_physical_changes']=physical_changes(records[0]['mechanics'],mechanics) if records else {}
         records.append(record);cache[key]=record
         if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation))
+        if observation['status']!='computed':raise ValueError(observation['reason'])
         return record
 
     def at_normalized(z):return evaluate([physical_value(m,float(v)) for m,v in zip(mappings,z)])

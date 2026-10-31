@@ -163,8 +163,8 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(response['status'],'nonsmooth_or_degenerate');self.assertEqual(response['numerical_cost']['QP_calls'],2)
         target=PhysicalMechanismTarget(quantity='tangent_compliance',reduction='norm')
         self.assertEqual(observe(record,target)['status'],'not_applicable')
-        record['equilibrium']['equilibrium']['status']='unqualified'
-        with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,record['equilibrium']['equilibrium'],.5,0.,[.5])
+        rejected=deepcopy(record['equilibrium']['equilibrium']);rejected['status']='unqualified'
+        with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,rejected,.5,0.,[.5])
         (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium and directional QPs',mechanics=record,tangent=response),indent=2),encoding='utf-8')
 
     def test_real_passive_compilation_and_equilibrium(self):
