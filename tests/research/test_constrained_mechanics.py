@@ -93,6 +93,16 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(result['status'],'computed',result)
         self.assertEqual(result['structure_research']['cost']['model_builds'],5)
         self.assertEqual(result['structure_research']['cost']['physics_steps'],0)
+        from extensions.tendon_family.mjcf import compile_xml
+        from extensions.tendon_family.backends import physics_for
+        from extensions.tendon_family.scene import assemble_physical
+        from schemas.platform import SessionInput
+        from io import BytesIO
+        inp=SessionInput.model_validate(h.store.artifact(c)['configuration']);physics=physics_for(inp)
+        scene=assemble_physical(inp,physics);scene['control']=dict(tension_execution_mode='actuator_realistic')
+        xml=BytesIO();compile_xml(physics,scene,None,xml);realistic=mujoco.MjModel.from_xml_string(xml.getvalue().decode())
+        self.assertEqual(realistic.nu,len(physics['tendons']))
+        result['realistic_compilation_check']=dict(model_builds=1,nu=realistic.nu,physics_steps=0)
         (OUT/'active_two_scale.json').write_text(json.dumps(dict(scope='Real native worker, no synthetic numerical matrices',result=result),indent=2),encoding='utf-8')
 
     def test_real_shared_worker_v4_feedback_and_generation(self):
@@ -175,7 +185,9 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         with self.assertRaises(ValidationError):TaskDefinition.model_validate(task)
         self.assertIsNotNone(TaskDefinition.model_validate({**task,'physical_problem':problem}))
         with self.assertRaises(ValidationError):MechanismQuestionV2.model_validate(passive_question()['structure'])
-        boundary=deepcopy(physics);boundary['fixed_payout_lengths_m']['tendon_0']=physics['reference_lengths_m'][0]
+        from extensions.tendon_family.compiler import resolve
+        boundary_design=deepcopy(design);boundary_design['fixed_payout_lengths_m']['tendon_0']=physics['reference_lengths_m'][0]
+        boundary=resolve(boundary_design,mesh)
         folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
         native=PassiveModel(boundary,problem,folder/'model.xml')
         record=mechanics(native,'unloaded',.5)
@@ -185,9 +197,25 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(response['status'],'nonsmooth_or_degenerate');self.assertEqual(response['numerical_cost']['QP_calls'],2)
         target=PhysicalMechanismTarget(quantity='tangent_compliance',reduction='norm')
         self.assertEqual(observe(record,target)['status'],'not_applicable')
-        rejected=deepcopy(record['equilibrium']['equilibrium']);rejected['status']='unqualified'
+        from extensions.tendon_family.passive_inverse import design_sensitivity
+        models=[]
+        for offset in (-1e-5,1e-5):
+            perturbed=deepcopy(boundary_design);perturbed['fixed_payout_lengths_m']['tendon_0']+=offset
+            models.append(PassiveModel(resolve(perturbed,mesh),problem))
+        switch=design_sensitivity(native,record['equilibrium']['equilibrium'],*models,'normalized_payout',.01,.5,[0.,0.,0.])
+        self.assertEqual(switch['status'],'directional_comparison');self.assertFalse(switch['resolved_comparison']['same_active_set'])
+        shorter=deepcopy(request);shorter['segments']['0']['cells']=1
+        _,_,other_physics=generate_family(dict(space=space,request=shorter));other=PassiveModel(other_physics,problem)
+        different=design_sensitivity(native,record['equilibrium']['equilibrium'],other,models[1],'topology',.01,.5,0.)
+        self.assertEqual(different['reason'],'discrete_topology_change')
+        weak_design=deepcopy(design);weak_design['tendons'][0]['force_limit_n']=1e-6
+        capacity_model=PassiveModel(resolve(weak_design,mesh),problem)
+        candidate=solve(capacity_model,.5,0.)
+        rejected=candidate['equilibrium'];self.assertEqual(rejected['status'],'unqualified');self.assertFalse(rejected['capacity'])
         with self.assertRaisesRegex(ValueError,'QUALIFIED'):tangent(native,rejected,.5,0.,[.5])
-        (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium and directional QPs',mechanics=record,tangent=response),indent=2),encoding='utf-8')
+        (OUT/'boundary_cone.json').write_text(json.dumps(dict(scope='Real MuJoCo boundary equilibrium, directional QPs, active-set switch and capacity qualification failure',
+            mechanics=record,tangent=response,active_set_switch=switch,incomparable=different,capacity_failure=candidate,
+            model_builds=5,physics_steps=0),indent=2),encoding='utf-8')
 
     def test_real_passive_compilation_and_equilibrium(self):
         space,request,design,mesh,physics,problem=physical_fixture()
