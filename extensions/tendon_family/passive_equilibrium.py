@@ -85,7 +85,10 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
             method='SLSQP',constraints=cons,options=dict(ftol=opts['ftol'],maxiter=opts['max_iterations']))
         problem.cost['optimizer_iterations']+=int(result.nit)
         checked=problem.qualify(result.x)
-        if not result.success:checked['status']='unqualified'
+        # Preserve PHS qualification: independent physical KKT/second-order
+        # checks, not SLSQP's line-search flag, establish numerical eligibility.
+        # A failed solver termination remains explicit alongside those checks.
+        checked['solver_termination']='converged' if result.success else 'nonconverged_numerically_qualified' if checked['status']=='qualified_local_minimum' else 'nonconverged_unqualified'
         checked.update(optimizer_success=bool(result.success),optimizer_message=result.message,iterations=int(result.nit),initial=start.tolist())
         trials.append(checked)
     good=[x for x in trials if x['status']=='qualified_local_minimum']
@@ -154,6 +157,7 @@ def mechanics(native,condition,material_s,initial=None):
         constraint_tip_row_residual=matched['horizontal_row_residuals'],equilibrium=loaded,baseline_equilibrium=baseline,
         constraint_state=dict(status='smooth_fixed_active_set' if smooth else 'nonsmooth_or_degenerate' if qualified else 'unqualified',
             qualified=qualified,LICQ=eq['LICQ'],strict_complementarity=eq['strict_complementarity'],
+            optimizer_success=eq['optimizer_success'],solver_termination=eq['solver_termination'],
             active_count=int(sum(active)),positive_count=int(sum(positive)),slack_count=int(sum(~active)),boundary_count=int(sum(active&~positive)),
             stationarity_inf_nm=eq['stationarity_inf_nm'],primal_violation_m=eq['primal_violation_m'],
             native_soft_reaction_inf_nm=float(np.max(abs(data.qfrc_constraint))),native_soft_length_residual_m=(data.ten_length-native.payout).tolist()),

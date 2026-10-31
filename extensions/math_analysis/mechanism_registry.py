@@ -110,7 +110,7 @@ def derived(mechanics, target):
 def observe(mechanics, target):
     """Use only registered primitive/reduction pairs; preserve units and raw source."""
     from tools.research.contracts import PhysicalMechanismTarget
-    target=PhysicalMechanismTarget.model_validate(target)
+    target=PhysicalMechanismTarget.model_validate(target.model_dump() if hasattr(target,'model_dump') else target)
     meta=deepcopy(PRIMITIVES[target.quantity]);value=mechanics
     passive=mechanics.get('physical_problem')=='passive_unilateral_equilibrium'
     if (target.quantity in CONSTRAINED)!=passive:

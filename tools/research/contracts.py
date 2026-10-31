@@ -472,7 +472,7 @@ class ScientificStructureV4(MechanismQuestionV2):
 
 class MechanismStudy(Contract):
     operation: Literal['inspect','differentiate','optimize','compare']
-    target: PhysicalMechanismTarget
+    target: MechanismTarget | PhysicalMechanismTarget
     parameter_path: str | None = None
     parameter_paths: list[str] = Field(default_factory=list,max_length=2)
     point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state','re_equilibrated']
