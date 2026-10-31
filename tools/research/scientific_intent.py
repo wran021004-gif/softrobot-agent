@@ -112,12 +112,17 @@ def question_schema(spec, candidate=None, action=None):
             from extensions.math_analysis.mechanism_registry import CONSTRAINED,COMMON_GEOMETRY
             problem=candidate['configuration']['task']['physical_problem']
             props=schema['$defs']['ScientificStructureV4']['properties']
+            for name in ('source_selection','control_scope','search_strategy','tensions_n','saved_state','execution','update_id','response_horizon_s','parameter_group'):
+                props.pop(name,None)
             props['physical_problem']={'type':'string','const':problem['mode']}
             props['control_treatment']={'type':'string','const':'no_active_control'}
             props['operating_point']={'type':'string','const':'re_equilibrated'}
             props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
             schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':[*CONSTRAINED,*COMMON_GEOMETRY]}
+            target_props=schema['$defs']['PhysicalMechanismTarget']['properties']
+            for name in ('tendon_channel','direction_generalized'):target_props.pop(name,None)
+            target_props['reduction']={'type':'string','enum':['identity','norm','minimum','maximum','directional_norm'],'default':'identity'}
             schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
         elif candidate:
             from extensions.math_analysis.mechanism_registry import PRIMITIVES,CONSTRAINED

@@ -1,0 +1,2765 @@
+{
+  "scope": "Actual SDK/Mock HTTP; numerical workers use real MuJoCo. Zero real Provider requests.",
+  "question": {
+    "version": "scientific_question_v4",
+    "domain": "structure",
+    "structure": {
+      "operation": "differentiate",
+      "physical_problem": "passive_unilateral_equilibrium",
+      "effect_semantics": "re_equilibrated_passive_response",
+      "operating_point": "re_equilibrated",
+      "control_treatment": "no_active_control",
+      "load_condition": "lateral",
+      "target": {
+        "quantity": "re_equilibrated_position_response",
+        "reduction": "norm",
+        "goal": "increase",
+        "material_s": 0.5
+      },
+      "parameter_paths": [
+        "segments.0.young_pa"
+      ],
+      "requested_budget": 5
+    }
+  },
+  "wire": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Research the frozen passive assembly through mechanism_research. Choose load conditions, constrained observables, legal physical parameters and finite mathematical effort. Compare constrained motion and load compliance. Decide whether evidence supports a structural proposal; only you choose whether to generate it. Passive independent dynamic acceptance is not registered; do not claim SELECT eligibility. Use English.\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search)."
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "Research Session prepared and identity-bound to the saved handoff preparation. No prior conversation copied. The next model request supplies the authoritative current state in CURRENT_RESEARCH_PACKET. Full history and original scientific evidence remain queryable from Store. Study: stage2-constrained-4a02436d",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": "CURRENT_RESEARCH_PACKET\n{\"study_id\":\"stage2-constrained-4a02436d\",\"research\":{\"version\":\"research_information_flow_v1\",\"scientific_results\":{\"version\":\"scientific_result_delivery_v1\",\"latest_search\":null,\"study_best_mathematical\":[],\"critical_failures\":[],\"latest_evaluation\":{\"reference\":\"result_3\",\"facts_at\":\"mathematical_research.latest_result\"},\"scope\":\"Finite saved observations grouped by task, profile, numerical method and discretization. Different groups are not ranked against each other; unequal optimization budgets establish no causal or global optimum claim. Search summaries grant no formal SELECT/read credit.\",\"best_independent_physical\":null},\"study_goal\":{\"task\":{\"family\":\"task.reach\",\"reference\":{\"contract\":\"reference.reach_goal\",\"data\":{\"target_m\":[0.295,0.0,0.215]},\"version\":\"1.0.0\"},\"evaluator\":{\"extension_id\":\"evaluate.reach\",\"parameters\":{\"contract\":\"reference.reach_evaluation\",\"data\":{\"tolerance_m\":0.01},\"version\":\"1.0.0\"},\"version\":\"1.0.0\"},\"holding\":{\"position_limit_m\":0.01,\"speed_limit_m_s\":0.03,\"window_s\":0.06},\"timing\":{\"control_period_s\":0.02,\"duration_s\":0.6,\"sample_period_s\":0.02,\"termination\":[\"duration\",\"numerical_failure\"],\"timestep_s\":0.001},\"metrics\":[{\"name\":\"terminal_error_m\",\"unit\":\"m\",\"meaning\":\"Sealed endpoint evaluator position error\"},{\"name\":\"holding_max_error_m\",\"unit\":\"m\",\"meaning\":\"Maximum sampled final-window tip error\"},{\"name\":\"holding_max_speed_m_s\",\"unit\":\"m/s\",\"meaning\":\"Maximum sampled world translational tip speed\"}]},\"task_conditions\":[]},\"research_focus\":{\"candidate\":\"candidate_8\",\"candidate_status\":{\"generated_valid\":1,\"control_sources_initialized\":0,\"mathematical_evaluations\":3,\"independent_physical_evaluations\":0,\"has_executable_candidate\":true,\"task_passed\":false,\"has_measured_task_feedback\":false},\"task_accepted\":false,\"control\":{\"executable_under_current_profile\":true,\"generated\":true,\"compiled\":true,\"control_initialized\":false,\"has_completed_nmpc_execution\":false,\"methods_used\":[\"mechanism_structure_v1\"],\"mathematically_evaluated\":true,\"physically_evaluated\":false,\"accepted\":false,\"best_valid_reference\":null,\"control_sources\":[{\"source\":\"result_3\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/2\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}},{\"source\":\"result_2\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/1\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}},{\"source\":\"result_1\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/0\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}}],\"parameters_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/parameters\"},\"provenance_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/provenance\"},\"control_source_status\":\"no_complete_bound_sequence_recorded\",\"details_query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/candidate_index/0\"},\"control_source_scope\":\"Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.\"},\"latest_result\":{\"reference\":\"result_3\",\"operation\":\"mechanism_structure_v1\",\"status\":\"computed\",\"report_reference\":\"evidence_123\",\"facts_at\":\"mathematical_research.latest_result\"},\"formal_hypothesis\":{\"plan_reference\":\"evidence_37\",\"pointer\":\"/original_plan\",\"hypothesis_id\":\"mixed_structure_control_reach_hold_v1\",\"hypothesis\":\"A fixed-payout active set may limit tip motion while retaining material-point compliance.\",\"expected_observation\":\"Qualified equilibria and measured constrained compliance under the frozen lateral load.\",\"status\":\"Main intent excerpts; not verified facts. Restore full text from the Plan.\"},\"open_questions\":[{\"text\":\"Unqualified equilibrium or no useful decoupling.\",\"kind\":\"Main falsification target excerpt\",\"source\":{\"reference\":\"evidence_37\",\"pointer\":\"/original_plan/weakening_observation\"}}]},\"current_research_state\":{\"phase\":\"research\",\"object\":{\"candidate\":\"candidate_8\",\"origin\":\"unknown\",\"provenance_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/provenance\"},\"compiled\":true,\"control_initialized\":false,\"mathematical_result\":true,\"independently_evaluated\":false,\"task_acceptance\":\"unmeasured\"},\"completed\":[\"legal_candidate_compiled\",\"mathematical_result_recorded\",\"Main_hypothesis_recorded\",\"diagnose_plan_completed\"],\"methods_read\":[],\"mathematical_read_progress\":[{\"method\":\"mechanism_structure_v1\",\"selected\":true,\"selection_source\":\"ScientificQuestion compilation\",\"action_view\":\"unconfirmed\",\"control_source_prerequisites\":\"not_required\",\"request_template\":\"unconfirmed\",\"diagnose\":\"completed\",\"mathematical_request\":\"result_recorded\",\"relevant_content\":\"unconfirmed\",\"changed_fields\":[],\"scope\":\"Confirmed action-field delivery, not full method text, understanding or scientific evidence. Rechecks remain optional.\"}],\"last_effective_action\":{\"status\":\"mathematical_result_recorded\",\"action\":\"research_analysis\",\"source\":{\"reference\":\"evidence_118\",\"pointer\":\"/tool_use/input\"}},\"unresolved\":[],\"scope\":\"Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence.\"},\"verified_facts\":[{\"result_reference\":\"result_2\",\"metrics\":[],\"quantitative_facts\":{\"computation_status\":\"computed\",\"solver\":null,\"mathematical_conclusion\":\"diagnostic\",\"verification_status\":\"local_mechanism_numerical_observation\",\"task_acceptance\":\"unmeasured\",\"source\":{\"reference\":\"result_2\",\"pointer\":\"\"},\"model_context\":{\"basis\":null,\"model_scope\":null,\"solver_scope\":null,\"state_dimension\":null,\"generalized_coordinate_count\":4,\"physical_inputs\":{\"constraints\":{\"tendon_0\":0.1598},\"control_period_s\":0.02,\"frame\":\"world\",\"lower\":[],\"phase\":\"static_equilibrium\",\"signal\":\"no_active_control\",\"tendon_order\":[],\"units\":\"N\",\"upper\":[]},\"source\":{\"reference\":\"result_2\",\"pointer\":\"/scoped_claim\"}}},\"comparisons\":[],\"mathematics\":{\"claim_source\":{\"pointer\":\"/scoped_claim\",\"reference\":\"result_2\"},\"requirement_source\":{\"pointer\":\"/task_analysis\",\"reference\":\"result_2\"},\"problem_definition\":{\"pointer\":\"/structure_research\",\"reference\":\"result_2\"},\"scope\":{\"model_declaration\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"Contact-free ideal unilateral fixed-payout equilibrium; native tendon soft limits are a separate dynamic model.\"],\"representation_id\":\"native_named_hinges_v1\"},\"computation_status\":\"computed\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_interpretation\":\"Declared local native mechanism, constrained equilibrium or structural sensitivity only; candidate proposal is not task success or a strict descent certificate.\",\"unsupported_conclusions\":[\"task acceptance\",\"whole holding-window compliance\",\"global nonlinear feasibility or infeasibility\",\"hardware performance\",\"robustness\",\"repeatability\",\"equilibrium validity at a non-equilibrium point\"],\"horizon\":{\"analysis_horizon_s\":0.0,\"interpretation\":\"Static constrained equilibrium; no dynamic task acceptance.\",\"task_duration_s\":0.6},\"constraint_coverage\":[]},\"operating_point\":{\"actual_time_s\":0.0,\"name\":\"standardized_initial_pretension\"},\"quantities\":[],\"capability\":null,\"owning_study\":\"stage2-constrained-4a02436d\",\"unresolved\":{\"potential_discriminating_checks\":[\"Check task constraints with an applicable operation.\"],\"supported_facts\":[\"Local model diagnostic only.\"],\"unresolved_questions\":[\"Bounded task feasibility unresolved.\"],\"unsupported_inferences\":[\"Global/physical feasibility, structural necessity or surrounding-region exclusion.\"],\"evidence_limits\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]},\"structure_research\":{\"baseline\":0.02194229839966953,\"baseline_unit\":\"m/N\",\"comparison\":null,\"constraint_state\":{\"LICQ\":true,\"active_count\":1,\"boundary_count\":0,\"maximum_constraint_tension_n\":0.11112053382018187,\"minimum_reduced_stiffness_nm_rad\":0.2947853587959618,\"minimum_slack_margin_m\":-5.551115123125783e-17,\"native_soft_length_excess_m\":5.551115123125783e-17,\"native_soft_reaction_inf_nm\":0.0018600917566141929,\"optimizer_success\":true,\"positive_count\":1,\"primal_violation_m\":5.551115123125783e-17,\"qualified\":true,\"slack_count\":0,\"solver_termination\":\"converged\",\"stationarity_inf_nm\":2.5483295671129697e-10,\"status\":\"smooth_fixed_active_set\",\"strict_complementarity\":true,\"within_declared_tendon_capacity\":true},\"cost\":{\"KKT_solves\":0,\"QP_calls\":0,\"constraint_calls\":156,\"constraint_jacobian_calls\":42,\"equilibrium_solves\":2,\"evaluation_attempts\":1,\"gradient_calls\":42,\"hessian_columns\":8,\"kernel_wall_s\":0.021540699992328882,\"material_point_jacobian_calls\":204,\"model_builds\":1,\"multiplier_fits\":2,\"native_forward_calls\":174,\"objective_calls\":154,\"optimizer_iterations\":24,\"physics_steps\":0,\"rollouts\":0,\"tendon_jacobian_extractions\":42},\"direction_source\":null,\"direction_status\":\"not_requested\",\"generation_handoff\":null,\"local_search\":null,\"operation\":\"inspect\",\"parameter_sensitivities\":[],\"physical_problem\":\"passive_unilateral_equilibrium\",\"point_binding\":{\"frame\":\"world\",\"load\":{\"force_world_n\":[0.0,0.01,0.0],\"material_s\":0.5,\"name\":\"lateral\"},\"material_s\":0.5},\"registered_acceptance\":\"not_registered\",\"source\":{\"pointer\":\"/structure_research\",\"reference\":\"result_2\"},\"structure_direction\":null,\"target\":{\"direction_world\":null,\"goal\":\"increase\",\"material_s\":0.5,\"quantity\":\"tangent_compliance\",\"reduction\":\"norm\"},\"task_acceptance\":\"unmeasured\",\"task_observations\":[{\"maximum\":0.001,\"name\":\"middle_response\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"value\":7.512847491041175e-05,\"within_mathematical_limit\":true},{\"maximum\":0.001,\"name\":\"tip_motion\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"value\":7.512920445945747e-05,\"within_mathematical_limit\":true},{\"maximum\":2.0,\"name\":\"decoupling_ratio\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"1\",\"value\":1.0000097106862156,\"within_mathematical_limit\":true}],\"unsupported_conclusions\":[\"full task improvement\",\"task success\",\"strict derivative\",\"structural descent certificate\",\"hardware performance\"]}}},{\"result_reference\":\"result_3\",\"facts_at\":\"mathematical_research.latest_result\"}],\"mathematical_research\":{\"candidate\":\"candidate_8\",\"status\":\"research_requests_can_be_prepared\",\"latest_result\":{\"reference\":\"result_3\",\"operation\":\"mechanism_structure_v1\",\"status\":\"computed\",\"conclusion\":\"diagnostic\",\"task_acceptance\":\"unmeasured\",\"observations\":[{\"constraint_id\":\"passive_dynamic_acceptance\",\"passed\":null,\"scope\":\"unmeasured\",\"source\":{\"reference\":\"result_3\",\"pointer\":\"/task_analysis/constraints/0\"}}],\"observation_scope\":\"Only saved supported outputs; unmeasured constraints remain unresolved. No independent task acceptance is inferred.\",\"quantities\":[],\"directional_quantities\":[],\"reliability\":{},\"scientific_scope\":{\"model\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"Contact-free ideal unilateral fixed-payout equilibrium; native tendon soft limits are a separate dynamic model.\"],\"representation_id\":\"native_named_hinges_v1\"},\"horizon\":{\"analysis_horizon_s\":0.0,\"interpretation\":\"Static constrained equilibrium; no dynamic task acceptance.\",\"task_duration_s\":0.6},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"verification_status\":\"local_mechanism_numerical_observation\"},\"unresolved\":[\"Bounded task feasibility unresolved.\"],\"detail_query\":{\"reference\":\"result_3\",\"view\":\"working_set\",\"pointer\":\"/mathematical_decision_view\"},\"structure_research\":{\"operation\":\"differentiate\",\"target\":{\"direction_world\":null,\"goal\":\"increase\",\"material_s\":0.5,\"quantity\":\"re_equilibrated_position_response\",\"reduction\":\"norm\"},\"baseline\":7.512847491041175e-05,\"baseline_unit\":\"m\",\"physical_problem\":\"passive_unilateral_equilibrium\",\"constraint_state\":{\"LICQ\":true,\"active_count\":1,\"boundary_count\":0,\"maximum_constraint_tension_n\":0.11112053382018187,\"minimum_reduced_stiffness_nm_rad\":0.2947853587959618,\"minimum_slack_margin_m\":-5.551115123125783e-17,\"native_soft_reaction_inf_nm\":0.0018600917566141929,\"optimizer_success\":true,\"positive_count\":1,\"primal_violation_m\":5.551115123125783e-17,\"qualified\":true,\"slack_count\":0,\"solver_termination\":\"converged\",\"stationarity_inf_nm\":2.5483295671129697e-10,\"status\":\"smooth_fixed_active_set\",\"strict_complementarity\":true,\"within_declared_tendon_capacity\":true,\"native_soft_length_excess_m\":5.551115123125783e-17},\"point_binding\":{\"frame\":\"world\",\"load\":{\"force_world_n\":[0.0,0.01,0.0],\"material_s\":0.5,\"name\":\"lateral\"},\"material_s\":0.5},\"registered_acceptance\":\"not_registered\",\"task_observations\":[{\"maximum\":0.001,\"name\":\"middle_response\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"within_mathematical_limit\":true,\"value_at\":\"structure_research.baseline\"},{\"maximum\":0.001,\"name\":\"tip_motion\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"value\":7.512920445945747e-05,\"within_mathematical_limit\":true},{\"maximum\":2.0,\"name\":\"decoupling_ratio\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"1\",\"value\":1.0000097106862156,\"within_mathematical_limit\":true}],\"direction_status\":\"locally_supported_proposal\",\"structure_direction\":{\"parameter_changes\":[{\"baseline\":7200000.0,\"bounds\":[2000000.0,15000000.0],\"delta\":-65000.0,\"parameter_path\":\"segments.0.young_pa\",\"suggested_value\":7135000.0,\"unit\":\"Pa\"}],\"full_task_improvement_verified\":false,\"formal_candidate_created\":false,\"proposal_only\":true,\"other_parameters_unchanged\":true},\"generation_handoff\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"agent_decision_required\":true,\"if_action_not_loaded\":{\"tool\":\"research_route\",\"input\":{\"tool\":\"research_plan\",\"action\":\"generate\"}},\"alternatives\":[\"adopt\",\"reject\",\"inspect_further\",\"change_hypothesis\"],\"supporting_evidence\":[\"result_3\"],\"generation_query\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction/generation_handoff/generation\"},\"direction_source\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction\"}},\"comparison\":null,\"parameter_sensitivities\":[{\"parameter_path\":\"segments.0.young_pa\",\"derivatives\":[-1.0437971405158885e-11,-1.0435537008155295e-11],\"derivative_unit\":\"(m)/(Pa)\",\"consistency\":{\"observed_change\":1.3814433104121211e-06,\"passed\":true,\"relative_difference\":0.00023322510755176726,\"same_direction\":true,\"scope\":\"Two finite scales and an observed signal check; no rigorous error bound or differentiability proof.\",\"signal_floor\":1e-12,\"tolerance\":0.1},\"direction_status\":\"locally_consistent\",\"strict_derivative\":false,\"implicit_sensitivity\":{\"status\":\"regular_implicit_gradient\",\"baseline_included\":true,\"relative_error\":9.603100485779566e-05,\"gradient_trustworthy\":true,\"strict_derivative\":false}}],\"local_search\":null,\"source\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research\"},\"direction_source\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction\"},\"cost\":{\"KKT_solves\":2,\"QP_calls\":0,\"constraint_calls\":427,\"constraint_jacobian_calls\":159,\"equilibrium_solves\":10,\"evaluation_attempts\":5,\"gradient_calls\":159,\"hessian_columns\":40,\"kernel_wall_s\":0.8772264000144787,\"material_point_jacobian_calls\":624,\"model_builds\":5,\"multiplier_fits\":10,\"native_forward_calls\":519,\"objective_calls\":413,\"optimizer_iterations\":81,\"physics_steps\":0,\"rollouts\":0,\"tendon_jacobian_extractions\":159},\"task_acceptance\":\"unmeasured\",\"unsupported_conclusions\":[\"full task improvement\",\"task success\",\"strict derivative\",\"structural descent certificate\",\"hardware performance\"]},\"effect_semantics\":\"re_equilibrated_passive_response\",\"actual_cost\":{\"evaluations\":5,\"numerical_s\":1.9010214000009}},\"parameters\":{\"total\":34,\"continuous_authorized\":2,\"categories\":[\"assembly\",\"segment\"],\"registered_categories\":[\"assembly\",\"controller\",\"discretization\",\"geometry\",\"material_geometry\",\"routing\",\"segment\",\"tendon\",\"topology\"]},\"method_directory_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/methods\"},\"detail_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/research_opportunities\"}},\"mechanism_research\":{\"version\":\"structure_mechanism_discovery_v2\",\"candidate\":\"candidate_8\",\"operations\":[\"inspect\",\"differentiate\",\"optimize\",\"compare\"],\"operation_admission\":{\"inspect\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":1,\"inputs_required\":true},\"compare\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":2,\"inputs_required\":true},\"differentiate\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":5,\"inputs_required\":true},\"optimize\":{\"can_prepare\":false,\"execution_status\":\"blocked\",\"reason\":\"insufficient_budget\",\"minimum_evaluations\":6,\"inputs_required\":true}},\"remaining_evaluations\":5,\"method_admission\":{\"planning_status\":\"ready\",\"execution_status\":\"conditional_on_admission\",\"formal_execution_authorized\":true,\"missing\":[]},\"mechanism_categories\":[\"constraint_geometry\",\"taut_slack_activity\",\"tangent_compliance\",\"re_equilibrated_response\"],\"effective_parameter_groups\":[\"assembly\",\"segment\"],\"evidenced_direction\":true,\"direction_proposed\":true,\"direction_query\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction\"},\"formal_candidate_created\":false,\"details_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/structure_research\"},\"task_scope\":\"Instantaneous mechanism; full task improvement unmeasured. Short responses use the existing M1 methods.\",\"direction_candidate\":\"candidate_8\",\"generation_plan_cited_evidence\":false,\"suggestion_adopted\":false,\"generation_relations\":[],\"formal_candidate_query\":null,\"historical_directions\":[]},\"research_trace\":{\"version\":\"research_trace_v1\",\"total\":3,\"recent\":[{\"step\":54,\"action\":\"research_analysis\",\"text\":\"#54 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false},{\"step\":81,\"action\":\"research_analysis\",\"text\":\"#81 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false},{\"step\":108,\"action\":\"research_analysis\",\"text\":\"#108 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false}],\"unresolved\":[],\"page_query\":{\"view\":\"summary\",\"offset\":0,\"limit\":4,\"trace\":\"milestones\"},\"recall\":\"research_recall(step=<stable step>, view=\\\"summary\\\" or \\\"details\\\"); omit step for paginated history.\",\"scope\":\"Recorded actions and actual statuses only. Request acceptance, computation, verification and physical acceptance are distinct.\",\"action_total\":4},\"post_result_decision\":{\"status\":\"awaiting_Main_judgment\",\"prior_Main_question_at\":\"research_focus.formal_hypothesis\",\"completed_action\":{\"reference\":\"evidence_118\",\"pointer\":\"/tool_use/input\"},\"facts_and_limits_at\":\"mathematical_research.latest_result\",\"interpretations_at\":\"reporter_findings\",\"interpretation_role\":\"Non-authoritative source-linked explanations; fixed facts remain available without Reporter.\",\"read_progress_at\":\"evidence_access.stop_index.read_progress\",\"legal_actions_at\":\"capabilities\",\"remaining_resources_at\":\"budget\",\"decision\":\"Assess the original hypothesis and choose further evidence, a new hypothesis or legal research action, or a justified STOP. No outcome or next action is selected by this projection.\"},\"capabilities\":[{\"category\":\"Design\",\"actions\":[{\"action\":\"generate\",\"status\":\"available\",\"tool\":\"research_plan\"}]},{\"category\":\"Control\",\"actions\":[{\"action\":\"initialize_control\",\"status\":\"available\",\"tool\":\"research_plan\"},{\"action\":\"control_search\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"execute\",\"status\":\"available\",\"tool\":\"research_plan\"},{\"action\":\"research_rl\",\"tool\":\"research_rl\",\"status\":\"available_for_request_validation\"}]},{\"category\":\"Mathematical Research\",\"actions\":[{\"action\":\"mechanics\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"refine\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"diagnose\",\"status\":\"available\",\"reason\":\"Record hypothesis/candidate and optionally next_research_action; loads an interface only.\",\"tool\":\"research_plan\"},{\"action\":\"research_analysis\",\"tool\":\"research_analysis\",\"status\":\"available_for_request_validation\",\"reason\":\"Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.\"},{\"action\":\"research_analysis\",\"status\":\"conditional\",\"methods_at\":\"mathematical_research\",\"reason\":\"Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.\",\"cost\":\"Uses the shared mathematical allowance; inspect the method detail.\"}]},{\"category\":\"Physical Validation\",\"actions\":[{\"action\":\"physical_replay\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"replay\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"select\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"stop\",\"status\":\"available\",\"tool\":\"research_plan\"}]},{\"category\":\"Evidence & Knowledge\",\"actions\":[{\"action\":\"experience_retrieve\",\"tool\":\"experience_retrieve\",\"status\":\"available_for_request_validation\"},{\"action\":\"evidence_read\",\"tool\":\"evidence_read\",\"status\":\"available_for_request_validation\"},{\"action\":\"research_recall\",\"tool\":\"research_recall\",\"status\":\"available_for_request_validation\"},{\"action\":\"research_investigate\",\"tool\":\"research_investigate\",\"status\":\"available_for_request_validation\"}]}],\"tool_continuation\":{\"selection\":{\"tool\":\"research_plan\",\"action\":\"diagnose\",\"tool_use_id\":\"offline-use-0\",\"sequence\":19,\"source\":\"evidence_17\",\"status\":\"tool_feedback_recorded\",\"feedback\":\"evidence_41\"},\"plan_action\":\"diagnose\",\"plan_selection\":{\"tool\":\"research_plan\",\"action\":\"diagnose\",\"tool_use_id\":\"offline-use-0\",\"sequence\":19,\"source\":\"evidence_17\",\"status\":\"submission_feedback_recorded\",\"feedback_status\":\"success\",\"feedback\":\"evidence_41\"},\"recent\":[{\"tool\":\"research_plan\",\"tool_use_id\":\"offline-use-1\",\"status\":\"success\",\"source\":\"evidence_41\"},{\"tool\":\"research_analysis\",\"tool_use_id\":\"offline-use-2\",\"status\":\"success\",\"source\":\"evidence_64\"},{\"tool\":\"research_analysis\",\"tool_use_id\":\"offline-use-3\",\"status\":\"success\",\"source\":\"evidence_91\"}],\"scope\":\"Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.\",\"loaded\":{\"tool\":\"research_analysis\",\"action\":null,\"plan_action\":\"diagnose\"},\"switch_tool\":\"Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.\",\"direct_plan\":{\"tool\":\"research_plan\",\"action\":\"diagnose\",\"instruction\":\"Record hypothesis and candidate; optionally choose next_research_action. No action is inferred from hypothesis or method text; omitted choice keeps discovery neutral.\",\"status\":\"completed\",\"scientific_fields\":[\"hypothesis\",\"decision.selected_candidate\",\"next_research_action\"],\"current_hypothesis\":\"A fixed-payout active set may limit tip motion while retaining material-point compliance.\",\"candidate\":\"candidate_8\"},\"pending_feedback\":{\"items\":[{\"delivery\":\"fixed_facts_in_l0\",\"feedback_reference\":\"evidence_118\",\"original_result_query\":{\"pointer\":\"/result\",\"reference\":\"evidence_118\",\"view\":\"full\"},\"query\":{\"domain\":\"structure\",\"structure\":{\"control_treatment\":\"no_active_control\",\"effect_semantics\":\"re_equilibrated_passive_response\",\"load_condition\":\"lateral\",\"operating_point\":\"re_equilibrated\",\"operation\":\"differentiate\",\"parameter_paths\":[\"segments.0.young_pa\"],\"physical_problem\":\"passive_unilateral_equilibrium\",\"requested_budget\":5,\"target\":{\"goal\":\"increase\",\"material_s\":0.5,\"quantity\":\"re_equilibrated_position_response\",\"reduction\":\"norm\"}},\"version\":\"scientific_question_v4\"},\"status\":\"success\",\"tool\":\"research_analysis\",\"tool_id\":\"offline-use-4\",\"facts_at\":\"mathematical_research.latest_result\"}],\"omitted_tools\":0,\"scope\":\"Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.\",\"total_tools\":1,\"version\":\"pending_feedback_delivery_v1\"},\"scientific_action_handoff\":{\"diagnose_choice\":\"mechanism_research\",\"status\":\"result_completed\",\"loaded\":{\"tool\":\"research_analysis\",\"action\":null,\"plan_action\":\"diagnose\"},\"choices\":[{\"scientific_goal\":\"structure_control_codesign\",\"tool\":\"research_plan\",\"action\":\"search\",\"interface\":null,\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"structure_control\"},{\"scientific_goal\":\"single_parameter_effect\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"structure\"},{\"scientific_goal\":\"control_feasibility\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"control\"},{\"scientific_goal\":\"mechanism_research\",\"domain\":\"structure\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":true,\"scope\":\"Inspect, differentiate, optimize or compare frozen constrained geometry/equilibrium and load responses; Main owns structure adoption.\"}],\"selection_executes_science\":false,\"next\":\"Submit scientific choices to the loaded interface; selection alone produces no scientific result.\"},\"analysis_handoff\":{\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"loaded\":true,\"status\":\"result_completed\",\"next\":\"Choose a frozen load and registered constrained target; inspect, differentiate, optimize or compare. Main independently decides whether to generate a proposed structure.\",\"result_reference\":\"result_3\",\"parameter_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/structure_research/parameters\"}}},\"knowledge\":{\"role\":\"procedural_knowledge\",\"access\":{\"query\":{\"operation\":\"search\",\"task\":\"reach\"},\"available_historical_tasks\":[\"oriented_tracking\",\"passive_force_response\",\"position_tool_axis\",\"soft_robot_research\",\"tracking\"],\"study_private_entries\":[],\"scope\":\"Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.\",\"hints\":[{\"entry_id\":\"model-physics-comparison\",\"revision\":\"1\",\"method\":\"Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.\",\"task\":\"soft_robot_research\",\"scope\":\"context_only; cross-task generalization unverified\",\"read_query\":{\"operation\":\"read\",\"entry_id\":\"model-physics-comparison\",\"revision\":\"1\"}},{\"entry_id\":\"research-bounded-continuation\",\"revision\":\"2\",\"method\":\"Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.\",\"task\":\"soft_robot_research\",\"scope\":\"context_only; cross-task generalization unverified\",\"read_query\":{\"operation\":\"read\",\"entry_id\":\"research-bounded-continuation\",\"revision\":\"2\"}}]},\"read_progress\":null},\"reporter_findings\":[{\"report_reference\":\"evidence_96\",\"question\":null,\"reference_role\":\"reporter_report\",\"scientific_citation_eligible\":false,\"result_references\":[\"result_2\"],\"status\":\"unavailable\",\"interpretation_query\":{\"reference\":\"evidence_96\",\"view\":\"full\",\"pointer\":\"/report/interpretations\"},\"summary_query\":{\"reference\":\"evidence_96\",\"view\":\"summary\"},\"reading_guidance\":\"Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.\",\"interpretations\":[],\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]},{\"report_reference\":\"evidence_123\",\"question\":null,\"reference_role\":\"reporter_report\",\"scientific_citation_eligible\":false,\"result_references\":[\"result_3\"],\"status\":\"unavailable\",\"interpretation_query\":{\"reference\":\"evidence_123\",\"view\":\"full\",\"pointer\":\"/report/interpretations\"},\"summary_query\":{\"reference\":\"evidence_123\",\"view\":\"summary\"},\"reading_guidance\":\"Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.\",\"interpretations\":[],\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]}],\"evidence_access\":{\"working_set\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"\"},\"method_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/methods\"},\"stop_index\":{\"count\":3,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/all_fresh_results\"},\"read_progress\":{\"status\":\"unread\",\"last_confirmed_read\":null,\"current_index_confirmed\":false,\"pending_confirmation\":false,\"result_count\":3,\"complete_body_reads\":[],\"unread_bodies\":[\"result_1\",\"result_2\",\"result_3\"],\"scope\":\"Index delivery is not a full scientific result read or independent SELECT qualification.\"}},\"select_requirement\":\"A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.\",\"stop_requirement\":\"Retrieve and cite the complete new result index; original admission checks remain in force.\",\"citation_eligibility\":{\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/citation_eligibility\"},\"registered_count\":4,\"scientific_result_count\":3,\"rule\":\"supporting_evidence requires registered result_reference matching inference, candidate, task and model scope. report_reference only restores Reporter text; Knowledge is procedural context; Domain Reference defines the problem; tool receipts record operations. None gains scientific eligibility by being read.\",\"recent_registered\":[{\"reference\":\"candidate_8\",\"role\":\"domain_reference\",\"registered\":true,\"supports_scientific_conclusion\":false,\"candidate\":null,\"claim_kind\":\"UNVERIFIED_HYPOTHESIS\",\"supported_inferences\":[]}]},\"result_scopes\":[{\"result\":{\"pointer\":\"\",\"reference\":\"result_2\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_inferences\":[\"local_diagnostic\"]},{\"result\":{\"pointer\":\"\",\"reference\":\"result_3\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_inferences\":[\"local_diagnostic\"]}],\"domain\":{\"query\":{\"reference\":\"evidence_2\",\"view\":\"full\",\"pointer\":\"\"},\"role\":\"domain_reference\"},\"delegated_read\":{\"tool\":\"research_investigate\",\"arguments\":\"question and existing result references; optional exact reads\",\"scope\":\"Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit.\"}},\"budget\":{\"model_calls\":43,\"model_closeout_reserve\":4,\"public_operations\":195,\"public_closeout_reserve\":12,\"physical\":64,\"mathematical\":5,\"closeout\":{\"active\":false,\"next_request_will_protect\":false,\"reason\":null}}},\"saved_replay_choices\":{\"options\":[],\"scope\":\"Bounded saved-result options. Main chooses; no physical execution or acceptance is implied. Other saved results remain queryable from Store.\"},\"saved_object_choices\":[{\"choice\":\"candidate_8\"}],\"object_choice_rule\":\"Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.\"}"
+      }
+    ],
+    "model": "deepseek-flash",
+    "reasoning_effort": "none",
+    "stream": false,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "description": "Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              },
+              "LocalDiagnostic": {
+                "additionalProperties": false,
+                "properties": {
+                  "execution": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "update_id": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "repetitions": {
+                    "default": 2,
+                    "maximum": 2,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "mode": {
+                    "default": "research_policy",
+                    "enum": [
+                      "research_policy",
+                      "research_current"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "execution",
+                  "update_id"
+                ],
+                "type": "object"
+              },
+              "ResearchDecision": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "const": "research_decision_v1",
+                    "default": "research_decision_v1",
+                    "type": "string"
+                  },
+                  "hypothesis_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "claimed_inference": {
+                    "default": "empirical_search",
+                    "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "research_intent": {
+                    "enum": [
+                      "DIAGNOSE",
+                      "MATHEMATICAL_ANALYSIS",
+                      "CONTROL_SEARCH",
+                      "DESIGN_MODIFICATION",
+                      "NMPC_EXECUTION",
+                      "RL_TRAINING",
+                      "PHYSICAL_VALIDATION",
+                      "SELECT",
+                      "STOP"
+                    ],
+                    "type": "string"
+                  },
+                  "selected_method": {
+                    "description": "Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected_variables": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "selected_candidate": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source. For diagnose, place the owned candidate here at decision.selected_candidate; there is no top-level selected_candidate field."
+                  },
+                  "requested_budget": {
+                    "default": 0,
+                    "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "hypothesis_id",
+                  "research_intent"
+                ],
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "diagnose"
+                ],
+                "description": "Property action"
+              },
+              "decision": {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/ResearchDecision"
+                      },
+                      {
+                        "properties": {
+                          "research_intent": {
+                            "const": "DIAGNOSE"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "required": [
+                      "selected_candidate"
+                    ],
+                    "properties": {
+                      "selected_candidate": {
+                        "$ref": "#/$defs/EvidenceRef"
+                      }
+                    }
+                  }
+                ],
+                "description": "Property decision"
+              },
+              "next_step": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "adjust_training",
+                      "revise_design",
+                      "diagnose",
+                      "stop"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property next_step"
+              },
+              "next_research_action": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "structure_control_codesign",
+                      "single_parameter_effect",
+                      "control_feasibility",
+                      "mechanism_research"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Diagnose only, explicit scientific action Study: explicitly choose the next scientific interface. Loads its Schema only; does not execute or choose variables/budget. Omit to keep action discovery neutral."
+              },
+              "hypothesis": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property hypothesis"
+              },
+              "supporting_evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "type": "array",
+                "description": "Property supporting_evidence"
+              },
+              "expected_observation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property expected_observation"
+              },
+              "weakening_observation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property weakening_observation"
+              },
+              "fixed_conditions": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property fixed_conditions"
+              },
+              "stopping_condition": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property stopping_condition"
+              },
+              "interpretation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property interpretation"
+              },
+              "diagnostic": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/LocalDiagnostic"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property diagnostic"
+              },
+              "experience_disposition": {
+                "additionalProperties": {
+                  "enum": [
+                    "adopted",
+                    "rejected",
+                    "context_only"
+                  ],
+                  "type": "string"
+                },
+                "description": "Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.",
+                "type": "object"
+              }
+            },
+            "required": [
+              "action",
+              "hypothesis",
+              "expected_observation",
+              "weakening_observation",
+              "fixed_conditions",
+              "stopping_condition",
+              "interpretation",
+              "decision"
+            ],
+            "type": "object",
+            "description": "Submit the selected diagnose action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP."
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "experience_retrieve",
+          "description": "Search curated procedural guidance, then execute a result entry read_query exactly. A retrieval receipt artifact ID is not an entry_id. Historical guidance never grants scientific evidence or action permission.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "default": "search",
+                "enum": [
+                  "search",
+                  "read"
+                ],
+                "title": "Operation",
+                "type": "string",
+                "description": "Property operation"
+              },
+              "key": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Key",
+                "description": "Property key"
+              },
+              "entry_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Entry Id",
+                "description": "Property entry_id"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Revision",
+                "description": "Property revision"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Task",
+                "description": "Property task"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Structure",
+                "description": "Property structure"
+              },
+              "failure_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Failure Type",
+                "description": "Property failure_type"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version",
+                "description": "Property version"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Kind",
+                "description": "Property kind"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                "title": "Limit"
+              }
+            },
+            "title": "ExperienceQuery",
+            "type": "object",
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "description": "Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set"
+                ],
+                "title": "View",
+                "type": "string",
+                "description": "Property view"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer",
+                "description": "Property start"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer",
+                "description": "Property count"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object",
+            "if": {},
+            "then": {
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "view": {
+                        "const": "fields"
+                      }
+                    },
+                    "required": [
+                      "view"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "fields": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "fields"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_recall",
+          "description": "Recall saved research by stable step number, or page through history. Details support precise JSON Pointers. Navigation grants no formal SELECT/STOP evidence credit.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "step": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Stable Store step number. Omit to page through the trace.",
+                "title": "Step"
+              },
+              "trace": {
+                "default": "actions",
+                "enum": [
+                  "actions",
+                  "milestones"
+                ],
+                "title": "Trace",
+                "type": "string",
+                "description": "Property trace"
+              },
+              "view": {
+                "default": "summary",
+                "enum": [
+                  "summary",
+                  "details"
+                ],
+                "title": "View",
+                "type": "string",
+                "description": "Property view"
+              },
+              "offset": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Offset",
+                "type": "integer",
+                "description": "Property offset"
+              },
+              "limit": {
+                "default": 8,
+                "maximum": 10,
+                "minimum": 1,
+                "title": "Limit",
+                "type": "integer",
+                "description": "Property limit"
+              },
+              "pointer": {
+                "default": "",
+                "description": "JSON Pointer relative to the original Plan or tool feedback result; details only.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "fields": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Fields",
+                "description": "Property fields"
+              }
+            },
+            "title": "ResearchRecallQuery",
+            "type": "object",
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_route",
+          "description": "Select a tool and action; load its Schema on the next request. No scientific execution or evidence credit.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "tool": {
+                "enum": [
+                  "research_plan",
+                  "experience_retrieve",
+                  "evidence_read",
+                  "research_recall",
+                  "research_analysis",
+                  "research_investigate",
+                  "research_rl"
+                ],
+                "title": "Tool",
+                "type": "string",
+                "description": "Property tool"
+              },
+              "action": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+                "title": "Action"
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "title": "ResearchRouteQuery",
+            "type": "object",
+            "description": "Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch."
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_analysis",
+          "description": "Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              },
+              "PhysicalMechanismTarget": {
+                "additionalProperties": false,
+                "properties": {
+                  "quantity": {
+                    "type": "string",
+                    "enum": [
+                      "constraint_length_jacobian",
+                      "constraint_active_set",
+                      "constraint_multiplier",
+                      "slack_margin",
+                      "constrained_motion_subspace",
+                      "tangent_stiffness",
+                      "tangent_compliance",
+                      "material_point_force_response",
+                      "re_equilibrated_position_response",
+                      "constraint_tip_row_residual",
+                      "directional_material_response",
+                      "tip_jacobian",
+                      "tendon_jacobian",
+                      "joint_stiffness",
+                      "joint_damping"
+                    ]
+                  },
+                  "reduction": {
+                    "default": "identity",
+                    "enum": [
+                      "identity",
+                      "norm",
+                      "minimum",
+                      "maximum",
+                      "directional_norm",
+                      "generalized_projection",
+                      "direction_cosine"
+                    ],
+                    "title": "Reduction",
+                    "type": "string"
+                  },
+                  "direction_world": {
+                    "anyOf": [
+                      {
+                        "maxItems": 3,
+                        "minItems": 3,
+                        "prefixItems": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ],
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Direction World"
+                  },
+                  "tendon_channel": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Tendon Channel"
+                  },
+                  "direction_generalized": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "number"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Direction Generalized"
+                  },
+                  "goal": {
+                    "enum": [
+                      "increase",
+                      "decrease"
+                    ],
+                    "title": "Goal",
+                    "type": "string",
+                    "description": "Main explicitly chooses increase or decrease for differentiation or optimization."
+                  },
+                  "material_s": {
+                    "default": 0.5,
+                    "maximum": 1,
+                    "minimum": 0,
+                    "title": "Material S",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "quantity"
+                ],
+                "title": "PhysicalMechanismTarget",
+                "type": "object"
+              },
+              "ScientificControlScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "mode": {
+                    "description": "C2 finite search parameterization: full_task adjusts all tendon channels with two independent endpoint knots over the frozen task; time_window adjusts all channels with one triangular pulse per channel and zero endpoint corrections. Choose a scope only when this parameterization answers the question; arbitrary waveform or channel-subset search is not adapted.",
+                    "enum": [
+                      "full_task",
+                      "time_window"
+                    ],
+                    "title": "Mode",
+                    "type": "string"
+                  },
+                  "window_s": {
+                    "anyOf": [
+                      {
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "prefixItems": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ],
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Only control corrections inside this interval; evaluation still covers the complete frozen task.",
+                    "title": "Window S"
+                  }
+                },
+                "required": [
+                  "mode"
+                ],
+                "title": "ScientificControlScope",
+                "type": "object"
+              },
+              "ScientificSourcesV2": {
+                "additionalProperties": false,
+                "properties": {
+                  "control_source": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "comparison_candidates": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "maxItems": 2,
+                    "title": "Comparison Candidates",
+                    "type": "array"
+                  },
+                  "t1_results": {
+                    "description": "Comparable saved Native T1 results, baseline first; may select explicit shared-baseline paths/scales. No new search is requested.",
+                    "items": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "maxItems": 9,
+                    "title": "T1 Results",
+                    "type": "array"
+                  },
+                  "model_results": {
+                    "description": "Saved Conic-compatible model stencil, baseline first. Original optimal sensitivity admission determines its validity.",
+                    "items": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "maxItems": 5,
+                    "title": "Model Results",
+                    "type": "array"
+                  }
+                },
+                "title": "ScientificSourcesV2",
+                "type": "object"
+              },
+              "ScientificStructureV4": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation": {
+                    "enum": [
+                      "inspect",
+                      "differentiate",
+                      "optimize",
+                      "compare"
+                    ],
+                    "title": "Operation",
+                    "type": "string"
+                  },
+                  "effect_semantics": {
+                    "type": "string",
+                    "enum": [
+                      "mechanism_effect",
+                      "re_equilibrated_passive_response"
+                    ]
+                  },
+                  "parameter_group": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Actual capability category; segment_lengths is retained as a legacy selector.",
+                    "title": "Parameter Group"
+                  },
+                  "parameter_paths": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2,
+                    "title": "Parameter Paths",
+                    "type": "array"
+                  },
+                  "target": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/PhysicalMechanismTarget"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "title": "Target"
+                  },
+                  "hypothesis": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Hypothesis"
+                  },
+                  "source_selection": {
+                    "$ref": "#/$defs/ScientificSourcesV2"
+                  },
+                  "control_scope": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/ScientificControlScope"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "search_strategy": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "response",
+                          "pattern"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Search Strategy"
+                  },
+                  "operating_point": {
+                    "type": "string",
+                    "const": "re_equilibrated"
+                  },
+                  "control_treatment": {
+                    "type": "string",
+                    "const": "no_active_control"
+                  },
+                  "tensions_n": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "number"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Tensions N"
+                  },
+                  "saved_state": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "execution": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "update_id": {
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Update Id"
+                  },
+                  "comparison_candidates": {
+                    "items": {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    "maxItems": 1,
+                    "title": "Comparison Candidates",
+                    "type": "array"
+                  },
+                  "requested_budget": {
+                    "anyOf": [
+                      {
+                        "maximum": 64,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Maximum original mathematical evaluations for this question. Mechanism cost depends on selected paths, central/one-sided stencils and bounded local search. Fixed-input short responses retain original accounting. For explicit control optimization this caps Native callbacks; saved M2 aggregation never requests new T1 rollouts.",
+                    "title": "Requested Budget"
+                  },
+                  "local_radius_fraction": {
+                    "default": 0.02,
+                    "description": "Bounded neighborhood in normalized parameter coordinates, used by the existing SciPy local optimizer.",
+                    "exclusiveMinimum": 0,
+                    "maximum": 0.1,
+                    "title": "Local Radius Fraction",
+                    "type": "number"
+                  },
+                  "response_horizon_s": {
+                    "anyOf": [
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 0.05,
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Response Horizon S"
+                  },
+                  "physical_problem": {
+                    "type": "string",
+                    "const": "passive_unilateral_equilibrium"
+                  },
+                  "load_condition": {
+                    "type": "string",
+                    "enum": [
+                      "unloaded",
+                      "lateral"
+                    ]
+                  }
+                },
+                "required": [
+                  "operation",
+                  "effect_semantics",
+                  "target",
+                  "operating_point",
+                  "control_treatment",
+                  "physical_problem",
+                  "load_condition"
+                ],
+                "title": "ScientificStructureV4",
+                "type": "object",
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "operation": {
+                          "enum": [
+                            "differentiate",
+                            "optimize"
+                          ]
+                        },
+                        "effect_semantics": {
+                          "const": "mechanism_effect"
+                        }
+                      },
+                      "required": [
+                        "operation",
+                        "effect_semantics"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "target": {
+                          "required": [
+                            "goal"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "description": "Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.",
+            "properties": {
+              "version": {
+                "const": "scientific_question_v4",
+                "default": "scientific_question_v4",
+                "title": "Version",
+                "type": "string",
+                "description": "Property version"
+              },
+              "domain": {
+                "type": "string",
+                "const": "structure",
+                "description": "Property domain"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ScientificStructureV4"
+                  }
+                ],
+                "description": "Property structure"
+              }
+            },
+            "required": [
+              "domain",
+              "structure"
+            ],
+            "title": "ScientificQuestionV4",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_investigate",
+          "description": "Read-only investigation of saved results: provide a question and result references; exact reads and authorized experience_queries are optional. No candidate is needed to read existing evidence. This does not execute research_plan(diagnose) or candidate-bound research_analysis. Returns compact findings and an interpretation_query; internal reads give no SELECT/STOP credit.",
+          "parameters": {
+            "$defs": {
+              "EvidenceQuery": {
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "view": {
+                          "const": "fields"
+                        }
+                      },
+                      "required": [
+                        "view"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fields": {
+                          "minItems": 1
+                        }
+                      },
+                      "required": [
+                        "fields"
+                      ]
+                    }
+                  }
+                ],
+                "properties": {
+                  "reference": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "pointer": {
+                    "default": "",
+                    "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                    "title": "Pointer",
+                    "type": "string"
+                  },
+                  "view": {
+                    "default": "full",
+                    "enum": [
+                      "full",
+                      "summary",
+                      "fields",
+                      "range",
+                      "capabilities",
+                      "mathematical_capabilities",
+                      "working_set",
+                      "acceptance_certificate"
+                    ],
+                    "title": "View",
+                    "type": "string"
+                  },
+                  "fields": {
+                    "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 32,
+                    "title": "Fields",
+                    "type": "array"
+                  },
+                  "start": {
+                    "default": 0,
+                    "minimum": 0,
+                    "title": "Start",
+                    "type": "integer"
+                  },
+                  "count": {
+                    "default": 20,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "title": "Count",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "reference"
+                ],
+                "title": "EvidenceQuery",
+                "type": "object"
+              },
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              },
+              "ExperienceQuery": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation": {
+                    "default": "search",
+                    "enum": [
+                      "search",
+                      "read"
+                    ],
+                    "title": "Operation",
+                    "type": "string"
+                  },
+                  "key": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Key"
+                  },
+                  "entry_id": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Entry Id"
+                  },
+                  "revision": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Revision"
+                  },
+                  "task": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Task"
+                  },
+                  "structure": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Structure"
+                  },
+                  "failure_type": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Failure Type"
+                  },
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Version"
+                  },
+                  "kind": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Kind"
+                  },
+                  "limit": {
+                    "anyOf": [
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                    "title": "Limit"
+                  }
+                },
+                "title": "ExperienceQuery",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "title": "Question",
+                "type": "string",
+                "description": "Property question"
+              },
+              "references": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "minItems": 1,
+                "title": "References",
+                "type": "array",
+                "description": "Property references"
+              },
+              "focus": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Focus",
+                "type": "array",
+                "description": "Property focus"
+              },
+              "constraints": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Constraints",
+                "type": "array",
+                "description": "Property constraints"
+              },
+              "reads": {
+                "description": "Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit",
+                "items": {
+                  "$ref": "#/$defs/EvidenceQuery"
+                },
+                "title": "Reads",
+                "type": "array"
+              },
+              "experience_queries": {
+                "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+                "items": {
+                  "$ref": "#/$defs/ExperienceQuery"
+                },
+                "maxItems": 8,
+                "title": "Experience Queries",
+                "type": "array"
+              }
+            },
+            "required": [
+              "question",
+              "references"
+            ],
+            "title": "InvestigationRequest",
+            "type": "object"
+          }
+        }
+      }
+    ],
+    "thinking": {
+      "type": "disabled"
+    }
+  },
+  "generation_wire": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Research the frozen passive assembly through mechanism_research. Choose load conditions, constrained observables, legal physical parameters and finite mathematical effort. Compare constrained motion and load compliance. Decide whether evidence supports a structural proposal; only you choose whether to generate it. Passive independent dynamic acceptance is not registered; do not claim SELECT eligibility. Use English.\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search)."
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "Research Session prepared and identity-bound to the saved handoff preparation. No prior conversation copied. The next model request supplies the authoritative current state in CURRENT_RESEARCH_PACKET. Full history and original scientific evidence remain queryable from Store. Study: stage2-constrained-4a02436d",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": "CURRENT_RESEARCH_PACKET\n{\"study_id\":\"stage2-constrained-4a02436d\",\"research\":{\"version\":\"research_information_flow_v1\",\"scientific_results\":{\"version\":\"scientific_result_delivery_v1\",\"latest_search\":null,\"study_best_mathematical\":[],\"critical_failures\":[],\"latest_evaluation\":{\"reference\":\"result_3\",\"facts_at\":\"mathematical_research.latest_result\"},\"scope\":\"Finite saved observations grouped by task, profile, numerical method and discretization. Different groups are not ranked against each other; unequal optimization budgets establish no causal or global optimum claim. Search summaries grant no formal SELECT/read credit.\",\"best_independent_physical\":null},\"study_goal\":{\"task\":{\"family\":\"task.reach\",\"reference\":{\"contract\":\"reference.reach_goal\",\"data\":{\"target_m\":[0.295,0.0,0.215]},\"version\":\"1.0.0\"},\"evaluator\":{\"extension_id\":\"evaluate.reach\",\"parameters\":{\"contract\":\"reference.reach_evaluation\",\"data\":{\"tolerance_m\":0.01},\"version\":\"1.0.0\"},\"version\":\"1.0.0\"},\"holding\":{\"position_limit_m\":0.01,\"speed_limit_m_s\":0.03,\"window_s\":0.06},\"timing\":{\"control_period_s\":0.02,\"duration_s\":0.6,\"sample_period_s\":0.02,\"termination\":[\"duration\",\"numerical_failure\"],\"timestep_s\":0.001},\"metrics\":[{\"name\":\"terminal_error_m\",\"unit\":\"m\",\"meaning\":\"Sealed endpoint evaluator position error\"},{\"name\":\"holding_max_error_m\",\"unit\":\"m\",\"meaning\":\"Maximum sampled final-window tip error\"},{\"name\":\"holding_max_speed_m_s\",\"unit\":\"m/s\",\"meaning\":\"Maximum sampled world translational tip speed\"}]},\"task_conditions\":[]},\"research_focus\":{\"candidate\":\"candidate_8\",\"candidate_status\":{\"generated_valid\":2,\"control_sources_initialized\":0,\"mathematical_evaluations\":3,\"independent_physical_evaluations\":0,\"has_executable_candidate\":true,\"task_passed\":false,\"has_measured_task_feedback\":false},\"task_accepted\":false,\"control\":{\"executable_under_current_profile\":true,\"generated\":true,\"compiled\":true,\"control_initialized\":false,\"has_completed_nmpc_execution\":false,\"methods_used\":[\"mechanism_structure_v1\"],\"mathematically_evaluated\":true,\"physically_evaluated\":false,\"accepted\":false,\"best_valid_reference\":null,\"control_sources\":[{\"source\":\"result_3\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/2\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}},{\"source\":\"result_2\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/1\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}},{\"source\":\"result_1\",\"source_kind\":\"mathematical_prediction\",\"initialized\":false,\"full_control_sequence\":false,\"task_acceptance\":\"unmeasured\",\"control_source\":null,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/control_result_links/0\",\"fields\":[\"source\",\"source_kind\",\"initialized\",\"full_control_sequence\",\"task_acceptance\",\"control_source\",\"trajectory_query\"]}}],\"parameters_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/parameters\"},\"provenance_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/provenance\"},\"control_source_status\":\"no_complete_bound_sequence_recorded\",\"details_query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/candidate_index/0\"},\"control_source_scope\":\"Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.\"},\"latest_result\":{\"reference\":\"result_3\",\"operation\":\"mechanism_structure_v1\",\"status\":\"computed\",\"report_reference\":\"evidence_123\",\"facts_at\":\"mathematical_research.latest_result\"},\"formal_hypothesis\":{\"plan_reference\":\"evidence_173\",\"pointer\":\"/original_plan\",\"hypothesis_id\":\"offline-p61\",\"hypothesis\":\"A small reduction of the registered modulus may increase the frozen material-point displacement.\",\"expected_observation\":\"Legal rebuilt structure matching the numerical proposal.\",\"status\":\"Main intent excerpts; not verified facts. Restore full text from the Plan.\"},\"open_questions\":[{\"text\":\"Invalid structure or failed later independent validation.\",\"kind\":\"Main falsification target excerpt\",\"source\":{\"reference\":\"evidence_173\",\"pointer\":\"/original_plan/weakening_observation\"}}]},\"current_research_state\":{\"phase\":\"research\",\"object\":{\"candidate\":\"candidate_8\",\"origin\":\"unknown\",\"provenance_query\":{\"reference\":\"candidate_8\",\"view\":\"full\",\"pointer\":\"/provenance\"},\"compiled\":true,\"control_initialized\":false,\"mathematical_result\":true,\"independently_evaluated\":false,\"task_acceptance\":\"unmeasured\"},\"completed\":[\"legal_candidate_compiled\",\"mathematical_result_recorded\",\"Main_hypothesis_recorded\"],\"methods_read\":[],\"mathematical_read_progress\":[],\"last_effective_action\":{\"status\":\"request_submitted\",\"action\":\"generate\",\"source\":{\"reference\":\"evidence_173\",\"pointer\":\"/original_plan\"}},\"unresolved\":[{\"text\":\"Invalid structure or failed later independent validation.\",\"source\":\"evidence_173\",\"scope\":\"Main falsification target; unresolved until Main assesses evidence\"}],\"scope\":\"Descriptive current-Study facts, not a required research sequence. Historical Knowledge is not current task evidence.\"},\"verified_facts\":[{\"result_reference\":\"result_2\",\"metrics\":[],\"quantitative_facts\":{\"computation_status\":\"computed\",\"solver\":null,\"mathematical_conclusion\":\"diagnostic\",\"verification_status\":\"local_mechanism_numerical_observation\",\"task_acceptance\":\"unmeasured\",\"source\":{\"reference\":\"result_2\",\"pointer\":\"\"},\"model_context\":{\"basis\":null,\"model_scope\":null,\"solver_scope\":null,\"state_dimension\":null,\"generalized_coordinate_count\":4,\"physical_inputs\":{\"constraints\":{\"tendon_0\":0.1598},\"control_period_s\":0.02,\"frame\":\"world\",\"lower\":[],\"phase\":\"static_equilibrium\",\"signal\":\"no_active_control\",\"tendon_order\":[],\"units\":\"N\",\"upper\":[]},\"source\":{\"reference\":\"result_2\",\"pointer\":\"/scoped_claim\"}}},\"comparisons\":[],\"mathematics\":{\"claim_source\":{\"pointer\":\"/scoped_claim\",\"reference\":\"result_2\"},\"requirement_source\":{\"pointer\":\"/task_analysis\",\"reference\":\"result_2\"},\"problem_definition\":{\"pointer\":\"/structure_research\",\"reference\":\"result_2\"},\"scope\":{\"model_declaration\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"Contact-free ideal unilateral fixed-payout equilibrium; native tendon soft limits are a separate dynamic model.\"],\"representation_id\":\"native_named_hinges_v1\"},\"computation_status\":\"computed\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_interpretation\":\"Declared local native mechanism, constrained equilibrium or structural sensitivity only; candidate proposal is not task success or a strict descent certificate.\",\"unsupported_conclusions\":[\"task acceptance\",\"whole holding-window compliance\",\"global nonlinear feasibility or infeasibility\",\"hardware performance\",\"robustness\",\"repeatability\",\"equilibrium validity at a non-equilibrium point\"],\"horizon\":{\"analysis_horizon_s\":0.0,\"interpretation\":\"Static constrained equilibrium; no dynamic task acceptance.\",\"task_duration_s\":0.6},\"constraint_coverage\":[]},\"operating_point\":{\"actual_time_s\":0.0,\"name\":\"standardized_initial_pretension\"},\"quantities\":[],\"capability\":null,\"owning_study\":\"stage2-constrained-4a02436d\",\"unresolved\":{\"potential_discriminating_checks\":[\"Check task constraints with an applicable operation.\"],\"supported_facts\":[\"Local model diagnostic only.\"],\"unresolved_questions\":[\"Bounded task feasibility unresolved.\"],\"unsupported_inferences\":[\"Global/physical feasibility, structural necessity or surrounding-region exclusion.\"],\"evidence_limits\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]},\"structure_research\":{\"baseline\":0.02194229839966953,\"baseline_unit\":\"m/N\",\"comparison\":null,\"constraint_state\":{\"LICQ\":true,\"active_count\":1,\"boundary_count\":0,\"maximum_constraint_tension_n\":0.11112053382018187,\"minimum_reduced_stiffness_nm_rad\":0.2947853587959618,\"minimum_slack_margin_m\":-5.551115123125783e-17,\"native_soft_length_excess_m\":5.551115123125783e-17,\"native_soft_reaction_inf_nm\":0.0018600917566141929,\"optimizer_success\":true,\"positive_count\":1,\"primal_violation_m\":5.551115123125783e-17,\"qualified\":true,\"slack_count\":0,\"solver_termination\":\"converged\",\"stationarity_inf_nm\":2.5483295671129697e-10,\"status\":\"smooth_fixed_active_set\",\"strict_complementarity\":true,\"within_declared_tendon_capacity\":true},\"cost\":{\"KKT_solves\":0,\"QP_calls\":0,\"constraint_calls\":156,\"constraint_jacobian_calls\":42,\"equilibrium_solves\":2,\"evaluation_attempts\":1,\"gradient_calls\":42,\"hessian_columns\":8,\"kernel_wall_s\":0.021540699992328882,\"material_point_jacobian_calls\":204,\"model_builds\":1,\"multiplier_fits\":2,\"native_forward_calls\":174,\"objective_calls\":154,\"optimizer_iterations\":24,\"physics_steps\":0,\"rollouts\":0,\"tendon_jacobian_extractions\":42},\"direction_source\":null,\"direction_status\":\"not_requested\",\"generation_handoff\":null,\"local_search\":null,\"operation\":\"inspect\",\"parameter_sensitivities\":[],\"physical_problem\":\"passive_unilateral_equilibrium\",\"point_binding\":{\"frame\":\"world\",\"load\":{\"force_world_n\":[0.0,0.01,0.0],\"material_s\":0.5,\"name\":\"lateral\"},\"material_s\":0.5},\"registered_acceptance\":\"not_registered\",\"source\":{\"pointer\":\"/structure_research\",\"reference\":\"result_2\"},\"structure_direction\":null,\"target\":{\"direction_world\":null,\"goal\":\"increase\",\"material_s\":0.5,\"quantity\":\"tangent_compliance\",\"reduction\":\"norm\"},\"task_acceptance\":\"unmeasured\",\"task_observations\":[{\"maximum\":0.001,\"name\":\"middle_response\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"value\":7.512847491041175e-05,\"within_mathematical_limit\":true},{\"maximum\":0.001,\"name\":\"tip_motion\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"m\",\"value\":7.512920445945747e-05,\"within_mathematical_limit\":true},{\"maximum\":2.0,\"name\":\"decoupling_ratio\",\"registered_acceptance\":\"not_registered\",\"scope\":\"Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.\",\"unit\":\"1\",\"value\":1.0000097106862156,\"within_mathematical_limit\":true}],\"unsupported_conclusions\":[\"full task improvement\",\"task success\",\"strict derivative\",\"structural descent certificate\",\"hardware performance\"]}}},{\"result_reference\":\"result_3\",\"facts_at\":\"mathematical_research.latest_result\"}],\"mathematical_research\":{\"candidate\":\"candidate_8\",\"status\":\"research_requests_can_be_prepared\",\"latest_result\":{\"reference\":\"result_3\",\"operation\":\"mechanism_structure_v1\",\"status\":\"computed\",\"conclusion\":\"diagnostic\",\"task_acceptance\":\"unmeasured\",\"detail_query\":{\"reference\":\"result_3\",\"view\":\"working_set\",\"pointer\":\"/mathematical_decision_view\"},\"direction_status\":\"locally_supported_proposal\"},\"parameters\":{\"total\":34,\"continuous_authorized\":2,\"categories\":[\"assembly\",\"segment\"],\"registered_categories\":[\"assembly\",\"controller\",\"discretization\",\"geometry\",\"material_geometry\",\"routing\",\"segment\",\"tendon\",\"topology\"]},\"method_directory_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/methods\"},\"detail_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/research_opportunities\"}},\"mechanism_research\":{\"version\":\"structure_mechanism_discovery_v2\",\"candidate\":\"candidate_8\",\"operations\":[\"inspect\",\"differentiate\",\"optimize\",\"compare\"],\"operation_admission\":{\"inspect\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":1,\"inputs_required\":true},\"compare\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":2,\"inputs_required\":true},\"differentiate\":{\"can_prepare\":true,\"execution_status\":\"conditional_on_original_request_admission\",\"reason\":null,\"minimum_evaluations\":5,\"inputs_required\":true},\"optimize\":{\"can_prepare\":false,\"execution_status\":\"blocked\",\"reason\":\"insufficient_budget\",\"minimum_evaluations\":6,\"inputs_required\":true}},\"remaining_evaluations\":5,\"method_admission\":{\"planning_status\":\"ready\",\"execution_status\":\"conditional_on_admission\",\"formal_execution_authorized\":true,\"missing\":[]},\"mechanism_categories\":[\"constraint_geometry\",\"taut_slack_activity\",\"tangent_compliance\",\"re_equilibrated_response\"],\"effective_parameter_groups\":[\"assembly\",\"segment\"],\"evidenced_direction\":true,\"direction_proposed\":true,\"direction_query\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction\"},\"formal_candidate_created\":true,\"details_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/structure_research\"},\"task_scope\":\"Instantaneous mechanism; full task improvement unmeasured. Short responses use the existing M1 methods.\",\"direction_candidate\":\"candidate_8\",\"generation_plan_cited_evidence\":true,\"suggestion_adopted\":true,\"generation_relations\":[{\"direction_source\":{\"reference\":\"result_3\",\"pointer\":\"/structure_research/structure_direction\"},\"direction_candidate\":\"candidate_8\",\"relation\":\"current_candidate_direction\",\"generation_plan\":{\"reference\":\"evidence_173\"},\"formal_candidates\":[\"candidate_175\"],\"suggestion_adopted_by\":[\"candidate_175\"]}],\"formal_candidate_query\":{\"reference\":\"candidate_175\"},\"historical_directions\":[]},\"research_trace\":{\"version\":\"research_trace_v1\",\"total\":4,\"recent\":[{\"step\":54,\"action\":\"research_analysis\",\"text\":\"#54 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false},{\"step\":81,\"action\":\"research_analysis\",\"text\":\"#81 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false},{\"step\":108,\"action\":\"research_analysis\",\"text\":\"#108 research_analysis; computed\",\"execution_status\":\"completed\",\"execution_kind\":\"scientific_result_recorded\",\"scientific_result\":true,\"scientific_execution\":\"result_recorded\",\"unresolved\":false},{\"step\":165,\"action\":\"generate\",\"text\":\"#165 generate: generate; generated\",\"execution_status\":\"completed\",\"execution_kind\":\"protocol_receipt_only; no scientific result recorded\",\"scientific_result\":false,\"scientific_execution\":\"unknown; inspect original receipt\",\"unresolved\":false}],\"unresolved\":[],\"page_query\":{\"view\":\"summary\",\"offset\":0,\"limit\":4,\"trace\":\"milestones\"},\"recall\":\"research_recall(step=<stable step>, view=\\\"summary\\\" or \\\"details\\\"); omit step for paginated history.\",\"scope\":\"Recorded actions and actual statuses only. Request acceptance, computation, verification and physical acceptance are distinct.\",\"action_total\":5},\"capabilities\":[{\"category\":\"Design\",\"actions\":[{\"action\":\"generate\",\"status\":\"available\",\"tool\":\"research_plan\"}]},{\"category\":\"Control\",\"actions\":[{\"action\":\"initialize_control\",\"status\":\"available\",\"tool\":\"research_plan\"},{\"action\":\"control_search\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"execute\",\"status\":\"available\",\"tool\":\"research_plan\"},{\"action\":\"research_rl\",\"tool\":\"research_rl\",\"status\":\"available_for_request_validation\"}]},{\"category\":\"Mathematical Research\",\"actions\":[{\"action\":\"mechanics\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"refine\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"diagnose\",\"status\":\"available\",\"reason\":\"Record hypothesis/candidate and optionally next_research_action; loads an interface only.\",\"tool\":\"research_plan\"},{\"action\":\"research_analysis\",\"status\":\"conditional\",\"methods_at\":\"mathematical_research\",\"reason\":\"Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.\",\"cost\":\"Uses the shared mathematical allowance; inspect the method detail.\"}]},{\"category\":\"Physical Validation\",\"actions\":[{\"action\":\"physical_replay\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"replay\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"select\",\"status\":\"conditional\",\"reason\":\"A suitable candidate, source, read, or other prerequisite is required.\",\"tool\":\"research_plan\"},{\"action\":\"stop\",\"status\":\"available\",\"tool\":\"research_plan\"}]},{\"category\":\"Evidence & Knowledge\",\"actions\":[{\"action\":\"experience_retrieve\",\"tool\":\"experience_retrieve\",\"status\":\"available_for_request_validation\"},{\"action\":\"evidence_read\",\"tool\":\"evidence_read\",\"status\":\"available_for_request_validation\"},{\"action\":\"research_recall\",\"tool\":\"research_recall\",\"status\":\"available_for_request_validation\"},{\"action\":\"research_investigate\",\"tool\":\"research_investigate\",\"status\":\"available_for_request_validation\"}]}],\"tool_continuation\":{\"selection\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"tool_use_id\":\"offline-use-6\",\"sequence\":150,\"source\":\"evidence_153\",\"status\":\"tool_feedback_recorded\",\"feedback\":\"evidence_178\"},\"plan_action\":\"generate\",\"plan_selection\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"tool_use_id\":\"offline-use-6\",\"sequence\":150,\"source\":\"evidence_153\",\"status\":\"submission_feedback_recorded\",\"feedback_status\":\"success\",\"feedback\":\"evidence_178\"},\"recent\":[{\"tool\":\"research_analysis\",\"tool_use_id\":\"offline-use-2\",\"status\":\"success\",\"source\":\"evidence_64\"},{\"tool\":\"research_analysis\",\"tool_use_id\":\"offline-use-3\",\"status\":\"success\",\"source\":\"evidence_91\"},{\"tool\":\"research_analysis\",\"tool_use_id\":\"offline-use-4\",\"status\":\"success\",\"source\":\"evidence_118\"}],\"scope\":\"Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.\",\"loaded\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"plan_action\":\"generate\"},\"switch_tool\":\"Use research_route only to change the loaded tool/action. Direct reads preserve the loaded Plan; selecting an entry alone executes nothing.\",\"direct_plan\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"instruction\":\"This Plan Schema is already available: submit the Plan object directly to act; no research_route call is needed for this action.\",\"generation_inputs\":{\"overrides\":\"Supply only design variables you intend to change. Omit unchanged sections, cells and other optional overrides; the existing resolver inherits frozen defaults and prototypes.\",\"sections\":{\"rule\":\"If explicitly changed, supply exactly one section per prototype station, in the same order.\",\"prototypes\":[{\"applies_to\":\"index 0\",\"prototype\":\"segment_0\",\"count\":1,\"stations_s\":[0.0]},{\"applies_to\":\"indices >= 1\",\"prototype\":\"segment_1\",\"count\":2,\"stations_s\":[0.0,1.0]}]},\"acceptance\":\"Valid generation is an unmeasured candidate, not task success. Mathematical research and independent task evaluation retain their original requirements.\",\"cells\":{\"bounds\":[1,32],\"default\":12,\"rule\":\"Omit to inherit default_cells; an explicit value must stay within frozen cell_count_bounds.\"}}},\"pending_feedback\":{\"items\":[{\"delivery\":\"summary_only\",\"facts\":{},\"feedback_reference\":\"evidence_178\",\"original_input_query\":{\"pointer\":\"/tool_use/input\",\"reference\":\"evidence_178\",\"view\":\"full\"},\"original_result_query\":{\"pointer\":\"/result\",\"reference\":\"evidence_178\",\"view\":\"full\"},\"query_summary\":{\"action\":\"generate\"},\"status\":\"success\",\"tool\":\"research_plan\",\"tool_id\":\"offline-use-7\"}],\"omitted_tools\":0,\"scope\":\"Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.\",\"total_tools\":1,\"version\":\"pending_feedback_delivery_v1\"},\"scientific_action_handoff\":{\"diagnose_choice\":null,\"status\":\"requires_candidate_bound_diagnose\",\"loaded\":{\"tool\":\"research_plan\",\"action\":\"generate\",\"plan_action\":\"generate\"},\"choices\":[{\"scientific_goal\":\"structure_control_codesign\",\"tool\":\"research_plan\",\"action\":\"search\",\"interface\":null,\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"structure_control\"},{\"scientific_goal\":\"single_parameter_effect\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"structure\"},{\"scientific_goal\":\"control_feasibility\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":false,\"scope\":\"This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.\",\"domain\":\"control\"},{\"scientific_goal\":\"mechanism_research\",\"domain\":\"structure\",\"tool\":\"research_analysis\",\"interface\":\"scientific_question_v4\",\"available\":true,\"scope\":\"Inspect, differentiate, optimize or compare frozen constrained geometry/equilibrium and load responses; Main owns structure adoption.\"}],\"selection_executes_science\":false,\"next\":\"Choose an action with research_route or record next_research_action in a new diagnose. Main owns the research choice.\"}},\"knowledge\":{\"role\":\"procedural_knowledge\",\"access\":{\"query\":{\"operation\":\"search\",\"task\":\"reach\"},\"available_historical_tasks\":[\"oriented_tracking\",\"passive_force_response\",\"position_tool_axis\",\"soft_robot_research\",\"tracking\"],\"study_private_entries\":[],\"scope\":\"Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.\",\"hints\":[{\"entry_id\":\"model-physics-comparison\",\"revision\":\"1\",\"method\":\"Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.\",\"task\":\"soft_robot_research\",\"scope\":\"context_only; cross-task generalization unverified\",\"read_query\":{\"operation\":\"read\",\"entry_id\":\"model-physics-comparison\",\"revision\":\"1\"}},{\"entry_id\":\"research-bounded-continuation\",\"revision\":\"2\",\"method\":\"Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.\",\"task\":\"soft_robot_research\",\"scope\":\"context_only; cross-task generalization unverified\",\"read_query\":{\"operation\":\"read\",\"entry_id\":\"research-bounded-continuation\",\"revision\":\"2\"}}]},\"read_progress\":null},\"reporter_findings\":[{\"report_reference\":\"evidence_96\",\"question\":null,\"reference_role\":\"reporter_report\",\"scientific_citation_eligible\":false,\"result_references\":[\"result_2\"],\"status\":\"unavailable\",\"interpretation_query\":{\"reference\":\"evidence_96\",\"view\":\"full\",\"pointer\":\"/report/interpretations\"},\"summary_query\":{\"reference\":\"evidence_96\",\"view\":\"summary\"},\"reading_guidance\":\"Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.\",\"interpretations\":[],\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]},{\"report_reference\":\"evidence_123\",\"question\":null,\"reference_role\":\"reporter_report\",\"scientific_citation_eligible\":false,\"result_references\":[\"result_3\"],\"status\":\"unavailable\",\"interpretation_query\":{\"reference\":\"evidence_123\",\"view\":\"full\",\"pointer\":\"/report/interpretations\"},\"summary_query\":{\"reference\":\"evidence_123\",\"view\":\"summary\"},\"reading_guidance\":\"Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.\",\"interpretations\":[],\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"]}],\"evidence_access\":{\"working_set\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"\"},\"method_query\":{\"reference\":\"candidate_8\",\"view\":\"mathematical_capabilities\",\"pointer\":\"/methods\"},\"stop_index\":{\"count\":3,\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/all_fresh_results\"},\"read_progress\":{\"status\":\"unread\",\"last_confirmed_read\":null,\"current_index_confirmed\":false,\"pending_confirmation\":false,\"result_count\":3,\"complete_body_reads\":[],\"unread_bodies\":[\"result_1\",\"result_2\",\"result_3\"],\"scope\":\"Index delivery is not a full scientific result read or independent SELECT qualification.\"}},\"select_requirement\":\"A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.\",\"stop_requirement\":\"Retrieve and cite the complete new result index; original admission checks remain in force.\",\"citation_eligibility\":{\"query\":{\"reference\":\"evidence_2\",\"view\":\"working_set\",\"pointer\":\"/citation_eligibility\"},\"registered_count\":5,\"scientific_result_count\":3,\"rule\":\"supporting_evidence requires registered result_reference matching inference, candidate, task and model scope. report_reference only restores Reporter text; Knowledge is procedural context; Domain Reference defines the problem; tool receipts record operations. None gains scientific eligibility by being read.\",\"recent_registered\":[{\"reference\":\"candidate_175\",\"role\":\"domain_reference\",\"registered\":true,\"supports_scientific_conclusion\":false,\"candidate\":null,\"claim_kind\":\"UNVERIFIED_HYPOTHESIS\",\"supported_inferences\":[]}]},\"result_scopes\":[{\"result\":{\"pointer\":\"\",\"reference\":\"result_2\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_inferences\":[\"local_diagnostic\"]},{\"result\":{\"pointer\":\"\",\"reference\":\"result_3\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"verification_status\":\"local_mechanism_numerical_observation\",\"supported_inferences\":[\"local_diagnostic\"]}],\"domain\":{\"query\":{\"reference\":\"evidence_2\",\"view\":\"full\",\"pointer\":\"\"},\"role\":\"domain_reference\"},\"delegated_read\":{\"tool\":\"research_investigate\",\"arguments\":\"question and existing result references; optional exact reads\",\"scope\":\"Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit.\"}},\"budget\":{\"model_calls\":40,\"model_closeout_reserve\":4,\"public_operations\":193,\"public_closeout_reserve\":12,\"physical\":64,\"mathematical\":5,\"closeout\":{\"active\":false,\"next_request_will_protect\":false,\"reason\":null}}},\"saved_replay_choices\":{\"options\":[],\"scope\":\"Bounded saved-result options. Main chooses; no physical execution or acceptance is implied. Other saved results remain queryable from Store.\"},\"saved_object_choices\":[{\"choice\":\"candidate_8\"},{\"choice\":\"candidate_175\"}],\"object_choice_rule\":\"Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.\"}"
+      }
+    ],
+    "model": "deepseek-flash",
+    "reasoning_effort": "none",
+    "stream": false,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "research_plan",
+          "description": "Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.",
+          "parameters": {
+            "$defs": {
+              "Attachment": {
+                "additionalProperties": false,
+                "properties": {
+                  "part": {
+                    "default": "fixed_base",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                    "type": "string"
+                  },
+                  "s": {
+                    "default": 0.0,
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "position_m": {
+                    "default": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  "quaternion_wxyz": {
+                    "default": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "maxItems": 4,
+                    "minItems": 4,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              },
+              "GenerationRequestV2": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "const": "serial_family_generation_v2",
+                    "default": "serial_family_generation_v2",
+                    "type": "string"
+                  },
+                  "segment_count": {
+                    "default": 2,
+                    "minimum": 1,
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9
+                    ]
+                  },
+                  "tendon_count": {
+                    "minimum": 1,
+                    "type": "integer",
+                    "maximum": 7
+                  },
+                  "strategy": {
+                    "const": "polar_consecutive_spans_v1",
+                    "default": "polar_consecutive_spans_v1",
+                    "type": "string"
+                  },
+                  "spans": {
+                    "items": {
+                      "$ref": "#/$defs/Span"
+                    },
+                    "type": "array"
+                  },
+                  "segments": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/SegmentChoiceV2"
+                    },
+                    "type": "object"
+                  },
+                  "tendon_parameters": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "type": "object"
+                  },
+                  "control_weights": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "type": "object"
+                  },
+                  "route_overrides": {
+                    "additionalProperties": {
+                      "items": {
+                        "$ref": "#/$defs/RoutePoint"
+                      },
+                      "type": "array"
+                    },
+                    "type": "object"
+                  },
+                  "controller_recipe": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "controller_solver": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "payout_lengths_m": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "tendon_count",
+                  "version"
+                ],
+                "type": "object",
+                "description": "Supply only intended design changes. Omitted optional overrides inherit frozen defaults/prototypes; sections and cells need not be filled. Valid generation does not establish task success."
+              },
+              "ResearchDecision": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "const": "research_decision_v1",
+                    "default": "research_decision_v1",
+                    "type": "string"
+                  },
+                  "hypothesis_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "claimed_inference": {
+                    "default": "empirical_search",
+                    "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "research_intent": {
+                    "enum": [
+                      "DIAGNOSE",
+                      "MATHEMATICAL_ANALYSIS",
+                      "CONTROL_SEARCH",
+                      "DESIGN_MODIFICATION",
+                      "NMPC_EXECUTION",
+                      "RL_TRAINING",
+                      "PHYSICAL_VALIDATION",
+                      "SELECT",
+                      "STOP"
+                    ],
+                    "type": "string"
+                  },
+                  "selected_method": {
+                    "description": "Optional action intent label; no solver name is required. The scientific question selects semantics after diagnose.",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected_variables": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "selected_candidate": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/EvidenceRef"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source. For diagnose, place the owned candidate here at decision.selected_candidate; there is no top-level selected_candidate field."
+                  },
+                  "requested_budget": {
+                    "default": 0,
+                    "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "hypothesis_id",
+                  "research_intent"
+                ],
+                "type": "object"
+              },
+              "RoutePoint": {
+                "additionalProperties": false,
+                "properties": {
+                  "attachment": {
+                    "$ref": "#/$defs/Attachment"
+                  },
+                  "hole": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "role": {
+                    "enum": [
+                      "start",
+                      "guide",
+                      "anchor"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "attachment",
+                  "role"
+                ],
+                "type": "object"
+              },
+              "Section": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "circle",
+                      "tube",
+                      "ellipse",
+                      "rectangle",
+                      "polygon"
+                    ],
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "type": "object"
+                  },
+                  "outer_yz_m": {
+                    "items": {
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  "holes_yz_m": {
+                    "items": {
+                      "items": {
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "prefixItems": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ],
+                        "type": "array"
+                      },
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  "angle_rad": {
+                    "default": 0.0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "type": "object"
+              },
+              "SegmentChoiceV2": {
+                "additionalProperties": false,
+                "properties": {
+                  "length_m": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "young_pa": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "sections": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "$ref": "#/$defs/Section"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Optional override. Omit unchanged sections; otherwise match the exact count and order of the selected prototype stations shown in generation_inputs."
+                  },
+                  "cells": {
+                    "anyOf": [
+                      {
+                        "minimum": 1,
+                        "type": "integer",
+                        "maximum": 32
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Optional override within frozen cell_count_bounds; omit to inherit default_cells."
+                  },
+                  "physical_parameters": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "Span": {
+                "additionalProperties": false,
+                "properties": {
+                  "first_segment": {
+                    "default": 0,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "last_segment": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "count": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "phase_rad": {
+                    "default": 0.0,
+                    "type": "number"
+                  },
+                  "angular_offsets_rad": {
+                    "description": "Extra offsets: theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]. Empty uses equal spacing. These are not absolute angles.",
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  "radius_m": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "guide_s": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "number"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "anchor_s": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "guide_angle_offset_rad": {
+                    "default": 0.0,
+                    "type": "number"
+                  },
+                  "anchor_angle_offset_rad": {
+                    "default": 0.0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "last_segment",
+                  "count"
+                ],
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "generate"
+                ],
+                "description": "Property action"
+              },
+              "decision": {
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/ResearchDecision"
+                      },
+                      {
+                        "properties": {
+                          "research_intent": {
+                            "const": "DESIGN_MODIFICATION"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "required": [
+                      "selected_method"
+                    ]
+                  }
+                ],
+                "description": "Property decision"
+              },
+              "next_step": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "adjust_training",
+                      "revise_design",
+                      "diagnose",
+                      "stop"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property next_step"
+              },
+              "hypothesis": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property hypothesis"
+              },
+              "supporting_evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "type": "array",
+                "description": "Property supporting_evidence"
+              },
+              "expected_observation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property expected_observation"
+              },
+              "weakening_observation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property weakening_observation"
+              },
+              "fixed_conditions": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property fixed_conditions"
+              },
+              "stopping_condition": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property stopping_condition"
+              },
+              "interpretation": {
+                "minLength": 1,
+                "type": "string",
+                "description": "Property interpretation"
+              },
+              "generation": {
+                "$ref": "#/$defs/GenerationRequestV2"
+              },
+              "experience_disposition": {
+                "additionalProperties": {
+                  "enum": [
+                    "adopted",
+                    "rejected",
+                    "context_only"
+                  ],
+                  "type": "string"
+                },
+                "description": "Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.",
+                "type": "object"
+              }
+            },
+            "required": [
+              "action",
+              "hypothesis",
+              "expected_observation",
+              "weakening_observation",
+              "fixed_conditions",
+              "stopping_condition",
+              "interpretation",
+              "decision",
+              "generation"
+            ],
+            "type": "object",
+            "description": "Submit the selected generate action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP."
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "experience_retrieve",
+          "description": "Search curated procedural guidance, then execute a result entry read_query exactly. A retrieval receipt artifact ID is not an entry_id. Historical guidance never grants scientific evidence or action permission.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "entry_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property entry_id",
+                "title": "Entry Id"
+              },
+              "failure_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property failure_type",
+                "title": "Failure Type"
+              },
+              "key": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property key",
+                "title": "Key"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property kind",
+                "title": "Kind"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                "title": "Limit"
+              },
+              "operation": {
+                "default": "search",
+                "description": "Property operation",
+                "enum": [
+                  "search",
+                  "read"
+                ],
+                "title": "Operation",
+                "type": "string"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property revision",
+                "title": "Revision"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property structure",
+                "title": "Structure"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property task",
+                "title": "Task"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property version",
+                "title": "Version"
+              }
+            },
+            "required": [],
+            "title": "ExperienceQuery",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "evidence_read",
+          "description": "Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.",
+          "parameters": {
+            "$defs": {
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set"
+                ],
+                "title": "View",
+                "type": "string",
+                "description": "Property view"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer",
+                "description": "Property start"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer",
+                "description": "Property count"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object",
+            "if": {},
+            "then": {
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "view": {
+                        "const": "fields"
+                      }
+                    },
+                    "required": [
+                      "view"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "fields": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "fields"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_recall",
+          "description": "Recall saved research by stable step number, or page through history. Details support precise JSON Pointers. Navigation grants no formal SELECT/STOP evidence credit.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "fields": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Property fields",
+                "title": "Fields"
+              },
+              "limit": {
+                "default": 8,
+                "description": "Property limit",
+                "maximum": 10,
+                "minimum": 1,
+                "title": "Limit",
+                "type": "integer"
+              },
+              "offset": {
+                "default": 0,
+                "description": "Property offset",
+                "minimum": 0,
+                "title": "Offset",
+                "type": "integer"
+              },
+              "pointer": {
+                "default": "",
+                "description": "JSON Pointer relative to the original Plan or tool feedback result; details only.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "step": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Stable Store step number. Omit to page through the trace.",
+                "title": "Step"
+              },
+              "trace": {
+                "default": "actions",
+                "description": "Property trace",
+                "enum": [
+                  "actions",
+                  "milestones"
+                ],
+                "title": "Trace",
+                "type": "string"
+              },
+              "view": {
+                "default": "summary",
+                "description": "Property view",
+                "enum": [
+                  "summary",
+                  "details"
+                ],
+                "title": "View",
+                "type": "string"
+              }
+            },
+            "required": [],
+            "title": "ResearchRecallQuery",
+            "type": "object"
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_route",
+          "description": "Select a tool and action; load its Schema on the next request. No scientific execution or evidence credit.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "tool": {
+                "enum": [
+                  "research_plan",
+                  "experience_retrieve",
+                  "evidence_read",
+                  "research_recall",
+                  "research_investigate",
+                  "research_rl"
+                ],
+                "title": "Tool",
+                "type": "string",
+                "description": "Property tool"
+              },
+              "action": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact Plan action or RL operation from the directory; omit for other tools.",
+                "title": "Action"
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "title": "ResearchRouteQuery",
+            "type": "object",
+            "description": "Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch."
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "research_investigate",
+          "description": "Read-only investigation of saved results: provide a question and result references; exact reads and authorized experience_queries are optional. No candidate is needed to read existing evidence. This does not execute research_plan(diagnose) or candidate-bound research_analysis. Returns compact findings and an interpretation_query; internal reads give no SELECT/STOP credit.",
+          "parameters": {
+            "$defs": {
+              "EvidenceQuery": {
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "view": {
+                          "const": "fields"
+                        }
+                      },
+                      "required": [
+                        "view"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "fields": {
+                          "minItems": 1
+                        }
+                      },
+                      "required": [
+                        "fields"
+                      ]
+                    }
+                  }
+                ],
+                "properties": {
+                  "reference": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "pointer": {
+                    "default": "",
+                    "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                    "title": "Pointer",
+                    "type": "string"
+                  },
+                  "view": {
+                    "default": "full",
+                    "enum": [
+                      "full",
+                      "summary",
+                      "fields",
+                      "range",
+                      "capabilities",
+                      "mathematical_capabilities",
+                      "working_set",
+                      "acceptance_certificate"
+                    ],
+                    "title": "View",
+                    "type": "string"
+                  },
+                  "fields": {
+                    "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 32,
+                    "title": "Fields",
+                    "type": "array"
+                  },
+                  "start": {
+                    "default": 0,
+                    "minimum": 0,
+                    "title": "Start",
+                    "type": "integer"
+                  },
+                  "count": {
+                    "default": 20,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "title": "Count",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "reference"
+                ],
+                "title": "EvidenceQuery",
+                "type": "object"
+              },
+              "EvidenceRef": {
+                "type": "string",
+                "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+                "description": "Use the stable short reference in the research packet or an evidence response."
+              },
+              "ExperienceQuery": {
+                "additionalProperties": false,
+                "properties": {
+                  "operation": {
+                    "default": "search",
+                    "enum": [
+                      "search",
+                      "read"
+                    ],
+                    "title": "Operation",
+                    "type": "string"
+                  },
+                  "key": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Key"
+                  },
+                  "entry_id": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Entry Id"
+                  },
+                  "revision": {
+                    "anyOf": [
+                      {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Revision"
+                  },
+                  "task": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Task"
+                  },
+                  "structure": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Structure"
+                  },
+                  "failure_type": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Failure Type"
+                  },
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Version"
+                  },
+                  "kind": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Kind"
+                  },
+                  "limit": {
+                    "anyOf": [
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                    "title": "Limit"
+                  }
+                },
+                "title": "ExperienceQuery",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "minLength": 1,
+                "title": "Question",
+                "type": "string",
+                "description": "Property question"
+              },
+              "references": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "minItems": 1,
+                "title": "References",
+                "type": "array",
+                "description": "Property references"
+              },
+              "focus": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Focus",
+                "type": "array",
+                "description": "Property focus"
+              },
+              "constraints": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Constraints",
+                "type": "array",
+                "description": "Property constraints"
+              },
+              "reads": {
+                "description": "Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit",
+                "items": {
+                  "$ref": "#/$defs/EvidenceQuery"
+                },
+                "title": "Reads",
+                "type": "array"
+              },
+              "experience_queries": {
+                "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+                "items": {
+                  "$ref": "#/$defs/ExperienceQuery"
+                },
+                "maxItems": 8,
+                "title": "Experience Queries",
+                "type": "array"
+              }
+            },
+            "required": [
+              "question",
+              "references"
+            ],
+            "title": "InvestigationRequest",
+            "type": "object"
+          }
+        }
+      }
+    ],
+    "thinking": {
+      "type": "disabled"
+    }
+  }
+}

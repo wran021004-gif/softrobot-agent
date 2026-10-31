@@ -176,6 +176,9 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(len(latest['structure_research']['task_observations']),3)
         self.assertEqual(latest['structure_research']['task_observations'][0]['value_at'],'structure_research.baseline')
         self.assertEqual(latest['structure_research']['structure_direction']['parameter_changes'][0]['suggested_value'],7135000.)
+        advertised=next(t['function']['parameters'] for t in wires[-1]['tools'] if t['function']['name']=='research_analysis')
+        self.assertNotIn('control_scope',advertised['$defs']['ScientificStructureV4']['properties'])
+        self.assertNotIn('ScientificSourcesV2',advertised['$defs'])
         self.assertEqual(l0['reporter_findings'][-1]['status'],'unavailable')
         from tools.research.scientific_intent import compile_question
         before=s['mathematical_evaluations']

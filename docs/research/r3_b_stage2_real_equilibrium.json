@@ -255,7 +255,30 @@
     "monitor_s": [
       0.5
     ],
-    "baseline_load": "unloaded"
+    "baseline_load": "unloaded",
+    "observations": [
+      {
+        "name": "middle_response",
+        "quantity": "material_displacement",
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 0.001
+      },
+      {
+        "name": "tip_motion",
+        "quantity": "tip_displacement",
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 0.001
+      },
+      {
+        "name": "decoupling_ratio",
+        "quantity": "displacement_ratio",
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 2.0
+      }
+    ]
   },
   "baseline": {
     "method": "passive_equilibrium_v1",
@@ -361,6 +384,7 @@
       "second_order_sufficient": true,
       "status": "qualified_local_minimum",
       "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+      "solver_termination": "converged",
       "optimizer_success": true,
       "optimizer_message": "Optimization terminated successfully",
       "iterations": 8,
@@ -467,6 +491,7 @@
         "second_order_sufficient": true,
         "status": "qualified_local_minimum",
         "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+        "solver_termination": "converged",
         "optimizer_success": true,
         "optimizer_message": "Optimization terminated successfully",
         "iterations": 8,
@@ -489,7 +514,8 @@
       "optimizer_iterations": 8,
       "QP_calls": 0,
       "equilibrium_solves": 1,
-      "KKT_solves": 0
+      "KKT_solves": 0,
+      "multiplier_fits": 1
     },
     "task_acceptance": "unmeasured",
     "regularization": "none",
@@ -599,6 +625,7 @@
       "second_order_sufficient": true,
       "status": "qualified_local_minimum",
       "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+      "solver_termination": "converged",
       "optimizer_success": true,
       "optimizer_message": "Optimization terminated successfully",
       "iterations": 16,
@@ -705,6 +732,7 @@
         "second_order_sufficient": true,
         "status": "qualified_local_minimum",
         "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+        "solver_termination": "converged",
         "optimizer_success": true,
         "optimizer_message": "Optimization terminated successfully",
         "iterations": 16,
@@ -727,7 +755,8 @@
       "optimizer_iterations": 16,
       "QP_calls": 0,
       "equilibrium_solves": 1,
-      "KKT_solves": 0
+      "KKT_solves": 0,
+      "multiplier_fits": 1
     },
     "task_acceptance": "unmeasured",
     "regularization": "none",
@@ -742,6 +771,24 @@
   "native_soft_length_residual_m": [
     5.551115123125783e-17
   ],
+  "numerical_cost": {
+    "tendon_jacobian_extractions": 43,
+    "gradient_calls": 42,
+    "constraint_jacobian_calls": 43,
+    "native_forward_calls": 174,
+    "rollouts": 0,
+    "KKT_solves": 0,
+    "constraint_calls": 158,
+    "model_builds": 1,
+    "multiplier_fits": 2,
+    "hessian_columns": 8,
+    "material_point_jacobian_calls": 201,
+    "optimizer_iterations": 24,
+    "QP_calls": 0,
+    "objective_calls": 154,
+    "physics_steps": 0,
+    "equilibrium_solves": 2
+  },
   "native_version": "3.13.0",
   "model_builds": 1,
   "physics_steps": 0,

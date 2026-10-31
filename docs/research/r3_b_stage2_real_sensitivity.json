@@ -1,0 +1,4159 @@
+{
+  "scope": "Read-only projection of actual MuJoCo worker evidence. Original complete immutable artifacts remain in the owning Store. No independent dynamic acceptance.",
+  "owning_study": "stage2-constrained-4a02436d",
+  "source_result": {
+    "artifact_id": "e7971ce172d31dc09f5c0b8742f5db480d91b47b3c52a73e1c81ff0a51b464fc",
+    "media_type": "application/json"
+  },
+  "stage1_base": "fe8043a7c965138f07f38c6ed7d76f098e359e4e",
+  "passive_kernel_source": "9d6d160e050c836b87d0563a497fc0ec1c3761a8",
+  "frozen_problem": {
+    "baseline_load": "unloaded",
+    "gravity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "loads": [
+      {
+        "force_world_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material_s": 0.5,
+        "name": "unloaded"
+      },
+      {
+        "force_world_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "material_s": 0.5,
+        "name": "lateral"
+      }
+    ],
+    "mode": "passive_unilateral_equilibrium",
+    "monitor_s": [
+      0.5
+    ],
+    "mount_position": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "mount_rotation": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "observations": [
+      {
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 0.001,
+        "name": "middle_response",
+        "quantity": "material_displacement"
+      },
+      {
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 0.001,
+        "name": "tip_motion",
+        "quantity": "tip_displacement"
+      },
+      {
+        "load_condition": "lateral",
+        "material_s": 0.5,
+        "maximum": 2.0,
+        "name": "decoupling_ratio",
+        "quantity": "displacement_ratio"
+      }
+    ]
+  },
+  "physical_design": {
+    "actuators": [],
+    "components": [
+      {
+        "connection": {
+          "part": "fixed_base",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_0",
+        "interpolation": "step",
+        "kind": "flexible_segment",
+        "length_m": 0.16,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 7200000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "ellipse",
+              "outer_yz_m": [],
+              "parameters": {
+                "semi_y_m": 0.0095,
+                "semi_z_m": 0.0076
+              }
+            }
+          }
+        ]
+      },
+      {
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "connection": {
+          "part": "segment_0",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 1.0
+        },
+        "envelope_halfsize_m": [
+          0.009,
+          0.009,
+          0.008
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0,
+        "id": "payload",
+        "inertia_com_local_kg_m2": [
+          [
+            6e-07,
+            1e-07,
+            0.0
+          ],
+          [
+            1e-07,
+            8e-07,
+            1e-07
+          ],
+          [
+            0.0,
+            1e-07,
+            9e-07
+          ]
+        ],
+        "kind": "payload",
+        "mass_kg": 0.01
+      }
+    ],
+    "fixed_payout_lengths_m": {
+      "tendon_0": 0.1598
+    },
+    "id": "serial_family_candidate",
+    "metadata": {},
+    "tendons": [
+      {
+        "diameter_m": 0.001,
+        "force_limit_n": 8.0,
+        "id": "tendon_0",
+        "length_servo_gain_n_m": 900.0,
+        "model": "straight_frictionless",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "position_m": [
+                0.0,
+                0.018,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "segment_0",
+              "position_m": [
+                0.0,
+                0.018,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.5
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "segment_0",
+              "position_m": [
+                0.0,
+                0.018,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 1.0
+            },
+            "hole": null,
+            "role": "anchor"
+          }
+        ],
+        "pretension_n": 0.2
+      }
+    ],
+    "tip": {
+      "part": "payload",
+      "position_m": [
+        0.014,
+        0.0,
+        0.0
+      ],
+      "quaternion_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "s": 0.0
+    },
+    "version": "tendon_family_v1"
+  },
+  "discretization": {
+    "contract": "family.discretization",
+    "data": {
+      "cells": {
+        "segment_0": 2
+      },
+      "coordinates": "two_principal_bending_angles_per_cell",
+      "model": "serial_bending_cells_v1",
+      "version": "serial_bending_discretization_v1"
+    },
+    "version": "1.0.0"
+  },
+  "requested_operation": {
+    "candidate": {
+      "artifact_id": "a00fd42bf4443affbb1e8ebe4550ca1121bc9f55b8cce82733a2896bac8790bc",
+      "media_type": "application/json"
+    },
+    "execution": null,
+    "mechanism_study": {
+      "comparison_candidates": [],
+      "effect_semantics": "re_equilibrated_passive_response",
+      "load_condition": "lateral",
+      "max_evaluations": 5,
+      "operation": "differentiate",
+      "parameter_path": null,
+      "parameter_paths": [
+        "segments.0.young_pa"
+      ],
+      "point_semantics": "re_equilibrated",
+      "target": {
+        "direction_world": null,
+        "goal": "increase",
+        "material_s": 0.5,
+        "quantity": "re_equilibrated_position_response",
+        "reduction": "norm"
+      }
+    },
+    "model_source": "mujoco",
+    "native": {
+      "correction_radius_n": 0.0,
+      "difference_step_n": 0.02,
+      "horizon_s": 0.01,
+      "tensions_n": null
+    },
+    "operating_point": "standardized_initial_pretension",
+    "operation": "mechanism_structure_v1",
+    "protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 0.6,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.02,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.34
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.05,
+        0.1,
+        0.35
+      ]
+    },
+    "saved_state": null,
+    "scoring_window_s": null,
+    "update_id": null
+  },
+  "worker_runtime": {
+    "implementation": "35137a2d1f966d791b137315902c6cd5a2677d0b",
+    "packages": {
+      "casadi": "3.7.2",
+      "numpy": "2.4.6",
+      "pydantic": "2.14.0",
+      "scipy": "1.17.1"
+    },
+    "python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+    "threads": {
+      "MKL_NUM_THREADS": null,
+      "OMP_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null
+    },
+    "version": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]"
+  },
+  "probes": [
+    {
+      "record_index": 0,
+      "parameter_values": {
+        "segments.0.young_pa": 7200000.0
+      },
+      "observation": {
+        "metadata": {
+          "actual_shape": [
+            3
+          ],
+          "constraint_state": {
+            "LICQ": true,
+            "active_count": 1,
+            "boundary_count": 0,
+            "maximum_constraint_tension_n": 0.11112053382018187,
+            "minimum_reduced_stiffness_nm_rad": 0.2947853587959618,
+            "minimum_slack_margin_m": -5.551115123125783e-17,
+            "native_soft_length_residual_m": [
+              5.551115123125783e-17
+            ],
+            "native_soft_reaction_inf_nm": 0.0018600917566141929,
+            "optimizer_success": true,
+            "positive_count": 1,
+            "primal_violation_m": 5.551115123125783e-17,
+            "qualified": true,
+            "slack_count": 0,
+            "solver_termination": "converged",
+            "stationarity_inf_nm": 2.5483295671129697e-10,
+            "status": "smooth_fixed_active_set",
+            "strict_complementarity": true,
+            "within_declared_tendon_capacity": true
+          },
+          "dof_order": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z"
+          ],
+          "field": "re_equilibrated_position_response",
+          "frame": "world / named hinges / ordered fixed-payout tendons",
+          "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+          "model": "native unilateral fixed-payout assembly",
+          "parameter_dependencies": [
+            "geometry",
+            "routing",
+            "stiffness",
+            "payout",
+            "external_load"
+          ],
+          "physical_inputs": {
+            "bounds_n": [],
+            "tensions_n": [
+              0.11112053382018187
+            ]
+          },
+          "point_binding": {
+            "frame": "world",
+            "load": {
+              "force_world_n": [
+                0.0,
+                0.01,
+                0.0
+              ],
+              "material_s": 0.5,
+              "name": "lateral"
+            },
+            "material_s": 0.5
+          },
+          "result_shape": [],
+          "shape": [
+            "3"
+          ],
+          "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+          "state": {
+            "qpos_rad": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "qvel_rad_s": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0
+          },
+          "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+          "tendon_order": [
+            "tendon_0"
+          ],
+          "unit": "m",
+          "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+        },
+        "source_pointer": "/mechanics/re_equilibrated_position_response",
+        "status": "computed",
+        "target": {
+          "direction_world": null,
+          "goal": "increase",
+          "material_s": 0.5,
+          "quantity": "re_equilibrated_position_response",
+          "reduction": "norm"
+        },
+        "unit": "m",
+        "value": 7.512847491041175e-05
+      },
+      "physics_identity": "227f3b138495965c9c950bd201e6e5c46f1dbe517cad765fbc71c82aa38fa008",
+      "compiled_physical_changes": {},
+      "baseline_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.2947814546559702,
+              4.034558025666456e-06,
+              -2.8766783876851827e-09,
+              -5.537792988931366e-09
+            ],
+            [
+              4.034558025666456e-06,
+              0.46060578663006074,
+              9.267218069319849e-12,
+              -1.3825876207795849e-08
+            ],
+            [
+              -2.8766783876851827e-09,
+              9.267218069319849e-12,
+              0.2947925106020486,
+              6.308974702254679e-06
+            ],
+            [
+              -5.537792988931366e-09,
+              -1.3825876207795849e-08,
+              6.308974702254679e-06,
+              0.460603482540893
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172062550676637,
+              0.016908421796876082,
+              0.006171905114472157,
+              0.016908440308739826
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.02545538941377257
+          ],
+          "capacity": true,
+          "complementarity_nm": 4.441202440320534e-17,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 4.2283884726934673e-13,
+          "initial": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "iterations": 8,
+          "kkt_pass": true,
+          "length_residual_m": [
+            3.3306690738754696e-16
+          ],
+          "native_contacts": 0,
+          "objective": 1.3334099004900847e-05,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.07999872976142487,
+              0.0004444454983852774,
+              0.9999244701550399
+            ],
+            [
+              0.173992759720307,
+              0.001488874574005502,
+              0.999746987776276
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 3.3306690738754696e-16,
+          "qpos": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "reduced_condition": 1.562499951206424,
+          "reduced_eigenvalues": [
+            0.29478698430232736,
+            0.31427988794774653,
+            0.46060464858867534
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.4644251907034583e-09,
+          "stationarity_vector_nm": [
+            1.4644251907034583e-09,
+            -6.774112850521652e-10,
+            1.2462742037368593e-09,
+            -3.120603784059761e-10
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.1333426510353633
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 22,
+          "constraint_jacobian_calls": 17,
+          "equilibrium_solves": 1,
+          "gradient_calls": 17,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 29,
+          "objective_calls": 21,
+          "optimizer_iterations": 8
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.2947814546559702,
+                4.034558025666456e-06,
+                -2.8766783876851827e-09,
+                -5.537792988931366e-09
+              ],
+              [
+                4.034558025666456e-06,
+                0.46060578663006074,
+                9.267218069319849e-12,
+                -1.3825876207795849e-08
+              ],
+              [
+                -2.8766783876851827e-09,
+                9.267218069319849e-12,
+                0.2947925106020486,
+                6.308974702254679e-06
+              ],
+              [
+                -5.537792988931366e-09,
+                -1.3825876207795849e-08,
+                6.308974702254679e-06,
+                0.460603482540893
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172062550676637,
+                0.016908421796876082,
+                0.006171905114472157,
+                0.016908440308739826
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.02545538941377257
+            ],
+            "capacity": true,
+            "complementarity_nm": 4.441202440320534e-17,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 4.2283884726934673e-13,
+            "initial": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "iterations": 8,
+            "kkt_pass": true,
+            "length_residual_m": [
+              3.3306690738754696e-16
+            ],
+            "native_contacts": 0,
+            "objective": 1.3334099004900847e-05,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.07999872976142487,
+                0.0004444454983852774,
+                0.9999244701550399
+              ],
+              [
+                0.173992759720307,
+                0.001488874574005502,
+                0.999746987776276
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 3.3306690738754696e-16,
+            "qpos": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "reduced_condition": 1.562499951206424,
+            "reduced_eigenvalues": [
+              0.29478698430232736,
+              0.31427988794774653,
+              0.46060464858867534
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.4644251907034583e-09,
+            "stationarity_vector_nm": [
+              1.4644251907034583e-09,
+              -6.774112850521652e-10,
+              1.2462742037368593e-09,
+              -3.120603784059761e-10
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.1333426510353633
+            ]
+          }
+        ]
+      },
+      "loaded_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.2947822857265667,
+              5.49115051660335e-06,
+              -2.3307907253550253e-09,
+              -4.486279511946301e-09
+            ],
+            [
+              5.49115051660335e-06,
+              0.46061060706143037,
+              6.730184985703768e-12,
+              -1.1200182491524767e-08
+            ],
+            [
+              -2.3307907253550253e-09,
+              6.730184985703768e-12,
+              0.2947884284242399,
+              4.379394362343664e-06
+            ],
+            [
+              -4.486279511946301e-09,
+              -1.1200182491524767e-08,
+              4.379394362343664e-06,
+              0.46060010065607093
+            ]
+          ],
+          "Jlength": [
+            [
+              0.00617202707360616,
+              0.016908317936667024,
+              0.006171983200504663,
+              0.01690852252765472
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455385370099236
+          ],
+          "capacity": true,
+          "complementarity_nm": 6.168428757790216e-18,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 4.119968255444917e-13,
+          "initial": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "iterations": 16,
+          "kkt_pass": true,
+          "length_residual_m": [
+            5.551115123125783e-17
+          ],
+          "native_contacts": 0,
+          "objective": 8.519317848175234e-06,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.07999827111969676,
+              0.0005185107193725394,
+              0.9999118836372436
+            ],
+            [
+              0.1739923010703572,
+              0.001562940082263486,
+              0.9997343985948324
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 5.551115123125783e-17,
+          "qpos": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "reduced_condition": 1.5625109983819623,
+          "reduced_eigenvalues": [
+            0.2947853587959618,
+            0.3142788310683207,
+            0.4606053652806632
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 2.5483295671129697e-10,
+          "stationarity_vector_nm": [
+            2.5483295671129697e-10,
+            9.12231405865438e-11,
+            -1.628925119789848e-10,
+            -1.2478298602736082e-10
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.11112053382018187
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 134,
+          "constraint_jacobian_calls": 25,
+          "equilibrium_solves": 1,
+          "gradient_calls": 25,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 141,
+          "objective_calls": 133,
+          "optimizer_iterations": 16
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.2947822857265667,
+                5.49115051660335e-06,
+                -2.3307907253550253e-09,
+                -4.486279511946301e-09
+              ],
+              [
+                5.49115051660335e-06,
+                0.46061060706143037,
+                6.730184985703768e-12,
+                -1.1200182491524767e-08
+              ],
+              [
+                -2.3307907253550253e-09,
+                6.730184985703768e-12,
+                0.2947884284242399,
+                4.379394362343664e-06
+              ],
+              [
+                -4.486279511946301e-09,
+                -1.1200182491524767e-08,
+                4.379394362343664e-06,
+                0.46060010065607093
+              ]
+            ],
+            "Jlength": [
+              [
+                0.00617202707360616,
+                0.016908317936667024,
+                0.006171983200504663,
+                0.01690852252765472
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455385370099236
+            ],
+            "capacity": true,
+            "complementarity_nm": 6.168428757790216e-18,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 4.119968255444917e-13,
+            "initial": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "iterations": 16,
+            "kkt_pass": true,
+            "length_residual_m": [
+              5.551115123125783e-17
+            ],
+            "native_contacts": 0,
+            "objective": 8.519317848175234e-06,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.07999827111969676,
+                0.0005185107193725394,
+                0.9999118836372436
+              ],
+              [
+                0.1739923010703572,
+                0.001562940082263486,
+                0.9997343985948324
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 5.551115123125783e-17,
+            "qpos": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "reduced_condition": 1.5625109983819623,
+            "reduced_eigenvalues": [
+              0.2947853587959618,
+              0.3142788310683207,
+              0.4606053652806632
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 2.5483295671129697e-10,
+            "stationarity_vector_nm": [
+              2.5483295671129697e-10,
+              9.12231405865438e-11,
+              -1.628925119789848e-10,
+              -1.2478298602736082e-10
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.11112053382018187
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "record_index": 1,
+      "parameter_values": {
+        "segments.0.young_pa": 7070000.0
+      },
+      "observation": {
+        "metadata": {
+          "actual_shape": [
+            3
+          ],
+          "constraint_state": {
+            "LICQ": true,
+            "active_count": 1,
+            "boundary_count": 0,
+            "maximum_constraint_tension_n": 0.10871296298053984,
+            "minimum_reduced_stiffness_nm_rad": 0.2894628200221765,
+            "minimum_slack_margin_m": -3.069766663088558e-14,
+            "native_soft_length_residual_m": [
+              3.069766663088558e-14
+            ],
+            "native_soft_reaction_inf_nm": 0.0018197903102910797,
+            "optimizer_success": false,
+            "positive_count": 1,
+            "primal_violation_m": 3.069766663088558e-14,
+            "qualified": true,
+            "slack_count": 0,
+            "solver_termination": "nonconverged_numerically_qualified",
+            "stationarity_inf_nm": 5.468177017957376e-12,
+            "status": "smooth_fixed_active_set",
+            "strict_complementarity": true,
+            "within_declared_tendon_capacity": true
+          },
+          "dof_order": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z"
+          ],
+          "field": "re_equilibrated_position_response",
+          "frame": "world / named hinges / ordered fixed-payout tendons",
+          "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+          "model": "native unilateral fixed-payout assembly",
+          "parameter_dependencies": [
+            "geometry",
+            "routing",
+            "stiffness",
+            "payout",
+            "external_load"
+          ],
+          "physical_inputs": {
+            "bounds_n": [],
+            "tensions_n": [
+              0.10871296298053984
+            ]
+          },
+          "point_binding": {
+            "frame": "world",
+            "load": {
+              "force_world_n": [
+                0.0,
+                0.01,
+                0.0
+              ],
+              "material_s": 0.5,
+              "name": "lateral"
+            },
+            "material_s": 0.5
+          },
+          "result_shape": [],
+          "shape": [
+            "3"
+          ],
+          "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+          "state": {
+            "qpos_rad": [
+              -0.003265743635682328,
+              -0.005725779839786123,
+              -0.0023180482191555666,
+              -0.0040642771256537815
+            ],
+            "qvel_rad_s": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0
+          },
+          "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+          "tendon_order": [
+            "tendon_0"
+          ],
+          "unit": "m",
+          "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+        },
+        "source_pointer": "/mechanics/re_equilibrated_position_response",
+        "status": "computed",
+        "target": {
+          "direction_world": null,
+          "goal": "increase",
+          "material_s": 0.5,
+          "quantity": "re_equilibrated_position_response",
+          "reduction": "norm"
+        },
+        "unit": "m",
+        "value": 7.650991822082387e-05
+      },
+      "physics_identity": "0a30251bbe989c9be6b41fd037a0482a1ea3072a41a6d00e743acee879fec7ac",
+      "compiled_physical_changes": {
+        "joint_stiffness_nm_rad": 0.008316252266734658,
+        "tendon_jacobian_m_rad": 2.0597195407590085e-09,
+        "tip_jacobian_m_rad": 1.1999221662421442e-06
+      },
+      "baseline_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.2894590117281893,
+              3.961709668545525e-06,
+              -2.824742393117696e-09,
+              -5.437791601552166e-09
+            ],
+            [
+              3.961709668545525e-06,
+              0.45228929325808165,
+              9.061219656547603e-12,
+              -1.3576282025667961e-08
+            ],
+            [
+              -2.824742393117696e-09,
+              9.061219656547603e-12,
+              0.28946986804920183,
+              6.195071137939794e-06
+            ],
+            [
+              -5.437791601552166e-09,
+              -1.3576282025667961e-08,
+              6.195071137939794e-06,
+              0.4522870307691875
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172062550661678,
+              0.016908421796950526,
+              0.006171905114123548,
+              0.016908440308634913
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455389413664178
+          ],
+          "capacity": true,
+          "complementarity_nm": 3.634178016063794e-17,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 4.553649124439119e-13,
+          "initial": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "iterations": 1,
+          "kkt_pass": true,
+          "length_residual_m": [
+            2.7755575615628914e-16
+          ],
+          "native_contacts": 0,
+          "objective": 1.3093344439527998e-05,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.07999872976122904,
+              0.0004444454643691025,
+              0.9999244697474491
+            ],
+            [
+              0.17399275971848827,
+              0.0014888745399917957,
+              0.9997469865092193
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 2.7755575615628914e-16,
+          "qpos": [
+            -0.002791917494797154,
+            -0.004895029343291795,
+            -0.002791846327710799,
+            -0.004895035066968987
+          ],
+          "reduced_condition": 1.5624999511877502,
+          "reduced_eigenvalues": [
+            0.28946444153180684,
+            0.308605389968979,
+            0.45228817576403757
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 8.444809131494257e-11,
+          "stationarity_vector_nm": [
+            1.2620947906563651e-11,
+            8.040622594823743e-11,
+            -1.5480070567411297e-12,
+            -8.444809131494257e-11
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.13093506207154362
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 7,
+          "constraint_jacobian_calls": 10,
+          "equilibrium_solves": 1,
+          "gradient_calls": 10,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 14,
+          "objective_calls": 6,
+          "optimizer_iterations": 1
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.2894590117281893,
+                3.961709668545525e-06,
+                -2.824742393117696e-09,
+                -5.437791601552166e-09
+              ],
+              [
+                3.961709668545525e-06,
+                0.45228929325808165,
+                9.061219656547603e-12,
+                -1.3576282025667961e-08
+              ],
+              [
+                -2.824742393117696e-09,
+                9.061219656547603e-12,
+                0.28946986804920183,
+                6.195071137939794e-06
+              ],
+              [
+                -5.437791601552166e-09,
+                -1.3576282025667961e-08,
+                6.195071137939794e-06,
+                0.4522870307691875
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172062550661678,
+                0.016908421796950526,
+                0.006171905114123548,
+                0.016908440308634913
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455389413664178
+            ],
+            "capacity": true,
+            "complementarity_nm": 3.634178016063794e-17,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 4.553649124439119e-13,
+            "initial": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "iterations": 1,
+            "kkt_pass": true,
+            "length_residual_m": [
+              2.7755575615628914e-16
+            ],
+            "native_contacts": 0,
+            "objective": 1.3093344439527998e-05,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.07999872976122904,
+                0.0004444454643691025,
+                0.9999244697474491
+              ],
+              [
+                0.17399275971848827,
+                0.0014888745399917957,
+                0.9997469865092193
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 2.7755575615628914e-16,
+            "qpos": [
+              -0.002791917494797154,
+              -0.004895029343291795,
+              -0.002791846327710799,
+              -0.004895035066968987
+            ],
+            "reduced_condition": 1.5624999511877502,
+            "reduced_eigenvalues": [
+              0.28946444153180684,
+              0.308605389968979,
+              0.45228817576403757
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 8.444809131494257e-11,
+            "stationarity_vector_nm": [
+              1.2620947906563651e-11,
+              8.040622594823743e-11,
+              -1.5480070567411297e-12,
+              -8.444809131494257e-11
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.13093506207154362
+            ]
+          }
+        ]
+      },
+      "loaded_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.28945984396431396,
+              5.420353651596626e-06,
+              -2.277949421973513e-09,
+              -4.38431300812947e-09
+            ],
+            [
+              5.420353651596626e-06,
+              0.4522941204783024,
+              6.578396681555797e-12,
+              -1.094581239882708e-08
+            ],
+            [
+              -2.277949421973513e-09,
+              6.578396681555797e-12,
+              0.28946579270685957,
+              4.268716622042069e-06
+            ],
+            [
+              -4.38431300812947e-09,
+              -1.094581239882708e-08,
+              4.268716622042069e-06,
+              0.4522836545578544
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172026370037019,
+              0.016908315876947484,
+              0.0061719845032461714,
+              0.01690852389916738
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455385058256178
+          ],
+          "capacity": true,
+          "complementarity_nm": 3.337234296032417e-15,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 2.873135757086587e-13,
+          "initial": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "iterations": 14,
+          "kkt_pass": true,
+          "length_residual_m": [
+            3.069766663088558e-14
+          ],
+          "native_contacts": 0,
+          "objective": 8.271753883040036e-06,
+          "optimizer_message": "Positive directional derivative for linesearch",
+          "optimizer_success": false,
+          "positions": [
+            [
+              0.07999826202550414,
+              0.0005198726350050806,
+              0.9999116521525382
+            ],
+            [
+              0.17399229197591262,
+              0.0015643020120834788,
+              0.9997341670602052
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 3.069766663088558e-14,
+          "qpos": [
+            -0.003265743635682328,
+            -0.005725779839786123,
+            -0.0023180482191555666,
+            -0.0040642771256537815
+          ],
+          "reduced_condition": 1.5625112014343978,
+          "reduced_eigenvalues": [
+            0.2894628200221765,
+            0.3086043354427599,
+            0.45228889868343986
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "nonconverged_numerically_qualified",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 5.468177017957376e-12,
+          "stationarity_vector_nm": [
+            2.646237179035338e-12,
+            1.1177916231508433e-12,
+            5.468177017957376e-12,
+            -4.0797241886852964e-12
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.10871296298053984
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 63,
+          "constraint_jacobian_calls": 19,
+          "equilibrium_solves": 1,
+          "gradient_calls": 19,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 70,
+          "objective_calls": 62,
+          "optimizer_iterations": 14
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.28945984396431396,
+                5.420353651596626e-06,
+                -2.277949421973513e-09,
+                -4.38431300812947e-09
+              ],
+              [
+                5.420353651596626e-06,
+                0.4522941204783024,
+                6.578396681555797e-12,
+                -1.094581239882708e-08
+              ],
+              [
+                -2.277949421973513e-09,
+                6.578396681555797e-12,
+                0.28946579270685957,
+                4.268716622042069e-06
+              ],
+              [
+                -4.38431300812947e-09,
+                -1.094581239882708e-08,
+                4.268716622042069e-06,
+                0.4522836545578544
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172026370037019,
+                0.016908315876947484,
+                0.0061719845032461714,
+                0.01690852389916738
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455385058256178
+            ],
+            "capacity": true,
+            "complementarity_nm": 3.337234296032417e-15,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 2.873135757086587e-13,
+            "initial": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "iterations": 14,
+            "kkt_pass": true,
+            "length_residual_m": [
+              3.069766663088558e-14
+            ],
+            "native_contacts": 0,
+            "objective": 8.271753883040036e-06,
+            "optimizer_message": "Positive directional derivative for linesearch",
+            "optimizer_success": false,
+            "positions": [
+              [
+                0.07999826202550414,
+                0.0005198726350050806,
+                0.9999116521525382
+              ],
+              [
+                0.17399229197591262,
+                0.0015643020120834788,
+                0.9997341670602052
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 3.069766663088558e-14,
+            "qpos": [
+              -0.003265743635682328,
+              -0.005725779839786123,
+              -0.0023180482191555666,
+              -0.0040642771256537815
+            ],
+            "reduced_condition": 1.5625112014343978,
+            "reduced_eigenvalues": [
+              0.2894628200221765,
+              0.3086043354427599,
+              0.45228889868343986
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "nonconverged_numerically_qualified",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 5.468177017957376e-12,
+            "stationarity_vector_nm": [
+              2.646237179035338e-12,
+              1.1177916231508433e-12,
+              5.468177017957376e-12,
+              -4.0797241886852964e-12
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.10871296298053984
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "record_index": 2,
+      "parameter_values": {
+        "segments.0.young_pa": 7330000.0
+      },
+      "observation": {
+        "metadata": {
+          "actual_shape": [
+            3
+          ],
+          "constraint_state": {
+            "LICQ": true,
+            "active_count": 1,
+            "boundary_count": 0,
+            "maximum_constraint_tension_n": 0.11352810519195727,
+            "minimum_reduced_stiffness_nm_rad": 0.300107897711212,
+            "minimum_slack_margin_m": -2.733924198139448e-14,
+            "native_soft_length_residual_m": [
+              2.733924198139448e-14
+            ],
+            "native_soft_reaction_inf_nm": 0.0019003925594091391,
+            "optimizer_success": false,
+            "positive_count": 1,
+            "primal_violation_m": 2.733924198139448e-14,
+            "qualified": true,
+            "slack_count": 0,
+            "solver_termination": "nonconverged_numerically_qualified",
+            "stationarity_inf_nm": 1.2715751064942826e-10,
+            "status": "smooth_fixed_active_set",
+            "strict_complementarity": true,
+            "within_declared_tendon_capacity": true
+          },
+          "dof_order": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z"
+          ],
+          "field": "re_equilibrated_position_response",
+          "frame": "world / named hinges / ordered fixed-payout tendons",
+          "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+          "model": "native unilateral fixed-payout assembly",
+          "parameter_dependencies": [
+            "geometry",
+            "routing",
+            "stiffness",
+            "payout",
+            "external_load"
+          ],
+          "physical_inputs": {
+            "bounds_n": [],
+            "tensions_n": [
+              0.11352810519195727
+            ]
+          },
+          "point_binding": {
+            "frame": "world",
+            "load": {
+              "force_world_n": [
+                0.0,
+                0.01,
+                0.0
+              ],
+              "material_s": 0.5,
+              "name": "lateral"
+            },
+            "material_s": 0.5
+          },
+          "result_shape": [],
+          "shape": [
+            "3"
+          ],
+          "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+          "state": {
+            "qpos_rad": [
+              -0.0032489362613319266,
+              -0.005696312634914295,
+              -0.0023348538767226307,
+              -0.00409374464430935
+            ],
+            "qvel_rad_s": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0
+          },
+          "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+          "tendon_order": [
+            "tendon_0"
+          ],
+          "unit": "m",
+          "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+        },
+        "source_pointer": "/mechanics/re_equilibrated_position_response",
+        "status": "computed",
+        "target": {
+          "direction_world": null,
+          "goal": "increase",
+          "material_s": 0.5,
+          "quantity": "re_equilibrated_position_response",
+          "reduction": "norm"
+        },
+        "unit": "m",
+        "value": 7.379604565548256e-05
+      },
+      "physics_identity": "7f2f81cae4dd86ec1793ce51422c5839b5e8674973064b557e0a80ee09c6693c",
+      "compiled_physical_changes": {
+        "joint_stiffness_nm_rad": 0.008316252266734714,
+        "tendon_jacobian_m_rad": 1.9814268455153883e-09,
+        "tip_jacobian_m_rad": 1.157311877770682e-06
+      },
+      "baseline_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.3001038975912701,
+              4.10740175866512e-06,
+              -2.9286360662961193e-09,
+              -5.637826902375741e-09
+            ],
+            [
+              4.10740175866512e-06,
+              0.4689222799971609,
+              9.557242150459722e-12,
+              -1.4075578810140986e-08
+            ],
+            [
+              -2.9286360662961193e-09,
+              9.557242150459722e-12,
+              0.30011515315442366,
+              6.42289606103772e-06
+            ],
+            [
+              -5.637826902375741e-09,
+              -1.4075578810140986e-08,
+              6.42289606103772e-06,
+              0.4689199343050091
+            ]
+          ],
+          "Jlength": [
+            [
+              0.0061720625506601475,
+              0.01690842179695817,
+              0.0061719051140878495,
+              0.01690844030862414
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455389413653072
+          ],
+          "capacity": true,
+          "complementarity_nm": 3.767825258857625e-17,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 2.49366499671666e-13,
+          "initial": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "iterations": 1,
+          "kkt_pass": true,
+          "length_residual_m": [
+            2.7755575615628914e-16
+          ],
+          "native_contacts": 0,
+          "objective": 1.3574853570260574e-05,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.079998729761209,
+              0.00044444546088428393,
+              0.999924469705693
+            ],
+            [
+              0.17399275971830194,
+              0.0014888745365072378,
+              0.9997469863794144
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 2.7755575615628914e-16,
+          "qpos": [
+            -0.0027919179701712646,
+            -0.004895029123394104,
+            -0.00279184673226987,
+            -0.004895034965669609
+          ],
+          "reduced_condition": 1.5624999511855455,
+          "reduced_eigenvalues": [
+            0.30010952707639743,
+            0.31995438592252845,
+            0.4689211214071881
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.6255451889060635e-10,
+          "stationarity_vector_nm": [
+            -1.3830772041967948e-10,
+            1.6255451889060635e-10,
+            -1.3175045201953978e-10,
+            -6.397663822321764e-11
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.13575021145430674
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 7,
+          "constraint_jacobian_calls": 10,
+          "equilibrium_solves": 1,
+          "gradient_calls": 10,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 14,
+          "objective_calls": 6,
+          "optimizer_iterations": 1
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.3001038975912701,
+                4.10740175866512e-06,
+                -2.9286360662961193e-09,
+                -5.637826902375741e-09
+              ],
+              [
+                4.10740175866512e-06,
+                0.4689222799971609,
+                9.557242150459722e-12,
+                -1.4075578810140986e-08
+              ],
+              [
+                -2.9286360662961193e-09,
+                9.557242150459722e-12,
+                0.30011515315442366,
+                6.42289606103772e-06
+              ],
+              [
+                -5.637826902375741e-09,
+                -1.4075578810140986e-08,
+                6.42289606103772e-06,
+                0.4689199343050091
+              ]
+            ],
+            "Jlength": [
+              [
+                0.0061720625506601475,
+                0.01690842179695817,
+                0.0061719051140878495,
+                0.01690844030862414
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455389413653072
+            ],
+            "capacity": true,
+            "complementarity_nm": 3.767825258857625e-17,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 2.49366499671666e-13,
+            "initial": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "iterations": 1,
+            "kkt_pass": true,
+            "length_residual_m": [
+              2.7755575615628914e-16
+            ],
+            "native_contacts": 0,
+            "objective": 1.3574853570260574e-05,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.079998729761209,
+                0.00044444546088428393,
+                0.999924469705693
+              ],
+              [
+                0.17399275971830194,
+                0.0014888745365072378,
+                0.9997469863794144
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 2.7755575615628914e-16,
+            "qpos": [
+              -0.0027919179701712646,
+              -0.004895029123394104,
+              -0.00279184673226987,
+              -0.004895034965669609
+            ],
+            "reduced_condition": 1.5624999511855455,
+            "reduced_eigenvalues": [
+              0.30010952707639743,
+              0.31995438592252845,
+              0.4689211214071881
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.6255451889060635e-10,
+            "stationarity_vector_nm": [
+              -1.3830772041967948e-10,
+              1.6255451889060635e-10,
+              -1.3175045201953978e-10,
+              -6.397663822321764e-11
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.13575021145430674
+            ]
+          }
+        ]
+      },
+      "loaded_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.30010472753148276,
+              5.562020532730651e-06,
+              -2.3838597111927595e-09,
+              -4.588056280382946e-09
+            ],
+            [
+              5.562020532730651e-06,
+              0.4689270938878966,
+              6.9063678387326624e-12,
+              -1.145436826985313e-08
+            ],
+            [
+              -2.3838597111927595e-09,
+              6.9063678387326624e-12,
+              0.30011106438160834,
+              4.490184125124225e-06
+            ],
+            [
+              -4.588056280382946e-09,
+              -1.145436826985313e-08,
+              4.490184125124225e-06,
+              0.468916546954713
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172027750424043,
+              0.01690831991809387,
+              0.00617198193956126,
+              0.016908521200077815
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455385662770176
+          ],
+          "capacity": true,
+          "complementarity_nm": 3.103772339532127e-15,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 3.469446951953614e-13,
+          "initial": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "iterations": 13,
+          "kkt_pass": true,
+          "length_residual_m": [
+            2.733924198139448e-14
+          ],
+          "native_contacts": 0,
+          "objective": 8.766640273083857e-06,
+          "optimizer_message": "Positive directional derivative for linesearch",
+          "optimizer_success": false,
+          "positions": [
+            [
+              0.0799982798681525,
+              0.0005171971841210732,
+              0.9999121068291386
+            ],
+            [
+              0.17399230981910288,
+              0.0015616265333370733,
+              0.9997346218598007
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 2.733924198139448e-14,
+          "qpos": [
+            -0.0032489362613319266,
+            -0.005696312634914295,
+            -0.0023348538767226307,
+            -0.00409374464430935
+          ],
+          "reduced_condition": 1.5625108025342769,
+          "reduced_eigenvalues": [
+            0.300107897711212,
+            0.31995332677757105,
+            0.4689218320996205
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "nonconverged_numerically_qualified",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.2715751064942826e-10,
+          "stationarity_vector_nm": [
+            1.2715751064942826e-10,
+            -4.630785468626164e-11,
+            1.270875780914199e-10,
+            -4.64980859805203e-11
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.11352810519195727
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 61,
+          "constraint_jacobian_calls": 18,
+          "equilibrium_solves": 1,
+          "gradient_calls": 18,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 68,
+          "objective_calls": 60,
+          "optimizer_iterations": 13
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.30010472753148276,
+                5.562020532730651e-06,
+                -2.3838597111927595e-09,
+                -4.588056280382946e-09
+              ],
+              [
+                5.562020532730651e-06,
+                0.4689270938878966,
+                6.9063678387326624e-12,
+                -1.145436826985313e-08
+              ],
+              [
+                -2.3838597111927595e-09,
+                6.9063678387326624e-12,
+                0.30011106438160834,
+                4.490184125124225e-06
+              ],
+              [
+                -4.588056280382946e-09,
+                -1.145436826985313e-08,
+                4.490184125124225e-06,
+                0.468916546954713
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172027750424043,
+                0.01690831991809387,
+                0.00617198193956126,
+                0.016908521200077815
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455385662770176
+            ],
+            "capacity": true,
+            "complementarity_nm": 3.103772339532127e-15,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 3.469446951953614e-13,
+            "initial": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "iterations": 13,
+            "kkt_pass": true,
+            "length_residual_m": [
+              2.733924198139448e-14
+            ],
+            "native_contacts": 0,
+            "objective": 8.766640273083857e-06,
+            "optimizer_message": "Positive directional derivative for linesearch",
+            "optimizer_success": false,
+            "positions": [
+              [
+                0.0799982798681525,
+                0.0005171971841210732,
+                0.9999121068291386
+              ],
+              [
+                0.17399230981910288,
+                0.0015616265333370733,
+                0.9997346218598007
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 2.733924198139448e-14,
+            "qpos": [
+              -0.0032489362613319266,
+              -0.005696312634914295,
+              -0.0023348538767226307,
+              -0.00409374464430935
+            ],
+            "reduced_condition": 1.5625108025342769,
+            "reduced_eigenvalues": [
+              0.300107897711212,
+              0.31995332677757105,
+              0.4689218320996205
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "nonconverged_numerically_qualified",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.2715751064942826e-10,
+            "stationarity_vector_nm": [
+              1.2715751064942826e-10,
+              -4.630785468626164e-11,
+              1.270875780914199e-10,
+              -4.64980859805203e-11
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.11352810519195727
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "record_index": 3,
+      "parameter_values": {
+        "segments.0.young_pa": 7135000.0
+      },
+      "observation": {
+        "metadata": {
+          "actual_shape": [
+            3
+          ],
+          "constraint_state": {
+            "LICQ": true,
+            "active_count": 1,
+            "boundary_count": 0,
+            "maximum_constraint_tension_n": 0.10991674768285889,
+            "minimum_reduced_stiffness_nm_rad": 0.29212408939074563,
+            "minimum_slack_margin_m": -6.661338147750939e-15,
+            "native_soft_length_residual_m": [
+              6.661338147750939e-15
+            ],
+            "native_soft_reaction_inf_nm": 0.001839940615770173,
+            "optimizer_success": true,
+            "positive_count": 1,
+            "primal_violation_m": 6.661338147750939e-15,
+            "qualified": true,
+            "slack_count": 0,
+            "solver_termination": "converged",
+            "stationarity_inf_nm": 1.3685699557126896e-10,
+            "status": "smooth_fixed_active_set",
+            "strict_complementarity": true,
+            "within_declared_tendon_capacity": true
+          },
+          "dof_order": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z"
+          ],
+          "field": "re_equilibrated_position_response",
+          "frame": "world / named hinges / ordered fixed-payout tendons",
+          "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+          "model": "native unilateral fixed-payout assembly",
+          "parameter_dependencies": [
+            "geometry",
+            "routing",
+            "stiffness",
+            "payout",
+            "external_load"
+          ],
+          "physical_inputs": {
+            "bounds_n": [],
+            "tensions_n": [
+              0.10991674768285889
+            ]
+          },
+          "point_binding": {
+            "frame": "world",
+            "load": {
+              "force_world_n": [
+                0.0,
+                0.01,
+                0.0
+              ],
+              "material_s": 0.5,
+              "name": "lateral"
+            },
+            "material_s": 0.5
+          },
+          "result_shape": [],
+          "shape": [
+            "3"
+          ],
+          "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+          "state": {
+            "qpos_rad": [
+              -0.003261427217465905,
+              -0.005718211878751883,
+              -0.0023223647079732004,
+              -0.0040718449804353326
+            ],
+            "qvel_rad_s": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0
+          },
+          "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+          "tendon_order": [
+            "tendon_0"
+          ],
+          "unit": "m",
+          "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+        },
+        "source_pointer": "/mechanics/re_equilibrated_position_response",
+        "status": "computed",
+        "target": {
+          "direction_world": null,
+          "goal": "increase",
+          "material_s": 0.5,
+          "quantity": "re_equilibrated_position_response",
+          "reduction": "norm"
+        },
+        "unit": "m",
+        "value": 7.581292655335071e-05
+      },
+      "physics_identity": "16b4081c2f0e8770cf019b71c261f02808954ccbf39e9fa367ab3cf2b38a93bd",
+      "compiled_physical_changes": {
+        "joint_stiffness_nm_rad": 0.004158126133367357,
+        "tendon_jacobian_m_rad": 1.0198573825725976e-09,
+        "tip_jacobian_m_rad": 5.945043718758904e-07
+      },
+      "baseline_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.2921202331943268,
+              3.9981325026952966e-06,
+              -2.8506927721161364e-09,
+              -5.487719111595123e-09
+            ],
+            [
+              3.9981325026952966e-06,
+              0.4564475399426292,
+              9.185902906383436e-12,
+              -1.3701117063807942e-08
+            ],
+            [
+              -2.8506927721161364e-09,
+              9.185902906383436e-12,
+              0.29213118932550053,
+              6.252028116136148e-06
+            ],
+            [
+              -5.487719111595123e-09,
+              -1.3701117063807942e-08,
+              6.252028116136148e-06,
+              0.45644525665292607
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172062550659764,
+              0.01690842179696006,
+              0.0061719051140789825,
+              0.016908440308621476
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455389413650314
+          ],
+          "capacity": true,
+          "complementarity_nm": 3.6675897888553005e-17,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 9.75781955236954e-14,
+          "initial": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "iterations": 1,
+          "kkt_pass": true,
+          "length_residual_m": [
+            2.7755575615628914e-16
+          ],
+          "native_contacts": 0,
+          "objective": 1.3213721722211148e-05,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.07999872976120398,
+              0.0004444454600181075,
+              0.9999244696953143
+            ],
+            [
+              0.17399275971825562,
+              0.0014888745356411146,
+              0.9997469863471508
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 2.7755575615628914e-16,
+          "qpos": [
+            -0.0027919180883281772,
+            -0.004895029068737226,
+            -0.0027918468328253024,
+            -0.004895034940491016
+          ],
+          "reduced_condition": 1.5624999511856281,
+          "reduced_eigenvalues": [
+            0.29212571291811196,
+            0.31144263895721314,
+            0.45644641217461673
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.77389900511693e-10,
+          "stationarity_vector_nm": [
+            -1.7125680615379807e-10,
+            1.77389900511693e-10,
+            -1.5973333940266787e-10,
+            -5.657035733949711e-11
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.13213884805149254
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 7,
+          "constraint_jacobian_calls": 10,
+          "equilibrium_solves": 1,
+          "gradient_calls": 10,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 14,
+          "objective_calls": 6,
+          "optimizer_iterations": 1
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.2921202331943268,
+                3.9981325026952966e-06,
+                -2.8506927721161364e-09,
+                -5.487719111595123e-09
+              ],
+              [
+                3.9981325026952966e-06,
+                0.4564475399426292,
+                9.185902906383436e-12,
+                -1.3701117063807942e-08
+              ],
+              [
+                -2.8506927721161364e-09,
+                9.185902906383436e-12,
+                0.29213118932550053,
+                6.252028116136148e-06
+              ],
+              [
+                -5.487719111595123e-09,
+                -1.3701117063807942e-08,
+                6.252028116136148e-06,
+                0.45644525665292607
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172062550659764,
+                0.01690842179696006,
+                0.0061719051140789825,
+                0.016908440308621476
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455389413650314
+            ],
+            "capacity": true,
+            "complementarity_nm": 3.6675897888553005e-17,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 9.75781955236954e-14,
+            "initial": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "iterations": 1,
+            "kkt_pass": true,
+            "length_residual_m": [
+              2.7755575615628914e-16
+            ],
+            "native_contacts": 0,
+            "objective": 1.3213721722211148e-05,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.07999872976120398,
+                0.0004444454600181075,
+                0.9999244696953143
+              ],
+              [
+                0.17399275971825562,
+                0.0014888745356411146,
+                0.9997469863471508
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 2.7755575615628914e-16,
+            "qpos": [
+              -0.0027919180883281772,
+              -0.004895029068737226,
+              -0.0027918468328253024,
+              -0.004895034940491016
+            ],
+            "reduced_condition": 1.5624999511856281,
+            "reduced_eigenvalues": [
+              0.29212571291811196,
+              0.31144263895721314,
+              0.45644641217461673
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.77389900511693e-10,
+            "stationarity_vector_nm": [
+              -1.7125680615379807e-10,
+              1.77389900511693e-10,
+              -1.5973333940266787e-10,
+              -5.657035733949711e-11
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.13213884805149254
+            ]
+          }
+        ]
+      },
+      "loaded_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.2921210648406617,
+              5.455743024235584e-06,
+              -2.3046587424926934e-09,
+              -4.435189195073352e-09
+            ],
+            [
+              5.455743024235584e-06,
+              0.45645236374031645,
+              6.494371013188171e-12,
+              -1.1072891735464106e-08
+            ],
+            [
+              -2.3046587424926934e-09,
+              6.494371013188171e-12,
+              0.2921271105330806,
+              4.324040404164384e-06
+            ],
+            [
+              -4.435189195073352e-09,
+              -1.1072891735464106e-08,
+              4.324040404164384e-06,
+              0.45644187758029675
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172026725234863,
+              0.01690831691680964,
+              0.006171983846572377,
+              0.016908523207835
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455385216659552
+          ],
+          "capacity": true,
+          "complementarity_nm": 7.321926244165426e-16,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 2.656295322589486e-13,
+          "initial": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "iterations": 16,
+          "kkt_pass": true,
+          "length_residual_m": [
+            6.661338147750939e-15
+          ],
+          "native_contacts": 0,
+          "objective": 8.395566883407193e-06,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.07999826661671365,
+              0.000519185512646896,
+              0.999911768913338
+            ],
+            [
+              0.1739922965671645,
+              0.0015636148825715253,
+              0.9997342838013517
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 6.661338147750939e-15,
+          "qpos": [
+            -0.003261427217465905,
+            -0.005718211878751883,
+            -0.0023223647079732004,
+            -0.0040718449804353326
+          ],
+          "reduced_condition": 1.562511098984681,
+          "reduced_eigenvalues": [
+            0.29212408939074563,
+            0.3114415832443584,
+            0.4564471319538332
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.3685699557126896e-10,
+          "stationarity_vector_nm": [
+            -4.7704981458174256e-11,
+            -1.0423124321111421e-10,
+            -4.1678393050172124e-11,
+            1.3685699557126896e-10
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.10991674768285889
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 84,
+          "constraint_jacobian_calls": 21,
+          "equilibrium_solves": 1,
+          "gradient_calls": 21,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 91,
+          "objective_calls": 83,
+          "optimizer_iterations": 16
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.2921210648406617,
+                5.455743024235584e-06,
+                -2.3046587424926934e-09,
+                -4.435189195073352e-09
+              ],
+              [
+                5.455743024235584e-06,
+                0.45645236374031645,
+                6.494371013188171e-12,
+                -1.1072891735464106e-08
+              ],
+              [
+                -2.3046587424926934e-09,
+                6.494371013188171e-12,
+                0.2921271105330806,
+                4.324040404164384e-06
+              ],
+              [
+                -4.435189195073352e-09,
+                -1.1072891735464106e-08,
+                4.324040404164384e-06,
+                0.45644187758029675
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172026725234863,
+                0.01690831691680964,
+                0.006171983846572377,
+                0.016908523207835
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455385216659552
+            ],
+            "capacity": true,
+            "complementarity_nm": 7.321926244165426e-16,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 2.656295322589486e-13,
+            "initial": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "iterations": 16,
+            "kkt_pass": true,
+            "length_residual_m": [
+              6.661338147750939e-15
+            ],
+            "native_contacts": 0,
+            "objective": 8.395566883407193e-06,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.07999826661671365,
+                0.000519185512646896,
+                0.999911768913338
+              ],
+              [
+                0.1739922965671645,
+                0.0015636148825715253,
+                0.9997342838013517
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 6.661338147750939e-15,
+            "qpos": [
+              -0.003261427217465905,
+              -0.005718211878751883,
+              -0.0023223647079732004,
+              -0.0040718449804353326
+            ],
+            "reduced_condition": 1.562511098984681,
+            "reduced_eigenvalues": [
+              0.29212408939074563,
+              0.3114415832443584,
+              0.4564471319538332
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.3685699557126896e-10,
+            "stationarity_vector_nm": [
+              -4.7704981458174256e-11,
+              -1.0423124321111421e-10,
+              -4.1678393050172124e-11,
+              1.3685699557126896e-10
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.10991674768285889
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "record_index": 4,
+      "parameter_values": {
+        "segments.0.young_pa": 7265000.0
+      },
+      "observation": {
+        "metadata": {
+          "actual_shape": [
+            3
+          ],
+          "constraint_state": {
+            "LICQ": true,
+            "active_count": 1,
+            "boundary_count": 0,
+            "maximum_constraint_tension_n": 0.11232431858539227,
+            "minimum_reduced_stiffness_nm_rad": 0.2974466282365637,
+            "minimum_slack_margin_m": -7.438494264988549e-15,
+            "native_soft_length_residual_m": [
+              7.438494264988549e-15
+            ],
+            "native_soft_reaction_inf_nm": 0.0018802419673710619,
+            "optimizer_success": true,
+            "positive_count": 1,
+            "primal_violation_m": 7.438494264988549e-15,
+            "qualified": true,
+            "slack_count": 0,
+            "solver_termination": "converged",
+            "stationarity_inf_nm": 3.4481029143051956e-12,
+            "status": "smooth_fixed_active_set",
+            "strict_complementarity": true,
+            "within_declared_tendon_capacity": true
+          },
+          "dof_order": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z"
+          ],
+          "field": "re_equilibrated_position_response",
+          "frame": "world / named hinges / ordered fixed-payout tendons",
+          "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+          "model": "native unilateral fixed-payout assembly",
+          "parameter_dependencies": [
+            "geometry",
+            "routing",
+            "stiffness",
+            "payout",
+            "external_load"
+          ],
+          "physical_inputs": {
+            "bounds_n": [],
+            "tensions_n": [
+              0.11232431858539227
+            ]
+          },
+          "point_binding": {
+            "frame": "world",
+            "load": {
+              "force_world_n": [
+                0.0,
+                0.01,
+                0.0
+              ],
+              "material_s": 0.5,
+              "name": "lateral"
+            },
+            "material_s": 0.5
+          },
+          "result_shape": [],
+          "shape": [
+            "3"
+          ],
+          "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+          "state": {
+            "qpos_rad": [
+              -0.003253025636106535,
+              -0.005703481590524445,
+              -0.0023307655492713643,
+              -0.004086575382303988
+            ],
+            "qvel_rad_s": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0
+          },
+          "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+          "tendon_order": [
+            "tendon_0"
+          ],
+          "unit": "m",
+          "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+        },
+        "source_pointer": "/mechanics/re_equilibrated_position_response",
+        "status": "computed",
+        "target": {
+          "direction_world": null,
+          "goal": "increase",
+          "material_s": 0.5,
+          "quantity": "re_equilibrated_position_response",
+          "reduction": "norm"
+        },
+        "unit": "m",
+        "value": 7.445630674229052e-05
+      },
+      "physics_identity": "8d9bf4438ecdae71587e5bfb190317dfa36d607baf45261a69b91f06c8ad350a",
+      "compiled_physical_changes": {
+        "joint_stiffness_nm_rad": 0.0041581261333674124,
+        "tendon_jacobian_m_rad": 1.000182991983678e-09,
+        "tip_jacobian_m_rad": 5.838515957296616e-07
+      },
+      "baseline_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.297442676125588,
+              4.070978664306828e-06,
+              -2.902653161232504e-09,
+              -5.587758446050361e-09
+            ],
+            [
+              4.070978664306828e-06,
+              0.46476403331233146,
+              9.12356128146552e-12,
+              -1.3950646193805481e-08
+            ],
+            [
+              -2.902653161232504e-09,
+              9.12356128146552e-12,
+              0.2974538318781684,
+              6.365939933940071e-06
+            ],
+            [
+              -5.587758446050361e-09,
+              -1.3950646193805481e-08,
+              6.365939933940071e-06,
+              0.46476170842105374
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172062550660162,
+              0.016908421796958093,
+              0.006171905114088237,
+              0.016908440308624255
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455389413653193
+          ],
+          "capacity": true,
+          "complementarity_nm": 4.107854782986117e-17,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 4.445228907190568e-13,
+          "initial": [
+            -0.0027919128545578153,
+            -0.0048950314897657195,
+            -0.0027918423787138655,
+            -0.004895036055776641
+          ],
+          "iterations": 1,
+          "kkt_pass": true,
+          "length_residual_m": [
+            3.0531133177191805e-16
+          ],
+          "native_contacts": 0,
+          "objective": 1.3454476287577542e-05,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.0799987297612092,
+              0.0004444454609190151,
+              0.9999244697061092
+            ],
+            [
+              0.17399275971830383,
+              0.0014888745365419682,
+              0.999746986380708
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 3.0531133177191805e-16,
+          "qpos": [
+            -0.0027919179654335947,
+            -0.004895029125585657,
+            -0.0027918467282379567,
+            -0.0048950349666791884
+          ],
+          "reduced_condition": 1.5624999511853037,
+          "reduced_eigenvalues": [
+            0.2974482556903094,
+            0.3171171369342663,
+            0.4647628849962622
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 1.603308002855186e-10,
+          "stationarity_vector_nm": [
+            -1.355858225172979e-10,
+            1.603308002855186e-10,
+            -1.2929657420678725e-10,
+            -6.364220565477363e-11
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.1345464237814428
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 7,
+          "constraint_jacobian_calls": 10,
+          "equilibrium_solves": 1,
+          "gradient_calls": 10,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 14,
+          "objective_calls": 6,
+          "optimizer_iterations": 1
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.297442676125588,
+                4.070978664306828e-06,
+                -2.902653161232504e-09,
+                -5.587758446050361e-09
+              ],
+              [
+                4.070978664306828e-06,
+                0.46476403331233146,
+                9.12356128146552e-12,
+                -1.3950646193805481e-08
+              ],
+              [
+                -2.902653161232504e-09,
+                9.12356128146552e-12,
+                0.2974538318781684,
+                6.365939933940071e-06
+              ],
+              [
+                -5.587758446050361e-09,
+                -1.3950646193805481e-08,
+                6.365939933940071e-06,
+                0.46476170842105374
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172062550660162,
+                0.016908421796958093,
+                0.006171905114088237,
+                0.016908440308624255
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455389413653193
+            ],
+            "capacity": true,
+            "complementarity_nm": 4.107854782986117e-17,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 4.445228907190568e-13,
+            "initial": [
+              -0.0027919128545578153,
+              -0.0048950314897657195,
+              -0.0027918423787138655,
+              -0.004895036055776641
+            ],
+            "iterations": 1,
+            "kkt_pass": true,
+            "length_residual_m": [
+              3.0531133177191805e-16
+            ],
+            "native_contacts": 0,
+            "objective": 1.3454476287577542e-05,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.0799987297612092,
+                0.0004444454609190151,
+                0.9999244697061092
+              ],
+              [
+                0.17399275971830383,
+                0.0014888745365419682,
+                0.999746986380708
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 3.0531133177191805e-16,
+            "qpos": [
+              -0.0027919179654335947,
+              -0.004895029125585657,
+              -0.0027918467282379567,
+              -0.0048950349666791884
+            ],
+            "reduced_condition": 1.5624999511853037,
+            "reduced_eigenvalues": [
+              0.2974482556903094,
+              0.3171171369342663,
+              0.4647628849962622
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 1.603308002855186e-10,
+            "stationarity_vector_nm": [
+              -1.355858225172979e-10,
+              1.603308002855186e-10,
+              -1.2929657420678725e-10,
+              -6.364220565477363e-11
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.1345464237814428
+            ]
+          }
+        ]
+      },
+      "loaded_equilibrium": {
+        "assumptions": "native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium",
+        "equilibrium": {
+          "H": [
+            [
+              0.29744350662456054,
+              5.526576638274944e-06,
+              -2.357478361830756e-09,
+              -4.537174672428201e-09
+            ],
+            [
+              5.526576638274944e-06,
+              0.4647688504459592,
+              6.730184985703768e-12,
+              -1.132723472310748e-08
+            ],
+            [
+              -2.357478361830756e-09,
+              6.730184985703768e-12,
+              0.2974497463730137,
+              4.434775349683104e-06
+            ],
+            [
+              -4.537174672428201e-09,
+              -1.132723472310748e-08,
+              4.434775349683104e-06,
+              0.4647583237802656
+            ]
+          ],
+          "Jlength": [
+            [
+              0.006172027415244645,
+              0.016908318936850016,
+              0.006171982564965315,
+              0.01690852185853442
+            ]
+          ],
+          "LICQ": true,
+          "active": [
+            true
+          ],
+          "active_rank": 1,
+          "active_singular_values": [
+            0.025455385518737376
+          ],
+          "capacity": true,
+          "complementarity_nm": 8.35523799616187e-16,
+          "dual_violation_n": 0.0,
+          "hessian_asymmetry": 3.144186300207963e-13,
+          "initial": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "iterations": 10,
+          "kkt_pass": true,
+          "length_residual_m": [
+            7.438494264988549e-15
+          ],
+          "native_contacts": 0,
+          "objective": 8.64300844269219e-06,
+          "optimizer_message": "Optimization terminated successfully",
+          "optimizer_success": true,
+          "positions": [
+            [
+              0.0799982755356635,
+              0.0005178480940242374,
+              0.9999119961843099
+            ],
+            [
+              0.17399230548636302,
+              0.0015622774500122115,
+              0.9997345111219854
+            ]
+          ],
+          "positive": [
+            true
+          ],
+          "primal_violation_m": 7.438494264988549e-15,
+          "qpos": [
+            -0.003253025636106535,
+            -0.005703481590524445,
+            -0.0023307655492713643,
+            -0.004086575382303988
+          ],
+          "reduced_condition": 1.562510899580775,
+          "reduced_eigenvalues": [
+            0.2974466282365637,
+            0.31711607891277543,
+            0.4647635986631815
+          ],
+          "second_order_sufficient": true,
+          "solver_termination": "converged",
+          "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+          "stationarity_inf_nm": 3.4481029143051956e-12,
+          "stationarity_vector_nm": [
+            -3.2502528229602645e-12,
+            1.2238586880042313e-12,
+            -3.4481029143051956e-12,
+            1.2212114999798906e-12
+          ],
+          "status": "qualified_local_minimum",
+          "strict_complementarity": true,
+          "tensions_n": [
+            0.11232431858539227
+          ]
+        },
+        "force_n": [
+          0.0,
+          0.01,
+          0.0
+        ],
+        "method": "passive_equilibrium_v1",
+        "multistart_same_branch": null,
+        "numerical_cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 31,
+          "constraint_jacobian_calls": 15,
+          "equilibrium_solves": 1,
+          "gradient_calls": 15,
+          "hessian_columns": 4,
+          "multiplier_fits": 1,
+          "native_forward_calls": 38,
+          "objective_calls": 30,
+          "optimizer_iterations": 10
+        },
+        "regularization": "none",
+        "s": 0.5,
+        "status": "qualified_local_minimum",
+        "task_acceptance": "unmeasured",
+        "trials": [
+          {
+            "H": [
+              [
+                0.29744350662456054,
+                5.526576638274944e-06,
+                -2.357478361830756e-09,
+                -4.537174672428201e-09
+              ],
+              [
+                5.526576638274944e-06,
+                0.4647688504459592,
+                6.730184985703768e-12,
+                -1.132723472310748e-08
+              ],
+              [
+                -2.357478361830756e-09,
+                6.730184985703768e-12,
+                0.2974497463730137,
+                4.434775349683104e-06
+              ],
+              [
+                -4.537174672428201e-09,
+                -1.132723472310748e-08,
+                4.434775349683104e-06,
+                0.4647583237802656
+              ]
+            ],
+            "Jlength": [
+              [
+                0.006172027415244645,
+                0.016908318936850016,
+                0.006171982564965315,
+                0.01690852185853442
+              ]
+            ],
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "active_rank": 1,
+            "active_singular_values": [
+              0.025455385518737376
+            ],
+            "capacity": true,
+            "complementarity_nm": 8.35523799616187e-16,
+            "dual_violation_n": 0.0,
+            "hessian_asymmetry": 3.144186300207963e-13,
+            "initial": [
+              -0.0032571875667949906,
+              -0.005710779959742354,
+              -0.002326603540132126,
+              -0.004079277119191875
+            ],
+            "iterations": 10,
+            "kkt_pass": true,
+            "length_residual_m": [
+              7.438494264988549e-15
+            ],
+            "native_contacts": 0,
+            "objective": 8.64300844269219e-06,
+            "optimizer_message": "Optimization terminated successfully",
+            "optimizer_success": true,
+            "positions": [
+              [
+                0.0799982755356635,
+                0.0005178480940242374,
+                0.9999119961843099
+              ],
+              [
+                0.17399230548636302,
+                0.0015622774500122115,
+                0.9997345111219854
+              ]
+            ],
+            "positive": [
+              true
+            ],
+            "primal_violation_m": 7.438494264988549e-15,
+            "qpos": [
+              -0.003253025636106535,
+              -0.005703481590524445,
+              -0.0023307655492713643,
+              -0.004086575382303988
+            ],
+            "reduced_condition": 1.562510899580775,
+            "reduced_eigenvalues": [
+              0.2974466282365637,
+              0.31711607891277543,
+              0.4647635986631815
+            ],
+            "second_order_sufficient": true,
+            "solver_termination": "converged",
+            "stability_scope": "finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate",
+            "stationarity_inf_nm": 3.4481029143051956e-12,
+            "stationarity_vector_nm": [
+              -3.2502528229602645e-12,
+              1.2238586880042313e-12,
+              -3.4481029143051956e-12,
+              1.2212114999798906e-12
+            ],
+            "status": "qualified_local_minimum",
+            "strict_complementarity": true,
+            "tensions_n": [
+              0.11232431858539227
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "sensitivity": [
+    {
+      "branch_status": "same_active_set",
+      "consistency": {
+        "observed_change": 1.3814433104121211e-06,
+        "passed": true,
+        "relative_difference": 0.00023322510755176726,
+        "same_direction": true,
+        "scope": "Two finite scales and an observed signal check; no rigorous error bound or differentiability proof.",
+        "signal_floor": 1e-12,
+        "tolerance": 0.1
+      },
+      "coordinate": {
+        "kind": "normalized_linear_domain",
+        "maximum": 15000000.0,
+        "minimum": 2000000.0,
+        "normalized_bounds": [
+          0.0,
+          1.0
+        ],
+        "origin": 0.4,
+        "physical_scale": 13000000.0,
+        "physical_value": 7200000.0
+      },
+      "coordinates": [
+        7070000.0,
+        7330000.0,
+        7135000.0,
+        7265000.0
+      ],
+      "derivative_unit": "(m)/(Pa)",
+      "derivatives": [
+        -1.0437971405158885e-11,
+        -1.0435537008155295e-11
+      ],
+      "descent_certificate": false,
+      "direction_status": "locally_consistent",
+      "implicit_sensitivity": {
+        "baseline_included": true,
+        "branches": {
+          "baseline_equilibrium": {
+            "KKT_condition": 309.02847708512036,
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "comparison_scope": "Mixed absolute/relative numerical consistency; observed-residual stiffness noise estimate, no rigorous bound.",
+            "coordinate": "dimensionless normalized parameter u",
+            "dlength_residual_du": [
+              3.931979777316089e-20
+            ],
+            "dposition_du": {
+              "point": [
+                -4.949298197491551e-13,
+                -3.5478205577832944e-11,
+                -7.329802634986252e-10
+              ],
+              "tip": [
+                -3.4374027021723304e-12,
+                -3.547369945910145e-11,
+                -2.2912768102794766e-09
+              ]
+            },
+            "dq_du": [
+              -8.454788861065284e-09,
+              3.5583499248491634e-09,
+              -7.118342905833917e-09,
+              2.1262245744125172e-09
+            ],
+            "dslack_margin_du": [
+              -3.931979777316089e-20
+            ],
+            "dtension_du": [
+              0.2407575397746378
+            ],
+            "dtension_margin_du": [
+              -0.2407575397746378
+            ],
+            "force_n": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "gradient_absolute_error": 2.168677476427856e-08,
+            "gradient_relative_error": 1.8372227983140192,
+            "gradient_trustworthy": true,
+            "method": "passive_design_sensitivity_v1",
+            "numerical_cost": {
+              "KKT_solves": 1,
+              "QP_calls": 0,
+              "constraint_calls": 2,
+              "constraint_jacobian_calls": 2,
+              "equilibrium_solves": 0,
+              "gradient_calls": 2,
+              "hessian_columns": 0,
+              "multiplier_fits": 0,
+              "native_forward_calls": 3,
+              "objective_calls": 0,
+              "optimizer_iterations": 0
+            },
+            "parameter": "segments.0.young_pa",
+            "reason": null,
+            "resolved_comparison": {
+              "dpositions_du": [
+                [
+                  -1.0019762797242038e-12,
+                  -1.7424092767573396e-10,
+                  -2.0878021533832225e-09
+                ],
+                [
+                  -9.316158955385845e-12,
+                  -1.7422789556562068e-10,
+                  -6.4902472285410795e-09
+                ]
+              ],
+              "dq_du": [
+                -2.376870553676136e-08,
+                1.0994884516724035e-08,
+                -2.022795353526924e-08,
+                5.064968887011356e-09
+              ],
+              "minus_positions": [
+                [
+                  0.07999872976122904,
+                  0.0004444454643691025,
+                  0.9999244697474491
+                ],
+                [
+                  0.17399275971848827,
+                  0.0014888745399917957,
+                  0.9997469865092193
+                ]
+              ],
+              "minus_status": "qualified_local_minimum",
+              "plus_positions": [
+                [
+                  0.079998729761209,
+                  0.00044444546088428393,
+                  0.999924469705693
+                ],
+                [
+                  0.17399275971830194,
+                  0.0014888745365072378,
+                  0.9997469863794144
+                ]
+              ],
+              "plus_status": "qualified_local_minimum",
+              "same_active_set": true
+            },
+            "s": 0.5,
+            "state_difference_noise_estimate": 5.912393908738365e-07,
+            "status": "regular_implicit_gradient",
+            "step": 0.01,
+            "strict_complementarity": true,
+            "tension_margin_n": [
+              7.866657348964637
+            ]
+          },
+          "equilibrium": {
+            "KKT_condition": 309.0288910260051,
+            "LICQ": true,
+            "active": [
+              true
+            ],
+            "comparison_scope": "Mixed absolute/relative numerical consistency; observed-residual stiffness noise estimate, no rigorous bound.",
+            "coordinate": "dimensionless normalized parameter u",
+            "dlength_residual_du": [
+              4.743384504624082e-20
+            ],
+            "dposition_du": {
+              "point": [
+                8.917976734662156e-07,
+                -0.00013372888147477583,
+                2.272465032436241e-05
+              ],
+              "tip": [
+                8.918174054897263e-07,
+                -0.0001337302744518375,
+                2.2726903056526963e-05
+              ]
+            },
+            "dq_du": [
+              0.0008400737603647577,
+              0.0014728868851403012,
+              -0.0008400268760257422,
+              -0.0014728883569786267
+            ],
+            "dslack_margin_du": [
+              -4.743384504624082e-20
+            ],
+            "dtension_du": [
+              0.24075704880823554
+            ],
+            "dtension_margin_du": [
+              -0.24075704880823554
+            ],
+            "force_n": [
+              0.0,
+              0.01,
+              0.0
+            ],
+            "gradient_absolute_error": 7.837954445488185e-07,
+            "gradient_relative_error": 0.00032686060704363736,
+            "gradient_trustworthy": true,
+            "method": "passive_design_sensitivity_v1",
+            "numerical_cost": {
+              "KKT_solves": 1,
+              "QP_calls": 0,
+              "constraint_calls": 2,
+              "constraint_jacobian_calls": 2,
+              "equilibrium_solves": 0,
+              "gradient_calls": 2,
+              "hessian_columns": 0,
+              "multiplier_fits": 0,
+              "native_forward_calls": 3,
+              "objective_calls": 0,
+              "optimizer_iterations": 0
+            },
+            "parameter": "segments.0.young_pa",
+            "reason": null,
+            "resolved_comparison": {
+              "dpositions_du": [
+                [
+                  8.921324179400614e-07,
+                  -0.0001337725442003741,
+                  2.2733830018495382e-05
+                ],
+                [
+                  8.921595129329773e-07,
+                  -0.0001337739373202763,
+                  2.27399797714245e-05
+                ]
+              ],
+              "dq_du": [
+                0.0008403687175200783,
+                0.0014733602435913935,
+                -0.0008402828783532056,
+                -0.001473375932778409
+              ],
+              "minus_positions": [
+                [
+                  0.07999826202550414,
+                  0.0005198726350050806,
+                  0.9999116521525382
+                ],
+                [
+                  0.17399229197591262,
+                  0.0015643020120834788,
+                  0.9997341670602052
+                ]
+              ],
+              "minus_status": "qualified_local_minimum",
+              "plus_positions": [
+                [
+                  0.0799982798681525,
+                  0.0005171971841210732,
+                  0.9999121068291386
+                ],
+                [
+                  0.17399230981910288,
+                  0.0015616265333370733,
+                  0.9997346218598007
+                ]
+              ],
+              "plus_status": "qualified_local_minimum",
+              "same_active_set": true
+            },
+            "s": 0.5,
+            "state_difference_noise_estimate": 1.3385437354234247e-07,
+            "status": "regular_implicit_gradient",
+            "step": 0.01,
+            "strict_complementarity": true,
+            "tension_margin_n": [
+              7.8888794661798185
+            ]
+          }
+        },
+        "drelative_position_du": [
+          8.917981683960353e-07,
+          -0.00013372884599657025,
+          2.2725383304625907e-05
+        ],
+        "gradient_trustworthy": true,
+        "numerical_cost": {
+          "KKT_solves": 2,
+          "QP_calls": 0,
+          "constraint_calls": 4,
+          "constraint_jacobian_calls": 4,
+          "equilibrium_solves": 0,
+          "gradient_calls": 4,
+          "hessian_columns": 0,
+          "multiplier_fits": 0,
+          "native_forward_calls": 6,
+          "objective_calls": 0,
+          "optimizer_iterations": 0
+        },
+        "relative_error": 9.603100485779566e-05,
+        "scope": "Numerically checked local KKT implicit response; no rigorous error bound or dynamic acceptance.",
+        "status": "regular_implicit_gradient",
+        "strict_derivative": false,
+        "target_normalized_derivative": -0.00013564895334965222
+      },
+      "method": "controlled_native_finite_difference",
+      "model_effect_observed": true,
+      "normalized_derivative_unit": "m/normalized_coordinate",
+      "normalized_derivatives": [
+        -0.0001356936282670655,
+        -0.00013566198110601883
+      ],
+      "normalized_steps": [
+        0.01,
+        0.005
+      ],
+      "offsets": [
+        -0.01,
+        0.01,
+        -0.005,
+        0.005
+      ],
+      "one_sided_sign": 0,
+      "parameter_path": "segments.0.young_pa",
+      "parameter_unit": "Pa",
+      "samples": [
+        {
+          "derivative": -1.0437971405158885e-11,
+          "minus": {
+            "coordinate": 7070000.0,
+            "normalized_coordinate": 0.39,
+            "record_index": 1,
+            "value": 7.650991822082387e-05
+          },
+          "normalized_derivative": -0.0001356936282670655,
+          "normalized_step": 0.01,
+          "plus": {
+            "coordinate": 7330000.0,
+            "normalized_coordinate": 0.41000000000000003,
+            "record_index": 2,
+            "value": 7.379604565548256e-05
+          }
+        },
+        {
+          "derivative": -1.0435537008155295e-11,
+          "minus": {
+            "coordinate": 7135000.0,
+            "normalized_coordinate": 0.395,
+            "record_index": 3,
+            "value": 7.581292655335071e-05
+          },
+          "normalized_derivative": -0.00013566198110601883,
+          "normalized_step": 0.005,
+          "plus": {
+            "coordinate": 7265000.0,
+            "normalized_coordinate": 0.405,
+            "record_index": 4,
+            "value": 7.445630674229052e-05
+          }
+        }
+      ],
+      "scheme": "central_two_scales",
+      "selected_record_index": 3,
+      "steps": [
+        130000.0,
+        65000.0
+      ],
+      "strict_derivative": false,
+      "suggested_delta": -65000.0,
+      "unavailable": [
+        "Analytic, AD or KKT structural derivatives are not available for this native observable/state binding."
+      ],
+      "value": 7200000.0
+    }
+  ],
+  "structure_direction": {
+    "actual_cost": {
+      "KKT_solves": 2,
+      "QP_calls": 0,
+      "constraint_calls": 427,
+      "constraint_jacobian_calls": 159,
+      "equilibrium_solves": 10,
+      "evaluation_attempts": 5,
+      "gradient_calls": 159,
+      "hessian_columns": 40,
+      "kernel_wall_s": 0.8772264000144787,
+      "material_point_jacobian_calls": 624,
+      "model_builds": 5,
+      "multiplier_fits": 10,
+      "native_forward_calls": 519,
+      "objective_calls": 413,
+      "optimizer_iterations": 81,
+      "physics_steps": 0,
+      "rollouts": 0,
+      "tendon_jacobian_extractions": 159
+    },
+    "baseline_metric": {
+      "metadata": {
+        "actual_shape": [
+          3
+        ],
+        "constraint_state": {
+          "LICQ": true,
+          "active_count": 1,
+          "boundary_count": 0,
+          "maximum_constraint_tension_n": 0.11112053382018187,
+          "minimum_reduced_stiffness_nm_rad": 0.2947853587959618,
+          "minimum_slack_margin_m": -5.551115123125783e-17,
+          "native_soft_length_residual_m": [
+            5.551115123125783e-17
+          ],
+          "native_soft_reaction_inf_nm": 0.0018600917566141929,
+          "optimizer_success": true,
+          "positive_count": 1,
+          "primal_violation_m": 5.551115123125783e-17,
+          "qualified": true,
+          "slack_count": 0,
+          "solver_termination": "converged",
+          "stationarity_inf_nm": 2.5483295671129697e-10,
+          "status": "smooth_fixed_active_set",
+          "strict_complementarity": true,
+          "within_declared_tendon_capacity": true
+        },
+        "dof_order": [
+          "segment_0_cell_0_y",
+          "segment_0_cell_0_z",
+          "segment_0_cell_1_y",
+          "segment_0_cell_1_z"
+        ],
+        "field": "re_equilibrated_position_response",
+        "frame": "world / named hinges / ordered fixed-payout tendons",
+        "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+        "model": "native unilateral fixed-payout assembly",
+        "parameter_dependencies": [
+          "geometry",
+          "routing",
+          "stiffness",
+          "payout",
+          "external_load"
+        ],
+        "physical_inputs": {
+          "bounds_n": [],
+          "tensions_n": [
+            0.11112053382018187
+          ]
+        },
+        "point_binding": {
+          "frame": "world",
+          "load": {
+            "force_world_n": [
+              0.0,
+              0.01,
+              0.0
+            ],
+            "material_s": 0.5,
+            "name": "lateral"
+          },
+          "material_s": 0.5
+        },
+        "result_shape": [],
+        "shape": [
+          "3"
+        ],
+        "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+        "state": {
+          "qpos_rad": [
+            -0.0032571875667949906,
+            -0.005710779959742354,
+            -0.002326603540132126,
+            -0.004079277119191875
+          ],
+          "qvel_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "time_s": 0.0
+        },
+        "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+        "tendon_order": [
+          "tendon_0"
+        ],
+        "unit": "m",
+        "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+      },
+      "source_pointer": "/mechanics/re_equilibrated_position_response",
+      "status": "computed",
+      "target": {
+        "direction_world": null,
+        "goal": "increase",
+        "material_s": 0.5,
+        "quantity": "re_equilibrated_position_response",
+        "reduction": "norm"
+      },
+      "unit": "m",
+      "value": 7.512847491041175e-05
+    },
+    "baseline_parameter": 7200000.0,
+    "candidate": {
+      "artifact_id": "a00fd42bf4443affbb1e8ebe4550ca1121bc9f55b8cce82733a2896bac8790bc",
+      "media_type": "application/json"
+    },
+    "delta": -65000.0,
+    "formal_candidate_created": false,
+    "full_task_improvement_verified": false,
+    "generation_handoff": {
+      "action": "generate",
+      "agent_decision_required": true,
+      "alternatives": [
+        "adopt",
+        "reject",
+        "inspect_further",
+        "change_hypothesis"
+      ],
+      "generation": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "family_space_identity": "d8fe1150514b846370cb6c22183589f9b720465086efb867e58e60d8b35886e2",
+        "payout_lengths_m": {
+          "tendon_0": 0.1598
+        },
+        "route_overrides": {},
+        "segment_count": 1,
+        "segments": {
+          "0": {
+            "cells": 2,
+            "length_m": 0.16,
+            "physical_parameters": {
+              "curvature_y_rad_m": 0.0,
+              "curvature_z_rad_m": 0.0,
+              "density_kg_m3": 1100.0,
+              "section_angle_rad": 0.35,
+              "viscosity_y_nm2_s": 0.0005,
+              "viscosity_z_nm2_s": 0.0007
+            },
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            ],
+            "young_pa": 7135000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 1,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "if_action_not_loaded": {
+        "input": {
+          "action": "generate",
+          "tool": "research_plan"
+        },
+        "tool": "research_route"
+      },
+      "source_pointer": "/structure_research/records/3",
+      "tool": "research_plan"
+    },
+    "model_scope": "Contact-free fixed-payout equilibrium under frozen loads.",
+    "next_action": "Main reads evidence and independently chooses whether to submit the original generate/propose Plan.",
+    "numerical_consistency": [
+      {
+        "observed_change": 1.3814433104121211e-06,
+        "passed": true,
+        "relative_difference": 0.00023322510755176726,
+        "same_direction": true,
+        "scope": "Two finite scales and an observed signal check; no rigorous error bound or differentiability proof.",
+        "signal_floor": 1e-12,
+        "tolerance": 0.1
+      }
+    ],
+    "other_parameters_unchanged": true,
+    "parameter_changes": [
+      {
+        "baseline": 7200000.0,
+        "bounds": [
+          2000000.0,
+          15000000.0
+        ],
+        "delta": -65000.0,
+        "parameter_path": "segments.0.young_pa",
+        "suggested_value": 7135000.0,
+        "unit": "Pa"
+      }
+    ],
+    "parameter_path": "segments.0.young_pa",
+    "parameter_unit": "Pa",
+    "perturbed_metric": {
+      "metadata": {
+        "actual_shape": [
+          3
+        ],
+        "constraint_state": {
+          "LICQ": true,
+          "active_count": 1,
+          "boundary_count": 0,
+          "maximum_constraint_tension_n": 0.10991674768285889,
+          "minimum_reduced_stiffness_nm_rad": 0.29212408939074563,
+          "minimum_slack_margin_m": -6.661338147750939e-15,
+          "native_soft_length_residual_m": [
+            6.661338147750939e-15
+          ],
+          "native_soft_reaction_inf_nm": 0.001839940615770173,
+          "optimizer_success": true,
+          "positive_count": 1,
+          "primal_violation_m": 6.661338147750939e-15,
+          "qualified": true,
+          "slack_count": 0,
+          "solver_termination": "converged",
+          "stationarity_inf_nm": 1.3685699557126896e-10,
+          "status": "smooth_fixed_active_set",
+          "strict_complementarity": true,
+          "within_declared_tendon_capacity": true
+        },
+        "dof_order": [
+          "segment_0_cell_0_y",
+          "segment_0_cell_0_z",
+          "segment_0_cell_1_y",
+          "segment_0_cell_1_z"
+        ],
+        "field": "re_equilibrated_position_response",
+        "frame": "world / named hinges / ordered fixed-payout tendons",
+        "meaning": "Numerical local constrained observation, not independent dynamic task acceptance.",
+        "model": "native unilateral fixed-payout assembly",
+        "parameter_dependencies": [
+          "geometry",
+          "routing",
+          "stiffness",
+          "payout",
+          "external_load"
+        ],
+        "physical_inputs": {
+          "bounds_n": [],
+          "tensions_n": [
+            0.10991674768285889
+          ]
+        },
+        "point_binding": {
+          "frame": "world",
+          "load": {
+            "force_world_n": [
+              0.0,
+              0.01,
+              0.0
+            ],
+            "material_s": 0.5,
+            "name": "lateral"
+          },
+          "material_s": 0.5
+        },
+        "result_shape": [],
+        "shape": [
+          "3"
+        ],
+        "source": "extensions.tendon_family.passive_equilibrium.mechanics",
+        "state": {
+          "qpos_rad": [
+            -0.003261427217465905,
+            -0.005718211878751883,
+            -0.0023223647079732004,
+            -0.0040718449804353326
+          ],
+          "qvel_rad_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "time_s": 0.0
+        },
+        "state_requirements": "Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.",
+        "tendon_order": [
+          "tendon_0"
+        ],
+        "unit": "m",
+        "validity": "Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity."
+      },
+      "source_pointer": "/mechanics/re_equilibrated_position_response",
+      "status": "computed",
+      "target": {
+        "direction_world": null,
+        "goal": "increase",
+        "material_s": 0.5,
+        "quantity": "re_equilibrated_position_response",
+        "reduction": "norm"
+      },
+      "unit": "m",
+      "value": 7.581292655335071e-05
+    },
+    "point_semantics": "re_equilibrated",
+    "proposal_only": true,
+    "raw_evidence_pointer": "/structure_research/records",
+    "suggested_value": 7135000.0,
+    "tradeoffs": "All frozen task constraints, finite response and task acceptance remain unmeasured.",
+    "version": "structure_direction_v2"
+  },
+  "task_observations": [
+    {
+      "maximum": 0.001,
+      "name": "middle_response",
+      "registered_acceptance": "not_registered",
+      "scope": "Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.",
+      "unit": "m",
+      "value": 7.512847491041175e-05,
+      "within_mathematical_limit": true
+    },
+    {
+      "maximum": 0.001,
+      "name": "tip_motion",
+      "registered_acceptance": "not_registered",
+      "scope": "Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.",
+      "unit": "m",
+      "value": 7.512920445945747e-05,
+      "within_mathematical_limit": true
+    },
+    {
+      "maximum": 2.0,
+      "name": "decoupling_ratio",
+      "registered_acceptance": "not_registered",
+      "scope": "Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.",
+      "unit": "1",
+      "value": 1.0000097106862156,
+      "within_mathematical_limit": true
+    }
+  ],
+  "cost": {
+    "KKT_solves": 2,
+    "QP_calls": 0,
+    "constraint_calls": 427,
+    "constraint_jacobian_calls": 159,
+    "equilibrium_solves": 10,
+    "evaluation_attempts": 5,
+    "gradient_calls": 159,
+    "hessian_columns": 40,
+    "kernel_wall_s": 0.8772264000144787,
+    "material_point_jacobian_calls": 624,
+    "model_builds": 5,
+    "multiplier_fits": 10,
+    "native_forward_calls": 519,
+    "objective_calls": 413,
+    "optimizer_iterations": 81,
+    "physics_steps": 0,
+    "rollouts": 0,
+    "tendon_jacobian_extractions": 159
+  },
+  "charged_numerical_s": 1.9010214000009,
+  "registered_acceptance": "not_registered",
+  "task_acceptance": "unmeasured"
+}
