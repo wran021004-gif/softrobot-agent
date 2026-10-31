@@ -676,3 +676,14 @@ def result_card(host, reference):
         recorded_context=context,metrics=metrics,main_violations=violations,critical_observations=critical,
         deterministic_summary=summary,mathematics=mathematics,control_search=search,
         resources=resources,detail_sources=details)
+
+
+def scoped_feedback(host, references):
+    """Expose only supplied, versioned feedback packets; preserve their provenance."""
+    packets = []
+    for reference in references:
+        value = host.store.artifact(reference)
+        if isinstance(value, dict) and value.get("schema") in (
+                "sorosim_s55_s5t_feedback_v1", "sorosim_s56_s5t2_feedback_v1", "sorosim_s57_prediction_feedback_v1"):
+            packets.append(dict(reference=reference, evidence=value))
+    return packets

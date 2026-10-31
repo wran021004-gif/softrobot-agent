@@ -227,8 +227,26 @@ def pending_feedback_delivery(host):
             packet=json.loads(tail.split('\n',1)[1])
             research=packet.get('research',{})
             shown=packet_feedback(research)
-            if shown==delivery:return None
+            from tools.research.object_choices import main_context_enabled
+            expected=main_feedback_projection(host,delivery) if main_context_enabled(state(host)['spec']) else delivery
+            if shown==expected:return None
     return delivery
+
+
+def main_feedback_projection(host, delivery):
+    """Present existing feedback with short refs and one mathematical fact owner."""
+    from tools.research.object_choices import main_projection
+    value=deepcopy(delivery)
+    for row in value.get('items',[]):
+        if row.get('tool')=='research_analysis' and row.get('status')=='success':
+            saved=host.store.artifact(row['feedback_reference'])['result']
+            payload=json.loads(''.join(b.get('text','') for b in saved['content']))
+            reference=payload.get('scientific_result_reference') or (payload.get('operation_outcome') or {}).get('reference')
+            if reference not in state(host).get('analysis_results',[]):continue
+            if host.store.artifact(reference).get('status')!='computed':continue
+            for key in ('result','facts'):row.pop(key,None)
+            row.update(delivery='fixed_facts_in_l0',facts_at='mathematical_research.latest_result')
+    return main_projection(host,value)
 
 
 def unmatched(messages):
@@ -305,7 +323,9 @@ async def request_feedback_boundary(host,agent):
     index=max(i for i,m in enumerate(messages) if m['role']=='assistant')
     prefix=wire['messages']
     if prefix[-1]['role']=='user' and str(prefix[-1].get('content','')).startswith('CURRENT_RESEARCH_PACKET\n'):prefix=prefix[:-1]
-    if model_messages(host,messages[:index],wire['messages'][0]['content'])!=prefix:
+    formatted=model_messages(host,messages[:index],wire['messages'][0]['content'])
+    from tools.research.object_choices import main_context_enabled,main_projection
+    if formatted!=prefix and not (main_context_enabled(s['spec']) and main_projection(host,formatted)==prefix):
         raise ValueError('REQUEST_BOUNDARY_ORIGINAL_WIRE_PREFIX_MISMATCH')
     def assistant(value):
         content=value.get('content')

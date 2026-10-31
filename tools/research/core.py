@@ -525,7 +525,7 @@ def resource_use(host):
 
 def packet(host):
     from tools.research.analysis import decision_result
-    from tools.research.diagnostic_relations import scoped_feedback
+    from tools.research.evidence_views import scoped_feedback
     s=state(host)
     if s['spec'].get('capabilities'):
         from tools.research.feedback import result_view, eligibility, facts, search_feedback

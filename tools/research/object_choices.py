@@ -17,7 +17,7 @@ def remove_fields(schema,names):
         for child in schema.values():remove_fields(child,names)
 
 
-def reference_choices(host):
+def reference_choices(host, *, include_all=False):
     """Short selectors in this original Store; immutable references remain authoritative."""
     s=state(host);choices={}
     candidates=list(s.get('candidates',{}).values())
@@ -28,6 +28,8 @@ def reference_choices(host):
     # Row identities are local selectors, not portable scientific identities.
     # Each advertised schema retains the exact alias-to-reference binding below.
     with host.store.connect(True) as db:
+        if include_all:
+            refs=[dict(artifact_id=i,media_type=m) for i,m in db.execute('SELECT id,media FROM artifacts')]
         for ref in refs:
             if ref in choices.values():continue
             if ref in analyses:name='result_'+str(analyses.index(ref)+1)
@@ -57,27 +59,20 @@ def reference_schema(schema, choices, action):
     if action in ('select','confirm','replay'):
         schema['properties'].pop('supporting_evidence',None)
         schema['required']=[k for k in schema.get('required',[]) if k!='supporting_evidence']
-    needed=set()
-    def visit(node):
-        if isinstance(node,dict):
-            if '$ref' in node:
-                name=node['$ref'].rsplit('/',1)[-1]
-                if name not in needed:needed.add(name);visit(schema['$defs'][name])
-            for child in node.values():visit(child)
-        elif isinstance(node,list):
-            for child in node:visit(child)
-    visit({k:v for k,v in schema.items() if k not in ('$defs','x-research-reference-choices')})
-    schema['$defs']={k:v for k,v in schema.get('$defs',{}).items() if k in needed}
+    from tools.research.contracts import prune_schema_definitions
+    prune_schema_definitions(schema)
     return schema
 
 
-def expand_references(payload, schema):
+def expand_references(payload, schema, *, strict=True):
     """Resolve only schema-typed reference positions, never scientific text."""
     choices=schema.get('x-research-reference-choices',{});definitions=schema.get('$defs',{})
     def expand(value,node):
         if '$ref' in node:
             name=node['$ref'].rsplit('/',1)[-1]
-            if name=='EvidenceRef':return deepcopy(choices[value]) if isinstance(value,str) else value
+            if name=='EvidenceRef':
+                if isinstance(value,str) and (strict or value in choices):return deepcopy(choices[value])
+                return value
             return expand(value,definitions[name])
         if isinstance(value,dict):
             properties=node.get('properties',{})
@@ -198,32 +193,25 @@ def expand_choice(host, payload):
 
 
 def main_context_enabled(spec):
-    return spec.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='research_information_flow_v1'
-
-
-def visible_references(host):
-    """Append-only Store ordinals, shared by all Main tool/reference projections."""
-    choices=reference_choices(host)
-    known={ref['artifact_id'] for ref in choices.values()}
-    with host.store.connect(True) as db:
-        for ordinal,identity,media_type in db.execute('SELECT rowid,id,media FROM artifacts'):
-            if identity not in known:
-                choices['evidence_'+str(ordinal)]=dict(artifact_id=identity,media_type=media_type)
-    return choices
+    return (spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4' or
+        spec.get('research_decisions',{}).get('tool_schema_policy',{}).get('version')=='research_information_flow_v1')
 
 
 def main_projection(host, value):
     """Last-mile presentation only. Exact artifacts and SDK history stay in Store."""
-    choices=visible_references(host);aliases={ref['artifact_id']:name for name,ref in choices.items()}
+    choices=reference_choices(host,include_all=True);aliases={ref['artifact_id']:name for name,ref in choices.items()}
     identities=re.compile(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',re.I)
+    authored_text={'hypothesis','expected_observation','weakening_observation','fixed_conditions',
+        'interpretation','question','user_request','instruction'}
     def project(item):
         if isinstance(item,dict):
-            if 'artifact_id' in item:
-                alias=aliases.get(item['artifact_id'])
-                if alias:
-                    rest={k:project(v) for k,v in item.items() if k not in ('artifact_id','media_type')}
-                    return dict(reference=alias,**rest) if rest else alias
-            return {k:project(v) for k,v in item.items() if not k.startswith('x-research-') and not (
+            if isinstance(item.get('artifact_id'),str):
+                alias=aliases.get(item['artifact_id'],'unavailable_external_reference')
+                rest={k:project(v) for k,v in item.items() if k not in ('artifact_id','media_type')}
+                return dict(reference=alias,**rest) if rest else alias
+            return {k:(v if isinstance(v,str) and (k in authored_text or
+                k=='content' and item.get('role')=='user' and not v.startswith('CURRENT_RESEARCH_PACKET\n')) else project(v))
+                for k,v in item.items() if not k.startswith('x-research-') and not (
                 (k.endswith('_identity') or k in ('freeze','sha','sha256','identities')) and
                 identities.search(json.dumps(v)))}
         if isinstance(item,list):return [project(v) for v in item]
@@ -234,7 +222,7 @@ def main_projection(host, value):
             if isinstance(decoded,(dict,list)):return json.dumps(project(decoded),separators=(',',':'))
             if item.startswith('CURRENT_RESEARCH_PACKET\n'):
                 return 'CURRENT_RESEARCH_PACKET\n'+json.dumps(project(json.loads(item.split('\n',1)[1])),separators=(',',':'))
-            return identities.sub(lambda match:aliases.get(match.group(0),'[internal identity]'),item)
+            return aliases.get(item,item) if not identities.fullmatch(item) else aliases.get(item,'[internal identity]')
         return item
     return project(value)
 
@@ -259,11 +247,29 @@ def main_packet(host, packet):
         research['verified_facts']=[f for f in research.get('verified_facts',[]) if
             f.get('result_reference')!=reference and (f.get('source') or {}).get('reference')!=reference]
         research['verified_facts'].append(dict(result_reference=reference,facts_at='mathematical_research.latest_result'))
-        pending=(research.get('tool_continuation') or {}).get('pending_feedback') or {}
-        for row in pending.get('items',[]):
-            if row.get('tool')=='research_analysis' and row.get('status')=='success':
-                for key in ('result','facts'):row.pop(key,None)
-                row.update(delivery='fixed_facts_in_l0',facts_at='mathematical_research.latest_result')
+        # Reuse the existing confirmed request receipts to distinguish first
+        # delivery from later unchanged turns; no extra delivery state is saved.
+        events=host.store.events(host.run_id)
+        requests={e['request_id']:e for e in events if e['kind']=='r3_request'}
+        for event in reversed(events):
+            if event['kind']!='r3_response':continue
+            receipt=host.store.artifact(event['outputs'][0])
+            if receipt.get('purpose')!='conversation' or receipt.get('http_status')!=200:continue
+            request=requests[event['request_id']]
+            wire=host.store.artifact(host.store.artifact(request['outputs'][0])['request'])
+            tail=wire['messages'][-1].get('content','')
+            prior=json.loads(tail.split('\n',1)[1]) if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n') else {}
+            prior_latest=((prior.get('research',{}).get('mathematical_research') or {}).get('latest_result') or {})
+            alias=next(k for k,v in reference_choices(host,include_all=True).items() if v==reference)
+            if prior_latest.get('reference') in (reference,alias):
+                research['mathematical_research']['latest_result']={k:latest[k] for k in
+                    ('reference','operation','status','conclusion','task_acceptance','detail_query') if k in latest}
+                research['mathematical_research']['latest_result']['direction_status']=latest['structure_research']['direction_status']
+            break
+    continuation=research.get('tool_continuation') or {}
+    if continuation.get('pending_feedback'):
+        from tools.research.session_handoff import main_feedback_projection
+        continuation['pending_feedback']=main_feedback_projection(host,continuation['pending_feedback'])
     seen={}
     def deduplicate(item,path):
         if isinstance(item,dict):

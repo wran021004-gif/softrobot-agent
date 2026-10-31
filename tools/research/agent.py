@@ -148,18 +148,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['description']='Submit the selected '+actions[0]+' action. All original Plan validation and evidence admission apply. hypothesis is required; probe completion is not scientific STOP.'
         if actions[0] in ('stop','select'):
             schema['description']+=' Observation/condition fields describe existing evidence and closure criteria; state unmeasured or not applicable where appropriate.'
-    needed=set()
-    def visit(v):
-        if isinstance(v,dict):
-            if '$ref' in v:
-                name=v['$ref'].rsplit('/',1)[-1]
-                if name not in needed:
-                    needed.add(name);visit(schema['$defs'][name])
-            for x in v.values():visit(x)
-        elif isinstance(v,list):
-            for x in v:visit(x)
-    visit(schema['properties'])
-    schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+    from tools.research.contracts import prune_schema_definitions
+    prune_schema_definitions(schema)
     if focused and study and study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v3','research_information_flow_v1'):
         schema=compact_plan_schema(schema,actions[0],study)
     return schema
@@ -383,7 +373,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
     if detail.get('request_template',{}).get('model_source')=='mujoco':
         schema['properties']['model_source']={'type':'string','const':'mujoco'}
         schema['required'].append('model_source')
-    schema['description']='Selected registered method: '+method+'. Required source and parameter details: '+json.dumps(detail.get('required_parameters',[]),ensure_ascii=False)+'. Exact method query: '+json.dumps(detail.get('detail_query'),ensure_ascii=False)
+    schema['description']='Selected registered method: '+method+'. Scientific inputs and source prerequisites are in tool_continuation.analysis_handoff.'
     if bound:
         for key in ('candidate','protocol','operation','capability_method'):
             schema['properties'].pop(key,None)
@@ -423,21 +413,11 @@ def selected_analysis_schema(method, detail, *, bound=False):
             schema['$defs']['NativeAnalysisOptions']['properties'].pop('difference_step_n',None)
             schema['$defs']['NativeAnalysisOptions']['properties'].pop('correction_radius_n',None)
         guide=detail.get('operating_point_guidance',{})
-        schema['description']='Selected method '+method+'. Frozen identity and protocol are bound by the program; submit scientific variables only. '+json.dumps(guide,separators=(',',':'),ensure_ascii=False)
+        schema['description']='Selected method '+method+'. Frozen identity and protocol are bound by the program; submit scientific variables only. Operating point guidance is in tool_continuation.analysis_handoff.'
     if detail.get('control_input_guidance'):
-        schema['description']+=' Control input prerequisites: '+json.dumps(detail['control_input_guidance'],separators=(',',':'),ensure_ascii=False)
-    needed=set()
-    def visit(value):
-        if isinstance(value,dict):
-            if '$ref' in value:
-                key=value['$ref'].rsplit('/',1)[-1]
-                if key not in needed:
-                    needed.add(key);visit(schema['$defs'][key])
-            for child in value.values():visit(child)
-        elif isinstance(value,list):
-            for child in value:visit(child)
-    visit({k:v for k,v in schema.items() if k!='$defs'})
-    schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+        schema['description']+=' Use the candidate-bound control source shown in tool_continuation.analysis_handoff.'
+    from tools.research.contracts import prune_schema_definitions
+    prune_schema_definitions(schema)
     return schema
 
 
@@ -892,6 +872,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     if main_context_enabled(before['spec']) and payload.get('action')=='generate':
                         payload=deepcopy(payload)
                         payload['generation'].setdefault('family_space_identity',before['spec']['family_space_identity'])
+                    if main_context_enabled(before['spec']) and (payload.get('search') or {}).get('version')=='family_mixed_search_v1':
+                        payload=deepcopy(payload)
+                        payload['search'].setdefault('family_space_identity',before['spec']['family_space_identity'])
                     if payload!=use['input']:
                         record(host,'plan_choice_resolution',dict(tool_use_id=use['toolUseId'],
                             original_input=use['input'],expanded_plan=payload,scientific_execution_started=False))
@@ -1122,9 +1105,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             for name,definition in definitions.items():
                 parameters=deepcopy(definition['parameters'])
                 if parameters.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
-                    from tools.research.object_choices import visible_references
+                    from tools.research.object_choices import reference_choices
                     offered=parameters['$defs']['EvidenceRef'].get('enum')
-                    parameters['x-research-reference-choices']={k:v for k,v in visible_references(host).items() if offered is None or k in offered}
+                    parameters['x-research-reference-choices']={k:v for k,v in reference_choices(host,include_all=True).items() if offered is None or k in offered}
                 registry[name].tool_spec=dict(name=name,description=definition.get('description',''),
                     inputSchema={'json':parameters})
             return
@@ -1173,7 +1156,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
             if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
                 tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                    'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']))}}
+                    'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'))}}
                 agent.tool_registry.registry['research_analysis']=tool
             elif selected:
                 method,detail=selected
@@ -1273,14 +1256,14 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             if operator_request:
                 boundary.research_packet['operator_request']=dict(reference=operator_request,
                     instruction=host.store.artifact(operator_request))
-            from tools.research.object_choices import main_context_enabled,main_tool_schema,visible_references,main_packet
-            if main_context_enabled(s['spec']):
-                choices=visible_references(host)
-                for tool in registry.values():
-                    tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
-                boundary.research_packet=main_packet(host,boundary.research_packet)
-            # Record the actual L0 after dynamic tool selection; no extra model call.
-            record(host,'model_decision_packet',boundary.research_packet)
+        from tools.research.object_choices import main_context_enabled,main_tool_schema,reference_choices,main_packet
+        if main_context_enabled(s['spec']):
+            choices=reference_choices(host,include_all=True)
+            for tool in agent.tool_registry.registry.values():
+                tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
+            boundary.research_packet=main_packet(host,boundary.research_packet)
+        # Record the actual L0 after its final presentation projection.
+        if on_demand:record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
         paired=bool(agent.messages and agent.messages[-1]['role']=='user'
             and any('toolResult' in b for b in agent.messages[-1]['content']))

@@ -80,7 +80,7 @@ def question_contract(spec):
     return {'scientific_question_v4':ScientificQuestionV4,'scientific_question_v2':ScientificQuestionV2,'scientific_question_v3':ScientificQuestionV3}.get(spec.get('research_decisions',{}).get('analysis_interface'),ScientificQuestion)
 
 
-def question_schema(spec, candidate=None):
+def question_schema(spec, candidate=None, action=None):
     schema=question_contract(spec).model_json_schema()
     if question_contract(spec) is ScientificQuestionV4:
         # Reuse the two existing scientific payloads, with a single outer version.
@@ -89,6 +89,20 @@ def question_schema(spec, candidate=None):
         control=schema['$defs']['ScientificQuestionV3']['properties']
         for name in ('parameter_paths','search_strategy','requested_budget'):control.pop(name,None)
         control['question_type']={'type':'string','const':'control_feasibility'}
+        if action in ('mechanism_research','single_parameter_effect','control_feasibility'):
+            domain='control' if action=='control_feasibility' else 'structure'
+            schema['properties']['domain']={'type':'string','const':domain}
+            schema['properties'].pop('structure' if domain=='control' else 'control')
+            schema['properties'][domain].pop('default',None)
+            schema['properties'][domain]['anyOf']=[b for b in schema['properties'][domain]['anyOf'] if b.get('type')!='null']
+            schema['required'].append(domain)
+        target=schema['$defs']['MechanismTarget']['properties']['goal']
+        target.pop('default',None)
+        target['description']='Main explicitly chooses increase or decrease for differentiation or optimization.'
+        schema['$defs']['MechanismQuestionV2']['allOf']=[dict(
+            **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize']),effect_semantics=dict(const='mechanism_effect')),
+                required=['operation','effect_semantics'])},
+            then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
@@ -99,7 +113,8 @@ def question_schema(spec, candidate=None):
         if candidate:
             rows=parameter_catalog(spec,candidate)
             schema['properties']['parameter_id']['anyOf'][0]['enum']=[r['parameter_id'] for r in rows if r['selectable']]
-    return schema
+    from tools.research.contracts import prune_schema_definitions
+    return prune_schema_definitions(schema)
 
 
 def control_settings(spec, effort, *, window=None, channels=None):
@@ -147,10 +162,15 @@ def compile_question(host, payload, *, tool_use_id):
         choice=(intent or {}).get('agent_hypothesis',{}).get('next_research_action')
         if choice in ('mechanism_research','single_parameter_effect') and q.domain!='structure' or choice=='control_feasibility' and q.domain!='control':
             return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False)
-        if q.domain=='structure':return compile_mechanism(host,plain(q.structure),tool_use_id=tool_use_id)
+        if q.domain=='structure':
+            structure=payload['structure']
+            if (q.structure.effect_semantics=='mechanism_effect' and q.structure.operation in ('differentiate','optimize') and
+                    isinstance(structure.get('target'),dict) and 'goal' not in structure['target']):
+                return dict(status='needs_choice',reason='EXPLICIT_MECHANISM_GOAL_REQUIRED',fields=['structure.target.goal'],scientific_execution_started=False)
+            return compile_mechanism(host,structure,tool_use_id=tool_use_id)
         if q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
-        return compile_v1(host,plain(q.control),tool_use_id=tool_use_id,contract=ScientificQuestionV3)
+        return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificQuestionV3,source_question=payload)
     if mechanism_interface(spec):return compile_mechanism(host,payload,tool_use_id=tool_use_id)
     return compile_v1(host,payload,tool_use_id=tool_use_id,contract=question_contract(spec))
 

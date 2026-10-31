@@ -483,6 +483,23 @@ class MechanismStudy(Contract):
         return value
 
 
+def prune_schema_definitions(schema):
+    """Keep exactly the definitions reachable from this executable schema."""
+    definitions=schema.get('$defs',{});needed=set()
+    def visit(node):
+        if isinstance(node,dict):
+            if '$ref' in node and node['$ref'].startswith('#/$defs/'):
+                name=node['$ref'].rsplit('/',1)[-1]
+                if name not in needed:
+                    needed.add(name);visit(definitions[name])
+            for child in node.values():visit(child)
+        elif isinstance(node,list):
+            for child in node:visit(child)
+    visit({k:v for k,v in schema.items() if k!='$defs' and not k.startswith('x-research-')})
+    schema['$defs']={k:v for k,v in definitions.items() if k in needed}
+    return schema
+
+
 class ScientificQuestionV4(Contract):
     """New integrated choices; historical question versions keep their contracts."""
     version: Literal['scientific_question_v4'] = 'scientific_question_v4'

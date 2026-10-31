@@ -302,9 +302,19 @@ def summary(value, reference):
             direction_source=dict(reference=reference,pointer='/structure_research/structure_direction'))
     compact=({k:direction[k] for k in ('parameter_changes','parameter_path','parameter_unit','delta','suggested_value',
         'full_task_improvement_verified','formal_candidate_created','proposal_only','other_parameters_unchanged') if k in direction} if direction else None)
-    return dict(operation=raw['operation'],target=raw['target'],baseline=baseline if np.asarray(baseline).ndim==0 else None,
+    if compact and compact.get('parameter_changes'):
+        for key in ('parameter_path','parameter_unit','delta','suggested_value'):compact.pop(key,None)
+    def observation_summary(item):
+        array=np.asarray(item) if item is not None else None
+        return item if array is None or array.ndim==0 else dict(shape=list(array.shape),
+            minimum=float(np.min(array)),maximum=float(np.max(array)),norm=float(np.linalg.norm(array)))
+    comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
+    sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','strict_derivative') if k in row}
+        for row in raw.get('parameter_sensitivities',[])]
+    return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,
+        comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),
         source=dict(reference=reference,pointer='/structure_research'),
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
         cost=raw['cost'],task_acceptance='unmeasured',unsupported_conclusions=raw['unsupported_conclusions'])

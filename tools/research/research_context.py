@@ -441,9 +441,15 @@ def read_coverage(host):
         if use['name']!='evidence_read' or result.get('status')!='success' or result.get('toolUseId')!=use['toolUseId']:continue
         try:
             default='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
-            q=EvidenceQuery.model_validate({'view':default,**use['input']})
+            from tools.research.object_choices import expand_references,reference_choices
+            query_schema=EvidenceQuery.model_json_schema()
+            query_schema['x-research-reference-choices']=reference_choices(host,include_all=True)
+            q=EvidenceQuery.model_validate(expand_references({'view':default,**use['input']},query_schema,strict=False))
             delivered=json.loads(''.join(b.get('text','') for b in result['content']))
-            provided=any(content==''.join(b.get('text','') for b in result['content']) for content in deliveries.get(use['toolUseId'],[]))
+            raw_content=''.join(b.get('text','') for b in result['content'])
+            from tools.research.object_choices import main_context_enabled,main_projection
+            visible=main_projection(host,raw_content) if main_context_enabled(state(host)['spec']) else raw_content
+            provided=any(content in (raw_content,visible) for content in deliveries.get(use['toolUseId'],[]))
             # Index metadata describes this read, not a change in scientific content.
             if q.view=='working_set' and q.pointer=='/all_fresh_results' and isinstance(delivered,dict) and delivered.get('index_kind')=='all_fresh_results':
                 delivered=delivered['results']
@@ -1048,7 +1054,7 @@ def milestone_trace(trace):
         action=row['action'];status=row['execution_status']
         failure=status in ('failed','rejected','pending') or row['outcome'].get('task_passed') is False
         first=action in ('generate','propose','search','initialize_control') and status=='completed'
-        key=(action,(row.get('candidate') or {}).get('artifact_id'))
+        key=(action,json.dumps(row.get('candidate'),sort_keys=True))
         if row['result_references'] or failure or (first and key not in seen) or (action in ('select','stop') and status=='completed'):
             selected.append(row)
         if first:seen.add(key)
@@ -1114,11 +1120,15 @@ def research_action_trace(host, limit=5):
         if not refs and result.get('reference') in known:refs=[result['reference']]
         if not refs and receipt and receipt.get('output') in known:refs=[receipt['output']]
         decision=plan.get('decision') or {}
+        candidate=plan_candidate(plan) or result.get('candidate')
+        if isinstance(candidate,str):
+            from tools.research.object_choices import reference_choices
+            candidate=reference_choices(host,include_all=True).get(candidate,candidate)
         return dict(request_id=request_id,step=requests.get(request_id,events[position]['sequence']),
             **(dict(feedback_source=feedback[request_id]) if request_id in feedback else {}),
             action=plan.get('action',plan.get('operation')),
             method=decision.get('selected_method',('controlled-capability-sensitivity-v1' if plan.get('optimal_sensitivity') else plan.get('capability_method')) or plan.get('operation')),
-            candidate=plan_candidate(plan) or result.get('candidate'),task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
+            candidate=candidate,task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
             agent_hypothesis={k:plan[k] for k in ('hypothesis','decision','expected_observation',
                 'weakening_observation','supporting_evidence','interpretation','fixed_conditions','stopping_condition') if k in plan},
             execution_status=receipt['execution_status'] if receipt else 'pending',
@@ -1315,7 +1325,7 @@ def mathematical_discovery_observations(host, current, candidate):
             latest['structure_research']=summary['structure_research']
             latest['effect_semantics']=(raw.get('request',{}).get('mechanism_study') or {}).get('effect_semantics','mechanism_effect')
             latest['actual_cost']=dict(evaluations=raw.get('charged_analysis_evaluations'),
-                numerical_s=raw.get('charged_numerical_s'),native=summary['structure_research']['cost'])
+                numerical_s=raw.get('charged_numerical_s'))
         if optimized:
             latest['actual_experiment']=dict(operation=raw['operation'],
                 initial_control_source=optimized.get('provenance',{}).get('source'),

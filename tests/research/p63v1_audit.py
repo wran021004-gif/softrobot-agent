@@ -211,7 +211,7 @@ out=dict(schema='p63v1_compact_live_audit_v1',study_id=RUN,store=str(root),freez
     control_initialization_s=s.get('control_initialization_s'),control_source_registration_count=len(s.get('control_initializations',[])),
     known_native_cost_counters=dict(reported_cost),missing_detailed_analysis_costs=sum(r['cost'] is None for r in results),
     cost_scope='Only reported counters are summed; missing detailed cost is unknown, not zero. Worker wall and kernel wall scopes overlap and must not be added again.',
-    selected=s.get('selected'),success_gate=s.get('success_gate'),
+    selected=s.get('selected'),selected_solution=s.get('selected_solution'),success_gate=s.get('success_gate'),
     final_disposition=art(s['final_disposition']) if s.get('final_disposition') else None,
     open_calls=[c for c in calls if not c['receipt']],shared_ledger={k:sum((c['charged'] or {}).get(k,0) for c in calls) for k in ('model_calls','tool_calls','backend_solves','worker_calls','wall_s')},
     worker_boundaries=[dict(kind=kind,folder=str(folder.relative_to(root)),boundary=read(folder/'boundary.json'),
