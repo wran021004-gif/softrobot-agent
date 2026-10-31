@@ -351,6 +351,7 @@ def summary(value, reference):
         for key in ('parameter_path','parameter_unit','delta','suggested_value'):compact.pop(key,None)
     def observation_summary(item):
         array=np.asarray(item) if item is not None else None
+        if array is not None and array.ndim and not array.size:return dict(shape=list(array.shape),minimum=None,maximum=None,norm=0.)
         return item if array is None or array.ndim==0 else dict(shape=list(array.shape),
             minimum=float(np.min(array)),maximum=float(np.max(array)),norm=float(np.linalg.norm(array)))
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)

@@ -92,6 +92,19 @@ def passive_question(operation='inspect',quantity='tangent_compliance',budget=1)
 
 
 class ConstrainedMechanicsTests(unittest.TestCase):
+    def test_empty_tangent_space_projection(self):
+        """Synthetic dimension-only boundary fixture; no physical conclusion."""
+        from extensions.math_analysis.mechanism_registry import observe
+        from tools.research.structure_research import summary
+        mechanics=dict(physical_problem='passive_unilateral_equilibrium',tangent_stiffness=[],
+            coordinates=dict(dof_order=['q'],tendon_order=['t']),constraint_state=dict(positive_count=1),
+            time_s=0.,qpos_rad=[0.],qvel_rad_s=[0.],actual_tensions_n=[1.],input_bounds_n=[],point_binding={})
+        value=observe(mechanics,dict(quantity='tangent_stiffness'))
+        self.assertEqual(value['metadata']['actual_shape'],[0,0])
+        self.assertEqual(observe(mechanics,dict(quantity='tangent_stiffness',reduction='minimum'))['reason'],'EMPTY_TANGENT_SPACE_HAS_NO_EXTREMUM')
+        raw=dict(operation='inspect',target=value['target'],baseline=value,cost={},unsupported_conclusions=[])
+        self.assertEqual(summary(dict(structure_research=raw),'fixture')['baseline']['norm'],0.)
+
     def test_real_active_two_scale_native_path(self):
         from tests.research.test_r3_b_stage1 import structure_question
         from tests.research.test_p63g3_action_handoff import diagnosis

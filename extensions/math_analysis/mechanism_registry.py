@@ -130,8 +130,11 @@ def observe(mechanics, target):
     nv=len(mechanics['coordinates']['dof_order']);nu=len(mechanics['coordinates']['tendon_order'])
     free=nv-mechanics.get('constraint_state',{}).get('positive_count',0)
     expected=tuple({'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2,'free':free}[s] for s in meta['shape'])
+    if passive and not raw.size and 0 in expected:raw=raw.reshape(expected)
     if raw.shape!=expected or not np.isfinite(raw).all():raise ValueError('MECHANISM_DIMENSION_OR_FINITE_VALUE_MISMATCH')
     source_shape=list(raw.shape)
+    if not raw.size and target.reduction in ('minimum','maximum'):
+        return dict(status='not_applicable',reason='EMPTY_TANGENT_SPACE_HAS_NO_EXTREMUM',value=None,metadata=meta,target=target.model_dump())
     if target.tendon_channel is not None:
         if target.tendon_channel>=nu:raise ValueError('TENDON_CHANNEL_OUTSIDE_CURRENT_MODEL')
         raw=raw[:,target.tendon_channel] if raw.ndim==2 else raw[target.tendon_channel]
