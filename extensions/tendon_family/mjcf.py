@@ -60,6 +60,11 @@ def compile_xml(physics, scene, config, path):
     ET.SubElement(parent,'site',name='tip_site',pos=fmt(tip['position_m']),size='.002',rgba='0 1 0 1')
     tendons=ET.SubElement(root,'tendon'); actuators=ET.SubElement(root,'actuator')
     execution_mode=scene['control'].get('tension_execution_mode','actuator_realistic')
+    if execution_mode not in ('ideal_tension','actuator_realistic','passive_fixed_payout_v1'):
+        raise ValueError('UNSUPPORTED_TENDON_FORCE_MODEL')
+    payout=p.get('fixed_payout_lengths_m')
+    if (payout is not None)!=(execution_mode=='passive_fixed_payout_v1'):
+        raise ValueError('COMPILED_DESIGN_AND_SCENE_FORCE_MODE_MISMATCH')
     for t in p['tendons']:
         route=ET.SubElement(tendons,'spatial',name=t['entity'],width=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
         for j,point in enumerate(t['points']):
@@ -67,7 +72,10 @@ def compile_xml(physics, scene, config, path):
             name=f"{t['entity']}_point_{j}"
             ET.SubElement(parent,'site',name=name,pos=fmt(point['position_m']),size=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
             ET.SubElement(route,'site',site=name)
-        if execution_mode=='ideal_tension':
+        if execution_mode=='passive_fixed_payout_v1':
+            route.set('limited','true');route.set('range',fmt([0.,payout[t['entity']]]))
+            route.set('solreflimit','.002 1');route.set('solimplimit','.99 .999 .0001')
+        elif execution_mode=='ideal_tension':
             # Positive controller tension maps to MuJoCo's negative tendon force.
             ET.SubElement(actuators,'general',name=t['entity']+'_direct_tension',tendon=t['entity'],
                 gainprm='-1',ctrllimited='true',ctrlrange=fmt([0,t['force_limit_n']]),

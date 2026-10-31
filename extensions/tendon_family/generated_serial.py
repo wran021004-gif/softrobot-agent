@@ -144,7 +144,7 @@ def _generate(space,design,*,serial=False):
             raise ValueError('GUIDE_ENVELOPE')
     from .compiler import resolve
     physics=resolve(design,mesh)
-    if not np.allclose(physics['transmission'],np.eye(len(design['tendons']))):raise ValueError('ONE_TO_ONE_TRANSMISSION_REQUIRED')
+    if not design.get('fixed_payout_lengths_m') and not np.allclose(physics['transmission'],np.eye(len(design['tendons']))):raise ValueError('ONE_TO_ONE_TRANSMISSION_REQUIRED')
     return design,mesh,physics
 
 
@@ -371,6 +371,9 @@ def generate_family(value):
     used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
     for guide in guides:guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
     design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
+    if getattr(space,'passive_payout_domains_m',{}):
+        design['actuators']=[]
+        design['fixed_payout_lengths_m']={k:r.payout_lengths_m.get(k,d.default) for k,d in space.passive_payout_domains_m.items()}
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
     result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)

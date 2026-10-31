@@ -1,6 +1,6 @@
 """SI family description. Reserved topology types are descriptive, never executable."""
 from typing import Literal, Annotated
-from pydantic import Field, FiniteFloat, model_validator
+from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_math import (
@@ -146,9 +146,54 @@ class Design(Contract):
     id: Name
     components: list[Annotated[Segment | Rigid | Reserved, Field(discriminator='kind')]] = Field(min_length=1)
     tendons: list[Tendon] = Field(min_length=1)
-    actuators: list[Actuator] = Field(min_length=1)
+    actuators: list[Actuator]
+    fixed_payout_lengths_m: dict[str, FiniteFloat] | None = None
     tip: Attachment
     metadata: dict = Field(default_factory=dict, description='Descriptive only; no hidden physical parameters')
+
+    @model_validator(mode='after')
+    def force_elements(self):
+        if self.fixed_payout_lengths_m is None:
+            if not self.actuators:raise ValueError('ACTIVE_DESIGN_REQUIRES_ACTUATORS')
+        elif self.actuators or set(self.fixed_payout_lengths_m)!={t.id for t in self.tendons} or any(v<=0 for v in self.fixed_payout_lengths_m.values()):
+            raise ValueError('PASSIVE_REQUIRES_POSITIVE_PAYOUT_FOR_EVERY_TENDON_AND_NO_ACTUATORS')
+        return self
+
+    @model_serializer(mode='wrap')
+    def historical_design(self,handler):
+        value=handler(self)
+        if self.fixed_payout_lengths_m is None:value.pop('fixed_payout_lengths_m',None)
+        return value
+
+
+class MaterialLoad(Contract):
+    name: Name
+    material_s: FiniteFloat = Field(ge=0,le=1)
+    force_world_n: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+
+
+class ConstrainedPhysicalProblem(Contract):
+    """Frozen contact-free assembly/load problem; payout belongs to Design."""
+    mode: Literal['passive_unilateral_equilibrium']
+    constraint_mode: Literal['fixed_payout'] = 'fixed_payout'
+    mount_position: Vec3
+    mount_rotation: tuple[Vec3,Vec3,Vec3]
+    gravity: Vec3
+    loads: list[MaterialLoad] = Field(min_length=1)
+    monitor_s: list[FiniteFloat] = Field(min_length=1)
+    baseline_load: Name
+    contact_mode: Literal['none'] = 'none'
+
+    @model_validator(mode='after')
+    def physical_binding(self):
+        import numpy as np
+        R=np.asarray(self.mount_rotation)
+        names=[x.name for x in self.loads]
+        if len(set(names))!=len(names) or self.baseline_load not in names:raise ValueError('UNIQUE_FROZEN_LOAD_BINDINGS_REQUIRED')
+        if any(not 0<=s<=1 for s in self.monitor_s):raise ValueError('MATERIAL_S_OUT_OF_RANGE')
+        if not np.allclose(R.T@R,np.eye(3),atol=1e-10) or abs(np.linalg.det(R)-1)>1e-10:raise ValueError('PROPER_MOUNT_ROTATION_REQUIRED')
+        if any(next(x for x in self.loads if x.name==self.baseline_load).force_world_n):raise ValueError('ZERO_LOAD_BASELINE_REQUIRED')
+        return self
 
 
 class Initial(Contract):

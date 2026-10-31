@@ -188,6 +188,13 @@ class SerialAssemblyRule(Contract):
 class FamilySpaceV2(FamilySpace):
     version: Literal['serial_family_space_v2'] = 'serial_family_space_v2'
     serial_assembly: SerialAssemblyRule
+    passive_payout_domains_m: dict[str,Domain] = Field(default_factory=dict)
+
+    @model_serializer(mode='wrap')
+    def historical_space(self,handler):
+        value=handler(self)
+        if not self.passive_payout_domains_m:value.pop('passive_payout_domains_m',None)
+        return value
 
     @model_validator(mode='after')
     def serial(self):
@@ -224,11 +231,12 @@ class GenerationRequestV2(GenerationRequest):
     segments: dict[int,SegmentChoiceV2] = Field(default_factory=dict)
     controller_recipe: dict = Field(default_factory=dict)
     controller_solver: dict = Field(default_factory=dict)
+    payout_lengths_m: dict[str,FiniteFloat] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def legacy_generation(self,handler):
         result=handler(self)
-        for key in ('controller_recipe','controller_solver'):
+        for key in ('controller_recipe','controller_solver','payout_lengths_m'):
             if not getattr(self,key):result.pop(key,None)
         return result
 
@@ -257,6 +265,15 @@ def validate_request(space, request):
     from tools.platform_store import plain
     if request.family_space_identity != digest(plain(space)):
         raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
+    payouts=getattr(space,'passive_payout_domains_m',{})
+    selected=getattr(request,'payout_lengths_m',{})
+    if selected and not payouts:raise ValueError('PAYOUT_REQUIRES_FROZEN_PASSIVE_ASSEMBLY_GRANT')
+    if payouts:
+        if set(payouts)!={'tendon_'+str(i) for i in range(request.tendon_count)}:raise ValueError('PAYOUT_DOMAINS_MUST_MATCH_SELECTED_TOPOLOGY')
+        for key,domain in payouts.items():
+            if domain.minimum<=0:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
+            domain.check(selected.get(key,domain.default),key)
+        if set(selected)-set(payouts):raise ValueError('UNKNOWN_PAYOUT_TENDON')
     if space.conditional_rules == 'base_only_consecutive_spans_v1' and any(
             span.first_segment != 0 for span in request.spans):
         raise ValueError('BASE_ONLY_REQUIRES_FIRST_SEGMENT_ZERO')
@@ -389,6 +406,7 @@ def resolved_request(value, request):
         if not span['angular_offsets_rad']:span['angular_offsets_rad']=[0.]*span['count']
     for k,d in space.tendon_domains.items():params['tendon_parameters'].setdefault(k,d.default)
     for k,d in space.control_domains.items():params['control_weights'].setdefault(k,d.default)
+    for k,d in getattr(space,'passive_payout_domains_m',{}).items():params.setdefault('payout_lengths_m',{}).setdefault(k,d.default)
     return plain((GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(params))
 
 
@@ -446,6 +464,8 @@ def parameter_capabilities(value, request):
         if isinstance(space,FamilySpaceV2):
             lo,hi=space.serial_assembly.cell_count_bounds
             add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells),reason='Numerical model resolution, not a physical structural gradient')
+    for k,d in getattr(space,'passive_payout_domains_m',{}).items():
+        add('payout_lengths_m.'+k,'assembly','number','m',d,source='passive_payout_domains_m.'+k)
     for k,d in space.tendon_domains.items():
         reason={'length_servo_gain_n_m':'Ideal tension bypasses the length servo',
             'diameter_m':'Clearance/visual geometry only; native ideal tendon has no diameter-dependent inertia or friction',

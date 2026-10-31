@@ -121,7 +121,8 @@ class TaskDefinition(Contract):
     goal: Payload
     environment: Payload
     robot_families: list[Identifier] = Field(min_length=1)
-    actuator_channels: list[Identifier] = Field(min_length=1)
+    actuator_channels: list[Identifier]
+    physical_problem: dict | None = None
     initializer: Binding
     timing: Timing
     evaluator: Binding
@@ -130,8 +131,19 @@ class TaskDefinition(Contract):
     observations: list[SignalSpec] = Field(min_length=1)
     sampling: Sampling
 
+    @model_serializer(mode='wrap')
+    def historical_task(self,handler):
+        value=handler(self)
+        if self.physical_problem is None:value.pop('physical_problem',None)
+        return value
+
     @model_validator(mode='after')
     def window(self):
+        if self.physical_problem is not None:
+            from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
+            ConstrainedPhysicalProblem.model_validate(self.physical_problem)
+            if self.actuator_channels:raise ValueError('PASSIVE_TASK_REQUIRES_NO_ACTIVE_CHANNELS')
+        elif not self.actuator_channels:raise ValueError('ACTIVE_TASK_REQUIRES_ACTUATOR_CHANNELS')
         if self.sampling.window_s[1] > self.timing.duration_s:
             raise ValueError('EVALUATION_WINDOW_EXCEEDS_DURATION_S')
         return self

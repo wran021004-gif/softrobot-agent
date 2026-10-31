@@ -175,7 +175,7 @@ def resolve(design, discretization=None):
             ids = [t['entity'] for t in routes]
             if t.tendon not in ids or t.tendon in owners: raise ValueError('TENDON_NEEDS_EXACTLY_ONE_TRANSMISSION')
             owners.add(t.tendon); B[ids.index(t.tendon),j] = t.ratio*(a.drum_radius_m or 1.)
-    if len(owners) != len(routes): raise ValueError('UNDRIVEN_TENDON')
+    if d.fixed_payout_lengths_m is None and len(owners) != len(routes): raise ValueError('UNDRIVEN_TENDON')
     physical_source = d.model_dump(mode='json')
     model_source = discretization.model_dump(mode='json')
     result = dict(version='serial_bending_physics_v1',source_identity=digest(physical_source),
@@ -202,5 +202,6 @@ def resolve(design, discretization=None):
         part['collision_vertices_m'] = vertices.tolist()
     g = geometry(result,np.zeros(len(dofs)))
     result['reference_lengths_m'] = g['lengths'].tolist()
+    if d.fixed_payout_lengths_m is not None:result['fixed_payout_lengths_m']=dict(d.fixed_payout_lengths_m)
     result['identity'] = digest(result)
     return result
