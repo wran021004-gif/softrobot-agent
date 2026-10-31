@@ -56,18 +56,15 @@
               ]
             },
             "reduction": {
-              "default": "identity",
+              "type": "string",
               "enum": [
                 "identity",
                 "norm",
                 "minimum",
                 "maximum",
-                "directional_norm",
-                "generalized_projection",
-                "direction_cosine"
+                "directional_norm"
               ],
-              "title": "Reduction",
-              "type": "string"
+              "default": "identity"
             },
             "direction_world": {
               "anyOf": [
@@ -94,34 +91,6 @@
               "default": null,
               "title": "Direction World"
             },
-            "tendon_channel": {
-              "anyOf": [
-                {
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Tendon Channel"
-            },
-            "direction_generalized": {
-              "anyOf": [
-                {
-                  "items": {
-                    "type": "number"
-                  },
-                  "type": "array"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Direction Generalized"
-            },
             "goal": {
               "enum": [
                 "increase",
@@ -145,92 +114,6 @@
           "title": "PhysicalMechanismTarget",
           "type": "object"
         },
-        "ScientificControlScope": {
-          "additionalProperties": false,
-          "properties": {
-            "mode": {
-              "description": "C2 finite search parameterization: full_task adjusts all tendon channels with two independent endpoint knots over the frozen task; time_window adjusts all channels with one triangular pulse per channel and zero endpoint corrections. Choose a scope only when this parameterization answers the question; arbitrary waveform or channel-subset search is not adapted.",
-              "enum": [
-                "full_task",
-                "time_window"
-              ],
-              "title": "Mode",
-              "type": "string"
-            },
-            "window_s": {
-              "anyOf": [
-                {
-                  "maxItems": 2,
-                  "minItems": 2,
-                  "prefixItems": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ],
-                  "type": "array"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "description": "Only control corrections inside this interval; evaluation still covers the complete frozen task.",
-              "title": "Window S"
-            }
-          },
-          "required": [
-            "mode"
-          ],
-          "title": "ScientificControlScope",
-          "type": "object"
-        },
-        "ScientificSourcesV2": {
-          "additionalProperties": false,
-          "properties": {
-            "control_source": {
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/EvidenceRef"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null
-            },
-            "comparison_candidates": {
-              "items": {
-                "$ref": "#/$defs/EvidenceRef"
-              },
-              "maxItems": 2,
-              "title": "Comparison Candidates",
-              "type": "array"
-            },
-            "t1_results": {
-              "description": "Comparable saved Native T1 results, baseline first; may select explicit shared-baseline paths/scales. No new search is requested.",
-              "items": {
-                "$ref": "#/$defs/EvidenceRef"
-              },
-              "maxItems": 9,
-              "title": "T1 Results",
-              "type": "array"
-            },
-            "model_results": {
-              "description": "Saved Conic-compatible model stencil, baseline first. Original optimal sensitivity admission determines its validity.",
-              "items": {
-                "$ref": "#/$defs/EvidenceRef"
-              },
-              "maxItems": 5,
-              "title": "Model Results",
-              "type": "array"
-            }
-          },
-          "title": "ScientificSourcesV2",
-          "type": "object"
-        },
         "ScientificStructureV4": {
           "additionalProperties": false,
           "properties": {
@@ -250,19 +133,6 @@
                 "mechanism_effect",
                 "re_equilibrated_passive_response"
               ]
-            },
-            "parameter_group": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "description": "Actual capability category; segment_lengths is retained as a legacy selector.",
-              "title": "Parameter Group"
             },
             "parameter_paths": {
               "items": {
@@ -295,36 +165,6 @@
               "default": null,
               "title": "Hypothesis"
             },
-            "source_selection": {
-              "$ref": "#/$defs/ScientificSourcesV2"
-            },
-            "control_scope": {
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/ScientificControlScope"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null
-            },
-            "search_strategy": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "response",
-                    "pattern"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Search Strategy"
-            },
             "operating_point": {
               "type": "string",
               "const": "re_equilibrated"
@@ -332,56 +172,6 @@
             "control_treatment": {
               "type": "string",
               "const": "no_active_control"
-            },
-            "tensions_n": {
-              "anyOf": [
-                {
-                  "items": {
-                    "type": "number"
-                  },
-                  "type": "array"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Tensions N"
-            },
-            "saved_state": {
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/EvidenceRef"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null
-            },
-            "execution": {
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/EvidenceRef"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null
-            },
-            "update_id": {
-              "anyOf": [
-                {
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Update Id"
             },
             "comparison_candidates": {
               "items": {
@@ -413,20 +203,6 @@
               "maximum": 0.1,
               "title": "Local Radius Fraction",
               "type": "number"
-            },
-            "response_horizon_s": {
-              "anyOf": [
-                {
-                  "exclusiveMinimum": 0,
-                  "maximum": 0.05,
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": null,
-              "title": "Response Horizon S"
             },
             "physical_problem": {
               "type": "string",
@@ -735,7 +511,7 @@
           "evaluation_attempts": 5,
           "gradient_calls": 159,
           "hessian_columns": 40,
-          "kernel_wall_s": 0.8772264000144787,
+          "kernel_wall_s": 0.8758980999700725,
           "material_point_jacobian_calls": 624,
           "model_builds": 5,
           "multiplier_fits": 10,
@@ -758,7 +534,7 @@
       "effect_semantics": "re_equilibrated_passive_response",
       "actual_cost": {
         "evaluations": 5,
-        "numerical_s": 1.9010214000009
+        "numerical_s": 1.8871812999714166
       }
     },
     "parameters": {
