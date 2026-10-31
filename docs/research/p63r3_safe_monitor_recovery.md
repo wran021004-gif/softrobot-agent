@@ -28,3 +28,22 @@ BEGIN EXCLUSIVE；监控参数错误单独退出，不影响科研写入。2 项
 
 以下各阶段在原 Store/SDK 隔离副本验证前，不在真实 V1 上执行本地放弃或发送新请求。
 后续补充严格反例、SDK/Mock wire、原账本保持与真实接续结果。
+
+已实现 operator-only 的 abandon_unrecoverable_reporter_attempt，不注册为 Main 工具，
+不自动调用。要求精确 Study/请求的本次用户授权、唯一 unknown Reporter、原响应缺失、
+确定性基础报告、已封口科学结果、无活 Worker、无未消费响应、匹配原 science_delivery
+边界的已配对 SDK 快照，且该未知调用是最后一次发送。事务中再次核对状态和唯一未封口
+调用，通过原 Store.complete 以 cancelled 终结本地 reservation，保留 model_calls=1。
+不创建 r3_response、HTTP 状态或解释文本；provider_outcome 仍 unknown，tokens/money
+为未知。本地放弃事件和 receipt 输出精确保留授权、原 wire/base report 和范围声明。
+重复执行只返回已存在的处置；Main 或其他 unknown 仍由原 pending 机制阻断。
+
+17 项不同的相关离线测试已通过，覆盖并发监控、8 类恢复准入/反例、原 5 项证据门槛
+以及两种 Mock 终局；后者明确检查 SELECT 写入 selected_solution 后自动 stopped，
+失败 SELECT 被拒绝后由 Mock Main 使用完整索引合法 STOP。没有修改正式阈值或准入。
+完整输入、关键断言、日志和结果见 p63r3_targeted_validation.json。
+
+真实操作前备份已保存为 P63-R3-before-recovery.zip；逐字节核对当前 SQLite 与原归档
+一致、全部 30 个 SDK 文件一致，freeze/profile/spec 一致。SHA-256、原 DB SHA 和原始
+路径见 p63r3_pre_recovery_backup.json。当前真实 Study 仍未执行本地放弃；以下继续
+验证完整隔离 SDK 恢复链路，只有通过后才允许按用户授权处置真实第 32 次请求。

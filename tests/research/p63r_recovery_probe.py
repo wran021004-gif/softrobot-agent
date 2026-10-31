@@ -10,7 +10,7 @@ from tools.platform_store import Store
 from tools.research.agent import converse
 from tools.research.state import state
 from tools.research.config import ROOT
-from tools.research.session_handoff import session_storage_path
+from tools.research.session_handoff import session_storage_path,snapshot_files
 
 RUN='p63v1-m3-autonomous-feasibility-sol-20261030'
 
@@ -21,6 +21,8 @@ def main():
     parser.add_argument('--expect-scope',action='store_true')
     parser.add_argument('--source-store',type=Path,help='Explicit immutable pre-R checkpoint for offline testing only; never a live replacement')
     parser.add_argument('--configuration-archive',type=Path,help='Original matching archive when the offline checkpoint contains only DB/SDK')
+    parser.add_argument('--abandon-reporter-request',help='Explicit isolated Reporter-only recovery fixture, never automatic')
+    parser.add_argument('--authorization-file',type=Path)
     args=parser.parse_args()
     for key in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS'):os.environ[key]='1'
     original=args.source_store.resolve() if args.source_store else ROOT/'runs/research'/RUN
@@ -33,6 +35,11 @@ def main():
     assert len(before['analysis_results'])==args.expected_math and not before['pending'] and not before['pilot'].get('unconsumed_response')
     with sqlite3.connect(clone/'platform.sqlite') as destination:source.backup(destination)
     source.close();shutil.copytree(session_storage_path(original/'framework_sessions'),session_storage_path(clone/'framework_sessions'))
+    if args.abandon_reporter_request:
+        assert args.authorization_file
+        for folder in ('analyses','physical_replay','mechanics','local_diagnostics'):
+            for path in (original/folder).glob('*/boundary.json'):
+                target=clone/path.relative_to(original);target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(path,target)
     if args.configuration_archive:
         assert args.source_store,'Configuration archive is only for an explicit offline checkpoint'
         with zipfile.ZipFile(args.configuration_archive) as archive:
@@ -45,7 +52,7 @@ def main():
         for name in ('framework_configuration.json','implementation_freeze.json','resolved_configuration.json'):
             shutil.copy2(original/name,clone/name)
     h=Host(clone,RUN,actor='explicit-offline-recovery-fixture');assert state(h)==before
-    sent=[];times={};phase={'allow_http':False}
+    sent=[];times={};phase={'allow_http':False};abandonment=None
     handoff_stages=[]
     def clone_transaction(store,db):
         # Fixture-only isolation, not a migrated grant. No original Store write.
@@ -55,8 +62,15 @@ def main():
     def respond(request):
         assert phase['allow_http'],'Restore-only must not send even a Mock Provider request'
         wire=json.loads(request.content);sent.append(wire)
+        content='OFFLINE fixture: saved evidence received; no science requested.'
+        if args.abandon_reporter_request and wire['messages'][0]['content'].startswith('You are a read-only scientific Reporter.'):
+            payload=json.loads(wire['messages'][-1]['content'])
+            assert payload['report_reference']!=abandonment['base_report'],'Lost Reporter must never be resent'
+            source_id=next(iter(payload['source_catalog']))
+            content=json.dumps(dict(interpretations=[dict(kind='unresolved_question',
+                text='Synthetic isolated fixture only: deterministic evidence retained; no scientific conclusion.',source_ids=[source_id])]))
         return httpx.Response(200,json=dict(id='OFFLINE-R1',object='chat.completion',created=1,model=wire['model'],
-            choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content='OFFLINE fixture: saved evidence received; no science requested.'))],
+            choices=[dict(index=0,finish_reason='stop',message=dict(role='assistant',content=content))],
             usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
     with ExitStack() as stack:
         for target,replacement in [('tools.platform_store.Store.check_root',clone_transaction),
@@ -71,6 +85,18 @@ def main():
             return await original_handoff(*values,**kwargs,stage=stage)
         stack.enter_context(patch('tools.research.session_handoff.handoff',measured_handoff))
         migration=None
+        if args.abandon_reporter_request:
+            from tools.research.provider import abandon_unrecoverable_reporter_attempt,received,pending
+            from tools.research.core import recover
+            authorization=json.loads(args.authorization_file.read_text(encoding='utf-8'))
+            files=snapshot_files(clone/'framework_sessions',before['pilot']['framework_session_id'])
+            abandonment=abandon_unrecoverable_reporter_attempt(h,args.abandon_reporter_request,authorization=authorization)
+            assert state(h)==before and received(h,args.abandon_reporter_request) is None and not pending(h)
+            assert snapshot_files(clone/'framework_sessions',before['pilot']['framework_session_id'])==files
+            events_before=h.store.events(RUN)
+            assert abandon_unrecoverable_reporter_attempt(h,args.abandon_reporter_request,authorization=authorization)==abandonment
+            assert h.store.events(RUN)==events_before
+            recover(h)
         if args.migrate:
             from tools.research.core import bind
             start=time.perf_counter();bind(h,reason='R1 isolated offline verification of committed result-delivery/reading repair')
@@ -83,12 +109,15 @@ def main():
         restored=state(h);assert restored['pilot']['live_model_requests']==args.expected_provider and restored['analysis_results']==before['analysis_results']
         assert not sent and not restored['pending'] and not restored['pilot'].get('unconsumed_response')
         phase['allow_http']=True
-        start=time.perf_counter();asyncio.run(converse(h,max_new_provider_requests=1));times['one_mock_converse_s']=time.perf_counter()-start
-    after=state(h);assert len(sent)==1 and after['pilot']['live_model_requests']==args.expected_provider+1
+        start=time.perf_counter()
+        asyncio.run(converse(h,max_new_provider_requests=80-args.expected_provider,pause_after_completed_invocations=1) if args.abandon_reporter_request else converse(h,max_new_provider_requests=1))
+        times['one_mock_converse_s']=time.perf_counter()-start
+    after=state(h);assert len(sent)>=1 and after['pilot']['live_model_requests']==args.expected_provider+len(sent)
     for key in ('analysis_results','candidates','control_initializations','search_results','analysis_costs','numerical_s','physical_replays'):
         assert after[key]==before[key],key
     assert after['profile']==expected_profile
-    wire=sent[0];packet=json.loads(next(m['content'].split('\n',1)[1] for m in reversed(wire['messages'])
+    mains=[wire for wire in sent if wire.get('tools')];assert len(mains)==1
+    wire=mains[0];packet=json.loads(next(m['content'].split('\n',1)[1] for m in reversed(wire['messages'])
         if m['role']=='user' and isinstance(m.get('content'),str) and m['content'].startswith('CURRENT_RESEARCH_PACKET\n')))
     research=packet['research'];delivery=research['scientific_results'];latest=delivery['latest_search']['fixed_result']['best_mathematical'][0]
     best=delivery['study_best_mathematical'][0]['fact']
@@ -116,14 +145,16 @@ def main():
     result=dict(schema='p63r_isolated_recovery_probe_v1',original=str(original),clone=str(clone),
         fixture_only=True,configuration_archive=str(args.configuration_archive) if args.configuration_archive else None,
         real_provider_requests=0,scientific_workers=0,source_unchanged=True,
-        source_provider=args.expected_provider,clone_mock_provider=args.expected_provider+1,math_preserved=args.expected_math,searches_preserved=before['search_results'],
+        source_provider=args.expected_provider,clone_mock_provider=after['pilot']['live_model_requests'],math_preserved=args.expected_math,searches_preserved=before['search_results'],
+        abandonment=abandonment,mock_main_requests=len(mains),mock_other_reporter_requests=len(sent)-len(mains),
         profile_before=before['profile'],profile_after=expected_profile,migration=migration,
         sdk_restore_events=[e['outputs'][0] for e in recoveries],
         mock_wire_bytes=len(json.dumps(wire).encode()),timings=times,handoff_stages=handoff_stages,latest_search=delivery['latest_search']['reference'],
         latest_best=latest,study_best=best,scope_fields_verified=args.expect_scope,original_fields_preserved=True,worker_reexecutions=0,
         original_provider_retransmissions=0,notes='Only the isolated clone uses patched root/guard/credentials and Mock HTTP. These patches grant no live authorization and are never used by R2.')
-    (ROOT/'runs/p63r_recovery_probe.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
-    (ROOT/'runs/p63r_recovery_mock_wire.json').write_text(json.dumps(wire,indent=2)+'\n',encoding='utf-8')
+    prefix='p63r3' if args.abandon_reporter_request else 'p63r'
+    (ROOT/f'runs/{prefix}_recovery_probe.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+    (ROOT/f'runs/{prefix}_recovery_mock_wire.json').write_text(json.dumps(wire,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:v for k,v in result.items() if k not in ('profile_preserved','latest_best','study_best')},indent=2),flush=True)
 
 

@@ -49,7 +49,8 @@ def main():
     if a.samples<1 or a.interval<0:p.error('Positive samples and nonnegative interval required')
     for i in range(a.samples):
         try:value=observe(a.database)
-        except sqlite3.OperationalError:value=dict(schema='p63r3_short_observation_v1',observation='temporarily_unavailable',research_action=None)
+        except sqlite3.OperationalError as exc:
+            value=dict(schema='p63r3_short_observation_v1',observation='temporarily_unavailable',error=str(exc),research_action=None)
         print(json.dumps(value),flush=True)
         if value.get('status')=='stopped':break
         if i+1<a.samples:time.sleep(a.interval)
