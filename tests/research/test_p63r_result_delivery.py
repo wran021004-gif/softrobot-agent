@@ -63,6 +63,24 @@ class ScientificResultDeliveryTests(unittest.TestCase):
         self.assertEqual(value['study_best_mathematical'][0]['search_reference'],first)
         self.assertEqual(value['study_best_mathematical'][0]['fact']['reference'],a)
         self.assertEqual(value['latest_search']['fixed_result']['status_counts']['execution_incomplete'],1)
+        failure=value['critical_failures'][-1]
+        self.assertEqual(failure['status'],'execution_incomplete')
+        self.assertEqual(failure['search_reference'],third)
+        self.assertEqual(failure['source_query']['pointer'],'/result/comparison_summary/0/conditions/primary')
+
+    def test_native_discovery_reads_metadata_once_before_variable_loop(self):
+        from tools.research.optimal_capability import candidate_methods
+        _,analysis,_=fixture(self.h,self.c,-.05)
+        original=self.h.store.artifact;reads=[]
+        def metadata_only(ref,**kwargs):
+            if ref==analysis:
+                self.assertIsNotNone(kwargs.get('paths'),'Native rollouts must not be decoded for every parameter')
+                reads.append(ref)
+            return original(ref,**kwargs)
+        with patch.object(self.h.store,'artifact',side_effect=metadata_only):
+            result=candidate_methods(self.h,self.c)
+        self.assertTrue(result['variables'])
+        self.assertEqual(len(reads),1)
 
     def test_incomparable_profiles_are_not_ranked_together(self):
         fixture(self.h,self.c,-.05)

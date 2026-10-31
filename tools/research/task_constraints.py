@@ -120,7 +120,9 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     if reference not in s.get('candidates',{}).values():raise ValueError('OWNED_RESOLVED_CANDIDATE_REQUIRED')
     try:verify_candidate(host,reference);binding_error=None
     except ValueError as exc:binding_error=str(exc)
-    readiness=candidate_methods(host,reference) if binding_error is None else dict(
+    analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','implementation','status','model','protocol',
+        'requested_operation.operating_point'))) for r in s.get('analysis_results',[])]
+    readiness=candidate_methods(host,reference,analysis_metadata=analysis_metadata) if binding_error is None else dict(
         method=SENSITIVITY,status='requires_current_profile_candidate',reasons=[binding_error])
     cfg=c['configuration'];requirements=describe_analysis_requirements(cfg,{})
     remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
@@ -128,8 +130,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
         remaining_evaluations=remaining,mathematical_methods={CONIC:spec.get('mathematical_methods',{}).get(CONIC),
             SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})
     models=[]
-    for r in s.get('analysis_results',[]):
-        v=host.store.artifact(r,paths=('candidate','implementation','status','model','protocol'))
+    for r,v in analysis_metadata:
         if (v.get('candidate')==reference and v.get('implementation')==s['freeze'] and
                 v.get('status')=='computed' and v.get('model') and v.get('protocol')==spec['analysis_protocol']):models.append(r)
     authorization=mathematics_authorization(host,s);methods={}

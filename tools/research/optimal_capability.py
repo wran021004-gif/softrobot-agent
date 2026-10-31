@@ -174,7 +174,7 @@ def sensitivity_cost(steps, reused, remaining, *, conic_authorized=False, subpro
         assumptions='Preparation methods require their own task/model admission; no automatic generation or solve.')
 
 
-def candidate_methods(host, reference):
+def candidate_methods(host, reference, *, analysis_metadata=None):
     """Candidate-specific discovery; executable T2 uses the same saved-context gate."""
     from tools.research.design import verify_candidate, parameter_value
     from tools.research.contracts import AnalysisRequest
@@ -187,14 +187,18 @@ def candidate_methods(host, reference):
         else [p for p in spec['allowed_parameters'] if p.endswith(('.length_m','.young_pa'))])
     if spec.get('family_sensitivity_variables',{}).get('version')=='family_sensitivity_v2':
         variables=[r['parameter_id'] for r in family_analysis_parameters(spec,candidate) if r['study_authorized'] and r['continuous_perturbation']]
+    # Stencil discovery needs identity/eligibility, not every Native rollout.
+    # Read once before the variable loop; execution still validates original models.
+    if analysis_metadata is None:
+        analysis_metadata=[(ref,host.store.artifact(ref,paths=('status','implementation','model','protocol',
+            'candidate','requested_operation.operating_point'))) for ref in s.get('analysis_results',[])]
+    eligible=[(ref,raw) for ref,raw in analysis_metadata if raw.get('status')=='computed'
+        and raw.get('implementation')==s['freeze'] and raw.get('model') and raw.get('protocol')==spec['analysis_protocol']]
     rows=[]
     for variable in variables:
         row=dict(variable=variable,status='missing_models',ready_stencils=[],incomplete_stencils=[],rejections=[])
         models=[]
-        for ref in s.get('analysis_results',[]):
-            raw=host.store.artifact(ref)
-            if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or not raw.get('model')
-                    or raw.get('protocol')!=spec['analysis_protocol']):continue
+        for ref,raw in eligible:
             try:
                 c=verify_candidate(host,raw['candidate'])
                 p=family_parameters(spec,c,variable)[0] if spec.get('start_mode')=='family_space' else c['parameters']

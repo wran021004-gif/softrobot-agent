@@ -217,7 +217,7 @@ def physical_diagnostic(host,reference):
             'Only the original registered acceptance establishes this execution outcome'])
 
 
-def legacy_context(host):
+def legacy_context(host, *, evidence_references=None):
     from tools.research.candidate_portfolio import ranking_key
     from tools.research_tasks import task_adapter
     from tools.research.budget import protected, closeout_operations, stage_usage
@@ -237,7 +237,9 @@ def legacy_context(host):
         x=axes(a);y=axes(b)
         return x.keys()==y.keys() and all(x[k]<=y[k] for k in x) and any(x[k]<y[k] for k in x)
     pareto=[r['reference'] for r in valid if not any(dominates(q,r) for q in valid)]
-    evidence=[summarize_evidence(host.store.artifact(r),r) for r in [*s.get('research_mathematics',[]),*s.get('analysis_results',[]),*s.get('mechanics_results',[])]]
+    references=([*s.get('research_mathematics',[]),*s.get('analysis_results',[]),*s.get('mechanics_results',[])]
+        if evidence_references is None else evidence_references)
+    evidence=[summarize_evidence(host.store.artifact(r),r) for r in references]
     evidence=[{k:v[k] for k in ('claim_kind','verification_status','model_identity','candidate_identity','task_identity',
         'supported_inferences','unsupported_inferences','evidence_reference','numerical_evidence_pointer','prospective_guarantee')} for v in evidence]
     return dict(version='research_context_v1',task_identity=spec.get('canonical_task_identity',digest(s['base_configuration']['task'])),
@@ -307,9 +309,9 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
         retrieval='Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.',value=result)
 
 
-def context(host):
+def context(host, *, evidence_references=None):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
-    current=legacy_context(host)
+    current=legacy_context(host,evidence_references=evidence_references)
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
     current['budget']=decision_budget(host)
@@ -358,12 +360,14 @@ def context(host):
     # One authoritative STOP index, including results absent from observation previews.
     current['all_fresh_results']=[r for key in ('results','mechanics_results','physical_replays',
         'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])]
+    analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','operation','source_kind')))
+        for r in s.get('analysis_results',[])]
     current['decision_feedback']=dict(
         recent_searches=[dict(reference=r,**compact_evidence(host.store.artifact(r),r)['summary'])
             for r in reversed(s.get('control_search_results',[])[-2:])],
         recent_observations=[compact_evidence(host.store.artifact(r),r)['summary'] | dict(reference=r)
             for r in reversed([*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])][-3:])],
-        actions=action_feedback(host,current),
+        actions=action_feedback(host,current,analysis_metadata=analysis_metadata),
         citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
     from tools.research.budget import decision_budget
     from tools.research.rl import allocation_feedback
@@ -398,7 +402,7 @@ def context(host):
             current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
             if value.get('acceptance'):
                 current['latest_scientific_feedback']['physical_diagnostic']=physical_diagnostic(host,latest)
-    current['evidence_working_set']=working_set(host,current)
+    current['evidence_working_set']=working_set(host,current,citation_references=evidence_references,analysis_metadata=analysis_metadata)
     return current
 
 
@@ -584,12 +588,15 @@ def recorded_changes(before,after,path=''):
     return [dict(pointer=path,before=before,after=after)]
 
 
-def working_set(host,current):
+def working_set(host,current, *, citation_references=None, analysis_metadata=None):
     """Recomputable bounded Store projection; science and next-method choice stay separate."""
     from tools.research.candidate_portfolio import ranking_key
     from tools.research.evidence_policy import registered_references
     s=state(host);candidates=ordered_candidates(host,s);index=[];links=[];facts=[];comparisons=[]
     references=current['all_fresh_results'];coverage=read_coverage(host)
+    metadata={r['artifact_id']:v for r,v in (analysis_metadata or [])}
+    owners=[(ref,metadata[ref['artifact_id']] if ref['artifact_id'] in metadata and metadata[ref['artifact_id']].get('candidate')
+        else host.store.artifact(ref,paths=('candidate','design_candidate'))) for ref in references]
     shown=candidates[-3:];best=current.get('best_valid') or {};important=best.get('executable_candidate',best.get('candidate'))
     if important in candidates and important not in shown:shown=[*shown[-2:],important]
     selected=decision_candidate(host,current,research_intent(host))
@@ -597,8 +604,7 @@ def working_set(host,current):
     for candidate in shown:
         c=host.store.artifact(candidate);results=[];math=[]
         controls=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==candidate]
-        for ref in references:
-            value=host.store.artifact(ref,paths=('candidate','design_candidate'))
+        for ref,value in owners:
             if value.get('candidate',value.get('design_candidate'))!=candidate:continue
             if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])]:math.append(ref)
             if ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:results.append((ref,host.store.artifact(ref)))
@@ -678,6 +684,15 @@ def working_set(host,current):
                 normalized_violation_change={k:v-task_gap(x)['components'][k] for k,v in task_gap(y)['components'].items()
                     if k in task_gap(x)['components']} if comparable else None,
                 scope='Same candidate and recorded evaluation settings only; negative is improvement, no causal or global claim'))
+    known=list({r['artifact_id']:r for r in registered_references(host)}.values())
+    citation_totals={}
+    if citation_references is not None:
+        from tools.research.evidence_policy import citation_role
+        last=known[-1:]
+        citation_references=list({r['artifact_id']:r for r in citation_references if r not in last}.values())+last
+        citation_totals=dict(citation_eligibility_counts=dict(registered_count=len(known),
+            scientific_result_count=sum(citation_role(host,r,current=s,known=known) in
+                ('scientific_result','independent_evaluation') for r in known)))
     return dict(version='evidence_working_set_v2',candidate_index=index,candidate_count=len(candidates),
         candidate_index_query='All candidate references remain in source_references; previews retain the latest three',
         control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage,read_coverage_count=len(coverage),
@@ -697,13 +712,14 @@ def working_set(host,current):
             for r in current['decision_feedback']['actions']],budget=dict(current['budget'],training=current['training_budget_details'],
                 method_remaining={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}),
         control_search_domain=current.get('control_search_domain'),
-        source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
-        citation_eligibility=citation_inventory(host),research_history_index={r['source']['reference']['artifact_id']:r for r in history_index(host)},action_trace=research_action_trace(host,limit=None),
+        source_references=known,all_fresh_results=references,
+        citation_eligibility=citation_inventory(host,references=citation_references),**citation_totals,
+        research_history_index={r['source']['reference']['artifact_id']:r for r in history_index(host)},action_trace=research_action_trace(host,limit=None),
         recent_searches=current['decision_feedback']['recent_searches'],
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
 
-def action_feedback(host,current):
+def action_feedback(host,current, *, analysis_metadata=None):
     """Admission prerequisites for parameterized actions, not model decisions."""
     from tools.research.physical_replay import binding, verified_input_response, explicit_control_source, numerically_verified_source
     from tools.research.design import verify_candidate
@@ -738,8 +754,11 @@ def action_feedback(host,current):
     # warm_start rejects every other source kind before reading a trajectory.
     # Filter that invariant once, instead of decoding every large math result
     # again for each candidate and initialization mode. Admission stays below.
+    if analysis_metadata is None:
+        analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','operation','source_kind'))) for r in s.get('analysis_results',[])]
+    metadata={r['artifact_id']:v for r,v in analysis_metadata}
     warm_sources=[ref for ref in known if ref in s.get('mechanics_results',[]) or
-        host.store.artifact(ref,paths=('source_kind',)).get('source_kind') in ('verified_mathematical_trajectory',
+        (metadata[ref['artifact_id']] if ref['artifact_id'] in metadata else host.store.artifact(ref,paths=('source_kind',))).get('source_kind') in ('verified_mathematical_trajectory',
             'historical_mathematical_trajectory','independently_integrated_control_v1')]
     for candidate in candidates:
         from tools.research.contracts import MechanicsRequest
@@ -787,8 +806,7 @@ def action_feedback(host,current):
             check_only='Mathematical checking uses the analysis allowance; it is not an optimized or physically accepted result',
             remaining_checks=['full_plan_admission','requested_budget','model/coordinate/state/substeps/grid preflight'],
             example=dict(action='mechanics',mechanics=dict(candidate=candidate,initialization=modes[0],check_only=False))))
-        references=[r for r in s.get('analysis_results',[]) if
-            (value:=host.store.artifact(r,paths=('candidate','operation'))).get('candidate')==candidate
+        references=[r for r,value in analysis_metadata if value.get('candidate')==candidate
             and value.get('operation')=='input_sensitivity']
         status='blocked';reason='verified_input_sensitivity_required';ref=None
         for ref in reversed(references):
@@ -820,8 +838,9 @@ def decision_brief(current):
     brief['evidence_access']=dict(reference=anchor,view='working_set',pointer='',
         scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage, source_references or citation_eligibility. Original references support full/fields/range reads.')
     brief['citation_eligibility']=dict(query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
-        registered_count=len(ws['citation_eligibility']),latest_registered=deepcopy(ws['citation_eligibility'][-1:]),
-        scientific_result_count=sum(r['role'] in ('scientific_result','independent_evaluation') for r in ws['citation_eligibility']),
+        registered_count=ws.get('citation_eligibility_counts',{}).get('registered_count',len(ws['citation_eligibility'])),latest_registered=deepcopy(ws['citation_eligibility'][-1:]),
+        scientific_result_count=ws.get('citation_eligibility_counts',{}).get('scientific_result_count',
+            sum(r['role'] in ('scientific_result','independent_evaluation') for r in ws['citation_eligibility'])),
         empty_reference_rule='With no scientific results, exploratory empirical_search may use supporting_evidence=[]. Domain references and procedural knowledge do not support scientific conclusions. SELECT/STOP keep their original evidence gates.',
         rule='supporting_evidence requires registration AND matching inference/candidate/task/model scope. Candidate/control identity is not task success. FamilySpace and unregistered raw motion samples are readable only; reading never registers evidence.',
         required_observations='Physical claims need a complete bound independent evaluation; mathematical claims need verified scoped results. STOP cites all_fresh_results; SELECT requires a read fresh pass.')
@@ -1322,9 +1341,24 @@ def mathematical_discovery_observations(host, current, candidate):
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
-    current=context(host);brief=decision_brief(current)
     from tools.research.feedback import scientific_result_delivery
-    brief['scientific_results']=scientific_result_delivery(host)
+    delivery=scientific_result_delivery(host)
+    s=state(host);selected=[]
+    latest=(delivery.get('latest_search') or {}).get('fixed_result') or {}
+    facts=[fact for row in delivery['study_best_mathematical']
+        for fact in ([row['fact']] if row.get('fact') else latest.get('best_mathematical',[]))]
+    facts.extend(latest.get('best_mathematical',[]))
+    for fact in facts:
+        if fact.get('profile_identity')==s['profile']['identity'] and fact['reference'] not in selected:
+            selected.append(fact['reference'])
+    for row in delivery.get('critical_failures',[]):
+        if row.get('profile_identity')==s['profile']['identity'] and row.get('reference') and row['reference'] not in selected:
+            selected.append(row['reference'])
+    latest_evaluation=delivery.get('latest_evaluation') or {}
+    if latest_evaluation.get('reference') and latest_evaluation['reference'] not in selected:selected.append(latest_evaluation['reference'])
+    cap=s['spec'].get('research_decisions',{}).get('context_limits',{}).get('evidence',3)
+    current=context(host,evidence_references=selected[:max(1,cap)]);brief=decision_brief(current)
+    brief['scientific_results']=delivery
     from tools.research.candidate_portfolio import ranking_key
     physical=[r for r in current['observations'] if not r['historical_only'] and r['task_gap']['valid_complete']]
     brief['scientific_results']['best_independent_physical']=min(physical,key=ranking_key) if physical else None
@@ -1891,10 +1925,14 @@ def route_review(host,current,brief,trace):
     for step in trace['recent']:
         for ref in step['result_references']:
             if ref['artifact_id'] in seen:continue
-            seen.add(ref['artifact_id']);raw=host.store.artifact(ref)
+            seen.add(ref['artifact_id'])
+            independent=ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+            raw=host.store.artifact(ref) if independent else host.store.artifact(ref,paths=(
+                'candidate','design_candidate','native_dynamics.optimization.best.measure.signed_maximum_excess',
+                'trajectory.replayed_violation','model_identity','model','analysis_applicability','task_analysis',
+                'native_analysis.basis','requested_operation'))
             candidate=raw.get('candidate',raw.get('design_candidate'))
             if not candidate:continue
-            independent=ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
             gap=task_gap(raw) if independent else {}
             pointer='/acceptance';scope='independent_task';score=gap.get('normalized_gap') if gap.get('valid_complete') else None
             if not independent:

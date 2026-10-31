@@ -219,7 +219,7 @@ def candidate_responses(host, reference):
     s=state(host);spec=s['spec'];candidate=verify_candidate(host,reference)
     parameters=family_analysis_parameters(spec,candidate);inventory=[];ready=[]
     for ref in s.get('analysis_results',[]):
-        raw=host.store.artifact(ref)
+        raw=host.store.artifact(ref,paths=('status','implementation','protocol','candidate','nonlinear_capability.method'))
         if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or raw.get('protocol')!=spec['analysis_protocol']
                 or raw.get('nonlinear_capability',{}).get('method')!=T1):continue
         c=verify_candidate(host,raw['candidate'])

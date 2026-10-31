@@ -261,11 +261,11 @@ def citation_role(host, reference, *, current=None, known=None):
     return 'unregistered_reference'
 
 
-def citation_inventory(host):
+def citation_inventory(host, *, references=None):
     """Registration permits citation checks; it never upgrades an artifact's claim."""
     from tools.research.state import state
     rows=[];current=state(host);known=registered_references(host)
-    for ref in {r['artifact_id']:r for r in known}.values():
+    for ref in {r['artifact_id']:r for r in (known if references is None else references)}.values():
         value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
         rows.append(dict(reference=ref,role=citation_role(host,ref,current=current,known=known),registered=True,
             supports_scientific_conclusion=bool(summary['supported_inferences']),

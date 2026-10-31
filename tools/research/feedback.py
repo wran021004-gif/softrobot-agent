@@ -179,7 +179,7 @@ def scientific_result_delivery(host):
     s=state(host);searches=[search_feedback(host,r) for r in s.get('search_results',[])]
     # The legacy search reader keeps its fields; L0 gives J/source one owner.
     searches=[{k:v for k,v in row.items() if k not in ('proxy_values','best_candidate')} for row in searches]
-    groups={};covered=set()
+    groups={};covered=set();failures={}
     for search in searches:
         fixed=search.get('fixed_result') or {}
         for fact in fixed.get('best_mathematical',[]):
@@ -189,6 +189,17 @@ def scientific_result_delivery(host):
                 groups[key]=dict(fact=fact,search=search)
         raw=host.store.artifact(search['reference'])['result']
         covered.update(v['analysis']['artifact_id'] for row in raw.get('comparison_summary',[]) for v in row['conditions'].values() if v.get('analysis'))
+        for i,row in enumerate(raw.get('comparison_summary',[])):
+            for condition,value in row['conditions'].items():
+                score=value.get('J');status=value.get('status')
+                if status=='computed' and (not isinstance(score,(int,float)) or score<=0):continue
+                key=(condition,status)
+                # Keep the latest representative of each observed failure status.
+                failures.pop(key,None)
+                failures[key]=dict(reference=value.get('analysis'),candidate=row.get('candidate'),condition_id=condition,
+                    status=status,J=score,reason=value.get('reason'),search_reference=search['reference'],
+                    source_query=dict(reference=search['reference'],view='full',
+                        pointer='/result/comparison_summary/'+str(i)+'/conditions/'+condition.replace('~','~0').replace('/','~1')))
     latest_evaluation=None
     # Search owns its batch summary; standalone Native results share its fact card.
     for ref in s.get('analysis_results',[]):
@@ -211,7 +222,12 @@ def scientific_result_delivery(host):
             best.append(dict(fact=fact,search_reference=search['reference'] if search else None,
                 plan_reference=(search.get('fixed_result') or {}).get('plan') if search else None,
                 final_materialization=search['final_materialization'] if search else None))
-    return dict(version='scientific_result_delivery_v1',latest_search=latest,study_best_mathematical=best,
+    critical=list(failures.values())[-2:]
+    for failure in critical:
+        candidate=failure.get('candidate')
+        failure['profile_identity']=host.store.artifact(candidate,paths=('profile_identity',)).get('profile_identity') if candidate else None
+        failure['scope']='Saved mathematical failure/incomplete status, not structural infeasibility or an independent physical verdict. Full details remain queryable.'
+    return dict(version='scientific_result_delivery_v1',latest_search=latest,study_best_mathematical=best,critical_failures=critical,
         latest_evaluation=latest_evaluation,
         scope='Finite saved observations grouped by task, profile, numerical method and discretization. Different groups are not ranked against each other; unequal optimization budgets establish no causal or global optimum claim. Search summaries grant no formal SELECT/read credit.')
 
