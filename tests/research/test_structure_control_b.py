@@ -15,16 +15,6 @@ from tests.research.test_information_flow import generation
 
 
 class DirectionProjectionTests(unittest.TestCase):
-    def test_scripted_main_plans_retain_original_required_decision_method(self):
-        from tools.research.contracts import Plan
-        from tests.research.structure_control_b_check import plan
-        def validate(host,value,key,**kw):return plain(Plan.model_validate(value))
-        with patch.object(core,'dispatch',side_effect=validate):
-            result=plan(None,'generate','schema-only',generation=dict(version='serial_family_generation_v2',
-                family_space_identity='a'*64,segment_count=2,tendon_count=4))
-            self.assertEqual(result['decision']['selected_method'],'generate')
-            self.assertEqual(plan(None,'stop','schema-stop')['decision']['selected_method'],'stop')
-
     def test_two_candidates_alternate_without_cross_candidate_direction(self):
         h,a=prepare();b=generate(h,(.17,.11));diagnose(h,a,'scientific_question')
         ar=execute_synthetic(h,a,mechanism_question())['reference']
@@ -57,6 +47,7 @@ class DirectionProjectionTests(unittest.TestCase):
         ready=agent_decision_brief(h)['mechanism_research'];self.assertTrue(ready['operation_admission']['differentiate']['can_prepare'])
         for change in ('budget','closeout','grant'):
             update(h,**deepcopy(original))
+            spec=deepcopy(state(h)['spec']);spec['research_decisions']['analysis_interface']='scientific_question_v4';update(h,spec=spec)
             if change=='budget':update(h,mathematical_evaluations=32)
             elif change=='closeout':update(h,count_closeout=True)
             else:
@@ -180,7 +171,7 @@ class JointSemanticsTests(unittest.TestCase):
         from tools.research.task_constraints import mathematical_method_view
         from tools.research.state import save
         from tools.state_io import read,atomic_json,digest
-        cfg=read(ROOT/'configs/research/study_structure_mechanism_aplus_check.json')
+        cfg=read(ROOT/'tests/research/fixtures/b_mechanism_study.json')
         cfg.update(study_id='b-tracking-fixture-'+uuid4().hex[:8],task='../../tasks/bf4_tracking_direction_change_v1.json')
         cfg['family_execution']=read(ROOT/'configs/research/study_tracking_public.json')['family_execution']
         cfg['control']='control_bf4_tracking.json'

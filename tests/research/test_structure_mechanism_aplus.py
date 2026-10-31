@@ -58,9 +58,7 @@ def prepare(*,physical=False):
     return h,c
 
 
-def execute_synthetic(h,c,q):
-    compiled=compile_question(h,q,tool_use_id='aplus-synthetic-compile')
-    assert compiled['status']=='ready',compiled
+def synthetic_worker(h,c):
     def worker(command,log,timeout,**kw):
         req=read(Path(command[-1]));query=AnalysisRequest.model_validate(req['query'])
         context=prepare_context(state(h)['spec'],h.store.artifact(c),query.mechanism_study,[])
@@ -71,7 +69,13 @@ def execute_synthetic(h,c,q):
         value=analysis.scoped_result(value,TaskAnalysisRequirement.model_validate(req['task_analysis']),req['analysis_applicability'],query)
         atomic_json(Path(command[-1]).with_name('result.json'),value)
         return SimpleNamespace(returncode=0)
-    with patch('tools.service_execution._run_contained',side_effect=worker):
+    return patch('tools.service_execution._run_contained',side_effect=worker)
+
+
+def execute_synthetic(h,c,q):
+    compiled=compile_question(h,q,tool_use_id='aplus-synthetic-compile')
+    assert compiled['status']=='ready',compiled
+    with synthetic_worker(h,c):
         return analysis.dispatch(h,compiled['request'],'aplus-synthetic-'+str(len(state(h)['analysis_results'])),guard=lambda *a:None,origin='engineering_preflight')
 
 

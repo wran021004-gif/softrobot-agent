@@ -96,6 +96,43 @@ class SavedChoiceTests(unittest.TestCase):
 
 
 class SelectAdmissionTests(unittest.TestCase):
+    def test_actual_wire_replay_choice_then_certificate_select_and_stop(self):
+        from tests.research.test_p63g_bounded_evidence import bounded_host,perfect_tracking_worker
+        from tests.research.test_p63a_math_interface import generate,t1_request,offline_dispatch
+        from tests.research.test_recent_round_tools import run_fixture
+        from tests.research.test_p63r3_closure import selection
+        from tools.research.state import state,save,update
+        h=bounded_host();candidate=generate(h)
+        result=offline_dispatch(h,t1_request(h,candidate),'short-choice-native-fixture')['reference']
+        # The older T1 fixture predates Replay's complete-trajectory flag.
+        # Add it only to a new, explicitly synthetic fixture artifact.
+        raw=h.store.artifact(result);raw['native_dynamics']['optimization']['best']['task_gap']=dict(valid_complete=True)
+        schedule=h.store.artifact(raw['control_schedule_reference'])
+        schedule['provenance']['candidate']=candidate
+        raw['control_schedule_reference']=save(h,schedule,'synthetic_candidate_bound_schedule')
+        raw['native_dynamics']['optimized_schedule']=schedule
+        result=save(h,raw,'synthetic_complete_replay_source')
+        update(h,analysis_results=[*state(h)['analysis_results'],result])
+        saved_choice(h,'result_2')
+        plan=rationale('physical_replay');plan['physical_replay']=dict(result_choice='result_2')
+        plan['decision']=dict(hypothesis_id='fixture')
+        with patch('tools.research.physical_replay.guard'),patch('tools.service_execution._run_contained',side_effect=perfect_tracking_worker),\
+                patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+            wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='physical_replay')),('research_plan',plan)],limit=2)
+        evaluation=state(h)['physical_replays'][-1]
+        self.assertEqual(h.store.artifact(evaluation)['candidate'],candidate)
+        self.assertEqual(h.store.artifact(evaluation)['source_reference'],h.store.artifact(result)['control_schedule_reference'])
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_ADDITIONAL_WORKER')),\
+                patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+            wires+=run_fixture(h,[('evidence_read',dict(reference=evaluation,view='acceptance_certificate')),
+                ('research_route',dict(tool='research_plan',action='select')),('research_plan',selection(candidate,evaluation))],id_offset=2)
+        self.assertEqual(state(h)['selected'],evaluation);self.assertEqual(state(h)['research_status'],'stopped')
+        self.assertEqual(len(state(h)['physical_replays']),1)
+        import json,re
+        for wire in wires:
+            self.assertIsNone(re.search(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',json.dumps(wire),re.I))
+            self.assertNotIn('x-research-reference-choices',json.dumps(wire))
+
     def test_short_choice_keeps_public_read_gate_and_auto_closure(self):
         from tests.research.test_p63g_bounded_evidence import bounded_host,BoundedEvidenceTests
         from tests.research.test_recent_round_tools import run_fixture

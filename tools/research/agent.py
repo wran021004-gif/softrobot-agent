@@ -954,6 +954,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     from tools.research.evidence_policy import english_native
     if english_native(state(host)['spec']):
         instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
+    from tools.research.object_choices import main_context_enabled
+    if main_context_enabled(state(host)['spec']):
+        instructions+='\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search).'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search curated procedural guidance, then execute a result entry read_query exactly. A retrieval receipt artifact ID is not an entry_id. Historical guidance never grants scientific evidence or action permission.',ExperienceQuery,'experience'),

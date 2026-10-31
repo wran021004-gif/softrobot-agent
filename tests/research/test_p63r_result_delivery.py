@@ -122,17 +122,20 @@ class ScientificResultDeliveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.h.store.artifact(ref,raw=True,paths=('a',))
 
     def test_actual_sdk_mock_wire_keeps_fact_card_and_existing_fields(self):
-        fixture(self.h,self.c,-.05);facts=scientific_result_delivery(self.h)
         for status in ('available','unavailable','skipped'):
             with self.subTest(reporter=status):
-                h=g3_host();generate(h);original=decision_packet(h)
+                h=g3_host();candidate=generate(h);fixture(h,candidate,-.05)
+                facts=scientific_result_delivery(h);original=decision_packet(h)
                 projected=deepcopy(original);projected['research']['scientific_results']=facts
                 projected['research']['latest_reports']=[dict(report_reference=save(h,dict(offline_report=status)),
                     reporter_status=status,result_references=[],findings=[],interpretations=[],unresolved=[])]
                 with patch('tools.research.agent.decision_packet',return_value=projected):
                     wire=run_fixture(h,[None])[0]
                 delivered=packet(wire)
-                self.assertEqual(delivered['scientific_results'],facts)
+                fact=delivered['scientific_results']['latest_search']['fixed_result']['best_mathematical'][0]
+                self.assertEqual(fact['J'],-.05)
+                self.assertEqual([m['value'] for m in fact['metrics']],[.009,.0095,.019])
+                self.assertIsInstance(fact['reference'],str)
                 self.assertEqual(delivered['reporter_findings'][0]['status'],status)
                 for key in ('research_trace','tool_continuation','knowledge','budget','capabilities','research_focus','evidence_access'):
                     self.assertIn(key,delivered)

@@ -26,7 +26,7 @@ def provision(*,tools=True):
     return h
 
 
-def run_fixture(h, responses, *, limit=None):
+def run_fixture(h, responses, *, limit=None, id_offset=0):
     sent=[]
     def respond(request):
         wire=json.loads(request.content);sent.append(wire);n=len(sent)-1
@@ -42,7 +42,12 @@ def run_fixture(h, responses, *, limit=None):
             from tools.research.object_choices import main_projection
             if definition.get('$defs',{}).get('EvidenceRef',{}).get('type')=='string':
                 payload=main_projection(h,payload)
-            message.update(content=None,tool_calls=[dict(id='offline-use-'+str(n),type='function',
+                if name=='research_plan':
+                    if 'supporting_evidence' not in definition.get('properties',{}):payload.pop('supporting_evidence',None)
+                    decision=definition.get('$defs',{}).get('ResearchDecision',{}).get('properties',{})
+                    for field in ('selected_candidate','selected_method','requested_budget','research_intent','selected_variables'):
+                        if field not in decision:payload.get('decision',{}).pop(field,None)
+            message.update(content=None,tool_calls=[dict(id='offline-use-'+str(n+id_offset),type='function',
                 function=dict(name=name,arguments=json.dumps(payload)))])
         return httpx.Response(200,json=dict(id='offline-response-'+str(n),object='chat.completion',created=1,
             model=wire['model'],choices=[dict(index=0,finish_reason='tool_calls' if use else 'stop',message=message)],

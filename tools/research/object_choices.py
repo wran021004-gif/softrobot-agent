@@ -216,6 +216,12 @@ def main_projection(host, value):
                 identities.search(json.dumps(v)))}
         if isinstance(item,list):return [project(v) for v in item]
         if isinstance(item,str):
+            # SDK historical previews may cut a JSON object in half. They are
+            # not authoritative evidence; never expose raw identity fragments
+            # from an unparseable preview. Current fixed facts and exact reads
+            # are delivered independently in CURRENT_RESEARCH_PACKET.
+            if re.match(r'^\[Truncated: \d+ blocks?, ~[\d,]+ tokens\]\n\n',item):
+                return 'SDK truncated historical preview. Use the current research packet and original-result query for evidence; this preview gives no complete-read credit.'
             # Tool results and action arguments are JSON inside the SDK wire.
             try:decoded=json.loads(item)
             except (ValueError,TypeError):decoded=None
