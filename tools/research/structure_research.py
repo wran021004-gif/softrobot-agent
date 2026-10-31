@@ -1,5 +1,6 @@
 """Bounded structural research in the existing worker; no Store or candidate writes."""
 import time
+from copy import deepcopy
 import numpy as np
 from tools.platform_store import plain
 from extensions.tendon_family.family_space import resolved_request
@@ -355,18 +356,26 @@ def summary(value, reference):
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
     sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]
-    for compact,row in zip(sensitivity,raw.get('parameter_sensitivities',[])):
+    for compact_sensitivity,row in zip(sensitivity,raw.get('parameter_sensitivities',[])):
         if row.get('implicit_sensitivity'):
-            compact['implicit_sensitivity']={k:row['implicit_sensitivity'][k] for k in
+            compact_sensitivity['implicit_sensitivity']={k:row['implicit_sensitivity'][k] for k in
                 ('status','baseline_included','relative_error','gradient_trustworthy','strict_derivative','reason') if k in row['implicit_sensitivity']}
     constraint_state=raw.get('constraint_state')
     if constraint_state:
         constraint_state={k:v for k,v in constraint_state.items() if k!='native_soft_length_residual_m'}
         constraint_state['native_soft_length_excess_m']=max(0.,max(raw['constraint_state']['native_soft_length_residual_m']))
+    task_observations=deepcopy(raw.get('task_observations',[])[:4])
+    if raw.get('physical_problem'):
+        definitions={o['name']:o for o in raw['records'][0]['configuration']['task']['physical_problem'].get('observations',[])}
+        for row in task_observations:
+            metric=definitions[row['name']]
+            if (raw['target']['quantity']=='re_equilibrated_position_response' and raw['target']['reduction']=='norm' and
+                    metric['quantity']=='material_displacement' and metric.get('material_s',.5)==raw['target'].get('material_s',.5)):
+                row.pop('value',None);row['value_at']='structure_research.baseline'
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
-        task_observations=raw.get('task_observations',[])[:4],
+        task_observations=task_observations,
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,
         comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),

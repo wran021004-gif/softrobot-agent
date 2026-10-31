@@ -142,6 +142,8 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(latest['status'],'computed');self.assertEqual(latest['effect_semantics'],'re_equilibrated_passive_response')
         self.assertEqual(latest['structure_research']['registered_acceptance'],'not_registered')
         self.assertEqual(len(latest['structure_research']['task_observations']),3)
+        self.assertEqual(latest['structure_research']['task_observations'][0]['value_at'],'structure_research.baseline')
+        self.assertEqual(latest['structure_research']['structure_direction']['parameter_changes'][0]['suggested_value'],7135000.)
         self.assertEqual(l0['reporter_findings'][-1]['status'],'unavailable')
         from tools.research.scientific_intent import compile_question
         before=s['mathematical_evaluations']
