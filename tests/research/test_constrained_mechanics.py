@@ -104,6 +104,14 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         self.assertEqual(observe(mechanics,dict(quantity='tangent_stiffness',reduction='minimum'))['reason'],'EMPTY_TANGENT_SPACE_HAS_NO_EXTREMUM')
         raw=dict(operation='inspect',target=value['target'],baseline=value,cost={},unsupported_conclusions=[])
         self.assertEqual(summary(dict(structure_research=raw),'fixture')['baseline']['norm'],0.)
+        from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
+        from tools.research_tasks import ResearchTaskAdapter
+        problem=physical_fixture()[-1];problem.update(monitor_s=[.3],observations=[dict(name='capacity',quantity='maximum_tension',load_condition='lateral')])
+        ConstrainedPhysicalProblem.model_validate(problem)
+        fixture=dict(equilibrium=dict(equilibrium=dict(positions=[[0.,0.,0.],[0.,0.,0.]],tensions_n=[.2],length_residual_m=[0.])),
+            baseline_equilibrium=dict(equilibrium=dict(positions=[[0.,0.,0.],[0.,0.,0.]])),
+            constraint_state=dict(qualified=True),point_binding=dict(load=dict(name='lateral')))
+        self.assertEqual(ResearchTaskAdapter(dict(task=dict(physical_problem=problem))).constrained_observations(fixture)[0]['value'],.2)
 
     def test_real_active_two_scale_native_path(self):
         from tests.research.test_r3_b_stage1 import structure_question

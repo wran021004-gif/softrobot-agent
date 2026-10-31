@@ -200,7 +200,8 @@ class ConstrainedPhysicalProblem(Contract):
         names=[x.name for x in self.loads]
         if len(set(names))!=len(names) or self.baseline_load not in names:raise ValueError('UNIQUE_FROZEN_LOAD_BINDINGS_REQUIRED')
         if any(not 0<=s<=1 for s in self.monitor_s):raise ValueError('MATERIAL_S_OUT_OF_RANGE')
-        if len({o.name for o in self.observations})!=len(self.observations) or any(o.load_condition not in names or o.material_s not in self.monitor_s for o in self.observations):
+        if len({o.name for o in self.observations})!=len(self.observations) or any(o.load_condition not in names or
+                o.quantity in ('material_displacement','displacement_ratio') and o.material_s not in self.monitor_s for o in self.observations):
             raise ValueError('UNIQUE_OBSERVATIONS_WITH_FROZEN_LOAD_AND_MONITOR_BINDING_REQUIRED')
         if not np.allclose(R.T@R,np.eye(3),atol=1e-10) or abs(np.linalg.det(R)-1)>1e-10:raise ValueError('PROPER_MOUNT_ROTATION_REQUIRED')
         if any(next(x for x in self.loads if x.name==self.baseline_load).force_world_n):raise ValueError('ZERO_LOAD_BASELINE_REQUIRED')

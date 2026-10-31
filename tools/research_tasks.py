@@ -163,7 +163,8 @@ class ResearchTaskAdapter:
         delta=np.array(eq['positions'])-np.array(base['positions'])
         for metric in problem.get('observations',[]):
             if metric['load_condition']!=mechanics['point_binding']['load']['name']:continue
-            point=float(np.linalg.norm(delta[problem['monitor_s'].index(metric.get('material_s',.5))]));tip=float(np.linalg.norm(delta[-1]))
+            point=float(np.linalg.norm(delta[problem['monitor_s'].index(metric.get('material_s',.5))])) if metric['quantity'] in ('material_displacement','displacement_ratio') else 0.
+            tip=float(np.linalg.norm(delta[-1]))
             name=metric['quantity'];unit='1' if name=='displacement_ratio' else 'N' if name=='maximum_tension' else 'm'
             value={'material_displacement':point,'tip_displacement':tip,'displacement_ratio':tip/point if point>1e-12 else None,
                 'maximum_tension':max(eq['tensions_n']),'maximum_length_excess':max(0.,max(eq['length_residual_m']))}[name] if qualified else None
