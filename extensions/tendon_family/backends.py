@@ -255,6 +255,13 @@ class SerialBackend:
             if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
+        if inp.task.physical_problem:
+            if cls.model!='mujoco_serial_bending_v1':raise ValueError('PASSIVE_NATIVE_MUJOCO_MODEL_REQUIRED')
+            p=physics_for(inp)
+            if not p.get('fixed_payout_lengths_m') or p['actuators']:raise ValueError('PASSIVE_ASSEMBLY_REQUIRED')
+            # Definition admission for the mathematical worker only. compile()
+            # still rejects unregistered passive dynamic execution via assemble.
+            return
         controllers=['controller.gvs_nmpc','controller.sorosim_matlab_nmpc']
         if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry

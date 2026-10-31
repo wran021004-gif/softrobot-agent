@@ -399,7 +399,7 @@ class MechanismTarget(Contract):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_DIRECTION_ONLY')
         if self.direction_world is not None and abs(sum(x*x for x in self.direction_world)-1)>1e-8:
             raise ValueError('UNIT_WORLD_DIRECTION_REQUIRED')
-        if self.reduction=='directional_norm' and self.quantity not in ('tip_jacobian','tip_acceleration_input_map'):
+        if self.reduction=='directional_norm' and self.quantity not in ('tip_jacobian','tip_acceleration_input_map','tangent_compliance','material_point_force_response','re_equilibrated_position_response'):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_VECTOR_MAP')
         generalized=self.reduction in ('generalized_projection','direction_cosine')
         if generalized != (self.direction_generalized is not None):
@@ -418,6 +418,14 @@ class MechanismTarget(Contract):
         for key in ('tendon_channel','direction_generalized'):
             if getattr(self,key) is None:result.pop(key,None)
         return result
+
+
+class PhysicalMechanismTarget(MechanismTarget):
+    quantity: MechanismTarget.model_fields['quantity'].annotation | Literal[
+        'constraint_length_jacobian','constraint_active_set','constraint_multiplier','slack_margin',
+        'constrained_motion_subspace','tangent_stiffness','tangent_compliance','material_point_force_response',
+        're_equilibrated_position_response','constraint_tip_row_residual']
+    material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
 
 
 class ScientificSourcesV2(ScientificSources):
@@ -455,12 +463,21 @@ class MechanismQuestionV2(Contract):
     response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05)
 
 
+class ScientificStructureV4(MechanismQuestionV2):
+    target: PhysicalMechanismTarget | str
+    control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop','no_active_control']
+    physical_problem: Literal['passive_unilateral_equilibrium'] | None = None
+    load_condition: str | None = None
+
+
 class MechanismStudy(Contract):
     operation: Literal['inspect','differentiate','optimize','compare']
-    target: MechanismTarget
+    target: PhysicalMechanismTarget
     parameter_path: str | None = None
     parameter_paths: list[str] = Field(default_factory=list,max_length=2)
-    point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']
+    point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state','re_equilibrated']
+    load_condition: str | None = None
+    effect_semantics: Literal['mechanism_effect','re_equilibrated_passive_response'] = 'mechanism_effect'
     max_evaluations: StrictInt = Field(ge=1,le=64)
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
@@ -480,6 +497,8 @@ class MechanismStudy(Contract):
         value=handler(self)
         if not self.parameter_paths:value.pop('parameter_paths',None)
         if self.local_radius_fraction==.02:value.pop('local_radius_fraction',None)
+        if self.load_condition is None:value.pop('load_condition',None)
+        if self.effect_semantics=='mechanism_effect':value.pop('effect_semantics',None)
         return value
 
 
@@ -504,7 +523,7 @@ class ScientificQuestionV4(Contract):
     """New integrated choices; historical question versions keep their contracts."""
     version: Literal['scientific_question_v4'] = 'scientific_question_v4'
     domain: Literal['structure','control']
-    structure: MechanismQuestionV2 | None = None
+    structure: ScientificStructureV4 | None = None
     control: ScientificQuestionV3 | None = None
 
     @model_validator(mode='after')

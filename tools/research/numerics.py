@@ -134,6 +134,12 @@ def native_point(host, query, configuration):
     Prefix verification/integration happens inside the charged analysis worker,
     not during admission. No complete optimizer record or GVS recipe is needed.
     """
+    if configuration['task'].get('physical_problem'):
+        if not query.mechanism_study:raise ValueError('PASSIVE_CONTROL_AND_DYNAMIC_METHODS_NOT_ADAPTED')
+        from extensions.tendon_family.compiler import resolve
+        physics=resolve(configuration['robot']['structure']['data'],configuration['policy']['discretization']['data'])
+        return dict(actual_time_s=0.,dof_order=physics['dofs'],tendon_order=[],u=[],
+            qpos_rad=[0.]*len(physics['dofs']),qvel_rad_s=[0.]*len(physics['dofs']))
     if query.saved_state:
         point=deepcopy(host.store.artifact(query.saved_state))
         if (point.get('candidate')!=plain(query.candidate) or

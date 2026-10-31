@@ -171,6 +171,7 @@ def evaluate_signals(task, result, source, reg, comparison_identity, mode):
         source=source, evaluator=task.evaluator.extension_id, comparison_identity=comparison_identity)
 
 def evaluate_reach(task, result, source, reg, identity):
+    if task.physical_problem:raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
     return evaluate_signals(task, result, source, reg, identity, 'reach')
 
 

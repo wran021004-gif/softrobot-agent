@@ -80,7 +80,11 @@ def compile_input(value, reg=None):
         raise ValueError('BACKEND_SIGNAL_PHASE_UNSUPPORTED')
     if set(controller.capabilities.get('observations', [])) - set(caps['signals']):
         raise ValueError('CONTROL_OBSERVATION_UNSUPPORTED')
-    if controller.capabilities['channel'] not in task.actuator_channels:
+    if task.physical_problem:
+        design=inp.robot.structure.data
+        if inp.robot.structure.contract!='family.design' or not design.get('fixed_payout_lengths_m') or design.get('actuators'):
+            raise ValueError('PASSIVE_TASK_REQUIRES_FIXED_PAYOUT_ASSEMBLY_WITHOUT_ACTUATORS')
+    elif controller.capabilities['channel'] not in task.actuator_channels:
         raise ValueError('CONTROL_CHANNEL_UNSUPPORTED')
     if inp.policy.candidate_builder is None:
         from schemas.platform import Binding, Payload

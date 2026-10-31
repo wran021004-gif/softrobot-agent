@@ -638,6 +638,7 @@ def family_bootstrap(space, execution):
         frame='world_base_x_forward_yz_cross_section',sources=['frozen family assembly'],
         assumptions=space['assumptions'],unsupported=space['unsupported'],
         structure=dict(contract='family.design',version='1.0.0',data=design))
+    if design.get('fixed_payout_lengths_m'):robot['channels']=[]
     initial = {k:{j:0. for j in physics['dofs']} for k in ('qpos_rad','qvel_rad_s')}
     initial['unspecified'] = 'zero'
     return dict(robot=robot,discretization=dict(contract='family.discretization',version='1.0.0',data=mesh),

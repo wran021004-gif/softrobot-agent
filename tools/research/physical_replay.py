@@ -391,6 +391,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     candidate=plain(arguments.candidate)
     cfg=verify_candidate(host,candidate)['configuration']
+    if cfg['task'].get('physical_problem'):raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
     source_ref=plain(arguments.source)
     source=host.store.artifact(source_ref)
     if explicit_control_source(source) and 'control_correction' not in s['spec']['capabilities']:

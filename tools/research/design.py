@@ -82,6 +82,10 @@ def resolved_configuration(source,base,p,owner,*,topology_grant=None):
     cfg=deepcopy(base)
     cfg['run_id']=owner
     cfg['robot']['structure']['data']=robot
+    if robot.get('fixed_payout_lengths_m'):
+        if not cfg['task'].get('physical_problem'):raise ValueError('FROZEN_PASSIVE_PHYSICAL_PROBLEM_REQUIRED')
+        cfg['task']['actuator_channels']=[];cfg['robot']['channels']=[]
+    elif cfg['task'].get('physical_problem'):raise ValueError('PASSIVE_TASK_REQUIRES_PASSIVE_ASSEMBLY')
     cfg['policy']['discretization']['data']=mesh
     cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='4.0.0' if topology_grant else '3.0.0',
         parameters=dict(contract='family.topology_space' if topology_grant else 'family.generator_space',version='1.0.0',data=plain(space)))
@@ -281,10 +285,14 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
                 cfg['policy']['controller']['parameters']['data']['recipe'].get('replan_period_s')!=spec['nmpc_replan_period_s']):
             raise ValueError('FROZEN_STUDY_NMPC_REPLAN_PERIOD')
         compile_input(cfg,host.reg)
-        numerical=mathematical_numerical(SessionInput.model_validate(cfg))
+        if cfg['task'].get('physical_problem'):
+            numerical=dict(coordinate_order=physics['dofs'],measured_initial_state=[0.]*len(physics['dofs']),
+                tendon_order=[t['entity'] for t in physics['tendons']],force_limits_n=[t['force_limit_n'] for t in physics['tendons']],warm_guess=dict(tensions=[]))
+        else:numerical=mathematical_numerical(SessionInput.model_validate(cfg))
         identity=family_candidate_identity(cfg,s)
         dimensions=dict(physical_dofs=len(physics['dofs']),gvs_coordinates=len(numerical['coordinate_order']),
             state=len(numerical['measured_initial_state']),inputs=len(numerical['tendon_order']))
+        if cfg['task'].get('physical_problem'):dimensions.update(gvs_coordinates=0,inputs=0)
         resolved=dict(segments=[c for c in robot['components'] if c['kind']=='flexible_segment'],
             tendons=robot['tendons'],actuators=robot['actuators'],discretization=mesh,
             tendon_order=numerical['tendon_order'],actuator_order=[a['id'] for a in robot['actuators']],

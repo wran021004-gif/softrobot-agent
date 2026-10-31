@@ -53,6 +53,7 @@ def assemble_physical(inp,p):
 
 
 def assemble(inp,p):
+    if inp.task.physical_problem:raise ValueError('PASSIVE_DYNAMIC_EXECUTION_AND_ACCEPTANCE_NOT_REGISTERED')
     from tools.platform_registry import registry
     from tools.research_tasks import task_adapter
     scene=assemble_physical(inp,p)

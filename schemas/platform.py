@@ -176,7 +176,17 @@ class TaskConditionView(Contract):
 class RobotDescription(Contract):
     family: Identifier
     structure: Payload
-    channels: list[Identifier] = Field(min_length=1)
+    channels: list[Identifier]
+
+    @model_validator(mode='after')
+    def physical_channels(self):
+        passive=self.structure.contract=='family.design' and self.structure.data.get('fixed_payout_lengths_m') is not None
+        if passive:
+            from extensions.tendon_family.contracts import Design
+            Design.model_validate(self.structure.data)
+            if self.channels:raise ValueError('PASSIVE_ROBOT_REQUIRES_NO_ACTIVE_CHANNELS')
+        elif not self.channels:raise ValueError('ACTIVE_ROBOT_REQUIRES_CHANNELS')
+        return self
     units: Literal['SI'] = 'SI'
     frame: str
     assumptions: list[str] = Field(min_length=1)

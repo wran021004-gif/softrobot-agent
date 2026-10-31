@@ -78,3 +78,24 @@ def differentiate(parameter, baseline, evaluate, *, goal):
         suggested_delta=selected['coordinate']-plan['value'] if selected else None,
         selected_record_index=selected['record_index'] if selected else None,
         direction_status='locally_consistent' if selected else 'unresolved',strict_derivative=False,descent_certificate=False)
+
+
+def re_equilibrated(parameter,baseline,records,models,response,study):
+    """Reuse legal two-scale rebuilt models; add qualified implicit state checks."""
+    from extensions.tendon_family.passive_inverse import task_design_sensitivity
+    sample=response['samples'][0]
+    if 'minus' not in sample:return dict(status='directional_comparison',reason='BOUNDARY_PARAMETER_USES_ONE_SIDED_STENCIL',strict_derivative=False)
+    mi=sample['minus']['record_index'];pi=sample['plus']['record_index'];base=baseline['record_index']
+    result=task_design_sensitivity(models[base],baseline['mechanics'],models[mi],models[pi],records[mi]['mechanics'],records[pi]['mechanics'],
+        parameter['parameter_id'],sample['normalized_step'],study.target.material_s)
+    for key,value in result['numerical_cost'].items():models[base].cost[key]=models[base].cost.get(key,0)+value
+    if result['status']=='regular_implicit_gradient':
+        v=np.array(baseline['mechanics']['re_equilibrated_position_response']);dv=np.array(result['drelative_position_du'])
+        if study.target.reduction=='norm' and np.linalg.norm(v)>1e-12:
+            predicted=float(v@dv/np.linalg.norm(v));measured=response['normalized_derivatives'][-1]
+            error=abs(predicted-measured)/max(abs(predicted),abs(measured),1e-10)
+            result.update(target_normalized_derivative=predicted,relative_error=error,
+                gradient_trustworthy=bool(error<.05 and response['consistency']['passed']))
+            if not result['gradient_trustworthy']:result['status']='directional_comparison'
+        else:result.update(status='directional_comparison',reason='NONDIFFERENTIABLE_OR_UNADAPTED_REDUCTION')
+    return result

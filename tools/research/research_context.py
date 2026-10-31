@@ -1323,7 +1323,7 @@ def mathematical_discovery_observations(host, current, candidate):
         if summary.get('structure_research'):
             latest['quantities']=[]
             latest['structure_research']=summary['structure_research']
-            latest['effect_semantics']=(raw.get('request',{}).get('mechanism_study') or {}).get('effect_semantics','mechanism_effect')
+            latest['effect_semantics']=(raw.get('requested_operation',{}).get('mechanism_study') or {}).get('effect_semantics','mechanism_effect')
             latest['actual_cost']=dict(evaluations=raw.get('charged_analysis_evaluations'),
                 numerical_s=raw.get('charged_numerical_s'))
         if optimized:

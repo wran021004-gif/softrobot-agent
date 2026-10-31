@@ -1,8 +1,8 @@
 """Registered observations of NativeModel.mechanics; no engine or expression evaluator.
 
 Tendon Jacobians always describe geometry. Active ideal-tension channels are
-forces, never fixed-payout constraints. Passive active-set nullspaces require a
-separate qualified passive model and are deliberately unavailable here.
+forces, never fixed-payout constraints. Passive observations require the actual
+fixed-payout assembly, qualified equilibrium and unilateral active set.
 """
 from copy import deepcopy
 import numpy as np
@@ -58,9 +58,24 @@ PRIMITIVES = {
 }
 
 
+CONSTRAINED = {
+    'constraint_length_jacobian':('m/rad',['nu','nv']),
+    'constraint_active_set':('1',['nu']), 'constraint_multiplier':('N',['nu']),
+    'slack_margin':('m',['nu']), 'constrained_motion_subspace':('1',['nv','free']),
+    'tangent_stiffness':('N*m/rad',['free','free']),
+    'tangent_compliance':('m/N',['3','3']), 'material_point_force_response':('m/N',['3','3']),
+    're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2'])}
+for name,(unit,shape) in CONSTRAINED.items():
+    PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame='world / named hinges / ordered fixed-payout tendons',
+        parameter_dependencies=['geometry','routing','stiffness','payout','external_load'],
+        source='extensions.tendon_family.passive_equilibrium.mechanics',model='native hard unilateral equilibrium',
+        validity='Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity.',
+        meaning='Numerical local constrained observation, not independent dynamic task acceptance.')
+
+
 def catalog():
     return dict(primitives=deepcopy(PRIMITIVES),compositions=['identity','norm','minimum','maximum','directional_norm','generalized_projection','direction_cosine'],
-        unavailable=dict(passive_constraint_nullspace='Requires actual passive fixed payout, verified taut active set and qualified equilibrium; active tension channels are not constraints.'),
+        unavailable=dict(hybrid_or_contact='Active/passive mixtures and contact sensitivities are not implemented.'),
         legacy_sources=dict(endpoint='bounded affine task kernel; no local mechanism substitution',
             braking='bounded affine task kernel',native_dynamics_v1='NativeModel.mechanics',
             fixed_input_structure_v1='same mechanics plus existing short fixed-input rollouts'))
@@ -94,18 +109,22 @@ def derived(mechanics, target):
 
 def observe(mechanics, target):
     """Use only registered primitive/reduction pairs; preserve units and raw source."""
-    from tools.research.contracts import MechanismTarget
-    target=MechanismTarget.model_validate(target)
+    from tools.research.contracts import PhysicalMechanismTarget
+    target=PhysicalMechanismTarget.model_validate(target)
     meta=deepcopy(PRIMITIVES[target.quantity]);value=mechanics
+    passive=mechanics.get('physical_problem')=='passive_unilateral_equilibrium'
+    if (target.quantity in CONSTRAINED)!=passive:
+        return dict(status='not_applicable',reason='MECHANISM_PHYSICAL_MODE_MISMATCH',value=None,metadata=meta)
     if meta['field']:
         for key in meta['field'].split('/'):value=value[key]
     else:value=derived(mechanics,target)
     if value is None:
-        return dict(status='not_applicable',reason='NONZERO_VELOCITY_REQUIRED' if target.quantity=='instantaneous_braking' else 'NONZERO_GEOMETRIC_ROW_OR_FORCE_CHANNEL_REQUIRED',
+        return dict(status='not_applicable',reason='QUALIFIED_REGULAR_EQUILIBRIUM_REQUIRED' if passive else 'NONZERO_VELOCITY_REQUIRED' if target.quantity=='instantaneous_braking' else 'NONZERO_GEOMETRIC_ROW_OR_FORCE_CHANNEL_REQUIRED',
             value=None,metadata=meta,target=target.model_dump())
     raw=np.asarray(value,dtype=float)
     nv=len(mechanics['coordinates']['dof_order']);nu=len(mechanics['coordinates']['tendon_order'])
-    expected=tuple({'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2}[s] for s in meta['shape'])
+    free=nv-mechanics.get('constraint_state',{}).get('positive_count',0)
+    expected=tuple({'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2,'free':free}[s] for s in meta['shape'])
     if raw.shape!=expected or not np.isfinite(raw).all():raise ValueError('MECHANISM_DIMENSION_OR_FINITE_VALUE_MISMATCH')
     source_shape=list(raw.shape)
     if target.tendon_channel is not None:
@@ -127,5 +146,6 @@ def observe(mechanics, target):
         dof_order=mechanics['coordinates']['dof_order'],tendon_order=mechanics['coordinates']['tendon_order'],
         state=dict(time_s=mechanics['time_s'],qpos_rad=mechanics['qpos_rad'],qvel_rad_s=mechanics['qvel_rad_s']),
         physical_inputs=dict(tensions_n=mechanics['actual_tensions_n'],bounds_n=mechanics['input_bounds_n']))
+    if passive:meta.update(constraint_state=mechanics['constraint_state'],point_binding=mechanics['point_binding'])
     return dict(status='computed',value=value,unit=meta['unit'],target=target.model_dump(),metadata=meta,
         source_pointer='/mechanics/'+meta['field'] if meta['field'] else '/mechanics')

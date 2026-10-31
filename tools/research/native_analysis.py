@@ -86,6 +86,10 @@ def structure_context(base, candidates, request, *, spec=None):
 
 
 def assessment(configuration, requirements):
+    if configuration.task.physical_problem:
+        return dict(model_id='model.mujoco_native',model_version='1.0.0',representation_id='native_named_hinges_v1',
+            relevant_assumptions=['Contact-free ideal unilateral fixed-payout equilibrium; native tendon soft limits are a separate dynamic model.'],
+            uses=dict(native_numerics=dict(status='ACCEPT',reasons=[])))
     reasons=[]
     if configuration.policy.backend.extension_id!='backend.family_mujoco':reasons.append('MuJoCo backend required.')
     if configuration.task.environment.data.get('external_forces'):
@@ -105,6 +109,12 @@ def assessment(configuration, requirements):
 
 
 def applicability(requirements, query, assessed, point):
+    if requirements.binding.get('physical_problem'):
+        study=getattr(query,'mechanism_study',None)
+        supported=bool(study and study.point_semantics=='re_equilibrated')
+        return dict(status='applicable' if supported else 'not_applicable',reasons=[] if supported else ['Passive problem requires re-equilibrated mechanism analysis.'],
+            constraint_coverage=[],full_task_supported=False,execution_support='mathematical_diagnostic_only',model_assessment=assessed,
+            horizon=dict(analysis_horizon_s=0.,task_duration_s=requirements.duration_s,interpretation='Static constrained equilibrium; no dynamic task acceptance.'))
     reasons=[r for use in assessed['uses'].values() for r in use['reasons']]
     point=point or {};start=point.get('actual_time_s')
     initial=query.operating_point=='standardized_initial_pretension'

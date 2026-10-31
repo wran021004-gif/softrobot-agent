@@ -62,6 +62,10 @@ def selected_operating_point_guidance(host, reference, method, detail):
     from tools.research.numerics import native_point, execution_update
     from tools.research.design import verify_candidate
     s=state(host);cfg=verify_candidate(host,reference)['configuration']
+    if cfg['task'].get('physical_problem'):
+        return dict(method=method,operating_points=[dict(name='re_equilibrated',meaning='Solve the frozen unilateral assembly under the selected load; no active input.')],
+            saved_sources=[],unavailable=[],load_conditions=[x['name'] for x in cfg['task']['physical_problem']['loads']],
+            details_query=dict(reference=reference,view='full',pointer='/configuration/task/physical_problem'))
     operation=detail['operation'];native=detail['request_template'].get('model_source')=='mujoco'
     sources=[];unavailable=[]
     if native:
@@ -327,6 +331,14 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             request_template=dict(candidate=reference,operation=METHOD,model_source='mujoco',
                 operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+METHOD))
+        if cfg['task'].get('physical_problem'):
+            ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and remaining>=1
+            item.update(planning_status='ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
+                missing=[] if ready else ['original_scope_budget_or_candidate_admission'],
+                applicable=True,executable=ready,registered_acceptance='not_registered',
+                prerequisites=['Frozen passive assembly, load condition and material-point binding.'],
+                required_parameters=['V4 physical_problem, no_active_control, re_equilibrated, frozen load_condition, registered target and evaluation cap.'])
+            item['applicability'].update(status='applicable',reasons=[],full_task_supported=False)
         if not authorized:
             item['planning_status']='unauthorized';item['execution_status']='blocked'
             item['missing']=[*item['missing'],'explicit_frozen_mechanism_method_grant_required']

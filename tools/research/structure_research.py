@@ -139,6 +139,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     rows=context['selected_parameters'];mappings=[coordinate(row) for row in rows]
     center=np.asarray([m['origin'] for m in mappings]);base_values=[r['current_value'] for r in rows]
     attempts=0;baseline_point=None
+    passive=bool(configuration['task'].get('physical_problem'))
 
     def evaluate(values=None, *, comparison=None):
         nonlocal attempts,baseline_point
@@ -155,8 +156,21 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             cfg,build,_=family_configuration(configuration,context['space'],params,configuration['run_id'])
             params=plain(build.request);compile_input(cfg,registry())
         elif comparison is not None:cfg=comparison['configuration']
-        native=NativeModel(cfg);models.append(native)
-        if baseline_point is None:
+        if passive:
+            from pathlib import Path
+            from uuid import uuid4
+            from extensions.tendon_family.passive import PassiveModel
+            from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
+            from extensions.tendon_family.compiler import resolve
+            from tools.paths import ROOT
+            folder=ROOT/'runs'/('mechanism-'+uuid4().hex[:8]);folder.mkdir(parents=True)
+            native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'],folder/'model.xml')
+            mechanics=constrained_mechanics(native,study.load_condition,study.target.material_s)
+            data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
+        else:native=NativeModel(cfg)
+        models.append(native)
+        if passive:pass
+        elif baseline_point is None:
             baseline_point,data=native.reconstruct(point) if point.get('native_replay') else (point,native.restore(point))
             if study.point_semantics!='saved_native_state':
                 if study.point_semantics=='fixed_generalized_pose':baseline_point={**baseline_point,'qvel_rad_s':[0.]*len(native.order)}
@@ -166,11 +180,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 'qpos_rad':native.scene['qpos_rad'],'qvel_rad_s':native.scene['qvel_rad_s'],'actual_time_s':0.}
             data=native.restore(own,comparable=True)
         else:data=native.restore(baseline_point,comparable=True)
-        u=point['u'] if query.native.tensions_n is None else query.native.tensions_n
-        mechanics=native.mechanics(data,u);observation=observe(mechanics,study.target)
+        if not passive:
+            u=point['u'] if query.native.tensions_n is None else query.native.tensions_n
+            mechanics=native.mechanics(data,u)
+        observation=observe(mechanics,study.target)
         if observation['status']!='computed':raise ValueError(observation['reason'])
         record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
-            configuration=cfg,observation=observation,mechanics=mechanics,state=native.checkpoint(data),
+            configuration=cfg,observation=observation,mechanics=mechanics,state=data if passive else native.checkpoint(data),
             physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None)
         record['compiled_physical_changes']=physical_changes(records[0]['mechanics'],mechanics) if records else {}
         records.append(record);cache[key]=record
@@ -183,14 +199,16 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         task_acceptance='unmeasured',proxy_values={},operating_point=dict(name=query.operating_point,
             actual_time_s=point['actual_time_s'],semantics=study.point_semantics,
             source=point.get('provenance') or point.get('source'),
-            control_treatment='Same legal absolute tensions in every model; no control reoptimization.'))
+            control_treatment='No active control; same frozen load condition and fixed assembly payout across load cases.' if passive else 'Same legal absolute tensions in every model; no control reoptimization.'))
     evidence=dict(operation=study.operation,target=plain(study.target),records=records,
-        model_source='NativeModel.mechanics',point_semantics=study.point_semantics,
+        model_source='Constrained native equilibrium' if passive else 'NativeModel.mechanics',point_semantics=study.point_semantics,
         scope='Task initial state, fixed generalized pose and saved native state are distinct. Changed structures use named-coordinate transfer/reset, not equal Cartesian state, energy or equilibrium.',
         unsupported_conclusions=['full task improvement','task success','strict derivative','structural descent certificate',
             'passive constraint nullspace','hardware performance'])
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
+        if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
+            constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],registered_acceptance='not_registered')
         if study.operation=='compare':
             other=evaluate(comparison=context['comparisons'][0])
             evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
@@ -202,6 +220,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     values=list(base_values);values[i]=value
                     return evaluate(values)
                 response=differentiate(row,base,probe,goal=study.target.goal)
+                if passive and study.target.quantity=='re_equilibrated_position_response':
+                    from extensions.math_analysis.differentiation_router import re_equilibrated
+                    response['implicit_sensitivity']=re_equilibrated(row,base,records,models,response,study)
                 response.update(parameter_path=row['parameter_id'],parameter_unit=row['unit'],
                     model_effect_observed=any(r['compiled_physical_changes'] for r in records[first:]))
                 if not response['model_effect_observed']:
@@ -265,7 +286,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     baseline_metric=base['observation'],perturbed_metric=selected['observation'],
                     numerical_consistency=[r['consistency'] for r in responses],
                     tradeoffs='All frozen task constraints, finite response and task acceptance remain unmeasured.',
-                    model_scope='Contact-free native ideal tension, declared state and absolute input only.',
+                    model_scope='Contact-free fixed-payout equilibrium under frozen loads.' if passive else 'Contact-free native ideal tension, declared state and absolute input only.',
                     point_semantics=study.point_semantics,full_task_improvement_verified=False,
                     formal_candidate_created=False,proposal_only=True,other_parameters_unchanged=True,
                     generation_handoff=dict(tool='research_plan',action='generate',generation=generation,
@@ -312,6 +333,8 @@ def summary(value, reference):
     sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
+        physical_problem=raw.get('physical_problem'),constraint_state=raw.get('constraint_state'),point_binding=raw.get('point_binding'),
+        registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,
         comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),

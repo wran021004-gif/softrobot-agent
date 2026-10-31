@@ -84,7 +84,7 @@ def question_schema(spec, candidate=None, action=None):
     schema=question_contract(spec).model_json_schema()
     if question_contract(spec) is ScientificQuestionV4:
         # Reuse the two existing scientific payloads, with a single outer version.
-        for name in ('MechanismQuestionV2','ScientificQuestionV3'):
+        for name in ('ScientificStructureV4','ScientificQuestionV3'):
             schema['$defs'][name]['properties'].pop('version',None)
         control=schema['$defs']['ScientificQuestionV3']['properties']
         for name in ('parameter_paths','search_strategy','requested_budget'):control.pop(name,None)
@@ -96,10 +96,10 @@ def question_schema(spec, candidate=None, action=None):
             schema['properties'][domain].pop('default',None)
             schema['properties'][domain]['anyOf']=[b for b in schema['properties'][domain]['anyOf'] if b.get('type')!='null']
             schema['required'].append(domain)
-        target=schema['$defs']['MechanismTarget']['properties']['goal']
+        target=schema['$defs']['PhysicalMechanismTarget']['properties']['goal']
         target.pop('default',None)
         target['description']='Main explicitly chooses increase or decrease for differentiation or optimization.'
-        schema['$defs']['MechanismQuestionV2']['allOf']=[dict(
+        schema['$defs']['ScientificStructureV4']['allOf']=[dict(
             **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize']),effect_semantics=dict(const='mechanism_effect')),
                 required=['operation','effect_semantics'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
@@ -167,7 +167,7 @@ def compile_question(host, payload, *, tool_use_id):
             if (q.structure.effect_semantics=='mechanism_effect' and q.structure.operation in ('differentiate','optimize') and
                     isinstance(structure.get('target'),dict) and 'goal' not in structure['target']):
                 return dict(status='needs_choice',reason='EXPLICIT_MECHANISM_GOAL_REQUIRED',fields=['structure.target.goal'],scientific_execution_started=False)
-            return compile_mechanism(host,structure,tool_use_id=tool_use_id)
+            return compile_mechanism(host,structure,tool_use_id=tool_use_id,v4=True)
         if q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
         return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificQuestionV3,source_question=payload)
@@ -399,15 +399,15 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
         limitations=detail['limitations'],cost_scope=detail['cost_scope'])
 
 
-def compile_mechanism(host, payload, *, tool_use_id):
+def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     """Resolve physical meaning and actual domains; original worker owns execution."""
     from pydantic import ValidationError
-    from tools.research.contracts import MechanismQuestionV2,MechanismStudy
+    from tools.research.contracts import MechanismQuestionV2,MechanismStudy,ScientificStructureV4
     from tools.research.task_constraints import mathematical_method_view
     from tools.research.design import verify_candidate
     from tools.research.agent import bind_selected_analysis_request
     from tools.research.structure_research import METHOD,parameters,prepare_context,group_matches
-    try:q=MechanismQuestionV2.model_validate(payload)
+    try:q=(ScientificStructureV4 if v4 else MechanismQuestionV2).model_validate(payload)
     except ValidationError as exc:
         return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V2_INPUT',issues=[
             dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
@@ -418,6 +418,12 @@ def compile_mechanism(host, payload, *, tool_use_id):
     intent=completed_question_plan(host)
     if not intent:return feedback('needs_prerequisite','COMPLETED_CANDIDATE_BOUND_DIAGNOSE_REQUIRED',
         preparation=dict(tool='research_plan',action='diagnose',fields=['hypothesis','decision.selected_candidate']))
+    c=verify_candidate(host,intent['candidate'])
+    if c['configuration']['task'].get('physical_problem'):
+        if not v4:return feedback('unsupported','PASSIVE_REQUIRES_V4_PHYSICAL_SEMANTICS')
+        return compile_constrained(host,q,payload,intent,tool_use_id=tool_use_id)
+    if v4 and (q.physical_problem or q.load_condition or q.control_treatment=='no_active_control'):
+        return feedback('unsupported','FROZEN_PHYSICAL_MODE_MISMATCH')
     if q.effect_semantics=='reoptimized_task_capability':
         return compile_reoptimized(host,q,payload,tool_use_id=tool_use_id,intent=intent)
     if q.effect_semantics not in ('mechanism_effect','fixed_input_response'):
@@ -512,6 +518,44 @@ def compile_mechanism(host, payload, *, tool_use_id):
     return dict(status='ready',method=METHOD,request=full,scientific_execution_started=False,
         hypothesis=q.hypothesis or intent['agent_hypothesis'].get('hypothesis'),required_evaluations=needed,
         minimum_evaluations=context['minimum_evaluations'],limitations=detail['limitations'],cost_scope=detail['cost_scope'])
+
+
+def compile_constrained(host,q,payload,intent,*,tool_use_id):
+    """V4 only; frozen physics, original method admission and allowance."""
+    from tools.research.design import verify_candidate
+    from tools.research.structure_research import parameters,prepare_context,METHOD
+    from tools.research.task_constraints import mathematical_method_view
+    from tools.research.agent import bind_selected_analysis_request
+    from tools.research.contracts import MechanismStudy
+    spec=state(host)['spec'];candidate=intent['candidate'];c=verify_candidate(host,candidate)
+    problem=c['configuration']['task']['physical_problem']
+    def fail(reason):return dict(status='unsupported',reason=reason,scientific_execution_started=False)
+    if q.physical_problem!=problem['mode'] or q.control_treatment!='no_active_control' or q.operating_point!='re_equilibrated':
+        return fail('PASSIVE_REQUIRES_EXPLICIT_FROZEN_MODE_RE_EQUILIBRATION_AND_NO_ACTIVE_CONTROL')
+    if q.effect_semantics not in ('mechanism_effect','re_equilibrated_passive_response'):return fail('UNSUPPORTED_PASSIVE_EFFECT')
+    if q.load_condition not in [x['name'] for x in problem['loads']]:return fail('SELECT_FROZEN_LOAD_CONDITION')
+    if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
+        return fail('PASSIVE_STATIC_QUESTION_CANNOT_BIND_ACTIVE_OR_DYNAMIC_CONTROL')
+    from extensions.math_analysis.mechanism_registry import CONSTRAINED
+    if isinstance(q.target,str) or q.target.quantity not in CONSTRAINED:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
+    if q.target.quantity=='re_equilibrated_position_response' and q.effect_semantics!='re_equilibrated_passive_response':return fail('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
+    paths=q.parameter_paths
+    if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETERS')
+    if q.operation in ('differentiate','optimize') and 'goal' not in payload.get('target',{}):return fail('EXPLICIT_MECHANISM_GOAL_REQUIRED')
+    if q.requested_budget is None:return fail('EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
+    study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
+        load_condition=q.load_condition,effect_semantics=q.effect_semantics,max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
+    try:
+        context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
+        detail=mathematical_method_view(host,candidate)['methods'][METHOD]
+    except ValueError as exc:return fail(str(exc))
+    if detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED')
+    if context['evaluations']>spec['budgets']['mathematical_evaluations']-state(host)['mathematical_evaluations']:
+        return fail('SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
+    request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
+        tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
+    return dict(status='ready',method=METHOD,request=request,required_evaluations=context['evaluations'],
+        registered_acceptance='not_registered',scientific_execution_started=False)
 
 
 def compile_reoptimized(host,q,payload,*,tool_use_id,intent):

@@ -27,6 +27,11 @@ class ResearchTaskAdapter:
         Task-only calls retain known conditions and explicitly report missing
         Reach hold requirements. No optimization weight supplies a hard limit.
         """
+        if self.task.get('physical_problem'):
+            return dict(contract='research.task_conditions',version='1.0.0',task_identity=digest(self.task),
+                conditions=[],missing=['Passive independent dynamic task evaluator is not registered.'],
+                registered_acceptance='not_registered',physical_problem=self.task['physical_problem'],
+                authority='Frozen material-point and load definitions; mathematical diagnostics only.',continuous_time_guarantee=False)
         from schemas.platform import TaskConditionView
         from tools.platform_store import plain
         task = self.task
@@ -137,6 +142,10 @@ class ResearchTaskAdapter:
 
     def _physical_inputs(self):
         self._require_configuration()
+        if self.task.get('physical_problem'):
+            return dict(control_period_s=self.task['timing']['control_period_s'],tendon_order=[],lower=[],upper=[],
+                signal='no_active_control',units='N',frame='world',phase='static_equilibrium',
+                constraints=self.configuration['robot']['structure']['data'].get('fixed_payout_lengths_m'))
         tendons = self.configuration['robot']['structure']['data']['tendons']
         return dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
             control_period_s=self.task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
@@ -227,6 +236,14 @@ class ResearchTaskAdapter:
         from extensions.math_analysis.kernels import aligned_steps
         self._require_configuration()
         task, cfg = self.task, self.configuration
+        if task.get('physical_problem'):
+            duration,period=task['timing']['duration_s'],task['timing']['sample_period_s']
+            signal=next(s for s in task['observations'] if s['name']=='tip_position')
+            return TaskAnalysisRequirement(binding={**binding,'task_identity':digest(task),'physical_problem':task['physical_problem']},
+                duration_s=duration,sample_period_s=period,time_grid_s=[i*period for i in range(round(duration/period)+1)],
+                constraints=[dict(constraint_id='passive_dynamic_acceptance',signal=signal,indices=[0],kind='unsupported',reference=[[0.,0.,0.]],
+                    provenance=['/task/physical_problem'],unsupported_requirement=dict(registered_acceptance='not_registered'))],
+                physical_inputs=self._physical_inputs(),required_physics=['unilateral_tendon_lengths'])
         conditions = self.condition_view()['conditions']
         duration, period = task['timing']['duration_s'], task['timing']['sample_period_s']
         last, _ = aligned_steps(duration, period)
