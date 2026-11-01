@@ -57,3 +57,11 @@ the operator supplies no next scientific method after failures.
 records equality checks and cumulative allocation. Raw Stores, SDK wires and
 private runtime details stay local. This restart remains confined to M1, without
 automatic further tasks or a main merge.
+
+## Sealed autonomous outcome
+
+The explicitly authorized restart has completed with a native Main STOP, no
+joint acceptance, and no pending execution. Mathematics was not exhausted.
+See [the result report](m1_knowledge_assisted_restart_result.md) for the ten-part
+autonomy assessment, unmeasured three-condition acceptance, actual Native
+integration cost, and cumulative costs including the preserved first failure.

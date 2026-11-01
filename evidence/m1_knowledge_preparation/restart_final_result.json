@@ -1,0 +1,567 @@
+{
+  "version": "sealed_m1_restart_summary_v1",
+  "study_id": "m1-knowledge-assisted-v4-restart-20261101-4399be2a",
+  "resolved_identity": "e9a2607c0eaf771e05d11e55e18dab09a808214f5d9c9f4c9dff96ea7637cedd",
+  "bound_implementation": "915a127f34040672126cca4a7374f10c306f96ab",
+  "scientific_scope_identity": "b29fdf0dd01013bf7c4ec2a12fbf041961e618108e92fc5a266df9f7fa4a23e0",
+  "authorization_scope_identity": "26dd3f0ab525f6606899c8eab57d61eca785944cf7f0362d01f2c0652849efa3",
+  "research_status": "stopped",
+  "outcome": "bounded_autonomous_search_incomplete_at_provider_protection",
+  "success": false,
+  "select": false,
+  "stop_origin": "model",
+  "stop_accepted": true,
+  "final_disposition": {
+    "artifact_id": "faf0cc4c60ea784accd92ffa0415025b45c5888a7846a8d0d819c421c35d5f84",
+    "media_type": "application/json"
+  },
+  "pending": null,
+  "unknown_provider_outcomes": 0,
+  "stop_reason": "last_requests_v2 Provider protection; no joint acceptance evidence; mathematics allowance not exhausted",
+  "conditions": [
+    {
+      "condition_id": "positive_high",
+      "status": "not_independently_evaluated",
+      "terminal_error_m": null,
+      "holding_max_error_m": null,
+      "holding_max_speed_m_s": null,
+      "solver_errors": null,
+      "force_limit_violation_n": null,
+      "independent_acceptance": null
+    },
+    {
+      "condition_id": "negative_low",
+      "status": "not_independently_evaluated",
+      "terminal_error_m": null,
+      "holding_max_error_m": null,
+      "holding_max_speed_m_s": null,
+      "solver_errors": null,
+      "force_limit_violation_n": null,
+      "independent_acceptance": null
+    },
+    {
+      "condition_id": "central_high",
+      "status": "not_independently_evaluated",
+      "terminal_error_m": null,
+      "holding_max_error_m": null,
+      "holding_max_speed_m_s": null,
+      "solver_errors": null,
+      "force_limit_violation_n": null,
+      "independent_acceptance": null
+    }
+  ],
+  "claims": {
+    "claim_version": "bounded_research_claims_v1",
+    "selected": null,
+    "selected_candidate": null,
+    "candidate_generated_from_family_space": true,
+    "physically_constructed_and_validated_candidates": [
+      {
+        "artifact_id": "79507d6e2e239b420f6e2a5c9890122196330e8bf0740effa2b8e1a29d6fac9a",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "7b3ed91f40e188e95d78a99453b1cc7f8064aa4829348e9def284e6308da0d55",
+        "media_type": "application/json"
+      }
+    ],
+    "design_changes_between_candidates": [],
+    "distinct_generated_designs": 1,
+    "structure_control_search_performed": false,
+    "optimizer_feedback_decisions": [],
+    "selected_structurally_new": null,
+    "model_selected_structure_search_evaluations": null,
+    "new_design_and_control_confirmed": null,
+    "reference_comparison": "not_applicable_no_reference_design",
+    "task_passed": false,
+    "independent_task_acceptance": null,
+    "confirmation_progress": {
+      "required_total": 0,
+      "historical_confirmations": 0,
+      "current_study_confirmations": 0,
+      "remaining": 0,
+      "failures": 0,
+      "invalid_executions": 0,
+      "executions": [],
+      "confirmed": false,
+      "correct_operation": {
+        "tool": "research_plan",
+        "action": "select",
+        "selected_execution": null
+      }
+    },
+    "limited_repeat_supported_acceptance": false,
+    "confirmation_status": "not_required",
+    "reproducibility_assessed": false,
+    "parameter_improvement_attribution_permitted": false,
+    "explicit_structure_control_adaptations": [],
+    "local_control_search_results": []
+  },
+  "hypothesis_history": [
+    {
+      "reference": {
+        "artifact_id": "a84e54b174c4f58b9827ddfd8dde9c9f270d25373d7c8d46e3a539c6de35975d",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "hypothesis": "A symmetric six-tendon, two-segment structure using two three-tendon spans—one spanning both segments and one confined to the distal segment—will provide independent proximal and distal bending authority suitable for later condition-specific control optimization across all three load conditions.",
+      "expected_observation": "Generation produces a valid owned candidate with six legal tendon routes, unchanged inherited segment prototypes and discretization, and the candidate can proceed to mechanism and control-feasibility diagnostics.",
+      "weakening_observation": "Generation is invalid, routes are degenerate or mechanically redundant, or subsequent diagnostics show inadequate independent authority toward the target under one or more conditions."
+    },
+    {
+      "reference": {
+        "artifact_id": "027e3e64260c2d60e4952f7969b6d890c40ee0e1e9196ec7735f8f11b7e8713f",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "hypothesis": "The prior dual-span concept failed only because its base-only tendon group violated the family routing rule. A legal symmetric arrangement with one three-tendon group spanning both segments and one three-tendon group confined to the distal segment, with the distal-only group beginning at segment 1, will preserve independent proximal and distal bending authority while satisfying route legality.",
+      "expected_observation": "Generation returns a valid owned candidate with six nondegenerate legal routes: three tendons spanning segments 0 through 1 and three tendons confined to segment 1, while inherited segment prototypes and default discretization remain unchanged.",
+      "weakening_observation": "Generation is invalid, any route is degenerate or redundant, or the corrected spans still violate family routing constraints."
+    },
+    {
+      "reference": {
+        "artifact_id": "acdda703e540d76798e12b75e694efa7ddd7bd2daa3f3fab480ff4f2ae7825f8",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "hypothesis": "The previous generation request encoded the distal-only tendon group as base-only. A corrected legal symmetric dual-span structure with three tendons spanning segments 0 through 1 and three tendons confined to segment 1 will satisfy the routing constraints and produce six nondegenerate routes while retaining the frozen segment prototypes and default discretization.",
+      "expected_observation": "Generation returns a valid owned candidate with six legal nondegenerate routes: three spanning segments 0 through 1 and three confined to segment 1, with inherited sections and default cells unchanged.",
+      "weakening_observation": "Generation is invalid, any route is degenerate or redundant, or a segment-1-only span violates the family routing constraints."
+    },
+    {
+      "reference": {
+        "artifact_id": "874c3b6a6c92b38aae4785ddc58dfc6b4caae74d09f4b541295791382f626e68",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "hypothesis": "The prior request failed because a segment-1-only tendon group is illegal under the consecutive-span generator. A legal symmetric six-tendon structure using two groups of three tendons, both spanning segments 0 through 1 but separated by a 60-degree phase offset, will produce six nondegenerate routes and provide a neutral owned seed for later mechanism and condition-specific control feasibility research.",
+      "expected_observation": "Generation returns a valid owned candidate with six legal nondegenerate routes, consisting of two three-tendon groups spanning segments 0 through 1 at phases 0 and pi/3, while inherited sections and default cells remain unchanged.",
+      "weakening_observation": "Generation is invalid, routes are degenerate or redundant, or the phase-offset grouping does not create six distinct legal routes."
+    },
+    {
+      "reference": {
+        "artifact_id": "a2168632bb8f2c118fed2a522e29d4449d25f9977b2f1bc312923e36e8e92bde",
+        "media_type": "application/json"
+      },
+      "action": "diagnose",
+      "hypothesis": "The compiled legal candidate_100 may admit condition-specific bounded controls that satisfy the unchanged reach and holding constraints for all three task conditions, despite having no initialized controls or measured task evidence yet.",
+      "expected_observation": "After condition-bound control initialization and fair bounded optimization, each condition yields a legal current-structure control whose terminal error, final-window maximum error, and final-window maximum speed meet the frozen thresholds, making fresh independent Replay scientifically warranted.",
+      "weakening_observation": "One or more conditions retain substantial best-found violation under comparable bounded optimization, exhibit numerical failure, or cannot produce a legal bound control source; this would weaken this control-feasibility hypothesis without proving structural infeasibility."
+    },
+    {
+      "reference": {
+        "artifact_id": "03e354dab54c5defec87a6191eea77384148cf8e5fc54bf0472e99bdaa48b120",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "hypothesis": "A legal condition-bound baseline initialized from candidate_100 pretensions will provide an executable source for subsequent bounded control optimization under positive_high without changing the structure.",
+      "expected_observation": "Initialization returns a legal positive_high-bound control source on candidate_100 with the frozen task grid, channel identity, and actuator limits preserved.",
+      "weakening_observation": "Initialization is rejected, produces no complete bound sequence, or reports an identity, legality, grid, or actuator-limit incompatibility."
+    },
+    {
+      "reference": {
+        "artifact_id": "4898c40066dde547bad3e0dccaf619f32706155b80bd7532e452dbebad21e059",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "hypothesis": "A legal condition-bound baseline initialized from candidate_100 pretensions will provide an executable source for subsequent bounded control optimization under negative_low without changing the structure.",
+      "expected_observation": "Initialization returns a complete legal negative_low-bound control source for candidate_100 while preserving the frozen task grid, channel identity, and actuator limits.",
+      "weakening_observation": "Initialization is rejected, produces no complete bound sequence, or reports an identity, legality, grid, or actuator-limit incompatibility."
+    },
+    {
+      "reference": {
+        "artifact_id": "bbe5a58abc7365831a5190add6e89732ea10d538dab910b1cfb2193fa8c31c2b",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "hypothesis": "A legal positive_high-bound baseline initialized from candidate_100 pretensions will provide a complete executable source for subsequent bounded control optimization without changing the structure.",
+      "expected_observation": "Initialization returns a complete legal positive_high-bound control source for candidate_100 while preserving the frozen task grid, channel identity, and actuator limits.",
+      "weakening_observation": "Initialization is rejected, produces no complete bound sequence, or reports an identity, legality, grid, or actuator-limit incompatibility."
+    },
+    {
+      "reference": {
+        "artifact_id": "264864f9944b150299748b1ab2b9635fc8967cd6b2b43ceca2ee2e751285ed01",
+        "media_type": "application/json"
+      },
+      "action": "diagnose",
+      "hypothesis": "For candidate_100, the initialized legal positive_high-bound schedule can be adapted by bounded condition-specific control analysis to reduce the frozen reach-task violations while retaining the same structure, discretization, grid, channels, and actuator limits.",
+      "expected_observation": "A condition-bound mathematical control-feasibility result is produced for positive_high, with a complete legal schedule and finite task metrics; ideally all three reach and holding predicates improve relative to the initialized baseline.",
+      "weakening_observation": "The admitted analysis fails numerically or legally, produces no complete bound schedule, or returns finite metrics with no useful reduction in terminal error, holding error, or holding speed under the declared bounded effort."
+    },
+    {
+      "reference": {
+        "artifact_id": "81ef6b82ed5f32cd4242eb2d5e7f253fdeaf24fbd552124cc2c7010543410825",
+        "media_type": "application/json"
+      },
+      "action": "diagnose",
+      "hypothesis": "Candidate_100's large residual position and holding-speed violations after bounded control adaptation are materially influenced by insufficient or poorly oriented workspace authority arising from segment lengths and tendon routing phases; a structure-response analysis can identify whether small legal changes in these variables improve reoptimized task capability enough to justify a new structure.",
+      "expected_observation": "Reoptimized structure-response diagnostics show a consistent local direction in one or more selected legal variables that decreases signed maximum excess J and preferably decreases terminal error, holding error, and holding speed relative to result_1.",
+      "weakening_observation": "The diagnostics are invalid or numerically unstable, or all tested local legal perturbations fail to improve J and the position and speed violations under matched reoptimization effort."
+    },
+    {
+      "reference": {
+        "artifact_id": "faf0cc4c60ea784accd92ffa0415025b45c5888a7846a8d0d819c421c35d5f84",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "hypothesis": "Protected closeout is required because the only fresh scientific result is a finite-budget numerical diagnostic for candidate_100, not an independent physical evaluation, and it violates all three reported sampled constraints; no jointly acceptable structure has been established for positive_high, negative_low, and central_high.",
+      "expected_observation": "The protected closeout records no selected candidate and preserves result_1 as a failed finite-budget diagnostic with independent task acceptance unmeasured.",
+      "weakening_observation": "A fresh independently evaluated result with a complete acceptance certificate showing the same structure passes every frozen predicate for all three conditions would invalidate this closure rationale; no such result appears in the complete fresh-result index."
+    }
+  ],
+  "autonomy_assessment": {
+    "testable_hypotheses": true,
+    "control_research_executed": true,
+    "mechanism_research_attempted": true,
+    "mechanism_research_executed": false,
+    "distinct_structures": 1,
+    "post_analysis_structure_changes": 0,
+    "mathematics_guided_structure_changes": 0,
+    "conditions_control_initialized": [
+      "positive_high",
+      "negative_low"
+    ],
+    "conditions_control_optimized": [
+      "positive_high"
+    ],
+    "all_condition_reoptimization": false,
+    "native_prediction_vs_independent_physics": "unassessed; zero independent Replays",
+    "knowledge_adoption": "method entry explicitly adopted; no demonstrated improvement attributable to Knowledge",
+    "strengths": [
+      "testable control and structure hypotheses",
+      "autonomous correction to a legal generated seed",
+      "bounded Native control optimization",
+      "correct refusal to claim infeasibility or acceptance",
+      "original Main STOP"
+    ],
+    "weaknesses": [
+      "repeated routing and request-schema mistakes",
+      "repeated prerequisite and evidence-navigation requests",
+      "no completed structure mathematics or subsequent design change",
+      "no all-condition search or independent acceptance"
+    ],
+    "success_classification": "none of control-only, changed-structure, or mathematics-guided-structure success established"
+  },
+  "native_prediction": {
+    "reference": {
+      "artifact_id": "adc03569c1e0ce7c687747f06e6aafb675d263b9c95037afe93848c2ea370658",
+      "media_type": "application/json"
+    },
+    "condition_id": "positive_high",
+    "status": "computed",
+    "operation": "mujoco_nonlinear_task_capability_v1",
+    "evidence_level": "finite_budget_observation",
+    "initial_metrics": {
+      "holding_max_position_error_m": 0.12018539226203076,
+      "holding_max_speed_m_s": 0.34321420339306546,
+      "normalized_gap": 11.018539226203076,
+      "returned_array_gap_interval": [
+        11.018539226203067,
+        11.018539226203082
+      ],
+      "signed_maximum_excess": 11.018539226203076,
+      "sum_normalized_excess": 32.47755189884167,
+      "terminal_position_error_m": 0.12018539226203076,
+      "worst_constraint": {
+        "constraint_id": "terminal_error_m",
+        "kind": "terminal_position",
+        "limit": 0.01,
+        "normalized_signed_excess": 11.018539226203076,
+        "time_s": 0.6000000000000004,
+        "unit": "m",
+        "value": 0.12018539226203076
+      }
+    },
+    "best_metrics": {
+      "holding_max_position_error_m": 0.11181231827253374,
+      "holding_max_speed_m_s": 0.2694487179116058,
+      "normalized_gap": 10.181231827253374,
+      "returned_array_gap_interval": [
+        10.181231827253367,
+        10.181231827253383
+      ],
+      "signed_maximum_excess": 10.181231827253374,
+      "sum_normalized_excess": 28.344087584893607,
+      "terminal_position_error_m": 0.11181231827253374,
+      "worst_constraint": {
+        "constraint_id": "terminal_error_m",
+        "kind": "terminal_position",
+        "limit": 0.01,
+        "normalized_signed_excess": 10.181231827253374,
+        "time_s": 0.6000000000000004,
+        "unit": "m",
+        "value": 0.11181231827253374
+      }
+    },
+    "initial_J": 11.018539226203076,
+    "best_found_J": 10.181231827253374,
+    "stop_reason": "evaluation_request_budget",
+    "settings": {
+      "coefficient_limit_n": 2.0,
+      "correction_window_s": [
+        0.0,
+        0.6
+      ],
+      "difference_step_n": 0.01,
+      "evaluation_requests": 32,
+      "initial_radius_n": 0.1,
+      "iterations": 16,
+      "knots_s": [
+        0.0,
+        0.19999999999999998,
+        0.39999999999999997,
+        0.6
+      ],
+      "method": "pattern",
+      "minimum_radius_n": 0.0001,
+      "version": "local_control_search_v2"
+    },
+    "task_acceptance": "unmeasured",
+    "control_schedule_reference": {
+      "artifact_id": "caf949d285b4b97513a579286099f1b9ce054ea75fa5c97170a2b499713f20bf",
+      "media_type": "application/json"
+    },
+    "scope": "Frozen MuJoCo sampled task; finite local control search. No global feasibility, hardware, or independent acceptance claim."
+  },
+  "knowledge": {
+    "mode": "Knowledge-assisted",
+    "frozen_body_hashes": {
+      "research-bounded-continuation@1": "ca39b1e5a72e595528415b21af754ab912c3d45ceeb7a5638098d50a2d9779c3",
+      "research-witness-and-cost@1": "59e140a16f92fb7f51dc59c3427257eb98cfcc462e54d5946efab09f5461d321",
+      "research-bounded-continuation@2": "9b68aecc5601bb6cf8c366009c39277df47a900a6c68489958ff7c17ce519e04",
+      "research-witness-and-cost@2": "b702cbfb39875af3d40fc2a575febc005808ef311400fcf2ffbb66c199a9ba4d"
+    },
+    "excluded_entry_ids": [
+      "model-physics-comparison"
+    ],
+    "read_operations": 5,
+    "distinct_entries_read": [
+      "research-bounded-continuation@2"
+    ],
+    "decision_read_bindings": [
+      {
+        "plan_reference": {
+          "artifact_id": "a84e54b174c4f58b9827ddfd8dde9c9f270d25373d7c8d46e3a539c6de35975d",
+          "media_type": "application/json"
+        },
+        "bindings": [
+          {
+            "content_sha256": "9b68aecc5601bb6cf8c366009c39277df47a900a6c68489958ff7c17ce519e04",
+            "disposition": "adopted",
+            "entry_id": "research-bounded-continuation",
+            "exact_key": "research-bounded-continuation@2",
+            "read_receipt": {
+              "artifact_id": "3b51fcefd141e474d4c748a82c3999fda90883fe7fd7c8fe77be5224e50f01fd",
+              "media_type": "application/json"
+            },
+            "reader": "agent",
+            "revision": "2"
+          }
+        ]
+      }
+    ],
+    "historical_success_cases_imported": 0
+  },
+  "cost": {
+    "provider_by_role": {
+      "conversation": {
+        "requests": 41,
+        "usage_missing": 0,
+        "prompt_tokens": 498034,
+        "completion_tokens": 8115,
+        "total_tokens": 506149,
+        "prompt_cache_hit_tokens": null,
+        "prompt_cache_miss_tokens": null,
+        "cost_usd": "unknown"
+      },
+      "reporter": {
+        "requests": 1,
+        "usage_missing": 0,
+        "prompt_tokens": 7224,
+        "completion_tokens": 506,
+        "total_tokens": 7730,
+        "prompt_cache_hit_tokens": null,
+        "prompt_cache_miss_tokens": null,
+        "cost_usd": "unknown"
+      }
+    },
+    "provider_requests": 42,
+    "successful_http_responses": 42,
+    "prompt_tokens": 505258,
+    "completion_tokens": 8621,
+    "total_tokens": 513879,
+    "money_usd": null,
+    "public_operations": 41,
+    "main_tool_feedbacks": 41,
+    "mathematical_evaluations": 1,
+    "native_callbacks": 32,
+    "native_iterations": 16,
+    "native_model_builds": 1,
+    "native_rollouts": 32,
+    "native_physics_steps": 19200,
+    "native_physics_step_attempts": 19200,
+    "native_forward_evaluations": 1953,
+    "native_kernel_wall_s": 1.82030559994746,
+    "charged_analysis_numerical_s": 2.901416099979542,
+    "total_recorded_numerical_s": 4.330302199989092,
+    "construction_numerical_s": 0.37302110000746325,
+    "control_initialization_s": 1.0558650000020862,
+    "compatibility_preparation_s": 0.6447385999490507,
+    "scientific_model_build_scope": "Native analysis counter only; family compilation and initialization costs reported separately, not inferred as zero.",
+    "independent_replays": 0,
+    "independent_replay_physics_steps": 0,
+    "nmpc": 0,
+    "ppo": 0,
+    "rl": 0,
+    "ledger_active_wall_s": 536.5094160998706,
+    "study_elapsed_s": 1070.1077017784119
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 18,
+      "model_calls": 47,
+      "tool_calls": 159,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 41,
+      "model_calls": 42,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 536.5094160998706
+    },
+    "remaining": {
+      "backend_solves": 18,
+      "model_calls": 5,
+      "tool_calls": 118,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "remaining_mathematical_evaluations": 15,
+  "tool_feedback_counts": [
+    {
+      "tool": "experience_retrieve",
+      "status": "success",
+      "reason": "",
+      "count": 5
+    },
+    {
+      "tool": "research_plan",
+      "status": "invalid",
+      "reason": "BASE_ONLY_REQUIRES_FIRST_SEGMENT_ZERO",
+      "count": 3
+    },
+    {
+      "tool": "research_plan",
+      "status": "generated",
+      "reason": "",
+      "count": 1
+    },
+    {
+      "tool": "evidence_read",
+      "status": "raw_result_not_delivered",
+      "reason": "",
+      "count": 3
+    },
+    {
+      "tool": "research_plan",
+      "status": "rejected",
+      "reason": "Additional properties are not allowed ('selected_candidate' was unexpected)",
+      "count": 2
+    },
+    {
+      "tool": "research_plan",
+      "status": "read_only_diagnosis",
+      "reason": "",
+      "count": 3
+    },
+    {
+      "tool": "research_analysis",
+      "status": "needs_prerequisite",
+      "reason": "COMPLETE_LEGAL_CONTROL_SOURCE_REQUIRED",
+      "count": 2
+    },
+    {
+      "tool": "evidence_read",
+      "status": "success",
+      "reason": "",
+      "count": 4
+    },
+    {
+      "tool": "research_route",
+      "status": "success",
+      "reason": "",
+      "count": 2
+    },
+    {
+      "tool": "research_plan",
+      "status": "success",
+      "reason": "",
+      "count": 4
+    },
+    {
+      "tool": "research_analysis",
+      "status": "success",
+      "reason": "",
+      "count": 1
+    },
+    {
+      "tool": "research_analysis",
+      "status": "needs_choice",
+      "reason": "INVALID_SCIENTIFIC_V4_INPUT",
+      "count": 9
+    },
+    {
+      "tool": "research_analysis",
+      "status": "needs_choice",
+      "reason": "M2_REQUIRES_REGISTERED_TASK_CONSTRAINT_OR_TASK_VIOLATION",
+      "count": 2
+    }
+  ],
+  "cumulative_assignment_cost": {
+    "prior_study_id": "m1-knowledge-assisted-v4-20261101-45235eda",
+    "prior_failed_provider_requests": 1,
+    "prior_public_operations": 1,
+    "total_provider_requests": 43,
+    "total_public_operations": 42,
+    "known_successful_response_tokens": 513879,
+    "prior_failed_request_tokens": null,
+    "money_usd": null,
+    "total_mathematical_evaluations": 1,
+    "total_native_callbacks": 32,
+    "total_native_physics_steps": 19200,
+    "total_independent_replays": 0
+  },
+  "gateway": {
+    "explicit_process_proxy_port": 7890,
+    "environment_proxy_enabled": true,
+    "loopback_bypassed": true,
+    "health_http_status": 200,
+    "catalog_http_status": 200,
+    "live_inference_http_200": 42,
+    "runtime_tools_and_reasoning_verified": true,
+    "global_proxy_changed": false
+  },
+  "integrity": {
+    "science_and_core_hashes_unchanged": true,
+    "original_pending_authorization_text_preserved": true,
+    "formal_authorization_recorded": true,
+    "old_study_failure_preserved": true,
+    "science_threshold_changes": 0,
+    "budget_extensions": 0,
+    "raw_store_and_wires_published": false,
+    "additional_studies_after_restart": 0,
+    "main_merged": false
+  },
+  "validation": {
+    "targeted_prelaunch_checks_passed": 7,
+    "live_first_tool_feedback_verified": true,
+    "live_sdk_restore_verified": true,
+    "source_compatibility": true,
+    "sealed_pending_checks": true,
+    "immutable_export_created": true
+  }
+}
