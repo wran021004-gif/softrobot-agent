@@ -122,4 +122,4 @@ Existing installed runtime `D:/softrobot-agent/.f3-prestudy-env/Scripts/python.e
 
 Stage III still needs its own complete frozen goal/evaluator and reset, transient/settling, sampling, safety, force-refresh and load/time protocol; the no-controller adapter must use the existing backend/Replay path and complete traces. Source-bound independent evaluator output must feed the original certificate/SELECT gates. Mathematics-only diagnostic success cannot fill those gaps. II.5 does not start that work or restart any historical Study.
 
-The branch is delivered through ordinary non-force push. The final commit record is available in the branch compare view from `99496f4e`; neither source branches nor main are merged.
+Command-line Git transport was unavailable. Publication uses the connected GitHub service with non-forced ref updates and exact file-tree checks. Local validation commits retain their original identities; publication commit metadata may differ. The final commit record is available in the branch compare view from `99496f4e`; neither source branches nor main are merged.
