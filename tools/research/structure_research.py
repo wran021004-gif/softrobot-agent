@@ -9,6 +9,8 @@ from extensions.math_analysis.differentiation_router import differentiate, stenc
 
 METHOD='mechanism_structure_v1'
 OPERATIONS=('inspect','differentiate','optimize','compare')
+SCALAR_DIRECTION_TARGETS=('mass_balance_residual','total_mass','body_inertia_trace',
+    'directional_tendon_row_residual','motion_decoupling','finite_time_task_violation')
 
 
 def parameters(spec, candidate):
@@ -109,8 +111,7 @@ def prepare_context(spec, candidate, study, comparisons):
             row=rows[path]
             if not row['mechanism_differentiation']['supported']:raise ValueError(row['mechanism_differentiation']['reason'])
             selected.append(row)
-        scalar=(study.target.reduction!='identity' or study.target.quantity in
-            ('mass_balance_residual','total_mass','body_inertia_trace','directional_tendon_row_residual','motion_decoupling','finite_time_task_violation') or
+        scalar=(study.target.reduction!='identity' or study.target.quantity in SCALAR_DIRECTION_TARGETS or
             study.target.quantity=='directional_drive' and study.target.tendon_channel is not None)
         if not scalar:raise ValueError('SCALAR_MECHANISM_REDUCTION_REQUIRED_FOR_DIRECTION')
     if (study.operation=='compare') != bool(comparisons or loads):raise ValueError('COMPARE_REQUIRES_OWNED_CANDIDATE_OR_FROZEN_LOAD_CONDITIONS')

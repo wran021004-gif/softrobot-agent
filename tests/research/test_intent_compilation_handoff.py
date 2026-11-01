@@ -142,6 +142,9 @@ class IntentCompilationHandoffTests(unittest.TestCase):
         invalid=deepcopy(q);invalid['structure']['effect_semantics']='reoptimized_task_capability'
         projected=question_schema(state(h)['spec'],h.store.artifact(c),'mechanism_research')
         self.assertTrue(list(Draft202012Validator(projected).iter_errors(invalid)))
+        matrix=structure_question();matrix['structure']['target']=dict(quantity='tip_jacobian',reduction='identity',goal='increase')
+        self.assertTrue(list(Draft202012Validator(projected).iter_errors(matrix)))
+        self.assertNotEqual(compile_question(h,matrix,tool_use_id='matrix-direction')['status'],'ready')
         self.assertNotEqual(compile_question(h,invalid,tool_use_id='semantics')['status'],'ready')
         update(h,research_status='stopped')
         self.assertEqual(compile_question(h,q,tool_use_id='sealed')['reason'],'ORIGINAL_PROTECTED_CLOSEOUT_OR_STOP')

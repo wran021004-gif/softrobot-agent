@@ -156,7 +156,8 @@ compatibility white lists were introduced.
 | physical_replay.py | Read-only legal_control_sources extraction; existing execution/evaluation functions unchanged. |
 | task_constraints.py | Same legal sources in method discovery and accurate preparation request. |
 | research_context.py | Read earlier Plan intent without state mutation; preserve prepared hypothesis and concise grouped L0 handoff. |
-| test_intent_compilation_handoff.py | Six focused Mock SDK/worker contract, source, routing, invalid-input and sealed-state checks. |
+| structure_research.py | Share the original scalar-direction admission set with Schema; unchanged computation and acceptance semantics. |
+| test_intent_compilation_handoff.py | Seven focused Mock SDK/worker contract, registry, source, routing, invalid-input and sealed-state checks. |
 | study_m1_knowledge_assisted_v4_intent_repair.json | New independent finite proposal, preserving original science and curated Knowledge. |
 
 No file or historical contract was deleted. Native T1/T2 algorithms, MuJoCo
@@ -166,7 +167,7 @@ implementation were not edited.
 ## Validation and bounded real-model follow-up
 
 Offline validation uses original SDK request assembly and explicitly fabricated
-workers. The six new cases cover M1 T1 admission, mechanism inspect and explicit
+workers. The seven new cases cover M1 T1 admission, mechanism inspect and explicit
 decrease, shared source uniqueness/ambiguity, generation grants, rejected inputs,
 STOP sends, and candidate-change barriers. Existing targeted V1/V2/V3, passive
 V4 and heterogeneous Direct checks cover compatibility. A first passive check was
@@ -187,6 +188,14 @@ an unregistered parameter pointer, and request four returned confirmed HTTP 502
 `empty_response`. Its four charges and engineering STOP are preserved. After the
 registry projection repair, at most four remaining requests may be used under a
 new committed implementation, keeping the cumulative engineering ceiling at eight.
+
+The second window used three requests: inspect compiled immediately; a legal
+Schema request for differentiation selected an unreduced matrix, correctly
+rejected by the original scalar-direction rule; its next response was again
+confirmed HTTP 502 empty_response. Both failed windows retain their own source
+identities, receipts and engineering STOP. The scalar requirement is now projected
+using the exact original admission set, with no automatic choice of norm/min/max.
+Only one original engineering request remains for a final check.
 
 ## New formal M1 proposal
 

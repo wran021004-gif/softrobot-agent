@@ -199,6 +199,14 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             structure['properties']['parameter_paths']['description']='Choose registered physical parameter IDs from this enum, or a parameter_group. Evidence JSON navigation pointers are not parameter IDs.'
         structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
         structure['description']='Choose operation, effect semantics, target, and parameters. Hypothesis and evaluation cap may reuse the completed diagnose decision. Only uniquely implied execution fields are compiled; distinct working points, sources and scientific methods remain Main choices.'
+        from tools.research.structure_research import SCALAR_DIRECTION_TARGETS
+        structure['allOf'].append({'if':{'properties':{'operation':{'enum':['differentiate','optimize']},
+            'target':{'type':'object'}},'required':['operation','target']},
+            'then':{'properties':{'target':{'anyOf':[
+                {'properties':{'reduction':{'not':{'const':'identity'}}},'required':['reduction']},
+                {'properties':{'quantity':{'enum':list(SCALAR_DIRECTION_TARGETS)}},'required':['quantity']},
+                {'properties':{'quantity':{'const':'directional_drive'},'tendon_channel':{'type':'integer'}},
+                    'required':['quantity','tendon_channel']}]}}}})
         if not passive:
             from tools.research_tasks import task_adapter
             constraints=([c.constraint_id for c in task_adapter(candidate['configuration']).analysis_requirements({}).constraints]
