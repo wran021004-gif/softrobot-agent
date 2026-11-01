@@ -72,6 +72,21 @@ class ResearchOpportunityTests(unittest.TestCase):
             self.assertIn('considered legal alternatives',schema['properties']['interpretation']['description'])
             self.assertNotIn('next_structure',schema['properties'])
 
+    def test_single_passive_task_has_no_invented_conditions_or_control_optimization(self):
+        from tools.research import core
+        from tools.research.config import ROOT
+        from tools.research.design import generate_candidate
+        from tests.research.test_cross_task_integration import fixture_directory
+        with fixture_directory() as folder:
+            h=core.prepare(ROOT/'configs/research/study_passive_engineering_v1.json',folder)
+            update(h,freeze='offline-passive-view-only')
+            generate_candidate(h,dict(version='serial_family_generation_v2',family_space_identity=state(h)['spec']['family_space_identity'],segment_count=1,tendon_count=1),dict(origin='offline_fixture'))
+            with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+                view=research_opportunity_review(h)
+            self.assertEqual([r['condition'] for r in view['conditions']],['primary'])
+            self.assertEqual(view['conditions'][0]['control_studies'],0)
+            self.assertFalse(view['full_independent_acceptance'])
+
     def test_existing_native_search_handles_open_topology_and_all_conditions_offline(self):
         from tools.research import search,analysis
         from tools.research.structure_intent import compile_search

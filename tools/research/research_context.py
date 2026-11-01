@@ -1475,23 +1475,23 @@ def research_opportunity_review(host, *, details=False):
     return dict(version=review['version'],study_status=s['research_status'],full_independent_acceptance=bool(complete),
         coverage=dict(physical_structures=len(structures),topologies=[{k:v[k] for k in ('segment_count','tendon_count')} for v in structures.values()],
             allowed_segments=review['coverage']['segment_counts'],allowed_tendons=review['coverage']['tendon_counts'] or review['coverage']['tendon_count_bounds'],
-            continuous_domain_coverage='Not exhausted or quantified by these finite observations.'),
+            continuous_domain_coverage='Not exhausted or quantified.'),
         conditions=[dict(topology=[structures[k[0]]['segment_count'],structures[k[0]]['tendon_count']],condition=k[1],
             control_sources=len(v.get('control_sources',[])),control_studies=len(v['control_searches']),mechanism_studies=len(v['mechanism_results']),
             other_math=len(v['other_math']),independent_evaluations=len(v['independent_results'])) for k,v in conditions.items()],
         finite_control_searches=dict(stop_reasons=dict(Counter(r['control_search']['stop_reason'] for r in searches)),
             latest=dict(reference=last['reference'],condition=last['condition'],**{k:last_search[k] for k in ('stop_reason','iterations_started','search_dimension','callbacks','requested_callbacks','baseline','best')}) if last else None,
             scope='Iteration/callback exhaustion is not convergence, structural infeasibility or independent acceptance.'),
-        mechanism_scope='Local registered point/model only. Unresolved or zero local signals do not exclude nonlinear task improvement.',
+        mechanism_scope='Local point/model only. Parameter names imply no physical effect; consult candidate mathematical_capabilities /research_opportunities/parameters.',
         comparison=dict(cross_structure_common_task=any(len({candidates[host.store.artifact(r)['candidate']['artifact_id']][0] for r in refs})>1 for refs in grouped.values()),
-            rule=review['comparisons']['rule']),
+            rule='Match condition, initial state/loading, scoring scope, fidelity, protocol and effort. Common task alone is insufficient; cross-condition errors do not identify topology effects.'),
         remaining=dict(provider=provider['remaining_total'],provider_closeout=provider['reserved_for_closeout'],
             public_operations=budget['public_operation_budget']['remaining_total'],mathematics=science['remaining_mathematical'],replay=science['remaining_full_replays']),
         allowed_plan_actions=current['actions'],method_statuses=dict(Counter(r['status'] for r in methods)),
         questions=[dict(reference=r['plan'],view='full',pointer='/original_plan/weakening_observation') for r in review['unresolved_questions'][-1:]],
         queries={key:dict(reference=s.get('family_space_reference') or next(iter(s['candidates'].values()),s.get('public_prior_manifest')),
             view='working_set',pointer='/research_opportunities/'+key) for key in ('results','actions','mathematical_methods')},
-        decision_rule='Explain why considered legal alternatives lack sufficient information value, with evidence and uncertainty. No passing witness alone does not justify STOP; unused budget alone does not require continuation. User termination, real blocks and resource limits remain valid. Independent acceptance precedes design simplicity.')
+        decision_rule='Explain declined alternatives with evidence and uncertainty. No passing witness alone cannot justify STOP; unused budget cannot compel continuation. Preserve user stop, real blocks, resource limits and acceptance before simplicity.')
 
 
 def agent_decision_brief(host):
