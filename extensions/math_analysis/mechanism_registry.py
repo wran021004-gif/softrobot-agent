@@ -121,6 +121,15 @@ for name,meta in PRIMITIVES.items():
     if len(meta['operations'])==2:meta['unavailable_operation_reason']='Discrete active-set, basis/sign ambiguity or one-sided cone response does not define an ordinary structural gradient.'
 
 
+PRIMITIVES['finite_time_task_violation']=dict(field='signed_task_gap',unit='1',shape=[],frame='all frozen load cases and windows',
+    physical_modes=['passive_unilateral_equilibrium'],operations=['inspect','differentiate','optimize','compare'],
+    main_visible=False,world_projection=False,parameter_dependencies=['geometry','routing','stiffness','payout','damping'],
+    requires_qualified_equilibrium=False,state_requirements='Frozen dynamic initial state, loading protocol and complete sampling grid.',
+    source='extensions.reference.passive_response.task_metrics',model='MuJoCo fixed payout soft limits',
+    validity='Every frozen constraint must have valid measurements and a legal normalization scale for a scalar objective.',
+    meaning='Maximum normalized signed violation over every required load and constraint; independent acceptance remains unmeasured.')
+
+
 def mechanism_ids(mode, operation=None):
     return [k for k,v in PRIMITIVES.items() if v['main_visible'] and mode in v['physical_modes'] and
         (operation is None or operation in v['operations'])]

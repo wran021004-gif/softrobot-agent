@@ -32,12 +32,26 @@ def group_matches(row, group):
 
 def prepare_context(spec, candidate, study, comparisons):
     """Read-only actual-domain/source admission before the existing reservation."""
+    from tools.research_tasks import task_adapter
+    capabilities=task_adapter(candidate['configuration']).physical_capabilities()
+    if capabilities['status']=='unsupported':raise ValueError('UNSUPPORTED_PHYSICAL_CAPABILITIES: '+','.join(capabilities['missing']))
+    dynamic=study.effect_semantics=='finite_time_task_response'
+    if dynamic:
+        if not capabilities['evaluation']['finite_time_structure_response']:raise ValueError('REGISTERED_FINITE_TIME_STRUCTURE_RESPONSE_REQUIRED')
+        if study.point_semantics!='frozen_task_initial_state' or study.target.quantity!='finite_time_task_violation':
+            raise ValueError('DYNAMIC_TASK_REQUIRES_FROZEN_INITIAL_STATE_AND_COMPLETE_TASK_TARGET')
+        if study.load_condition is not None or study.comparison_load_conditions or study.load_aggregation:
+            raise ValueError('DYNAMIC_TASK_ALWAYS_REQUIRES_ALL_FROZEN_LOADS')
+        if study.operation in ('differentiate','optimize'):
+            definitions=task_adapter(candidate['configuration']).constraint_observations({})
+            unscaled=[d['constraint_id'] for d in definitions if not d['normalization_scale']]
+            if unscaled:raise ValueError('TASK_OBJECTIVE_REQUIRES_FROZEN_NORMALIZATION_SCALE: '+','.join(unscaled))
     problem=candidate['configuration']['task'].get('physical_problem')
     mode=problem['mode'] if problem else 'active_ideal_tension'
     metadata=PRIMITIVES[study.target.quantity]
     if mode not in metadata['physical_modes']:raise ValueError('MECHANISM_PHYSICAL_MODE_MISMATCH')
     if study.operation not in metadata['operations']:raise ValueError('MECHANISM_OPERATION_NOT_IMPLEMENTED: '+metadata['unavailable_operation_reason'])
-    if problem:
+    if problem and not dynamic:
         if study.point_semantics!='re_equilibrated' or study.load_condition not in [x['name'] for x in problem['loads']]:
             raise ValueError('FROZEN_PASSIVE_LOAD_AND_RE_EQUILIBRATION_REQUIRED')
         if study.target.quantity=='re_equilibrated_position_response' and study.effect_semantics!='re_equilibrated_passive_response':
@@ -61,7 +75,7 @@ def prepare_context(spec, candidate, study, comparisons):
             if not row['mechanism_differentiation']['supported']:raise ValueError(row['mechanism_differentiation']['reason'])
             selected.append(row)
         scalar=(study.target.reduction!='identity' or study.target.quantity in
-            ('mass_balance_residual','total_mass','body_inertia_trace','directional_tendon_row_residual','motion_decoupling') or
+            ('mass_balance_residual','total_mass','body_inertia_trace','directional_tendon_row_residual','motion_decoupling','finite_time_task_violation') or
             study.target.quantity=='directional_drive' and study.target.tendon_channel is not None)
         if not scalar:raise ValueError('SCALAR_MECHANISM_REDUCTION_REQUIRED_FOR_DIRECTION')
     if (study.operation=='compare') != bool(comparisons or loads):raise ValueError('COMPARE_REQUIRES_OWNED_CANDIDATE_OR_FROZEN_LOAD_CONDITIONS')
@@ -71,9 +85,14 @@ def prepare_context(spec, candidate, study, comparisons):
     minimum=(1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
         1+sum(len(set(p['coordinates'])) for p in plans)+int(len(plans)==2)+int(study.operation=='optimize'))
     if study.max_evaluations<minimum:raise ValueError('MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires '+str(minimum))
-    return dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
+    result=dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
         minimum_evaluations=minimum,evaluations=study.max_evaluations if study.operation=='optimize' else minimum,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
+    if dynamic:
+        task=candidate['configuration']['task'];episodes=len(task['goal']['data']['load_conditions'])
+        result['dynamic_cost_bound']=dict(model_builds=result['evaluations'],episodes=result['evaluations']*episodes,
+            physics_steps=result['evaluations']*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
+    return result
 
 
 def discovery(spec, candidate, reference, *, latest_direction=None, formal_candidate_created=False,
@@ -162,6 +181,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     center=np.asarray([m['origin'] for m in mappings]);base_values=[r['current_value'] for r in rows]
     attempts=0;baseline_point=None
     passive=bool(configuration['task'].get('physical_problem'))
+    dynamic=study.effect_semantics=='finite_time_task_response'
 
     def evaluate(values=None, *, comparison=None):
         nonlocal attempts,baseline_point
@@ -178,6 +198,39 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             cfg,build,_=family_configuration(configuration,context['space'],params,configuration['run_id'])
             params=plain(build.request);compile_input(cfg,registry())
         elif comparison is not None:cfg=comparison['configuration']
+        if dynamic:
+            from types import SimpleNamespace
+            from schemas.platform import SessionInput
+            from extensions.tendon_family.passive_execution import execute
+            from extensions.reference.passive_response import task_metrics
+            from tools.research_tasks import task_adapter,constraint_gap
+            directory=getattr(checkpoint,'directory',None)
+            backend=execute(SessionInput.model_validate(cfg),directory/('dynamic_'+str(index)) if directory else None)
+            raw=backend.data.data
+            measured=task_metrics(SessionInput.model_validate(cfg).task,raw)
+            components={'evaluator:'+c.name:dict(value=c.observed,passed=c.satisfied,limit=c.limit,unit=c.units)
+                for c in measured['constraints']}
+            gap=constraint_gap(task_adapter(cfg).constraint_observations(components),valid_complete=measured['validity']=='valid')
+            observation=dict(status='computed' if measured['validity']=='valid' else 'unavailable',
+                value=gap['signed_task_gap'],unit='1',reason=measured.get('reason'),
+                objective_status='comparable' if gap['comparable'] else 'no_common_normalization_scale',
+                task_gap=gap,task_acceptance='unmeasured')
+            mechanics=dict(dynamic_execution=raw,task_constraints=gap['constraints'],
+                reference_semantics=dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
+                    unloaded_tip_drift='same_episode_initial_sample',constraint_model='mujoco_unilateral_soft_limits',
+                    reference_time_s=cfg['task']['goal']['data']['unloaded_until_s'],time_grid=cfg['task']['timing']),
+                task_observations=[],constraint_state=dict(status='finite_time_soft_constraints',qualified=False),
+                point_binding=dict(reference='frozen_dynamic_initial_state'))
+            native=SimpleNamespace(cost=raw['cost'],physics=dict(identity=raw['physical_binding']['model_identity']))
+            models.append(native)
+            record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
+                configuration=cfg,observation=observation,mechanics=mechanics,state=dict(reference='frozen_dynamic_initial_state'),
+                physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None,
+                compiled_physical_changes=dict(model_recompiled=True) if records and native.physics['identity']!=records[0]['physics_identity'] else {})
+            records.append(record);cache[key]=record
+            if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation,raw_execution=raw))
+            if observation['status']!='computed':raise ValueError('INCOMPLETE_OR_INVALID_DYNAMIC_TASK: '+str(measured.get('reason')))
+            return record
         if passive:
             from extensions.tendon_family.passive import PassiveModel
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
@@ -229,9 +282,19 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         scope='Task initial state, fixed generalized pose and saved native state are distinct. Changed structures use named-coordinate transfer/reset, not equal Cartesian state, energy or equilibrium.',
         unsupported_conclusions=['full task improvement','task success','strict derivative','structural descent certificate',
             'passive constraint nullspace','hardware performance'])
+    evidence['effect_semantics']=study.effect_semantics
+    from tools.research_tasks import task_adapter
+    from extensions.math_analysis.differentiation_router import select_method
+    evidence['method_selection']=select_method(effect_semantics=study.effect_semantics,
+        capabilities=task_adapter(configuration).physical_capabilities(),target=study.target.quantity,operation=study.operation)
+    evidence['reference_semantics']=(dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
+        constraint_model='mujoco_unilateral_soft_limits') if dynamic else
+        dict(baseline='re_equilibrated_unloaded',loaded='re_equilibrated_loaded',constraint_model='ideal_hard_unilateral') if passive else
+        dict(initial='saved_active_execution_state' if study.point_semantics=='saved_native_state' else 'frozen_dynamic_initial_state',constraint_model='active_ideal_tension'))
     if passive:
         from tools.research_tasks import task_adapter
-        evidence['scope']='Each rebuilt legal assembly solves both frozen zero-load and selected loaded equilibria. Payout is fixed across load cases; hard equilibrium is separate from native soft-limit dynamics.'
+        evidence['scope']=('All frozen load episodes, identical named initial reset and complete dynamic sampling. Research observation grants no certificate or SELECT eligibility.' if dynamic else
+            'Each rebuilt legal assembly solves both frozen zero-load and selected loaded equilibria. Payout is fixed across load cases; hard equilibrium is separate from native soft-limit dynamics.')
         evidence['unsupported_conclusions'].remove('passive constraint nullspace')
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
@@ -264,7 +327,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             else:
                 other=evaluate(comparison=context['comparisons'][0])
                 evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
-                    delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist())
+                    delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist()
+                        if other['observation']['value'] is not None and base['observation']['value'] is not None else None)
         elif study.operation in ('differentiate','optimize'):
             for i,row in enumerate(rows):
                 first=len(records)
@@ -272,10 +336,17 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     values=list(base_values);values[i]=value
                     return evaluate(values)
                 response=differentiate(row,base,probe,goal=study.target.goal)
-                if passive and study.target.quantity=='re_equilibrated_position_response':
+                if evidence['method_selection']['method']=='passive_kkt_implicit':
                     from extensions.math_analysis.differentiation_router import re_equilibrated
                     response['implicit_sensitivity']=re_equilibrated(row,base,records,models,response,study)
-                if passive:
+                if dynamic:
+                    active=lambda record:{r['constraint_id'] for r in record['observation']['task_gap']['dominant_constraints']}
+                    switch=any(active(record)!=active(base) for record in records[first:])
+                    response.update(direction_status='directional_comparison',maximum_constraint_switch=switch,strict_derivative=False)
+                    if switch:
+                        response.update(suggested_delta=None,selected_record_index=None)
+                        response['consistency'].update(passed=False,reason='NONSMOOTH_MAXIMUM_CONSTRAINT_SWITCH')
+                if passive and not dynamic:
                     branch=base['mechanics']['equilibrium']['equilibrium']
                     changed=any(r['mechanics']['equilibrium']['equilibrium'][key]!=branch[key]
                         for r in records[first:] for key in ('active','positive'))
@@ -347,8 +418,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 direction=dict(version='structure_direction_v2',candidate=binding['candidate'],parameter_changes=changes,
                     baseline_metric=base['observation'],perturbed_metric=selected['observation'],
                     numerical_consistency=[r['consistency'] for r in responses],
-                    tradeoffs='All frozen task constraints, finite response and task acceptance remain unmeasured.',
-                    model_scope='Contact-free fixed-payout equilibrium under frozen loads.' if passive else 'Contact-free native ideal tension, declared state and absolute input only.',
+                    tradeoffs=('All frozen dynamic observations retained; independent task acceptance remains unmeasured.' if dynamic else
+                        'All frozen task constraints, finite response and task acceptance remain unmeasured.'),
+                    model_scope='Finite-time fixed-payout MuJoCo soft limits under every frozen load.' if dynamic else 'Contact-free fixed-payout equilibrium under frozen loads.' if passive else 'Contact-free native ideal tension, declared state and absolute input only.',
                     point_semantics=study.point_semantics,full_task_improvement_verified=False,
                     formal_candidate_created=False,proposal_only=True,other_parameters_unchanged=True,
                     generation_handoff=dict(tool='research_plan',action='generate',generation=generation,
@@ -363,10 +435,15 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 evidence['structure_direction']=direction
             evidence['direction_status']='locally_supported_proposal' if selected else 'unresolved'
     except ValueError as exc:
-        result.update(status='not_applicable',reason=str(exc));evidence['failure']=dict(reason=str(exc),attempted_evaluations=attempts)
+        incomplete=dynamic and records and records[-1]['observation']['status']!='computed'
+        result.update(status='execution_incomplete' if incomplete else 'not_applicable',reason=str(exc))
+        evidence['failure']=dict(reason=str(exc),attempted_evaluations=attempts)
     cost={key:sum(m.cost[key] for m in models) for key in (models[0].cost if models else [])}
     cost.update(evaluation_attempts=attempts,kernel_wall_s=time.perf_counter()-started)
     evidence.update(cost=cost,invalid_local_probes=failures)
+    evidence['method_selection'].update(actual_cost=cost,working_point=evidence['reference_semantics'],
+        parameter=study.paths,evidence_source='/structure_research/records',
+        numerical_consistency=[r['consistency'] for r in evidence.get('parameter_sensitivities',[])])
     if evidence.get('structure_direction'):evidence['structure_direction']['actual_cost']=cost
     result.update(structure_research=evidence,model_identity=records[0]['physics_identity'] if records else None,
         internal_calculations=[dict(purpose='native_mechanism_structure',**cost)])
@@ -400,7 +477,7 @@ def summary(value, reference):
             compact_sensitivity['implicit_sensitivity']={k:row['implicit_sensitivity'][k] for k in
                 ('status','baseline_included','relative_error','gradient_trustworthy','strict_derivative','reason') if k in row['implicit_sensitivity']}
     constraint_state=raw.get('constraint_state')
-    if constraint_state:
+    if constraint_state and 'native_soft_length_residual_m' in constraint_state:
         constraint_state={k:v for k,v in constraint_state.items() if k!='native_soft_length_residual_m'}
         constraint_state['native_soft_length_excess_m']=max(0.,max(raw['constraint_state']['native_soft_length_residual_m']))
     task_observations=deepcopy(raw.get('task_observations',[])[:4])
@@ -425,4 +502,12 @@ def summary(value, reference):
                 qualified=c['mechanics']['constraint_state']['qualified']) for c in raw['load_comparison']['cases']]} if raw.get('load_comparison') else None),
         source=dict(reference=reference,pointer='/structure_research'),
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
+        effect_semantics=raw.get('effect_semantics'),reference_semantics=raw.get('reference_semantics'),
+        method_selection=raw.get('method_selection'),
+        dynamic_task_gaps=[dict(record_index=row['record_index'],task_gap={k:v for k,v in row['observation']['task_gap'].items() if k not in ('constraints','components')})
+            for row in raw['records'] if row['observation'].get('task_gap')],
+        dynamic_metrics=[dict(record_index=row['record_index'],metrics=[{k:c[k] for k in
+            ('constraint_id','condition_id','time_window','observed_value','bound','bound_type','unit','signed_violation','normalized_violation','passed','source_pointer')}
+            for c in row['observation']['task_gap']['constraints']])
+            for row in raw['records'] if row['observation'].get('task_gap')],
         cost=raw['cost'],task_acceptance='unmeasured',unsupported_conclusions=raw['unsupported_conclusions'])

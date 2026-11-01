@@ -48,6 +48,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['properties']['next_research_action']['anyOf'][0]['enum'].remove('mechanism_research')
     elif (study or {}).get('canonical_task',{}).get('physical_problem') and 'next_research_action' in schema['properties']:
         schema['properties']['next_research_action']['anyOf'][0]['enum']=['mechanism_research']
+    elif (study or {}).get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':
+        schema['properties']['next_research_action']['anyOf'][0]['enum'].remove('single_parameter_effect')
     from tools.research.structure_intent import enabled as structure_enabled
     structure_intent=structure_enabled(study or {}) and 'search' in actions
     if scientific_question:

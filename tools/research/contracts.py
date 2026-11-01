@@ -476,6 +476,7 @@ class MechanismQuestionV2(Contract):
 
 
 class ScientificStructureV4(MechanismQuestionV2):
+    effect_semantics: MechanismQuestionV2.model_fields['effect_semantics'].annotation | Literal['finite_time_task_response']
     target: PhysicalMechanismTarget | str
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop','no_active_control']
     physical_problem: Literal['passive_unilateral_equilibrium'] | None = None
@@ -495,7 +496,7 @@ class MechanismStudy(Contract):
     load_condition: str | None = None
     comparison_load_conditions: list[str] = Field(default_factory=list)
     load_aggregation: Literal['minimum','maximum'] | None = None
-    effect_semantics: Literal['mechanism_effect','re_equilibrated_passive_response'] = 'mechanism_effect'
+    effect_semantics: Literal['mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'] = 'mechanism_effect'
     max_evaluations: StrictInt = Field(ge=1,le=64)
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)

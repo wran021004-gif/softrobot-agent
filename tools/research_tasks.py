@@ -29,8 +29,45 @@ class ResearchTaskAdapter:
             raise ValueError('EFFECTIVE_CONFIGURATION_REQUIRED: frozen policy and robot snapshot')
 
     def _require_active(self):
-        if self.task.get('physical_problem'):
+        capability=self.physical_capabilities()
+        if capability['status']=='unsupported':raise ValueError('UNSUPPORTED_PHYSICAL_CAPABILITIES: '+','.join(capability['missing']))
+        if capability['actuation']=='no_active_control':
             raise ValueError('NOT_APPLICABLE_PASSIVE_HAS_NO_ACTIVE_REFERENCE_OR_CONTROL')
+
+    def physical_capabilities(self):
+        """Read-only axes from the frozen model, controller, channels and task."""
+        cfg=self.configuration;task=self.task;policy=cfg.get('policy',{})
+        controller=policy.get('controller',{});backend=policy.get('backend',{})
+        design=cfg.get('robot',{}).get('structure',{}).get('data',{})
+        active=bool(design.get('actuators') or task.get('actuator_channels') or cfg.get('robot',{}).get('channels'))
+        no_control=controller.get('extension_id')=='controller.no_active_control'
+        mode=controller.get('parameters',{}).get('data',{}).get('tension_execution_mode')
+        actuation=('no_active_control' if not active else 'realistic_actuator' if mode=='actuator_realistic' else
+            'ideal_tension' if active or controller.get('extension_id') else 'unknown')
+        constrained=bool(task.get('physical_problem') or design.get('fixed_payout_lengths_m'))
+        mixed=constrained and actuation!='no_active_control'
+        dynamic=bool(passive_registered(task) and backend.get('extension_id')=='backend.family_passive_mujoco' and no_control and not active)
+        missing=(['mixed_actuation_fixed_payout_backend'] if mixed else [])
+        if constrained and 'contact' in task.get('required_physics',[]):
+            missing.append('contact_structure_response_backend');dynamic=False
+        if no_control and active:missing.append('no_active_controller_with_active_assembly')
+        return dict(actuation=actuation,constraints=['unilateral_fixed_payout'] if constrained else [],
+            state_solution=['fixed_state',*(['re_equilibrated'] if constrained and not mixed else []),
+                *(['finite_time_dynamic'] if dynamic or not constrained and active else [])],
+            interaction=['frozen_world_load'] if constrained else ['frozen_world_load','contact'] if 'contact' in task.get('required_physics',[]) else ['frozen_world_load'],
+            evaluation=dict(task_family=task['family'],evaluator=task['evaluator']['extension_id'],
+                finite_time_structure_response=dynamic,independent_acceptance_registered=passive_registered(task) or not constrained),
+            status='unsupported' if missing else 'supported',missing=missing,
+            source_pointers=['/task/physical_problem','/task/actuator_channels','/robot/structure/data',
+                '/policy/controller','/policy/backend'],authority='Derived capability axes; original Registry and execution admission remain authoritative.')
+
+    def structure_task_view(self):
+        conditions=self.condition_view()
+        return dict(physical_capabilities=self.physical_capabilities(),conditions=conditions,
+            response_semantics='finite_time_task_response' if passive_registered(self.task) else 'registered_active_task_and_saved_control_evidence',
+            static_coverage='Static mechanisms cannot predict finite-time speed, drift, full Tracking or contact bounds.',
+            dynamic_coverage='All frozen load cases and sample windows; per-step safety extrema where required by evaluator.',
+            task_acceptance='unmeasured')
 
     def constraint_observations(self, components):
         """Join frozen task meanings to recorded evaluator values; never evaluate physics."""
@@ -521,17 +558,22 @@ def constraint_observation(definition, component):
     row=dict(definition);value=component.get('value');bound=row.get('bound',component.get('limit'))
     numeric=type(value) in (int,float) and math.isfinite(value) and type(bound) in (int,float) and math.isfinite(bound)
     signed=(bound-value if row['bound_type']=='lower' else value-bound) if numeric else None
-    scale=abs(bound) if numeric and bound!=0 else None
+    scale=abs(bound) if type(bound) in (int,float) and math.isfinite(bound) and bound!=0 else None
     key=row['constraint_id'].replace('~','~0').replace('/','~1')
     row.update(observed_value=value,bound=bound,passed=component.get('passed'),signed_violation=signed,
         normalization_scale=scale,normalization_source='absolute_frozen_bound' if scale else None,
-        normalized_violation=signed/scale if scale else None,
+        normalized_violation=signed/scale if scale and signed is not None else None,
         source_pointer='/acceptance/components/'+key)
     return row
 
 
 def constraint_gap(rows, *, valid_complete, accepted=None):
     """Common TaskGap contract; unscaled/missing bounds cannot mint a score."""
+    required={'constraint_id','passed','signed_violation','normalized_violation','observed_value','bound'}
+    if any(not required<=row.keys() for row in rows):
+        return dict(normalized_gap=None,signed_task_gap=None,components={},constraints=rows,
+            unscaled_constraints=[],valid_complete=False,comparable=False,accepted=accepted,dominant_constraints=[],
+            invalid_reason='MALFORMED_DERIVED_CONSTRAINT_OBSERVATIONS')
     complete=bool(valid_complete and rows and all(r['passed'] is not None and r['signed_violation'] is not None for r in rows))
     comparable=complete and all(r['normalized_violation'] is not None for r in rows)
     signed={r['constraint_id']:r['normalized_violation'] for r in rows if r['normalized_violation'] is not None}

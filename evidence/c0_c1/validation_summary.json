@@ -1,0 +1,121 @@
+{
+  "scope": "C0/C1 engineering implementation and bounded validation; no autonomous C2 Study or benchmark claim",
+  "baseline": "35640f0ff2d680bb01f9f9806cda2b0db77ded65",
+  "branch": "codex/r3-b-c0-c1-structure-task-bridge",
+  "c0_local_checkpoint": "cd356500",
+  "c1_local_code_checkpoint": "b5cea9c1e443b403a7cb253e30c14506aff9db61",
+  "context_comparison": {
+    "before": {
+      "sql_reads": 1395,
+      "artifact_reads": 317,
+      "artifact_enumerations": 10,
+      "prepare_s": 2.5960537999635562,
+      "l0_bytes": 25036,
+      "wire_bytes": 39962,
+      "scope": "Read-only saved III-AB Store; reconstructed final packet and saved Mock SDK wire envelope; no Provider or physics"
+    },
+    "after": {
+      "sql_reads": 360,
+      "artifact_reads": 121,
+      "artifact_enumerations": 1,
+      "prepare_s": 1.9859738000086509,
+      "l0_bytes": 24743,
+      "wire_bytes": 39651,
+      "scope": "Read-only saved III-AB Store; reconstructed final packet and saved Mock SDK wire envelope; no Provider or physics"
+    }
+  },
+  "physics": {
+    "total_model_builds": 5,
+    "total_episodes": 6,
+    "total_mj_step": 2400,
+    "dynamic_research": {
+      "attempted_steps": 1600,
+      "episodes_completed": 4,
+      "episodes_started": 4,
+      "evaluation_attempts": 2,
+      "kernel_wall_s": 1.4580394999939017,
+      "material_point_jacobian_calls": 3532,
+      "model_builds": 2,
+      "native_forward_calls": 6408,
+      "physics_steps": 1600
+    },
+    "independent_replay": {
+      "attempted_steps": 800,
+      "episodes_completed": 2,
+      "episodes_started": 2,
+      "material_point_jacobian_calls": 1766,
+      "model_builds": 1,
+      "native_forward_calls": 3204,
+      "physics_steps": 800
+    },
+    "static": {
+      "active": {
+        "model_builds": 1,
+        "forward_evaluations": 3,
+        "physics_steps": 0,
+        "physics_step_attempts": 0,
+        "rollouts": 0,
+        "mechanics_evaluations": 1,
+        "material_point_jacobian_calls": 1
+      },
+      "passive": {
+        "model_builds": 1,
+        "native_forward_calls": 183,
+        "physics_steps": 0,
+        "rollouts": 0,
+        "material_point_jacobian_calls": 214,
+        "tendon_jacobian_extractions": 51,
+        "objective_calls": 154,
+        "gradient_calls": 50,
+        "constraint_calls": 157,
+        "constraint_jacobian_calls": 51,
+        "hessian_columns": 12,
+        "optimizer_iterations": 30,
+        "QP_calls": 2,
+        "equilibrium_solves": 2,
+        "KKT_solves": 0,
+        "multiplier_fits": 2
+      }
+    },
+    "no_additional_physics_after_this_run": true
+  },
+  "provider_requests": 0,
+  "mock_sdk_requests": 5,
+  "actual_mock_sdk_wire_bytes": [
+    40648,
+    41779,
+    64139,
+    88656,
+    65335
+  ],
+  "independent_replay_state": "stopped",
+  "dynamic_research_task_acceptance": "unmeasured",
+  "dynamic_research_constraints_per_structure": 17,
+  "budget_rejection": "SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT",
+  "receipt_reuse": true,
+  "tests": {
+    "c0_batch": {
+      "total": 36,
+      "passed": 35,
+      "dependency_change_race": 1,
+      "isolated_retest_passed": 1
+    },
+    "c0_clean_v4": 3,
+    "c1_regression_batch": {
+      "total": 23,
+      "passed": 22,
+      "malformed_diagnostic_error": 1
+    },
+    "final_bridge_contracts": 10,
+    "final_failure_contract_retest": 1,
+    "original_v4_targeted": 2,
+    "original_real_physics": 2,
+    "note": "Failed/intermediate logs retained locally. Malformed diagnostic fixed and entire 10-case bridge file passed. No assertions or frozen task thresholds weakened."
+  },
+  "limits": [
+    "Zero/no-contact bounds without frozen reference scale have no normalized J; complete paired metrics remain available.",
+    "Actual normalized dynamic differentiation/optimization checked with a separate synthetic fixture, not claimed as a real engineering-task improvement.",
+    "Mixed actuation/fixed-payout dynamics, differentiable contact and active finite-time structure replay are unsupported.",
+    "No global gradient, independent acceptance from mathematics, autonomous search, PPO or NMPC training."
+  ]
+}

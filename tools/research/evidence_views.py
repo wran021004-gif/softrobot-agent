@@ -64,6 +64,10 @@ def acceptance_certificate(host, reference):
             motion=host.store.artifact(raw['raw_reference']).get('samples')
         original=assemble_acceptance(cfg,host.store.artifact(sources['evaluation']),host.store.artifact(sources['profile']),
             evaluation_reference=sources['evaluation'],profile_reference=sources['profile'],motion=motion,protocol_id=acceptance['protocol_id'])
+        # Historical certificates predate this optional read-only diagnostic.
+        # All original acceptance fields still compare exactly; a present new
+        # diagnostic is recomputed and compared too, never trusted as authority.
+        if 'constraint_observations' not in acceptance:original.pop('constraint_observations',None)
         if original!=acceptance:issues.append('ACCEPTANCE_DIFFERS_FROM_ORIGINAL_EVALUATOR_AND_PROFILE')
     return dict(version='formal_acceptance_view_v1',status='acceptance_certificate',reference=reference,
         complete_acceptance_view=not issues and view['complete'],validation_issues=issues,

@@ -257,6 +257,9 @@ def scoped_result(result, requirements, applicability, query):
         if result.get('structure_research'):
             conclusion,verification,pointer='diagnostic','local_mechanism_numerical_observation','/structure_research'
             interpretation='Declared local native mechanism, constrained equilibrium or structural sensitivity only; candidate proposal is not task success or a strict descent certificate.'
+            if result['structure_research'].get('effect_semantics')=='finite_time_task_response':
+                verification='frozen_finite_time_research_observation'
+                interpretation='All recorded frozen dynamic load cases and task bounds retained, including unscaled conditions; independent Replay, acceptance certificate and Main SELECT remain separate.'
         elif result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
@@ -525,13 +528,18 @@ def dispatch(host,query,key,*,guard,origin='model'):
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
+        if episodes and episodes>backend_capacity(host,db):raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
         if current.get('success_gate') or current.get('mathematical_evaluations',0)+count>current['spec']['budgets']['mathematical_evaluations']:
             raise ValueError('MATHEMATICAL_COUNT_OR_SUCCESS_GATE')
         current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+count
         current['numerical_reserved_s']+=reserve
         host.store.update_state(db,host.run_id,current)
+    episodes=(sensitivity_context or {}).get('dynamic_cost_bound',{}).get('episodes',0)
+    if episodes:
+        from tools.research.budget import backend_capacity
+        if episodes>backend_capacity(host):raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,
-        {**zero(),'wall_s':reserve,'tool_calls':int(origin=='engineering_preflight')},kind='candidate_analysis',guard=charge)
+        {**zero(),'wall_s':reserve,'tool_calls':int(origin=='engineering_preflight'),'backend_solves':episodes},kind='candidate_analysis',guard=charge)
     folder=host.store.root/'analyses'/row['execution_id']
     folder.mkdir(parents=True,exist_ok=True)
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
@@ -542,6 +550,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time(),analysis_evaluations=count)
+    if episodes:pending['dynamic_cost_bound']=sensitivity_context['dynamic_cost_bound']
     if preparation_s:pending['preparation_numerical_s']=preparation_s
     if method_fit:pending['method_admission']=method_fit
     update(host,pending=pending)
@@ -571,6 +580,11 @@ def recover(host):
     boundary=read(folder/'boundary.json')
     elapsed=boundary['elapsed_s']
     value=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',task_acceptance='unmeasured',boundary=boundary)
+    if p.get('dynamic_cost_bound'):
+        value['reserved_dynamic_cost_bound']=p['dynamic_cost_bound']
+        if value.get('status')!='computed':
+            value['dynamic_execution_progress']=[read(path) for path in sorted(folder.glob('dynamic_*/passive_progress.json'))]
+        value['dynamic_progress_scope']='Original partial snapshots; not a completed task observation or independent Replay. Reserved attempts remain charged.'
     if (folder/'worker_runtime.json').exists():value['worker_runtime']=read(folder/'worker_runtime.json')
     # New failed workers still carry scope; old receipts are never reinterpreted.
     if 'scoped_claim' not in value and (folder/'request.json').exists():

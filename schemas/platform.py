@@ -142,7 +142,7 @@ class TaskDefinition(Contract):
         if self.physical_problem is not None:
             from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
             ConstrainedPhysicalProblem.model_validate(self.physical_problem)
-            if self.actuator_channels:raise ValueError('PASSIVE_TASK_REQUIRES_NO_ACTIVE_CHANNELS')
+            if self.actuator_channels:raise ValueError('UNSUPPORTED_MIXED_ACTUATION_FIXED_PAYOUT_BACKEND')
         elif not self.actuator_channels:raise ValueError('ACTIVE_TASK_REQUIRES_ACTUATOR_CHANNELS')
         if self.sampling.window_s[1] > self.timing.duration_s:
             raise ValueError('EVALUATION_WINDOW_EXCEEDS_DURATION_S')

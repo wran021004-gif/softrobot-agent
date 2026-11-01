@@ -344,6 +344,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             item['planning_status']='unauthorized';item['execution_status']='blocked'
             item['missing']=[*item['missing'],'explicit_frozen_mechanism_method_grant_required']
         methods[METHOD]=item
+        item['task_conditioned_query']=dict(reference=reference,view='mathematical_capabilities',pointer='/structure_research/task_conditioned_view')
         methods['native_dynamics_v1']['frontend_role']='internal_mechanism_source'
         item['internal_mechanics_query']=methods['native_dynamics_v1']['detail_query']
     for method,item in methods.items():
@@ -383,6 +384,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
         from tools.research.structure_research import parameters,discovery
         from extensions.math_analysis.mechanism_registry import catalog,mechanism_ids
         extra['structure_research']=dict(**discovery(spec,c,reference,method_detail=methods['mechanism_structure_v1'],remaining_evaluations=remaining),mechanisms=catalog(),parameters=parameters(spec,c),
+            task_conditioned_view=task_adapter(cfg).structure_task_view(),
             selectable_mechanisms=mechanism_ids('passive_unilateral_equilibrium' if cfg['task'].get('physical_problem') else 'active_ideal_tension'),
             evaluation_rule='One common baseline, actual stencil coordinates per selected effective path, one joint check for two paths; bounded local SciPy search uses the requested cap.',method_query=methods['mechanism_structure_v1']['detail_query'],
             differentiation='Normalized linear/log coordinates; central or legal one-sided two-scale native differences, at most two actual continuous physical parameters. No strict derivative or descent certificate.',

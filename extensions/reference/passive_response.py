@@ -118,18 +118,14 @@ def reduce_vector(bound, vector):
     return float(np.linalg.norm(vector))
 
 
-def evaluate(task, result, source, reg, identity):
-    goal,bounds,problem=task_definition(task,reg)
-    raw=result.data.data
+def task_metrics(task, raw):
+    """Pure frozen metric extraction shared by research observations and evaluation."""
+    from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
+    goal=PassiveResponseGoal.model_validate(task.goal.data)
+    bounds=PassiveResponseEvaluation.model_validate(task.evaluator.parameters.data)
+    problem=ConstrainedPhysicalProblem.model_validate(task.physical_problem)
     validity,reason=inspect_evidence(task,raw)
-    if (result.backend_id!='backend.family_passive_mujoco' or result.model_id!='mujoco_passive_fixed_payout_v1' or
-            result.data.contract!='family.passive_dynamic_data' or result.initial_state!=task.initializer.parameters or
-            result.seed not in task.sampling.seeds):
-        validity,reason='invalid','BACKEND_INITIALIZER_OR_SEED_BINDING_MISMATCH'
-    if result.solver_status!='completed' and validity=='valid':validity,reason='incomplete','BACKEND_EXECUTION_NOT_COMPLETED'
-    kwargs=dict(source=source,evaluator=task.evaluator.extension_id,evaluator_version=task.evaluator.version,
-        comparison_identity=identity)
-    if validity!='valid':return EvaluationResult(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason,**kwargs)
+    if validity!='valid':return dict(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason)
     metrics=[];constraints=[]
     for b in bounds.bounds:
         rows=next(e['samples'] for e in raw['episodes'] if e['load_condition']==b.load_condition)
@@ -142,7 +138,7 @@ def evaluate(task, result, source, reg, identity):
             point=reduce_vector(b,np.asarray(row['material_positions_m'][i])-baseline['material_positions_m'][i])
             tip=reduce_vector(b,np.asarray(row['tip_m'])-baseline['tip_m'])
             if b.quantity=='displacement_ratio' and point==0:
-                return EvaluationResult(validity='invalid',task_success=None,metrics=[],constraints=[],reason='ZERO_DISPLACEMENT_RATIO_DENOMINATOR',**kwargs)
+                return dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='ZERO_DISPLACEMENT_RATIO_DENOMINATOR')
             value={'material_displacement':lambda:point,'tip_displacement':lambda:tip,
                 'displacement_difference':lambda:tip-b.material_scale*point,'displacement_ratio':lambda:tip/point,
                 'maximum_tension':lambda:max(row['actual_tension_n']),
@@ -157,10 +153,10 @@ def evaluate(task, result, source, reg, identity):
             episode=next(e for e in raw['episodes'] if e['load_condition']==b.load_condition)
             field='maximum_tension_n' if b.quantity=='maximum_tension' else 'maximum_length_excess_m'
             if field not in episode:
-                return EvaluationResult(validity='incomplete',task_success=None,metrics=[],constraints=[],reason='PER_STEP_CONSTRAINT_EXTREMA_MISSING',**kwargs)
+                return dict(validity='incomplete',task_success=None,metrics=[],constraints=[],reason='PER_STEP_CONSTRAINT_EXTREMA_MISSING')
             values.append(episode[field])
         if not np.isfinite(values).all():
-            return EvaluationResult(validity='invalid',task_success=None,metrics=[],constraints=[],reason='NONFINITE_DYNAMIC_METRIC',**kwargs)
+            return dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='NONFINITE_DYNAMIC_METRIC')
         for suffix,limit,value,satisfied in [('minimum',b.minimum,min(values),b.minimum is None or min(values)>=b.minimum),
                 ('maximum',b.maximum,max(values),b.maximum is None or max(values)<=b.maximum)]:
             if limit is None:continue
@@ -171,4 +167,17 @@ def evaluate(task, result, source, reg, identity):
         maximum=max(e['maximum_contacts'] for e in raw['episodes'])
         metrics.append(Metric(name='maximum_contacts',value=maximum,units='count'))
         constraints.append(ConstraintResult(name='no_contact',satisfied=maximum==0,observed=maximum,limit=0,units='count'))
-    return EvaluationResult(validity='valid',task_success=all(c.satisfied for c in constraints),metrics=metrics,constraints=constraints,**kwargs)
+    return dict(validity='valid',task_success=all(c.satisfied for c in constraints),metrics=metrics,constraints=constraints)
+
+
+def evaluate(task, result, source, reg, identity):
+    task_definition(task,reg)
+    observation=task_metrics(task,result.data.data)
+    if (result.backend_id!='backend.family_passive_mujoco' or result.model_id!='mujoco_passive_fixed_payout_v1' or
+            result.data.contract!='family.passive_dynamic_data' or result.initial_state!=task.initializer.parameters or
+            result.seed not in task.sampling.seeds):
+        observation=dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='BACKEND_INITIALIZER_OR_SEED_BINDING_MISMATCH')
+    if result.solver_status!='completed' and observation['validity']=='valid':
+        observation=dict(validity='incomplete',task_success=None,metrics=[],constraints=[],reason='BACKEND_EXECUTION_NOT_COMPLETED')
+    return EvaluationResult(**observation,source=source,evaluator=task.evaluator.extension_id,
+        evaluator_version=task.evaluator.version,comparison_identity=identity)

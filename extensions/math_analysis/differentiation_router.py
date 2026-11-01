@@ -2,6 +2,36 @@
 import numpy as np
 
 
+def select_method(*, effect_semantics, capabilities, target=None, operation='differentiate', saved_t1=False, saved_conic=False):
+    """Select existing computations; selection never launches a solver or search."""
+    missing=list(capabilities.get('missing',[]));actuation=capabilities.get('actuation')
+    method=None;strength='not_applicable';preparation=[]
+    if not missing and effect_semantics=='finite_time_task_response':
+        if capabilities.get('evaluation',{}).get('finite_time_structure_response'):
+            method='finite_time_task_paired_response';strength='bounded_directional_comparison'
+        else:missing.append('registered_finite_time_structure_response_backend')
+    elif not missing and effect_semantics=='re_equilibrated_passive_response':
+        if 're_equilibrated' in capabilities.get('state_solution',[]):
+            method='passive_kkt_implicit' if target=='re_equilibrated_position_response' else 'passive_re_equilibrated_pairs'
+            strength='conditional_implicit_gradient' if method=='passive_kkt_implicit' else 'directional_comparison'
+        else:missing.append('qualified_unilateral_equilibrium')
+    elif not missing and effect_semantics=='reoptimized_task_capability':
+        if saved_conic:method='saved_conic_capability_sensitivity';strength='conditional_optimal_value_sensitivity'
+        elif saved_t1:method='saved_native_t1_t2';strength='finite_budget_best_found_secant'
+        else:preparation=['Read or explicitly prepare comparable saved T1/Conic evidence. No automatic T1 search.']
+    elif not missing and effect_semantics=='mechanism_effect':
+        if actuation=='ideal_tension':method='native_instantaneous_finite_difference';strength='local_numerical_derivative_estimate'
+        elif 're_equilibrated' in capabilities.get('state_solution',[]):method='passive_re_equilibrated_pairs';strength='directional_comparison'
+        else:missing.append('registered_instantaneous_mechanism_backend')
+    else:missing.append('registered_effect_semantics')
+    return dict(method=method,effect_semantics=effect_semantics,parameter=None,working_point=None,
+        control_treatment=actuation,comparison_scope='same frozen task, model protocol and declared control treatment',
+        numerical_consistency='requires_recorded_checks',direction_status=strength,
+        validity='unsupported' if missing else 'needs_prerequisite' if preparation else 'conditional',
+        missing=missing,preparation=preparation,evidence_source=None,actual_cost=None,
+        strict_derivative=False,automatic_expensive_search=False)
+
+
 def coordinate(parameter):
     """Normalize the actual physical domain; wide positive domains use log scale."""
     lo,hi,x=(float(parameter[k]) for k in ('minimum','maximum','current_value'))

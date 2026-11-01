@@ -123,10 +123,10 @@ def question_schema(spec, candidate=None, action=None):
                 props.pop(name,None)
             props['physical_problem']={'type':'string','const':problem['mode']}
             props['control_treatment']={'type':'string','const':'no_active_control'}
-            props['operating_point']={'type':'string','const':'re_equilibrated'}
-            props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
+            props['operating_point']={'type':'string','enum':['re_equilibrated','frozen_task_initial_state']}
+            props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]+['all_frozen_conditions']}
             props['comparison_load_conditions']['items']['enum']=[x['name'] for x in problem['loads']]
-            props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
+            props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response','finite_time_task_response']}
             target_props=schema['$defs']['PhysicalMechanismTarget']['properties']
             for name in ('tendon_channel','direction_generalized'):target_props.pop(name,None)
             target_props['reduction']={'type':'string','enum':['identity','norm','minimum','maximum','directional_norm','directional_component'],'default':'identity'}
@@ -159,6 +159,11 @@ def question_schema(spec, candidate=None, action=None):
             structure.setdefault('allOf',[]).append({
                 'if':{'properties':{'operation':{'enum':['differentiate','optimize']}},'required':['operation']},
                 'then':{'properties':{'target':{'properties':{'quantity':{'not':{'enum':excluded}}}}}}})
+        if passive:
+            structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
+                'then':{'properties':{'operating_point':{'const':'frozen_task_initial_state'},
+                    'target':{'type':'string','const':'finite_time_task_violation'}}},
+                'else':{'properties':{'operating_point':{'const':'re_equilibrated'}}}})
         if passive:
             structure['allOf'].append({'if':{'properties':{'operation':{'not':{'const':'compare'}}},'required':['operation']},
                 'then':{'properties':{'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'}}}})
@@ -487,6 +492,12 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     if not intent:return feedback('needs_prerequisite','COMPLETED_CANDIDATE_BOUND_DIAGNOSE_REQUIRED',
         preparation=dict(tool='research_plan',action='diagnose',fields=['hypothesis','decision.selected_candidate']))
     c=verify_candidate(host,intent['candidate'])
+    from tools.research_tasks import task_adapter
+    capabilities=task_adapter(c['configuration']).physical_capabilities()
+    if capabilities['status']=='unsupported':
+        return feedback('unsupported','UNSUPPORTED_PHYSICAL_CAPABILITIES',missing=capabilities['missing'])
+    if v4 and q.effect_semantics=='finite_time_task_response':
+        return compile_dynamic(host,q,payload,intent,tool_use_id=tool_use_id)
     if c['configuration']['task'].get('physical_problem'):
         if not v4:return feedback('unsupported','PASSIVE_REQUIRES_V4_PHYSICAL_SEMANTICS')
         return compile_constrained(host,q,payload,intent,tool_use_id=tool_use_id)
@@ -494,7 +505,12 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         return feedback('unsupported','FROZEN_PHYSICAL_MODE_MISMATCH')
     if v4 and (q.comparison_load_conditions or q.load_aggregation):return feedback('unsupported','LOAD_COMPARISON_REQUIRES_PASSIVE_ASSEMBLY')
     if q.effect_semantics=='reoptimized_task_capability':
-        return compile_reoptimized(host,q,payload,tool_use_id=tool_use_id,intent=intent)
+        from extensions.math_analysis.differentiation_router import select_method
+        route=select_method(effect_semantics=q.effect_semantics,capabilities=capabilities,
+            saved_t1=bool(q.source_selection.t1_results),saved_conic=bool(q.source_selection.model_results))
+        result=compile_reoptimized(host,q,payload,tool_use_id=tool_use_id,intent=intent)
+        result['method_selection']=route
+        return result
     if q.effect_semantics not in ('mechanism_effect','fixed_input_response'):
         return feedback('unsupported','V2_EFFECT_NOT_IMPLEMENTED',detail={
             'closed_loop_performance':'Requires complete feedback execution and independent frozen task evaluation; no closed-loop derivative adapted.',
@@ -589,6 +605,47 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     return dict(status='ready',method=METHOD,request=full,scientific_execution_started=False,
         hypothesis=q.hypothesis or intent['agent_hypothesis'].get('hypothesis'),required_evaluations=needed,
         minimum_evaluations=context['minimum_evaluations'],limitations=detail['limitations'],cost_scope=detail['cost_scope'])
+
+
+def compile_dynamic(host,q,payload,intent,*,tool_use_id):
+    """V4 full-task observation; the original worker and budgets own all execution."""
+    from tools.research.contracts import MechanismStudy,PhysicalMechanismTarget
+    from tools.research.design import verify_candidate
+    from tools.research.structure_research import prepare_context,METHOD
+    from tools.research.task_constraints import mathematical_method_view
+    from tools.research.agent import bind_selected_analysis_request
+    from tools.research_tasks import task_adapter
+    from extensions.math_analysis.differentiation_router import select_method
+    spec=state(host)['spec'];c=verify_candidate(host,intent['candidate'])
+    capabilities=task_adapter(c['configuration']).physical_capabilities()
+    route=select_method(effect_semantics=q.effect_semantics,capabilities=capabilities,operation=q.operation,target=q.target)
+    def fail(reason):return dict(status='unsupported',reason=reason,method_selection=route,scientific_execution_started=False)
+    if route['validity']=='unsupported':return fail('REGISTERED_FINITE_TIME_STRUCTURE_RESPONSE_REQUIRED')
+    if (q.target!='finite_time_task_violation' or q.operating_point!='frozen_task_initial_state' or
+            q.control_treatment!='no_active_control' or q.physical_problem!=c['configuration']['task']['physical_problem']['mode']):
+        return fail('EXPLICIT_COMPLETE_DYNAMIC_TASK_AND_FROZEN_INITIAL_STATE_REQUIRED')
+    if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.response_horizon_s is not None or q.control_scope or q.search_strategy or any(plain(q.source_selection).values()):
+        return fail('DYNAMIC_PASSIVE_RESPONSE_CANNOT_BIND_ACTIVE_CONTROL_OR_SHORT_HORIZON')
+    if q.load_condition not in (None,'all_frozen_conditions') or q.comparison_load_conditions or q.load_aggregation:
+        return fail('ALL_FROZEN_CONDITIONS_REQUIRED')
+    if q.requested_budget is None:return fail('EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
+    study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
+        parameter_paths=q.parameter_paths,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
+        max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
+    try:
+        context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
+        detail=mathematical_method_view(host,intent['candidate'])['methods'][METHOD]
+    except ValueError as exc:return fail(str(exc))
+    if detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED')
+    if context['evaluations']>spec['budgets']['mathematical_evaluations']-state(host)['mathematical_evaluations']:
+        return fail('SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
+    from tools.research.budget import backend_capacity
+    if backend_capacity(host)<context['dynamic_cost_bound']['episodes']:return fail('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
+    request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
+        tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
+    return dict(status='ready',method=METHOD,request=request,method_selection=route,
+        required_evaluations=context['evaluations'],dynamic_cost_bound=context['dynamic_cost_bound'],
+        task_acceptance='unmeasured',scientific_execution_started=False)
 
 
 def compile_constrained(host,q,payload,intent,*,tool_use_id):

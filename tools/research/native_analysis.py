@@ -111,10 +111,12 @@ def assessment(configuration, requirements):
 def applicability(requirements, query, assessed, point):
     if requirements.binding.get('physical_problem'):
         study=getattr(query,'mechanism_study',None)
-        supported=bool(study and study.point_semantics=='re_equilibrated')
+        dynamic=bool(study and study.effect_semantics=='finite_time_task_response')
+        supported=bool(study and (study.point_semantics=='re_equilibrated' or dynamic and study.point_semantics=='frozen_task_initial_state'))
         return dict(status='applicable' if supported else 'not_applicable',reasons=[] if supported else ['Passive problem requires re-equilibrated mechanism analysis.'],
             constraint_coverage=[],full_task_supported=False,execution_support='mathematical_diagnostic_only',model_assessment=assessed,
-            horizon=dict(analysis_horizon_s=0.,task_duration_s=requirements.duration_s,interpretation='Static constrained equilibrium; no dynamic task acceptance.'))
+            horizon=dict(analysis_horizon_s=requirements.duration_s if dynamic else 0.,task_duration_s=requirements.duration_s,
+                interpretation='Complete frozen dynamic research observation; no independent acceptance.' if dynamic else 'Static constrained equilibrium; no dynamic task acceptance.'))
     reasons=[r for use in assessed['uses'].values() for r in use['reasons']]
     point=point or {};start=point.get('actual_time_s')
     initial=query.operating_point=='standardized_initial_pretension'

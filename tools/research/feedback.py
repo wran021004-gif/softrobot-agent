@@ -54,10 +54,11 @@ def task_gap(result):
                     source_pointer=f'/episodes/{i}/{key}',limit_pointer='/acceptance/'+limit)
         signed={key:row['value']/row['limit']-1 for key,row in metrics.items()}
         gaps={key:max(0.,value) for key,value in signed.items()}
-        return dict(normalized_gap=max(gaps.values()) if len(gaps)==3 else None,components=gaps,
+        valid=bool(result['independent_evaluation_executed'] and episodes and all(
+                e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes))
+        return dict(normalized_gap=max(gaps.values()) if valid and len(gaps)==3 else None,components=gaps,
             dominant_constraints=_dominant_metrics(signed,metrics) if len(gaps)==3 else [],
-            valid_complete=bool(result['independent_evaluation_executed'] and episodes and all(
-                e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
+            valid_complete=valid,
             accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
     components=acceptance.get('components',{})
     if acceptance.get('constraint_observations') is not None:
@@ -91,7 +92,7 @@ def task_gap(result):
     if acceptance.get('task_family')=='task.oriented_tracking':required=(*required,'rigid_tool_binding')
     if acceptance.get('protocol_id')=='offline_oriented_tracking_v2':required=(*required,'no_environment_contact')
     valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True for k in required))
-    return dict(normalized_gap=max(ratios.values()) if len(ratios)==len(scored) else None,
+    return dict(normalized_gap=max(ratios.values()) if valid and len(ratios)==len(scored) else None,
         components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),
         dominant_constraints=_dominant_metrics(signed,metrics) if len(ratios)==len(scored) else [],
         interpretation='Research ranking only; invalid executions remain invalid regardless of gap')
