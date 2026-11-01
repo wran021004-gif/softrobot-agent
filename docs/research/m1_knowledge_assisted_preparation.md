@@ -126,8 +126,15 @@ code changed. The R0 full suite and nine-task Benchmark were not run.
 
 Actual cost is zero real inference requests, scientific workers, control
 optimizations, physics steps and independent Replays. Engineering health/catalog
-HTTP requests are separate from inference. A new Store must be prepared and
-bound only after committing this configuration and tests. Preparation grants no
+HTTP requests are separate from inference. Configuration and tests were committed
+at `750db6b1cb07c8006f8e1af01d4b05cb3b93e65c` before the successful new Store
+prepare/bind. Bound scientific profile identity is
+`730f501788ff372ad064423e9167fdf921c53869e9d1f903e771f90ba9f9eaec`;
+pending approval scope identity is
+`968c21dd14ff01da5e649be8f973fbdb61cf20350ee93610a80c07bfd0927e3b`.
+The bound Store is compatible, with no candidates, retrievals, pending workers,
+authorization events or charged operations. The original formal approval guard
+was checked and still rejects execution. Preparation grants no
 science: preserve `PENDING_EXPLICIT_APPROVAL`, publish the exact bound identity
 and approval scope, then wait for the user. Use only the original
 `formal_study_authorization` event bound to Study ID, resolved identity and scope;
@@ -138,5 +145,6 @@ SELECT/STOP. No other task, extra optimization/robustness work, new Study,
 budget expansion or main merge is authorized.
 
 Machine-readable preflight: [offline_audit.json](../../evidence/m1_knowledge_preparation/offline_audit.json).
+Bound readout: [binding_summary.json](../../evidence/m1_knowledge_preparation/binding_summary.json).
 Full resolved configuration, raw source/profile hashes, pending approval packet,
 Store, SDK wires and detailed trajectories remain in local evidence directories.
