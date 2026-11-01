@@ -88,7 +88,7 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
             ['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
-        mechanisms=mechanism_ids('passive_unilateral_equilibrium' if candidate['configuration']['task'].get('physical_problem') else 'active_ideal_tension'),
+        selectable_mechanisms=mechanism_ids('passive_unilateral_equilibrium' if candidate['configuration']['task'].get('physical_problem') else 'active_ideal_tension'),
         effective_parameter_groups=sorted({r['category'] for r in rows if r['mechanism_differentiation']['supported']}),
         evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,
