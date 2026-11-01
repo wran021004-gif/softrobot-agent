@@ -89,6 +89,9 @@ def execute(inp,folder=None):
     def checkpoint():
         raw.update(physics_steps=failure.completed_steps,attempted_steps=failure.attempted_steps,
             native_forward_calls=failure.forward_evaluations)
+        raw['cost']=dict(model_builds=1,physics_steps=failure.completed_steps,attempted_steps=failure.attempted_steps,
+            native_forward_calls=failure.forward_evaluations,episodes_started=len(raw['episodes']),
+            episodes_completed=sum(e['complete'] for e in raw['episodes']),material_point_jacobian_calls=native.cost['material_point_jacobian_calls'])
         raw['timings_s']['total']=time.perf_counter()-started
         if folder:atomic_json(folder/'passive_progress.json',raw)
     for case in goal.load_conditions:
@@ -141,9 +144,6 @@ def execute(inp,folder=None):
             checkpoint();break
         checkpoint()
     if len(raw['episodes'])==len(goal.load_conditions) and all(e['complete'] for e in raw['episodes']):raw['status']='completed'
-    raw['cost']=dict(model_builds=1,physics_steps=failure.completed_steps,attempted_steps=failure.attempted_steps,
-        native_forward_calls=failure.forward_evaluations,episodes_started=len(raw['episodes']),
-        episodes_completed=sum(e['complete'] for e in raw['episodes']),material_point_jacobian_calls=native.cost['material_point_jacobian_calls'])
     checkpoint()
     return backend_result(inp,raw)
 

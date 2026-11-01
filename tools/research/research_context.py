@@ -337,6 +337,7 @@ def context(host, *, evidence_references=None):
     if best:best['physical_diagnostic']=physical_diagnostic(host,best['reference'])
     if best and best.get('source'):
         starts.insert(0,dict(candidate=best.get('executable_candidate',best['candidate']),source=best['source'],observation=best['reference']))
+    if s['spec']['configuration']['task'].get('physical_problem'):starts=[]
     seen=set();unique=[]
     for entry in starts:
         key=(entry['candidate']['artifact_id'],entry['source']['artifact_id'])
