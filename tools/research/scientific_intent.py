@@ -83,14 +83,21 @@ def parameter_catalog(spec, candidate, group=None, method=None):
     """Project actual authoritative FamilySpace rows, including original admission."""
     from tools.research.optimal_capability import family_analysis_parameters
     if not spec.get('family_space') or not candidate.get('generation_version'):return []
+    v4=spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4'
+    if v4:
+        from tools.research.structure_research import parameters
+        actual=parameters(spec,candidate)
+    else:actual=family_analysis_parameters(spec,candidate)
     rows=[]
-    for row in family_analysis_parameters(spec,candidate):
+    for row in actual:
         path=row['parameter_id']
         kind=('routing' if row['category']=='routing' else 'lengths' if path.endswith('.length_m') else
             'sections' if '.sections.' in path or path.endswith('.section_angle_rad') else
             'materials' if path.startswith('segments.') and (path.endswith('.young_pa') or '.physical_parameters.' in path) else None)
+        if v4:kind=row['category']
         if not kind or group and kind!=group:continue
         legal=row['continuous_perturbation'] and row['effective_in_current_execution'] and '*' not in path
+        if v4:legal=legal and row['mechanism_differentiation']['supported']
         methods=row['applicable_mathematical_methods']
         rows.append(dict(parameter_group=kind,parameter_id=path,physical_meaning=path.rsplit('.',1)[-1].replace('_',' '),
             physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
@@ -181,6 +188,14 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             target['allOf'].append({'if':{'properties':{'reduction':{'const':reduction}},'required':['reduction']},
                 'then':{'properties':{'quantity':{'enum':quantities}}}})
         structure=schema['$defs']['ScientificStructureV4']
+        if candidate:
+            registered=parameter_catalog(spec,candidate)
+            groups=sorted({r['parameter_group'] for r in registered if r['selectable']})
+            if any(r['selectable'] and r['parameter_id'].endswith('.length_m') for r in registered):groups.append('segment_lengths')
+            for branch in structure['properties']['parameter_group']['anyOf']:
+                if branch.get('type')=='string':branch['enum']=groups
+            structure['properties']['parameter_paths']['items']['enum']=[r['parameter_id'] for r in registered if '*' not in r['parameter_id']]
+            structure['properties']['parameter_paths']['description']='Choose registered physical parameter IDs from this enum, or a parameter_group. Evidence JSON navigation pointers are not parameter IDs.'
         structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
         structure['description']='Choose operation, effect semantics, target, and parameters. Hypothesis and evaluation cap may reuse the completed diagnose decision. Only uniquely implied execution fields are compiled; distinct working points, sources and scientific methods remain Main choices.'
         if not passive:

@@ -13,7 +13,7 @@ from jsonschema import Draft202012Validator
 from tools.research import agent, core
 from tools.research.contracts import AnalysisRequest, ScientificQuestionV4
 from tools.research.scientific_intent import (compile_question, completed_question_plan,
-    control_method_choices, question_schema)
+    control_method_choices, question_schema, parameter_catalog)
 from tools.research.state import state, update, save
 from tools.research.task_constraints import mathematical_method_view
 from tools.state_io import atomic_json, read
@@ -157,3 +157,17 @@ class IntentCompilationHandoffTests(unittest.TestCase):
         with patch.object(core,'guard'):core.dispatch(h,initialization(h,other),'other-preparation')
         self.assertIsNone(completed_question_plan(h))
         self.assertEqual(state(h)['analysis_results'],[])
+
+    def test_registered_groups_and_paths_match_the_actual_v4_compiler(self):
+        h,c=integrated_host();spec=state(h)['spec'];candidate=h.store.artifact(c)
+        projected=question_schema(spec,candidate,'mechanism_research')
+        q=structure_question();q['structure'].update(operation='inspect',requested_budget=1,parameter_group='segment_lengths')
+        q['structure'].pop('parameter_paths')
+        Draft202012Validator(projected).validate(q)
+        self.assertEqual(compile_question(h,q,tool_use_id='registered-group')['status'],'ready')
+        invalid=deepcopy(q);invalid['structure']['parameter_paths']=['/parameters']
+        self.assertTrue(list(Draft202012Validator(projected).iter_errors(invalid)))
+        from tools.research.structure_research import group_matches,parameters
+        actual={r['parameter_id']:r for r in parameters(spec,candidate)}
+        for r in parameter_catalog(spec,candidate):
+            if r['selectable']:self.assertTrue(group_matches(actual[r['parameter_id']],r['parameter_group']))

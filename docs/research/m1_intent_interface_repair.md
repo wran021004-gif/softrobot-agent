@@ -44,6 +44,14 @@ Confirmed attribution:
 - Request 25 entered the original Native T1 worker and completed 32 callbacks,
   16 iterations and 19,200 physics steps. Its failing model prediction is a
   scientific result, unlike rejected requests, and is not independent acceptance.
+- The delivered V4 parameter catalog used labels such as lengths/materials/sections,
+  while the mechanism compiler accepted authoritative registry categories and the
+  existing segment_lengths selector. This is a confirmed catalog/compiler mismatch;
+  the historical requests failed earlier, so it does not explain away their root
+  field errors. The real engineering inspect probe exposed an additional unregistered
+  `/parameters` navigation pointer admitted by the free-string parameter Schema.
+  V4 now uses the original structural registry's group names and enumerated IDs.
+  V1/V2/V3 selectors retain their existing meanings.
 
 The architecture planning document was read for responsibility boundaries only.
 Its historical candidate examples are not supplied to the next Main Study.
@@ -172,7 +180,13 @@ permission request. A bounded engineering model-interface probe may use at most
 generated requests against actual projected schemas and the original compiler;
 it executes no numerical/physical workers and establishes no autonomous M1 result.
 Its exact calls and costs must be reported separately from Mock tests and from
-the future formal Study. There is no automatic full research run.
+the future formal Study. There is no automatic full research run. The first
+engineering window made four actual requests: the control case corrected a root
+field error and compiled to original T1 on request two; an inspect case submitted
+an unregistered parameter pointer, and request four returned confirmed HTTP 502
+`empty_response`. Its four charges and engineering STOP are preserved. After the
+registry projection repair, at most four remaining requests may be used under a
+new committed implementation, keeping the cumulative engineering ceiling at eight.
 
 ## New formal M1 proposal
 
