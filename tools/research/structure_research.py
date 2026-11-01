@@ -32,7 +32,8 @@ def group_matches(row, group):
 
 def dynamic_protocol(configuration):
     """Comparison identity excludes the changed structure, not the task or model."""
-    return dict(task=configuration['task'],policy=configuration['policy'],
+    return dict(task=configuration['task'],policy={k:configuration['policy'].get(k) for k in
+        ('backend','controller','dynamics_model','discretization')},
         seed=configuration.get('seed'),robot={k:v for k,v in configuration['robot'].items() if k!='structure'})
 
 
