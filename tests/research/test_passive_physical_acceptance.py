@@ -95,6 +95,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
         self.assertEqual(raw['cost']['episodes_completed'],2)
         self.assertEqual(self.evaluation.validity,'valid');self.assertTrue(self.evaluation.task_success)
         self.assertTrue(b.signals)
+        registry().parse(b.data)
         a,z=raw['episodes']
         self.assertEqual(a['initial_state'],z['initial_state'])
         self.assertEqual(len(a['samples']),41)
@@ -112,6 +113,9 @@ class PassiveAcceptanceTests(unittest.TestCase):
         cfg['robot']['structure']['data']['fixed_payout_lengths_m']['tendon_0']=space['passive_payout_domains_m']['tendon_0']['minimum']
         taut=execute(SessionInput.model_validate(cfg),OUT/'real_taut')
         self.assertEqual(taut.solver_status,'completed')
+        taut_ev=evaluate(SessionInput.model_validate(cfg).task,taut,self.source,registry(),'taut-engineering')
+        self.assertEqual(taut_ev.validity,'valid');self.assertFalse(taut_ev.task_success)
+        atomic_json(OUT/'taut_evaluation.json',plain(taut_ev))
         self.assertGreater(max(e['maximum_tension_n'] for e in taut.data.data['episodes']),0.)
         failure_cfg=deepcopy(self.cfg)
         failure_cfg['task']=json.loads((ROOT/'tasks/passive_response_engineering_failure_v1.json').read_text())['task']
@@ -154,6 +158,21 @@ class PassiveAcceptanceTests(unittest.TestCase):
         cert=acceptance_certificate(h,ref)
         self.assertTrue(cert['complete_acceptance_view'],cert)
         self.assertFalse(eligibility(h,ref,selection=True)['eligible'])
+        # A forged success flag/evaluator cannot replace independent raw evidence.
+        from tools.research_tasks import assemble_acceptance
+        forged=deepcopy(h.store.artifact(ref))
+        ev=deepcopy(h.store.artifact(forged['evaluation_reference']))
+        ev['task_success']=True
+        for constraint in ev['constraints']:constraint['satisfied']=True
+        er=save(h,ev,'synthetic_forged_evaluator')
+        profile=deepcopy(forged['profile']);profile.update(evaluation=er,official_task_success=True)
+        pr=save(h,profile,'synthetic_forged_profile')
+        forged.update(evaluation_reference=er,profile_reference=pr,profile=profile,
+            acceptance=assemble_acceptance(h.store.artifact(c)['configuration'],ev,profile,evaluation_reference=er,profile_reference=pr))
+        fr=save(h,forged,'synthetic_forged_success')
+        bad_certificate=acceptance_certificate(h,fr)
+        self.assertFalse(bad_certificate['complete_acceptance_view'])
+        self.assertIn('PASSIVE_EVALUATOR_OR_PROFILE_DIFFERS_FROM_RAW_SAMPLES',bad_certificate['validation_issues'])
         # Recovery after a settled request reuses the receipt; no new episode.
         before=h.store.remaining()['used']['backend_solves']
         with patch.object(core,'guard'):
@@ -170,6 +189,35 @@ class PassiveAcceptanceTests(unittest.TestCase):
         with patch.object(core,'guard'),patch('tools.research.physical_replay.guard'):
             with self.assertRaisesRegex(ValueError,'RESERVE_CANNOT_FIT'):core.dispatch(small,replay_plan(sc),'too-small')
         self.assertEqual(small.store.remaining()['used']['backend_solves'],0)
+
+    def test_interrupted_worker_retains_partial_physics_without_relaunch(self):
+        import mujoco
+        from types import SimpleNamespace
+        from tools.research.physical_replay import calculate
+        from tools.state_io import read
+        h,c=prepared_host()
+        engine_step=mujoco.mj_step
+        attempts=0
+        def injected_step(model,data):
+            nonlocal attempts
+            attempts+=1
+            if attempts==7:raise RuntimeError('ENGINEERING_INJECTED_INTERRUPTION_BEFORE_ENGINE_STEP')
+            engine_step(model,data)
+        def interrupted_worker(command,log,timeout):
+            request_path=Path(command[-1])
+            with patch.object(mujoco,'mj_step',injected_step):calculate(read(request_path),request_path.parent)
+            # Simulate loss of result.json after durable original progress.
+            return SimpleNamespace(returncode=1)
+        with patch.object(core,'guard'),patch('tools.research.physical_replay.guard'),patch('tools.service_execution._run_contained',interrupted_worker):
+            result=core.dispatch(h,replay_plan(c),'interrupted-real-worker')['result']
+        self.assertIsNone(result['acceptance']['accepted'])
+        self.assertEqual(result['actual_resource_consumption']['physics_steps'],6)
+        self.assertEqual(result['actual_resource_consumption']['attempted_steps'],7)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
+        self.assertIsNone(state(h)['pending'])
+        with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_RELAUNCH')):
+            core.dispatch(h,replay_plan(c),'interrupted-real-worker')
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
 
     def test_real_sdk_mock_wire_worker_certificate_select_stop(self):
         from tests.research.test_recent_round_tools import run_fixture

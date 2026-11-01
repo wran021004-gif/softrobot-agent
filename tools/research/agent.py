@@ -7,6 +7,7 @@ from uuid import uuid4
 import httpx
 from strands_harness import create_harness
 from tools.platform_store import plain,zero,encode
+from tools.research_tasks import passive_registered
 from tools.state_io import atomic_json,digest
 from tools.research.state import (state, update, save, guard, enabled, protected,
     closeout_operations, admit_closeout, readable_results)
@@ -183,7 +184,7 @@ def compact_plan_schema(schema, action, study):
         schema['$defs'][name]['required']=[*schema['$defs'][name].get('required',[]),'version']
         properties=schema['$defs'][name]['properties']
         if study.get('canonical_task',{}).get('physical_problem'):
-            for key in ('controller_recipe','controller_solver'):properties.pop(key,None)
+            for key in ('controller_recipe','controller_solver','control_weights'):properties.pop(key,None)
         properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
         properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
         lo,hi=space['executable_tendon_count_bounds']
@@ -1426,7 +1427,7 @@ def decision_packet(host):
         for ref in candidates:
             identity=host.store.artifact(ref)['profile_identity']
             bindings.append(dict(candidate=ref,profile_identity=identity,
-                executable_under_current_profile=identity==s['profile']['identity'] and (not spec['configuration']['task'].get('physical_problem') or __import__('tools.research_tasks',fromlist=['passive_registered']).passive_registered(spec['configuration']['task']))))
+                executable_under_current_profile=identity==s['profile']['identity'] and (not spec['configuration']['task'].get('physical_problem') or passive_registered(spec['configuration']['task']))))
         return dict(research=research,implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
@@ -1437,7 +1438,7 @@ def decision_packet(host):
             source_relative_design=dict(reference_parameters=spec['reference_parameters'],allowed_parameters=spec['allowed_parameters'],
                 length_constraint=spec.get('length_constraint')) if spec.get('start_mode')!='family_space' else None,
             analysis_protocol=spec['analysis_protocol'],
-            guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at the first complete task pass; for a multi-condition Study this means every frozen condition on the identical structure. Publicly read each evaluation and select the complete result set. Retrieve the exact stop_result_index before STOP; cite every new result.')
+            guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. Execution sources must match the selected structure and frozen task. Do not infer global feasibility/infeasibility. Stop at the first complete task pass; for a multi-condition Study this means every frozen condition on the identical structure. Publicly read each evaluation and select the complete result set. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)
     spec=result.pop('specification')
     result['configuration_identity']=spec['resolved_identity']

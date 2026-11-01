@@ -77,7 +77,7 @@ def execute(inp,folder=None):
     compile_s=time.perf_counter()-started
     binding=source_binding(plain(inp))
     raw=dict(kind='passive_dynamic_execution_v1',status='incomplete',physical_binding=binding,
-        active_actuators=int(model.nu),joint_count=model.nv,tendon_order=[t['entity'] for t in p['tendons']],
+        active_actuators=int(model.nu),joint_count=model.nv,coordinate_order=p['dofs'],tendon_order=[t['entity'] for t in p['tendons']],
         payout_lengths_m=native.payout.tolist(),initial_state=dict(qpos_rad=scene['qpos_rad'],qvel_rad_s=scene['qvel_rad_s']),
         episodes=[],physics_steps=0,attempted_steps=0,native_forward_calls=0,model_builds=1,
         timings_s=dict(model_compile=compile_s),mujoco_version=mujoco.__version__,

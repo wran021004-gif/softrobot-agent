@@ -185,7 +185,7 @@ class ResearchTaskAdapter:
         self._require_configuration()
         if self.task.get('physical_problem'):
             return dict(control_period_s=self.task['timing']['control_period_s'],tendon_order=[],lower=[],upper=[],
-                signal='no_active_control',units='N',frame='world',phase='static_equilibrium',
+                signal='no_active_control',units='N',frame='world',phase='passive_episode_protocol' if passive_registered(self.task) else 'static_equilibrium',
                 constraints=self.configuration['robot']['structure']['data'].get('fixed_payout_lengths_m'))
         tendons = self.configuration['robot']['structure']['data']['tendons']
         return dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',

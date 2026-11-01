@@ -365,8 +365,10 @@ def resolve(path, profile=None, *, backend_profile=None):
         robot, bootstrap = family_bootstrap(family_space, study.pop('family_execution'))
     else:
         robot = inputs['robot']
-    control['rl_defaults']['seed'] = task['seed']
-    control['rl_defaults'] = rl_configuration(control['rl_defaults'])
+    from tools.research_tasks import passive_registered
+    if not passive_registered(task['task']):
+        control['rl_defaults']['seed'] = task['seed']
+        control['rl_defaults'] = rl_configuration(control['rl_defaults'])
     if 'segments' in study['reference_parameters']:
         raise ValueError('PHYSICAL_REFERENCE_VALUES_OWNED_BY_ROBOT_SOURCE')
     segments = {p['id']: dict(length_m=p['length_m'], young_pa=p['physics']['young_pa'],

@@ -68,6 +68,11 @@ def inspect_evidence(task, raw):
     total_steps=round(task.timing.duration_s/task.timing.timestep_s)
     n=raw.get('joint_count',0);nt=len(raw.get('tendon_order',[]));nm=len(problem['monitor_s'])
     if n<=0 or nt<=0:return 'invalid','MISSING_MODEL_DIMENSIONS'
+    order=raw.get('coordinate_order',[])
+    initial=task.initializer.parameters.data
+    expected_initial={k:[initial[k].get(j,0.) for j in order] for k in ('qpos_rad','qvel_rad_s')}
+    if len(order)!=n or expected_initial!=raw.get('initial_state'):
+        return 'invalid','FROZEN_NAMED_INITIAL_STATE_MISMATCH'
     for episode in episodes:
         rows=episode.get('samples',[])
         if (not episode.get('complete') or len(rows)!=count+1 or episode.get('physics_steps')!=total_steps or
@@ -77,6 +82,10 @@ def inspect_evidence(task, raw):
             return 'incomplete','PER_STEP_SAFETY_COVERAGE_REQUIRED'
         if episode.get('initial_state')!=raw.get('initial_state'):
             return 'invalid','RESET_STATE_MISMATCH'
+        for key in ('maximum_contacts','maximum_tension_n','maximum_length_excess_m'):
+            value=episode.get(key)
+            if not isinstance(value,(int,float)) or not np.isfinite(value) or value<0:
+                return 'incomplete','PER_STEP_SAFETY_EXTREMA_REQUIRED'
         try:
             for row in rows:
                 shapes=dict(qpos_rad=(n,),qvel_rad_s=(n,),tip_m=(3,),tip_velocity_m_s=(3,),
@@ -113,6 +122,10 @@ def evaluate(task, result, source, reg, identity):
     goal,bounds,problem=task_definition(task,reg)
     raw=result.data.data
     validity,reason=inspect_evidence(task,raw)
+    if (result.backend_id!='backend.family_passive_mujoco' or result.model_id!='mujoco_passive_fixed_payout_v1' or
+            result.data.contract!='family.passive_dynamic_data' or result.initial_state!=task.initializer.parameters or
+            result.seed not in task.sampling.seeds):
+        validity,reason='invalid','BACKEND_INITIALIZER_OR_SEED_BINDING_MISMATCH'
     if result.solver_status!='completed' and validity=='valid':validity,reason='incomplete','BACKEND_EXECUTION_NOT_COMPLETED'
     kwargs=dict(source=source,evaluator=task.evaluator.extension_id,evaluator_version=task.evaluator.version,
         comparison_identity=identity)

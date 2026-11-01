@@ -238,7 +238,9 @@ def family_configuration(base_configuration, space, request, owner):
     cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
         parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
     passive=bool(cfg['task'].get('physical_problem'))
-    if passive and (build.request.control_weights or (serial and (build.request.controller_recipe or build.request.controller_solver))):
+    if passive and cfg['policy']['controller']['extension_id']=='controller.no_active_control' and (
+            any(v!=build.space.control_domains[k].default for k,v in build.request.control_weights.items()) or
+            (serial and (build.request.controller_recipe or build.request.controller_solver))):
         raise ValueError('PASSIVE_HAS_NO_CONTROL_PARAMETERS')
     if not passive:
         for key,d in build.space.control_domains.items():

@@ -230,13 +230,14 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         unsupported_conclusions=['full task improvement','task success','strict derivative','structural descent certificate',
             'passive constraint nullspace','hardware performance'])
     if passive:
+        from tools.research_tasks import task_adapter
         evidence['scope']='Each rebuilt legal assembly solves both frozen zero-load and selected loaded equilibria. Payout is fixed across load cases; hard equilibrium is separate from native soft-limit dynamics.'
         evidence['unsupported_conclusions'].remove('passive constraint nullspace')
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
             constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
-            task_observations=base['mechanics']['task_observations'],registered_acceptance='not_registered')
+            task_observations=base['mechanics']['task_observations'],registered_acceptance=task_adapter(configuration).execution_requirements()['registered_acceptance'])
         if study.operation=='compare':
             if study.comparison_load_conditions:
                 from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics

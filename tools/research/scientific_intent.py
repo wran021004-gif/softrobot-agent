@@ -42,7 +42,7 @@ def scientific_actions(spec):
             scope='inspect / differentiate / optimize / compare instantaneous mechanisms and explicit M1/M2 evidence. Main owns target, direction and adoption.'))
     for row in actions:
         if spec.get('canonical_task',{}).get('physical_problem') and row['scientific_goal']!='mechanism_research':
-            row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive acceptance is not registered.')
+            row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive Replay is available through research_plan only for a registered dynamic task.')
         elif spec.get('canonical_task',{}).get('physical_problem'):
             row['scope']='Inspect, differentiate, optimize or compare frozen constrained geometry/equilibrium and load responses; Main owns structure adoption.'
         row.setdefault('domain','structure_control' if row['scientific_goal']=='structure_control_codesign' else
@@ -621,8 +621,9 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
         return fail('SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
     request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
         tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
+    from tools.research_tasks import task_adapter
     return dict(status='ready',method=METHOD,request=request,required_evaluations=context['evaluations'],
-        registered_acceptance='not_registered',scientific_execution_started=False)
+        registered_acceptance=task_adapter(c['configuration']).execution_requirements()['registered_acceptance'],scientific_execution_started=False)
 
 
 def compile_reoptimized(host,q,payload,*,tool_use_id,intent):

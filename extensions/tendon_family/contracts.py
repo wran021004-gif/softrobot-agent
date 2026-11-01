@@ -392,6 +392,31 @@ class Data(Contract):
     control_identity: str | None = None
 
 
+class PassiveDynamicData(Contract):
+    kind: Literal['passive_dynamic_execution_v1']
+    status: Literal['completed','incomplete']
+    physical_binding: dict
+    active_actuators: Literal[0]
+    joint_count: int = Field(gt=0)
+    coordinate_order: list[str]
+    tendon_order: list[str]
+    payout_lengths_m: list[FiniteFloat]
+    initial_state: dict
+    episodes: list[dict]
+    physics_steps: int = Field(ge=0)
+    attempted_steps: int = Field(ge=0)
+    native_forward_calls: int = Field(ge=0)
+    model_builds: Literal[1]
+    timings_s: dict[str, FiniteFloat]
+    mujoco_version: str
+    solver_options: dict
+    cost: dict
+    reason: str | None = None
+    numerical_failure: dict | None = None
+    boundary: dict | None = None
+    implementation: str | None = None
+
+
 class ExperimentSpec(Contract):
     """Immutable composition view; editable values remain in their source objects."""
     version: Literal['family_experiment_v1'] = 'family_experiment_v1'
