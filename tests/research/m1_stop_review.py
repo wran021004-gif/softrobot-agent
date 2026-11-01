@@ -25,11 +25,11 @@ class HistoricalReads:
         return getattr(self.store,name)
 
 
-def historical_decision():
+def historical_decision(number=70):
     h=Host(ROOT/'runs/research'/RUN,RUN,actor='unified-research')
     store=h.store;events=store.events(RUN)
     requests=list({e['request_id']:e for e in events if e['kind']=='r3_request'}.values())
-    event=requests[69]  # The actual first STOP-route decision, before selection.
+    event=requests[number-1]
     before=[e for e in events if e['sequence']<event['sequence']]
     meta=store.artifact(event['outputs'][0]);wire=store.artifact(meta['request'])
     packet=json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']
@@ -45,4 +45,4 @@ def historical_decision():
     ledger['occupied']={}
     h.store=HistoricalReads(store,s,before,ledger)
     return h,wire,dict(request_id=event['request_id'],reference=event['outputs'][0],wire_reference=meta['request'],
-        reconstruction='All 14 mathematical results existed at request 70. Later STOP/read/navigation events are excluded; original wire supplies remaining counts. Original Store is never changed.')
+        reconstruction='All 14 mathematical results existed at the requested pre-STOP boundary. Later events are excluded; original wire supplies remaining counts. Original Store is never changed.')

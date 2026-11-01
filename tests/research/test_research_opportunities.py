@@ -44,6 +44,24 @@ class ResearchOpportunityTests(unittest.TestCase):
         self.assertFalse(row['model_predicates_passed']);self.assertNotIn('converged',row)
         self.assertIsNone(native_search_summary({},dict(artifact_id='fixture')))
 
+    def test_selected_stop_delivers_opportunity_facts_in_real_mock_wire(self):
+        from tools.research import core,agent
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        from tests.research.test_research_authorization_preflight import approve
+        from tests.research.test_cross_task_integration import plan
+        from tests.research.test_recent_round_tools import run_fixture
+        with fixture() as h:
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE])
+            with patch('tools.research.core.guard'),patch('tools.research.state.guard'):
+                core.dispatch(h,plan('generate',generation=dict(version='serial_family_generation_v2',family_space_identity=state(h)['spec']['family_space_identity'],segment_count=1,tendon_count=2)),'offline-view-generation')
+            with patch('tools.research.agent.credential',return_value='offline'):
+                run_fixture(h,[('research_route',dict(tool='research_plan',action='stop'))],limit=1)
+                sent=run_fixture(h,[None],limit=1)
+            packet=json.loads(sent[0]['messages'][-1]['content'].split('\n',1)[1])['research']
+            review=packet['evidence_access']['opportunity_review']['facts']
+            self.assertEqual(review['coverage']['physical_structures'],1)
+            self.assertFalse(review['full_independent_acceptance'])
+
     def test_empty_study_keeps_stop_and_no_forced_research_direction(self):
         with fixture() as h:
             view=research_opportunity_review(h)

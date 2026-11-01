@@ -1702,6 +1702,9 @@ def agent_decision_brief(host):
             rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
         brief['opportunity_review']=dict(query=dict(reference=anchor,view='working_set',pointer='/research_opportunities'),
             purpose='Before voluntary STOP, inspect research coverage, comparable evidence, finite-search limits and remaining admitted opportunities. Explain considered alternatives in Plan interpretation; no direction is prescribed.')
+        route=s['pilot'].get('tool_route')
+        if route and host.store.artifact(route).get('action')=='stop':
+            brief['opportunity_review']['facts']=research_opportunity_review(host)
         # Keep the compact registration rule/query in L0; the inventory stays in L1.
         ws=brief.get('evidence_working_set',{})
         for key in ('candidate_index','control_result_links','control_comparisons'):
