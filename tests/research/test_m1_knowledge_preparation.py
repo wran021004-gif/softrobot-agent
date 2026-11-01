@@ -22,6 +22,22 @@ SPEC = ROOT / 'configs/research/study_m1_knowledge_assisted_v4.json'
 
 
 class M1KnowledgePreparationTests(unittest.TestCase):
+    def test_restart_preserves_science_and_carries_assignment_cost(self):
+        original = resolve(SPEC)
+        restart = resolve(ROOT / 'configs/research/study_m1_knowledge_assisted_v4_restart.json')
+        self.assertNotEqual(restart['study_id'], original['study_id'])
+        self.assertEqual(full_science(restart['configuration']), full_science(original['configuration']))
+        for key in ('task_conditions', 'family_space', 'analysis_protocol', 'knowledge',
+                    'knowledge_manifest', 'native_control_limits', 'research_decisions'):
+            self.assertEqual(restart[key], original[key], key)
+        self.assertEqual(restart['budgets']['provider_requests'] + 1, original['budgets']['provider_requests'])
+        self.assertEqual(restart['budgets']['public_operations'] + 1, original['budgets']['public_operations'])
+        for key in ('mathematical_evaluations', 'physical_launches', 'protected_provider_requests',
+                    'protected_public_operations', 'provider_reserve_policy'):
+            self.assertEqual(restart['budgets'][key], original['budgets'][key])
+        self.assertTrue(restart['authorization'].startswith('PENDING_EXPLICIT_APPROVAL:'))
+        self.assertFalse(restart['supplied_evidence'])
+
     def test_original_science_and_unapproved_fresh_store(self):
         proposed = resolve(SPEC)
         original = resolve(ROOT / 'configs/research/study_r0_m1_v4_draft.json')

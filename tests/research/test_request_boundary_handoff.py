@@ -14,6 +14,70 @@ from tests.research.test_s125_contract import cold_host
 
 
 class RequestBoundaryHandoffTests(unittest.TestCase):
+    def test_initial_parameter_rejection_restores_without_reset_or_duplicate_prompt(self):
+        from tools.research.provider import pending, provider_outcome
+        from tools.research.session_handoff import INVOCATION_PROMPT
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['tool_schema_policy']=dict(version='research_information_flow_v1')
+        update(h,spec=spec);sent=[]
+        def respond(request):
+            wire=json.loads(request.content);sent.append(wire)
+            if len(sent)==1:
+                return httpx.Response(400,json=dict(error=dict(code='unsupported_parameter',message='Old Gateway rejects tools')))
+            return httpx.Response(200,json=dict(id='offline-recovered-400',object='chat.completion',created=1,
+                model=wire['model'],choices=[dict(index=0,finish_reason='stop',
+                    message=dict(role='assistant',content='Offline restored response'))],
+                usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14)))
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
+            with self.assertRaises(Exception):
+                asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=1))
+            request=next(e for e in h.store.events(h.run_id) if e['kind']=='r3_request')
+            self.assertEqual(provider_outcome(h,request['request_id'])['http_status'],400)
+            ledger=h.store.remaining()
+            asyncio.run(converse(h,session_handoff=False,restore_only=True))
+            self.assertEqual(h.store.remaining(),ledger)
+            self.assertEqual(len(sent),1)
+            asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=1))
+        self.assertEqual(len(sent),2)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+        self.assertEqual(pending(h),[])
+        self.assertEqual(provider_outcome(h,request['request_id'])['http_status'],400)
+        self.assertEqual([m for m in sent[1]['messages'] if m.get('content')==INVOCATION_PROMPT],
+                         [m for m in sent[0]['messages'] if m.get('content')==INVOCATION_PROMPT])
+
+    def test_initial_parameter_rejection_does_not_trust_changed_sdk_prompt(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['tool_schema_policy']=dict(version='research_information_flow_v1')
+        update(h,spec=spec)
+        def reject(request):
+            return httpx.Response(400,json=dict(error=dict(code='unsupported_parameter',message='Offline rejection')))
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(reject)):
+            with self.assertRaises(Exception):asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=1))
+            root=h.store.root/'framework_sessions/session'/state(h)['pilot']['framework_session_id']
+            path=next(root.rglob('snapshot_latest.json'));snapshot=json.loads(path.read_bytes())
+            snapshot['data']['messages'][-1]['content'][0]['text']='Untrusted replacement prompt'
+            path.write_text(json.dumps(snapshot),encoding='utf8')
+            with self.assertRaisesRegex(ValueError,'SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR'):
+                asyncio.run(converse(h,session_handoff=False,restore_only=True))
+        self.assertEqual(h.store.remaining()['used']['model_calls'],1)
+
+    def test_initial_other_http_error_remains_closed(self):
+        h=self.provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['tool_schema_policy']=dict(version='research_information_flow_v1')
+        update(h,spec=spec)
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(lambda request:
+                    httpx.Response(400,json=dict(error=dict(code='unrecognized_error',message='Offline unknown error'))))):
+            with self.assertRaises(Exception):asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=1))
+            with self.assertRaisesRegex(ValueError,'SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR'):
+                asyncio.run(converse(h,session_handoff=False,restore_only=True))
+        self.assertEqual(h.store.remaining()['used']['model_calls'],1)
+
     def test_large_request_feedback_handoff_uses_transaction_reads(self):
         h=self.provision();sent=[]
         # Larger than SQLite's default 2000 KiB cache. Rollback-journal cache

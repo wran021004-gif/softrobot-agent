@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$GatewayRoot,
     [ValidateRange(1, 65535)]
-    [int]$ProxyPort = 7890
+    [int]$ProxyPort = 7890,
+    [switch]$CheckOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,6 +11,9 @@ $entry = Join-Path (Resolve-Path -LiteralPath $GatewayRoot).Path 'src\cli.mjs'
 if (-not (Test-Path -LiteralPath $entry -PathType Leaf)) {
     throw 'Existing Gateway src/cli.mjs is required.'
 }
+& node (Join-Path $PSScriptRoot 'check_research_gateway.mjs') $GatewayRoot
+if ($LASTEXITCODE -ne 0) { throw 'Gateway does not support the frozen research tools/reasoning contract. No service was started.' }
+if ($CheckOnly) { return }
 
 # Process-local settings; no global proxy, credentials or account changes.
 $names = @('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY', 'NODE_USE_ENV_PROXY')

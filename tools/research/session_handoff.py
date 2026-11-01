@@ -507,12 +507,18 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
         from tools.research.provider import received,model_messages
         send=sends[0];row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])
         repaired=any(e['kind']=='implementation_binding' and e['sequence']>send['sequence'] for e in events)
+        error_code=(json.loads(host.store.artifact(reception['body'],raw=True)).get('error',{}).get('code')
+            if reception and reception['http_status']==400 else None)
         rejected_schema=bool(repaired and reception and reception['http_status']==400
-            and json.loads(host.store.artifact(reception['body'],raw=True)).get('error',{}).get('code')=='invalid_function_parameters')
+            and error_code=='invalid_function_parameters')
+        rejected_transport=error_code=='unsupported_parameter' and not any(
+            e['sequence']>send['sequence'] and e['kind'] in ('model_original_tool_request',
+                'model_original_tool_feedback','original_research_plan','candidate_constructed',
+                'candidate_analysis','physical_replay','tool') for e in events)
         connect_failed=not reception and any(e['kind']=='r3_boundary_failure'
             and host.store.artifact(e['outputs'][0])==dict(exception_type='ConnectError',request_id=send['request_id'],response_saved=False)
             for e in events)
-        if row and row['receipt'] and (rejected_schema or connect_failed):
+        if row and row['receipt'] and (rejected_schema or rejected_transport or connect_failed):
             receipt=json.loads(row['receipt'])
             wire=host.store.artifact(host.store.artifact(send['outputs'][0])['request'])['messages']
             normalized=[{k:v for k,v in m.items() if k!='tracking_id'} for m in agent.messages]
@@ -520,8 +526,8 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
                     and normalized==[dict(role='user',content=[dict(text=INVOCATION_PROMPT)])]
                     and wire[-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
                     and model_messages(host,agent.messages,wire[0]['content'])==wire[:-1]):
-                # No model output or tool exists to replay. A settled initial
-                # connection failure also resumes this exact saved prompt.
+                # A known initial rejection has no model/tool output to replay.
+                # Resume its exact saved prompt; keep its charge and failure.
                 return 'rejected_initial_request'
     if agent.messages or any(e['kind']=='r3_request' and
             host.store.artifact(e['outputs'][0]).get('purpose') not in ('reporter','provider_validation')
