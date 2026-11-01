@@ -28,6 +28,8 @@ class C0BridgeTests(unittest.TestCase):
         self.assertTrue(gate_only['observation_feasible'])
         self.assertEqual(gate_only['objective_status'],'feasibility_comparison_only')
         self.assertIsNone(gate_only['signed_task_gap'])
+        stale=row('zero',0.,0.);stale['normalized_violation']=0.
+        self.assertIsNone(constraint_gap([stale],valid_complete=True)['signed_task_gap'])
 
     def test_freeze_detects_passive_solver_without_modifying_evidence(self):
         import tools.research.state as st

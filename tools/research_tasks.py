@@ -575,7 +575,8 @@ def constraint_gap(rows, *, valid_complete, accepted=None):
             unscaled_constraints=[],valid_complete=False,comparable=False,accepted=accepted,dominant_constraints=[],
             hard_gate_status='unknown',hard_gate_constraints=[],observation_feasible=False,objective_status='invalid_observation',
             invalid_reason='MALFORMED_DERIVED_CONSTRAINT_OBSERVATIONS')
-    numerical=[r for r in rows if (_number(r.get('normalization_scale')) and r['normalization_scale']>0) or _number(r['normalized_violation'])]
+    numerical=[r for r in rows if _number(r['bound']) and r['bound']!=0 and
+        _number(r.get('normalization_scale')) and r['normalization_scale']>0]
     gates=[r for r in rows if r not in numerical]
     gate_status=('not_required' if not gates else 'failed' if any(r['passed'] is False for r in gates) else
         'passed' if all(r['passed'] is True for r in gates) else 'unknown')
