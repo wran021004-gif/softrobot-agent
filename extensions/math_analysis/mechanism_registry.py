@@ -60,26 +60,32 @@ PRIMITIVES = {
 
 LEGACY_ACTIVE_MECHANISMS=tuple(PRIMITIVES)
 CONSTRAINED = {
-    'constraint_length_jacobian':('m/rad',['nu','nv']),
-    'constraint_active_set':('1',['nu']), 'constraint_multiplier':('N',['nu']),
-    'slack_margin':('m',['nu']), 'constrained_motion_subspace':('1',['nv','free']),
-    'tangent_stiffness':('N*m/rad',['free','free']),
-    'tangent_compliance':('m/N',['3','3']),
-    're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2']),
-    'directional_material_response':('m/N',['2','3']),
-    'constraint_output_row_residual':('1',['projection']),
-    'constraint_payout':('m',['nu']), 'constraint_length_residual':('m',['nu']),
-    'constraint_tension_margin':('N',['nu']), 'constraint_kkt_residual':('N*m',[]),
-    'constraint_boundary_set':('1',['nu']), 'constraint_slack_set':('1',['nu']),
-    'constraint_feasible_equalities':('m/rad',['positive','nv']),
-    'constraint_feasible_inequalities':('m/rad',['boundary','nv'])}
+    'constraint_length_jacobian':('m/rad',['ntendon','nv'],'Actual length-rate Jacobian; geometry alone does not identify active unilateral constraints.','ordered tendon lengths / named hinges'),
+    'constraint_active_set':('1',['ntendon'],'Length-bound activity at the declared tolerance, including zero-multiplier boundaries.','ordered tendons'),
+    'constraint_multiplier':('N',['ntendon'],'Nonnegative NNLS tension fit; physical eligibility also requires all equilibrium qualification checks.','ordered tendons'),
+    'slack_margin':('m',['ntendon'],'Payout minus actual length; negative values expose a constraint violation.','ordered tendons'),
+    'constrained_motion_subspace':('1',['nv','free'],'Orthonormal basis of the positive-multiplier tangent nullspace; basis is not unique and boundary inequalities are separate.','named hinges / tangent coordinates'),
+    'tangent_stiffness':('N*m/rad',['free','free'],'Z.T H_Lagrangian Z, including loaded geometric stiffness; not compiled joint stiffness.','tangent coordinates'),
+    'tangent_compliance':('m/N',['3','3'],'J_point Z (Z.T H_Lagrangian Z)^-1 Z.T J_point.T at the qualified smooth loaded equilibrium.','world point displacement / world point force'),
+    're_equilibrated_position_response':('m',['3'],'Position under selected load minus the separately re-equilibrated unloaded position of the same assembly and station.','world'),
+    'constraint_tip_row_residual':('1',['2'],'Legacy X/Y tip-row coverage by positive constraints only.','world X/Y / named hinges'),
+    'directional_material_response':('m/N',['2','3'],'Signed local force-increment QP responses, preserving unilateral boundary inequalities.','world'),
+    'constraint_output_row_residual':('1',['projection'],'Declared output row coverage by positive constraints only; not loaded compliance or boundary-cone feasibility.','declared world output rows / named hinges'),
+    'constraint_payout':('m',['ntendon'],'Frozen assembly payout, unchanged across all load cases.','ordered tendons'),
+    'constraint_length_residual':('m',['ntendon'],'g=actual length-payout <= 0; positive entries are violations.','ordered tendons'),
+    'constraint_tension_margin':('N',['ntendon'],'Declared tendon capacity minus fitted multiplier; this diagnostic is not a task acceptance certificate.','ordered tendons'),
+    'constraint_kkt_residual':('N*m',[],'Stationarity infinity residual only; primal, complementarity and capacity checks remain separately reported.','named hinge stationarity'),
+    'constraint_boundary_set':('1',['ntendon'],'Active length rows without positive multipliers; impose one-sided local inequalities.','ordered tendons'),
+    'constraint_slack_set':('1',['ntendon'],'Inactive length rows; they impose no local motion equality.','ordered tendons'),
+    'constraint_feasible_equalities':('m/rad',['positive','nv'],'J_positive dq=0 at the qualified equilibrium.','ordered positive constraints / named hinges'),
+    'constraint_feasible_inequalities':('m/rad',['boundary','nv'],'J_boundary dq<=0 at the qualified equilibrium; never replace by a bilateral nullspace.','ordered boundary constraints / named hinges')}
 COMMON_GEOMETRY=('tip_jacobian','material_point_jacobian','tendon_jacobian','joint_stiffness','joint_damping','all_tendon_output_row_residual')
-for name,(unit,shape) in CONSTRAINED.items():
-    PRIMITIVES[name]=dict(field=name,unit=unit,shape=['ntendon' if s=='nu' else s for s in shape],frame='world / named hinges / ordered fixed-payout tendons',
+for name,(unit,shape,meaning,frame) in CONSTRAINED.items():
+    PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame=frame,
         parameter_dependencies=['geometry','routing','stiffness','payout','external_load'],
         source='extensions.tendon_family.passive_equilibrium.mechanics',model='native hard unilateral equilibrium',
         validity='Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity.',
-        meaning='Numerical local constrained observation, not independent dynamic task acceptance.')
+        meaning=meaning)
 PRIMITIVES['directional_material_response'].update(
     validity='Qualified equilibrium; positive rows are equalities and zero-multiplier active rows are inequalities. Two local +/-0.001 N QPs; not an ordinary gradient at a switching boundary.',
     meaning='Two signed material-point response vectors per newton along the declared world force direction; finite-load nonlinear response remains unmeasured.')
