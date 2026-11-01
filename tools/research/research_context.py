@@ -385,7 +385,7 @@ def context(host, *, evidence_references=None):
         control_sources_initialized=len(s.get('control_initializations',[])),
         mathematical_evaluations=len(s.get('analysis_results',[]))+len(s.get('mechanics_results',[])),
         independent_physical_evaluations=sum(len(s.get(k,[])) for k in ('results','physical_replays','rl_evaluations')),
-        has_executable_candidate=bool(s['candidates']),task_passed=current['task_accepted'])
+        has_executable_candidate=bool(s['candidates']) and not s['spec']['configuration']['task'].get('physical_problem'),task_passed=current['task_accepted'])
     current['candidate_status']['has_measured_task_feedback']=bool(current['candidate_status']['independent_physical_evaluations'])
     current['research_information']='Compilation establishes structure validity only. Creating structures adds candidate information; completed mathematical analysis or independent physical evaluation adds task-performance evidence. Neither compilation nor control initialization establishes task success.'
     refs=[*current['all_fresh_results'],*s.get('control_search_results',[])]
@@ -428,7 +428,11 @@ def confirmed_tool_deliveries(host):
                 for item in delivery.get('items',[]):
                     if item['delivery']=='exact_feedback':
                         deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
-                    else:summaries.setdefault(item['tool_id'],[]).append(item.get('facts',{}))
+                    else:
+                        facts=deepcopy(item.get('facts',{}))
+                        if item.get('delivery')=='fixed_facts_in_l0':
+                            facts['delivered_scientific_reference']=(research.get('mathematical_research',{}).get('latest_result') or {}).get('reference')
+                        summaries.setdefault(item['tool_id'],[]).append(facts)
     return deliveries,summaries
 
 
@@ -1577,12 +1581,19 @@ def agent_decision_brief(host):
     if information_flow_v1(s['spec']):
         brief['focus_hypothesis']=deepcopy(intent.get('latest_decision'))
         brief['flow_facts']=[]
+        from tools.research.object_choices import main_projection
+        _,delivered=confirmed_tool_deliveries(host)
+        delivered_science=[f['delivered_scientific_reference'] for facts in delivered.values() for f in facts if f.get('delivered_scientific_reference')]
         seen_results=set()
         for report in reversed(brief.get('latest_reports',[])):
             for finding in report.get('findings',[]):
                 key=finding['result']['reference']['artifact_id']
                 if key in seen_results:continue
                 seen_results.add(key)
+                if main_projection(host,finding['result']['reference']) in delivered_science:
+                    brief['flow_facts'].append(dict(result_reference=finding['result']['reference'],
+                        delivery='fixed_facts_previously_confirmed',details_query=dict(reference=finding['result']['reference'],view='summary')))
+                    continue
                 brief['flow_facts'].append(dict(result_reference=finding['result']['reference'],
                     metrics=finding.get('metrics',[]),quantitative_facts=finding.get('quantitative_facts'),
                     comparisons=finding.get('comparisons',[]),mathematics=finding.get('mathematics')))

@@ -42,6 +42,13 @@ def prepare_context(spec, candidate, study, comparisons):
             raise ValueError('FROZEN_PASSIVE_LOAD_AND_RE_EQUILIBRATION_REQUIRED')
         if study.target.quantity=='re_equilibrated_position_response' and study.effect_semantics!='re_equilibrated_passive_response':
             raise ValueError('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
+    loads=study.comparison_load_conditions
+    if loads or study.load_aggregation:
+        if not problem or study.operation!='compare' or comparisons or not loads:
+            raise ValueError('LOAD_COMPARISON_REQUIRES_PASSIVE_COMPARE_WITHOUT_COMPARISON_CANDIDATE')
+        names=[study.load_condition,*loads]
+        if len(set(names))!=len(names) or not set(names)<={x['name'] for x in problem['loads']}:
+            raise ValueError('DISTINCT_FROZEN_LOAD_CONDITIONS_REQUIRED')
     rows={r['parameter_id']:r for r in parameters(spec,candidate)};selected=[]
     if study.operation in ('differentiate','optimize'):
         if spec.get('fixed_structure_reference'):raise ValueError('FROZEN_FIXED_STRUCTURE_FORBIDS_STRUCTURAL_PROBES')
@@ -55,11 +62,11 @@ def prepare_context(spec, candidate, study, comparisons):
             ('mass_balance_residual','total_mass','body_inertia_trace','directional_tendon_row_residual','motion_decoupling') or
             study.target.quantity=='directional_drive' and study.target.tendon_channel is not None)
         if not scalar:raise ValueError('SCALAR_MECHANISM_REDUCTION_REQUIRED_FOR_DIRECTION')
-    if (study.operation=='compare') != bool(comparisons):raise ValueError('COMPARE_REQUIRES_ONE_OWNED_COMPARISON_CANDIDATE_ONLY')
+    if (study.operation=='compare') != bool(comparisons or loads):raise ValueError('COMPARE_REQUIRES_OWNED_CANDIDATE_OR_FROZEN_LOAD_CONDITIONS')
     for ref,c in comparisons:
         if c['task_identity']!=candidate['task_identity']:raise ValueError('MECHANISM_COMPARISON_REQUIRES_SAME_FROZEN_TASK')
     plans=[stencil(row) for row in selected]
-    minimum=(1 if study.operation=='inspect' else 2 if study.operation=='compare' else
+    minimum=(1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
         1+sum(len(set(p['coordinates'])) for p in plans)+int(len(plans)==2)+int(study.operation=='optimize'))
     if study.max_evaluations<minimum:raise ValueError('MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires '+str(minimum))
     return dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
@@ -229,9 +236,32 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
             task_observations=base['mechanics']['task_observations'],registered_acceptance='not_registered')
         if study.operation=='compare':
-            other=evaluate(comparison=context['comparisons'][0])
-            evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
-                delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist())
+            if study.comparison_load_conditions:
+                from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
+                from tools.research_tasks import task_adapter
+                cases=[dict(load_condition=study.load_condition,observation=base['observation'],
+                    task_observations=base['mechanics']['task_observations'],mechanics=base['mechanics'])]
+                for condition in study.comparison_load_conditions:
+                    mechanics=constrained_mechanics(models[0],condition,study.target.material_s,
+                        direction_world=study.target.direction_world if study.target.quantity=='directional_material_response' else None,
+                        baseline_result=base['mechanics']['baseline_equilibrium'])
+                    observation=observe(mechanics,study.target)
+                    if observation['status']!='computed':raise ValueError(observation['reason'])
+                    cases.append(dict(load_condition=condition,observation=observation,
+                        task_observations=task_adapter(configuration).constrained_observations(mechanics),mechanics=mechanics))
+                evidence['load_comparison']=dict(cases=cases,assembly_unchanged=True,
+                    scope='Identical structure, payout, material, mounting and gravity; same unloaded reference. Local static comparison only.')
+                if study.load_aggregation:
+                    values=[c['observation']['value'] for c in cases]
+                    if any(np.asarray(v).ndim for v in values):raise ValueError('LOAD_AGGREGATION_REQUIRES_SCALAR_REDUCTION')
+                    choose=min if study.load_aggregation=='minimum' else max
+                    case=choose(cases,key=lambda c:c['observation']['value'])
+                    evidence['load_comparison']['aggregate']=dict(operation=study.load_aggregation,
+                        value=case['observation']['value'],unit=case['observation']['unit'],load_condition=case['load_condition'])
+            else:
+                other=evaluate(comparison=context['comparisons'][0])
+                evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
+                    delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist())
         elif study.operation in ('differentiate','optimize'):
             for i,row in enumerate(rows):
                 first=len(records)
@@ -385,6 +415,10 @@ def summary(value, reference):
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
         structure_direction=compact,generation_handoff=handoff,
         comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),
+        load_comparison=({**{k:v for k,v in raw['load_comparison'].items() if k!='cases'},
+            'cases':[dict(load_condition=c['load_condition'],status=c['observation']['status'],
+                value=observation_summary(c['observation']['value']),unit=c['observation']['unit'],
+                qualified=c['mechanics']['constraint_state']['qualified']) for c in raw['load_comparison']['cases']]} if raw.get('load_comparison') else None),
         source=dict(reference=reference,pointer='/structure_research'),
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
         cost=raw['cost'],task_acceptance='unmeasured',unsupported_conclusions=raw['unsupported_conclusions'])

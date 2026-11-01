@@ -117,6 +117,7 @@ def question_schema(spec, candidate=None, action=None):
             props['control_treatment']={'type':'string','const':'no_active_control'}
             props['operating_point']={'type':'string','const':'re_equilibrated'}
             props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
+            props['comparison_load_conditions']['items']['enum']=[x['name'] for x in problem['loads']]
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
             target_props=schema['$defs']['PhysicalMechanismTarget']['properties']
             for name in ('tendon_channel','direction_generalized'):target_props.pop(name,None)
@@ -124,7 +125,7 @@ def question_schema(spec, candidate=None, action=None):
             schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
         elif candidate:
             props=schema['$defs']['ScientificStructureV4']['properties']
-            for name in ('physical_problem','load_condition'):props.pop(name,None)
+            for name in ('physical_problem','load_condition','comparison_load_conditions','load_aggregation'):props.pop(name,None)
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','fixed_input_response','reoptimized_task_capability']}
             props['control_treatment']={'type':'string','enum':['fixed_absolute_tensions','reoptimized']}
             props['operating_point']={'type':'string','enum':['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']}
@@ -463,6 +464,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         return compile_constrained(host,q,payload,intent,tool_use_id=tool_use_id)
     if v4 and (q.physical_problem or q.load_condition or q.control_treatment=='no_active_control'):
         return feedback('unsupported','FROZEN_PHYSICAL_MODE_MISMATCH')
+    if v4 and (q.comparison_load_conditions or q.load_aggregation):return feedback('unsupported','LOAD_COMPARISON_REQUIRES_PASSIVE_ASSEMBLY')
     if q.effect_semantics=='reoptimized_task_capability':
         return compile_reoptimized(host,q,payload,tool_use_id=tool_use_id,intent=intent)
     if q.effect_semantics not in ('mechanism_effect','fixed_input_response'):
@@ -582,7 +584,8 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
     if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETERS')
     if q.requested_budget is None:return fail('EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
     study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
-        load_condition=q.load_condition,effect_semantics=q.effect_semantics,max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
+        load_condition=q.load_condition,comparison_load_conditions=q.comparison_load_conditions,load_aggregation=q.load_aggregation,
+        effect_semantics=q.effect_semantics,max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
     try:
         context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
         detail=mathematical_method_view(host,candidate)['methods'][METHOD]

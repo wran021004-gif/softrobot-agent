@@ -482,6 +482,10 @@ class ScientificStructureV4(MechanismQuestionV2):
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop','no_active_control']
     physical_problem: Literal['passive_unilateral_equilibrium'] | None = None
     load_condition: str | None = None
+    comparison_load_conditions: list[str] = Field(default_factory=list,
+        description='compare only: additional frozen loads on the identical assembly. Do not also select a comparison candidate.')
+    load_aggregation: Literal['minimum','maximum'] | None = Field(default=None,
+        description='Optional deterministic extremum of scalar compared load-case observations; no new optimizer or gradient.')
 
 
 class MechanismStudy(Contract):
@@ -491,6 +495,8 @@ class MechanismStudy(Contract):
     parameter_paths: list[str] = Field(default_factory=list,max_length=2)
     point_semantics: Literal['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state','re_equilibrated']
     load_condition: str | None = None
+    comparison_load_conditions: list[str] = Field(default_factory=list)
+    load_aggregation: Literal['minimum','maximum'] | None = None
     effect_semantics: Literal['mechanism_effect','re_equilibrated_passive_response'] = 'mechanism_effect'
     max_evaluations: StrictInt = Field(ge=1,le=64)
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1)
@@ -512,6 +518,8 @@ class MechanismStudy(Contract):
         if not self.parameter_paths:value.pop('parameter_paths',None)
         if self.local_radius_fraction==.02:value.pop('local_radius_fraction',None)
         if self.load_condition is None:value.pop('load_condition',None)
+        if not self.comparison_load_conditions:value.pop('comparison_load_conditions',None)
+        if self.load_aggregation is None:value.pop('load_aggregation',None)
         if self.effect_semantics=='mechanism_effect':value.pop('effect_semantics',None)
         return value
 

@@ -787,7 +787,7 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     of tendon_family.math_analysis.linear_model; constructed models are checked
     again using their actual outputs before metrics/endpoint computations.
     """
-    if requirements.horizon_semantics=='static_load_cases':
+    if requirements.horizon_semantics=='static_load_cases' and query.operation!='mechanism_structure_v1':
         return dict(status='not_applicable',reasons=['PASSIVE_REQUIRES_REGISTERED_CONSTRAINED_MECHANISM_METHOD'],
             constraint_coverage=[],full_task_supported=False)
     if assessment['model_id']=='model.mujoco_native':
