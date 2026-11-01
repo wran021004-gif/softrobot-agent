@@ -989,11 +989,11 @@ def tool_continuation(host):
         scope='Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.')
 
 
-def research_intent(host):
+def research_intent(host, *, plan_references=None):
     """Rebuild the last decision and experiment from original plans and receipts."""
     import json
     s=state(host);latest=None;experiment=None
-    for reference in reversed(s.get('plans',[])):
+    for reference in reversed(s.get('plans',[]) if plan_references is None else plan_references):
         saved=host.store.artifact(reference);plan=saved['original_plan']
         row=host.store.lookup(host.run_id,saved['request_id'])
         receipt=json.loads(row['receipt']) if row and row['receipt'] else None
@@ -1541,6 +1541,7 @@ def agent_decision_brief(host):
         brief['scientific_actions']=scientific_actions(s['spec'])
         diagnosis=completed_question_plan(host)
         if diagnosis:
+            brief['prepared_scientific_intent']=diagnosis
             brief['scientific_parameter_catalog']=parameter_catalog(s['spec'],host.store.artifact(diagnosis['candidate']))
             if s['spec']['research_decisions']['analysis_interface']=='scientific_question_v4':
                 from tools.research.scientific_intent import control_method_choices
@@ -1599,7 +1600,7 @@ def agent_decision_brief(host):
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
     from tools.research.config import information_flow_v1
     if information_flow_v1(s['spec']):
-        brief['focus_hypothesis']=deepcopy(intent.get('latest_decision'))
+        brief['focus_hypothesis']=deepcopy(brief.get('prepared_scientific_intent') or intent.get('latest_decision'))
         brief['flow_facts']=[]
         from tools.research.object_choices import main_projection
         _,delivered=confirmed_tool_deliveries(host)
@@ -1961,6 +1962,13 @@ def information_flow_brief(brief, delivered):
                 parameter_catalog=brief.get('scientific_parameter_catalog',[]),
                 control_methods=brief.get('scientific_control_methods',[]),
                 next='Choose scientific variables, or control scope and effort using the candidate registered method choices. Reach/Hold retains T1; Direct keeps its own identity. T2 only reuses saved comparable T1 evidence.')
+            if brief['analysis_interface']=='scientific_question_v4':
+                handoff=continuation['analysis_handoff'];parameters=handoff.pop('parameter_catalog')
+                from collections import Counter
+                handoff.update(parameter_groups=dict(Counter(r['parameter_group'] for r in parameters if r['selectable'])),
+                    parameters_query=dict(reference=intent['candidate'],view='mathematical_capabilities',pointer='/structure_research/parameters'),
+                    already_bound=['diagnose hypothesis and candidate','frozen task, protocol and condition','control treatment implied by chosen effect semantics'],
+                    input_shape='Outer domain plus structure OR control. Structure chooses operation/effect_semantics/target and parameters; control chooses scope/effort. Put execution options inside the selected payload; hypothesis remains in the Plan.')
             if post_result:
                 continuation['analysis_handoff'].update(result_reference=math_result['reference'],
                     next='Interpret the completed result at post_result_decision; Main chooses whether to pursue a new scientific question.')

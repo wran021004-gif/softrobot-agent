@@ -69,10 +69,20 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             'Original AnalysisRequest and execution admission still apply.')
         if explicit_actions(study or {}):
             schema['$defs']['ControlSeedRequest']['properties']['method']['description']='baseline uses candidate pretensions over the full frozen task grid without evaluation. Use the returned control source, not candidate. Initialization supersedes the latest diagnose; record a new hypothesis/candidate and optionally next_research_action. Main chooses the subsequent research action.'
+        if (study or {}).get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':
+            schema['$defs']['ControlSeedRequest']['properties']['method']['description']='baseline prepares a complete unmeasured schedule. For the identical candidate/condition, the completed V4 scientific choice remains selected; submit research_analysis with your scope and effort. A different candidate or condition requires a new diagnose. Initialization starts no scientific worker.'
     if family_version:
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
+        space=(study or {}).get('family_space',{})
+        if space:
+            for name in ('segment_count','tendon_count'):
+                lower,upper=space[name+'_bounds']
+                schema['$defs'][generation]['properties'][name].update(minimum=lower,maximum=upper)
+            if space['conditional_rules']=='base_only_consecutive_spans_v1':
+                schema['$defs']['Span']['properties']['first_segment'].update(const=0,
+                    description='Frozen FamilySpace requires a fixed-base start. last_segment chooses the anchor segment; other span variables remain selectable.')
     if structure_intent:
         from tools.research.contracts import ScientificStructureSearch
         intent_schema=ScientificStructureSearch.model_json_schema()
@@ -272,7 +282,7 @@ def load_selected_tool_schema(host, registry, directory):
         events=host.store.events(host.run_id)
         plan_seq=next(e['sequence'] for e in events if diagnosis['plan_reference'] in e['outputs'])
         route_seq=max((e['sequence'] for e in events if route_ref and route_ref in e['outputs']),default=-1)
-        if plan_seq>route_seq:
+        if plan_seq>route_seq or (diagnosis.get('resumed_after_preparation') and route.get('tool')=='research_plan' and route.get('action')=='initialize_control'):
             choice=diagnosis['agent_hypothesis'].get('next_research_action')
             route=action_entry(s['spec'],choice) or {};name=route.get('tool')
     # Frozen legacy interfaces retain their implicit mathematical continuation.
@@ -472,11 +482,9 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
         field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources})
     if scientific_question is not None:
-        from tools.research.scientific_intent import question_schema,control_method_choices
-        from tools.research.task_constraints import mathematical_method_view
+        from tools.research.scientific_intent import selected_question_schema
         audit_input.update(raw_main_input=deepcopy(scientific_question),
-            provider_schema=question_schema(spec,verify_candidate(host,candidate),
-                control_methods=control_method_choices(mathematical_method_view(host,candidate))),internal_binding_schema=schema,
+            provider_schema=selected_question_schema(host),internal_binding_schema=schema,
             compiled_variables=deepcopy(payload))
         audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
@@ -1172,14 +1180,13 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
             if english_native(s['spec']):
                 tool=next((t for t in native if t.tool_name=='research_analysis'),None)
-                from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema,control_method_choices
+                from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, selected_question_schema
                 from tools.research.task_constraints import mathematical_method_view
                 question_mode=question_enabled(s['spec'])
                 selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
                 if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
                     tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                        'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'),
-                            control_methods=control_method_choices(mathematical_method_view(host,completed_question_plan(host)['candidate'])))}}
+                        'inputSchema':{'json':selected_question_schema(host)}}
                     agent.tool_registry.registry['research_analysis']=tool
                 elif selected:
                     method,detail=selected

@@ -34,6 +34,27 @@ def explicit_control_source(value):
         and bool(value.get('provenance')))
 
 
+def legal_control_sources(host, candidate, selected=None):
+    """Existing complete schedules, deduplicated by exact bound trajectory."""
+    s=state(host);configuration=verify_candidate(host,candidate)['configuration']
+    sources=[r['source'] for r in s.get('control_initializations',[]) if r['candidate']==candidate]
+    for ref in s.get('analysis_results',[]):
+        raw=host.store.artifact(ref)
+        if raw.get('candidate')==candidate and raw.get('control_schedule_reference'):
+            sources.append(raw['control_schedule_reference'])
+    legal=[];trajectories=[]
+    for ref in ([selected] if selected else sources):
+        if ref in legal:continue
+        try:
+            raw=host.store.artifact(ref)
+            if not (explicit_control_source(raw) or numerically_verified_source(raw)):continue
+            binding(configuration,raw['trajectory'])
+        except (ValueError,KeyError):continue
+        if raw['trajectory'] not in trajectories:
+            legal.append(ref);trajectories.append(raw['trajectory'])
+    return legal
+
+
 def schedule_identity(configuration, trajectory):
     """Exact executed inputs plus physical/task binding, independent of provenance."""
     bound={k:trajectory[k] for k in ('times_s','tensions_n','tendon_order','task_identity','model_identity','design_identity')}

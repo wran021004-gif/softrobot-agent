@@ -133,6 +133,8 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     readiness=candidate_methods(host,reference,analysis_metadata=analysis_metadata) if binding_error is None else dict(
         method=SENSITIVITY,status='requires_current_profile_candidate',reasons=[binding_error])
     cfg=c['configuration'];requirements=describe_analysis_requirements(cfg,{})
+    from tools.research.physical_replay import legal_control_sources
+    bound_sources=legal_control_sources(host,reference) if binding_error is None else []
     from tools.research.config import frozen_analysis_protocol
     protocol=frozen_analysis_protocol(spec,c)
     remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
@@ -212,11 +214,12 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             methods[key]['control_input_guidance']=dict(
                 candidate_role='Structure reference; candidate is not an executable control source.',
                 source_role='Complete executable sequence bound to candidate/task/channels/time grid/bounds; use the returned source reference.',
-                recorded_sources=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==reference][-3:],
+                recorded_sources=bound_sources,
                 baseline_initialization=dict(tool='research_plan',action='initialize_control',
                     control_seed=dict(candidate=reference,method='baseline'),
                     scope='Optional candidate pretension baseline on the full frozen task grid; task_acceptance=unmeasured. Full Plan/decision admission applies.'),
-                after_initialization='Use returned source, not candidate. An initialization Plan supersedes the last diagnose. Submit diagnose again with your chosen hypothesis, candidate and method, then research_analysis.',
+                after_initialization=('On the identical candidate/condition, the V4 scientific choice survives this preparation. Submit research_analysis with the chosen scope and effort; select a source only if distinct legal schedules exist.' if spec.get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4' else
+                    'Use returned source, not candidate. Submit diagnose again with your chosen hypothesis, candidate and method, then research_analysis.'),
                 settings=required[-1])
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
             from tools.research.native_control import window_facts
@@ -224,7 +227,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             budget=(budget_snapshot if budget_snapshot is not None else decision_budget(host))['science_budget']
             methods[key]['action_prerequisites']=dict(candidate=reference,
                 initial_state=dict(operating_point='standardized_initial_pretension',**window_facts(requirements,dict(actual_time_s=0.))),
-                recorded_control_sources=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==reference][-3:],
+                recorded_control_sources=bound_sources,
                 required_agent_fields=['control_optimization.source','control_optimization.settings with explicit v2 window and knots'],
                 unmet=['control_source_selection_required','explicit_search_settings_required'],
                 callback_unit='cloned native sequence rollout; not a new independent physical replay',
@@ -552,7 +555,7 @@ def mathematical_opportunity_summary(view, *, observations=(), latest_result=Non
             generic_operations=categories,status=detail['planning_status'],
             execution_status=detail['execution_status'],readiness='request_preparation_available' if detail['planning_status']=='ready' and not missing else 'requires_inputs',
             request_admission='not_checked',missing=missing[:3],
-            preparation={k:guide['baseline_initialization'][k] for k in ('tool','action')} if guide and not sources else None,
+            preparation={k:guide['baseline_initialization'][k] for k in ('tool','action','control_seed')} if guide and not sources else None,
             recorded_control_source_available=bool(sources) if guide else None,
             related_constraints=sorted(overlap),
             coverage='full_task_model' if detail['coverage'] and detail['full_task_supported'] else 'diagnostic_or_partial',

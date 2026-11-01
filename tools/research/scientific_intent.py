@@ -16,11 +16,22 @@ DIRECT = 'mujoco_direct_control_v1'
 
 def control_method_choices(view):
     """Project candidate-bound admission facts; no second method registry."""
-    return [dict(method=key,operation=row['operation'],planning_status=row['planning_status'],
+    choices=[]
+    for key,row in view['methods'].items():
+        if key not in (T1,DIRECT):continue
         selectable=bool(row['formal_execution_authorized'] and row['kernel_supported'] and
-            row['planning_status'] not in ('unauthorized','unsupported','insufficient_budget','blocked')),
-        scientific_purpose=row['scientific_purpose'],missing=row['missing'],detail_query=row['detail_query'])
-        for key,row in view['methods'].items() if key in (T1,DIRECT)]
+            row['planning_status'] not in ('unauthorized','unsupported','insufficient_budget','blocked'))
+        guide=row.get('control_input_guidance') or {};sources=guide.get('recorded_sources',[])
+        readiness=(row['planning_status'] if not selectable else 'requires_control_initialization' if not sources else
+            'requires_source_choice' if len(sources)>1 else 'ready_for_scientific_request')
+        missing=(row['missing'] if not selectable else
+            (['legal_control_source'] if not sources else ['source_selection.control_source'] if len(sources)>1 else [])+
+            ['control_scope','control_search_effort'])
+        choices.append(dict(method=key,operation=row['operation'],planning_status=row['planning_status'],
+            selectable=selectable,scientific_purpose=row['scientific_purpose'],readiness=readiness,
+            legal_control_sources=sources,preparation=guide.get('baseline_initialization') if selectable and not sources else None,
+            missing=missing,detail_query=row['detail_query'],request_admission='not_checked'))
+    return choices
 
 
 def explicit_actions(spec):
@@ -109,6 +120,8 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
                 'fixed_input','tensions_n','response_horizon_s'):control.pop(name,None)
         control['question_type']={'type':'string','const':'control_feasibility'}
         control['effect_semantics']={'type':'string','const':'reoptimized_task_capability'}
+        schema['$defs']['ScientificControlV4']['required']=[
+            k for k in schema['$defs']['ScientificControlV4']['required'] if k!='question_type']
         if control_methods is not None:
             legal=[r['method'] for r in control_methods if r['selectable']]
             control['numerical_method']={'enum':[None,*legal],
@@ -168,6 +181,20 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             target['allOf'].append({'if':{'properties':{'reduction':{'const':reduction}},'required':['reduction']},
                 'then':{'properties':{'quantity':{'enum':quantities}}}})
         structure=schema['$defs']['ScientificStructureV4']
+        structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
+        structure['description']='Choose operation, effect semantics, target, and parameters. Hypothesis and evaluation cap may reuse the completed diagnose decision. Only uniquely implied execution fields are compiled; distinct working points, sources and scientific methods remain Main choices.'
+        if not passive:
+            from tools.research_tasks import task_adapter
+            constraints=([c.constraint_id for c in task_adapter(candidate['configuration']).analysis_requirements({}).constraints]
+                if candidate else [])
+            for semantics,treatment,target_schema,point in (
+                    ('mechanism_effect','fixed_absolute_tensions',{'type':'object'},None),
+                    ('fixed_input_response','fixed_absolute_tensions',{'type':'string','enum':[*constraints,'tip_position','tip_velocity']},None),
+                    ('reoptimized_task_capability','reoptimized',{'type':'string','enum':[*constraints,'best_found_J','optimal_task_violation']},'frozen_task_initial_state')):
+                properties=dict(control_treatment={'const':treatment},target=target_schema)
+                if point:properties['operating_point']={'const':point}
+                structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':semantics}},'required':['effect_semantics']},
+                    'then':{'properties':properties,**({'required':['operating_point']} if point is None else {})}})
         excluded=[k for k in mechanism_ids(mode) if k not in mechanism_ids(mode,'differentiate')]
         if excluded:
             structure.setdefault('allOf',[]).append({
@@ -226,7 +253,21 @@ def control_settings(spec, effort, *, window=None, channels=None):
 
 def completed_question_plan(host):
     from tools.research.research_context import research_intent
+    import json
+    s=state(host);references=list(s.get('plans',[]))
     intent = research_intent(host)['latest_decision'] or {}
+    # Preparation of the identical object preserves Main's scientific choice.
+    # Any other action or condition change ends this carry.
+    while (s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4'
+            and intent.get('action')=='initialize_control' and intent.get('execution_status')=='completed'):
+        saved=host.store.artifact(intent['plan_reference'])
+        receipt=json.loads(host.store.lookup(host.run_id,saved['request_id'])['receipt'])
+        output=host.store.artifact(receipt['output'])
+        actual=output.get('result',output).get('candidate')
+        references=references[:references.index(intent['plan_reference'])]
+        previous=research_intent(host,plan_references=references)['latest_decision'] or {}
+        if not actual or actual!=intent['candidate'] or previous.get('candidate')!=actual:return None
+        intent={**previous,'resumed_after_preparation':True}
     decision = (intent.get('agent_hypothesis') or {}).get('decision') or {}
     if (intent.get('action') == 'diagnose' and intent.get('execution_status') == 'completed'
             and intent.get('candidate') and decision.get('selected_candidate') == intent['candidate']):
@@ -234,16 +275,56 @@ def completed_question_plan(host):
     return None
 
 
+def expand_v4(spec, payload, candidate=None):
+    """Fill only fields uniquely implied by explicit semantics/frozen physics."""
+    full=deepcopy(payload);sources={}
+    domain=payload.get('domain');body=full.get(domain)
+    if not isinstance(body,dict):return full,sources
+    def bind(name,value,basis):
+        if name not in body:
+            body[name]=value;sources[domain+'.'+name]=basis
+    if domain=='control':
+        bind('question_type','control_feasibility','control domain')
+        bind('effect_semantics','reoptimized_task_capability','control feasibility contract')
+    if domain=='structure':
+        semantics=body.get('effect_semantics')
+        passive=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem')
+            or spec.get('canonical_task',{}).get('physical_problem'))
+        if passive:
+            bind('physical_problem',passive['mode'],'frozen physical problem')
+            bind('control_treatment','no_active_control','frozen passive physical mode')
+            if semantics in ('mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'):
+                bind('operating_point','frozen_task_initial_state' if semantics=='finite_time_task_response' else 're_equilibrated','selected passive response semantics')
+        elif semantics in ('mechanism_effect','fixed_input_response','reoptimized_task_capability'):
+            bind('control_treatment','reoptimized' if semantics=='reoptimized_task_capability' else 'fixed_absolute_tensions','selected effect semantics')
+            if semantics=='reoptimized_task_capability':bind('operating_point','frozen_task_initial_state','complete frozen-task reoptimization semantics')
+    return full,sources
+
+
+def selected_question_schema(host):
+    """One candidate/choice projection for Provider, compiler and binding audit."""
+    from tools.research.task_constraints import mathematical_method_view
+    intent=completed_question_plan(host)
+    if not intent:return None
+    return question_schema(state(host)['spec'],host.store.artifact(intent['candidate']),
+        intent['agent_hypothesis'].get('next_research_action'),
+        control_methods=control_method_choices(mathematical_method_view(host,intent['candidate'])))
+
+
 def compile_question(host, payload, *, tool_use_id):
     """Version dispatch only; all paths end in original execution and allowance."""
     spec=state(host)['spec'];version=spec.get('research_decisions',{}).get('analysis_interface')
     if version=='scientific_question_v4':
         from pydantic import ValidationError
-        try:q=ScientificQuestionV4.model_validate(payload)
+        if protected(host) or state(host)['research_status']=='stopped':
+            return dict(status='blocked',reason='ORIGINAL_PROTECTED_CLOSEOUT_OR_STOP',scientific_execution_started=False)
+        intent=completed_question_plan(host)
+        candidate=host.store.artifact(intent['candidate']) if intent else None
+        expanded,field_sources=expand_v4(spec,payload,candidate)
+        try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
             return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
                 dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
-        intent=completed_question_plan(host)
         choice=(intent or {}).get('agent_hypothesis',{}).get('next_research_action')
         if choice in ('mechanism_research','single_parameter_effect') and q.domain!='structure' or choice=='control_feasibility' and q.domain!='control':
             return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False)
@@ -252,12 +333,26 @@ def compile_question(host, payload, *, tool_use_id):
             if (q.structure.operation in ('differentiate','optimize') and
                     isinstance(structure.get('target'),dict) and 'goal' not in structure['target']):
                 return dict(status='needs_choice',reason='EXPLICIT_MECHANISM_GOAL_REQUIRED',fields=['structure.target.goal'],scientific_execution_started=False)
-            return compile_mechanism(host,structure,tool_use_id=tool_use_id,v4=True)
-        if spec.get('canonical_task',{}).get('physical_problem'):
+        if q.domain=='control' and spec.get('canonical_task',{}).get('physical_problem'):
             return dict(status='unsupported',reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OPTIMIZATION',scientific_execution_started=False)
-        if q.control.question_type!='control_feasibility':
+        if q.domain=='control' and q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
-        return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload)
+        from jsonschema import Draft202012Validator
+        schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
+        result=(compile_mechanism(host,expanded['structure'],tool_use_id=tool_use_id,v4=True) if q.domain=='structure' else
+            compile_v1(host,expanded['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload))
+        if result['status']!='ready':return result
+        errors=list(Draft202012Validator(schema).iter_errors(payload))
+        if errors:
+            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
+                dict(field='.'.join(map(str,e.absolute_path)),reason=e.message) for e in errors],
+                scientific_execution_started=False)
+        from tools.research.state import save
+        result['intent_compilation']=save(host,dict(version='scientific_intent_compilation_v1',
+            tool_use_id=tool_use_id,plan_reference=intent['plan_reference'],raw_main_input=deepcopy(payload),
+            provider_schema=schema,compiled_question=expanded,deterministic_field_sources=field_sources,
+            full_request=result['request'],scientific_execution_started=False),'scientific_intent_compilation')
+        return result
     if mechanism_interface(spec):return compile_mechanism(host,payload,tool_use_id=tool_use_id)
     return compile_v1(host,payload,tool_use_id=tool_use_id,contract=question_contract(spec))
 
@@ -382,23 +477,9 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
         if missing:
             return feedback('needs_choice','CONTROL_SEARCH_SCIENTIFIC_CHOICES_REQUIRED',fields=missing,
                 choices=dict(control_scope=['full_task','time_window'],search_strategy=['response','pattern']))
-        from tools.research.physical_replay import binding, explicit_control_source, numerically_verified_source
-        sources = [r['source'] for r in s.get('control_initializations',[]) if r['candidate']==candidate]
-        for ref in s.get('analysis_results',[]):
-            raw = host.store.artifact(ref)
-            if raw.get('candidate')==candidate and raw.get('control_schedule_reference'):
-                sources.append(raw['control_schedule_reference'])
+        from tools.research.physical_replay import legal_control_sources
         selected = plain(q.source_selection.control_source) if q.source_selection.control_source else None
-        legal = [];trajectories = []
-        for ref in ([selected] if selected else sources):
-            if ref in legal:continue
-            try:
-                raw = host.store.artifact(ref)
-                if not (explicit_control_source(raw) or numerically_verified_source(raw)):continue
-                binding(c['configuration'],raw['trajectory'])
-            except (ValueError,KeyError):continue
-            if raw['trajectory'] not in trajectories:
-                legal.append(ref);trajectories.append(raw['trajectory'])
+        legal = legal_control_sources(host,candidate,selected)
         if not legal:
             return feedback('needs_prerequisite','COMPLETE_LEGAL_CONTROL_SOURCE_REQUIRED',
                 preparation=dict(tool='research_plan',action='initialize_control',control_seed=dict(candidate=candidate,method='baseline')))
