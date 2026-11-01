@@ -509,7 +509,9 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         return feedback('needs_choice','UNAMBIGUOUS_NATIVE_SOURCE_AND_INTERVAL_REQUIRED')
     candidate=intent['candidate'];c=verify_candidate(host,candidate);view=mathematical_method_view(host,candidate)
     rows=parameters(spec,c);by_path={r['parameter_id']:r for r in rows}
-    paths=q.parameter_paths or (intent['agent_hypothesis']['decision'].get('selected_variables') or [])
+    paths=q.parameter_paths
+    if not paths and (not v4 or q.operation in ('differentiate','optimize')):
+        paths=intent['agent_hypothesis']['decision'].get('selected_variables') or []
     if len(paths)>2:return feedback('needs_choice','SELECT_AT_MOST_TWO_PARAMETERS')
     if not paths and q.parameter_group:
         matches=[r['parameter_id'] for r in rows if r['mechanism_differentiation']['supported'] and group_matches(r,q.parameter_group)]
