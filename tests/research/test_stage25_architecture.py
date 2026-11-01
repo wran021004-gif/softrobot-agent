@@ -70,6 +70,14 @@ class Stage25ArchitectureTests(unittest.TestCase):
         self.assertNotIn('closed_loop_performance',choices['effect_semantics']['enum'])
         self.assertNotIn('re_equilibrated_passive_response',choices['effect_semantics']['enum'])
         self.assertNotIn('closed_loop',choices['control_treatment']['enum'])
+        with patch.object(core,'guard'):core.dispatch(a,diagnosis(ac,'mechanism_research'),'active-catalog-diagnose')
+        for quantity in mechanism_ids('active_ideal_tension'):
+            q=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='inspect',
+                effect_semantics='mechanism_effect',operating_point='frozen_task_initial_state',
+                control_treatment='fixed_absolute_tensions',target=target_for(quantity),requested_budget=1))
+            with self.subTest(active_quantity=quantity):
+                Draft202012Validator(active).validate(q)
+                self.assertEqual(compile_question(a,q,tool_use_id='active-'+quantity)['status'],'ready')
 
     def test_directional_lower_upper_and_unit_contracts(self):
         row=ConstrainedObservation(name='directed',quantity='material_displacement',load_condition='lateral',
