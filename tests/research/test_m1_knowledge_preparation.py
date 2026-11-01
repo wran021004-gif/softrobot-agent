@@ -27,6 +27,7 @@ class M1KnowledgePreparationTests(unittest.TestCase):
         from tools.research.agent import plan_schema
         from tools.research.physical_replay import binding, legal_control_sources
         from tools.research.task_constraints import mathematical_method_view
+        from tests.research.test_cross_task_integration import perfect_tracking_worker
         spec=resolve(ROOT/'configs/research/study_m1_knowledge_assisted_v4_intent_repair.json')
         previous=resolve(SPEC)
         self.assertEqual(spec['canonical_task'],previous['canonical_task'])
@@ -77,9 +78,14 @@ class M1KnowledgePreparationTests(unittest.TestCase):
                 self.assertEqual(compiled['status'],'ready',compiled)
                 self.assertEqual(compiled['request']['candidate'],c)
                 self.assertEqual(compiled['request']['control_optimization']['source'],seed['source'])
+                with patch('tools.research.physical_replay.guard'), \
+                        patch('tools.service_execution._run_contained',side_effect=perfect_tracking_worker):
+                    replay=core.dispatch(h,plan('physical_replay',c,physical_replay=dict(candidate=c,source=seed['source'])),
+                        'mock-replay-'+cid)['result']
+                self.assertEqual(h.store.artifact(replay['reference'])['candidate'],c)
                 previous_source=seed['source']
             self.assertEqual(state(h)['mathematical_evaluations'],0)
-            self.assertFalse(state(h)['physical_replays'])
+            self.assertEqual(len(state(h)['physical_replays']),3)  # Fabricated motion; no integration.
             self.assertEqual(h.store.remaining()['used']['model_calls'],0)
 
     def test_restart_preserves_science_and_carries_assignment_cost(self):
