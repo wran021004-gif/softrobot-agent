@@ -1389,6 +1389,111 @@ def mathematical_discovery_observations(host, current, candidate):
     return observations,latest
 
 
+def research_opportunity_review(host, *, details=False):
+    """On-demand facts and existing admission leads; never choose an experiment."""
+    from tools.research.evidence_views import native_search_summary
+    from tools.research.budget import decision_budget
+    from tools.research.task_constraints import mathematical_method_view,mathematical_opportunity_summary
+    from tools.research.feedback import result_view
+    from tools.research.conditions import configuration_for_condition
+    s=state(host);spec=s['spec'];structures={};candidates={};results=[];conditions={}
+    frozen=spec.get('task_conditions') or [dict(condition_id='primary',task=spec['configuration']['task'])]
+    for ref in s['candidates'].values():
+        c=host.store.artifact(ref);cfg=c['configuration'];physical=c.get('physical_design_identity') or digest(cfg['robot']['structure']['data'])
+        structures.setdefault(physical,dict(candidate=c.get('structure_candidate',ref),
+            segment_count=c.get('parameters',{}).get('segment_count'),tendon_count=c.get('parameters',{}).get('tendon_count')))
+        cid=c.get('condition_id') or (next((item['condition_id'] for item in frozen
+            if configuration_for_condition(cfg,item)==cfg),'unmatched_task') if spec.get('task_conditions') else 'primary')
+        candidates[ref['artifact_id']]=(physical,cid,c)
+        conditions.setdefault((physical,cid),dict(structure=structures[physical]['candidate'],condition=cid,
+            candidate=ref,control_searches=[],mechanism_results=[],other_math=[],independent_results=[]))
+    for row in s.get('control_initializations',[]):
+        key=candidates.get(row.get('candidate',{}).get('artifact_id'))
+        if key:
+            item=conditions[key[0],key[1]]
+            item.setdefault('control_sources',[]).append(row['source'])
+    for ref in s.get('analysis_results',[]):
+        a=host.store.artifact(ref);key=candidates.get(a.get('candidate',{}).get('artifact_id'))
+        if not key:continue
+        physical,cid,c=key;search=native_search_summary(a,ref);m=a.get('structure_research') or {}
+        row=dict(reference=ref,candidate=a['candidate'],condition=cid,task_identity=c.get('task_identity') or digest(c['configuration']['task']),
+            status=a.get('status'),operation=a.get('operation'),control_search=search)
+        if m:
+            row['mechanism']=dict(operation=m.get('operation'),direction_status=m.get('direction_status'),
+                scope=m.get('scope'),point_semantics=m.get('point_semantics'),
+                baseline_value=(m.get('baseline') or {}).get('value'),
+                parameters=[p['parameter_path'] for p in m.get('parameter_sensitivities',[])],
+                unsupported_conclusions=m.get('unsupported_conclusions',[]),
+                query=dict(reference=ref,view='full',pointer='/structure_research/method_selection'))
+        conditions[physical,cid]['control_searches' if search else 'mechanism_results' if m else 'other_math'].append(ref)
+        results.append(row)
+    for ref in [*s.get('physical_replays',[]),*s.get('results',[]),*s.get('rl_evaluations',[])]:
+        a=host.store.artifact(ref);key=candidates.get(a.get('candidate',{}).get('artifact_id'))
+        if not key:continue
+        physical,cid,_=key;v=result_view(host,ref)
+        conditions[physical,cid]['independent_results'].append(dict(reference=ref,
+            complete=v.get('complete'),task_passed=v.get('passed'),fresh=v.get('fresh_current_study')))
+    # Missing condition variants are absent evidence, not failed experiments.
+    for physical,structure in structures.items():
+        for c in frozen:
+            conditions.setdefault((physical,c['condition_id']),dict(structure=structure['candidate'],condition=c['condition_id'],
+                candidate=None,control_searches=[],mechanism_results=[],other_math=[],independent_results=[]))
+    complete=[]
+    for physical,structure in structures.items():
+        if all(any(r['complete'] and r['task_passed'] and r['fresh'] for r in conditions[physical,c['condition_id']]['independent_results']) for c in frozen):
+            complete.append(structure['candidate'])
+    methods=[]
+    for ref in {v['candidate']['artifact_id']:v['candidate'] for v in conditions.values() if v['candidate'] and 'analysis' in spec['capabilities']}.values():
+        view=mathematical_method_view(host,ref)
+        summary=mathematical_opportunity_summary(view)
+        methods.extend(dict(candidate=ref,**{k:r[k] for k in ('method','status','missing','estimated_evaluations','detail_query','coverage')}) for r in summary['methods'])
+    grouped={}
+    for r in results:
+        if r['control_search']:grouped.setdefault(r['task_identity'],[]).append(r['reference'])
+    space=spec.get('family_space') or {};scope=spec.get('topology_scope') or {}
+    current=context(host);brief=decision_brief(current)
+    review=dict(version='research_opportunity_review_v1',study_status=s['research_status'],
+        independently_accepted_structures=complete,full_independent_acceptance=bool(complete),
+        coverage=dict(distinct_physical_structures=len(structures),structures=list(structures.values()),
+            segment_counts=scope.get('segment_counts',space.get('executable_segment_counts')),
+            tendon_count_bounds=space.get('executable_tendon_count_bounds'),tendon_counts=scope.get('tendon_counts'),
+            generation_query=dict(reference=s.get('family_space_reference'),view='full'),
+            scope='Observed structures only; untested topology/continuous domains are not excluded by finite searches.'),
+        conditions=list(conditions.values()),results=results,
+        comparisons=dict(common_task_result_groups=list(grouped.values()),
+            rule='Common task alone is not a matched experiment. Check condition, initial state/loading, scoring window, fidelity, protocol and control effort. Different conditions cannot identify a topology effect. No causal superiority is inferred.'),
+        budget=decision_budget(host),
+        actions=brief.get('available_research_actions',[]),allowed_plan_actions=current['actions'],mathematical_methods=methods,
+        unresolved_questions=[dict(plan=ref,weakening_observation=host.store.artifact(ref)['original_plan'].get('weakening_observation')) for ref in s.get('plans',[])[-3:]],
+        decision_rule='Main chooses continuation, change of hypothesis or STOP. Explain the information value and prerequisites of considered alternatives and why any are declined, with evidence and uncertainty. No passing candidate alone is not a sufficient voluntary STOP reason; unused budget is not a requirement to continue. Preserve user termination, genuine engineering blocks, budget limits and justified scientific closure. Full independent task acceptance precedes design simplicity preferences; no global optimality follows from finite exploration.',
+        scope='Read-only discovery. No request admission, formal-read credit, solver run, new authorization or scientific conclusion is created.')
+    if details:return review
+    from collections import Counter
+    budget=review['budget'];provider=budget['provider_budget'];science=budget['science_budget']
+    searches=[r for r in results if r['control_search']];last=searches[-1] if searches else None
+    last_search=last['control_search'] if last else {}
+    return dict(version=review['version'],study_status=s['research_status'],full_independent_acceptance=bool(complete),
+        coverage=dict(physical_structures=len(structures),topologies=[{k:v[k] for k in ('segment_count','tendon_count')} for v in structures.values()],
+            allowed_segments=review['coverage']['segment_counts'],allowed_tendons=review['coverage']['tendon_counts'] or review['coverage']['tendon_count_bounds'],
+            continuous_domain_coverage='Not exhausted or quantified by these finite observations.'),
+        conditions=[dict(topology=[structures[k[0]]['segment_count'],structures[k[0]]['tendon_count']],condition=k[1],
+            control_sources=len(v.get('control_sources',[])),control_studies=len(v['control_searches']),mechanism_studies=len(v['mechanism_results']),
+            other_math=len(v['other_math']),independent_evaluations=len(v['independent_results'])) for k,v in conditions.items()],
+        finite_control_searches=dict(stop_reasons=dict(Counter(r['control_search']['stop_reason'] for r in searches)),
+            latest=dict(reference=last['reference'],condition=last['condition'],**{k:last_search[k] for k in ('stop_reason','iterations_started','search_dimension','callbacks','requested_callbacks','baseline','best')}) if last else None,
+            scope='Iteration/callback exhaustion is not convergence, structural infeasibility or independent acceptance.'),
+        mechanism_scope='Local registered point/model only. Unresolved or zero local signals do not exclude nonlinear task improvement.',
+        comparison=dict(cross_structure_common_task=any(len({candidates[host.store.artifact(r)['candidate']['artifact_id']][0] for r in refs})>1 for refs in grouped.values()),
+            rule=review['comparisons']['rule']),
+        remaining=dict(provider=provider['remaining_total'],provider_closeout=provider['reserved_for_closeout'],
+            public_operations=budget['public_operation_budget']['remaining_total'],mathematics=science['remaining_mathematical'],replay=science['remaining_full_replays']),
+        allowed_plan_actions=current['actions'],method_statuses=dict(Counter(r['status'] for r in methods)),
+        questions=[dict(reference=r['plan'],view='full',pointer='/original_plan/weakening_observation') for r in review['unresolved_questions'][-1:]],
+        queries={key:dict(reference=s.get('family_space_reference') or next(iter(s['candidates'].values()),s.get('public_prior_manifest')),
+            view='working_set',pointer='/research_opportunities/'+key) for key in ('results','actions','mathematical_methods')},
+        decision_rule='Explain why considered legal alternatives lack sufficient information value, with evidence and uncertainty. No passing witness alone does not justify STOP; unused budget alone does not require continuation. User termination, real blocks and resource limits remain valid. Independent acceptance precedes design simplicity.')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -1595,6 +1700,8 @@ def agent_decision_brief(host):
             view='working_set',pointer='/all_fresh_results'),
             read_progress=result_index_progress(refs,current['evidence_working_set']['read_coverage']),
             rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
+        brief['opportunity_review']=dict(query=dict(reference=anchor,view='working_set',pointer='/research_opportunities'),
+            purpose='Before voluntary STOP, inspect research coverage, comparable evidence, finite-search limits and remaining admitted opportunities. Explain considered alternatives in Plan interpretation; no direction is prescribed.')
         # Keep the compact registration rule/query in L0; the inventory stays in L1.
         ws=brief.get('evidence_working_set',{})
         for key in ('candidate_index','control_result_links','control_comparisons'):
@@ -1771,6 +1878,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             unresolved=report.get('unresolved',[])[:3]),
         action_menu=actions,
         evidence_access=dict(working_set=brief.get('evidence_access'),
+            opportunity_review=brief.get('opportunity_review'),
             method_query=catalog.get('detail_query'),stop_index=brief.get('stop_result_index'),
             select_requirement='A fresh, complete, independently evaluated passing result must be formally read by the Main Agent before SELECT. Multi-condition tasks require a passing result for every frozen condition on the same structure. Reporter reads do not count.',
             stop_requirement='Retrieve and cite the complete new result index; original admission checks remain in force.',

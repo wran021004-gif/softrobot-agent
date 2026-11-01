@@ -39,6 +39,14 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
+    if 'stop' in actions:
+        schema['properties']['interpretation']['description']=schema['properties']['interpretation'].get('description','')+(
+            ' For voluntary STOP before independent task acceptance, review evidence_read '
+            '(view=working_set, pointer=/research_opportunities) at the frozen domain anchor. '
+            'Explain considered legal alternatives, their expected information value, why declining them '
+            'is justified, and remaining uncertainty. No passing candidate alone is insufficient; unused '
+            'budget alone does not require continuation. User stop, budget limits, engineering blocks '
+            'and evidence-based scientific closure remain valid. Use existing Plan fields; no experiment is prescribed.')
     conditions=(study or {}).get('task_conditions')
     if conditions:
         for branch in schema['properties']['selected_execution']['anyOf']:

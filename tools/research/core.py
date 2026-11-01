@@ -141,7 +141,10 @@ def read_evidence(host, query, *, record_read=True):
         from tools.research.evidence_policy import registered_references
         from tools.research.research_context import context
         if plain(q.reference) not in [s.get('family_space_reference'),*registered_references(host)]:raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
-        if q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
+        if q.pointer=='/research_opportunities' or q.pointer.startswith('/research_opportunities/'):
+            from tools.research.research_context import research_opportunity_review
+            derived=dict(research_opportunities=research_opportunity_review(host,details=q.pointer!='/research_opportunities'))
+        elif q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
             from tools.research.evidence_views import diagnostic_relations
             derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))
         elif q.pointer=='/mathematical_decision_view' or q.pointer.startswith('/mathematical_decision_view/'):

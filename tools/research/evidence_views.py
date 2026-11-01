@@ -493,6 +493,25 @@ def _search(value, reference):
         all_steps=_location(reference, '/candidates'))
 
 
+def native_search_summary(value, reference):
+    """Recorded effort and termination, without controls or a convergence claim."""
+    search=(value.get('native_dynamics') or {}).get('optimization')
+    if not search:return None
+    baseline=next((r for r in search.get('candidates',[]) if r.get('label')=='baseline'),{})
+    cost=search.get('cost_feedback') or {}
+    def metrics(row):
+        measure=row.get('measure') or {}
+        return {k:measure[k] for k in ('normalized_gap','terminal_position_error_m',
+            'holding_max_position_error_m','holding_max_speed_m_s') if k in measure}
+    return dict(source=dict(reference=reference,pointer='/native_dynamics/optimization'),
+        algorithm=search.get('algorithm'),stop_reason=search.get('stop_reason'),
+        iterations_started=search.get('iterations_started'),search_dimension=search.get('search_dimension'),
+        callbacks=cost.get('evaluation_callbacks'),requested_callbacks=cost.get('request_budget'),
+        baseline=metrics(baseline),best=metrics(search.get('best') or {}),
+        model_predicates_passed=(search.get('best') or {}).get('task_gap',{}).get('accepted'),
+        interpretation='Recorded finite search only. Iteration/callback limits are not convergence or structural infeasibility. Model predicates are not independent acceptance.')
+
+
 def _resources(value, reference):
     resources=[]
     def add(data, key, unit, prefix='', time_basis=None):
@@ -560,6 +579,8 @@ def result_card(host, reference):
         design_identity=evidence['design_identity'],
         evaluation_profile_identity=value.get('profile_identity'),evaluation_identity=value.get('execution_id'))
     summary=compact_evidence(value,reference,facts_only=True)['summary']
+    native_search=native_search_summary(value,reference)
+    if native_search:summary['control_search']=native_search
     recorded=recorded_math_summary(value,reference)
     if recorded is not None:summary['recorded_mathematics']=recorded
     metrics=[];violations=[];critical=[];mathematics=None;search=None
