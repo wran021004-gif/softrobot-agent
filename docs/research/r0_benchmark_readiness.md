@@ -22,7 +22,7 @@ M1 可以在现有接口下准备新的盲测 V4 Study；本轮只冻结待授�
 | PHS-2D | 原十工况开发协议通过，含原独立/半步长/扰动检查；无正式 SELECT | 原 round3b Store、独立开发 evaluator、冻结协议、40 个结果引用和实际物理样本 |
 | P3 | 原渐进刚度开发协议通过，含机制对照和原独立检查；无正式 SELECT | 原 P3 Store、冻结协议、原 evaluator、轨迹；空间验证证据在另一个 spatial Store |
 
-本轮递归检查 9 份 Trace 中的 86 个文件路径，均可读取，已声明的文件哈希均一致。M1–M6 选中结果链实际读取了 62 个 Store artifact 并复核字节哈希；C1 的 8 个控制/原始采样 artifact 亦匹配。PHS 的 40 个引用全部存在，另解析一份 401 样本的真实动力学结果及 assembly/baseline/protocol 绑定。P3 的 28 个引用在其各自原 Store 中全部存在，另解析一份 2,000 样本动力学结果；其中 6 个空间检查引用归属 spatial Store，不能在原 P3 Store 中误报缺失。未将原私有 Store、获胜结构或控制复制到新 Study。
+本轮递归检查 9 份 Trace 中的 86 个文件路径，均可读取，已声明的文件哈希均一致。M1–M6 选中结果链实际读取了 62 个 Store artifact 并复核字节哈希；C1 的 8 个控制/原始采样 artifact 亦匹配。PHS 的 40 个引用全部存在，另解析一份 401 样本的真实动力学结果及 assembly/baseline/protocol 绑定。P3 的 28 个引用在其各自原 Store 中全部存在，另解析一份 2,000 样本动力学结果，并读取最终 8 份 CSV、核对全部 1,600,000 行及各自哈希；其中 6 个空间检查引用归属 spatial Store，不能在原 P3 Store 中误报缺失。未将原私有 Store、获胜结构或控制复制到新 Study。
 
 原始索引与检查细节见：
 
@@ -75,6 +75,8 @@ M1 可以在现有接口下准备新的盲测 V4 Study；本轮只冻结待授�
 
 草案：[study_r0_m1_v4_draft.json](../../configs/research/study_r0_m1_v4_draft.json)。
 Study ID：`r0-m1-v4-offline-preparation-20261101`。这是本轮待授权准备对象，正式研究必须使用新的单次 Study ID；不修改或重置此对象预算。
+
+实际 prepare/bind 均通过；绑定实现为 `36193aedd70fdf4755dc27e986931772682b0bd3`，resolved identity 为 `956c10cf70b31c111b1df0c74609c0160dc52bfa8fe1d66a0bb252dbff8e6ba0`。后续交付提交只补文档/检查记录，没有改写该绑定。绑定后兼容性通过，候选数、所有消耗和授权事件仍为 0，pending 为空，正式研究门禁仍拒绝未授权执行。
 
 与原 M1 Store 比较：三个 `task_conditions`、解析后的 FamilySpace、backend、dynamics_model、discretization 完全相同。原 2 段/6 腱子域保留；Main 仍可在该原域内选择合法长度、材料、截面和腱路。增补的 `family_sensitivity_variables_v2` 仅冻结该域中现有参数的可选机制研究授权，不拓宽物理参数域。V4 公共请求保持真实结构/控制研究意图；内部复用旧请求编译器不改变对外版本。
 
