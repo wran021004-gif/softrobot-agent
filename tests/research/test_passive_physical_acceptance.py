@@ -137,7 +137,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
         self.assertEqual(evaluate(self.inp.task,backend_result(self.inp,raw),self.source,registry(),'wrong-force').validity,'invalid')
         raw=deepcopy(self.backend.data.data);del raw['episodes'][0]['samples'][0]['qvel_rad_s']
         # Missing required samples stay incomplete, with no task score.
-        modified=self.backend.model_copy(deep=True);modified.data.data=raw
+        modified=self.backend.model_copy(update=dict(data=self.backend.data.model_copy(update=dict(data=raw))))
         self.assertEqual(evaluate(self.inp.task,modified,self.source,registry(),'missing-state').validity,'incomplete')
 
     def test_shared_worker_budget_and_failing_result_cannot_select(self):
