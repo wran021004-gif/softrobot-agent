@@ -1,0 +1,67 @@
+{
+  "status": "PROPOSAL_ONLY_NOT_APPLIED",
+  "science_scope_change_requires_original_freeze_and_authorization": true,
+  "capability_additions": [
+    "search"
+  ],
+  "allowed_plan_action_additions": [
+    "search"
+  ],
+  "research_decisions_patch": {
+    "structure_search_interface": "scientific_structure_search_v1"
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "evaluation_modes": [
+      "mujoco_control"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 24
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "note": "Retain all existing physics, controller grants, Native limits, task conditions, budgets and acceptance. Derive new final_evaluation_identity and approval scope through the original resolver/freeze. Counts are maxima for optional Main-selected requests, not mandatory proposals or a scientific order. No implicit mathematical_proxy mode."
+}

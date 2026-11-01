@@ -1,0 +1,200 @@
+{
+  "version": "research_opportunity_review_v1",
+  "study_status": "ready",
+  "full_independent_acceptance": false,
+  "coverage": {
+    "physical_structures": 2,
+    "topologies": [
+      {
+        "segment_count": 3,
+        "tendon_count": 4
+      },
+      {
+        "segment_count": 3,
+        "tendon_count": 6
+      }
+    ],
+    "allowed_segments": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "allowed_tendons": [
+      1,
+      7
+    ],
+    "continuous_domain_coverage": "Not exhausted or quantified."
+  },
+  "conditions": [
+    {
+      "topology": [
+        3,
+        4
+      ],
+      "condition": "central_high",
+      "control_sources": 1,
+      "control_studies": 0,
+      "mechanism_studies": 0,
+      "other_math": 0,
+      "independent_evaluations": 0
+    },
+    {
+      "topology": [
+        3,
+        6
+      ],
+      "condition": "negative_low",
+      "control_sources": 5,
+      "control_studies": 3,
+      "mechanism_studies": 1,
+      "other_math": 0,
+      "independent_evaluations": 0
+    },
+    {
+      "topology": [
+        3,
+        4
+      ],
+      "condition": "positive_high",
+      "control_sources": 6,
+      "control_studies": 5,
+      "mechanism_studies": 5,
+      "other_math": 0,
+      "independent_evaluations": 0
+    },
+    {
+      "topology": [
+        3,
+        6
+      ],
+      "condition": "positive_high",
+      "control_sources": 1,
+      "control_studies": 0,
+      "mechanism_studies": 0,
+      "other_math": 0,
+      "independent_evaluations": 0
+    },
+    {
+      "topology": [
+        3,
+        6
+      ],
+      "condition": "central_high",
+      "control_sources": 1,
+      "control_studies": 0,
+      "mechanism_studies": 0,
+      "other_math": 0,
+      "independent_evaluations": 0
+    },
+    {
+      "topology": [
+        3,
+        4
+      ],
+      "condition": "negative_low",
+      "control_sources": 1,
+      "control_studies": 0,
+      "mechanism_studies": 0,
+      "other_math": 0,
+      "independent_evaluations": 0
+    }
+  ],
+  "finite_control_searches": {
+    "stop_reasons": {
+      "iteration_limit": 4,
+      "evaluation_request_budget": 4
+    },
+    "latest": {
+      "reference": {
+        "artifact_id": "4e33989be5cf9af8a23a537f53cad1baaf86219b91dc28dfd0b06aa638562a81",
+        "media_type": "application/json"
+      },
+      "condition": "negative_low",
+      "stop_reason": "evaluation_request_budget",
+      "iterations_started": 4,
+      "search_dimension": 24,
+      "callbacks": 80,
+      "requested_callbacks": 80,
+      "baseline": {
+        "normalized_gap": 35.59700461369975,
+        "terminal_position_error_m": 0.32506604021825336,
+        "holding_max_position_error_m": 0.3659700461369975,
+        "holding_max_speed_m_s": 0.8422627501137845
+      },
+      "best": {
+        "normalized_gap": 31.65264784881738,
+        "terminal_position_error_m": 0.2821069345789463,
+        "holding_max_position_error_m": 0.32652647848817384,
+        "holding_max_speed_m_s": 0.9189714708396344
+      }
+    },
+    "scope": "Iteration/callback exhaustion is not convergence, structural infeasibility or independent acceptance."
+  },
+  "mechanism_scope": "Local point/model only. Parameter names imply no physical effect; consult candidate mathematical_capabilities /research_opportunities/parameters.",
+  "comparison": {
+    "cross_structure_common_task": false,
+    "rule": "Match condition, initial state/loading, scoring scope, fidelity, protocol and effort. Common task alone is insufficient; cross-condition errors do not identify topology effects."
+  },
+  "remaining": {
+    "provider": 88,
+    "provider_closeout": 12,
+    "public_operations": 570,
+    "mathematics": 78,
+    "replay": 18
+  },
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "method_statuses": {
+    "ready": 18,
+    "requires_parameters": 6
+  },
+  "questions": [
+    {
+      "reference": {
+        "artifact_id": "39d7db62d01e9c1b92c9b42ff6c42a065ac8199f01ffc960a4741acc10093459",
+        "media_type": "application/json"
+      },
+      "view": "full",
+      "pointer": "/original_plan/weakening_observation"
+    }
+  ],
+  "queries": {
+    "results": {
+      "reference": {
+        "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/research_opportunities/results"
+    },
+    "actions": {
+      "reference": {
+        "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/research_opportunities/actions"
+    },
+    "mathematical_methods": {
+      "reference": {
+        "artifact_id": "df303f6330b508bd0223ad025747a0ed7b653494baa8cf903d1a06dc2211b8da",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/research_opportunities/mathematical_methods"
+    }
+  },
+  "decision_rule": "Explain declined alternatives with evidence and uncertainty. No passing witness alone cannot justify STOP; unused budget cannot compel continuation. Preserve user stop, real blocks, resource limits and acceptance before simplicity."
+}
