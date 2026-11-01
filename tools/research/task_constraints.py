@@ -381,8 +381,9 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     extra={}
     if mechanism_interface(spec):
         from tools.research.structure_research import parameters,discovery
-        from extensions.math_analysis.mechanism_registry import catalog
+        from extensions.math_analysis.mechanism_registry import catalog,mechanism_ids
         extra['structure_research']=dict(**discovery(spec,c,reference,method_detail=methods['mechanism_structure_v1'],remaining_evaluations=remaining),mechanisms=catalog(),parameters=parameters(spec,c),
+            selectable_mechanisms=mechanism_ids('passive_unilateral_equilibrium' if cfg['task'].get('physical_problem') else 'active_ideal_tension'),
             evaluation_rule='One common baseline, actual stencil coordinates per selected effective path, one joint check for two paths; bounded local SciPy search uses the requested cap.',method_query=methods['mechanism_structure_v1']['detail_query'],
             differentiation='Normalized linear/log coordinates; central or legal one-sided two-scale native differences, at most two actual continuous physical parameters. No strict derivative or descent certificate.',
             unsupported_parameter_kinds=dict(undeclared='Only the selected frozen FamilySpace generates parameter domains; absent density/damping fields are not assumed available.',

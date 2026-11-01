@@ -91,8 +91,12 @@ def question_schema(spec, candidate=None, action=None):
         for name in ('ScientificStructureV4','ScientificQuestionV3'):
             schema['$defs'][name]['properties'].pop('version',None)
         control=schema['$defs']['ScientificQuestionV3']['properties']
-        for name in ('parameter_paths','search_strategy','requested_budget'):control.pop(name,None)
+        for name in ('parameter_paths','search_strategy','requested_budget','parameter_group','parameter_id',
+                'fixed_input','tensions_n','response_horizon_s'):control.pop(name,None)
         control['question_type']={'type':'string','const':'control_feasibility'}
+        control['effect_semantics']={'type':'string','const':'reoptimized_task_capability'}
+        sources=schema['$defs']['ScientificSources']['properties']
+        for name in ('comparison_candidates','t1_results'):sources.pop(name,None)
         passive=bool((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec.get('canonical_task',{}).get('physical_problem'))
         if action in ('mechanism_research','single_parameter_effect','control_feasibility') or passive:
             domain='control' if action=='control_feasibility' and not passive else 'structure'

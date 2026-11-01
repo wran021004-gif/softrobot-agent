@@ -104,6 +104,8 @@ class Stage25ArchitectureTests(unittest.TestCase):
         effective=observe(boundary,target_for('constraint_output_row_residual'))
         self.assertAlmostEqual(effective['value'],1.)
         self.assertLess(geometric['value'],1.)
+        unqualified=deepcopy(record);unqualified['constraint_state']['qualified']=False
+        self.assertEqual(observe(unqualified,target_for('constraint_feasible_inequalities'))['status'],'not_applicable')
         from tests.research.test_r3_b_stage1 import integrated_host
         from extensions.tendon_family.mujoco_analysis import NativeModel
         a,ac=integrated_host();active=NativeModel(a.store.artifact(ac)['configuration'])

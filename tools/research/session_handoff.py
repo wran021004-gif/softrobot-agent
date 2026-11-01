@@ -245,6 +245,7 @@ def main_feedback_projection(host, delivery):
             if reference not in state(host).get('analysis_results',[]):continue
             if host.store.artifact(reference).get('status')!='computed':continue
             for key in ('result','facts'):row.pop(key,None)
+            if state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':row.pop('query',None)
             row.update(delivery='fixed_facts_in_l0',facts_at='mathematical_research.latest_result')
     return main_projection(host,value)
 

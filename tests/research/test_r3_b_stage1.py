@@ -88,7 +88,8 @@ class IntegratedWireTests(unittest.TestCase):
             self.assertIsNone(re.search(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',text,re.I))
             self.assertNotIn('artifact_id',text);self.assertNotIn('x-research-reference-choices',text)
             self.assertIsNone(re.search(r'[\u4e00-\u9fff]',text))
-        self.assertEqual(l0['scientific_results']['latest_evaluation']['facts_at'],'mathematical_research.latest_result')
+        self.assertNotIn('scientific_results',l0)
+        self.assertEqual(l0['research_focus']['latest_result']['facts_at'],'mathematical_research.latest_result')
         self.assertFalse(any(r.get('structure_research') for r in l0.get('verified_facts',[])))
         # Save the actual complete wire as an explicitly labelled synthetic example.
         destination=Path(__file__).resolve().parents[2]/'runs/stage1_validation/wire_example.json'

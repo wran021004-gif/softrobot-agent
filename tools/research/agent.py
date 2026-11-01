@@ -182,6 +182,8 @@ def compact_plan_schema(schema, action, study):
         # Plan's legacy union default is v1; do not advertise omission as v2.
         schema['$defs'][name]['required']=[*schema['$defs'][name].get('required',[]),'version']
         properties=schema['$defs'][name]['properties']
+        if study.get('canonical_task',{}).get('physical_problem'):
+            for key in ('controller_recipe','controller_solver'):properties.pop(key,None)
         properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
         properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
         lo,hi=space['executable_tendon_count_bounds']

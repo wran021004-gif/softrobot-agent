@@ -4,7 +4,7 @@ from copy import deepcopy
 import numpy as np
 from tools.platform_store import plain
 from extensions.tendon_family.family_space import resolved_request
-from extensions.math_analysis.mechanism_registry import observe,PRIMITIVES,mechanism_ids
+from extensions.math_analysis.mechanism_registry import observe,PRIMITIVES
 from extensions.math_analysis.differentiation_router import differentiate, stencil, coordinate, physical_value
 
 METHOD='mechanism_structure_v1'
@@ -78,7 +78,8 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
               method_detail=None, remaining_evaluations=None, execution_block=None):
     rows=parameters(spec,candidate);detail=method_detail or {}
     minima=[1+len(set(stencil(r)['coordinates'])) for r in rows if r['mechanism_differentiation']['supported']]
-    minimum=dict(inspect=1,compare=2,differentiate=min(minima) if minima else None,
+    problem=candidate['configuration']['task'].get('physical_problem')
+    minimum=dict(inspect=1,compare=1 if problem and len(problem['loads'])>1 else 2,differentiate=min(minima) if minima else None,
         optimize=min(minima)+1 if minima else None)
     unavailable=execution_block or (detail.get('planning_status') if detail.get('planning_status') in
         ('unauthorized','unsupported','insufficient_budget','blocked') else None)
@@ -95,7 +96,6 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
             ['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
-        selectable_mechanisms=mechanism_ids('passive_unilateral_equilibrium' if candidate['configuration']['task'].get('physical_problem') else 'active_ideal_tension'),
         effective_parameter_groups=sorted({r['category'] for r in rows if r['mechanism_differentiation']['supported']}),
         evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,

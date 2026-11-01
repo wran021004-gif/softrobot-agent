@@ -19,7 +19,7 @@ def _primitive(field, unit, shape, frame, dependencies, meaning):
 PRIMITIVES = {
     'tip_jacobian': _primitive('tip_jacobian_m_rad','m/rad',['3','nv'],'world / named hinges',
         'geometry routing','Tip velocity = J qvel; geometric map, not task feasibility.'),
-    'tendon_jacobian': _primitive('tendon_jacobian_m_rad','m/rad',['nu','nv'],'ordered tendon lengths / named hinges',
+    'tendon_jacobian': _primitive('tendon_jacobian_m_rad','m/rad',['ntendon','nv'],'ordered tendon lengths / named hinges',
         'geometry routing','Length rates = J_length qvel. Active channels do not constrain length rates to zero.'),
     'input_force_map': _primitive('input_force_map_nm_n','N*m/N',['nv','nu'],'named hinges / ordered absolute tensions',
         'geometry routing','Active generalized force = map times nonnegative absolute tension; native sign already resolved.'),
@@ -75,7 +75,7 @@ CONSTRAINED = {
     'constraint_feasible_inequalities':('m/rad',['boundary','nv'])}
 COMMON_GEOMETRY=('tip_jacobian','material_point_jacobian','tendon_jacobian','joint_stiffness','joint_damping','all_tendon_output_row_residual')
 for name,(unit,shape) in CONSTRAINED.items():
-    PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame='world / named hinges / ordered fixed-payout tendons',
+    PRIMITIVES[name]=dict(field=name,unit=unit,shape=['ntendon' if s=='nu' else s for s in shape],frame='world / named hinges / ordered fixed-payout tendons',
         parameter_dependencies=['geometry','routing','stiffness','payout','external_load'],
         source='extensions.tendon_family.passive_equilibrium.mechanics',model='native hard unilateral equilibrium',
         validity='Actual load and material-point binding; smooth tangent quantities require qualified equilibrium, LICQ and strict complementarity.',
@@ -111,6 +111,7 @@ for name,meta in PRIMITIVES.items():
     meta['world_projection']=name in ('tip_jacobian','material_point_jacobian','tip_acceleration_input_map',
         'tangent_compliance','material_point_force_response','re_equilibrated_position_response')
     meta['state_requirements']=meta.get('state_requirements','Frozen fixed-payout assembly and load; qualified equilibrium for constrained response, LICQ and strict complementarity for smooth tangent matrices.')
+    meta['requires_qualified_equilibrium']=name in ('constraint_feasible_equalities','constraint_feasible_inequalities')
     if len(meta['operations'])==2:meta['unavailable_operation_reason']='Discrete active-set, basis/sign ambiguity or one-sided cone response does not define an ordinary structural gradient.'
 
 
@@ -185,6 +186,8 @@ def observe(mechanics, target):
     mode='passive_unilateral_equilibrium' if passive else 'active_ideal_tension'
     if mode not in meta['physical_modes']:
         return dict(status='not_applicable',reason='MECHANISM_PHYSICAL_MODE_MISMATCH',value=None,metadata=meta)
+    if meta['requires_qualified_equilibrium'] and not mechanics['constraint_state']['qualified']:
+        return dict(status='not_applicable',reason='QUALIFIED_EQUILIBRIUM_REQUIRED',value=None,metadata=meta)
     if meta['field']:
         for key in meta['field'].split('/'):value=value[key]
     else:value=derived(mechanics,target)
@@ -195,7 +198,7 @@ def observe(mechanics, target):
     nv=len(mechanics['coordinates']['dof_order']);nu=len(mechanics['coordinates']['tendon_order'])
     counts=mechanics.get('constraint_state',{})
     free=nv-mechanics.get('equilibrium',{}).get('equilibrium',{}).get('positive_rank',counts.get('positive_count',0))
-    dimensions={'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2,'free':free,
+    dimensions={'3':3,'nv':nv,'nu':nu,'ntendon':nu,'min(3,nu)':min(3,nu),'2':2,'free':free,
         'positive':counts.get('positive_count',0),'boundary':counts.get('boundary_count',0),
         'projection':len(output_rows(target)) if target.quantity in ('constraint_output_row_residual','all_tendon_output_row_residual') else 0}
     expected=tuple(dimensions[s] for s in meta['shape'])
