@@ -4,6 +4,7 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import subprocess
 import unittest
 from unittest.mock import patch
@@ -146,7 +147,13 @@ class InformationFlowTests(unittest.TestCase):
             retrieve(h,dict(operation='read',entry_id=row['entry_id'],revision='1'))
 
     def test_version_and_all_focused_action_schemas(self):
-        h=flow_host();spec=state(h)['spec'];validate_conversation_policy(spec['research_decisions'])
+        # Schema-only fixture: optional MATLAB availability does not start an Engine.
+        from importlib import metadata
+        distribution=metadata.distribution
+        with patch('tools.platform_registry.metadata.distribution',side_effect=lambda name:
+                SimpleNamespace(version='mock-schema-only') if name=='matlabengine' else distribution(name)):
+            h=flow_host()
+        spec=state(h)['spec'];validate_conversation_policy(spec['research_decisions'])
         for action in ('generate','initialize_control','diagnose','select','stop'):
             canonical=agent.plan_schema([action],decision_required=True,focused=True,study=spec,
                 family_version=spec['family_space']['version'],diagnose_candidate_required=True)

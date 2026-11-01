@@ -38,14 +38,14 @@ def fixture_directory():
         shutil.rmtree(folder)
 
 
-def fixture_host(folder, leaf='study_tracking_public.json'):
+def fixture_host(folder, leaf='study_tracking_public.json', *, physical_launches=3):
     spec=resolve(ROOT/'configs/research'/leaf)
     spec=deepcopy(spec)
     spec['mode']='engineering_numerical'
     spec['study_id']='cross-task-fixture-'+uuid4().hex[:8]
     spec['configuration']['run_id']=spec['study_id']
-    spec['budgets'].update(physical_launches=3, public_operations=100)
-    spec['configuration']['policy']['budget'].update(backend_solves=3, tool_calls=100)
+    spec['budgets'].update(physical_launches=physical_launches, public_operations=100)
+    spec['configuration']['policy']['budget'].update(backend_solves=physical_launches, tool_calls=100)
     with patch('tools.research.config.resolve',return_value=spec):
         host=core.prepare(directory=folder)
     update(host,freeze='fabricated-interface-fixture')

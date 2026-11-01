@@ -25,10 +25,22 @@ class C1Archive:
         self.archive=tarfile.open(ARCHIVE)
         self.snapshot=json.load(self.archive.extractfile(next(m for m in self.archive.getmembers() if m.name.startswith('snapshot/'))))
 
-    def artifact(self,ref,raw=False):
+    def artifact(self,ref,raw=False,*,paths=None):
         ref=plain(ref);suffix='.json' if ref.get('media_type','application/json')=='application/json' else '.bin'
         body=self.archive.extractfile('artifacts/'+ref['artifact_id']+suffix).read()
-        return body if raw else json.loads(body)
+        if raw:return body
+        value=json.loads(body)
+        if paths is None:return value
+        result={}
+        for path in paths:
+            keys=path.split('.');source=value;target=result
+            for key in keys:
+                if not isinstance(source,dict) or key not in source:break
+                source=source[key]
+            else:
+                for key in keys[:-1]:target=target.setdefault(key,{})
+                target[keys[-1]]=source
+        return result
 
     def host(self,events=None):
         events=self.snapshot['events'] if events is None else events

@@ -813,7 +813,7 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     return result
 
 
-def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None):
+def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None, condition_contract=None):
     """The frozen scheduled denominator includes absent, incomplete and replay slots."""
     from tools.platform_store import plain
     if not isinstance(scheduled, int) or scheduled<=0 or len(records)>scheduled:
@@ -830,12 +830,19 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
         return (row.get('case_id'),row.get('seed'),row.get('repetition'))
     if schedule is not None and len({slot_key(s) for s in schedule}) != scheduled:
         raise ValueError('DUPLICATE_SCHEDULE_SLOT')
+    heterogeneous=condition_contract=='heterogeneous_conditions_v1'
+    if condition_contract is not None and not heterogeneous:
+        raise ValueError('UNKNOWN_CONDITION_AGGREGATION_CONTRACT')
+    if heterogeneous and (schedule is None or any(not {'task_family','protocol_id','task_identity'}<=s.keys() or
+            not s['task_identity'] or _protocol_requirements(s) is None for s in schedule) or
+            len({s['case_id'] for s in schedule})!=scheduled or policy!=dict(require_fresh_repetitions=True,allow_historical_reuse=False)):
+        raise ValueError('FROZEN_HETEROGENEOUS_TASK_BINDINGS_AND_FRESH_EXECUTIONS_REQUIRED')
     results = [r['acceptance'] for r in records if r.get('acceptance')]
     families = {r['task_family'] for r in results}
     protocols = {r['protocol_id'] for r in results}
-    if len(families)>1 or len(protocols)>1:
+    if not heterogeneous and (len(families)>1 or len(protocols)>1):
         raise ValueError('AGGREGATION_TASK_PROTOCOL_MISMATCH')
-    family = next(iter(families), None)
+    family = None if heterogeneous else next(iter(families), None)
     metric_names = (('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')
                     if family=='task.reach' else ('max_position_error','rms_position_error','terminal_position_error')
                     if family=='task.tracking' else ())
@@ -865,6 +872,10 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
             if record.get(kind) and record[kind]!=expected:
                 source_issues.append(kind)
         declaration=next((s for s in (schedule or []) if slot==slot_key(s)), {})
+        if heterogeneous and result:
+            if any(result.get(k)!=declaration[k] for k in ('task_family','protocol_id','task_identity')):
+                raise ValueError('CONDITION_ACCEPTANCE_TASK_BINDING_MISMATCH')
+            source_issues.extend(issue for issue in (_source_issue(result),_outcome_issue(result)) if issue)
         fresh_required=declaration.get('fresh_required', policy.get('require_fresh_repetitions', True))
         # Reuse is protocol evidence, never a fresh repetition. An explicit
         # policy and source binding are both required for a nonfresh slot.
@@ -872,7 +883,8 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
             record.get('historical_reuse') and binding_matches and execution and
             receipt.get('tool_id')=='simulation.run')
         evidence_eligible = fresh or (not fresh_required and reuse)
-        count = bool(evidence_eligible and binding_matches and result['accepted'] is True)
+        count = bool(evidence_eligible and binding_matches and result['accepted'] is True and
+            (not heterogeneous or not source_issues))
         accepted += count
         entries.append(dict(case_id=slot[0], seed=slot[1], repetition=slot[2],
             fresh_execution=fresh, acceptance_execution_matches=binding_matches,
@@ -891,8 +903,9 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
             status=('not_new_repetition' if receipt and not fresh else
                     'acceptance_identity_mismatch' if result and result.get('execution_id') and not binding_matches else
                     result['status'] if result else 'pending_or_incomplete')))
-    return dict(contract='research.task_aggregation',version='1.0.0',accepted=accepted,scheduled=scheduled,
-        task_family=family,protocol_id=next(iter(protocols), None),
+    return dict(contract='research.task_aggregation',version='2.0.0' if heterogeneous else '1.0.0',accepted=accepted,scheduled=scheduled,
+        **(dict(condition_contract=condition_contract) if heterogeneous else {}),
+        task_family=family,protocol_id=None if heterogeneous else next(iter(protocols), None),
         schedule_identity=digest(schedule) if schedule is not None else None,
         schedule=schedule, evidence_policy=policy, comparison_scope=comparison_scope,
         recorded=len(records),unrecorded=scheduled-len(records),joint_acceptance_fraction=accepted/scheduled,

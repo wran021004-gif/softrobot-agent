@@ -32,6 +32,22 @@ def acceptance_certificate(host, reference):
     from tools.research_tasks import _source_issue,_outcome_issue,assemble_acceptance
     from tools.state_io import digest
     s=state(host);raw=host.store.artifact(reference);acceptance=raw.get('acceptance') or {}
+    if raw.get('kind')=='joint_condition_result_v1':
+        from tools.research.conditions import joint_assessment
+        issues=[];checked=None
+        try:
+            checked=joint_assessment(host,raw['condition_results'],require_reads=False)
+            original=deepcopy(raw['aggregation']);recomputed=deepcopy(checked['aggregation'])
+            for group in (original,recomputed):group['entries']=sorted(group['entries'],key=lambda row:row['case_id'])
+            if original!=recomputed or raw['candidate']!=checked['candidate']:
+                issues.append('JOINT_CERTIFICATE_DIFFERS_FROM_FROZEN_CONDITION_SOURCES')
+        except (ValueError,KeyError) as exc:issues.append(str(exc))
+        members=[acceptance_certificate(host,ref) for ref in raw['condition_results']]
+        return dict(version='formal_acceptance_view_v1',status='acceptance_certificate',reference=reference,
+            complete_acceptance_view=not issues and all(c['complete_acceptance_view'] for c in members),validation_issues=issues,
+            owning_study=raw['owning_study'],current_study=host.run_id,candidate=raw['candidate'],
+            aggregation=(checked or raw)['aggregation'],condition_certificates=members,
+            limitations=['Every member retains its full evaluator, units, thresholds and independent execution sources. Main must read each member certificate under the original SELECT gate; this view grants no execution or selection permission.'])
     if acceptance.get('contract')!='research.task_acceptance' or not acceptance.get('components') or not raw.get('candidate'):
         return dict(status='acceptance_certificate_not_supported',reference=reference,complete_acceptance_view=False,
             reason='No complete registered physical task-acceptance contract; mathematics and unsupported evaluation types retain original strict admission.')

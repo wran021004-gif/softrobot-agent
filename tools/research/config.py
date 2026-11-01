@@ -213,15 +213,46 @@ def extend_engineering_counts(spec, changes, authorization):
 def _reference(source, key, provenance):
     value=read(source)
     provenance['references'][key]=dict(path=str(source),sha256=digest(value))
-    if (key in ('task','control') or key.startswith('condition:')) and 'extends' in value:
+    if (key in ('task','control') or key.startswith(('condition:','condition_control:'))) and 'extends' in value:
         base=(source.parent/value.pop('extends')).resolve()
         original=read(base)
         if base.parent!=source.parent or 'extends' in original:
-            kind='TASK' if key.startswith('condition:') else key.upper()
+            kind='TASK' if key.startswith('condition:') else 'CONTROL' if key.startswith('condition_control:') else key.upper()
             raise ValueError('SAME_DIRECTORY_SINGLE_'+kind+'_EXTENSION_REQUIRED')
         value=patch(original,value)
         provenance['references'][key+'_base']=dict(path=str(base),sha256=digest(original))
     return value
+
+
+def controller_configuration(control, task, *, weights=None, replan_period=None):
+    """Compose existing controller defaults with only its registered task fields."""
+    controller=deepcopy(control['controller_defaults'])
+    name=controller['extension_id'];data=controller['parameters']['data']
+    if name in ('controller.gvs_nmpc','controller.sorosim_matlab_nmpc'):
+        from extensions.tendon_family.gvs_profile import ReachControl
+        from extensions.tendon_family.contracts import current_nmpc_recipe
+        if name=='controller.sorosim_matlab_nmpc':
+            from extensions.tendon_family.sorosim_control import SorosimReachControl as ReachControl
+        data['settling']=deepcopy(task.get('settling'))
+        for key in ('holding_tip_speed_weight','terminal_tip_speed_weight'):
+            if weights is not None:data['recipe'][key]=weights[key]
+        if replan_period is not None:
+            if name!='controller.gvs_nmpc':raise ValueError('GVS_NMPC_REPLAN_PERIOD_REQUIRED')
+            data['recipe']['replan_period_s']=replan_period
+        data=ReachControl.model_validate(data).model_dump(mode='json')
+        data['recipe']=current_nmpc_recipe(data['recipe'])
+        if replan_period is not None:
+            from extensions.tendon_family.contracts import GVSTrajectoryParameters
+            GVSTrajectoryParameters.model_validate(data['recipe']).replan_steps(task['task']['timing']['control_period_s'])
+        controller['parameters']['data']=data
+    elif replan_period is not None:raise ValueError('GVS_NMPC_REPLAN_PERIOD_REQUIRED')
+    return controller
+
+
+def frozen_analysis_protocol(spec, candidate):
+    """A condition may explicitly freeze the existing protocol contract."""
+    condition=next((c for c in spec.get('task_conditions',[]) if c['condition_id']==candidate.get('condition_id')), {})
+    return condition.get('analysis_protocol',spec['analysis_protocol'])
 
 
 def resolve(path, profile=None, *, backend_profile=None):
@@ -235,9 +266,16 @@ def resolve(path, profile=None, *, backend_profile=None):
     experience_index=study.pop('study_experience_index',None)
     conditions=study.pop('task_conditions',None)
     if conditions is not None:
-        if (len(conditions) not in (2,3) or any(set(c)!={'condition_id','task'} or not c['condition_id'] for c in conditions)
+        if (not isinstance(conditions,list) or not conditions or any(not isinstance(c,dict) or
+                not {'condition_id','task'}<=set(c) or set(c)-{'condition_id','task','execution'} or
+                not isinstance(c['condition_id'],str) or not c['condition_id'].strip() for c in conditions)
                 or len({c['condition_id'] for c in conditions})!=len(conditions) or 'task' in study):
-            raise ValueError('TWO_OR_THREE_UNIQUE_TASK_CONDITIONS_REPLACE_ROOT_TASK')
+            raise ValueError('FINITE_UNIQUE_TASK_CONDITIONS_REPLACE_ROOT_TASK')
+        for c in conditions:
+            execution=c.get('execution')
+            if execution is not None and (not isinstance(execution,dict) or not execution or
+                    set(execution)-{'control','backend','analysis_protocol'}):
+                raise ValueError('DECLARED_CONDITION_CONTROL_BACKEND_REQUIRED')
     fixed_structure=study.pop('fixed_structure_reference',None)
     family_sensitivity=study.pop('family_sensitivity_variables',None)
     methods=study.pop('mathematical_methods',None)
@@ -350,7 +388,10 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('UNSUPPORTED_MATHEMATICAL_BACKEND_PROFILE: '+str(backend_profile))
         study['control']='control_sorosim.json'
         study['mathematical_backend_profile']=backend_profile
-    if conditions is not None:study['task']=conditions[0]['task']
+    if conditions is not None:
+        study['task']=conditions[0]['task']
+        if conditions[0].get('execution',{}).get('control'):
+            study['control']=conditions[0]['execution']['control']
     inputs = {}
     if family_mode:
         study.pop('robot', None)  # Historical compositions may name it; never read it.
@@ -365,6 +406,8 @@ def resolve(path, profile=None, *, backend_profile=None):
         robot, bootstrap = family_bootstrap(family_space, study.pop('family_execution'))
     else:
         robot = inputs['robot']
+    if conditions is not None and conditions[0].get('execution',{}).get('backend'):
+        robot['backend']=deepcopy(conditions[0]['execution']['backend'])
     from tools.research_tasks import passive_registered
     if not passive_registered(task['task']):
         control['rl_defaults']['seed'] = task['seed']
@@ -450,12 +493,7 @@ def resolve(path, profile=None, *, backend_profile=None):
                 validate_provider(role_provider(dict(research_decisions=dict(role_policy=role_policy)),provider,purpose))
     if not provider.get('base_url') or not provider.get('model'):
         raise ValueError('EXPLICIT_PROVIDER_REQUIRED')
-    controller = deepcopy(control['controller_defaults'])
-    if replan_period is not None:
-        if controller['extension_id']!='controller.gvs_nmpc':
-            raise ValueError('GVS_NMPC_REPLAN_PERIOD_REQUIRED')
-        controller['parameters']['data']['recipe']['replan_period_s']=replan_period
-        study['nmpc_replan_period_s']=replan_period
+    if replan_period is not None:study['nmpc_replan_period_s']=replan_period
     from tools.research_tasks import passive_registered
     passive=passive_registered(task['task'])
     if passive:
@@ -465,9 +503,7 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('PASSIVE_V1_DISALLOWS_ACTIVE_EXECUTION_ACTIONS')
         controller=dict(extension_id='controller.no_active_control',version='1.0.0',parameters=dict(contract='platform.empty',version='1.0.0',data={}))
     else:
-        controller['parameters']['data']['settling'] = deepcopy(task['settling'])
-        for name in ('holding_tip_speed_weight', 'terminal_tip_speed_weight'):
-            controller['parameters']['data']['recipe'][name] = study['reference_parameters'][name]
+        controller=controller_configuration(control,task,weights=study['reference_parameters'],replan_period=replan_period)
     cfg = dict(run_id=study['study_id'], seed=task['seed'], robot=robot['robot'], task=task['task'], policy={})
     cfg['policy'].update(controller=controller, backend=robot['backend'], dynamics_model=robot['dynamics_model'],
         discretization=robot['discretization'], candidate_builder=dict(extension_id='candidate.family', version='3.0.0',
@@ -495,18 +531,6 @@ def resolve(path, profile=None, *, backend_profile=None):
         if any(level['backend']!=backend_name for level in [*policy['screening'].values(),policy['final_evaluation']]):
             raise ValueError('FIDELITY_REQUIRES_FROZEN_BACKEND')
     from extensions.tendon_family.contracts import MujocoParameters
-    if not passive:
-        from extensions.tendon_family.gvs_profile import ReachControl
-        if cfg['policy']['controller']['extension_id'] == 'controller.sorosim_matlab_nmpc':
-            from extensions.tendon_family.sorosim_control import SorosimReachControl
-            ReachControl = SorosimReachControl
-        from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
-        data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
-        data['recipe'] = current_nmpc_recipe(data['recipe'])
-        if replan_period is not None:
-            from extensions.tendon_family.contracts import GVSTrajectoryParameters
-            GVSTrajectoryParameters.model_validate(data['recipe']).replan_steps(cfg['task']['timing']['control_period_s'])
-        cfg['policy']['controller']['parameters']['data'] = data
     cfg['policy']['backend']['parameters']['data'] = MujocoParameters.model_validate(
         cfg['policy']['backend']['parameters']['data']).model_dump(mode='json')
     study['analysis_protocol'].update(baseline_lengths_m={k:v['length_m'] for k,v in segments.items()},
@@ -628,8 +652,30 @@ def resolve(path, profile=None, *, backend_profile=None):
             initial=canonical['initializer']['parameters']['data']
             if initial.get('unspecified')=='zero' and all(v==0 for key in ('qpos_rad','qvel_rad_s') for v in initial.get(key,{}).values()):
                 canonical['initializer']['parameters']['data']=dict(rule=study['candidate_initialization'])
-            frozen.append(dict(condition_id=condition['condition_id'],task=canonical,seed=value['seed'],
-                settling=deepcopy(value['settling'])))
+            item=dict(condition_id=condition['condition_id'],task=canonical,seed=value['seed'],settling=deepcopy(value.get('settling')))
+            if condition.get('execution'):
+                execution=condition['execution'];item['execution']={}
+                if 'control' in execution:
+                    source=_reference((path.parent/execution['control']).resolve(),'condition_control:'+condition['condition_id'],provenance)
+                    item['execution']['controller']=controller_configuration(source,value)
+                if 'backend' in execution:item['execution']['backend']=deepcopy(execution['backend'])
+                if 'analysis_protocol' in execution:
+                    from schemas.platform_analysis import TaskAnalysisProtocol
+                    item['analysis_protocol']=plain(TaskAnalysisProtocol.model_validate(execution['analysis_protocol']))
+                if index==0:item['execution']={k:deepcopy(cfg['policy'][k]) for k in item['execution']}
+            protocol=item.get('analysis_protocol',study['analysis_protocol'])
+            if any(protocol[key]!=value['task']['timing'][field] for key,field in
+                    (('duration_s','duration_s'),('period_s','control_period_s'))):
+                raise ValueError('CONDITION_REQUIRES_EXPLICIT_MATCHING_ANALYSIS_PROTOCOL')
+            if index==0 and protocol!=study['analysis_protocol']:
+                raise ValueError('FIRST_CONDITION_USES_ROOT_ANALYSIS_PROTOCOL')
+            from tools.research.conditions import configuration_for_condition
+            from tools.platform_tasks import compile_input
+            condition_cfg=configuration_for_condition(cfg,item)
+            if item.get('execution'):
+                item['execution']={k:deepcopy(condition_cfg['policy'][k]) for k in item['execution']}
+            compile_input(condition_cfg,registry())
+            frozen.append(item)
         study['task_conditions']=frozen
     if fixed_structure is not None:study['fixed_structure_reference']=plain(EvidenceRef.model_validate(fixed_structure))
     from tools.research.experience import freeze_knowledge

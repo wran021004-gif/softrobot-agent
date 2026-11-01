@@ -640,7 +640,7 @@ def result_view(host, reference):
         fresh_current_study=fresh,solution_identity=identity,solution_identity_sha256=digest(identity))
 
 
-def eligibility(host, reference, *, revise_selection=False, selection=None, root_operation=True, condition_member=False):
+def eligibility(host, reference, *, revise_selection=False, selection=None, root_operation=True, condition_member=False, evidence_only=False):
     from tools.research.state import state,capacity
     from tools.research.design import verify_candidate
     from tools.research.rl import evaluation_capacity
@@ -668,10 +668,10 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
     fit=None
     try:
         v=result_view(host,ref)
-        if ref not in s.get('evaluation_reads',[]):
+        if not evidence_only and ref not in s.get('evaluation_reads',[]):
             reasons.append('explicit evidence_read of this completed evaluation required before selection or confirmation')
         from tools.research.evidence_policy import english_native
-        if english_native(s['spec']):
+        if not evidence_only and english_native(s['spec']):
             from tools.research.research_context import read_coverage
             from tools.research.config import bounded_evidence_enabled
             if not any(r['query']['reference']==ref and (r['full_artifact'] or
@@ -688,7 +688,9 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
             reasons.append('selected scientific configuration mismatch')
         if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')):
             reasons.append('exact evaluated checkpoint identity missing')
-        if s.get('selected') and s['selected']!=ref:
+        # A read-only joint certificate still validates its member facts after
+        # SELECT/STOP. The enclosing list SELECT retains its immutable gate.
+        if not evidence_only and s.get('selected') and s['selected']!=ref:
             old=confirmation_progress(host,s['selected'])
             if not revise_selection:
                 reasons.append('confirmation selection already frozen; explicit revise_selection required')
@@ -716,9 +718,9 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
     except (ValueError,KeyError) as exc:
         reasons.append(str(exc))
         count=0
-    if s['research_status']=='stopped':
+    if not evidence_only and s['research_status']=='stopped':
         reasons.append('study sealed after STOP')
-    if s.get('selected') and confirmation_progress(host)['confirmed']:
+    if not evidence_only and s.get('selected') and confirmation_progress(host)['confirmed']:
         reasons.append('solution confirmed; close study')
     return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,
         owning_study=r.get('study',r.get('owning_study')),historical_input=ref in s.get('linked_selections',[]),

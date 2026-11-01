@@ -894,8 +894,8 @@ class Plan(Contract):
     def required(self):
         if self.next_research_action is not None and (self.action!='diagnose' or self.diagnostic is not None):
             raise ValueError('NEXT_RESEARCH_ACTION_REQUIRES_READ_ONLY_DIAGNOSE')
-        if isinstance(self.selected_execution,list) and (self.action!='select' or len(self.selected_execution) not in (2,3)):
-            raise ValueError('JOINT_SELECT_REQUIRES_TWO_OR_THREE_RESULTS')
+        if isinstance(self.selected_execution,list) and (self.action!='select' or not self.selected_execution):
+            raise ValueError('JOINT_SELECT_REQUIRES_NONEMPTY_FROZEN_CONDITION_RESULTS')
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         active = PLAN_PAYLOADS.get(self.action)

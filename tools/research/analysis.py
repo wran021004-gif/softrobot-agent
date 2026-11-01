@@ -419,7 +419,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
                 subproblems=method_fit['kernel_subproblems_per_model']))
     s=state(host)
     protocol=plain(q.protocol)
-    if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
+    from tools.research.config import frozen_analysis_protocol
+    if protocol!=frozen_analysis_protocol(s['spec'],c) or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
     count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
     if q.structure_response:count=1+len(q.structure_response.candidates)

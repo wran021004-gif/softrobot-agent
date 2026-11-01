@@ -404,7 +404,9 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
                 preparation=dict(tool='research_plan',action='initialize_control',control_seed=dict(candidate=candidate,method='baseline')))
         if len(legal)>1:
             return feedback('needs_choice','SCIENTIFICALLY_DISTINCT_CONTROL_SOURCES',choices=dict(control_source=legal))
-        duration = spec['analysis_protocol']['duration_s']
+        from tools.research.config import frozen_analysis_protocol
+        protocol=frozen_analysis_protocol(spec,c)
+        duration = protocol['duration_s']
         if q.control_scope.mode=='full_task':
             if q.control_scope.window_s is not None:
                 return feedback('needs_choice','FULL_TASK_SCOPE_HAS_NO_LOCAL_WINDOW')
@@ -424,7 +426,7 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
         if active is not None:settings['active_coefficients']=active
         if effort:
             try:
-                settings=plain(control_settings(spec,effort,window=q.control_scope.window_s if q.control_scope.mode=='time_window' else None,
+                settings=plain(control_settings({**spec,'analysis_protocol':protocol},effort,window=q.control_scope.window_s if q.control_scope.mode=='time_window' else None,
                     channels=len(c['configuration']['robot']['structure']['data']['tendons'])))
                 knots=settings['knots_s']
             except ValueError as exc:

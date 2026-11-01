@@ -133,14 +133,16 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     readiness=candidate_methods(host,reference,analysis_metadata=analysis_metadata) if binding_error is None else dict(
         method=SENSITIVITY,status='requires_current_profile_candidate',reasons=[binding_error])
     cfg=c['configuration'];requirements=describe_analysis_requirements(cfg,{})
+    from tools.research.config import frozen_analysis_protocol
+    protocol=frozen_analysis_protocol(spec,c)
     remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
-    rows=analysis_capabilities(cfg,requirements,spec['analysis_protocol'],
+    rows=analysis_capabilities(cfg,requirements,protocol,
         remaining_evaluations=remaining,mathematical_methods={CONIC:spec.get('mathematical_methods',{}).get(CONIC),
             SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})
     models=[]
     for r,v in analysis_metadata:
         if (v.get('candidate')==reference and v.get('implementation')==s['freeze'] and
-                v.get('status')=='computed' and v.get('model') and v.get('protocol')==spec['analysis_protocol']):models.append(r)
+                v.get('status')=='computed' and v.get('model') and v.get('protocol')==protocol):models.append(r)
     authorization=mathematics_authorization(host,s);methods={}
     closed=s['research_status']=='stopped' or protected(host)
     for row in rows:
@@ -152,13 +154,13 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             reasons=[r for r in reasons if r!='candidate_variable_and_saved_model_stencil_validation_required']+readiness.get('reasons',[])
         authorized='analysis' in spec['capabilities'] and (not row.get('capability_method') or
             bool(spec.get('mathematical_methods',{}).get(key) and spec.get('mathematical_methods',{}).get(CONIC)))
-        request=dict(candidate=reference,operation=row['operation'],protocol=spec['analysis_protocol'],
+        request=dict(candidate=reference,operation=row['operation'],protocol=protocol,
             operating_point='target_equilibrium' if key=='equilibrium' else 'fixed_input_equilibrium' if key in
             ('input_sensitivity','design_sensitivity') else 'saved_state' if key=='instantaneous_braking_v1' else 'controller_start_input')
         required=[]
         if key in ('linearization','controllability'):
             required.append('scoring_window_s from protocol.windows_s')
-            if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
+            if protocol['windows_s']:request['scoring_window_s']=protocol['windows_s'][0]
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
         if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
             request.update(model_source='mujoco',operating_point='standardized_initial_pretension')
@@ -274,7 +276,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
                 ['nonlinear_response={variable,unit,t1_results=[baseline,minus,plus]}'],
             cost_scope=item['cost_scope'] if method==T1 else 'One aggregation evaluation for admitted saved T1 results, zero new native models, optimizations or physics steps. Prior T1 charges remain referenced; actual preparation/worker wall time is additional.',
             request_template=dict(candidate=reference,operation=operation,model_source='mujoco',
-                operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
+                operating_point='standardized_initial_pretension',protocol=protocol),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+method))
         from tools.research.native_control import nonlinear_task_reason
         reason=nonlinear_task_reason(cfg['task']['family'])
@@ -329,7 +331,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             cost_scope='Shared allowance: inspect=1, compare=2; differentiated paths use one common baseline plus their actual two-scale central/one-sided probes, plus a two-path joint check. optimize reserves its explicit bounded SciPy search cap. Saved prefix reconstruction has its original native cost.',
             required_parameters=['ScientificQuestionV2 operation, effect_semantics, registered target, point/control semantics and evaluation cap; candidate and task come from diagnose.'],
             request_template=dict(candidate=reference,operation=METHOD,model_source='mujoco',
-                operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
+                operating_point='standardized_initial_pretension',protocol=protocol),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+METHOD))
         if cfg['task'].get('physical_problem'):
             ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and remaining>=1
@@ -451,6 +453,7 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
     """
     from tools.research.optimal_capability import family_analysis_parameters
     from tools.research.nonlinear_capability import T1, T2
+    from tools.research.config import frozen_analysis_protocol
     parameters=(family_analysis_parameters(spec,candidate) if candidate.get('generation_version')
         in ('serial_family_generation_v1','serial_family_generation_v2') else [])
     constraints=plain(requirements)['constraints']
@@ -486,7 +489,7 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
         **(dict(scientific_actions=scientific_actions(spec),parameter_catalog=parameter_catalog(spec,candidate)) if explicit_actions(spec) else {}),
         task_binding={**requirements.binding, 'task_family':candidate['configuration']['task']['family'],
             'canonical_task_identity':candidate.get('task_identity'),
-            'condition_id':candidate.get('condition_id')},protocol=spec['analysis_protocol'],
+            'condition_id':candidate.get('condition_id')},protocol=frozen_analysis_protocol(spec,candidate),
         parameters=rows,metrics=metrics,
         methods={key:dict(planning_status=detail['planning_status'],
             execution_status=detail['execution_status'],missing=detail['missing'],

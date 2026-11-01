@@ -39,6 +39,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
     schema=Plan.model_json_schema()
+    conditions=(study or {}).get('task_conditions')
+    if conditions:
+        for branch in schema['properties']['selected_execution']['anyOf']:
+            if branch.get('type')=='array':branch.update(minItems=len(conditions),maxItems=len(conditions),uniqueItems=True)
     from tools.research.scientific_intent import enabled as question_enabled
     scientific_question = question_enabled(study or {})
     from tools.research.scientific_intent import explicit_actions
@@ -438,17 +442,22 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
     method,detail=selection
     intent=research_intent(host)['latest_decision']
     candidate=intent['agent_hypothesis']['decision']['selected_candidate']
-    verify_candidate(host,candidate)
+    bound_candidate=verify_candidate(host,candidate)
     schema=selected_analysis_schema(method,detail,bound=True)
     extra=sorted(set(payload)-set(schema['properties']))
     if extra:raise ValueError('SELECTED_ANALYSIS_SCHEMA_MISMATCH: unsupported or frozen fields: '+', '.join(extra))
     spec=state(host)['spec'];template=detail['request_template']
-    if template.get('candidate')!=candidate or template.get('protocol')!=spec['analysis_protocol']:
+    from tools.research.config import frozen_analysis_protocol
+    protocol=frozen_analysis_protocol(spec,bound_candidate)
+    if template.get('candidate')!=candidate or template.get('protocol')!=protocol:
         raise ValueError('SELECTED_ANALYSIS_FROZEN_BINDING_MISMATCH')
-    frozen=dict(candidate=deepcopy(candidate),protocol=deepcopy(spec['analysis_protocol']),operation=detail['operation'])
+    frozen=dict(candidate=deepcopy(candidate),protocol=deepcopy(protocol),operation=detail['operation'])
     sources=dict(candidate=dict(reference=intent['plan_reference'],pointer='/original_plan/decision/selected_candidate'),
         protocol=dict(source='frozen Study',study_id=spec['study_id'],freeze=state(host)['freeze'],pointer='/spec/analysis_protocol'),
         operation=dict(source=detail['detail_query'],pointer='/operation'))
+    condition_index=next((i for i,row in enumerate(spec.get('task_conditions',[])) if
+        row['condition_id']==bound_candidate.get('condition_id') and row.get('analysis_protocol') is not None),None)
+    if condition_index is not None:sources['protocol']['pointer']=f'/spec/task_conditions/{condition_index}/analysis_protocol'
     if template.get('model_source')=='mujoco':
         frozen['model_source']='mujoco';sources['model_source']=dict(source=detail['detail_query'],pointer='/request_template/model_source')
     if 'capability_method' in template:
