@@ -89,6 +89,10 @@ def inspect_evidence(task, raw):
                 expected_force,phase=load_at(goal,SimpleNamespace(**loads[episode['load_condition']]),row['time_s'])
                 if phase!=row['phase'] or not np.allclose(row['force_world_n'],expected_force,rtol=0,atol=1e-12):
                     return 'invalid','FROZEN_FORCE_PROTOCOL_MISMATCH'
+                if abs(row['engine_time_s']-row['time_s'])>1e-9:return 'invalid','ENGINE_CLOCK_MISMATCH'
+                if not np.allclose(np.asarray(row['tendon_length_m'])-raw['payout_lengths_m'],row['length_residual_m'],rtol=0,atol=1e-12):
+                    return 'invalid','MEASURED_LENGTH_RESIDUAL_MISMATCH'
+                if min(row['actual_tension_n'])<0:return 'invalid','UNILATERAL_TENSION_SIGN_MISMATCH'
                 if any(w['number'] for w in row['warnings']):return 'invalid','MUJOCO_WARNING'
                 if not isinstance(row['ncon'],int) or row['solver_iterations']<0:return 'invalid','SOLVER_STATE_MISSING'
             if (rows[0]['qpos_rad']!=raw['initial_state']['qpos_rad'] or
@@ -136,6 +140,14 @@ def evaluate(task, result, source, reg, identity):
                 'maximum_joint_position':lambda:max(abs(v) for v in row['qpos_rad']),
                 'maximum_joint_speed':lambda:max(abs(v) for v in row['qvel_rad_s'])}[b.quantity]()
             values.append(value)
+        if b.window=='full' and b.quantity in ('maximum_tension','maximum_length_excess'):
+            episode=next(e for e in raw['episodes'] if e['load_condition']==b.load_condition)
+            field='maximum_tension_n' if b.quantity=='maximum_tension' else 'maximum_length_excess_m'
+            if field not in episode:
+                return EvaluationResult(validity='incomplete',task_success=None,metrics=[],constraints=[],reason='PER_STEP_CONSTRAINT_EXTREMA_MISSING',**kwargs)
+            values.append(episode[field])
+        if not np.isfinite(values).all():
+            return EvaluationResult(validity='invalid',task_success=None,metrics=[],constraints=[],reason='NONFINITE_DYNAMIC_METRIC',**kwargs)
         for suffix,limit,value,satisfied in [('minimum',b.minimum,min(values),b.minimum is None or min(values)>=b.minimum),
                 ('maximum',b.maximum,max(values),b.maximum is None or max(values)<=b.maximum)]:
             if limit is None:continue

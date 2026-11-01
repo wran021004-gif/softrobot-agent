@@ -196,6 +196,11 @@ def compact_plan_schema(schema, action, study):
             for branch in choice['cells']['anyOf']:
                 if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
             choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
+    from tools.research_tasks import passive_registered
+    if action=='physical_replay' and passive_registered(study.get('canonical_task',{})):
+        request=schema['$defs']['PhysicalReplayRequest']
+        request['properties'].pop('source',None)
+        request['description']='Select an owned passive candidate. The host binds its frozen loading protocol; no control sequence or source hash is required.'
     from tools.research.contracts import compact_schema
     return compact_schema(schema)
 
@@ -1421,7 +1426,7 @@ def decision_packet(host):
         for ref in candidates:
             identity=host.store.artifact(ref)['profile_identity']
             bindings.append(dict(candidate=ref,profile_identity=identity,
-                executable_under_current_profile=identity==s['profile']['identity'] and not spec['configuration']['task'].get('physical_problem')))
+                executable_under_current_profile=identity==s['profile']['identity'] and (not spec['configuration']['task'].get('physical_problem') or __import__('tools.research_tasks',fromlist=['passive_registered']).passive_registered(spec['configuration']['task']))))
         return dict(research=research,implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,

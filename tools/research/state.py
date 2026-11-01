@@ -65,7 +65,8 @@ SCIENCE_FILES = ['extensions/tendon_family/'+n+'.py' for n in ('gvs_nmpc','gvs_t
 SCIENCE_FILES += ['extensions/optimization/contracts.py','extensions/optimization/ipopt.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','tools/execution_completion.py','tools/research_tasks.py']
 SCIENCE_FILES += ['extensions/math_analysis/trajectory.py','extensions/math_analysis/task_capability.py','tools/research/capability.py']
 SCIENCE_FILES += ['extensions/math_analysis/conic_capability.py','extensions/math_analysis/capability_sensitivity.py']
-SCIENCE_FILES += ['extensions/tendon_family/family_space.py']
+SCIENCE_FILES += ['extensions/tendon_family/family_space.py','extensions/tendon_family/passive.py',
+    'extensions/tendon_family/passive_execution.py','extensions/reference/passive_response.py','extensions/reference/contracts.py']
 SCIENCE_FILES += ['extensions/tendon_family/mujoco_analysis.py']
 SCIENCE_FILES += ['extensions/math_analysis/mechanism_registry.py','extensions/math_analysis/differentiation_router.py']
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]

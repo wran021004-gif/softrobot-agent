@@ -3,6 +3,7 @@ from copy import deepcopy
 import json
 from tools.platform_store import plain
 from tools.state_io import digest
+from tools.research_tasks import passive_registered
 from tools.research.state import state, save, update
 from tools.research.feedback import task_gap
 from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog, comparable_task, citation_inventory
@@ -313,7 +314,8 @@ def context(host, *, evidence_references=None):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
     current=legacy_context(host,evidence_references=evidence_references)
     if s['spec']['configuration']['task'].get('physical_problem'):
-        current['actions']=[a for a in current['actions'] if a in ('generate','propose','diagnose','stop')]
+        current['actions']=[a for a in current['actions'] if a in (('generate','propose','diagnose','stop','physical_replay','select')
+            if passive_registered(s['spec']['configuration']['task']) else ('generate','propose','diagnose','stop'))]
         current['control_search_starts']=[]
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
@@ -385,7 +387,7 @@ def context(host, *, evidence_references=None):
         control_sources_initialized=len(s.get('control_initializations',[])),
         mathematical_evaluations=len(s.get('analysis_results',[]))+len(s.get('mechanics_results',[])),
         independent_physical_evaluations=sum(len(s.get(k,[])) for k in ('results','physical_replays','rl_evaluations')),
-        has_executable_candidate=bool(s['candidates']) and not s['spec']['configuration']['task'].get('physical_problem'),task_passed=current['task_accepted'])
+        has_executable_candidate=bool(s['candidates']) and (not s['spec']['configuration']['task'].get('physical_problem') or passive_registered(s['spec']['configuration']['task'])),task_passed=current['task_accepted'])
     current['candidate_status']['has_measured_task_feedback']=bool(current['candidate_status']['independent_physical_evaluations'])
     current['research_information']='Compilation establishes structure validity only. Creating structures adds candidate information; completed mathematical analysis or independent physical evaluation adds task-performance evidence. Neither compilation nor control initialization establishes task success.'
     refs=[*current['all_fresh_results'],*s.get('control_search_results',[])]
@@ -649,7 +651,7 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
         residual=[r for r in s.get('compatible_residual_references',[]) if r['candidate']==candidate and r.get('available')]
         index.append(dict(candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
             profile_identity=c.get('profile_identity'),current_profile_identity=s['profile']['identity'],
-            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'] and not c['configuration']['task'].get('physical_problem'),
+            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'] and (not c['configuration']['task'].get('physical_problem') or passive_registered(c['configuration']['task'])),
             resolved_facts=resolved_candidate_facts(c,candidate),
             parameters_query=dict(reference=candidate,view='full',pointer='/parameters'),
             provenance_query=dict(reference=candidate,view='full',pointer='/provenance'),
@@ -780,9 +782,18 @@ def action_feedback(host,current, *, analysis_metadata=None):
         cfg=host.store.artifact(candidate)['configuration']
         execution=task_adapter(cfg).execution_requirements()
         if cfg['task'].get('physical_problem'):
+            if passive_registered(cfg['task']):
+                from tools.research.budget import capacity as replay_capacity
+                episodes=len(cfg['task']['goal']['data']['load_conditions'])
+                fit=replay_capacity(host,episodes,route='passive_protocol')
+                rows.append(dict(action='physical_replay',candidate=candidate,route='passive_protocol',
+                    status='preflight_eligible' if not closed and 'physical_replay' in current['actions'] and fit['admitted']>=episodes else 'unavailable',
+                    new_physical_evaluations=episodes,source_kind='frozen_passive_protocol_v1',
+                    remaining_checks=['full_plan_admission','owned_candidate','frozen_protocol_source','shared_budget'],
+                    requires_agent_fields=['decision','hypothesis','physical_replay.candidate']))
             rows.extend(dict(action=action,candidate=candidate,status='not_applicable',
                 reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OR_REGISTERED_DYNAMIC_ACCEPTANCE')
-                for action in ('initialize_control','execute','control_search','physical_replay','mechanics','research_rl'))
+                for action in (('initialize_control','execute','control_search','mechanics','research_rl') if passive_registered(cfg['task']) else ('initialize_control','execute','control_search','physical_replay','mechanics','research_rl')))
             continue
         unsupported=execution.get('unsupported_control_methods',[])
         from tools.research.rl import allocation_feedback, compatible_references

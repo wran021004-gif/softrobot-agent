@@ -281,7 +281,7 @@ def observe_pass(host, reference):
             metrics = (result.get('acceptance') or {}).get('metrics', {})
             if any(not isinstance(metrics.get(k), (float, int)) or not math.isfinite(metrics[k]) or metrics[k] > limit for k, limit in limits.items()):
                 return
-        else:
+        elif view['controller_route']=='rl':
             keys = ('terminal_position_error_m', 'holding_max_position_error_m', 'holding_max_speed_m_s')
             if any(not e.get('holding_coverage_complete') or any(not isinstance(e.get(k), (float, int)) or not math.isfinite(e[k]) or e[k] > limit for k,limit in zip(keys,limits.values())) for e in result['episodes']):
                 return
