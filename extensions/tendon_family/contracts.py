@@ -400,6 +400,8 @@ class PassiveDynamicData(Contract):
     joint_count: int = Field(gt=0)
     coordinate_order: list[str]
     tendon_order: list[str]
+    material_point_bindings: list[dict]
+    tip_binding: dict
     payout_lengths_m: list[FiniteFloat]
     initial_state: dict
     episodes: list[dict]

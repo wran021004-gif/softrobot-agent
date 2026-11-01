@@ -40,6 +40,9 @@ def prepared_host(*,failure=False,wire=False,budget=4):
     try:h=core.prepare(path,ROOT/'runs'/name)
     finally:path.unlink()
     core.bind(h)
+    scope=dict(study_id=h.run_id,resolved_identity=state(h)['spec']['resolved_identity'],execution_scopes=['registered mathematics'])
+    from tools.state_io import digest
+    save(h,dict(user_approval='User authorized Stage III-A/B bounded engineering verification.',scope=scope,scope_identity=digest(scope)),'formal_study_authorization')
     pilot=state(h)['pilot'];pilot.update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback')
     update(h,pilot=pilot)
     from tools.research.design import generate_candidate
@@ -65,7 +68,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.cfg=resolve(CONFIG)['configuration']
         cls.inp=SessionInput.model_validate(cls.cfg)
-        cls.backend=execute(cls.inp,OUT/'real_default')
+        cls.backend=execute(cls.inp,OUT/('real_default_'+uuid4().hex[:10]))
         cls.source=EvidenceRef(artifact_id='0'*64) # Direct evaluator fixture, no formal read/SELECT credit.
         cls.evaluation=evaluate(cls.inp.task,cls.backend,cls.source,registry(),'engineering-direct')
         atomic_json(OUT/'direct_backend.json',plain(cls.backend))
@@ -85,6 +88,14 @@ class PassiveAcceptanceTests(unittest.TestCase):
         self.assertFalse(a.analysis_requirements({}).constraints)
         bad=deepcopy(self.cfg);bad['policy']['controller']=resolve(ROOT/'configs/research/study_s125_cold.json')['configuration']['policy']['controller']
         with self.assertRaises(ValueError):compile_input(bad)
+
+    def test_registered_mechanism_research_stays_available(self):
+        from tools.research.task_constraints import mathematical_method_view
+        h,c=prepared_host()
+        item=mathematical_method_view(h,c)['methods']['mechanism_structure_v1']
+        self.assertTrue(item['formal_execution_authorized'],item)
+        self.assertEqual(item['registered_acceptance'],'offline_passive_response_v1')
+        self.assertTrue(item['applicable'])
 
     def test_complete_real_execution_and_different_loads(self):
         b=self.backend;raw=b.data.data
@@ -111,7 +122,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
         cfg=deepcopy(self.cfg)
         space=json.loads((ROOT/'configs/research/family_space_passive_engineering_v1.json').read_text())
         cfg['robot']['structure']['data']['fixed_payout_lengths_m']['tendon_0']=space['passive_payout_domains_m']['tendon_0']['minimum']
-        taut=execute(SessionInput.model_validate(cfg),OUT/'real_taut')
+        taut=execute(SessionInput.model_validate(cfg),OUT/('real_taut_'+uuid4().hex[:10]))
         self.assertEqual(taut.solver_status,'completed')
         taut_ev=evaluate(SessionInput.model_validate(cfg).task,taut,self.source,registry(),'taut-engineering')
         self.assertEqual(taut_ev.validity,'valid');self.assertFalse(taut_ev.task_success)
@@ -122,7 +133,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
         # Apply the same frozen zero initializer to this already materialized mesh.
         failure_cfg['task']['initializer']=deepcopy(self.cfg['task']['initializer'])
         inp=SessionInput.model_validate(failure_cfg)
-        failed=execute(inp,OUT/'real_failure')
+        failed=execute(inp,OUT/('real_failure_'+uuid4().hex[:10]))
         ev=evaluate(inp.task,failed,self.source,registry(),'engineering-negative-control')
         self.assertEqual(ev.validity,'valid');self.assertFalse(ev.task_success)
         self.assertIn('lateral_response_maximum',[c.name for c in ev.constraints if not c.satisfied])
@@ -139,6 +150,10 @@ class PassiveAcceptanceTests(unittest.TestCase):
         self.assertEqual(evaluate(self.inp.task,backend_result(self.inp,raw),self.source,registry(),'invalid').validity,'invalid')
         raw=deepcopy(self.backend.data.data);raw['episodes'][0]['samples'][15]['force_world_n']=[0.,0.,0.]
         self.assertEqual(evaluate(self.inp.task,backend_result(self.inp,raw),self.source,registry(),'wrong-force').validity,'invalid')
+        raw=deepcopy(self.backend.data.data);raw['physical_binding']['model_identity']='wrong-model'
+        from tools.research.physical_replay import evaluate_playback
+        ev,profile=evaluate_playback(self.cfg,raw,plain(self.source),'wrong-model')
+        self.assertEqual(ev.validity,'invalid');self.assertFalse(profile['physical_source'])
         raw=deepcopy(self.backend.data.data);del raw['episodes'][0]['samples'][0]['qvel_rad_s']
         # Missing required samples stay incomplete, with no task score.
         modified=self.backend.model_copy(update=dict(data=self.backend.data.model_copy(update=dict(data=raw))))

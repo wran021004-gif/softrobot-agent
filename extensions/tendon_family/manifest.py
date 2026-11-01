@@ -310,6 +310,8 @@ EXTENSIONS.extend([
         binding='extensions.tendon_family.passive_execution:PassiveBackend',sources=_PASSIVE_SOURCES,
         capabilities={**_backend.capabilities,'families':['task.passive_response'],'channels':[],
             'controllers':['controller.no_active_control'],
+            'models':{'model.serial_bending_cells':{'implementation_model_id':'mujoco_passive_fixed_payout_v1',
+                'implementation':'MuJoCo articulated dynamics with unilateral fixed payout; no active commands'}},
             'signals':['tip_position','tip_velocity','material_position','material_velocity','joint_position','joint_velocity',
                 'tendon_length','tendon_tension','length_residual'],
             'signal_phases':['post_step'],'signal_specs_resolver':'extensions.tendon_family.passive_execution:observation_specs'}),

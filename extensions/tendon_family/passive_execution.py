@@ -70,7 +70,10 @@ def execute(inp,folder=None):
     p=physics_for(inp);scene=assemble_physical(inp,p)
     scene['control']=dict(tension_execution_mode='passive_fixed_payout_v1')
     folder=Path(folder) if folder else None
-    if folder:folder.mkdir(parents=True,exist_ok=True)
+    if folder:
+        folder.mkdir(parents=True,exist_ok=True)
+        if (folder/'passive.xml').exists() or (folder/'passive_progress.json').exists():
+            raise ValueError('PRESERVE_EXISTING_PASSIVE_EXECUTION_RECOVER_WITHOUT_RELAUNCH')
     started=time.perf_counter()
     native=PassiveModel(p,plain(problem),folder/'passive.xml' if folder else None,scene=scene)
     model=native.model
@@ -78,6 +81,7 @@ def execute(inp,folder=None):
     binding=source_binding(plain(inp))
     raw=dict(kind='passive_dynamic_execution_v1',status='incomplete',physical_binding=binding,
         active_actuators=int(model.nu),joint_count=model.nv,coordinate_order=p['dofs'],tendon_order=[t['entity'] for t in p['tendons']],
+        material_point_bindings=native.points[:-1],tip_binding=native.points[-1],
         payout_lengths_m=native.payout.tolist(),initial_state=dict(qpos_rad=scene['qpos_rad'],qvel_rad_s=scene['qvel_rad_s']),
         episodes=[],physics_steps=0,attempted_steps=0,native_forward_calls=0,model_builds=1,
         timings_s=dict(model_compile=compile_s),mujoco_version=mujoco.__version__,

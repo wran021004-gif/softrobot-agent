@@ -528,12 +528,16 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
         result=backend_result(inp,raw)
         evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
         evaluation=evaluator(inp.task,result,raw_reference,registry(),comparison_identity)
+        bound=raw.get('physical_binding')==source_binding(configuration)
+        if not bound:
+            evaluation=evaluation.model_copy(update=dict(validity='invalid',task_success=None,metrics=[],constraints=[],
+                reason='PASSIVE_PHYSICAL_MODEL_SOURCE_MISMATCH'))
         validity,reason=inspect_evidence(inp.task,raw)
         complete=raw.get('status')=='completed' and all(e.get('complete') for e in raw.get('episodes',[]))
         profile=dict(complete=complete,task=plain(inp.task),official_task_success=evaluation.task_success,
             solver_error_count=int(bool(raw.get('numerical_failure') or raw.get('reason'))),
             dynamic_sampling=validity=='valid',all_load_cases=[e.get('load_condition') for e in raw.get('episodes',[])]==inp.task.goal.data['load_conditions'],
-            physical_source=raw.get('physical_binding')==source_binding(configuration),
+            physical_source=bound,
             evaluation_validity=evaluation.validity,valid_complete_execution=validity=='valid',
             physics_steps=raw.get('physics_steps'),cost=raw.get('cost'),execution_failure_reason=reason,
             simulation_wall_s=raw.get('timings_s',{}).get('total'))

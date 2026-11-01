@@ -184,7 +184,8 @@ def compact_plan_schema(schema, action, study):
         schema['$defs'][name]['required']=[*schema['$defs'][name].get('required',[]),'version']
         properties=schema['$defs'][name]['properties']
         if study.get('canonical_task',{}).get('physical_problem'):
-            for key in ('controller_recipe','controller_solver','control_weights'):properties.pop(key,None)
+            for key in ('controller_recipe','controller_solver'):properties.pop(key,None)
+            if passive_registered(study['canonical_task']):properties.pop('control_weights',None)
         properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
         properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
         lo,hi=space['executable_tendon_count_bounds']
