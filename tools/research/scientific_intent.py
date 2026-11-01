@@ -192,8 +192,9 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             registered=parameter_catalog(spec,candidate)
             groups=sorted({r['parameter_group'] for r in registered if r['selectable']})
             if any(r['selectable'] and r['parameter_id'].endswith('.length_m') for r in registered):groups.append('segment_lengths')
-            for branch in structure['properties']['parameter_group']['anyOf']:
-                if branch.get('type')=='string':branch['enum']=groups
+            if not passive:
+                for branch in structure['properties']['parameter_group']['anyOf']:
+                    if branch.get('type')=='string':branch['enum']=groups
             structure['properties']['parameter_paths']['items']['enum']=[r['parameter_id'] for r in registered if '*' not in r['parameter_id']]
             structure['properties']['parameter_paths']['description']='Choose registered physical parameter IDs from this enum, or a parameter_group. Evidence JSON navigation pointers are not parameter IDs.'
         structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
