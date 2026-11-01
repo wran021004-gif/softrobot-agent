@@ -6,7 +6,7 @@ compiler. Ideal hard equilibrium and native soft tendon limits remain distinct.
 import numpy as np
 import mujoco
 from io import BytesIO
-from .mjcf import compile_xml
+from .mjcf import compile_xml, load_model
 from .contracts import ConstrainedPhysicalProblem
 
 
@@ -40,7 +40,7 @@ class PassiveModel:
             floor_id='floor',floor_z_m=-100.,timestep_s=.001,control=dict(tension_execution_mode='passive_fixed_payout_v1'))
         xml=BytesIO();compile_xml(physics,scene,None,xml)
         if path is not None:path.write_bytes(xml.getvalue())
-        self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf-8'))
+        self.model=load_model(xml=xml.getvalue().decode('utf-8'))
         self.model.opt.iterations=SOLVER['native_iterations'];self.model.opt.tolerance=SOLVER['native_tolerance']
         self.body_ids=[self.model.body(p['entity']).id for p in physics['parts']];self.base=self.model.body('fixed_base').id
         self.points=[material_point(physics,s) for s in problem.monitor_s]+[physics['tip']]

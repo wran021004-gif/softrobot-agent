@@ -1,8 +1,37 @@
 """Named bodies, full COM tensors, explicit tendon sites and tendon actuators."""
 import xml.etree.ElementTree as ET
+import os
+import threading
+from concurrent.futures import Future
 import numpy as np
 from scipy.spatial.transform import Rotation
 from .compiler import rx
+
+
+# Windows' main-thread stack can overflow inside MuJoCo's recursive XML compiler
+# for a legal 216-DoF chain. Only compilation moves threads; physics is unchanged.
+MODEL_LOADER = 'mujoco_xml_loader_v1/' + ('windows_8MiB_compile_thread' if os.name=='nt' else 'calling_thread')
+_compile_stack_lock = threading.Lock()
+
+
+def load_model(*, xml=None, path=None):
+    import mujoco
+    if (xml is None)==(path is None):raise ValueError('EXACTLY_ONE_MUJOCO_XML_SOURCE_REQUIRED')
+    def compile_model():
+        return mujoco.MjModel.from_xml_string(xml) if xml is not None else mujoco.MjModel.from_xml_path(str(path))
+    if os.name!='nt':return compile_model()
+    result=Future()
+    def run():
+        try:result.set_result(compile_model())
+        except BaseException as exc:result.set_exception(exc)
+    with _compile_stack_lock:
+        previous=threading.stack_size(8*1024*1024)
+        try:
+            worker=threading.Thread(target=run,name='mujoco-xml-compile')
+            worker.start()
+        finally:threading.stack_size(previous)
+    worker.join()
+    return result.result()
 
 
 def fmt(x):

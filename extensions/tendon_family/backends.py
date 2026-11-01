@@ -157,7 +157,7 @@ class MujocoFailureSnapshot:
 def playback_tensions(inp, physics, scene, commands, folder):
     """Run a fixed SI tension sequence through the existing candidate MuJoCo scene."""
     import mujoco
-    from .mjcf import compile_xml
+    from .mjcf import compile_xml, load_model
     from tools.platform_registry import registry
 
     started=time.perf_counter()
@@ -165,7 +165,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
         raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_TENSION')
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
-    model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    model=load_model(path=xml);data=mujoco.MjData(model)
     tool_binding=check_rigid_tool_model(inp,model) if inp.task.family=='task.oriented_tracking' else None
     if tool_binding is not None:atomic_json(folder/'rigid_tool_binding.json',tool_binding)
     forces=_bind_mujoco_forces(model,scene)
@@ -346,10 +346,10 @@ class MujocoBackend(SerialBackend):
 
     def solve(self,timeout_s):
         import mujoco
-        from .mjcf import compile_xml
+        from .mjcf import compile_xml, load_model
         p,s=self.physics,self.scene
         start=time.perf_counter(); path=self.folder/'robot.xml'
-        compile_xml(p,s,self.config,path); model=mujoco.MjModel.from_xml_path(str(path))
+        compile_xml(p,s,self.config,path); model=load_model(path=path)
         data=mujoco.MjData(model); pose=mujoco.MjData(model)
         safety=MujocoFailureSnapshot(model,p['identity'],self.folder)
         forces=_bind_mujoco_forces(model,s)

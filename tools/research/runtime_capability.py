@@ -13,12 +13,13 @@ from tools.state_io import digest, read, atomic_json
 
 def environment():
     import mujoco
+    from extensions.tendon_family.mjcf import MODEL_LOADER
     native=Path(mujoco.__file__).parent
     libraries={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(native.iterdir()) if p.suffix in ('.dll','.pyd')}
     return dict(python=str(Path(sys.executable).resolve()),python_version=platform.python_version(),
         python_sha256=hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest(),native_libraries=libraries,
         platform=platform.platform(),machine=platform.machine(),mujoco=mujoco.__version__,
-        loader='MjModel.from_xml_path/main_thread',
+        loader=MODEL_LOADER,
         threads={k:os.environ.get(k) for k in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')})
 
 
@@ -101,5 +102,6 @@ if __name__=='__main__':
     from tools.service_execution import contain_worker_children
     job=contain_worker_children()
     import mujoco
-    model=mujoco.MjModel.from_xml_path(sys.argv[1])
+    from extensions.tendon_family.mjcf import load_model
+    model=load_model(path=sys.argv[1])
     print(dict(nv=model.nv,nu=model.nu),flush=True)

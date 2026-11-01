@@ -1,4 +1,5 @@
 """Read sealed physical trajectories; no dynamics, provider or task re-evaluation."""
+from extensions.tendon_family.mjcf import load_model
 import csv
 import gzip
 import io
@@ -170,7 +171,7 @@ def snapshot_audit(source):
     import hashlib
     import mujoco
     xml=archived(source['source_folder'],source['source_files']['robot.xml'],raw=True)
-    model=mujoco.MjModel.from_xml_string(xml.decode('utf8'))
+    model=load_model(xml=xml.decode('utf8'))
     dimensions={k:int(getattr(model,k)) for k in ('nq','nv','na','nu','neq','nmocap','nuserdata','npluginstate','nbody')}
     required=['qacc_warmstart','qfrc_applied','xfrc_applied']
     for dimension,fields in [('na',['act']),('nu',['ctrl']),('neq',['eq_active']),

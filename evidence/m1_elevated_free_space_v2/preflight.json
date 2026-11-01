@@ -1,0 +1,271 @@
+{
+  "version": "elevated_m1_v2_preflight_v1",
+  "baseline_commit": "02d55a8b2c937bdab8aa40a6276cad4864f1b5b2",
+  "study_id": "m1-elevated-open-topology-20261101-6c70e8a4",
+  "geometry": {
+    "maximum_segment_lengths_m": [
+      0.24,
+      0.2,
+      0.24,
+      0.24,
+      0.24,
+      0.24,
+      0.24,
+      0.24,
+      0.24
+    ],
+    "maximum_chain_length_m": 2.12,
+    "eight_boundary_translation_bound_m": 0.112,
+    "rigid_outer_radius_bound_m": 0.03541186241925155,
+    "additional_route_radius_m": 0.023,
+    "additional_tip_radius_m": 0.014,
+    "total_conservative_mount_to_geometry_distance_m": 2.3044118624192516,
+    "mount_z_m": 2.5,
+    "floor_z_m": -0.02,
+    "minimum_global_floor_clearance_bound_m": 0.21558813758074846,
+    "delta_z_m": 2.35,
+    "scope": "Triangle-inequality floor bound for the frozen inextensible bending-only family and fixed connection prototypes; independent of joint rotations, tendon count and cell partition. Does not validate self collision or arbitrary numerical states."
+  },
+  "tasks": [
+    {
+      "condition_id": "positive_high",
+      "original_identity": "0812e2156f8d07464797ce328368fe6f39b26ac0482e4ebd3423872a8ce3156a",
+      "new_identity": "d930281873aea385e0c8b3d919691f48b430183384f62cfae130bbefcf01b2d1",
+      "original_task_id": "bf7-shared-reach-v1-positive_high",
+      "new_task_id": "m1-elevated-free-space-v2-positive_high",
+      "original_target_m": [
+        0.285,
+        0.035,
+        0.185
+      ],
+      "new_target_m": [
+        0.285,
+        0.035,
+        2.535
+      ],
+      "unchanged_relative_geometry": true,
+      "all_other_scientific_fields_equal": true,
+      "shared_physics_equal": true
+    },
+    {
+      "condition_id": "negative_low",
+      "original_identity": "42b622dae0335dd75e250a42427064240b5cc8d103453b69da848b8327df71d2",
+      "new_identity": "9ee6b08eef77cef6d7e8095b8fe1f7b3445a8c58474be8d39611c1ec6a41f2e2",
+      "original_task_id": "bf7-shared-reach-v1-negative_low",
+      "new_task_id": "m1-elevated-free-space-v2-negative_low",
+      "original_target_m": [
+        0.275,
+        -0.04,
+        0.135
+      ],
+      "new_target_m": [
+        0.275,
+        -0.04,
+        2.485
+      ],
+      "unchanged_relative_geometry": true,
+      "all_other_scientific_fields_equal": true,
+      "shared_physics_equal": true
+    },
+    {
+      "condition_id": "central_high",
+      "original_identity": "af03b7a36652478389f3c6eb7d5743578badc1894899bcc22647c2e98bb2812b",
+      "new_identity": "a7e1ac9fc7ad85298ab3013ffec540c3c4c555bb481513cec176c114d7a5be63",
+      "original_task_id": "bf7-shared-reach-v1-central_high",
+      "new_task_id": "m1-elevated-free-space-v2-central_high",
+      "original_target_m": [
+        0.295,
+        0.0,
+        0.215
+      ],
+      "new_target_m": [
+        0.295,
+        0.0,
+        2.565
+      ],
+      "unchanged_relative_geometry": true,
+      "all_other_scientific_fields_equal": true,
+      "shared_physics_equal": true
+    }
+  ],
+  "physics": {
+    "scope": "Engineering preflight only; no task success, no Provider calls, no formal budget charged",
+    "mujoco": "3.13.0",
+    "precision": "float64",
+    "mount_z_m": 2.5,
+    "delta_z_m": 2.35,
+    "floor_z_m": -0.02,
+    "baseline_checks": [
+      {
+        "label": "three_4",
+        "protocol": "mujoco_convex_native",
+        "steps": 600,
+        "recorded_states": 601,
+        "nv": 72,
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12,
+          "segment_2": 12
+        },
+        "ncon_max": 0,
+        "nefc_max": 0,
+        "warnings": [],
+        "all_finite": true,
+        "state_reset": false,
+        "minimum_geom_bounding_sphere_z_m": 2.1295177093813606,
+        "maximum_tension_error_n": 0.0,
+        "contact_protocol_max_qpos_difference": null,
+        "old_no_contact_prefix_max_qpos_difference": 6.158268339717665e-17,
+        "elapsed_s": 0.5014531000051647
+      },
+      {
+        "label": "three_4",
+        "protocol": "mujoco_frictionless_normal_v1",
+        "steps": 600,
+        "recorded_states": 601,
+        "nv": 72,
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12,
+          "segment_2": 12
+        },
+        "ncon_max": 0,
+        "nefc_max": 0,
+        "warnings": [],
+        "all_finite": true,
+        "state_reset": false,
+        "minimum_geom_bounding_sphere_z_m": 2.1295177093813606,
+        "maximum_tension_error_n": 0.0,
+        "contact_protocol_max_qpos_difference": 0.0,
+        "old_no_contact_prefix_max_qpos_difference": 6.158268339717665e-17,
+        "elapsed_s": 0.4795548000256531
+      },
+      {
+        "label": "three_5",
+        "protocol": "mujoco_convex_native",
+        "steps": 600,
+        "recorded_states": 601,
+        "nv": 72,
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12,
+          "segment_2": 12
+        },
+        "ncon_max": 0,
+        "nefc_max": 0,
+        "warnings": [],
+        "all_finite": true,
+        "state_reset": false,
+        "minimum_geom_bounding_sphere_z_m": 2.1293990644832914,
+        "maximum_tension_error_n": 0.0,
+        "contact_protocol_max_qpos_difference": null,
+        "old_no_contact_prefix_max_qpos_difference": 5.0306980803327406e-17,
+        "elapsed_s": 0.47582200000761077
+      },
+      {
+        "label": "three_5",
+        "protocol": "mujoco_frictionless_normal_v1",
+        "steps": 600,
+        "recorded_states": 601,
+        "nv": 72,
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12,
+          "segment_2": 12
+        },
+        "ncon_max": 0,
+        "nefc_max": 0,
+        "warnings": [],
+        "all_finite": true,
+        "state_reset": false,
+        "minimum_geom_bounding_sphere_z_m": 2.1293990644832914,
+        "maximum_tension_error_n": 0.0,
+        "contact_protocol_max_qpos_difference": 0.0,
+        "old_no_contact_prefix_max_qpos_difference": 5.0306980803327406e-17,
+        "elapsed_s": 0.5322154000168666
+      }
+    ],
+    "native": {
+      "completed": true,
+      "steps": 600,
+      "samples": 31,
+      "elapsed_s": 0.07121289998758584
+    },
+    "independent_replay": {
+      "original_calculate_entry": true,
+      "engineering_reservation_fixture": true,
+      "source_binding_passed": true,
+      "wrong_task_rejected": true,
+      "completed_steps": 600,
+      "samples": 31,
+      "elapsed_s": 0.2644517000298947,
+      "max_qpos_difference": 0.0,
+      "max_native_tip_difference_m": 0.0,
+      "formal_acceptance_credited": false
+    },
+    "total_engineering_physics_steps": 3600
+  },
+  "windows_compile": {
+    "default_process_exit": -1073741571,
+    "default_stack_bytes": 2031616,
+    "shared_loader_compile_stack_bytes": 8388608,
+    "nv": 216,
+    "cells_per_segment": 12,
+    "segments": 9,
+    "physics_steps": 0,
+    "nonphysical_fix": true
+  },
+  "sealed_predecessor": {
+    "study_id": "m1-open-topology-restart-20261101-fefefd8c",
+    "files_verified": 133,
+    "all_unchanged": true
+  },
+  "budgets": {
+    "provider_requests": 80,
+    "protected_provider_requests": 12,
+    "public_operations": 240,
+    "protected_public_operations": 16,
+    "physical_launches": 18,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 16,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "native_control_limits": {
+    "evaluation_requests": 800,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "conservative_new_study_step_bound": 7700400,
+  "preflight_not_scientific_acceptance": true,
+  "implementation_changes": {
+    "shared_compile_function": "extensions/tendon_family/mjcf.py::load_model",
+    "windows_stack_bytes": 8388608,
+    "all_native_replay_and_diagnostic_loaders_migrated": true,
+    "runtime_capability_environment_versioned": true,
+    "physical_parameters_changed": false,
+    "historical_task_files_changed": false,
+    "native_contact_free_gate_retained": true
+  },
+  "offline_validation": {
+    "targeted_tests": 11,
+    "new_tests": 4,
+    "existing_baseline_admission_tests": 7,
+    "provider_requests": 0,
+    "engineering_steps": 3600,
+    "nine_segment_compile_only": true,
+    "fixture_acceptance_is_fabricated": true
+  },
+  "reproduction": {
+    "interpreter": "frozen runtime research_python",
+    "offline_tests": "python -m unittest tests.research.test_elevated_m1 tests.research.test_native_baseline_blocker",
+    "physics_inputs": "Exact sealed candidate configurations and baseline schedules retained privately; never supplied to new Main",
+    "physics_source_file_sha256": "238f427723eb9c336eb64cf8951ae5e8c8782dbcfd72a2c5a229120feaaec395",
+    "private_state_file_sha256": "5442573ffc4e9c040dc6109f13e7a84be0d3edacddcfba6483ae4cc55ad66f88"
+  }
+}

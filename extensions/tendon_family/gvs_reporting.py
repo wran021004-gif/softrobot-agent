@@ -1,4 +1,5 @@
 """Read sealed backend exports and distinguish execution, task and solve results."""
+from extensions.tendon_family.mjcf import load_model
 import gzip
 import json
 from collections import Counter
@@ -192,7 +193,7 @@ def reconstruct_motion(files, rows, target):
     physics = json.loads(files['resolved_physics.json'])
     control = json.loads(files['control_spec.json'])
     basis = ResolvedGVSBasis.model_validate(control['projector']['resolved_basis'])
-    model = mujoco.MjModel.from_xml_string(files['robot.xml'].decode('utf8'))
+    model = load_model(xml=files['robot.xml'].decode('utf8'))
     data = mujoco.MjData(model)
     ids = [model.joint(j).id for j in physics['dofs']]
     qi = model.jnt_qposadr[ids]

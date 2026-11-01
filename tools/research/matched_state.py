@@ -1,4 +1,5 @@
 """Three saved-state, fixed-tension SoRoSim/MuJoCo interval comparisons."""
+from extensions.tendon_family.mjcf import load_model
 import hashlib
 import json
 from pathlib import Path
@@ -46,7 +47,7 @@ def calculate(request, folder):
             len(saved['samples'])!=36 or request['indices']!=[0,15,29] or
             request['resolutions']!=[4,8]):
         raise ValueError('MATCHED_STATE_SOURCE_OR_SCOPE_MISMATCH')
-    model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    model=load_model(path=xml);data=mujoco.MjData(model)
     joints=[model.joint(name).id for name in physics['dofs']]
     qi=model.jnt_qposadr[joints];vi=model.jnt_dofadr[joints]
     names=[t['entity'] for t in physics['tendons']]

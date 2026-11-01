@@ -1,5 +1,6 @@
 """Explicit cross-session imports and compact saved evidence, without a solve."""
 from copy import deepcopy
+from extensions.tendon_family.mjcf import load_model
 import json
 import numpy as np
 from pydantic import Field
@@ -61,7 +62,7 @@ def measured_motion(reader,source):
     import mujoco
     rows=reader.read_file(source,'trajectory.json.gz',[])
     physics=reader.read_file(source,'resolved_physics.json')
-    model=mujoco.MjModel.from_xml_string(reader.store.artifact(source['files']['robot.xml'],raw=True).decode('utf8'))
+    model=load_model(xml=reader.store.artifact(source['files']['robot.xml'],raw=True).decode('utf8'))
     data=mujoco.MjData(model)
     ids=[model.joint(j).id for j in physics['dofs']]
     qi=model.jnt_qposadr[ids];vi=model.jnt_dofadr[ids]

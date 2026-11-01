@@ -1,0 +1,63 @@
+{
+  "extends": "reach_hold.json",
+  "seed": 17,
+  "settling": {
+    "window_s": 0.06,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.03
+  },
+  "task": {
+    "task_id": "m1-elevated-free-space-v2-positive_high",
+    "task_version": "2.0.0",
+    "name": "Elevated M1 v2 shared-structure reach: positive_high",
+    "source": "Elevated free-space derivative of bf7-shared-reach-v1-positive_high; uniform world z translation +2.35 m: mount 0.15 to 2.5 m and target translated equally; floor remains -0.02 m; original physics, initial state, clocks and acceptance retained. Not a reproduction of BF7 v1.",
+    "goal": {
+      "data": {
+        "target_m": [
+          0.285,
+          0.035,
+          2.535
+        ]
+      }
+    },
+    "evaluator": {
+      "parameters": {
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "initializer": {
+      "parameters": {
+        "data": {
+          "qpos_rad": {},
+          "qvel_rad_s": {},
+          "unspecified": "zero"
+        }
+      }
+    },
+    "sampling": {
+      "window_s": [
+        0.0,
+        0.6
+      ]
+    },
+    "timing": {
+      "duration_s": 0.6,
+      "timestep_s": 0.001,
+      "control_period_s": 0.02,
+      "sample_period_s": 0.02
+    },
+    "environment": {
+      "data": {
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            2.5
+          ]
+        }
+      }
+    }
+  }
+}

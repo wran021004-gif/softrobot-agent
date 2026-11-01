@@ -14,7 +14,7 @@ from tools.platform_store import plain
 from .backends import (physics_for, _mujoco_state_failed, MujocoFailureSnapshot,
     _bind_mujoco_forces, _apply_mujoco_forces)
 from .scene import assemble_physical
-from .mjcf import compile_xml
+from .mjcf import compile_xml, load_model
 
 
 class NativeModel:
@@ -27,7 +27,7 @@ class NativeModel:
         self.scene['control']=dict(tension_execution_mode='ideal_tension')
         xml=BytesIO()
         compile_xml(self.physics,self.scene,registry().parse(inp.policy.backend.parameters),xml)
-        self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf8'))
+        self.model=load_model(xml=xml.getvalue().decode('utf8'))
         m=self.model
         self.forces=_bind_mujoco_forces(m,self.scene)
         self.safety=MujocoFailureSnapshot(m,self.physics['identity'])
