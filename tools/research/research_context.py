@@ -1465,7 +1465,7 @@ def research_opportunity_review(host, *, details=False):
         budget=decision_budget(host),
         actions=brief.get('available_research_actions',[]),allowed_plan_actions=current['actions'],mathematical_methods=methods,
         unresolved_questions=[dict(plan=ref,weakening_observation=host.store.artifact(ref)['original_plan'].get('weakening_observation')) for ref in s.get('plans',[])[-3:]],
-        decision_rule='Main chooses continuation, change of hypothesis or STOP. Explain the information value and prerequisites of considered alternatives and why any are declined, with evidence and uncertainty. No passing candidate alone is not a sufficient voluntary STOP reason; unused budget is not a requirement to continue. Preserve user termination, genuine engineering blocks, budget limits and justified scientific closure. Full independent task acceptance precedes design simplicity preferences; no global optimality follows from finite exploration.',
+        decision_rule='Main chooses continuation, change of hypothesis or STOP. Explain the information value and prerequisites of considered alternatives and why any are declined, with evidence and uncertainty. Absence of a passing candidate alone is not a sufficient voluntary STOP reason; unused budget is not a requirement to continue. Preserve user termination, genuine engineering blocks, budget limits and justified scientific closure. Full independent task acceptance precedes design simplicity preferences; no global optimality follows from finite exploration.',
         scope='Read-only discovery. No request admission, formal-read credit, solver run, new authorization or scientific conclusion is created.')
     if details:return review
     from collections import Counter
@@ -1491,7 +1491,7 @@ def research_opportunity_review(host, *, details=False):
         questions=[dict(reference=r['plan'],view='full',pointer='/original_plan/weakening_observation') for r in review['unresolved_questions'][-1:]],
         queries={key:dict(reference=s.get('family_space_reference') or next(iter(s['candidates'].values()),s.get('public_prior_manifest')),
             view='working_set',pointer='/research_opportunities/'+key) for key in ('results','actions','mathematical_methods')},
-        decision_rule='Explain declined alternatives with evidence and uncertainty. No passing witness alone cannot justify STOP; unused budget cannot compel continuation. Preserve user stop, real blocks, resource limits and acceptance before simplicity.')
+        decision_rule='Explain declined alternatives with evidence and uncertainty. Lack of a passing witness alone cannot justify STOP; unused budget cannot compel continuation. Preserve user stop, real blocks, resource limits and acceptance before simplicity.')
 
 
 def agent_decision_brief(host):
