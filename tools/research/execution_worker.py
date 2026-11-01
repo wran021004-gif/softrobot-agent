@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 from tools.service_execution import contain_worker_children
-from tools.state_io import read, atomic_json
+from tools.state_io import read, atomic_json,io_path
 
 
 def execute(request):
@@ -34,7 +34,7 @@ def main():
                 implementation=request['implementation']))
             from tools.research.analysis import calculate
             def checkpoint(name,value):
-                destination=path.with_name('numerical_'+name+'.json')
+                destination=io_path(path.with_name('numerical_'+name+'.json'))
                 if destination.exists():raise ValueError('PRESERVE_NUMERICAL_CHECKPOINT')
                 atomic_json(destination,value)
             checkpoint.directory=path.parent
@@ -53,7 +53,7 @@ def main():
             value['physics_steps_lower_bound']=exc.native_diagnostic['cost']['physics_steps']
         if getattr(exc,'mujoco_diagnostic',None):
             diagnostic=exc.mujoco_diagnostic
-            if not path.with_name('numerical_failure.json').exists():atomic_json(path.with_name('numerical_failure.json'),diagnostic)
+            if not io_path(path.with_name('numerical_failure.json')).exists():atomic_json(path.with_name('numerical_failure.json'),diagnostic)
             value['numerical_failure']=diagnostic
             value['physics_steps_lower_bound']=diagnostic['confirmed_completed_steps']
     atomic_json(path.with_name('result.json'),value)

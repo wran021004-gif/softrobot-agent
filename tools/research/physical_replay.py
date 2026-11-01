@@ -10,7 +10,7 @@ import numpy as np
 
 from schemas.platform import BackendResult, Payload, Signal, SessionInput
 from tools.platform_store import plain, zero, Store
-from tools.state_io import atomic_json, digest, read
+from tools.state_io import atomic_json, digest, read,io_path
 from tools.research.state import state, update, save, guard
 from tools.research.design import verify_candidate
 
@@ -474,7 +474,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     row,_=host.store.reserve(host.run_id,worker_key,digest(request),host.actor,
         {**zero(),'backend_solves':episodes},resources=('backend.family_mujoco',),guard=charge)
     folder=host.store.root/'physical_replay'/row['execution_id']
-    folder.mkdir(parents=True,exist_ok=True)
+    io_path(folder).mkdir(parents=True,exist_ok=True)
     atomic_json(folder/'request.json',request)
     update(host,pending=dict(kind='physical_replay',worker_request_id=worker_key,folder=str(folder),
         implementation=s['freeze'],candidate=candidate,source_reference=source_ref,
@@ -482,7 +482,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     from tools.service_execution import _run_contained
     started=time.perf_counter()
     try:
-        with (folder/'worker.log').open('w',encoding='utf8') as log:
+        with io_path(folder/'worker.log').open('w',encoding='utf8') as log:
             done=_run_contained([s['spec']['runtime']['research_python'],'-m','tools.research.execution_worker',
                 str(folder/'request.json')],log,None)
         boundary=dict(termination_confirmed=True,returncode=done.returncode)
@@ -583,7 +583,7 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
 def recover(host):
     from tools.research_tasks import assemble_acceptance
 
-    p=state(host)['pending'];folder=Path(p['folder'])
+    p=state(host)['pending'];folder=io_path(p['folder'])
     boundary=read(folder/'boundary.json')
     if not boundary['termination_confirmed']:
         raise ValueError('UNKNOWN_PHYSICAL_REPLAY_OUTCOME_RETAINS_RESERVATION')

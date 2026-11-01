@@ -11,7 +11,7 @@ from tools.research.config import ROOT
 from tools.research.core import prepare
 from tools.research.state import state, update
 from tools.research.budget import provider_request_scope, protected, decision_budget
-from tools.research.provider import LiveBoundary, request_settings
+from tools.research.provider import LiveBoundary, request_settings,SupervisorReviewPause
 from tests.research.test_recent_round_tools import run_fixture
 
 
@@ -95,7 +95,7 @@ class P5BudgetTests(unittest.TestCase):
             restored=LiveBoundary(h,httpx.MockTransport(reply),max_model_calls=8)
             await restored.handle_async_request(request)
             self.assertEqual(restored.request_phase,'closeout');restored.consumed()
-            with self.assertRaisesRegex(ValueError,'PROVIDER_REQUEST_LIMIT|COUNT_EXHAUSTED'):
+            with self.assertRaisesRegex(SupervisorReviewPause,'PROVIDER_REQUEST_LIMIT'):
                 await restored.handle_async_request(request)
             await restored.aclose();await boundary.aclose()
         asyncio.run(run())

@@ -1,11 +1,22 @@
 """Shared durable JSON and content identity, independent of any campaign."""
 import hashlib
 import json
+import os
 from pathlib import Path
 
 
+def io_path(path):
+    """Filesystem access only; keep logical paths/identities in saved records."""
+    value=os.fspath(path)
+    if os.name=='nt':
+        value=os.path.abspath(value)
+        if not value.startswith('\\\\?\\'):
+            value=('\\\\?\\UNC\\'+value[2:]) if value.startswith('\\\\') else '\\\\?\\'+value
+    return Path(value)
+
+
 def read(path):
-    return json.loads(Path(path).read_text(encoding='utf-8'))
+    return json.loads(io_path(path).read_text(encoding='utf-8'))
 
 
 def effective_input(configuration):
@@ -26,7 +37,7 @@ def digest(value):
 
 
 def atomic_json(path, value):
-    path = Path(path)
+    path = io_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(value, indent=2, allow_nan=False, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')

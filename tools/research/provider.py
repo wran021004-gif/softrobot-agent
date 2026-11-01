@@ -380,7 +380,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         capacity=capacity_estimate(request.content,expected)
         def guard(db):
             if self.max_model_calls is not None and store.remaining(db=db)['used']['model_calls']>=self.max_model_calls:
-                raise ValueError('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
+                raise SupervisorReviewPause('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
             from tools.research.budget import provider_allowance
@@ -391,7 +391,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         try:
             row,_=store.reserve(run,key,digest(wire),CALLER,{**zero(),'model_calls':1,'wall_s':0.},
                 resources=['provider_request'],inputs=[raw_request],kind='r3_model',guard=guard)
-        except ValueError as exc:
+        except (ValueError,SupervisorReviewPause) as exc:
             record(host,'r3_send_rejected',dict(request=plain(raw_request),sent=False,reason=str(exc)),status='blocked')
             raise
         self.last_request=key

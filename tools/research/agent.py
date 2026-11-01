@@ -1114,12 +1114,14 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         update(host,live_started_unix=time.time(),pilot=pilot)
     if state(host)['spec'].get('rl_evaluation_source') or state(host)['spec'].get('mode')=='engineering_investigation':
         agent.tool_registry.registry.pop('retrieve_context',None)
-    async def before_model(event):
+    def check_provider_pause():
         s=state(host)
         if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls and not s['pilot'].get('unconsumed_response'):
             if s.get('pending') or pending(host) or unmatched(agent.messages):raise ValueError('REQUEST_LIMIT_REQUIRES_SETTLED_FEEDBACK')
-            await agent._session_manager.save_snapshot(agent,is_latest=True)
             raise SupervisorReviewPause('Bounded Provider request limit reached; no further send')
+    async def before_model(event):
+        check_provider_pause()
+        s=state(host)
         if s['research_status']=='stopped':
             event.cancel='Accepted native STOP; no additional request'
             return
@@ -1159,6 +1161,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         guard(host)
         if s['spec'].get('research_decisions'):
             await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
+            check_provider_pause()
         with host.store.read_snapshot():
             if on_demand:
                 for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
@@ -1390,6 +1393,9 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     seen.add(id(cause));cause=cause.__cause__
                 if not isinstance(cause,RequestBoundaryHandoff):raise
                 if isinstance(cause,SupervisorReviewPause):
+                    if state(host).get('pending') or pending(host) or unmatched(agent.messages):
+                        raise ValueError('REQUEST_LIMIT_REQUIRES_SETTLED_FEEDBACK') from exc
+                    await agent._session_manager.save_snapshot(agent,is_latest=True)
                     record(host,'supervisor_pause',dict(boundary='request_feedback',session_id=agent._session_manager.session_id,
                         sdk_message_identity=digest(agent.messages),budgets_preserved=True,next_request_sent=False,
                         budget=decision_packet(host)['research']['budget']))

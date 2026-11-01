@@ -72,7 +72,7 @@ SCIENCE_FILES += ['extensions/math_analysis/mechanism_registry.py','extensions/m
 SCIENCE_FILES += ['extensions/tendon_family/passive_equilibrium.py','extensions/tendon_family/passive_inverse.py']
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
-CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']
+CORE_FILES += ['tools/state_io.py','tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']
 
 
 def science_hashes():

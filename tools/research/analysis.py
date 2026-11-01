@@ -9,7 +9,7 @@ from tools.research.contracts import AnalysisRequest
 from schemas.platform import SessionInput
 from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, ScopedMathematicalClaim, TaskAnalysisRequirement
 from tools.platform_store import plain, zero
-from tools.state_io import digest, atomic_json, read
+from tools.state_io import digest, atomic_json, read,io_path
 from tools.research.design import verify_candidate, source_lengths
 from tools.research.state import state,update,save
 from tools.research.task_constraints import describe_analysis_requirements, model_assessment, check_analysis_applicability
@@ -542,7 +542,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,
         {**zero(),'wall_s':reserve,'tool_calls':int(origin=='engineering_preflight'),'backend_solves':episodes},kind='candidate_analysis',guard=charge)
     folder=host.store.root/'analyses'/row['execution_id']
-    folder.mkdir(parents=True,exist_ok=True)
+    io_path(folder).mkdir(parents=True,exist_ok=True)
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
         task_analysis=plain(requirements),analysis_applicability=applicability)
     if sensitivity_context:request['design_context']=sensitivity_context
@@ -559,14 +559,14 @@ def dispatch(host,query,key,*,guard,origin='model'):
     from sys import executable
     started=time.perf_counter()
     try:
-        with (folder/'worker.log').open('w',encoding='utf8') as log:
+        with io_path(folder/'worker.log').open('w',encoding='utf8') as log:
             done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,None,
                 lifecycle_path=folder/'worker_lifecycle.json')
         boundary=dict(termination_confirmed=True,returncode=done.returncode,timed_out=False,worker_started=True)
     except subprocess.TimeoutExpired as exc:
         boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True,worker_started=True)
     except Exception as exc:
-        boundary=dict(termination_confirmed=False,error=str(exc),worker_started=True if (folder/'worker_lifecycle.json').exists() else None)
+        boundary=dict(termination_confirmed=False,error=str(exc),worker_started=True if io_path(folder/'worker_lifecycle.json').exists() else None)
     boundary['elapsed_s']=time.perf_counter()-started
     atomic_json(folder/'boundary.json',boundary)
     return recover(host)
@@ -575,7 +575,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
 def recover(host):
     s=state(host)
     p=s['pending']
-    folder=Path(p['folder'])
+    folder=io_path(p['folder'])
     if not (folder/'boundary.json').exists() or not read(folder/'boundary.json')['termination_confirmed']:
         raise ValueError('UNKNOWN_ANALYSIS_TERMINATION_RETAINS_RESERVATION; NO_RELAUNCH')
     boundary=read(folder/'boundary.json')

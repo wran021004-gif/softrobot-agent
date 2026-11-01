@@ -4,17 +4,14 @@ import json
 import os
 from pathlib import Path
 from tools.platform_store import plain
-from tools.state_io import digest
+from tools.state_io import digest,io_path
 from tools.research.state import state
 
 INVOCATION_PROMPT='Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.'
 
 def session_storage_path(path):
     """Use Windows extended-length paths for durable SDK snapshot temp files."""
-    value=os.path.abspath(str(path))
-    if os.name!='nt' or value.startswith('\\\\?\\'):return value
-    if value.startswith('\\\\'):return '\\\\?\\UNC\\'+value[2:]
-    return '\\\\?\\'+value
+    return str(io_path(os.path.abspath(str(path))))
 
 
 def session_storage(path):
