@@ -479,6 +479,14 @@ def dispatch(host,query,key,*,guard,origin='model'):
                 sensitivity_context.update(resume=previous['native_dynamics']['optimization'],rejected_sequences=rejected)
             elif q.control_optimization.failed_replays:
                 raise ValueError('FAILED_VALIDATION_REQUIRES_NATIVE_CONTINUATION')
+            from tools.research.native_control import baseline_identity
+            from tools.research.tool_readiness import native_baseline_failures
+            baseline_key=baseline_identity(cfg,q.candidate,point,source)
+            blocked=next((v for v in native_baseline_failures(host,q.candidate) if v['identity']==baseline_key),None)
+            if blocked:
+                return dict(status='blocked',reason='KNOWN_NATIVE_BASELINE_EXECUTION_BLOCKER',
+                    failure=blocked,additional_analysis_evaluations=0,task_acceptance='unmeasured',
+                    guidance='Isolate the recorded shared baseline failure. A different method name, objective or scoring window does not change this rollout. Changed physical inputs, state or frozen execution settings require their own admission; no automatic retry.')
     elif q.execution:
         from tools.research.numerics import execution_update
         source=execution_update(host,q.execution,q.update_id)

@@ -10,6 +10,17 @@ import numpy as np
 from tools.platform_store import plain
 
 
+def baseline_identity(configuration, candidate, point, schedule):
+    """Actual shared first rollout, independent of method/objective/search window."""
+    import mujoco
+    from tools.state_io import digest
+    return digest(dict(candidate=plain(candidate),robot=configuration['robot'],task=configuration['task'],
+        numerical={k:configuration['policy'].get(k) for k in ('backend','discretization','dynamics_model')},
+        engine=mujoco.__version__,point={k:point[k] for k in ('actual_time_s','qpos_rad','qvel_rad_s',
+            'integration_state','native_replay') if k in point},
+        trajectory={k:schedule['trajectory'][k] for k in ('times_s','tensions_n','tendon_order')}))
+
+
 def nonlinear_task_reason(family):
     """Current T1/T2 task boundary shared by admission and its catalog."""
     if family=='task.tracking':
@@ -89,6 +100,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
     if tracking and query.operation!='mujoco_direct_control_v1':
         raise ValueError('TRACKING_NONLINEAR_T1_T2_NOT_APPLICABLE')
     source=context['schedule'];tr=source['trajectory'];times=np.asarray(tr['times_s'])
+    baseline_key=baseline_identity(configuration,binding['candidate'],point,source)
     k=round(point['actual_time_s']/query.protocol.period_s)
     prefix=point.get('prefix_tensions_n')
     if point.get('native_replay'):prefix=[r['tension_n'] for r in point['native_replay']['rows']]
@@ -119,7 +131,14 @@ def calculate(configuration, binding, query, point, requirements, context, check
             outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:],
                 **(dict(capture_speed_after_s=options['holding_start']) if not tracking and not axis_task and not evaluations else {}))
             peak_state=outputs.pop('peak_speed_state',peak_state)
-        except Exception:
+        except Exception as exc:
+            diagnostic=getattr(exc,'mujoco_diagnostic',None) or getattr(exc,'native_diagnostic',None)
+            if metadata['label']=='baseline' and not evaluations and diagnostic:
+                exc.native_baseline_failure=dict(identity=baseline_key,
+                    failure_class='native_baseline_execution_blocker',reason=str(exc),
+                    time_s=diagnostic.get('time_before_call_s',diagnostic.get('time_s')),
+                    stage='initial_baseline_rollout',completed_optimization_evaluations=0,
+                    scientific_infeasibility=False,task_acceptance='unmeasured')
             if checkpoint:checkpoint('native_progress_'+str(len(evaluations)+1).zfill(4),dict(
                 callback_status='incomplete',completed_rollouts=len(evaluations),
                 latest_complete_measure=evaluations[-1] if evaluations else None,

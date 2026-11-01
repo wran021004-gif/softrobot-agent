@@ -23,7 +23,10 @@ def compile_xml(physics, scene, config, path):
     ET.SubElement(root,'option',timestep=str(scene['timestep_s']),gravity=fmt(scene['gravity']),integrator=integrator)
     default=ET.SubElement(root,'default')
     ET.SubElement(default,'joint',limited='false')
-    ET.SubElement(default,'geom',contype='1',conaffinity='2',friction=fmt(friction))
+    # Explicit opt-in: condim=3 with zero coefficients is NOT frictionless in
+    # MuJoCo (minimum friction and pyramidal rows remain). Retain legacy XML.
+    contact = {'condim':'1'} if getattr(config,'contact_model',None)=='mujoco_frictionless_normal_v1' else {}
+    ET.SubElement(default,'geom',contype='1',conaffinity='2',friction=fmt(friction),**contact)
     assets=ET.SubElement(root,'asset'); world=ET.SubElement(root,'worldbody')
     ET.SubElement(world,'light',pos='0 -0.3 1',dir='0 0 -1')
     ET.SubElement(world,'geom',name=scene['floor_id'],type='plane',pos=fmt([0,0,scene['floor_z_m']]),size='1 1 .01',contype='2',conaffinity='1',rgba='.6 .6 .6 1')

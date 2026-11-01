@@ -376,8 +376,14 @@ class MatlabParameters(Contract):
 class MujocoParameters(Contract):
     integrator: Literal['implicitfast'] = 'implicitfast'
     timestep_source: Literal['task.timing.timestep_s'] = 'task.timing.timestep_s'
-    contact_model: Literal['mujoco_convex_native'] = 'mujoco_convex_native'
+    contact_model: Literal['mujoco_convex_native', 'mujoco_frictionless_normal_v1'] = 'mujoco_convex_native'
     friction: tuple[float, float, float] = (0., 0., 0.)
+
+    @model_validator(mode='after')
+    def frictionless_normal(self):
+        if self.contact_model=='mujoco_frictionless_normal_v1' and any(self.friction):
+            raise ValueError('FRICTIONLESS_NORMAL_REQUIRES_ZERO_FRICTION')
+        return self
 
 
 class Data(Contract):

@@ -113,6 +113,17 @@ def observe_failure(host, raw, reference):
             status='engine_start_failed',failure_reference=plain(reference),scientific_infeasibility=False)})
 
 
+def native_baseline_failures(host, candidate):
+    """Existing settled results are the only owner; no cache or blanket method ban."""
+    s=state(host);rows=[]
+    for ref in s.get('analysis_results',[]):
+        raw=host.store.artifact(ref);failure=raw.get('native_baseline_failure')
+        if (failure and raw.get('candidate')==plain(candidate) and raw.get('implementation')==s.get('freeze')
+                and raw.get('status')=='execution_incomplete'):
+            rows.append(dict(reference=ref,**failure))
+    return rows
+
+
 if __name__=='__main__':
     from tools.service_execution import contain_worker_children
     job=contain_worker_children()

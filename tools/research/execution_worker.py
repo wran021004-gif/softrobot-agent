@@ -47,6 +47,7 @@ def main():
             value=execute(request)
     except Exception as exc:
         value=dict(status='execution_incomplete',error=type(exc).__name__,reason=str(exc))
+        if getattr(exc,'native_baseline_failure',None):value['native_baseline_failure']=exc.native_baseline_failure
         if getattr(exc,'native_diagnostic',None):
             value['native_diagnostic']=exc.native_diagnostic
             value['internal_calculations']=[dict(purpose='failed_native_analysis',**exc.native_diagnostic['cost'])]

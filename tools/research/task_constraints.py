@@ -367,6 +367,9 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             item['required_sources']=['Current candidate, minus_candidate and plus_candidate for one legal continuous variable; fixed physical input.']
         elif method in (T1,'mujoco_direct_control_v1'):
             item['required_sources']=['Current structure candidate is not a control source. control_optimization.source must reference a complete candidate/task/channel/time/bounds-bound executable sequence. If missing, use research_plan(initialize_control) baseline and its returned source; then resubmit diagnose. Main chooses method and settings.']
+            from tools.research.tool_readiness import native_baseline_failures
+            item['baseline_execution_admission']=dict(known_failures=native_baseline_failures(host,reference),
+                rule='Exact unchanged failed baseline is blocked before another Worker or mathematical charge, across T1/Direct/objective changes. Other legal baselines remain selectable; contact-free Native applicability is unchanged.')
         elif method==T2:item['required_sources']=['Comparable completed same-task T1 results; original stencil admission applies.']
         item['request_template_query']={**item['detail_query'],'pointer':item['detail_query']['pointer']+'/request_template'}
         item['scientific_scope']=dict(computes=item['description'],
