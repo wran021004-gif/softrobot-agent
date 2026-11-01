@@ -404,6 +404,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     model_effect_observed=any(r['compiled_physical_changes'] for r in records[first:]))
                 if not response['model_effect_observed']:
                     response.update(direction_status='unresolved',suggested_delta=None,selected_record_index=None)
+                    if dynamic:response['derivative_status']='no_observed_physical_effect'
                     response['consistency']['passed']=False
                 responses.append(response)
             evidence['parameter_sensitivities']=responses
@@ -492,7 +493,12 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         evidence.update({k:v for k,v in observed.items() if k!='gaps'})
         evidence['unsupported_conclusions']=[x for x in evidence['unsupported_conclusions'] if x!='full task improvement']
         evidence['unsupported_conclusions'].append('independent task acceptance')
-        evidence.setdefault('derivative_status',[r['derivative_status'] for r in evidence.get('parameter_sensitivities',[])] or 'not_requested')
+        active=[{r['constraint_id'] for r in g['dominant_constraints']} for g in observed['gaps'] if g['comparable']]
+        switch=any(a!=active[0] for a in active[1:])
+        gate_switch=bool(observed['gaps'] and any(g['hard_gate_status']!=observed['gaps'][0]['hard_gate_status'] for g in observed['gaps'][1:]))
+        evidence['maximum_constraint_switch']=switch
+        evidence.setdefault('derivative_status','discontinuous_hard_gate' if gate_switch else 'nonsmooth_maximum_switch' if switch else
+            [r['derivative_status'] for r in evidence.get('parameter_sensitivities',[])] or 'not_requested')
     cost={key:sum(m.cost[key] for m in models) for key in (models[0].cost if models else [])}
     cost.update(evaluation_attempts=attempts,kernel_wall_s=time.perf_counter()-started)
     evidence.update(cost=cost,invalid_local_probes=failures)
@@ -534,7 +540,8 @@ def dynamic_summary(raw, reference):
     return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
         baseline=compact(gaps[0]) if gaps else None,best_valid=compact(gaps[best]) if best is not None else None,
         hard_gates=gates,parameter_changes=direction['parameter_changes'] if direction else [],
-        derivative_status=raw.get('derivative_status','not_requested'),
+        direction_status=raw.get('direction_status','not_requested'),derivative_status=raw.get('derivative_status','not_requested'),
+        maximum_constraint_switch=raw.get('maximum_constraint_switch',False),
         parameter_sensitivities=[{k:r[k] for k in ('parameter_path','derivative_status','maximum_constraint_switch','strict_derivative') if k in r}
             for r in raw.get('parameter_sensitivities',[])],
         **observed,task_acceptance='unmeasured',reference_semantics=raw.get('reference_semantics'),

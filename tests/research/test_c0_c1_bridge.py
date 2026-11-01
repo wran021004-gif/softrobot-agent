@@ -196,10 +196,13 @@ class C1BridgeTests(unittest.TestCase):
                     limit=d['bound'],units=d['unit'],satisfied=value<=d['bound']))
             return dict(validity='valid',task_success=True,constraints=constraints,metrics=[])
         for mode,operation,cap in [('smooth','differentiate',5),('smooth','optimize',6),
-                ('switch','differentiate',5),('switch','optimize',6),('invalid_coarse','differentiate',5),
+                ('switch','differentiate',5),('switch','optimize',6),('two_parameters','differentiate',10),('invalid_coarse','differentiate',5),
                 ('invalid_best','differentiate',5),('contact_best','differentiate',5)]:
+            paths=[row['parameter_id']]
+            if mode=='two_parameters':paths.append(next(r['parameter_id'] for r in parameters(spec,candidate)
+                if r['mechanism_differentiation']['supported'] and r['parameter_id']!=row['parameter_id']))
             study=MechanismStudy(operation=operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
-                parameter_paths=[row['parameter_id']],point_semantics='frozen_task_initial_state',
+                parameter_paths=paths,point_semantics='frozen_task_initial_state',
                 effect_semantics='finite_time_task_response',max_evaluations=cap)
             q=AnalysisRequest(candidate=c,operation='mechanism_structure_v1',model_source='mujoco',
                 operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],mechanism_study=study)
@@ -233,6 +236,7 @@ class C1BridgeTests(unittest.TestCase):
             self.assertEqual(evidence['structure_direction']['generation_handoff']['tool'],'research_plan')
             self.assertFalse(evidence['structure_direction']['formal_candidate_created'])
             self.assertFalse(evidence['parameter_sensitivities'][0]['strict_derivative'])
+            if mode=='two_parameters':self.assertFalse(evidence['parameter_sensitivities'][1]['consistency']['passed'])
             if operation=='optimize':self.assertIn('Powell',evidence['local_search']['method'])
         study=study.model_copy(update=dict(operation='inspect',parameter_paths=[],max_evaluations=1))
         q=q.model_copy(update=dict(mechanism_study=study));context=prepare_context(spec,candidate,study,[])
@@ -242,3 +246,47 @@ class C1BridgeTests(unittest.TestCase):
         self.assertEqual(result['status'],'execution_incomplete')
         self.assertEqual(result['structure_research']['cost']['model_builds'],1)
         self.assertIsNone(result['structure_research']['records'][0]['observation']['task_gap']['signed_task_gap'])
+
+        # Execute the original compiler/worker/SDK path with fabricated physics.
+        from tools.research import core,analysis
+        from tools.state_io import read,atomic_json
+        from schemas.platform_analysis import TaskAnalysisRequirement
+        from tests.research.test_p63g3_action_handoff import diagnosis
+        from tests.research.test_recent_round_tools import run_fixture
+        from tests.research.test_information_flow import packet
+        import json,re
+        mode='switch';h,c=prepared_host(wire=True,budget=10,mathematical_budget=5)
+        def worker(command,log,timeout,**kw):
+            req=read(Path(command[-1]));query=AnalysisRequest.model_validate(req['query'])
+            candidate=h.store.artifact(c);context=prepare_context(state(h)['spec'],candidate,query.mechanism_study,[])
+            with patch('extensions.tendon_family.passive_execution.execute',side_effect=execute),patch('extensions.reference.passive_response.task_metrics',side_effect=measure):
+                value=calculate(candidate['configuration'],req['binding'],query,dict(actual_time_s=0.),context)
+            value=analysis.scoped_result(value,TaskAnalysisRequirement.model_validate(req['task_analysis']),req['analysis_applicability'],query)
+            atomic_json(Path(command[-1]).with_name('result.json'),value)
+            return SimpleNamespace(returncode=0)
+        question=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='differentiate',
+            effect_semantics='finite_time_task_response',target='finite_time_task_violation',
+            operating_point='frozen_task_initial_state',control_treatment='no_active_control',
+            physical_problem='passive_unilateral_equilibrium',load_condition='all_frozen_conditions',
+            parameter_paths=[row['parameter_id']],requested_budget=5))
+        with patch('tools.service_execution._run_contained',side_effect=worker),patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')):
+            wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),
+                ('research_plan',diagnosis(c,'mechanism_research')),('research_analysis',question),None])
+        compact=packet(wires[-1])['mathematical_research']['latest_result']['structure_research']
+        self.assertEqual(compact['candidate_improvement_status'],'observed_full_task_improvement')
+        self.assertAlmostEqual(compact['baseline']['signed_task_gap'],.2)
+        self.assertAlmostEqual(compact['best_valid']['signed_task_gap'],.195)
+        self.assertEqual(compact['derivative_status'],'nonsmooth_maximum_switch')
+        self.assertEqual(compact['hard_gates'][0]['baseline_passed'],True)
+        for wire in wires:
+            text=json.dumps(wire)
+            self.assertIsNone(re.search(r'(?<![0-9a-f])[0-9a-f]{40,64}(?![0-9a-f])',text,re.I))
+            for private in ('artifact_id','dynamic_metrics','dynamic_task_gaps','x-research-reference-choices'):
+                self.assertNotIn(private,text)
+        self.assertEqual(state(h)['mathematical_evaluations'],5)
+        self.assertEqual(len(state(h)['candidates']),1)
+        self.assertFalse(state(h).get('physical_replays'))
+        atomic_json(Path(__file__).resolve().parents[2]/'runs/c11_validation/synthetic_wire.json',
+            dict(scope='Synthetic SDK/Mock HTTP evidence, no engine or Provider',wire=wires[-1]))
+        again=packet(run_fixture(h,[None])[-1])['mathematical_research']['latest_result']
+        self.assertNotIn('structure_research',again)
