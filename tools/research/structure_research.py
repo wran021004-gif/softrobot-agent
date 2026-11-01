@@ -13,6 +13,14 @@ SCALAR_DIRECTION_TARGETS=('mass_balance_residual','total_mass','body_inertia_tra
     'directional_tendon_row_residual','motion_decoupling','finite_time_task_violation')
 
 
+class MechanismBudgetError(ValueError):
+    """Original admission failure with the cost of Main's actual question."""
+    def __init__(self, minimum, dependencies):
+        super().__init__('MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires '+str(minimum))
+        self.minimum_evaluations=minimum
+        self.cost_dependencies=dependencies
+
+
 def parameters(spec, candidate):
     if not spec.get('family_space') or not candidate.get('generation_version'):return []
     from tools.research.optimal_capability import family_analysis_parameters
@@ -122,9 +130,13 @@ def prepare_context(spec, candidate, study, comparisons):
     plans=[stencil(row) for row in selected]
     minimum=(1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
         1+sum(len(set(p['coordinates'])) for p in plans)+int(len(plans)==2)+int(study.operation=='optimize'))
-    if study.max_evaluations<minimum:raise ValueError('MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires '+str(minimum))
+    cost_dependencies=dict(operation=study.operation,baseline_evaluations=1,
+        parameter_stencil_evaluations={row['parameter_id']:len(set(plan['coordinates'])) for row,plan in zip(selected,plans)},
+        joint_check_evaluations=int(len(plans)==2),local_search=study.operation=='optimize',
+        rule='Actual legal stencil coordinates depend on selected parameter domains and operating values; two paths add a joint check; optimize adds a trial and uses the requested cap.')
+    if study.max_evaluations<minimum:raise MechanismBudgetError(minimum,cost_dependencies)
     result=dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
-        minimum_evaluations=minimum,evaluations=study.max_evaluations if study.operation=='optimize' else minimum,
+        minimum_evaluations=minimum,evaluations=study.max_evaluations if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
     if dynamic:
         task=candidate['configuration']['task'];episodes=len(task['goal']['data']['load_conditions'])

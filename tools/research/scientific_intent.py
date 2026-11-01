@@ -363,14 +363,14 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
         from jsonschema import Draft202012Validator
         schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
-        result=(compile_mechanism(host,expanded['structure'],tool_use_id=tool_use_id,v4=True) if q.domain=='structure' else
-            compile_v1(host,expanded['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload))
-        if result['status']!='ready':return result
         errors=list(Draft202012Validator(schema).iter_errors(payload))
         if errors:
             return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
                 dict(field='.'.join(map(str,e.absolute_path)),reason=e.message) for e in errors],
                 scientific_execution_started=False)
+        result=(compile_mechanism(host,expanded['structure'],tool_use_id=tool_use_id,v4=True) if q.domain=='structure' else
+            compile_v1(host,expanded['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload))
+        if result['status']!='ready':return result
         from tools.research.state import save
         result['intent_compilation']=save(host,dict(version='scientific_intent_compilation_v1',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference'],raw_main_input=deepcopy(payload),
@@ -613,7 +613,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     from tools.research.task_constraints import mathematical_method_view
     from tools.research.design import verify_candidate
     from tools.research.agent import bind_selected_analysis_request
-    from tools.research.structure_research import METHOD,parameters,prepare_context,group_matches
+    from tools.research.structure_research import METHOD,parameters,prepare_context,group_matches,MechanismBudgetError
     try:q=(ScientificStructureV4 if v4 else MechanismQuestionV2).model_validate(payload)
     except ValidationError as exc:
         return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V2_INPUT',issues=[
@@ -729,10 +729,18 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         point_semantics=q.operating_point,max_evaluations=budget,local_radius_fraction=q.local_radius_fraction,
         comparison_candidates=q.comparison_candidates)
     try:context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
+    except MechanismBudgetError as exc:
+        return feedback('blocked',str(exc),minimum_evaluations=exc.minimum_evaluations,
+            requested_evaluations=budget,remaining_evaluations=spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0),
+            cost_dependencies=exc.cost_dependencies,
+            next_choice='Main must reduce the question or choose a legal cap within the remaining budget; no automatic increase.')
     except ValueError as exc:return feedback('blocked' if str(exc).startswith('MECHANISM_QUESTION_BUDGET') else 'unsupported',str(exc))
     needed=context['evaluations']
     if spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)<needed:
-        return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed)
+        return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed,
+            minimum_evaluations=context['minimum_evaluations'],requested_evaluations=budget,
+            remaining_evaluations=spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0),
+            cost_dependencies=context['cost_dependencies'],next_choice='Main must reduce the question to fit the remaining budget.')
     compiled={**point_fields,'mechanism_study':plain(study)}
     if q.tensions_n is not None:compiled['native']=dict(tensions_n=q.tensions_n)
     full=bind_selected_analysis_request(host,compiled,tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)

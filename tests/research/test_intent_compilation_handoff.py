@@ -44,6 +44,45 @@ class IntentCompilationHandoffTests(unittest.TestCase):
             p=patch(name,side_effect=AssertionError('NO_REAL_SCIENTIFIC_WORKER_OR_INTEGRATION'))
             p.start();self.addCleanup(p.stop)
 
+    def test_raw_selected_schema_rejects_before_compilation_or_binding(self):
+        h,c=integrated_host()
+        q=structure_question();q['structure'].update(operation='inspect',requested_budget=1,
+            parameter_paths=['/parameters'])
+        before=h.store.events(h.run_id)
+        with patch('tools.research.scientific_intent.compile_mechanism',side_effect=AssertionError('RAW_SCHEMA_FIRST')):
+            result=compile_question(h,q,tool_use_id='raw-schema-first')
+        self.assertEqual(result['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
+        self.assertEqual(h.store.events(h.run_id),before)
+        self.assertFalse(state(h)['analysis_results'])
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+
+    def test_actual_question_cost_feedback_preserves_main_cap_and_shared_budget(self):
+        from tools.research.contracts import MechanismStudy
+        from tools.research.structure_research import prepare_context
+        h,c=integrated_host();spec=state(h)['spec'];candidate=h.store.artifact(c)
+        q=structure_question();body=q['structure']
+        for paths in (['segments.0.length_m'],['segments.0.length_m','segments.1.length_m']):
+            body['parameter_paths']=paths
+            expected=prepare_context(spec,candidate,MechanismStudy(operation='differentiate',
+                target=body['target'],parameter_paths=paths,point_semantics=body['operating_point'],max_evaluations=64),[])
+            body['requested_budget']=4
+            rejected=compile_question(h,q,tool_use_id='too-small')
+            self.assertEqual(rejected['minimum_evaluations'],expected['minimum_evaluations'])
+            self.assertEqual(rejected['requested_evaluations'],4)
+            self.assertEqual(rejected['remaining_evaluations'],spec['budgets']['mathematical_evaluations'])
+            self.assertEqual(rejected['cost_dependencies'],expected['cost_dependencies'])
+            self.assertIn('Main must',rejected['next_choice'])
+            self.assertEqual(body['requested_budget'],4)
+            body['requested_budget']=expected['minimum_evaluations']
+            ready=compile_question(h,q,tool_use_id='main-chosen-legal-cap')
+            self.assertEqual(ready['status'],'ready',ready)
+            self.assertEqual(ready['request']['mechanism_study']['max_evaluations'],body['requested_budget'])
+        update(h,mathematical_evaluations=spec['budgets']['mathematical_evaluations']-2)
+        rejected=compile_question(h,q,tool_use_id='shared-budget')
+        self.assertEqual(rejected['reason'],'SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
+        self.assertEqual(rejected['remaining_evaluations'],2)
+        self.assertFalse(state(h)['analysis_results'])
+
     def test_control_preparation_preserves_choice_and_actual_sdk_reaches_original_t1(self):
         h,c=integrated_host();seen=[]
         def worker(command,log,timeout,**kw):
