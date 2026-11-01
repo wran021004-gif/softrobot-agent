@@ -1,0 +1,581 @@
+{
+  "version": "m1_worker_persistence_restart_v1",
+  "study_id": "m1-open-topology-restart-20261101-fefefd8c",
+  "status": "stopped",
+  "identity": {
+    "resolved": "9d8eb242a4d6168bd6def4b1e4ca354333848eeabf5562e2eb8ef725ac613212",
+    "implementation": "c4de879c552de66b2bf9e95baeb68f8eeb4517e5",
+    "approval_scope": "16282ecbc25a3dfb93855a5acfc7b85fe90cd4d515d00c5e5c27ccdf601472ad",
+    "scientific_scope": "34dc6e0990ae1ee01a47007b18f47e8ec9631ebaac48421bd891455266d938ea",
+    "approval_event_reference": {
+      "artifact_id": "d427762a1b32907d02471d3989deacbdd9633a6bca1270f62aaa1e948381180d",
+      "media_type": "application/json"
+    }
+  },
+  "original_gate_verified": true,
+  "production_and_scientific_hashes_match": true,
+  "first_checkpoint": {
+    "study_id": "m1-open-topology-restart-20261101-fefefd8c",
+    "requests": 8,
+    "http_200": 8,
+    "cli_exit": 0,
+    "normal_supervisor_pause": true,
+    "rejected_sends": 0,
+    "numerical_attempt_status": "execution_incomplete",
+    "numerical_error": "FatalError",
+    "numerical_reason": "FactorizeHessian: rank-deficient sparse Hessian",
+    "actual_native_progress": {
+      "callback_status": "incomplete",
+      "completed_rollouts": 0,
+      "cost": {
+        "forward_evaluations": 19,
+        "kernel_wall_s": 0.06485589995281771,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "physics_step_attempts": 169,
+        "physics_steps": 168,
+        "rollouts": 1
+      },
+      "latest_complete_measure": null
+    },
+    "physics_steps_lower_bound": 168,
+    "files": [
+      "boundary.json",
+      "numerical_failure.json",
+      "numerical_native_progress_0000.json",
+      "numerical_native_progress_0001.json",
+      "request.json",
+      "result.json",
+      "worker.log",
+      "worker_lifecycle.json",
+      "worker_runtime.json"
+    ],
+    "pending": null
+  },
+  "final_action": "stop",
+  "final_disposition_reference": {
+    "artifact_id": "567a0571051b6133d36184a8be8ab21ca51e38a91ce2ab92f8c78ef7d0f64e4f",
+    "media_type": "application/json"
+  },
+  "stop_explanation": "Main chose STOP after repeated incomplete control computations, local-only evidence and one remaining mathematical evaluation; no candidate had an independently accepted task witness. Provider/public reserves had not been reached. This is Main judgement, not a proof that remaining resources cannot possibly produce a solution.",
+  "selected": null,
+  "requests": {
+    "total": 40,
+    "purpose_counts": {
+      "conversation": 35,
+      "reporter": 5
+    },
+    "http_status_counts": {
+      "200": 40
+    },
+    "rejected_sends": 0
+  },
+  "budget": {
+    "caps": {
+      "provider": 72,
+      "provider_protected": 12,
+      "public_operations": 233,
+      "public_protected": 16,
+      "mathematics": 15,
+      "independent_replay": 18
+    },
+    "used": {
+      "provider": 40,
+      "public_operations": 35,
+      "mathematics": 14,
+      "independent_replay": 0
+    },
+    "remaining": {
+      "provider": 32,
+      "public_operations": 198,
+      "mathematics": 1,
+      "independent_replay": 18
+    },
+    "predecessor_retained": {
+      "provider": 8,
+      "public_operations": 7,
+      "mathematics": 1,
+      "independent_replay": 0,
+      "physics_steps_confirmed": 0
+    },
+    "window_cumulative": {
+      "provider": 48,
+      "public_operations": 42,
+      "mathematics": 15,
+      "independent_replay": 0
+    },
+    "earlier_separate_costs": {
+      "formal_provider_requests": 43,
+      "mathematical_evaluations": 1,
+      "native_steps": 19200,
+      "engineering_provider_requests": 8
+    },
+    "new_conservative_physics_bound": 7219800,
+    "cumulative_window_physics_bound": 7700400,
+    "no_refunds": true
+  },
+  "structures": [
+    {
+      "reference": {
+        "artifact_id": "5e383501347dc628d98f479764fa0916b2478faafa6465831606b7a5bcde154e",
+        "media_type": "application/json"
+      },
+      "segments": 3,
+      "tendons": 4,
+      "condition": null,
+      "parent_structure": null,
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "segments": 3,
+      "tendons": 5,
+      "condition": null,
+      "parent_structure": null,
+      "task_acceptance": "unmeasured"
+    }
+  ],
+  "analysis_statuses": {
+    "execution_incomplete": 6,
+    "computed": 3,
+    "not_applicable": 1
+  },
+  "analyses": [
+    {
+      "reference": {
+        "artifact_id": "83f59eaaa00b701eb406adf9305e8a53dd7e89d1670f8fcac8e01667aa1ebe3d",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "5e383501347dc628d98f479764fa0916b2478faafa6465831606b7a5bcde154e",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1130234999582171,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.06485589995281771
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "17df17a9f3aa34cb54509d189481d3c48384bafc0e6736159b06500d81d2292c",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "5e383501347dc628d98f479764fa0916b2478faafa6465831606b7a5bcde154e",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_direct_control_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1063770999899134,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.058036700007505715
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "fc0869b62fde6c15e3ee880af77c910a6c2ab3780ebb63e6f7f08f01ac706ea4",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_nonlinear_task_capability_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.148786200035829,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.06036210001911968
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "144bae44c485b56d4f2e385a78f542172ebb34cac725454747d7be10398a91cf",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_direct_control_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.0919236000045203,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.059607099974527955
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "05cd34e11ba08c13749822d826468591ccc49d08b8ae42014de4c364a01e6371",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mechanism_structure_v1",
+      "structure_operation": "inspect",
+      "status": "computed",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1026624000514857,
+      "actual_cost": {
+        "evaluation_attempts": 1,
+        "model_builds": 1,
+        "forward_evaluations": 4,
+        "mechanics_evaluations": 1,
+        "physics_steps": 0,
+        "physics_step_attempts": 0,
+        "rollouts": 0,
+        "kernel_wall_s": 0.04059029999189079
+      },
+      "local_observation": {
+        "status": "computed",
+        "value": [
+          211.78505375899167,
+          1.153895089952652e-08,
+          7.86804624479752e-25
+        ],
+        "unit": "m/s^2/N"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "b2b3058a6588f60b76545a0a6e6cd4fef289b61b2f19344cac91fa0009bc1b0c",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mechanism_structure_v1",
+      "structure_operation": "differentiate",
+      "status": "not_applicable",
+      "charged_evaluations": 5,
+      "charged_numerical_s": 1.5340160999912769,
+      "actual_cost": {
+        "evaluation_attempts": 3,
+        "model_builds": 2,
+        "forward_evaluations": 7,
+        "mechanics_evaluations": 2,
+        "physics_steps": 0,
+        "physics_step_attempts": 0,
+        "rollouts": 0,
+        "kernel_wall_s": 0.4399234999436885
+      },
+      "local_observation": {
+        "status": "computed",
+        "value": 7.86804624479752e-25,
+        "unit": "m/s^2/N"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "349ef28681fe227bcd58768d58b39feeb51d83e14d3368d49bdbae635111497b",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mechanism_structure_v1",
+      "structure_operation": "inspect",
+      "status": "computed",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1064698999980465,
+      "actual_cost": {
+        "evaluation_attempts": 1,
+        "model_builds": 1,
+        "forward_evaluations": 4,
+        "mechanics_evaluations": 1,
+        "physics_steps": 0,
+        "physics_step_attempts": 0,
+        "rollouts": 0,
+        "kernel_wall_s": 0.04183599998941645
+      },
+      "local_observation": {
+        "status": "computed",
+        "value": [
+          -821.493236836549,
+          821.4932368365975
+        ],
+        "unit": "m/s^2"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "ba3835714e50f8aa5fd90c3c7abcf38e3c4d43e17011442e6e70f100c19c8b19",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_direct_control_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1481231999932788,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.0620910000288859
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "7905b33042fe5156e910f7ef97c60f620a7b20c670bb96e32b3eeaaa93b38e85",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mechanism_structure_v1",
+      "structure_operation": "inspect",
+      "status": "computed",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.1431628999998793,
+      "actual_cost": {
+        "evaluation_attempts": 1,
+        "model_builds": 1,
+        "forward_evaluations": 4,
+        "mechanics_evaluations": 1,
+        "physics_steps": 0,
+        "physics_step_attempts": 0,
+        "rollouts": 0,
+        "kernel_wall_s": 0.04343459999654442
+      },
+      "local_observation": {
+        "status": "computed",
+        "value": [
+          -881.843227575919,
+          862.2232275758873
+        ],
+        "unit": "m/s^2"
+      },
+      "task_acceptance": "unmeasured"
+    },
+    {
+      "reference": {
+        "artifact_id": "a062ba25b07fdeda14c9a4806a47b07bf95fed50eda353bb729f36ea3aa5cee1",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a46f69bdf4eb6f0b0ef2dc81e1c15aae9ccd3b3a62bb255473141646c89002df",
+        "media_type": "application/json"
+      },
+      "operation": "mujoco_direct_control_v1",
+      "structure_operation": null,
+      "status": "execution_incomplete",
+      "charged_evaluations": 1,
+      "charged_numerical_s": 1.176608000008855,
+      "actual_cost": {
+        "model_builds": 1,
+        "forward_evaluations": 19,
+        "mechanics_evaluations": 0,
+        "physics_steps": 168,
+        "physics_step_attempts": 169,
+        "rollouts": 1,
+        "kernel_wall_s": 0.06322730000829324
+      },
+      "local_observation": {},
+      "task_acceptance": "unmeasured"
+    }
+  ],
+  "actual_mathematical_cost": {
+    "model_builds": 11,
+    "forward_evaluations": 133,
+    "mechanics_evaluations": 5,
+    "physics_steps": 1008,
+    "physics_step_attempts": 1014,
+    "rollouts": 6,
+    "kernel_wall_s": 0.9339644999126904,
+    "evaluation_attempts": 6
+  },
+  "cost_semantics": {
+    "rollouts": "Six started, all incomplete; zero completed rollouts",
+    "evaluation_attempts": "Mechanism probes only; six native partial callback attempts are accounted separately",
+    "numerical_s_charged": 11.671152900031302
+  },
+  "replays": [],
+  "actions": {
+    "public_feedback": 35,
+    "valid_tools": 31,
+    "rejected_or_blocked": 4,
+    "valid_tools_per_provider": 0.775,
+    "completed_structure_generation": 2,
+    "completed_initializations": 2,
+    "completed_mathematical_research": 3,
+    "completed_generation_initialization_math_per_provider": 0.175,
+    "metric_definition": "Valid tools include reads/routing/diagnosis and admitted incomplete mathematics. The completed-action metric counts only generated structures, initialized controls and computed mathematical results; neither metric establishes task acceptance."
+  },
+  "model_action_errors_and_preconditions": [
+    {
+      "tool": "research_plan",
+      "action": "diagnose",
+      "status": "error",
+      "findings": [
+        {
+          "status": "rejected",
+          "reason": "Additional properties are not allowed ('selected_candidate' was unexpected)",
+          "error_code": "TOOL_SCHEMA_ADDITIONALPROPERTIES"
+        }
+      ]
+    },
+    {
+      "tool": "research_analysis",
+      "action": "structure",
+      "status": "success",
+      "findings": [
+        {
+          "status": "needs_choice",
+          "reason": "FROZEN_INITIAL_STATE_CANNOT_USE_SAVED_STATE_SOURCE"
+        }
+      ]
+    },
+    {
+      "tool": "research_plan",
+      "action": "diagnose",
+      "status": "error",
+      "findings": [
+        {
+          "status": "rejected",
+          "reason": "'DIAGNOSE' was expected",
+          "error_code": "TOOL_SCHEMA_CONST"
+        }
+      ]
+    },
+    {
+      "tool": "research_analysis",
+      "action": "structure",
+      "status": "success",
+      "findings": [
+        {
+          "status": "blocked",
+          "reason": "MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires 10"
+        }
+      ]
+    }
+  ],
+  "knowledge": {
+    "reads": 1,
+    "plans_marking_adopted": 11,
+    "observed_use": "Procedural adoption: distinguish bounded numerical failure from infeasibility and require fresh candidate-bound checks; no historical winning design supplied."
+  },
+  "main_evidence_use": {
+    "plans_citing_new_math": 8,
+    "revised_hypotheses_after_completed_math": true,
+    "structure_changed_after_incomplete_control_results": true,
+    "structure_changed_after_completed_mechanism_results": false,
+    "completed_reoptimized_controls": 0
+  },
+  "recovery": {
+    "pending": null,
+    "unsealed_receipts": 0,
+    "unknown_provider_outcomes": 0,
+    "supervisor_pauses": 3,
+    "sdk_restore_verified": 1
+  },
+  "repeated_numerical_failure": {
+    "engine": "MuJoCo 3.13.0",
+    "location": "native.sequence -> mj_step",
+    "shared_path": "native_control.calculate -> NativeModel.rollout_sequence",
+    "initial_baseline_failed_before_completed_optimization": true,
+    "all_pre_call_warnings_zero": true,
+    "all_pre_call_constraints": {
+      "ncon": 0,
+      "nefc": 0
+    },
+    "exact_internal_failure_state_saved": false,
+    "root_cause": "not located; sparse Newton Hessian factorization error confirmed",
+    "supervision_limitation": "Later repeated baseline attempts added no complete trajectory evidence; isolate the common numerical failure earlier"
+  },
+  "disclosure": {
+    "raw_store": false,
+    "complete_provider_wire": false,
+    "control_trajectories": false,
+    "credentials": false
+  },
+  "predecessor_manifest_preserved": {
+    "file_count": 23,
+    "all_sha256_match": true
+  },
+  "historical_STOP_stores_preserved": [
+    {
+      "study_id": "m1-knowledge-assisted-v4-20261101-45235eda",
+      "status": "stopped",
+      "file_count": 13,
+      "all_sha256_match": true
+    },
+    {
+      "study_id": "m1-knowledge-assisted-v4-restart-20261101-4399be2a",
+      "status": "stopped",
+      "file_count": 218,
+      "all_sha256_match": true
+    }
+  ],
+  "earlier_zero_run_study_preserved": {
+    "study_id": "m1-knowledge-assisted-v4-intent-20261101-49b305ab",
+    "provider_requests": 0,
+    "mathematical_evaluations": 0,
+    "independent_replays": 0
+  },
+  "private_archive": {
+    "file_count": 133,
+    "sdk_files": 37,
+    "complete_local_manifest": true
+  }
+}
