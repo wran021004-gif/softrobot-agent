@@ -31,8 +31,8 @@ Candidate-specific mathematical and execution admission remains mandatory.
 
 Existing Schema projection already reads these executable ranges. The added
 offline fixture checks all 63 topology pairs in the generation Schema and real
-generation, method discovery, control initialization, T1 compilation and Replay
-source binding for (1,1), (3,4), and (9,7). These checks establish interface
+generation, method discovery, control initialization, T1 compilation and original
+Replay dispatch with fabricated motion for (1,1), (3,4), and (9,7). These checks establish interface
 admission only, not numerical stability or task feasibility across the domain.
 
 The frozen instructions prioritize complete three-condition task acceptance,
@@ -80,6 +80,36 @@ and bindings remain in its original Store. The expanded scientific scope gets a
 new Study ID; it must be prepared/bound to committed code and reviewed for exact
 identity-bound authorization before the first eight-request formal checkpoint.
 Engineering probe authorization is not formal M1 scientific authorization.
+
+New Study: `m1-knowledge-assisted-v4-open-topology-20261101-75f02c6d`, prepared and
+bound to `78ade6e23456764b6ad07fc14fd8ef42be7db221`. Resolved identity:
+`c110b015e939c64411a29df56bf22f1a054de2f2c0c2103943eca222dee0d0b0`.
+Reviewed approval scope identity:
+`e1013397eee54528a611fc32592ac0de6d79c2bc04a6488973be340c6936ed3e`.
+No formal authorization event, Provider inference or scientific execution was
+created. Later commits change tests/documentation/evidence only; production
+source matches this frozen implementation.
+
+Sixteen focused tests ultimately pass: the original ten, the strengthened M1
+condition check, two additional intent/cost regressions, the open-topology
+regression, and two existing homogeneous/heterogeneous joint SELECT contracts.
+An initial run used a different interpreter lacking `tokenizers`; the affected
+SDK tests were rerun with the frozen research interpreter. Direct's test now
+asserts early selected-Schema rejection of an unsupported T1 choice; execution
+support was not broadened. No real mathematical Worker or integration ran.
+
+Read-only runtime checks returned health/catalog HTTP 200 and the exact frozen
+model was present. All fourteen deployed source files on disk match the frozen
+commit. The running process command line could not be independently inspected
+because process inventory access was denied. A first five-second catalog read
+timed out; the normal bounded forty-five-second metadata check succeeded. No
+inference request, service restart or transport policy change was made.
+
+M2 needs a fresh three-load configuration (the public template lists two), V4
+policies, supported method grants and its own finite budget/authorization. M5
+needs a fresh BF5 configuration preserving position and directed-axis acceptance,
+backend 1.3/tool binding, existing Direct V4 capability and independent finite
+budget/authorization. Neither Study was created or run here.
 
 Only derived identities, counts, code and fixture tests belong in public evidence.
 Raw Stores, Provider wires, credentials and private trajectories remain local.
