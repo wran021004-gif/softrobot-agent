@@ -38,6 +38,8 @@ class Stage25ArchitectureTests(unittest.TestCase):
         Draft202012Validator.check_schema(schema);validator=Draft202012Validator(schema)
         ids=schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']['enum']
         self.assertEqual(ids,mechanism_ids('passive_unilateral_equilibrium'))
+        cold=question_schema(state(h)['spec'])
+        self.assertEqual(cold['$defs']['PhysicalMechanismTarget']['properties']['quantity']['enum'],ids)
         self.assertNotIn('material_point_force_response',ids);self.assertNotIn('constraint_tip_row_residual',ids)
         self.assertNotIn('control',schema['properties'])
         for quantity in ids:
@@ -56,6 +58,7 @@ class Stage25ArchitectureTests(unittest.TestCase):
         q=passive_question(quantity='constraint_output_row_residual');q['structure']['target'].pop('material_s')
         self.assertTrue(list(validator.iter_errors(q)))
         self.assertEqual(state(h)['mathematical_evaluations'],0)
+        self.assertTrue(list(validator.iter_errors(passive_question('compare'))))
         from tests.research.test_r3_b_stage1 import integrated_host
         a,ac=integrated_host();active=question_schema(state(a)['spec'],a.store.artifact(ac),'mechanism_research')
         self.assertEqual(active['$defs']['PhysicalMechanismTarget']['properties']['quantity']['enum'],mechanism_ids('active_ideal_tension'))

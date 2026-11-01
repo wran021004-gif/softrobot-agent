@@ -112,8 +112,8 @@ def question_schema(spec, candidate=None, action=None):
             **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize'])),required=['operation'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
-        if candidate and candidate['configuration']['task'].get('physical_problem'):
-            problem=candidate['configuration']['task']['physical_problem']
+        if passive:
+            problem=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec['canonical_task']['physical_problem'])
             props=schema['$defs']['ScientificStructureV4']['properties']
             for name in ('source_selection','control_scope','search_strategy','tensions_n','saved_state','execution','update_id','response_horizon_s','parameter_group'):
                 props.pop(name,None)
@@ -135,7 +135,7 @@ def question_schema(spec, candidate=None, action=None):
             props['operating_point']={'type':'string','enum':['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']}
             target=schema['$defs']['PhysicalMechanismTarget']['properties']
         from extensions.math_analysis.mechanism_registry import mechanism_ids,PRIMITIVES
-        mode='passive_unilateral_equilibrium' if (candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') else 'active_ideal_tension'
+        mode='passive_unilateral_equilibrium' if passive else 'active_ideal_tension'
         target=schema['$defs']['PhysicalMechanismTarget']
         target['properties']['quantity']={'type':'string','enum':mechanism_ids(mode)}
         target.setdefault('allOf',[]).append(dict(
@@ -160,6 +160,11 @@ def question_schema(spec, candidate=None, action=None):
                 'then':{'properties':{'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'}}}})
             structure['allOf'].append({'if':{'properties':{'target':{'type':'object','properties':{'quantity':{'const':'re_equilibrated_position_response'}},'required':['quantity']}},'required':['target']},
                 'then':{'properties':{'effect_semantics':{'const':'re_equilibrated_passive_response'}}}})
+            structure['allOf'].append({'if':{'properties':{'operation':{'const':'compare'}},'required':['operation']},
+                'then':{'oneOf':[{'required':[key],'properties':{key:{'minItems':1}}}
+                    for key in ('comparison_candidates','comparison_load_conditions')]}})
+            structure['allOf'].append({'if':{'properties':{'load_aggregation':{'enum':['minimum','maximum']}},'required':['load_aggregation']},
+                'then':{'required':['comparison_load_conditions'],'properties':{'comparison_load_conditions':{'minItems':1}}}})
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
