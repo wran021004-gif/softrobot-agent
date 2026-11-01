@@ -102,6 +102,16 @@ def require_authorization(host):
     raise ValueError('INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE')
 
 
+def require_research_authorization(host):
+    """Admit formal mathematical research before creating any Provider request."""
+    require_authorization(host)
+    s=state(host)
+    if s['spec']['mode']=='formal_research' and s['spec']['budgets']['mathematical_evaluations']>0:
+        from tools.research.research_context import mathematics_authorization
+        if mathematics_authorization(host,s)['registered_study_scope_authorized'] is not True:
+            raise ValueError('FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER')
+
+
 def guard(host, expensive=False):
     s=state(host)
     require_authorization(host)

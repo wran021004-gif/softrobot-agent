@@ -10,6 +10,9 @@ from tools.research.capability import CapabilityComparison
 from extensions.math_analysis.mechanism_registry import PRIMITIVES,LEGACY_ACTIVE_MECHANISMS
 
 
+REGISTERED_MATHEMATICS_SCOPE = 'registered mathematics'
+
+
 class SegmentParameters(Contract):
     length_m: FiniteFloat = Field(gt=0)
     young_pa: FiniteFloat | None = Field(default=None,gt=0)

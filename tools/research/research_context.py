@@ -1,5 +1,6 @@
 """Compact trusted research views and declared archive import using the existing Store."""
 from copy import deepcopy
+from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
 import json
 from tools.platform_store import plain
 from tools.state_io import digest
@@ -1225,7 +1226,7 @@ def mathematics_authorization(host,s):
         and a.get('scope',{}).get('study_id')==host.run_id and a['scope'].get('resolved_identity')==s['spec']['resolved_identity']]
     approval=valid[-1] if valid else None
     methods=s['spec'].get('mathematical_methods',{})
-    return dict(registered_study_scope_authorized=('registered mathematics' in approval[1]['scope'].get('execution_scopes',[])
+    return dict(registered_study_scope_authorized=(REGISTERED_MATHEMATICS_SCOPE in approval[1]['scope'].get('execution_scopes',[])
         or 'analysis' in approval[1]['scope'].get('capabilities',[])) if approval else None,
         approval_reference=approval[0]['outputs'][0] if approval else None,
         methods=[dict(method=key,frozen_method_grant=bool(value),configuration_description=value) for key,value in methods.items()],

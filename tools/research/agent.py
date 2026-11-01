@@ -809,8 +809,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     if max_new_provider_requests is not None and (type(max_new_provider_requests) is not int or max_new_provider_requests<1):
         raise ValueError('POSITIVE_NEW_PROVIDER_REQUEST_LIMIT_REQUIRED')
     max_model_calls=(host.store.remaining()['used']['model_calls']+max_new_provider_requests if max_new_provider_requests is not None else None)
-    from tools.research.state import require_authorization
-    require_authorization(host)
+    from tools.research.state import require_research_authorization
+    require_research_authorization(host)
     if state(host)['spec'].get('initial_structure_strategy'):
         from tools.research.tool_readiness import execution_environment
         if execution_environment(state(host)['spec'])['status']!='ready':
