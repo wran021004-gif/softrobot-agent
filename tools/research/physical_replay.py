@@ -538,7 +538,7 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
             solver_error_count=int(bool(raw.get('numerical_failure') or raw.get('reason'))),
             dynamic_sampling=validity=='valid',all_load_cases=[e.get('load_condition') for e in raw.get('episodes',[])]==inp.task.goal.data['load_conditions'],
             physical_source=bound,
-            evaluation_validity=evaluation.validity,valid_complete_execution=validity=='valid',
+            evaluation_validity=evaluation.validity,valid_complete_execution=evaluation.validity=='valid' and complete,
             physics_steps=raw.get('physics_steps'),cost=raw.get('cost'),execution_failure_reason=reason,
             simulation_wall_s=raw.get('timings_s',{}).get('total'))
         return evaluation,profile

@@ -154,6 +154,7 @@ class PassiveAcceptanceTests(unittest.TestCase):
         from tools.research.physical_replay import evaluate_playback
         ev,profile=evaluate_playback(self.cfg,raw,plain(self.source),'wrong-model')
         self.assertEqual(ev.validity,'invalid');self.assertFalse(profile['physical_source'])
+        self.assertFalse(profile['valid_complete_execution'])
         raw=deepcopy(self.backend.data.data);del raw['episodes'][0]['samples'][0]['qvel_rad_s']
         # Missing required samples stay incomplete, with no task score.
         modified=self.backend.model_copy(update=dict(data=self.backend.data.model_copy(update=dict(data=raw))))
