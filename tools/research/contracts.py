@@ -550,12 +550,17 @@ def compact_schema(node):
     return result
 
 
+class ScientificControlV4(ScientificQuestionV3):
+    numerical_method: Literal['mujoco-nonlinear-task-capability-v1','mujoco_direct_control_v1'] | None = Field(default=None,
+        description='Optional registered numerical identity from the candidate control-method catalog. Reach/Hold retains its historical T1 interpretation; other task families use an applicable authorized Direct method. Never changes the scientific goal or grants execution permission.')
+
+
 class ScientificQuestionV4(Contract):
     """New integrated choices; historical question versions keep their contracts."""
     version: Literal['scientific_question_v4'] = 'scientific_question_v4'
     domain: Literal['structure','control']
     structure: ScientificStructureV4 | None = None
-    control: ScientificQuestionV3 | None = None
+    control: ScientificControlV4 | None = None
 
     @model_validator(mode='after')
     def domain_payload(self):

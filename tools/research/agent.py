@@ -463,9 +463,11 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
         method=method,raw_main_input=deepcopy(payload),full_request=full,provider_schema=schema,
         field_sources={**{k:dict(source='Main tool request',tool_use_id=tool_use_id,pointer='/'+k) for k in payload},**sources})
     if scientific_question is not None:
-        from tools.research.scientific_intent import question_schema
+        from tools.research.scientific_intent import question_schema,control_method_choices
+        from tools.research.task_constraints import mathematical_method_view
         audit_input.update(raw_main_input=deepcopy(scientific_question),
-            provider_schema=question_schema(spec,verify_candidate(host,candidate)),internal_binding_schema=schema,
+            provider_schema=question_schema(spec,verify_candidate(host,candidate),
+                control_methods=control_method_choices(mathematical_method_view(host,candidate))),internal_binding_schema=schema,
             compiled_variables=deepcopy(payload))
         audit_input['field_sources'].update({k:dict(source='Deterministic ScientificQuestion compilation',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference']) for k in payload})
@@ -1161,12 +1163,14 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
             if english_native(s['spec']):
                 tool=next((t for t in native if t.tool_name=='research_analysis'),None)
-                from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema
+                from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema,control_method_choices
+                from tools.research.task_constraints import mathematical_method_view
                 question_mode=question_enabled(s['spec'])
                 selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
                 if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
                     tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                        'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'))}}
+                        'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'),
+                            control_methods=control_method_choices(mathematical_method_view(host,completed_question_plan(host)['candidate'])))}}
                     agent.tool_registry.registry['research_analysis']=tool
                 elif selected:
                     method,detail=selected

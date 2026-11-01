@@ -1542,6 +1542,10 @@ def agent_decision_brief(host):
         diagnosis=completed_question_plan(host)
         if diagnosis:
             brief['scientific_parameter_catalog']=parameter_catalog(s['spec'],host.store.artifact(diagnosis['candidate']))
+            if s['spec']['research_decisions']['analysis_interface']=='scientific_question_v4':
+                from tools.research.scientific_intent import control_method_choices
+                from tools.research.task_constraints import mathematical_method_view
+                brief['scientific_control_methods']=control_method_choices(mathematical_method_view(host,diagnosis['candidate']))
     from tools.research.config import bounded_evidence_enabled
     brief['bounded_evidence']=bounded_evidence_enabled(s['spec'])
     selected=current_reports(host)[-2:]
@@ -1955,7 +1959,8 @@ def information_flow_brief(brief, delivered):
             continuation['analysis_handoff']=dict(tool='research_analysis',interface=brief['analysis_interface'],loaded=True,
                 status='result_completed' if post_result else 'diagnose_completed' if settled else 'requires_completed_candidate_bound_diagnose',
                 parameter_catalog=brief.get('scientific_parameter_catalog',[]),
-                next='Select a parameter group and registered physical parameter for effects, or control scope and effort for current-structure T1. T2 only reuses saved comparable T1 evidence.')
+                control_methods=brief.get('scientific_control_methods',[]),
+                next='Choose scientific variables, or control scope and effort using the candidate registered method choices. Reach/Hold retains T1; Direct keeps its own identity. T2 only reuses saved comparable T1 evidence.')
             if post_result:
                 continuation['analysis_handoff'].update(result_reference=math_result['reference'],
                     next='Interpret the completed result at post_result_decision; Main chooses whether to pursue a new scientific question.')
@@ -1966,7 +1971,7 @@ def information_flow_brief(brief, delivered):
         for category in capabilities:
             for row in category['actions']:
                 if row['action']=='diagnose':row['reason']='Record hypothesis/candidate and optionally next_research_action; loads an interface only.'
-                if row['action']=='research_analysis':row['reason']='Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.'
+                if row['action']=='research_analysis':row['reason']='Candidate-registered control feasibility or structural research; T2 reuses saved T1 results.'
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     result=dict(version='research_information_flow_v1',

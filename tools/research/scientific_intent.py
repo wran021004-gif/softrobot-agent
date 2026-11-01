@@ -5,12 +5,22 @@ No optimizer, state machine, source ledger or execution admission lives here.
 from copy import deepcopy
 
 from tools.platform_store import plain
-from tools.research.contracts import ScientificQuestion, ScientificQuestionV2, ScientificQuestionV3, ScientificQuestionV4, MechanismQuestionV2, ScientificControlEffort, LocalControlSearchSettings
+from tools.research.contracts import ScientificQuestion, ScientificQuestionV2, ScientificQuestionV3, ScientificQuestionV4, ScientificControlV4, MechanismQuestionV2, ScientificControlEffort, LocalControlSearchSettings
 from tools.research.state import state, protected
 from tools.research.nonlinear_capability import T1, T2
 
 INTERFACE = 'scientific_question_v1'
 INTERFACES = (INTERFACE,'scientific_question_v2','scientific_question_v3','scientific_question_v4')
+DIRECT = 'mujoco_direct_control_v1'
+
+
+def control_method_choices(view):
+    """Project candidate-bound admission facts; no second method registry."""
+    return [dict(method=key,operation=row['operation'],planning_status=row['planning_status'],
+        selectable=bool(row['formal_execution_authorized'] and row['kernel_supported'] and
+            row['planning_status'] not in ('unauthorized','unsupported','insufficient_budget','blocked')),
+        scientific_purpose=row['scientific_purpose'],missing=row['missing'],detail_query=row['detail_query'])
+        for key,row in view['methods'].items() if key in (T1,DIRECT)]
 
 
 def explicit_actions(spec):
@@ -35,7 +45,7 @@ def scientific_actions(spec):
             scope='One registered continuous physical parameter: fixed-input comparison, or T2 aggregation of comparable saved T1 results. No new T1 or structures.'),
         dict(scientific_goal='control_feasibility',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
-            scope='Native T1 optimizes control on the current structure; independent replay establishes acceptance.')]
+            scope='Candidate-registered Native control optimization on the current structure: Reach/Hold T1 or applicable Direct. Independent replay establishes acceptance.')]
     if mechanism_interface(spec):
         actions.append(dict(scientific_goal='mechanism_research',domain='structure',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
@@ -88,17 +98,21 @@ def question_contract(spec):
     return {'scientific_question_v4':ScientificQuestionV4,'scientific_question_v2':ScientificQuestionV2,'scientific_question_v3':ScientificQuestionV3}.get(spec.get('research_decisions',{}).get('analysis_interface'),ScientificQuestion)
 
 
-def question_schema(spec, candidate=None, action=None):
+def question_schema(spec, candidate=None, action=None, *, control_methods=None):
     schema=question_contract(spec).model_json_schema()
     if question_contract(spec) is ScientificQuestionV4:
         # Reuse the two existing scientific payloads, with a single outer version.
-        for name in ('ScientificStructureV4','ScientificQuestionV3'):
+        for name in ('ScientificStructureV4','ScientificControlV4'):
             schema['$defs'][name]['properties'].pop('version',None)
-        control=schema['$defs']['ScientificQuestionV3']['properties']
+        control=schema['$defs']['ScientificControlV4']['properties']
         for name in ('parameter_paths','search_strategy','requested_budget','parameter_group','parameter_id',
                 'fixed_input','tensions_n','response_horizon_s'):control.pop(name,None)
         control['question_type']={'type':'string','const':'control_feasibility'}
         control['effect_semantics']={'type':'string','const':'reoptimized_task_capability'}
+        if control_methods is not None:
+            legal=[r['method'] for r in control_methods if r['selectable']]
+            control['numerical_method']={'enum':[None,*legal],
+                'description':'Optional numerical identity from the current candidate catalog; Reach/Hold preserves its default T1 semantics. See analysis_handoff.control_methods for admission and scientific purpose.'}
         sources=schema['$defs']['ScientificSources']['properties']
         for name in ('comparison_candidates','t1_results'):sources.pop(name,None)
         passive=bool((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec.get('canonical_task',{}).get('physical_problem'))
@@ -243,7 +257,7 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='unsupported',reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OPTIMIZATION',scientific_execution_started=False)
         if q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
-        return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificQuestionV3,source_question=payload)
+        return compile_v1(host,payload['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload)
     if mechanism_interface(spec):return compile_mechanism(host,payload,tool_use_id=tool_use_id)
     return compile_v1(host,payload,tool_use_id=tool_use_id,contract=question_contract(spec))
 
@@ -280,7 +294,7 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
             choices=[dict(scientific_goal='structure_control_codesign',tool='research_plan',action='search'),
                 dict(scientific_goal='single_parameter_effect',tool='research_analysis',
                     prerequisites=['registered_parameter','comparable_saved_evidence'])])
-    if contract is ScientificQuestionV3 and ('parameter_paths' in payload or 'search_strategy' in payload or 'requested_budget' in payload):
+    if issubclass(contract,ScientificQuestionV3) and ('parameter_paths' in payload or 'search_strategy' in payload or 'requested_budget' in payload):
         return feedback('needs_choice','USE_VERSIONED_SCIENTIFIC_SELECTION_FIELDS',fields=['parameter_group','parameter_id','control_search_effort'])
     if contract is not ScientificQuestionV3 and q.question_type=='structure_parameter_effect' and not q.parameter_paths and intent['agent_hypothesis']['decision'].get('selected_variables'):
         q = q.model_copy(update={'parameter_paths':intent['agent_hypothesis']['decision']['selected_variables']})
@@ -295,6 +309,18 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
         if q.parameter_paths or getattr(q,'parameter_group',None) or getattr(q,'parameter_id',None) or q.fixed_input or q.tensions_n is not None or q.response_horizon_s is not None:
             return feedback('unsupported','STRUCTURAL_OR_FIXED_INPUT_FIELDS_DO_NOT_DESCRIBE_CONTROL_FEASIBILITY')
         method = T1
+        if contract is ScientificControlV4:
+            choices=control_method_choices(view)
+            selected=q.numerical_method
+            if selected is not None:
+                method=selected
+            elif T1 not in view['methods'] or not view['methods'][T1]['kernel_supported']:
+                legal=[r['method'] for r in choices if r['selectable']]
+                if len(legal)!=1:
+                    return feedback('needs_choice' if legal else 'blocked','REGISTERED_CONTROL_METHOD_REQUIRED',choices=choices)
+                method=legal[0]
+            # Reach/Hold keeps its original T1 result and evidence semantics.
+            # A blocked T1 is never silently replaced by a different identity.
     else:
         if not spec.get('family_space') or not c.get('generation_version'):
             return feedback('unsupported','C2_STRUCTURAL_QUESTIONS_REQUIRE_REGISTERED_FAMILYSPACE_PATHS')
@@ -341,7 +367,7 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
     if q.focus_metric and q.focus_metric not in metrics:
         return feedback('unsupported','FOCUS_MUST_NAME_A_REGISTERED_TASK_CONSTRAINT',
             field='focus_metric',choices=sorted(metrics))
-    if method==T1:
+    if method in (T1,DIRECT):
         if q.source_selection.comparison_candidates or q.source_selection.t1_results:
             return feedback('unsupported','CONTROL_SEARCH_REQUIRES_A_CONTROL_SOURCE_NOT_STRUCTURAL_EVIDENCE')
         effort=getattr(q,'control_search_effort',None)
@@ -412,6 +438,7 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
             if actual>limit:
                 return feedback('blocked','ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT',field=name,requested=actual,maximum=limit)
         compiled = dict(control_optimization=dict(source=legal[0],settings=settings))
+        if method==DIRECT:compiled['operating_point']='standardized_initial_pretension'
     else:
         if q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or q.source_selection.control_source:
             return feedback('unsupported','STRUCTURAL_COMPARISON_REUSES_FIXED_INPUT_OR_SAVED_T1_SETTINGS')
