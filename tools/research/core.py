@@ -669,7 +669,7 @@ def dispatch(host, value, request_id, origin='model'):
         candidate=plan.candidate if plan.action=='execute' else plan.physical_replay.candidate
         verify_candidate(host,candidate)
         scientific_preflight=experiment_preflight(host,candidate,
-            'nmpc' if plan.action=='execute' else 'fixed_tension',
+            'nmpc' if plan.action=='execute' else 'passive_protocol' if passive_registered(passive_task) else 'fixed_tension',
             source_ref=plan.physical_replay.source if plan.action=='physical_replay' else None)
         if not scientific_preflight['admitted']:
             raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
@@ -682,9 +682,10 @@ def dispatch(host, value, request_id, origin='model'):
     else:
         from tools.research.feedback import result_view
         route='nmpc'
-        if plan.action=='physical_replay':route='fixed_tension'
+        if plan.action=='physical_replay':route='passive_protocol' if passive_registered(passive_task) else 'fixed_tension'
         elif plan.action=='confirm':route=result_view(host,plan.selected_execution)['controller_route']
-        admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate,route=route)
+        requested=len(passive_task['goal']['data']['load_conditions']) if route=='passive_protocol' else plan.search.max_evaluations if plan.search else 1
+        admission=capacity(host,requested,plan.action=='confirm',root_operation=True,candidate=plan.candidate,route=route)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)
         if not timing['available']:

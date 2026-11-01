@@ -336,7 +336,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             item.update(planning_status='ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
                 description='Shared geometry, qualified unilateral equilibrium, active sets and re-equilibrated structural response. No dynamic task acceptance.',
                 missing=[] if ready else ['original_scope_budget_or_candidate_admission'],
-                applicable=True,executable=ready,registered_acceptance='not_registered',
+                applicable=True,executable=ready,registered_acceptance=task_adapter(cfg).execution_requirements()['registered_acceptance'],
                 prerequisites=['Frozen passive assembly, load condition and material-point binding.'],
                 required_parameters=['V4 physical_problem, no_active_control, re_equilibrated, frozen load_condition, registered target and evaluation cap.'])
             item['applicability'].update(status='applicable',reasons=[],full_task_supported=False)
@@ -736,7 +736,7 @@ def endpoint_target(requirements, protocol, *, braking=False):
 
 def model_assessment(configuration, requirements, operation,model=None,model_source='controller'):
     """Use the same GVS model binding as the candidate linearization builder."""
-    if model_source=='mujoco':
+    if model_source=='mujoco' or configuration.task.physical_problem:
         from tools.research.native_analysis import assessment
         return assessment(configuration,requirements)
     from extensions.tendon_family.model_applicability import assess_model_uses

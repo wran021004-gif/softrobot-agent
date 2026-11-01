@@ -309,7 +309,7 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     if route=='passive_protocol':
         from extensions.tendon_family.passive_execution import source_binding
         expected=source_binding(candidate['configuration'])
-        if {k:v for k,v in (source or {}).items() if k!='candidate'}!=expected:
+        if source is not None and {k:v for k,v in source.items() if k!='candidate'}!=expected:
             raise ValueError('PASSIVE_EXPERIMENT_SOURCE_MISMATCH')
         return canonical(dict(identity_version='effective_experiment_v3',identity_precision_significant_digits=12,
             physical=dict(robot=science['robot'],backend=policy['backend'],discretization=policy['discretization']),
