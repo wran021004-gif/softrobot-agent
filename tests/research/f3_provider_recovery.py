@@ -5,10 +5,11 @@ from tools.platform_host import Host
 from tools.platform_store import plain, zero
 from tools.research.config import ROOT
 from tools.research.state import state, require_authorization, core_hashes, science_hashes
-from tools.research.agent import pending, received, DeepSeekModel
+from tools.research.provider import pending, received, model_messages
+from tools.research.object_choices import main_context_enabled, main_projection
 from tools.research.session_handoff import unmatched, snapshot_files
 from tools.rl.run import process_birth
-from tools.state_io import read, digest, atomic_json
+from tools.state_io import read, digest, atomic_json, io_path
 
 ERROR='LOCAL_PROVIDER_RESPONSE_LOST_REMOTE_OUTCOME_UNKNOWN'
 POLICY=dict(remote_outcome='unknown',local_outcome='response_lost_authorized_continuation',
@@ -42,12 +43,14 @@ def inspect(host,request_id):
         raise ValueError('EXITED_MAIN_PROVIDER_OWNER_REQUIRED')
     wire=host.store.artifact(meta['request'])
     if digest(wire)!=row['request_hash']:raise ValueError('ORIGINAL_REQUEST_HASH_MISMATCH')
-    directory=host.store.root/'framework_sessions'
+    directory=io_path(host.store.root/'framework_sessions')
     paths=list((directory/'session'/s['pilot']['framework_session_id']).rglob('snapshot_latest.json'))
     if len(paths)!=1:raise ValueError('EXACT_SDK_SNAPSHOT_REQUIRED')
     data=read(paths[0])['data'];messages=data['messages']
+    formatted=model_messages(host,messages,wire['messages'][0]['content'])
+    if main_context_enabled(s['spec']):formatted=main_projection(host,formatted)
     if (unmatched(messages) or wire['messages'][-1]['role']!='user'
-            or DeepSeekModel.format_request_messages(messages,wire['messages'][0]['content'])!=wire['messages'][:-1]):
+            or formatted!=wire['messages'][:-1]):
         raise ValueError('SDK_ORIGINAL_WIRE_HISTORY_MISMATCH')
     requests={};feedback={}
     for e in events:
@@ -115,7 +118,7 @@ def apply(host,approval):
             local_outcome=POLICY['local_outcome'],authorization=authorization,original_call=original,
             original_wire=scope['original_wire'],no_response_fabricated=True,no_tool_submitted=True)
         receipt=host.store.complete(current,dict(request_id=current['request_id'],execution_id=current['execution_id'],
-            caller=current['caller'],tool_id='model.deepseek',tool_version='1.0.0',execution_status='failed',
+            caller=current['caller'],tool_id='model.'+state(host)['pilot']['provider']['adapter'],tool_version='1.0.0',execution_status='failed',
             error=ERROR,charged=zero()),output,elapsed=json.loads(current['charged'])['wall_s'],
             kind='provider_response_loss_disposition',db=db)
         after=host.store.remaining(db=db)
