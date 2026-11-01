@@ -121,8 +121,8 @@ def question_schema(spec, candidate=None, action=None):
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
             target_props=schema['$defs']['PhysicalMechanismTarget']['properties']
             for name in ('tendon_channel','direction_generalized'):target_props.pop(name,None)
-            target_props['reduction']={'type':'string','enum':['identity','norm','minimum','maximum','directional_norm'],'default':'identity'}
-            schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
+            target_props['reduction']={'type':'string','enum':['identity','norm','minimum','maximum','directional_norm','directional_component'],'default':'identity'}
+            schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition','requested_budget']
         elif candidate:
             props=schema['$defs']['ScientificStructureV4']['properties']
             for name in ('physical_problem','load_condition','comparison_load_conditions','load_aggregation'):props.pop(name,None)
@@ -130,18 +130,32 @@ def question_schema(spec, candidate=None, action=None):
             props['control_treatment']={'type':'string','enum':['fixed_absolute_tensions','reoptimized']}
             props['operating_point']={'type':'string','enum':['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']}
             target=schema['$defs']['PhysicalMechanismTarget']['properties']
-        from extensions.math_analysis.mechanism_registry import mechanism_ids
+        from extensions.math_analysis.mechanism_registry import mechanism_ids,PRIMITIVES
         mode='passive_unilateral_equilibrium' if (candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') else 'active_ideal_tension'
         target=schema['$defs']['PhysicalMechanismTarget']
         target['properties']['quantity']={'type':'string','enum':mechanism_ids(mode)}
         target.setdefault('allOf',[]).append(dict(
             **{'if':dict(properties=dict(quantity=dict(enum=['constraint_output_row_residual','all_tendon_output_row_residual'])),required=['quantity'])},
-            then=dict(required=['projection_world'])))
+            then=dict(required=['projection_world'],properties=dict(projection_world=dict(type='array')))))
+        target['allOf'].append({'if':{'anyOf':[
+            {'properties':{'quantity':{'enum':['directional_acceleration_bounds','directional_drive','directional_tendon_row_residual','motion_decoupling','directional_material_response']}},'required':['quantity']},
+            {'properties':{'reduction':{'enum':['directional_norm','directional_component']}},'required':['reduction']}]},
+            'then':{'required':['direction_world'],'properties':{'direction_world':{'type':'array'}}}})
+        for reduction,quantities in [('directional_component',['re_equilibrated_position_response']),
+                ('directional_norm',[k for k in mechanism_ids(mode) if PRIMITIVES[k]['world_projection']])]:
+            target['allOf'].append({'if':{'properties':{'reduction':{'const':reduction}},'required':['reduction']},
+                'then':{'properties':{'quantity':{'enum':quantities}}}})
         structure=schema['$defs']['ScientificStructureV4']
-        for operation in ('inspect','differentiate','optimize','compare'):
+        excluded=[k for k in mechanism_ids(mode) if k not in mechanism_ids(mode,'differentiate')]
+        if excluded:
             structure.setdefault('allOf',[]).append({
-                'if':{'properties':{'operation':{'const':operation}},'required':['operation']},
-                'then':{'properties':{'target':{'properties':{'quantity':{'enum':mechanism_ids(mode,operation)}}}}}})
+                'if':{'properties':{'operation':{'enum':['differentiate','optimize']}},'required':['operation']},
+                'then':{'properties':{'target':{'properties':{'quantity':{'not':{'enum':excluded}}}}}}})
+        if passive:
+            structure['allOf'].append({'if':{'properties':{'operation':{'not':{'const':'compare'}}},'required':['operation']},
+                'then':{'properties':{'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'}}}})
+            structure['allOf'].append({'if':{'properties':{'target':{'type':'object','properties':{'quantity':{'const':'re_equilibrated_position_response'}},'required':['quantity']}},'required':['target']},
+                'then':{'properties':{'effect_semantics':{'const':'re_equilibrated_passive_response'}}}})
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
@@ -151,8 +165,9 @@ def question_schema(spec, candidate=None, action=None):
         if candidate:
             rows=parameter_catalog(spec,candidate)
             schema['properties']['parameter_id']['anyOf'][0]['enum']=[r['parameter_id'] for r in rows if r['selectable']]
-    from tools.research.contracts import prune_schema_definitions
-    return prune_schema_definitions(schema)
+    from tools.research.contracts import prune_schema_definitions,compact_schema
+    schema=prune_schema_definitions(schema)
+    return compact_schema(schema) if question_contract(spec) is ScientificQuestionV4 else schema
 
 
 def control_settings(spec, effort, *, window=None, channels=None):

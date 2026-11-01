@@ -36,8 +36,8 @@ def _record(categories, source, models, inputs, outputs, prerequisites, limitati
 _METHOD_METADATA = {
     'mechanism_structure_v1': _record('inspect analyze differentiate_optimize compare',
         'tools/research/structure_research.py::calculate extensions/math_analysis/mechanism_registry.py::observe extensions/math_analysis/differentiation_router.py::differentiate',
-        'Native instantaneous ideal-tension mechanics', 'Registered target, explicit point/input semantics, one or two actual effective continuous physical parameters and local evaluation cap',
-        'Directional mechanism observation, normalized two-scale central/one-sided differences, bounded local best-found search and legal generation handoff', 'Explicit new V2 Study and method grant; original analysis admission'),
+        'Native ideal-tension mechanics or V4 qualified unilateral fixed-payout equilibrium', 'Registered target, explicit point/input or frozen load semantics, one or two actual effective continuous physical parameters and local evaluation cap',
+        'Directional mechanism observation, normalized two-scale central/one-sided differences, bounded local best-found search, frozen-load comparison and legal generation handoff', 'Frozen V2/V4 interface and explicit mechanism method grant; original analysis admission'),
     'linearization': _record('analyze',
         'extensions/tendon_family/math_analysis.py::linear_model extensions/tendon_family/sorosim_analysis.py::calculate_candidate_configuration',
         'GVS / SoRoSim local continuous affine dynamics', 'Candidate, operating point, protocol and model',

@@ -91,8 +91,12 @@ def re_equilibrated(parameter,baseline,records,models,response,study):
     for key,value in result['numerical_cost'].items():models[base].cost[key]=models[base].cost.get(key,0)+value
     if result['status']=='regular_implicit_gradient':
         v=np.array(baseline['mechanics']['re_equilibrated_position_response']);dv=np.array(result['drelative_position_du'])
-        if study.target.reduction=='norm' and np.linalg.norm(v)>1e-12:
-            predicted=float(v@dv/np.linalg.norm(v));measured=response['normalized_derivatives'][-1]
+        reduction=study.target.reduction
+        if reduction in ('directional_norm','directional_component'):
+            v=np.asarray(study.target.direction_world)@v;dv=np.asarray(study.target.direction_world)@dv
+        if reduction=='directional_component' or reduction in ('norm','directional_norm') and np.linalg.norm(v)>1e-12:
+            predicted=float(dv) if reduction=='directional_component' else float(np.sum(v*dv)/np.linalg.norm(v))
+            measured=response['normalized_derivatives'][-1]
             error=abs(predicted-measured)/max(abs(predicted),abs(measured),1e-10)
             result.update(target_normalized_derivative=predicted,relative_error=error,
                 gradient_trustworthy=bool(error<.05 and response['consistency']['passed']))

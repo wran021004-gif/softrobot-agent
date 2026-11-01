@@ -58,6 +58,7 @@ PRIMITIVES = {
 }
 
 
+LEGACY_ACTIVE_MECHANISMS=tuple(PRIMITIVES)
 CONSTRAINED = {
     'constraint_length_jacobian':('m/rad',['nu','nv']),
     'constraint_active_set':('1',['nu']), 'constraint_multiplier':('N',['nu']),
@@ -107,8 +108,10 @@ for name,meta in PRIMITIVES.items():
         operations=['inspect','compare'] if name in ('drive_directions','constraint_active_set','constraint_boundary_set','constraint_slack_set',
             'constrained_motion_subspace','directional_material_response') else ['inspect','differentiate','optimize','compare'],
         main_visible=name not in (*ALIASES,'constraint_tip_row_residual'))
+    meta['world_projection']=name in ('tip_jacobian','material_point_jacobian','tip_acceleration_input_map',
+        'tangent_compliance','material_point_force_response','re_equilibrated_position_response')
+    meta['state_requirements']=meta.get('state_requirements','Frozen fixed-payout assembly and load; qualified equilibrium for constrained response, LICQ and strict complementarity for smooth tangent matrices.')
     if len(meta['operations'])==2:meta['unavailable_operation_reason']='Discrete active-set, basis/sign ambiguity or one-sided cone response does not define an ordinary structural gradient.'
-ACTIVE_MECHANISMS=tuple(k for k,v in PRIMITIVES.items() if 'active_ideal_tension' in v['physical_modes'])
 
 
 def mechanism_ids(mode, operation=None):
@@ -208,6 +211,7 @@ def observe(mechanics, target):
     elif target.reduction=='minimum':value=float(np.min(raw))
     elif target.reduction=='maximum':value=float(np.max(raw))
     elif target.reduction=='directional_norm':value=float(np.linalg.norm(np.asarray(target.direction_world)@raw))
+    elif target.reduction=='directional_component':value=float(np.asarray(target.direction_world)@raw)
     elif target.reduction in ('generalized_projection','direction_cosine'):
         if len(target.direction_generalized)!=nv:raise ValueError('GENERALIZED_DIRECTION_MUST_MATCH_NAMED_HINGES')
         value=float(np.asarray(target.direction_generalized)@raw)
@@ -220,8 +224,10 @@ def observe(mechanics, target):
         dof_order=mechanics['coordinates']['dof_order'],tendon_order=mechanics['coordinates']['tendon_order'],
         state=dict(time_s=mechanics['time_s'],qpos_rad=mechanics['qpos_rad'],qvel_rad_s=mechanics['qvel_rad_s']),
         physical_inputs=dict(tensions_n=mechanics['actual_tensions_n'],bounds_n=mechanics['input_bounds_n']))
-    if passive:meta.update(model='native unilateral fixed-payout assembly',source='extensions.tendon_family.passive_equilibrium.mechanics',
+    if passive:meta.update(model='native unilateral fixed-payout assembly',
         state_requirements='Finite named-hinge geometry; equilibrium qualification governs constrained tangent and re-equilibrated response.',
         constraint_state=mechanics['constraint_state'],point_binding=mechanics['point_binding'])
+    if passive and meta['source'].endswith('NativeModel.mechanics'):meta['source']='extensions.tendon_family.passive_equilibrium.mechanics'
+    if not passive and mechanics.get('point_binding'):meta['point_binding']=mechanics['point_binding']
     return dict(status='computed',value=value,unit=meta['unit'],target=target.model_dump(),metadata=meta,
         source_pointer='/mechanics/'+meta['field'] if meta['field'] else '/mechanics')

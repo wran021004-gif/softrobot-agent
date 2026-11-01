@@ -7,6 +7,7 @@ from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
 from extensions.tendon_family.family_space import GenerationRequest, GenerationRequestV2
 from tools.research.capability import CapabilityComparison
+from extensions.math_analysis.mechanism_registry import PRIMITIVES,LEGACY_ACTIVE_MECHANISMS
 
 
 class SegmentParameters(Contract):
@@ -380,12 +381,7 @@ class ScientificStructureSearch(Contract):
 
 
 class MechanismTarget(Contract):
-    quantity: Literal['tip_jacobian','tendon_jacobian','input_force_map','mass_matrix',
-        'tip_acceleration_input_map','drive_singular_values','drive_directions',
-        'instantaneous_braking','tendon_row_projection','mass_balance_residual',
-        'directional_acceleration_bounds','directional_drive','input_force_directions',
-        'directional_tendon_row_residual','motion_decoupling','total_mass','body_inertia_trace',
-        'joint_stiffness','joint_damping']
+    quantity: Literal[LEGACY_ACTIVE_MECHANISMS]
     reduction: Literal['identity','norm','minimum','maximum','directional_norm','generalized_projection','direction_cosine'] = 'identity'
     direction_world: tuple[FiniteFloat,FiniteFloat,FiniteFloat] | None = None
     tendon_channel: StrictInt | None = Field(default=None,ge=0)
@@ -395,11 +391,11 @@ class MechanismTarget(Contract):
     @model_validator(mode='after')
     def directional(self):
         directional=self.quantity in ('directional_acceleration_bounds','directional_drive','directional_tendon_row_residual','motion_decoupling','directional_material_response')
-        if (self.reduction=='directional_norm' or directional) != (self.direction_world is not None):
+        if (self.reduction in ('directional_norm','directional_component') or directional) != (self.direction_world is not None):
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_DIRECTION_ONLY')
         if self.direction_world is not None and abs(sum(x*x for x in self.direction_world)-1)>1e-8:
             raise ValueError('UNIT_WORLD_DIRECTION_REQUIRED')
-        if self.reduction=='directional_norm' and self.quantity not in ('tip_jacobian','tip_acceleration_input_map','tangent_compliance','material_point_force_response','re_equilibrated_position_response'):
+        if self.reduction=='directional_norm' and not PRIMITIVES[self.quantity]['world_projection']:
             raise ValueError('DIRECTIONAL_NORM_REQUIRES_WORLD_VECTOR_MAP')
         generalized=self.reduction in ('generalized_projection','direction_cosine')
         if generalized != (self.direction_generalized is not None):
@@ -421,8 +417,8 @@ class MechanismTarget(Contract):
 
 
 class PhysicalMechanismTarget(MechanismTarget):
-    from extensions.math_analysis.mechanism_registry import PRIMITIVES as _mechanisms
-    quantity: Literal[tuple(_mechanisms)]
+    quantity: Literal[tuple(PRIMITIVES)]
+    reduction: MechanismTarget.model_fields['reduction'].annotation | Literal['directional_component'] = 'identity'
     material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
     projection_world: list[tuple[FiniteFloat,FiniteFloat,FiniteFloat]] | None = Field(default=None,min_length=1,max_length=3,
         description='Orthonormal world output rows for declared row-space coverage; choose a direction or subspace explicitly.')
@@ -433,6 +429,8 @@ class PhysicalMechanismTarget(MechanismTarget):
         projected=self.quantity in ('constraint_output_row_residual','all_tendon_output_row_residual')
         if projected != (self.projection_world is not None):raise ValueError('EXPLICIT_OUTPUT_PROJECTION_REQUIRED_ONLY_FOR_ROW_COVERAGE')
         if projected:validate_projection(self.projection_world)
+        if self.reduction=='directional_component' and self.quantity!='re_equilibrated_position_response':
+            raise ValueError('SIGNED_COMPONENT_REQUIRES_WORLD_POSITION_RESPONSE')
         return self
 
     @model_serializer(mode='wrap')
@@ -539,6 +537,16 @@ def prune_schema_definitions(schema):
     visit({k:v for k,v in schema.items() if k!='$defs' and not k.startswith('x-research-')})
     schema['$defs']={k:v for k,v in definitions.items() if k in needed}
     return schema
+
+
+def compact_schema(node):
+    """Shared annotation cleanup for selected Plan and scientific schemas."""
+    if isinstance(node,list):return [compact_schema(v) for v in node]
+    if not isinstance(node,dict):return node
+    result={k:({name:compact_schema(child) for name,child in v.items()} if k in ('properties','$defs') else compact_schema(v))
+        for k,v in node.items() if k!='title'}
+    if len(result.get('anyOf',[]))==1:result={**result.pop('anyOf')[0],**result}
+    return result
 
 
 class ScientificQuestionV4(Contract):

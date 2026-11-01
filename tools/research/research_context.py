@@ -1953,7 +1953,7 @@ def information_flow_brief(brief, delivered):
                 if row['action']=='research_analysis':row['reason']='Current-structure T1 or single-parameter comparison; T2 reuses saved T1 results.'
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
-    return dict(version='research_information_flow_v1',
+    result=dict(version='research_information_flow_v1',
         scientific_results=value.get('scientific_results'),
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),
@@ -1962,6 +1962,37 @@ def information_flow_brief(brief, delivered):
         capabilities=capabilities,tool_continuation=continuation,
         knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])
+    if brief.get('analysis_interface')=='scientific_question_v4':
+        # Presentation only: Store, pending feedback, budgets and read admission
+        # retain their original owners. Latest numerical facts stay above.
+        for key in ('selection','plan_selection','scope'):continuation.pop(key,None)
+        direct=continuation.get('direct_plan') or {}
+        for key in ('current_hypothesis','candidate'):direct.pop(key,None)
+        if direct:direct['context_at']='research_focus'
+        handoff=continuation.get('scientific_action_handoff') or {}
+        handoff.pop('loaded',None)
+        handoff['choices']=[{k:r[k] for k in ('scientific_goal','domain','tool','action') if k in r}
+            for r in handoff.get('choices',[]) if r.get('available')]
+        for item in continuation.get('pending_feedback',{}).get('items',[]):
+            if item.get('delivery')=='fixed_facts_in_l0':item.pop('query',None)
+        mechanism=result.get('mechanism_research')
+        if mechanism:
+            result['mechanism_research']={k:mechanism[k] for k in ('direction_query','suggestion_adopted',
+                'formal_candidate_created','generation_plan_cited_evidence','generation_relations',
+                'formal_candidate_query','historical_directions','details_query') if k in mechanism}
+        control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
+        task=result['study_goal'].get('task',{})
+        if task.get('physical_problem'):
+            task.pop('metrics',None);task.pop('reference',None)
+            focus['control']=dict(status='not_applicable',executable_under_current_profile=False,
+                control_channels=[],reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_CHANNELS')
+            focus['parameters_query']=control.get('parameters_query')
+        if findings and findings[-1]['status']=='unavailable':
+            result['reporter_findings']=[{k:findings[-1][k] for k in ('status','report_reference','result_references','interpretation_query')}]
+        science=result.get('scientific_results') or {}
+        if not any(science.get(k) for k in ('latest_search','study_best_mathematical','critical_failures','best_independent_physical')) and math_result:
+            result.pop('scientific_results',None)
+    return result
 
 
 

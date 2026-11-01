@@ -405,9 +405,10 @@ def summary(value, reference):
         definitions={o['name']:o for o in raw['records'][0]['configuration']['task']['physical_problem'].get('observations',[])}
         for row in task_observations:
             metric=definitions[row['name']]
-            if (raw['target']['quantity']=='re_equilibrated_position_response' and raw['target']['reduction']=='norm' and
+            if (raw['target']['quantity']=='re_equilibrated_position_response' and raw['target']['reduction']=='norm' and metric.get('reduction','norm')=='norm' and
                     metric['quantity']=='material_displacement' and metric.get('material_s',.5)==raw['target'].get('material_s',.5)):
                 row.pop('value',None);row['value_at']='structure_research.baseline'
+            row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),

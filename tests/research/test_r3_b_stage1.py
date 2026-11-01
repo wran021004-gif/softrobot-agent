@@ -91,7 +91,8 @@ class IntegratedWireTests(unittest.TestCase):
         self.assertEqual(l0['scientific_results']['latest_evaluation']['facts_at'],'mathematical_research.latest_result')
         self.assertFalse(any(r.get('structure_research') for r in l0.get('verified_facts',[])))
         # Save the actual complete wire as an explicitly labelled synthetic example.
-        destination=Path(__file__).resolve().parents[2]/'docs/research/r3_b_stage1_wire_example.json'
+        destination=Path(__file__).resolve().parents[2]/'runs/stage1_validation/wire_example.json'
+        destination.parent.mkdir(parents=True,exist_ok=True)
         destination.write_text(json.dumps(dict(scope='Synthetic SDK/Mock HTTP fixture; no scientific evidence or real Provider',
             wire=wires[-1]),indent=2),encoding='utf-8')
         unchanged=packet(run_fixture(h,[None])[-1])['mathematical_research']['latest_result']

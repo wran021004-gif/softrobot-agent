@@ -194,15 +194,8 @@ def compact_plan_schema(schema, action, study):
             for branch in choice['cells']['anyOf']:
                 if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
             choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
-    def clean(node):
-        if isinstance(node,list):return [clean(v) for v in node]
-        if not isinstance(node,dict):return node
-        result={k:({name:clean(child) for name,child in v.items()} if k in ('properties','$defs') else clean(v))
-            for k,v in node.items() if k!='title'}
-        if len(result.get('anyOf',[]))==1:
-            result={**result.pop('anyOf')[0],**result}
-        return result
-    return clean(schema)
+    from tools.research.contracts import compact_schema
+    return compact_schema(schema)
 
 
 def evidence_query_schema(study):
