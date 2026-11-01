@@ -24,6 +24,10 @@ class C0BridgeTests(unittest.TestCase):
         passing=constraint_gap([row('upper',1.,2.)],valid_complete=True)
         self.assertEqual(passing['signed_task_gap'],-.5)
         self.assertEqual(passing['normalized_gap'],0.)
+        gate_only=constraint_gap([row('zero',0.,0.)],valid_complete=True)
+        self.assertTrue(gate_only['observation_feasible'])
+        self.assertEqual(gate_only['objective_status'],'feasibility_comparison_only')
+        self.assertIsNone(gate_only['signed_task_gap'])
 
     def test_freeze_detects_passive_solver_without_modifying_evidence(self):
         import tools.research.state as st
@@ -121,7 +125,7 @@ class C1BridgeTests(unittest.TestCase):
         from tools.research.scientific_intent import question_schema,compile_question
         from tools.research.state import state
         from jsonschema import Draft202012Validator
-        h,c=prepared_host(budget=10)
+        h,c=prepared_host(budget=10,mathematical_budget=5)
         with patch.object(core,'guard'):core.dispatch(h,diagnosis(c,'mechanism_research'),'dynamic-diagnose')
         q=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='inspect',
             effect_semantics='finite_time_task_response',target='finite_time_task_violation',
@@ -179,14 +183,21 @@ class C1BridgeTests(unittest.TestCase):
                 physical_binding=dict(model_identity='SYNTHETIC-NO-ENGINE-'+str(payout)),
                 cost=dict(model_builds=1,physics_steps=0,episodes_started=2,episodes_completed=2))))
         def measure(task,raw):
+            z=(raw['synthetic_payout']-origin)/width
+            if mode=='invalid_best' and abs(z+.005)<1e-8 or mode=='invalid_coarse' and abs(z+.01)<1e-8:
+                return dict(validity='invalid',reason='SYNTHETIC_PROBE_FAILURE',constraints=[],metrics=[])
             rows=task_adapter(dict(task=plain(task))).constraint_observations({})
             constraints=[]
             for i,d in enumerate(rows):
-                value=d['bound']*(.8+(raw['synthetic_payout']-origin)/width if i==0 else .1)
+                ratio=(.8+z if i==0 else .1) if mode=='smooth' else (1.2+z if i==0 else 1.18-3*z if i==1 else .1)
+                value=d['bound']*ratio
+                if mode=='contact_best' and d['bound']==0 and abs(z+.005)<1e-8:value=1.
                 constraints.append(ConstraintResult(name=d['constraint_id'].split(':',1)[1],observed=value,
                     limit=d['bound'],units=d['unit'],satisfied=value<=d['bound']))
             return dict(validity='valid',task_success=True,constraints=constraints,metrics=[])
-        for operation,cap in [('differentiate',5),('optimize',6)]:
+        for mode,operation,cap in [('smooth','differentiate',5),('smooth','optimize',6),
+                ('switch','differentiate',5),('switch','optimize',6),('invalid_coarse','differentiate',5),
+                ('invalid_best','differentiate',5),('contact_best','differentiate',5)]:
             study=MechanismStudy(operation=operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
                 parameter_paths=[row['parameter_id']],point_semantics='frozen_task_initial_state',
                 effect_semantics='finite_time_task_response',max_evaluations=cap)
@@ -198,7 +209,27 @@ class C1BridgeTests(unittest.TestCase):
             self.assertEqual(result['status'],'computed',result)
             evidence=result['structure_research'];self.assertEqual(evidence['cost']['physics_steps'],0)
             self.assertEqual(len(evidence['records'][0]['observation']['task_gap']['constraints']),17)
+            if mode in ('invalid_best','contact_best'):
+                self.assertNotIn('structure_direction',evidence)
+                self.assertEqual(evidence['candidate_improvement_status'],'not_observed')
+                if mode=='contact_best':
+                    self.assertIn('discontinuous_hard_gate',evidence['derivative_status'])
+                    failed=[r['observation']['task_gap'] for r in evidence['records'] if r['observation']['task_gap']['hard_gate_status']=='failed']
+                    self.assertTrue(failed);self.assertFalse(failed[0]['observation_feasible'])
+                continue
             self.assertTrue(evidence['structure_direction'])
+            self.assertEqual(evidence['candidate_improvement_status'],'observed_full_task_improvement')
+            if mode!='smooth':
+                self.assertFalse(evidence['parameter_sensitivities'][0]['consistency']['passed'])
+                self.assertAlmostEqual(evidence['observed_reduction'],.005)
+            from tools.research.structure_research import summary,observed_task_improvement
+            compact=summary(result,dict(artifact_id='synthetic',media_type='application/json'))
+            self.assertNotIn('dynamic_metrics',compact);self.assertNotIn('dynamic_task_gaps',compact)
+            self.assertEqual(compact['hard_gates'][0]['bound'],0)
+            self.assertEqual(compact['candidate_improvement_status'],evidence['candidate_improvement_status'])
+            altered=deepcopy(evidence['records']);chosen=evidence['best_valid_record_index']
+            altered[chosen]['configuration']['policy']['backend']['version']='incomparable-test-model'
+            self.assertNotEqual(observed_task_improvement(altered,[row])['best_valid_record_index'],chosen)
             self.assertEqual(evidence['structure_direction']['generation_handoff']['tool'],'research_plan')
             self.assertFalse(evidence['structure_direction']['formal_candidate_created'])
             self.assertFalse(evidence['parameter_sensitivities'][0]['strict_derivative'])

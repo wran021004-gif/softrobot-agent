@@ -30,6 +30,40 @@ def group_matches(row, group):
     return (row['category']=='segment' and row['unit']=='m') if group=='segment_lengths' else row['category']==group
 
 
+def dynamic_protocol(configuration):
+    """Comparison identity excludes the changed structure, not the task or model."""
+    return dict(task=configuration['task'],policy=configuration['policy'],
+        seed=configuration.get('seed'),robot={k:v for k,v in configuration['robot'].items() if k!='structure'})
+
+
+def observed_task_improvement(records, rows=(), bounds=None):
+    """Reproject recorded full-task facts; derivative quality grants no eligibility."""
+    from tools.research_tasks import constraint_gap
+    gaps=[constraint_gap(r['observation']['task_gap']['constraints'],
+        valid_complete=r['observation']['status']=='computed' and r['observation']['task_gap']['valid_complete']) for r in records]
+    eligible=[]
+    for record,gap in zip(records,gaps):
+        if not gap['comparable'] or dynamic_protocol(record['configuration'])!=dynamic_protocol(records[0]['configuration']):continue
+        if record is not records[0]:
+            if not record['compiled_physical_changes'] or record['physics_identity']==records[0]['physics_identity']:continue
+            if rows:
+                values=[record['parameter_values'].get(row['parameter_id']) for row in rows]
+                if any(v is None or not np.isfinite(v) or not row['minimum']<=v<=row['maximum'] for row,v in zip(rows,values)):continue
+                z=[coordinate({**row,'current_value':v})['origin'] for row,v in zip(rows,values)]
+                if bounds and not all(lo-1e-14<=v<=hi+1e-14 for v,(lo,hi) in zip(z,bounds)):continue
+        eligible.append(record['record_index'])
+    best=min(eligible,key=lambda i:gaps[i]['signed_task_gap']) if eligible else None
+    base=gaps[0] if gaps else None
+    comparable=base is not None and base['comparable'] and best is not None
+    delta=base['signed_task_gap']-gaps[best]['signed_task_gap'] if comparable else None
+    floor=max(1e-12,abs(base['signed_task_gap'])*1e-9) if comparable else None
+    improved=comparable and best!=0 and delta>floor
+    return dict(candidate_improvement_status='observed_full_task_improvement' if improved else 'not_observed' if comparable else 'not_comparable',
+        best_valid_record_index=best,improved_record_index=best if improved else None,
+        observed_reduction=delta,resolution_floor=floor,gaps=gaps,
+        scope='Best recorded complete task objective under the same frozen protocol; no strict descent or global optimum.')
+
+
 def prepare_context(spec, candidate, study, comparisons):
     """Read-only actual-domain/source admission before the existing reservation."""
     from tools.research_tasks import task_adapter
@@ -81,6 +115,8 @@ def prepare_context(spec, candidate, study, comparisons):
     if (study.operation=='compare') != bool(comparisons or loads):raise ValueError('COMPARE_REQUIRES_OWNED_CANDIDATE_OR_FROZEN_LOAD_CONDITIONS')
     for ref,c in comparisons:
         if c['task_identity']!=candidate['task_identity']:raise ValueError('MECHANISM_COMPARISON_REQUIRES_SAME_FROZEN_TASK')
+        if dynamic and dynamic_protocol(c['configuration'])!=dynamic_protocol(candidate['configuration']):
+            raise ValueError('DYNAMIC_COMPARISON_REQUIRES_SAME_FROZEN_MODEL_PROTOCOL')
     plans=[stencil(row) for row in selected]
     minimum=(1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
         1+sum(len(set(p['coordinates'])) for p in plans)+int(len(plans)==2)+int(study.operation=='optimize'))
@@ -156,6 +192,8 @@ def physical_changes(base, changed):
 
 def joint_consistency(rows, responses, baseline, changed):
     """Compare one actual combined perturbation with its local linear prediction."""
+    if changed['observation']['value'] is None or any(r['normalized_derivatives'][-1] is None for r in responses):
+        return dict(record_index=changed['record_index'],passed=False,reason='INELIGIBLE_STENCIL_OR_JOINT_OBSERVATION')
     z=[coordinate({**row,'current_value':v})['origin'] for row,v in zip(rows,changed['parameter_values'].values())]
     center=[coordinate(row)['origin'] for row in rows]
     predicted=sum(r['normalized_derivatives'][-1]*(v-origin) for r,v,origin in zip(responses,z,center))
@@ -229,7 +267,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 compiled_physical_changes=dict(model_recompiled=True) if records and native.physics['identity']!=records[0]['physics_identity'] else {})
             records.append(record);cache[key]=record
             if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation,raw_execution=raw))
-            if observation['status']!='computed':raise ValueError('INCOMPLETE_OR_INVALID_DYNAMIC_TASK: '+str(measured.get('reason')))
+            if observation['status']!='computed':failures.append(dict(record_index=record['record_index'],reason=measured.get('reason')))
             return record
         if passive:
             from extensions.tendon_family.passive import PassiveModel
@@ -298,6 +336,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         evidence['unsupported_conclusions'].remove('passive constraint nullspace')
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
+        if dynamic and base['observation']['status']!='computed':raise ValueError('INCOMPLETE_OR_INVALID_DYNAMIC_TASK: '+str(base['observation']['reason']))
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
             constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
             task_observations=base['mechanics']['task_observations'],registered_acceptance=task_adapter(configuration).execution_requirements()['registered_acceptance'])
@@ -329,23 +368,27 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
                     delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist()
                         if other['observation']['value'] is not None and base['observation']['value'] is not None else None)
+        elif dynamic and base['observation']['value'] is None:
+            evidence.update(derivative_status='not_defined',direction_status='feasibility_comparison_only')
         elif study.operation in ('differentiate','optimize'):
             for i,row in enumerate(rows):
                 first=len(records)
                 def probe(value):
                     values=list(base_values);values[i]=value
                     return evaluate(values)
-                response=differentiate(row,base,probe,goal=study.target.goal)
+                response=differentiate(row,base,probe,goal=study.target.goal,allow_ineligible=dynamic)
                 if evidence['method_selection']['method']=='passive_kkt_implicit':
                     from extensions.math_analysis.differentiation_router import re_equilibrated
                     response['implicit_sensitivity']=re_equilibrated(row,base,records,models,response,study)
                 if dynamic:
                     active=lambda record:{r['constraint_id'] for r in record['observation']['task_gap']['dominant_constraints']}
                     switch=any(active(record)!=active(base) for record in records[first:])
+                    gate_switch=any(record['observation']['task_gap']['hard_gate_status']!=base['observation']['task_gap']['hard_gate_status'] for record in records[first:])
                     response.update(direction_status='directional_comparison',maximum_constraint_switch=switch,strict_derivative=False)
-                    if switch:
-                        response.update(suggested_delta=None,selected_record_index=None)
-                        response['consistency'].update(passed=False,reason='NONSMOOTH_MAXIMUM_CONSTRAINT_SWITCH')
+                    if switch or gate_switch:
+                        response.update(suggested_delta=None,selected_record_index=None,
+                            derivative_status='discontinuous_hard_gate' if gate_switch else 'nonsmooth_maximum_switch')
+                        response['consistency'].update(passed=False,reason='HARD_GATE_SWITCH' if gate_switch else 'NONSMOOTH_MAXIMUM_CONSTRAINT_SWITCH')
                 if passive and not dynamic:
                     branch=base['mechanics']['equilibrium']['equilibrium']
                     changed=any(r['mechanics']['equilibrium']['equilibrium'][key]!=branch[key]
@@ -379,7 +422,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 preference=1 if study.target.goal=='increase' else -1
                 bounds=[(max(0.,z-study.local_radius_fraction),min(1.,z+study.local_radius_fraction)) for z in center]
                 def objective(z):
-                    try:return -preference*float(at_normalized(z)['observation']['value'])
+                    try:
+                        value=at_normalized(z)['observation']['value']
+                        return -preference*float(value) if value is not None else float('inf')
                     except EvaluationLimit:raise
                     except ValueError as exc:
                         failures.append(dict(normalized_parameters=list(map(float,z)),reason=str(exc)));return float('inf')
@@ -399,10 +444,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     within=all(lo-1e-14<=v<=hi+1e-14 for v,(lo,hi) in zip(z,bounds))
                     if within and record['compiled_physical_changes']:eligible.append(record)
                 # Flat or inconsistent derivatives remain unresolved even if a noisy probe ranks first.
-                if eligible and all(r['consistency']['passed'] for r in responses):
+                if not dynamic and eligible and all(r['consistency']['passed'] for r in responses):
                     best=max(eligible,key=lambda r:preference*r['observation']['value'])
                     if preference*(best['observation']['value']-base['observation']['value'])>max(1e-12,abs(base['observation']['value'])*1e-9):selected=best
-            if selected and len(rows)==2:
+            if dynamic:
+                observed=observed_task_improvement(records,rows,bounds if study.operation=='optimize' else None)
+                selected=records[observed['improved_record_index']] if observed['improved_record_index'] is not None else None
+            if selected and len(rows)==2 and not dynamic:
                 check=joint_consistency(rows,responses,base,selected)
                 evidence['selected_joint_direction_check']=check
                 if not check['passed']:selected=None
@@ -433,11 +481,17 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     c=changes[0];direction.update(parameter_path=c['parameter_path'],parameter_unit=c['unit'],
                         baseline_parameter=c['baseline'],delta=c['delta'],suggested_value=c['suggested_value'])
                 evidence['structure_direction']=direction
-            evidence['direction_status']='locally_supported_proposal' if selected else 'unresolved'
+            evidence['direction_status']=('observed_improvement_proposal' if dynamic else 'locally_supported_proposal') if selected else 'unresolved'
     except ValueError as exc:
         incomplete=dynamic and records and records[-1]['observation']['status']!='computed'
         result.update(status='execution_incomplete' if incomplete else 'not_applicable',reason=str(exc))
         evidence['failure']=dict(reason=str(exc),attempted_evaluations=attempts)
+    if dynamic:
+        observed=observed_task_improvement(records,rows,evidence.get('local_search',{}).get('bounds_normalized'))
+        evidence.update({k:v for k,v in observed.items() if k!='gaps'})
+        evidence['unsupported_conclusions']=[x for x in evidence['unsupported_conclusions'] if x!='full task improvement']
+        evidence['unsupported_conclusions'].append('independent task acceptance')
+        evidence.setdefault('derivative_status',[r['derivative_status'] for r in evidence.get('parameter_sensitivities',[])] or 'not_requested')
     cost={key:sum(m.cost[key] for m in models) for key in (models[0].cost if models else [])}
     cost.update(evaluation_attempts=attempts,kernel_wall_s=time.perf_counter()-started)
     evidence.update(cost=cost,invalid_local_probes=failures)
@@ -450,9 +504,52 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     return result
 
 
+def dynamic_summary(raw, reference):
+    """First-delivery facts only; full per-probe constraints stay in the Store."""
+    observed=observed_task_improvement(raw['records'])
+    observed.update({k:raw[k] for k in observed if k!='gaps' and k in raw})
+    gaps=observed.pop('gaps');best=observed['best_valid_record_index']
+    fields=('constraint_id','condition_id','observed_value','bound','bound_type','unit','normalized_violation','passed')
+    def compact(gap):
+        return dict(signed_task_gap=gap['signed_task_gap'],normalized_gap=gap['normalized_gap'],
+            objective_status=gap['objective_status'],valid_complete=gap['valid_complete'],
+            observation_feasible=gap['observation_feasible'],hard_gate_status=gap['hard_gate_status'],
+            dominant_constraints=[{k:r[k] for k in fields if k in r} for r in gap['dominant_constraints']])
+    gates=[]
+    for key in dict.fromkeys(key for gap in gaps for key in gap['hard_gate_constraints']):
+        facts=[r for gap in gaps for r in gap['constraints'] if r['constraint_id']==key]
+        failed=[r for r in facts if r['passed'] is False]
+        gates.append(dict(constraint_id=key,condition_id=facts[0].get('condition_id'),bound=facts[0]['bound'],
+            unit=facts[0]['unit'],baseline_passed=facts[0]['passed'],
+            best_passed=next((r['passed'] for r in gaps[best]['constraints'] if r['constraint_id']==key),None) if best is not None else None,
+            failed_observations=len(failed),failed_values=list(dict.fromkeys(r['observed_value'] for r in failed))))
+    direction=raw.get('structure_direction');handoff=None
+    if direction and direction.get('generation_handoff'):
+        handoff=dict(tool='research_plan',action='generate',agent_decision_required=True,
+            if_action_not_loaded=dict(tool='research_route',input=dict(tool='research_plan',action='generate')),
+            alternatives=direction['generation_handoff']['alternatives'],supporting_evidence=[reference],
+            generation_query=dict(reference=reference,pointer='/structure_research/structure_direction/generation_handoff/generation'),
+            direction_source=dict(reference=reference,pointer='/structure_research/structure_direction'))
+    return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
+        baseline=compact(gaps[0]) if gaps else None,best_valid=compact(gaps[best]) if best is not None else None,
+        hard_gates=gates,parameter_changes=direction['parameter_changes'] if direction else [],
+        derivative_status=raw.get('derivative_status','not_requested'),
+        parameter_sensitivities=[{k:r[k] for k in ('parameter_path','derivative_status','maximum_constraint_switch','strict_derivative') if k in r}
+            for r in raw.get('parameter_sensitivities',[])],
+        **observed,task_acceptance='unmeasured',reference_semantics=raw.get('reference_semantics'),
+        observation_counts=dict(total=len(gaps),invalid_or_incomplete=sum(not g['valid_complete'] for g in gaps),
+            hard_gate_failed=sum(g['hard_gate_status']=='failed' for g in gaps)),
+        cost=raw['cost'],generation_handoff=handoff,
+        source=dict(reference=reference,pointer='/structure_research'),
+        records_query=dict(reference=reference,pointer='/structure_research/records'),
+        unsupported_conclusions=raw['unsupported_conclusions'],
+        projection='Read-only TaskGap reduction of saved constraint observations; original records and acceptance unchanged.')
+
+
 def summary(value, reference):
     """Read-only projection of immutable evidence, with a source-bound Plan fragment."""
     raw=value['structure_research'];direction=raw.get('structure_direction');baseline=raw.get('baseline',{}).get('value')
+    if raw.get('effect_semantics')=='finite_time_task_response':return dynamic_summary(raw,reference)
     handoff=None
     if direction and direction.get('generation_handoff'):
         handoff=dict(tool='research_plan',action='generate',agent_decision_required=True,
@@ -504,10 +601,4 @@ def summary(value, reference):
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
         effect_semantics=raw.get('effect_semantics'),reference_semantics=raw.get('reference_semantics'),
         method_selection=raw.get('method_selection'),
-        dynamic_task_gaps=[dict(record_index=row['record_index'],task_gap={k:v for k,v in row['observation']['task_gap'].items() if k not in ('constraints','components')})
-            for row in raw['records'] if row['observation'].get('task_gap')],
-        dynamic_metrics=[dict(record_index=row['record_index'],metrics=[{k:c[k] for k in
-            ('constraint_id','condition_id','time_window','observed_value','bound','bound_type','unit','signed_violation','normalized_violation','passed','source_pointer')}
-            for c in row['observation']['task_gap']['constraints']])
-            for row in raw['records'] if row['observation'].get('task_gap')],
         cost=raw['cost'],task_acceptance='unmeasured',unsupported_conclusions=raw['unsupported_conclusions'])

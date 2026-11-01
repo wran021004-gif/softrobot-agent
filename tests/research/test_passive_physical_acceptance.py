@@ -28,11 +28,12 @@ OUT=ROOT/'runs/stage3ab_validation'
 OUT.mkdir(parents=True,exist_ok=True)
 
 
-def prepared_host(*,failure=False,wire=False,budget=4):
+def prepared_host(*,failure=False,wire=False,budget=4,mathematical_budget=None):
     name='stage3ab-'+uuid4().hex[:10]
     cfg=json.loads(CONFIG.read_text())
     cfg.update(study_id=name,evidence_destination='runs/'+name)
     cfg['budgets']['physical_launches']=budget
+    if mathematical_budget is not None:cfg['budgets']['mathematical_evaluations']=mathematical_budget
     if failure:cfg['task']='../../tasks/passive_response_engineering_failure_v1.json'
     if wire:cfg['mode']='formal_research' # Mock HTTP protocol test; still engineering task/authorization.
     path=ROOT/'configs/research'/('._'+name+'.json')
