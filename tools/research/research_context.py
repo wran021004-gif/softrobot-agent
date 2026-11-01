@@ -312,6 +312,9 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
 def context(host, *, evidence_references=None):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
     current=legacy_context(host,evidence_references=evidence_references)
+    if s['spec']['configuration']['task'].get('physical_problem'):
+        current['actions']=[a for a in current['actions'] if a in ('generate','propose','diagnose','stop')]
+        current['control_search_starts']=[]
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
     current['budget']=decision_budget(host)
@@ -642,7 +645,7 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
         residual=[r for r in s.get('compatible_residual_references',[]) if r['candidate']==candidate and r.get('available')]
         index.append(dict(candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
             profile_identity=c.get('profile_identity'),current_profile_identity=s['profile']['identity'],
-            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'],
+            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'] and not c['configuration']['task'].get('physical_problem'),
             resolved_facts=resolved_candidate_facts(c,candidate),
             parameters_query=dict(reference=candidate,view='full',pointer='/parameters'),
             provenance_query=dict(reference=candidate,view='full',pointer='/provenance'),
@@ -772,6 +775,11 @@ def action_feedback(host,current, *, analysis_metadata=None):
         from tools.research_tasks import task_adapter
         cfg=host.store.artifact(candidate)['configuration']
         execution=task_adapter(cfg).execution_requirements()
+        if cfg['task'].get('physical_problem'):
+            rows.extend(dict(action=action,candidate=candidate,status='not_applicable',
+                reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OR_REGISTERED_DYNAMIC_ACCEPTANCE')
+                for action in ('initialize_control','execute','control_search','physical_replay','mechanics','research_rl'))
+            continue
         unsupported=execution.get('unsupported_control_methods',[])
         from tools.research.rl import allocation_feedback, compatible_references
         rl_budget=allocation_feedback(host);refs=compatible_references(host,publish=False)
@@ -1209,6 +1217,10 @@ def controller_capabilities(host):
     """Existing frozen controller owner; large schema is retrieved through L1."""
     from tools.research_tasks import task_adapter
     spec=state(host)['spec'];controller=spec['configuration']['policy']['controller']
+    if spec['configuration']['task'].get('physical_problem'):
+        return dict(status='not_applicable',parameter_schema={},control_channels=[],
+            ppo=task_adapter(spec['configuration']).ppo_applicability(),
+            reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_CHANNELS')
     return dict(recipe_defaults=controller['parameters']['data']['recipe'],
         frozen_replan_period_s=spec.get('nmpc_replan_period_s'),
         task_reference=task_adapter(spec['configuration']).control_reference(),
@@ -1709,7 +1721,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
     result=dict(version='research_decision_brief_v3',
         scientific_results=brief.get('scientific_results'),
-        research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics') if k in task},
+        research_state=dict(task_identity=brief.get('task_identity'),task={k:task.get(k) for k in ('family','reference','evaluator','holding','timing','metrics','research_mode','registered_acceptance','physical_problem') if k in task},
             task_conditions=(brief.get('task_conditions') or {}).get('frozen',[]),
             candidate_status=brief.get('candidate_status'),current_candidate=(brief.get('current_candidate') or {}).get('candidate'),
             task_accepted=brief.get('task_accepted'),latest_result={k:latest[k] for k in ('reference','operation','status','scientific_scope','report_reference') if k in latest}, pending=(brief.get('scientific_execution') or {}).get('pending'),

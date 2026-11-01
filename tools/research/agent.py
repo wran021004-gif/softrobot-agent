@@ -45,6 +45,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['properties'].pop('next_research_action')
     elif (study or {}).get('research_decisions',{}).get('analysis_interface')=='scientific_question_v3':
         schema['properties']['next_research_action']['anyOf'][0]['enum'].remove('mechanism_research')
+    elif (study or {}).get('canonical_task',{}).get('physical_problem') and 'next_research_action' in schema['properties']:
+        schema['properties']['next_research_action']['anyOf'][0]['enum']=['mechanism_research']
     from tools.research.structure_intent import enabled as structure_enabled
     structure_intent=structure_enabled(study or {}) and 'search' in actions
     if scientific_question:
@@ -226,6 +228,7 @@ def tool_directory(host, registry):
     rows=[]
     for name,tool in registry.items():
         if name not in resources:continue
+        if name=='research_rl' and state(host)['spec']['configuration']['task'].get('physical_problem'):continue
         row=dict(tool=name,purpose=tool.tool_spec.get('description','').split('.')[0],
             status='available_for_request_validation',resources=resources[name])
         if name in ('research_plan','research_rl'):
@@ -1415,14 +1418,15 @@ def decision_packet(host):
         research=agent_decision_brief(host)
         controller=controller_capabilities(host)
         controller.pop('parameter_schema')
-        controller['parameter_schema_query']=dict(reference=research['evidence_access']['reference'],
-            view='working_set',pointer='/controller_capabilities/parameter_schema')
+        if controller.get('status')!='not_applicable':
+            controller['parameter_schema_query']=dict(reference=research['evidence_access']['reference'],
+                view='working_set',pointer='/controller_capabilities/parameter_schema')
         candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):]
         bindings=[]
         for ref in candidates:
             identity=host.store.artifact(ref)['profile_identity']
             bindings.append(dict(candidate=ref,profile_identity=identity,
-                executable_under_current_profile=identity==s['profile']['identity']))
+                executable_under_current_profile=identity==s['profile']['identity'] and not spec['configuration']['task'].get('physical_problem')))
         return dict(research=research,implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,

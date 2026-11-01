@@ -29,8 +29,8 @@ class ResearchTaskAdapter:
         """
         if self.task.get('physical_problem'):
             return dict(contract='research.task_conditions',version='1.0.0',task_identity=digest(self.task),
-                conditions=[],mathematical_observations=[dict(condition_id=o['name'],metric=o['quantity'],limit=o.get('maximum'),
-                    load_condition=o['load_condition'],material_s=o.get('material_s',.5),scope='mathematical_equilibrium_only') for o in self.task['physical_problem'].get('observations',[])],
+                conditions=[],mathematical_observations=[dict(condition_id=o['name'],**o,
+                    scope='mathematical_equilibrium_only') for o in self.task['physical_problem'].get('observations',[])],
                 missing=['Passive independent dynamic task evaluator is not registered.'],
                 registered_acceptance='not_registered',physical_problem=self.task['physical_problem'],
                 authority='Frozen material-point and load definitions; mathematical diagnostics only.',continuous_time_guarantee=False)
@@ -95,6 +95,9 @@ class ResearchTaskAdapter:
 
     def ppo_applicability(self):
         """Task semantics supported by the current PPO environment, not a grant."""
+        if self.task.get('physical_problem'):
+            return dict(status='not_applicable',supported=False,reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_CHANNELS',
+                scope='Frozen unilateral equilibrium mathematics; PPO and active control are not applicable.')
         family=self.task['family']
         supported=family=='task.reach' or (family=='task.tracking' and self.control_reference()['kind']=='free_progress')
         return dict(status='conditional' if supported else 'not_applicable',
@@ -105,6 +108,14 @@ class ResearchTaskAdapter:
     def execution_requirements(self):
         """Required signals/registered capabilities, not a claim of executability."""
         task = self.task
+        if task.get('physical_problem'):
+            return dict(task_family=task['physical_problem']['mode'],task_status=task['status'],
+                actuator_channels=[],protocol_id=None,protocol_template_id=None,signals=[],
+                registered_acceptance='not_registered',execution_admission='not_registered',
+                known_blockers=['Passive independent dynamic execution/evaluator is not registered.'],
+                unsupported_control_methods=['ppo','nmpc','native','baseline','mathematical_response'],
+                physical_inputs=self._physical_inputs(),ppo=self.ppo_applicability(),
+                applicability='Frozen static load-case mathematics is available through research_analysis; passive Replay/SELECT is not registered.')
         reach = task['family'] == 'task.reach'
         timed = not reach and task['goal']['data']['time_requirement'] == 'timed'
         complete = {'robot', 'policy'} <= self.configuration.keys()
@@ -157,20 +168,28 @@ class ResearchTaskAdapter:
     def constrained_observations(self,mechanics):
         """Frozen task metrics from both equilibria; never a SELECT evaluator."""
         import numpy as np
+        from extensions.tendon_family.contracts import ConstrainedObservation
         problem=self.task['physical_problem'];rows=[]
         eq=mechanics['equilibrium']['equilibrium'];base=mechanics['baseline_equilibrium']['equilibrium']
         qualified=mechanics['constraint_state']['qualified']
         delta=np.array(eq['positions'])-np.array(base['positions'])
-        for metric in problem.get('observations',[]):
-            if metric['load_condition']!=mechanics['point_binding']['load']['name']:continue
-            point=float(np.linalg.norm(delta[problem['monitor_s'].index(metric.get('material_s',.5))])) if metric['quantity'] in ('material_displacement','displacement_ratio') else 0.
-            tip=float(np.linalg.norm(delta[-1]))
-            name=metric['quantity'];unit='1' if name=='displacement_ratio' else 'N' if name=='maximum_tension' else 'm'
-            value={'material_displacement':point,'tip_displacement':tip,'displacement_ratio':tip/point if point>1e-12 else None,
-                'maximum_tension':max(eq['tensions_n']),'maximum_length_excess':max(0.,max(eq['length_residual_m']))}[name] if qualified else None
-            limit=metric.get('maximum')
-            rows.append(dict(name=metric['name'],value=value,unit=unit,maximum=limit,
-                within_mathematical_limit=value<=limit if value is not None and limit is not None else None,
+        for raw in problem.get('observations',[]):
+            metric=ConstrainedObservation.model_validate(raw)
+            if metric.load_condition!=mechanics['point_binding']['load']['name']:continue
+            def reduce(vector):
+                if metric.reduction=='component':return float(np.asarray(metric.direction_world)@vector)
+                if metric.reduction=='projection_norm':return float(np.linalg.norm(np.asarray(metric.projection_world)@vector))
+                return float(np.linalg.norm(vector))
+            point=reduce(delta[problem['monitor_s'].index(metric.material_s)]) if metric.quantity in ('material_displacement','displacement_ratio','displacement_difference') else 0.
+            tip=reduce(delta[-1])
+            value={'material_displacement':point,'tip_displacement':tip,'displacement_ratio':tip/point if abs(point)>1e-12 else None,
+                'displacement_difference':tip-metric.material_scale*point,
+                'maximum_tension':max(eq['tensions_n']),'maximum_length_excess':max(0.,max(eq['length_residual_m']))}[metric.quantity] if qualified else None
+            bounded=metric.minimum is not None or metric.maximum is not None
+            rows.append(dict(name=metric.name,value=value,unit=metric.physical_unit,maximum=metric.maximum,minimum=metric.minimum,
+                observation=metric.model_dump(),reference_load=problem['baseline_load'],
+                within_mathematical_limit=bool((metric.minimum is None or value>=metric.minimum) and
+                    (metric.maximum is None or value<=metric.maximum)) if value is not None and bounded else None,
                 scope='Both design-dependent hard equilibria; independent dynamic acceptance is unmeasured.',registered_acceptance='not_registered'))
         return rows
 
@@ -222,6 +241,10 @@ class ResearchTaskAdapter:
     def control_reference(self):
         """Small view of the authoritative task; no acceptance state is copied."""
         task = self.task
+        if task.get('physical_problem'):
+            return dict(kind='static_load_cases',task_family=task['physical_problem']['mode'],
+                frame='world',goal=None,evaluator=None,control_channels=[],registered_acceptance='not_registered',
+                condition_source='/task/physical_problem',horizon_semantics='static_equilibrium_only')
         kind = ('constant' if task['family'] == 'task.reach' else
                 'timed' if task['goal']['data']['time_requirement'] == 'timed' else 'free_progress')
         return dict(kind=kind, task_family=task['family'], frame='world', units='m',
@@ -263,8 +286,7 @@ class ResearchTaskAdapter:
             signal=next(s for s in task['observations'] if s['name']=='tip_position')
             return TaskAnalysisRequirement(binding={**binding,'task_identity':digest(task),'physical_problem':task['physical_problem']},
                 duration_s=duration,sample_period_s=period,time_grid_s=[i*period for i in range(round(duration/period)+1)],
-                constraints=[dict(constraint_id='passive_dynamic_acceptance',signal=signal,indices=[0],kind='unsupported',reference=[[0.,0.,0.]],
-                    provenance=['/task/physical_problem'],unsupported_requirement=dict(registered_acceptance='not_registered'))],
+                constraints=[],horizon_semantics='static_load_cases',
                 physical_inputs=self._physical_inputs(),required_physics=['unilateral_tendon_lengths'])
         conditions = self.condition_view()['conditions']
         duration, period = task['timing']['duration_s'], task['timing']['sample_period_s']
@@ -321,6 +343,9 @@ class ResearchTaskAdapter:
             physical_inputs=self._physical_inputs())
 
     def operating_point(self, time_s=0.0):
+        if self.task.get('physical_problem'):
+            return dict(state_source='Solve each frozen unilateral load condition and its unloaded reference.',
+                frame='world',reference_is_equilibrium=False,time_reference='static_load_cases')
         if self.task['family']=='task.tracking' and self.task['goal']['data']['time_requirement']=='none':
             return dict(reference_position_m=self.task['goal']['data']['vertices_m'][0],reference_velocity_m_s=None,
                 frame='world',state_source='Named task initializer',reference_is_equilibrium=False,time_reference='none')
@@ -329,6 +354,12 @@ class ResearchTaskAdapter:
 
     def describe(self):
         task = self.task
+        if task.get('physical_problem'):
+            return dict(contract='research.task_adapter',version='1.0.0',family=task['physical_problem']['mode'],
+                research_mode='static_mechanism_research',physical_problem=task['physical_problem'],
+                evaluator=None,registered_acceptance='not_registered',reference=self.control_reference(),
+                metrics=self.condition_view()['mathematical_observations'],
+                context='Frozen unilateral static observations and diagnostic bounds; dynamic Replay/SELECT is not registered.')
         reach = task['family'] == 'task.reach'
         timed=not reach and task['goal']['data']['time_requirement']=='timed'
         metrics = [dict(name='terminal_error_m', unit='m', meaning='Sealed endpoint evaluator position error'), dict(name='holding_max_error_m', unit='m', meaning='Maximum sampled final-window tip error'), dict(name='holding_max_speed_m_s', unit='m/s', meaning='Maximum sampled world translational tip speed')] if reach else [dict(name=name, unit='m', meaning=meaning) for name, meaning in (('max_position_error', 'Maximum saved-polyline distance to geometric reference'), ('rms_position_error', 'RMS on uniform geometric arc-length samples; diagnostic'), ('terminal_position_error', 'Distance to path endpoint, no arrival deadline'), ('path_coverage_error','Reference path coverage by saved polyline'))]

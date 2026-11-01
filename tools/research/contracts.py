@@ -421,11 +421,25 @@ class MechanismTarget(Contract):
 
 
 class PhysicalMechanismTarget(MechanismTarget):
-    quantity: MechanismTarget.model_fields['quantity'].annotation | Literal[
-        'constraint_length_jacobian','constraint_active_set','constraint_multiplier','slack_margin',
-        'constrained_motion_subspace','tangent_stiffness','tangent_compliance','material_point_force_response',
-        're_equilibrated_position_response','constraint_tip_row_residual','directional_material_response']
+    from extensions.math_analysis.mechanism_registry import PRIMITIVES as _mechanisms
+    quantity: Literal[tuple(_mechanisms)]
     material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
+    projection_world: list[tuple[FiniteFloat,FiniteFloat,FiniteFloat]] | None = Field(default=None,min_length=1,max_length=3,
+        description='Orthonormal world output rows for declared row-space coverage; choose a direction or subspace explicitly.')
+
+    @model_validator(mode='after')
+    def projected_output(self):
+        from extensions.math_analysis.mechanism_registry import validate_projection
+        projected=self.quantity in ('constraint_output_row_residual','all_tendon_output_row_residual')
+        if projected != (self.projection_world is not None):raise ValueError('EXPLICIT_OUTPUT_PROJECTION_REQUIRED_ONLY_FOR_ROW_COVERAGE')
+        if projected:validate_projection(self.projection_world)
+        return self
+
+    @model_serializer(mode='wrap')
+    def physical_target(self,handler):
+        result=handler(self)
+        if self.projection_world is None:result.pop('projection_world',None)
+        return result
 
 
 class ScientificSourcesV2(ScientificSources):

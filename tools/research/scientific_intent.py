@@ -93,8 +93,9 @@ def question_schema(spec, candidate=None, action=None):
         control=schema['$defs']['ScientificQuestionV3']['properties']
         for name in ('parameter_paths','search_strategy','requested_budget'):control.pop(name,None)
         control['question_type']={'type':'string','const':'control_feasibility'}
-        if action in ('mechanism_research','single_parameter_effect','control_feasibility'):
-            domain='control' if action=='control_feasibility' else 'structure'
+        passive=bool((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec.get('canonical_task',{}).get('physical_problem'))
+        if action in ('mechanism_research','single_parameter_effect','control_feasibility') or passive:
+            domain='control' if action=='control_feasibility' and not passive else 'structure'
             schema['properties']['domain']={'type':'string','const':domain}
             schema['properties'].pop('structure' if domain=='control' else 'control')
             schema['properties'][domain].pop('default',None)
@@ -104,12 +105,10 @@ def question_schema(spec, candidate=None, action=None):
         target.pop('default',None)
         target['description']='Main explicitly chooses increase or decrease for differentiation or optimization.'
         schema['$defs']['ScientificStructureV4']['allOf']=[dict(
-            **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize']),effect_semantics=dict(const='mechanism_effect')),
-                required=['operation','effect_semantics'])},
+            **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize'])),required=['operation'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
         if candidate and candidate['configuration']['task'].get('physical_problem'):
-            from extensions.math_analysis.mechanism_registry import CONSTRAINED,COMMON_GEOMETRY
             problem=candidate['configuration']['task']['physical_problem']
             props=schema['$defs']['ScientificStructureV4']['properties']
             for name in ('source_selection','control_scope','search_strategy','tensions_n','saved_state','execution','update_id','response_horizon_s','parameter_group'):
@@ -119,19 +118,29 @@ def question_schema(spec, candidate=None, action=None):
             props['operating_point']={'type':'string','const':'re_equilibrated'}
             props['load_condition']={'type':'string','enum':[x['name'] for x in problem['loads']]}
             props['effect_semantics']={'type':'string','enum':['mechanism_effect','re_equilibrated_passive_response']}
-            schema['$defs']['PhysicalMechanismTarget']['properties']['quantity']={'type':'string','enum':[*CONSTRAINED,*COMMON_GEOMETRY]}
             target_props=schema['$defs']['PhysicalMechanismTarget']['properties']
             for name in ('tendon_channel','direction_generalized'):target_props.pop(name,None)
             target_props['reduction']={'type':'string','enum':['identity','norm','minimum','maximum','directional_norm'],'default':'identity'}
             schema['$defs']['ScientificStructureV4']['required']+=['physical_problem','load_condition']
         elif candidate:
-            from extensions.math_analysis.mechanism_registry import PRIMITIVES,CONSTRAINED
             props=schema['$defs']['ScientificStructureV4']['properties']
             for name in ('physical_problem','load_condition'):props.pop(name,None)
-            props['control_treatment']={'type':'string','enum':['fixed_absolute_tensions','reoptimized','closed_loop']}
+            props['effect_semantics']={'type':'string','enum':['mechanism_effect','fixed_input_response','reoptimized_task_capability']}
+            props['control_treatment']={'type':'string','enum':['fixed_absolute_tensions','reoptimized']}
+            props['operating_point']={'type':'string','enum':['frozen_task_initial_state','same_generalized_coordinates','fixed_generalized_pose','saved_native_state']}
             target=schema['$defs']['PhysicalMechanismTarget']['properties']
-            target['quantity']={'type':'string','enum':[k for k in PRIMITIVES if k not in CONSTRAINED]}
-            target.pop('material_s',None)
+        from extensions.math_analysis.mechanism_registry import mechanism_ids
+        mode='passive_unilateral_equilibrium' if (candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') else 'active_ideal_tension'
+        target=schema['$defs']['PhysicalMechanismTarget']
+        target['properties']['quantity']={'type':'string','enum':mechanism_ids(mode)}
+        target.setdefault('allOf',[]).append(dict(
+            **{'if':dict(properties=dict(quantity=dict(enum=['constraint_output_row_residual','all_tendon_output_row_residual'])),required=['quantity'])},
+            then=dict(required=['projection_world'])))
+        structure=schema['$defs']['ScientificStructureV4']
+        for operation in ('inspect','differentiate','optimize','compare'):
+            structure.setdefault('allOf',[]).append({
+                'if':{'properties':{'operation':{'const':operation}},'required':['operation']},
+                'then':{'properties':{'target':{'properties':{'quantity':{'enum':mechanism_ids(mode,operation)}}}}}})
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
         schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
@@ -192,7 +201,7 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False)
         if q.domain=='structure':
             structure=payload['structure']
-            if (q.structure.effect_semantics=='mechanism_effect' and q.structure.operation in ('differentiate','optimize') and
+            if (q.structure.operation in ('differentiate','optimize') and
                     isinstance(structure.get('target'),dict) and 'goal' not in structure['target']):
                 return dict(status='needs_choice',reason='EXPLICIT_MECHANISM_GOAL_REQUIRED',fields=['structure.target.goal'],scientific_execution_started=False)
             return compile_mechanism(host,structure,tool_use_id=tool_use_id,v4=True)
@@ -566,12 +575,11 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
     if q.load_condition not in [x['name'] for x in problem['loads']]:return fail('SELECT_FROZEN_LOAD_CONDITION')
     if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
         return fail('PASSIVE_STATIC_QUESTION_CANNOT_BIND_ACTIVE_OR_DYNAMIC_CONTROL')
-    from extensions.math_analysis.mechanism_registry import CONSTRAINED,COMMON_GEOMETRY
-    if isinstance(q.target,str) or q.target.quantity not in (*CONSTRAINED,*COMMON_GEOMETRY):return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
+    from extensions.math_analysis.mechanism_registry import PRIMITIVES
+    if isinstance(q.target,str) or problem['mode'] not in PRIMITIVES[q.target.quantity]['physical_modes']:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
     if q.target.quantity=='re_equilibrated_position_response' and q.effect_semantics!='re_equilibrated_passive_response':return fail('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
     paths=q.parameter_paths
     if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETERS')
-    if q.operation in ('differentiate','optimize') and 'goal' not in payload.get('target',{}):return fail('EXPLICIT_MECHANISM_GOAL_REQUIRED')
     if q.requested_budget is None:return fail('EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
     study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
         load_condition=q.load_condition,effect_semantics=q.effect_semantics,max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)

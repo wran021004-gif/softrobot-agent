@@ -21,9 +21,12 @@ def material_point(physics,s):
         target-=p['length_m']
 
 
-SOLVER=dict(hessian_step_rad=1e-5,active_tolerance_m=1e-7,rank_relative_tolerance=1e-8,
+SOLVER=dict(version='passive_equilibrium_v1',hessian_step_rad=1e-5,active_tolerance_m=1e-7,rank_relative_tolerance=1e-8,
     stationarity_tolerance_nm=1e-7,length_tolerance_m=1e-8,complementarity_tolerance_nm=1e-8,
-    minimum_reduced_eigenvalue=1e-8,ftol=1e-12,max_iterations=150)
+    minimum_reduced_eigenvalue=1e-8,ftol=1e-12,max_iterations=150,
+    positive_multiplier_tolerance_n=1e-7,multiplier_max_iterations=1000,
+    qp_ftol=1e-12,qp_max_iterations=200,qp_increment_n=.001,
+    native_iterations=100,native_tolerance=1e-10)
 
 
 class PassiveModel:
@@ -31,13 +34,14 @@ class PassiveModel:
         problem=ConstrainedPhysicalProblem.model_validate(problem)
         if not physics.get('fixed_payout_lengths_m') or physics['actuators']:raise ValueError('COMPILED_PASSIVE_ASSEMBLY_REQUIRED')
         self.physics=physics;self.problem=problem;self.unrestricted=False
-        self.protocol=dict(static_solver=SOLVER,monitor_s=problem.monitor_s)
+        self.protocol=dict(static_solver=dict(SOLVER),monitor_s=problem.monitor_s)
         self.payout=np.array([physics['fixed_payout_lengths_m'][t['entity']] for t in physics['tendons']])
         scene=dict(mount_position=problem.mount_position,mount_rotation=problem.mount_rotation,gravity=problem.gravity,
             floor_id='floor',floor_z_m=-100.,timestep_s=.001,control=dict(tension_execution_mode='passive_fixed_payout_v1'))
         xml=BytesIO();compile_xml(physics,scene,None,xml)
         if path is not None:path.write_bytes(xml.getvalue())
-        self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf-8'));self.model.opt.iterations=100;self.model.opt.tolerance=1e-10
+        self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf-8'))
+        self.model.opt.iterations=SOLVER['native_iterations'];self.model.opt.tolerance=SOLVER['native_tolerance']
         self.body_ids=[self.model.body(p['entity']).id for p in physics['parts']];self.base=self.model.body('fixed_base').id
         self.points=[material_point(physics,s) for s in problem.monitor_s]+[physics['tip']]
         if self.model.nu or self.model.nq!=self.model.nv:raise ValueError('PASSIVE_HINGES_WITHOUT_ACTIVE_CHANNELS_REQUIRED')

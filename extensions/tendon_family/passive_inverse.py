@@ -4,14 +4,18 @@ from .passive import material_point
 from .passive_equilibrium import StaticProblem, solve
 
 
-def row_match(Jlength,Jtip):
-    """Scale-free row-space coverage, including both horizontal task rows."""
+def row_match(Jlength,Joutput):
+    """Scale-free coverage of the explicitly selected output rows.
+
+    The caller owns whether length rows are all geometric routes or actual
+    positive-multiplier constraints. Boundary inequalities are not equalities.
+    """
     sv=np.linalg.svd(Jlength,compute_uv=False)
     rank=int(np.sum(sv>max(1e-12,sv[0]*1e-8))) if len(sv) else 0
     P=np.linalg.pinv(Jlength,rcond=1e-8)@Jlength
-    errors=[float(np.linalg.norm(j-j@P)/max(np.linalg.norm(j),1e-15)) for j in Jtip[:2]]
+    errors=[float(np.linalg.norm(j-j@P)/max(np.linalg.norm(j),1e-15)) for j in Joutput]
     return dict(rank=rank,singular_values=sv.tolist(),condition=float(sv[0]/sv[rank-1]) if rank else None,
-                horizontal_row_residuals=errors)
+                row_residuals=errors)
 
 
 def design_sensitivity(native,equilibrium,minus,plus,parameter,step,s,force,*,resolved=None,observation_s=None):

@@ -4,7 +4,7 @@ from copy import deepcopy
 import numpy as np
 from tools.platform_store import plain
 from extensions.tendon_family.family_space import resolved_request
-from extensions.math_analysis.mechanism_registry import observe
+from extensions.math_analysis.mechanism_registry import observe,PRIMITIVES,mechanism_ids
 from extensions.math_analysis.differentiation_router import differentiate, stencil, coordinate, physical_value
 
 METHOD='mechanism_structure_v1'
@@ -33,6 +33,10 @@ def group_matches(row, group):
 def prepare_context(spec, candidate, study, comparisons):
     """Read-only actual-domain/source admission before the existing reservation."""
     problem=candidate['configuration']['task'].get('physical_problem')
+    mode=problem['mode'] if problem else 'active_ideal_tension'
+    metadata=PRIMITIVES[study.target.quantity]
+    if mode not in metadata['physical_modes']:raise ValueError('MECHANISM_PHYSICAL_MODE_MISMATCH')
+    if study.operation not in metadata['operations']:raise ValueError('MECHANISM_OPERATION_NOT_IMPLEMENTED: '+metadata['unavailable_operation_reason'])
     if problem:
         if study.point_semantics!='re_equilibrated' or study.load_condition not in [x['name'] for x in problem['loads']]:
             raise ValueError('FROZEN_PASSIVE_LOAD_AND_RE_EQUILIBRATION_REQUIRED')
@@ -84,6 +88,7 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
             ['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],
+        mechanisms=mechanism_ids('passive_unilateral_equilibrium' if candidate['configuration']['task'].get('physical_problem') else 'active_ideal_tension'),
         effective_parameter_groups=sorted({r['category'] for r in rows if r['mechanism_differentiation']['supported']}),
         evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,
@@ -192,7 +197,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         else:data=native.restore(baseline_point,comparable=True)
         if not passive:
             u=point['u'] if query.native.tensions_n is None else query.native.tensions_n
-            mechanics=native.mechanics(data,u)
+            mechanics=native.mechanics(data,u,material_s=study.target.material_s) if study.target.quantity=='material_point_jacobian' else native.mechanics(data,u)
         observation=observe(mechanics,study.target)
         record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
             configuration=cfg,observation=observation,mechanics=mechanics,state=data if passive else native.checkpoint(data),

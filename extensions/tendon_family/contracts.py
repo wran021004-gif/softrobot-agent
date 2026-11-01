@@ -174,10 +174,46 @@ class MaterialLoad(Contract):
 
 class ConstrainedObservation(Contract):
     name: Name
-    quantity: Literal['material_displacement','tip_displacement','displacement_ratio','maximum_tension','maximum_length_excess']
+    quantity: Literal['material_displacement','tip_displacement','displacement_ratio','displacement_difference','maximum_tension','maximum_length_excess']
     load_condition: Name
     material_s: FiniteFloat = Field(default=.5,ge=0,le=1)
-    maximum: FiniteFloat | None = Field(default=None,ge=0)
+    maximum: FiniteFloat | None = None
+    minimum: FiniteFloat | None = None
+    reduction: Literal['norm','component','projection_norm'] = 'norm'
+    direction_world: Vec3 | None = None
+    projection_world: list[Vec3] | None = Field(default=None,min_length=1,max_length=3)
+    frame: Literal['world'] = 'world'
+    reference_load: Name | None = None
+    material_scale: FiniteFloat = Field(default=1.,gt=0,
+        description='For displacement_difference: tip response minus material_scale times material response, in metres; avoids division near zero.')
+    unit: Literal['m','N','1'] | None = None
+
+    @property
+    def physical_unit(self):
+        return 'N' if self.quantity=='maximum_tension' else '1' if self.quantity=='displacement_ratio' else 'm'
+
+    @model_validator(mode='after')
+    def observation_semantics(self):
+        import numpy as np
+        from extensions.math_analysis.mechanism_registry import validate_projection
+        if self.minimum is not None and self.maximum is not None and self.minimum>self.maximum:raise ValueError('ORDERED_OBSERVATION_BOUNDS_REQUIRED')
+        if self.unit is not None and self.unit!=self.physical_unit:raise ValueError('OBSERVATION_PHYSICAL_UNIT_MISMATCH')
+        if (self.reduction=='component') != (self.direction_world is not None):raise ValueError('COMPONENT_REQUIRES_EXPLICIT_WORLD_DIRECTION')
+        if self.direction_world is not None and abs(np.linalg.norm(self.direction_world)-1)>1e-8:raise ValueError('UNIT_WORLD_DIRECTION_REQUIRED')
+        if (self.reduction=='projection_norm') != (self.projection_world is not None):raise ValueError('PROJECTION_NORM_REQUIRES_WORLD_SUBSPACE')
+        if self.projection_world is not None:validate_projection(self.projection_world)
+        if self.quantity in ('maximum_tension','maximum_length_excess') and self.reduction!='norm':raise ValueError('GLOBAL_SCALAR_HAS_NO_SPATIAL_PROJECTION')
+        if self.quantity!='displacement_difference' and self.material_scale!=1.:raise ValueError('MATERIAL_SCALE_REQUIRES_DISPLACEMENT_DIFFERENCE')
+        return self
+
+    @model_serializer(mode='wrap')
+    def historical_observation(self,handler):
+        result=handler(self)
+        # Preserve absent defaults in frozen historical task identities.
+        for key,default in dict(minimum=None,reduction='norm',direction_world=None,projection_world=None,
+                frame='world',reference_load=None,material_scale=1.,unit=None).items():
+            if getattr(self,key)==default:result.pop(key,None)
+        return result
 
 
 class ConstrainedPhysicalProblem(Contract):
@@ -201,7 +237,8 @@ class ConstrainedPhysicalProblem(Contract):
         if len(set(names))!=len(names) or self.baseline_load not in names:raise ValueError('UNIQUE_FROZEN_LOAD_BINDINGS_REQUIRED')
         if any(not 0<=s<=1 for s in self.monitor_s):raise ValueError('MATERIAL_S_OUT_OF_RANGE')
         if len({o.name for o in self.observations})!=len(self.observations) or any(o.load_condition not in names or
-                o.quantity in ('material_displacement','displacement_ratio') and o.material_s not in self.monitor_s for o in self.observations):
+                o.quantity in ('material_displacement','displacement_ratio','displacement_difference') and o.material_s not in self.monitor_s or
+                o.reference_load is not None and o.reference_load!=self.baseline_load for o in self.observations):
             raise ValueError('UNIQUE_OBSERVATIONS_WITH_FROZEN_LOAD_AND_MONITOR_BINDING_REQUIRED')
         if not np.allclose(R.T@R,np.eye(3),atol=1e-10) or abs(np.linalg.det(R)-1)>1e-10:raise ValueError('PROPER_MOUNT_ROTATION_REQUIRED')
         if any(next(x for x in self.loads if x.name==self.baseline_load).force_world_n):raise ValueError('ZERO_LOAD_BASELINE_REQUIRED')

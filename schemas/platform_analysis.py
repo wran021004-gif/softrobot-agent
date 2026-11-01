@@ -323,14 +323,17 @@ class TaskAnalysisRequirement(Contract):
     duration_s: PositiveFloat
     sample_period_s: PositiveFloat
     time_grid_s: list[float] = Field(min_length=2)
-    constraints: list[TaskAnalysisConstraint | PathAnalysisConstraint] = Field(min_length=1)
+    constraints: list[TaskAnalysisConstraint | PathAnalysisConstraint]
     physical_inputs: dict
     required_physics: list[str] = Field(default_factory=list)
     horizon_semantics: Literal['absolute_task_time_inclusive_samples',
-        'numerical_witness_horizon_inclusive_samples'] = 'absolute_task_time_inclusive_samples'
+        'numerical_witness_horizon_inclusive_samples','static_load_cases'] = 'absolute_task_time_inclusive_samples'
 
     @model_validator(mode='after')
     def exact_grid(self):
+        if not self.constraints and not (self.horizon_semantics=='static_load_cases' and
+                self.binding.get('physical_problem',{}).get('mode')=='passive_unilateral_equilibrium'):
+            raise ValueError('REGISTERED_TASK_CONSTRAINTS_REQUIRED')
         if (any(abs(t-i*self.sample_period_s) > 1e-12 for i,t in enumerate(self.time_grid_s))
                 or abs(self.time_grid_s[-1]-self.duration_s) > 1e-12):
             raise ValueError('INCLUSIVE_UNIFORM_TASK_GRID_REQUIRED')

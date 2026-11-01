@@ -63,10 +63,16 @@ CONSTRAINED = {
     'constraint_active_set':('1',['nu']), 'constraint_multiplier':('N',['nu']),
     'slack_margin':('m',['nu']), 'constrained_motion_subspace':('1',['nv','free']),
     'tangent_stiffness':('N*m/rad',['free','free']),
-    'tangent_compliance':('m/N',['3','3']), 'material_point_force_response':('m/N',['3','3']),
+    'tangent_compliance':('m/N',['3','3']),
     're_equilibrated_position_response':('m',['3']), 'constraint_tip_row_residual':('1',['2']),
-    'directional_material_response':('m/N',['2','3'])}
-COMMON_GEOMETRY=('tip_jacobian','tendon_jacobian','joint_stiffness','joint_damping')
+    'directional_material_response':('m/N',['2','3']),
+    'constraint_output_row_residual':('1',['projection']),
+    'constraint_payout':('m',['nu']), 'constraint_length_residual':('m',['nu']),
+    'constraint_tension_margin':('N',['nu']), 'constraint_kkt_residual':('N*m',[]),
+    'constraint_boundary_set':('1',['nu']), 'constraint_slack_set':('1',['nu']),
+    'constraint_feasible_equalities':('m/rad',['positive','nv']),
+    'constraint_feasible_inequalities':('m/rad',['boundary','nv'])}
+COMMON_GEOMETRY=('tip_jacobian','material_point_jacobian','tendon_jacobian','joint_stiffness','joint_damping','all_tendon_output_row_residual')
 for name,(unit,shape) in CONSTRAINED.items():
     PRIMITIVES[name]=dict(field=name,unit=unit,shape=shape,frame='world / named hinges / ordered fixed-payout tendons',
         parameter_dependencies=['geometry','routing','stiffness','payout','external_load'],
@@ -77,10 +83,55 @@ PRIMITIVES['directional_material_response'].update(
     validity='Qualified equilibrium; positive rows are equalities and zero-multiplier active rows are inequalities. Two local +/-0.001 N QPs; not an ordinary gradient at a switching boundary.',
     meaning='Two signed material-point response vectors per newton along the declared world force direction; finite-load nonlinear response remains unmeasured.')
 
+PRIMITIVES['material_point_jacobian']=_primitive('material_point_jacobian_m_rad','m/rad',['3','nv'],'world / named hinges',
+    'geometry','Velocity of the declared material station = J_point qvel; body attachment is resolved from the actual mesh.')
+PRIMITIVES['all_tendon_output_row_residual']=_primitive(None,'1',['projection'],'declared world output rows / named hinges',
+    'geometry routing','Geometric coverage by ALL tendon routes, including slack routes; never an effective unilateral constraint space.')
+for name in ('constraint_tip_row_residual','constraint_output_row_residual'):
+    PRIMITIVES[name].update(field=None,source='extensions.tendon_family.passive_inverse.row_match',
+        meaning=('Legacy world-X/Y tip row coverage by positive-multiplier constraints; not general 3D decoupling.' if name=='constraint_tip_row_residual' else
+            'Coverage of explicitly projected tip rows by actual positive-multiplier constraints. Boundary inequalities remain in the feasible cone; loaded compliance is separate.'))
+for name,field in dict(constraint_payout='components/constraint_payout_m',constraint_length_residual='equilibrium/equilibrium/length_residual_m',
+        constraint_tension_margin='constraint_tension_margin_n',constraint_kkt_residual='constraint_state/stationarity_inf_nm',
+        constraint_boundary_set='constraint_boundary_set',constraint_slack_set='constraint_slack_set',
+        constraint_feasible_equalities='feasible_cone/equalities',constraint_feasible_inequalities='feasible_cone/inequalities').items():
+    PRIMITIVES[name]['field']=field
+
+ALIASES={'material_point_force_response':'tangent_compliance'}
+PRIMITIVES['material_point_force_response']={**deepcopy(PRIMITIVES['tangent_compliance']),
+    'alias_of':'tangent_compliance','meaning':'Historical name for the same J_point C J_point.T matrix; no independent experiment.'}
+CONSTRAINED['material_point_force_response']=CONSTRAINED['tangent_compliance']
+for name,meta in PRIMITIVES.items():
+    meta.update(physical_modes=['passive_unilateral_equilibrium'] if name in CONSTRAINED else
+        ['active_ideal_tension','passive_unilateral_equilibrium'] if name in COMMON_GEOMETRY else ['active_ideal_tension'],
+        operations=['inspect','compare'] if name in ('drive_directions','constraint_active_set','constraint_boundary_set','constraint_slack_set',
+            'constrained_motion_subspace','directional_material_response') else ['inspect','differentiate','optimize','compare'],
+        main_visible=name not in (*ALIASES,'constraint_tip_row_residual'))
+    if len(meta['operations'])==2:meta['unavailable_operation_reason']='Discrete active-set, basis/sign ambiguity or one-sided cone response does not define an ordinary structural gradient.'
+ACTIVE_MECHANISMS=tuple(k for k,v in PRIMITIVES.items() if 'active_ideal_tension' in v['physical_modes'])
+
+
+def mechanism_ids(mode, operation=None):
+    return [k for k,v in PRIMITIVES.items() if v['main_visible'] and mode in v['physical_modes'] and
+        (operation is None or operation in v['operations'])]
+
+
+def output_rows(target):
+    """Explicit world direction or orthonormal output subspace, never inferred."""
+    return np.asarray(target.projection_world if target.projection_world is not None else [target.direction_world])
+
+
+def validate_projection(rows):
+    matrix=np.asarray(rows,dtype=float)
+    if matrix.ndim!=2 or matrix.shape[1]!=3 or not 1<=len(matrix)<=3 or not np.allclose(matrix@matrix.T,np.eye(len(matrix)),atol=1e-8,rtol=0):
+        raise ValueError('ORTHONORMAL_WORLD_PROJECTION_ROWS_REQUIRED')
+
 
 def catalog():
     return dict(primitives=deepcopy(PRIMITIVES),compositions=['identity','norm','minimum','maximum','directional_norm','generalized_projection','direction_cosine'],
-        unavailable=dict(hybrid_or_contact='Active/passive mixtures and contact sensitivities are not implemented.'),
+        unavailable=dict(hybrid_or_contact='Active/passive mixtures and contact sensitivities are not implemented.',
+            dynamic_modes='No registered native eigenmode/frequency-response backend; PHS modal_target/matching remain specialized prototypes.',
+            energy_dissipation='Compiled stiffness/damping are exposed; no integrated energy/dissipation mechanism backend.'),
         legacy_sources=dict(endpoint='bounded affine task kernel; no local mechanism substitution',
             braking='bounded affine task kernel',native_dynamics_v1='NativeModel.mechanics',
             fixed_input_structure_v1='same mechanics plus existing short fixed-input rollouts'))
@@ -89,6 +140,16 @@ def catalog():
 def derived(mechanics, target):
     """Small compositions of existing native exports, never a second physics kernel."""
     name=target.quantity
+    if name in ('constraint_tip_row_residual','constraint_output_row_residual','all_tendon_output_row_residual'):
+        from extensions.tendon_family.passive_inverse import row_match
+        J=np.asarray(mechanics['tendon_jacobian_m_rad'])
+        if name!='all_tendon_output_row_residual':
+            if not mechanics['constraint_state']['qualified']:return None
+            J=J[np.asarray(mechanics['equilibrium']['equilibrium']['positive'],dtype=bool)]
+        projection=np.eye(3)[:2] if name=='constraint_tip_row_residual' else output_rows(target)
+        rows=projection@np.asarray(mechanics['tip_jacobian_m_rad'])
+        if np.any(np.linalg.norm(rows,axis=1)<=1e-14):return None
+        return row_match(J,rows)['row_residuals']
     if name=='drive_directions':return np.linalg.svd(mechanics['tip_acceleration_input_map_m_s2_n'],full_matrices=False)[0]
     if name in ('total_mass','body_inertia_trace'):
         return np.sum(mechanics['components']['body_mass_kg' if name=='total_mass' else 'body_inertia_kg_m2'])
@@ -118,7 +179,8 @@ def observe(mechanics, target):
     target=PhysicalMechanismTarget.model_validate(target.model_dump() if hasattr(target,'model_dump') else target)
     meta=deepcopy(PRIMITIVES[target.quantity]);value=mechanics
     passive=mechanics.get('physical_problem')=='passive_unilateral_equilibrium'
-    if target.quantity in CONSTRAINED and not passive or passive and target.quantity not in (*CONSTRAINED,*COMMON_GEOMETRY):
+    mode='passive_unilateral_equilibrium' if passive else 'active_ideal_tension'
+    if mode not in meta['physical_modes']:
         return dict(status='not_applicable',reason='MECHANISM_PHYSICAL_MODE_MISMATCH',value=None,metadata=meta)
     if meta['field']:
         for key in meta['field'].split('/'):value=value[key]
@@ -128,8 +190,12 @@ def observe(mechanics, target):
             value=None,metadata=meta,target=target.model_dump())
     raw=np.asarray(value,dtype=float)
     nv=len(mechanics['coordinates']['dof_order']);nu=len(mechanics['coordinates']['tendon_order'])
-    free=nv-mechanics.get('constraint_state',{}).get('positive_count',0)
-    expected=tuple({'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2,'free':free}[s] for s in meta['shape'])
+    counts=mechanics.get('constraint_state',{})
+    free=nv-mechanics.get('equilibrium',{}).get('equilibrium',{}).get('positive_rank',counts.get('positive_count',0))
+    dimensions={'3':3,'nv':nv,'nu':nu,'min(3,nu)':min(3,nu),'2':2,'free':free,
+        'positive':counts.get('positive_count',0),'boundary':counts.get('boundary_count',0),
+        'projection':len(output_rows(target)) if target.quantity in ('constraint_output_row_residual','all_tendon_output_row_residual') else 0}
+    expected=tuple(dimensions[s] for s in meta['shape'])
     if passive and not raw.size and 0 in expected:raw=raw.reshape(expected)
     if raw.shape!=expected or not np.isfinite(raw).all():raise ValueError('MECHANISM_DIMENSION_OR_FINITE_VALUE_MISMATCH')
     source_shape=list(raw.shape)

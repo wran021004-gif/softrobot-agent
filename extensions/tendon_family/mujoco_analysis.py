@@ -140,7 +140,7 @@ class NativeModel:
             motion['tip_tool_axis_world']=(d.site_xmat[self.tip].reshape(3,3)@self.tool_axis_local).tolist()
         return motion,jac
 
-    def mechanics(self, d, u):
+    def mechanics(self, d, u, *, material_s=None):
         m=self.model;self.apply(d,u);self.cost['mechanics_evaluations']+=1
         mass=np.empty((m.nv,m.nv));mujoco.mj_fullM(m,d,mass)
         motion,jac=self.motion(d);jdot=np.zeros_like(jac)
@@ -166,7 +166,17 @@ class NativeModel:
         braking_input=np.where(speed_map>=0,self.limits[:,0],self.limits[:,1]) if speed>0 else None
         speed_range=None if speed==0 else [float(speed_rate+np.sum(np.minimum(speed_map*(self.limits[:,0]-u),speed_map*(self.limits[:,1]-u)))),
             float(speed_rate+np.sum(np.maximum(speed_map*(self.limits[:,0]-u),speed_map*(self.limits[:,1]-u))))]
-        return dict(**motion,mass_matrix_kg_m2=mass[np.ix_(self.vi,self.vi)].tolist(),qacc_rad_s2=d.qacc[self.vi].tolist(),
+        material={}
+        if material_s is not None:
+            from .passive import material_point
+            binding=material_point(self.physics,material_s)
+            bid=m.body('fixed_base' if binding['body']<0 else self.physics['parts'][binding['body']]['entity']).id
+            position=d.xpos[bid]+d.xmat[bid].reshape(3,3)@binding['position_m']
+            point_jac=np.zeros((3,m.nv));mujoco.mj_jac(m,d,point_jac,None,position,bid)
+            self.cost['material_point_jacobian_calls']=self.cost.get('material_point_jacobian_calls',0)+1
+            material=dict(material_point_jacobian_m_rad=point_jac[:,self.vi].tolist(),
+                point_binding=dict(material_s=material_s,body=m.body(bid).name,frame='world'))
+        return dict(**motion,**material,mass_matrix_kg_m2=mass[np.ix_(self.vi,self.vi)].tolist(),qacc_rad_s2=d.qacc[self.vi].tolist(),
             qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist(),
             coordinates=dict(dof_order=self.order,tendon_order=self.tendons,tip_frame='world',
                 input_semantics='absolute ideal tension in N; engine actuator force has negative sign'),

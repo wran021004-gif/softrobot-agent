@@ -593,6 +593,8 @@ def dispatch(host, value, request_id, origin='model'):
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         origin='engineering'
     plan=Plan.model_validate(value)
+    if state(host)['spec']['configuration']['task'].get('physical_problem') and plan.action not in ('generate','propose','diagnose','stop'):
+        raise ValueError('PASSIVE_HAS_NO_ACTIVE_CONTROL_OR_REGISTERED_DYNAMIC_ACCEPTANCE')
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
     capability={'initialize_control':'control_correction','control_search':'control_search','execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
