@@ -1,5 +1,8 @@
 # Knowledge-assisted autonomous M1 preparation
 
+Subsequent approved-run outcome: [infrastructure STOP](m1_knowledge_assisted_first_run.md).
+The preparation status below is the historical pre-approval snapshot.
+
 This prepares one new Study from `codex/u1-u2-general-task-adaptation` at
 `bc4ea4c06214a3e77796c9f96c09c695f30bfdcd`. The remote branch head matched that
 commit on 2026-11-01 (Asia/Shanghai). Work is isolated on
