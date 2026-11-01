@@ -198,7 +198,6 @@ def compact_plan_schema(schema, action, study):
             for branch in choice['cells']['anyOf']:
                 if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
             choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
-    from tools.research_tasks import passive_registered
     if action=='physical_replay' and passive_registered(study.get('canonical_task',{})):
         request=schema['$defs']['PhysicalReplayRequest']
         request['properties'].pop('source',None)
