@@ -1,5 +1,11 @@
 # M1 final interface audit and open-topology preparation
 
+**Archive correction after the first formal checkpoint:** the 2/164 auxiliary SDK
+files initially reported absent below are present when addressed through extended
+Windows paths; every historical manifest hash matches. The prior normal-path
+completeness assessment is superseded. See
+`m1_open_topology_first_checkpoint.md` for the actual run and confirmed path issue.
+
 Baseline: local and remote `codex/scientific-intent-interface-repair` both resolved to
 `e129ff958645ae6ea34440f5abe3cd6c24eea91f`. The existing zero-run Study is bound to
 production commit `7229c1a922545e0577f9685397b76a031650e55f`.
