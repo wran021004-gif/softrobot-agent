@@ -1,0 +1,4857 @@
+{
+  "M1": {
+    "historical_scope": {
+      "protocol_level": "frozen_registered_benchmark",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": true,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M1\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m1-20261028-r2",
+    "selected": {
+      "artifact_id": "9e06f5455e3a9961f7139eef5a0624b121f26fc7b87b016a0a769c3f1b909136",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 145,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 149,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 16,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 100,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 800,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "68ed1b59a0092ba796dec7d8c0fae42db6b979629bade5348d25cc41195ebf8d",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "fef9a8198996105575d5d954ba7b24ab26b38722e56640fd476bfa39f5e2651a",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf7-shared-reach-v1-positive_high",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.285,
+                0.035,
+                0.185
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "window_s": 0.06
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "332542a13a6359f45a4c456c7dec21caecbca6050d9098e5349819a303af4755",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "8bd15c860718385b2ebb5c040288c00a0b364517b5fa42a10e08dc3f52ae13eb",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "0568a8f81c588eab67562008001553ab57c9caff097c25aabc144b530dd1e019",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009677933544936502
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 4,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009677933544936502
+          },
+          "holding_speed": {
+            "limit": 0.03,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02969999715787175
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:central_high": {
+            "current_path": "tasks/bf7_shared_reach_v1_central_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_central_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:central_high_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low": {
+            "current_path": "tasks/bf7_shared_reach_v1_negative_low.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_negative_low.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf7_shared_reach_v1_positive_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_positive_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "85358582f6779862e011f771979a7efebca353da54836f349335e028d9cfaf2a",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "eafe36cb425f425a2dc64f1f819295bdf113e48d2b434390d2710f811f58f144",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf7-shared-reach-v1-negative_low",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.275,
+                -0.04,
+                0.135
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "window_s": 0.06
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "ebc5e2619b2d49a83f7bfdc1dba4a8d5c2540bcb594a9e09f3526a45e931c7c0",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "6a8526d793b81a22af351cadbe656d4658e05b9207f0b36f3f4db741c6f22913",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "073169bf8ddec3dbb2df6d04c7ef47a406d88adf4bcabdcf931b3379ee5f2235",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.008632847894194254
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 4,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.008726240377154812
+          },
+          "holding_speed": {
+            "limit": 0.03,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.029120119883654066
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:central_high": {
+            "current_path": "tasks/bf7_shared_reach_v1_central_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_central_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:central_high_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low": {
+            "current_path": "tasks/bf7_shared_reach_v1_negative_low.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_negative_low.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf7_shared_reach_v1_positive_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_positive_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "ec4472f2f1da276eaaae820f5bfa0646a6152230b979cd0976d7fcac909f144c",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "28557d3afdd9699693be2a7735d6345eb1dd2e8bbf191ef5d06ba3da81f69f35",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf7-shared-reach-v1-central_high",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.295,
+                0.0,
+                0.215
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "window_s": 0.06
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "3c982ef9e1ab1d7a297e8b219a7ffc126a4f04cf91aeb18f59ad2da65c9a7dd0",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "eb8803e4109b46c938b75dbf20c1815cc3a26700583db3b24002aa1e0fb7bb7e",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "0db8f34c7c7ffcffc8b2440bfa3e8637762503d6b2bd71c7667635da3fa0d469",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009899982562532262
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 4,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.00989998256253226
+          },
+          "holding_speed": {
+            "limit": 0.03,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.029699999999999966
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:central_high": {
+            "current_path": "tasks/bf7_shared_reach_v1_central_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_central_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:central_high_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low": {
+            "current_path": "tasks/bf7_shared_reach_v1_negative_low.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_negative_low.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:negative_low_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf7_shared_reach_v1_positive_high.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf7_shared_reach_v1_positive_high.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "9e06f5455e3a9961f7139eef5a0624b121f26fc7b87b016a0a769c3f1b909136": {
+        "bytes": 18227,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "68ed1b59a0092ba796dec7d8c0fae42db6b979629bade5348d25cc41195ebf8d": {
+        "bytes": 33830,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "fef9a8198996105575d5d954ba7b24ab26b38722e56640fd476bfa39f5e2651a": {
+        "bytes": 63100,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "8bd15c860718385b2ebb5c040288c00a0b364517b5fa42a10e08dc3f52ae13eb": {
+        "bytes": 4968,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "0568a8f81c588eab67562008001553ab57c9caff097c25aabc144b530dd1e019": {
+        "bytes": 79854,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "e7637eb2339b19894c164554e8e64b94eb138c4c8ff1aad82a6e6540f936e2ba": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "152c11c2fc7710bfba42c0422d978181cd8b14d0a48b15160decbb3b1a80838a": {
+        "bytes": 5099,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "85358582f6779862e011f771979a7efebca353da54836f349335e028d9cfaf2a": {
+        "bytes": 33829,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "eafe36cb425f425a2dc64f1f819295bdf113e48d2b434390d2710f811f58f144": {
+        "bytes": 63328,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "6a8526d793b81a22af351cadbe656d4658e05b9207f0b36f3f4db741c6f22913": {
+        "bytes": 4727,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "073169bf8ddec3dbb2df6d04c7ef47a406d88adf4bcabdcf931b3379ee5f2235": {
+        "bytes": 78629,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "d47f67c76884d93140c5a981790eb9d5e31838667879baa668d61877a74e4dd3": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "135b5a4b5af5386cfea1ed9fe7b596f2105c9f2acec27a856973ac2735dbc478": {
+        "bytes": 5098,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "ec4472f2f1da276eaaae820f5bfa0646a6152230b979cd0976d7fcac909f144c": {
+        "bytes": 33820,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "28557d3afdd9699693be2a7735d6345eb1dd2e8bbf191ef5d06ba3da81f69f35": {
+        "bytes": 63324,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "eb8803e4109b46c938b75dbf20c1815cc3a26700583db3b24002aa1e0fb7bb7e": {
+        "bytes": 4886,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "0db8f34c7c7ffcffc8b2440bfa3e8637762503d6b2bd71c7667635da3fa0d469": {
+        "bytes": 79944,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "abd6b20d92aa1fb269073e898753e53c544acae7df1a2098a54b3c92890fec74": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "f2972f41bdd1b2fb1da68e77baaad5f1287d4a5c4c88b4f7b5f59775fa476ede": {
+        "bytes": 5095,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  },
+  "M2": {
+    "historical_scope": {
+      "protocol_level": "frozen_registered_benchmark",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": true,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M2\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m2-20261028-r2",
+    "selected": {
+      "artifact_id": "66e07f6a05c0133bd978e4e0484976f3605435dee6c38098196c815d1ae9664d",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 118,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 122,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 14,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 100,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 800,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "586638e0b53d8bf22c282e68b72b3c0cac6d8d845a8a8c595a98188daf8a3ebb",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "a9bca38aca2fd7d942cb41af1e6ebbf691f4058dd04cf88e345a264ecec7d992",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf2-multidirectional-hold-frozen-v1-zero",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "6785c7bdca259d479474b3583d796f97eaf2279f1a4bee7fbaa1c3e9cf661eed",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "a813fdf2a44f6bfb7ffd4ac406772ba02440d95b94bb908635f698c3ec391c89",
+            "media_type": "application/json"
+          },
+          "times": 36,
+          "tension_rows": 35,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.35000000000000003
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "545430fb3cc75ef83d87972fa149fe092ee9f882901a117f57cf203a2553f0de",
+            "media_type": "application/json"
+          },
+          "samples": 36,
+          "physics_step_attempts": 700,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.008670734616640448
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.008966762044447503
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01981225739479384
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:negative": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_negative.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_negative.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:positive": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_positive.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_positive.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_zero.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_zero.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "5e659d2b37f660f4a86d0b1f8611fca6bb2af9e9bb5a05b371a42cc5474af596",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "69411666f5d4b2b7a19df01730faf78406e2ecb3f4970ed2ddc4866808c76e37",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf2-multidirectional-hold-frozen-v1-positive",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [
+                {
+                  "end_s": 0.35,
+                  "entity": "payload",
+                  "force_n": [
+                    0,
+                    0.02,
+                    -0.03
+                  ],
+                  "frame": "world",
+                  "point": "center_of_mass",
+                  "start_s": 0.1
+                }
+              ],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "7dc4e8356d2fbea77c3bd57bd205a2b7d74ec92f38dd4872121e5033c8ef659b",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "dcaba14bd9b558746b87de73a83972afd017b06bc554b788d67ee80d87adf169",
+            "media_type": "application/json"
+          },
+          "times": 36,
+          "tension_rows": 35,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.35000000000000003
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "14469bd218ae744d532493606625b0f7337819687d502b2da230c413f3bba90f",
+            "media_type": "application/json"
+          },
+          "samples": 36,
+          "physics_step_attempts": 700,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009909575963200992
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009909575963200992
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01999994882346008
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:negative": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_negative.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_negative.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:positive": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_positive.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_positive.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_zero.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_zero.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "bfbfe22f21c245b599d1d8c805f6ce681c1b6c3f24ca2abf04aa1229430e0412",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "20de5ad1d737d725508e947bcd65927dde712e677933a56c4055b0602e4076a7",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf2-multidirectional-hold-frozen-v1-negative",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [
+                {
+                  "end_s": 0.35,
+                  "entity": "payload",
+                  "force_n": [
+                    0,
+                    -0.02,
+                    -0.03
+                  ],
+                  "frame": "world",
+                  "point": "center_of_mass",
+                  "start_s": 0.1
+                }
+              ],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "685cf576b81eeef6e6caf0d9c9537590746d89b3a0db16dfa095417b0c01cc09",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "d764d705cbaf2edec7b3b74e29eb9524c937ef069c67e898a9feb17711e80e3f",
+            "media_type": "application/json"
+          },
+          "times": 36,
+          "tension_rows": 35,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.35000000000000003
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "91e4059d87b092be43a9873a3e569bff3282cf9c9f9e743b82bf0dcf1daff9db",
+            "media_type": "application/json"
+          },
+          "samples": 36,
+          "physics_step_attempts": 700,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009799928195357799
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009799928195357799
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01959999999999975
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "condition:negative": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_negative.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_negative.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "condition:positive": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_positive.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_positive.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf2_multidirectional_hold_frozen_v1_zero.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf2_multidirectional_hold_frozen_v1_zero.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "66e07f6a05c0133bd978e4e0484976f3605435dee6c38098196c815d1ae9664d": {
+        "bytes": 18196,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "586638e0b53d8bf22c282e68b72b3c0cac6d8d845a8a8c595a98188daf8a3ebb": {
+        "bytes": 33982,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "a9bca38aca2fd7d942cb41af1e6ebbf691f4058dd04cf88e345a264ecec7d992": {
+        "bytes": 63252,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "a813fdf2a44f6bfb7ffd4ac406772ba02440d95b94bb908635f698c3ec391c89": {
+        "bytes": 5291,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "545430fb3cc75ef83d87972fa149fe092ee9f882901a117f57cf203a2553f0de": {
+        "bytes": 90974,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "b7514fb9937233c03cd12af0a03eb133085eb2c4ec6c53ba0a175a1c0e8a27f8": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "03103a6b0ae18327944a4ab4ce71840d4ed5c1fe6a3de939e0c12cf0e4dfac2f": {
+        "bytes": 5175,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "5e659d2b37f660f4a86d0b1f8611fca6bb2af9e9bb5a05b371a42cc5474af596": {
+        "bytes": 34224,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "69411666f5d4b2b7a19df01730faf78406e2ecb3f4970ed2ddc4866808c76e37": {
+        "bytes": 63718,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "dcaba14bd9b558746b87de73a83972afd017b06bc554b788d67ee80d87adf169": {
+        "bytes": 5507,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "14469bd218ae744d532493606625b0f7337819687d502b2da230c413f3bba90f": {
+        "bytes": 92128,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "6226c33a64aca9ae5ce47f280d89458fb3080c9781a9292f78a845415d7332ea": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "56c373c063eacf2b82a1bd52ef6d78d9024bd21e724c52202f5f13d9c9a2faa8": {
+        "bytes": 5296,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "bfbfe22f21c245b599d1d8c805f6ce681c1b6c3f24ca2abf04aa1229430e0412": {
+        "bytes": 34228,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "20de5ad1d737d725508e947bcd65927dde712e677933a56c4055b0602e4076a7": {
+        "bytes": 63720,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "d764d705cbaf2edec7b3b74e29eb9524c937ef069c67e898a9feb17711e80e3f": {
+        "bytes": 5312,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "91e4059d87b092be43a9873a3e569bff3282cf9c9f9e743b82bf0dcf1daff9db": {
+        "bytes": 91753,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "18782d3971aaa69bfedae7ee56dc642b8f3d279be5da8eba36d7a592933abbc7": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "7a892539ef6a5e25f3655f79825c10a1fa34c35e0fc9e93e57046fbb820b0c59": {
+        "bytes": 5297,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  },
+  "M3": {
+    "historical_scope": {
+      "protocol_level": "development_draft",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": false,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M3\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m3-20261028-r2",
+    "selected": {
+      "artifact_id": "90be6e5b9ea7e0a1bb5fb1981580a40946aaae27af9598b5b73b682559c7076a",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 61,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 64,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 4,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 20,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 800,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "90be6e5b9ea7e0a1bb5fb1981580a40946aaae27af9598b5b73b682559c7076a",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "937f5af53192be5a12b2d88535aaeb1ce93f11fa5eb7ed0989ff4fa17b1aa9f1",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "b3-reach-hold-050-draft",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.5,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "03f7d44758ef7f7b9cc3295484efc2f2cffd45ece34ea0a220305378ca8f4485",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "44cbff3f160be4246ce1a6edd591b445b5eda57e6d09a0149fafcb2cb96bfcf0",
+            "media_type": "application/json"
+          },
+          "times": 51,
+          "tension_rows": 50,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.5
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "b02c16c066fac90a20d17f2f2e5df4caf9c94ed3d8a5bf20001cff22f85ed2a2",
+            "media_type": "application/json"
+          },
+          "samples": 51,
+          "physics_step_attempts": 1000,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_reach_hold_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009948406169172598
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.009948406169172598
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.019887343773892167
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "family_space": {
+            "current_path": "configs/research/family_space_stage0_base_only_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_stage0_base_only_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/reach_hold_b3_050.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold_b3_050.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task_base": {
+            "current_path": "tasks/reach_hold.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\reach_hold.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "90be6e5b9ea7e0a1bb5fb1981580a40946aaae27af9598b5b73b682559c7076a": {
+        "bytes": 33756,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "937f5af53192be5a12b2d88535aaeb1ce93f11fa5eb7ed0989ff4fa17b1aa9f1": {
+        "bytes": 63025,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "44cbff3f160be4246ce1a6edd591b445b5eda57e6d09a0149fafcb2cb96bfcf0": {
+        "bytes": 7434,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "b02c16c066fac90a20d17f2f2e5df4caf9c94ed3d8a5bf20001cff22f85ed2a2": {
+        "bytes": 129573,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "767cf75f7a2e8b9f70c828ad71ae25a1fbed217cc655f7752a72a6198f53f155": {
+        "bytes": 618,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "32fd377ef867bce417a69840e96518b889639331c67fe290fa39853f67565149": {
+        "bytes": 5063,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  },
+  "M4": {
+    "historical_scope": {
+      "protocol_level": "frozen_registered_benchmark",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": true,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M4\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m4-20261028-r2",
+    "selected": {
+      "artifact_id": "c9ed235aa8ceaafb4a438a4713a8433a5cc682070821a5cc2d19926da5d34500",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 30,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 33,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 6,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 20,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 500,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "c9ed235aa8ceaafb4a438a4713a8433a5cc682070821a5cc2d19926da5d34500",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "247e2e318311547bd1866bea2535133608e846fd28da45f7ecaa23d1687ff453",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf4-timed-direction-change",
+          "family": "task.tracking",
+          "goal": {
+            "contract": "reference.tracking_goal",
+            "data": {
+              "frame": "world",
+              "interpolation": "linear",
+              "progression": "ordered_start_to_end",
+              "time_requirement": "timed",
+              "times_s": [
+                0.0,
+                0.3,
+                0.6
+              ],
+              "units": "m",
+              "vertices_m": [
+                [
+                  0.3,
+                  0.0,
+                  0.15
+                ],
+                [
+                  0.285,
+                  0.035,
+                  0.17
+                ],
+                [
+                  0.285,
+                  -0.025,
+                  0.18
+                ]
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": null,
+          "evaluator": {
+            "extension_id": "evaluate.tracking",
+            "parameters": {
+              "contract": "reference.tracking_evaluation",
+              "data": {
+                "geometry_step_m": 0.001,
+                "max_error_m": 0.012
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "0c3369208426d886591640c1904412344ac01ebe8631ae554b7dc9b576fcecdf",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.2.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "6e36627d94d00ad80d690700b28ec32cf987a044169adc4d8f012de43e6dfe78",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "9af814f9089cbd546f217851c41ccaea600e1aad5dcfc74d42e626a7238e2982",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_timed_tracking_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:tracking_max_error": {
+            "limit": 0.012,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.01198776272430606
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "tracking_sampling": {
+            "limit": null,
+            "passed": true,
+            "reason": "Full post-step motion and pre-step tension grids; r(t) is scored on the frozen inclusive window",
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "family_space": {
+            "current_path": "configs/research/family_space_base_only_tracking_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_tracking_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf4_tracking_direction_change_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf4_tracking_direction_change_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "c9ed235aa8ceaafb4a438a4713a8433a5cc682070821a5cc2d19926da5d34500": {
+        "bytes": 35211,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "247e2e318311547bd1866bea2535133608e846fd28da45f7ecaa23d1687ff453": {
+        "bytes": 65786,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "6e36627d94d00ad80d690700b28ec32cf987a044169adc4d8f012de43e6dfe78": {
+        "bytes": 4386,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "9af814f9089cbd546f217851c41ccaea600e1aad5dcfc74d42e626a7238e2982": {
+        "bytes": 78228,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "6a3efec83151ac040e0938207bcabc41322164c5bf1e2c5ab619a9a5fd6916db": {
+        "bytes": 778,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "6961508beda57e0381f79a698b2240eb64d6b9bb08c5f5373252d692727ae230": {
+        "bytes": 5435,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  },
+  "M5": {
+    "historical_scope": {
+      "protocol_level": "frozen_registered_benchmark",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": true,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M5\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m5-20261028-r2",
+    "selected": {
+      "artifact_id": "5f7a2148a96741fc471a634413f320f4bf80cf721e0476ca309feb1e732ffcfe",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 31,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 34,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 6,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 20,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 800,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "5f7a2148a96741fc471a634413f320f4bf80cf721e0476ca309feb1e732ffcfe",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "ba1a62dac9acaa7fc677f98a581f83e36938344df202dbf6e777273dee2c27aa",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf5-position-tool-axis",
+          "family": "task.position_tool_axis",
+          "goal": {
+            "contract": "reference.tool_axis_goal",
+            "data": {
+              "axis_frame": "tip_site_local",
+              "axis_local": [
+                1.0,
+                0.0,
+                0.0
+              ],
+              "frame": "world",
+              "target_axis_world": [
+                0.9656541190600237,
+                -0.17381774143080425,
+                -0.19313082381200475
+              ],
+              "target_m": [
+                0.29,
+                -0.025,
+                0.12
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": null,
+          "evaluator": {
+            "extension_id": "evaluate.position_tool_axis",
+            "parameters": {
+              "contract": "reference.tool_axis_evaluation",
+              "data": {
+                "angle_tolerance_rad": 0.05235987755982988,
+                "position_tolerance_m": 0.008
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "a33ed3b5b8d3348467d94b57a737a4c5e9bbdef239ff602dac5964e5edc4bdcf",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.3.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "fabe34b20edf5904024748c3bfa1776ff3ffe33d639b4babd892ec47a7098092",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "945d8ac54257166c18d30c951e2a9d23c5519fa9c51c478db4b8c1ee15444c10",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_position_tool_axis_v1",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:tool_axis_direction": {
+            "limit": 0.05235987755982988,
+            "passed": true,
+            "reason": null,
+            "unit": "rad",
+            "value": 0.051884755688871666
+          },
+          "evaluator:tool_position": {
+            "limit": 0.008,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.007923371919783135
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "tool_axis_sampling": {
+            "limit": null,
+            "passed": true,
+            "reason": "Both real world position and unit tool-axis signals on the complete post-step grid",
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "family_space": {
+            "current_path": "configs/research/family_space_base_only_tracking_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_tracking_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf5_position_tool_axis_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf5_position_tool_axis_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "5f7a2148a96741fc471a634413f320f4bf80cf721e0476ca309feb1e732ffcfe": {
+        "bytes": 35298,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "ba1a62dac9acaa7fc677f98a581f83e36938344df202dbf6e777273dee2c27aa": {
+        "bytes": 65846,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "fabe34b20edf5904024748c3bfa1776ff3ffe33d639b4babd892ec47a7098092": {
+        "bytes": 4880,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "945d8ac54257166c18d30c951e2a9d23c5519fa9c51c478db4b8c1ee15444c10": {
+        "bytes": 81846,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "824e873cc0af2d58b831045c92920db93f736306b982f5b6712e5b174507243f": {
+        "bytes": 841,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "8b531923da4e8e6197105e21380da00db88ef194c786ea2bc9486b6218531cec": {
+        "bytes": 5463,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  },
+  "M6": {
+    "historical_scope": {
+      "protocol_level": "frozen_registered_benchmark",
+      "physical_model": "Original three-dimensional MuJoCo serial bending-cell model; independent execution within the same model.",
+      "model_dimensions": {
+        "nq": 48,
+        "nv": 48,
+        "nbody": 29,
+        "ntendon": 6,
+        "nu": 6
+      },
+      "control_method": "mujoco_direct_control_v1",
+      "recorded_select": true,
+      "formal_benchmark_approved": true,
+      "separate_stop_plan": false
+    },
+    "store_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\runs\\base-only-owner-20261028-r2\\M6\\private-store\\platform.sqlite",
+    "store_sha256_matches": true,
+    "study_id": "base-only-m6-20261028-r2",
+    "selected": {
+      "artifact_id": "ab36e881283cbd84450666b96316a07185dfe5c09327aaa47ef6e19286c8da18",
+      "media_type": "application/json"
+    },
+    "select_events": [
+      {
+        "sequence": 85,
+        "status": "reserved",
+        "request_id": "select"
+      },
+      {
+        "sequence": 88,
+        "status": "completed",
+        "request_id": "select"
+      }
+    ],
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 10,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 20,
+      "protected_provider_requests": 0,
+      "protected_public_operations": 8,
+      "provider_requests": 0,
+      "public_operations": 500
+    },
+    "native_control_limits": {
+      "evaluation_requests": 800,
+      "iterations": 100,
+      "knots_s": 4
+    },
+    "family_space_identity": "59981dc09cf265117924b9dfa4fa05d9134efb1867cdada15dbf17045be6cbd3",
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        2
+      ],
+      "executable_tendon_counts": [
+        6,
+        6
+      ]
+    },
+    "members": [
+      {
+        "reference": {
+          "artifact_id": "ab36e881283cbd84450666b96316a07185dfe5c09327aaa47ef6e19286c8da18",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "f5cfbf7dfb03181b542e91cfc83ba4fa3164193c5b5296c38f35f0c654681fb3",
+          "media_type": "application/json"
+        },
+        "task": {
+          "id": "bf6-rigid-sensor-oriented-tracking",
+          "family": "task.oriented_tracking",
+          "goal": {
+            "contract": "reference.oriented_tracking_goal",
+            "data": {
+              "axis_frame": "tip_site_local",
+              "axis_interpolation": "normalized_linear",
+              "axis_local": [
+                1.0,
+                0.0,
+                0.0
+              ],
+              "axis_vertices_world": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9656541190600237,
+                  -0.17381774143080425,
+                  -0.19313082381200475
+                ],
+                [
+                  0.9738617339145248,
+                  0.11686340806974296,
+                  -0.19477234678290495
+                ]
+              ],
+              "frame": "world",
+              "interpolation": "linear",
+              "progression": "ordered_start_to_end",
+              "rigid_tool": {
+                "body": "payload",
+                "com_local_m": [
+                  0.007,
+                  0.001,
+                  -0.002
+                ],
+                "inertia_com_local_kg_m2": [
+                  [
+                    1.2e-06,
+                    2e-07,
+                    0.0
+                  ],
+                  [
+                    2e-07,
+                    1.6e-06,
+                    2e-07
+                  ],
+                  [
+                    0.0,
+                    2e-07,
+                    1.8e-06
+                  ]
+                ],
+                "mass_kg": 0.02,
+                "tip_position_local_m": [
+                  0.014,
+                  0.0,
+                  0.0
+                ]
+              },
+              "time_requirement": "timed",
+              "times_s": [
+                0.0,
+                0.3,
+                0.6
+              ],
+              "units": "m",
+              "vertices_m": [
+                [
+                  0.298,
+                  0.0,
+                  0.15
+                ],
+                [
+                  0.29,
+                  -0.025,
+                  0.12
+                ],
+                [
+                  0.29,
+                  0.015,
+                  0.12
+                ]
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "settling": null,
+          "evaluator": {
+            "extension_id": "evaluate.oriented_tracking",
+            "parameters": {
+              "contract": "reference.oriented_tracking_evaluation",
+              "data": {
+                "angle_tolerance_rad": 0.17453292519943295,
+                "geometry_step_m": 0.001,
+                "max_error_m": 0.012
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "required_physics": null
+        },
+        "structure_source": {
+          "artifact_id": "f2f5c89a372dacdf7187f7e887ec959b090206c62bd3b2d24130ce327c201da6",
+          "media_type": "application/json"
+        },
+        "generation_version": "serial_family_generation_v2",
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {
+              "contact_model": "mujoco_convex_native",
+              "friction": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "integrator": "implicitfast",
+              "timestep_source": "task.timing.timestep_s"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.4.0"
+        },
+        "dynamics_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "segment_0": 12,
+              "segment_1": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "control": {
+          "source_reference": {
+            "artifact_id": "adc8650cc180ce37b3c801ba465bbc4334c89862f36c7cacde54053b07e9da5f",
+            "media_type": "application/json"
+          },
+          "times": 31,
+          "tension_rows": 30,
+          "channels": 6,
+          "grid_start_s": 0.0,
+          "grid_end_s": 0.6
+        },
+        "physical": {
+          "raw_reference": {
+            "artifact_id": "2f1a3d2cfe191ea744bd7fc467ff17e48924bb17705076addc449fba740a8cf7",
+            "media_type": "application/json"
+          },
+          "samples": 31,
+          "physics_step_attempts": 600,
+          "status": "completed",
+          "first_sample_zero_qvel": true
+        },
+        "accepted": true,
+        "protocol_id": "offline_oriented_tracking_v2",
+        "acceptance_components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:tool_axis_direction": {
+            "limit": 0.17453292519943295,
+            "passed": true,
+            "reason": null,
+            "unit": "rad",
+            "value": 0.17365806202573997
+          },
+          "evaluator:tracking_max_error": {
+            "limit": 0.012,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.011937423248530352
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "no_environment_contact": {
+            "limit": null,
+            "passed": true,
+            "reason": "Every independent physics step checked for environment contact; the frozen task does not permit contact",
+            "unit": null,
+            "value": true
+          },
+          "rigid_tool_binding": {
+            "limit": null,
+            "passed": true,
+            "reason": "Compiled MuJoCo payload mass, COM, inertia and tool site match frozen task; no external-force substitution",
+            "unit": null,
+            "value": true
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "tool_axis_sampling": {
+            "limit": null,
+            "passed": true,
+            "reason": "Both real world position and unit tool-axis signals on the complete post-step grid",
+            "unit": null,
+            "value": true
+          }
+        },
+        "completed_owned_receipt": true,
+        "current_sources": {
+          "family_space": {
+            "current_path": "configs/research/family_space_base_only_sensor_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_base_only_sensor_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "family_space_base": {
+            "current_path": "configs/research/family_space_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\configs\\research\\family_space_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          },
+          "task": {
+            "current_path": "tasks/bf6_sensor_oriented_tracking_v1.json",
+            "original_path": "D:\\softrobot-agent\\.worktrees\\base-only-benchmark-feasibility\\tasks\\bf6_sensor_oriented_tracking_v1.json",
+            "exists": true,
+            "current_original_file_semantics_identical": true
+          }
+        }
+      }
+    ],
+    "artifact_read_checks": {
+      "ab36e881283cbd84450666b96316a07185dfe5c09327aaa47ef6e19286c8da18": {
+        "bytes": 36426,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "f5cfbf7dfb03181b542e91cfc83ba4fa3164193c5b5296c38f35f0c654681fb3": {
+        "bytes": 65261,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "adc8650cc180ce37b3c801ba465bbc4334c89862f36c7cacde54053b07e9da5f": {
+        "bytes": 4988,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "2f1a3d2cfe191ea744bd7fc467ff17e48924bb17705076addc449fba740a8cf7": {
+        "bytes": 83857,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "c02970e49f1818a359c1cd948f2329d3b39d133334fcfa942252caa1a732a163": {
+        "bytes": 989,
+        "media": "application/json",
+        "hash_matches": true
+      },
+      "44d38d32d4a7425ddcbdd188afb2949ade8acbef7e55e61fc70da063ae86ea96": {
+        "bytes": 6154,
+        "media": "application/json",
+        "hash_matches": true
+      }
+    }
+  }
+}
