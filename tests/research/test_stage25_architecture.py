@@ -130,7 +130,7 @@ class Stage25ArchitectureTests(unittest.TestCase):
         compiled=compile_question(h,q,tool_use_id='compare-frozen-loads');self.assertEqual(compiled['status'],'ready',compiled)
         result=analysis.dispatch(h,compiled['request'],'stage25-real-multiload',guard=lambda *a:None,origin='engineering_preflight')
         self.assertEqual(result['status'],'computed',result)
-        raw=result['structure_research'];cases=raw['load_comparison']['cases']
+        saved=h.store.artifact(state(h)['analysis_results'][-1]);raw=saved['structure_research'];cases=raw['load_comparison']['cases']
         self.assertEqual([r['load_condition'] for r in cases],['lateral','vertical','unloaded'])
         self.assertTrue(raw['load_comparison']['assembly_unchanged']);self.assertEqual(raw['cost']['model_builds'],1)
         self.assertEqual(raw['cost']['equilibrium_solves'],3);self.assertEqual(raw['cost']['physics_steps'],0)
@@ -139,7 +139,7 @@ class Stage25ArchitectureTests(unittest.TestCase):
         self.assertTrue(cases[0]['task_observations'][1]['within_mathematical_limit'])
         self.assertEqual(result['task_acceptance'],'unmeasured');self.assertEqual(state(h)['mathematical_evaluations'],1)
         OUT.mkdir(parents=True,exist_ok=True)
-        (OUT/'multiload.json').write_text(json.dumps(dict(question=q,result=result,study_cost=state(h)['analysis_costs']),indent=2),encoding='utf8')
+        (OUT/'multiload.json').write_text(json.dumps(dict(question=q,result=saved,study_cost=state(h)['analysis_costs']),indent=2),encoding='utf8')
 
 
 if __name__=='__main__':unittest.main()
