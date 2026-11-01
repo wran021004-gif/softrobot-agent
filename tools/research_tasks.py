@@ -568,24 +568,37 @@ def constraint_observation(definition, component):
 
 
 def constraint_gap(rows, *, valid_complete, accepted=None):
-    """Common TaskGap contract; unscaled/missing bounds cannot mint a score."""
+    """Scaled numerical objective, conditional on every unscaled hard gate."""
     required={'constraint_id','passed','signed_violation','normalized_violation','observed_value','bound'}
     if any(not required<=row.keys() for row in rows):
         return dict(normalized_gap=None,signed_task_gap=None,components={},constraints=rows,
             unscaled_constraints=[],valid_complete=False,comparable=False,accepted=accepted,dominant_constraints=[],
+            hard_gate_status='unknown',hard_gate_constraints=[],observation_feasible=False,objective_status='invalid_observation',
             invalid_reason='MALFORMED_DERIVED_CONSTRAINT_OBSERVATIONS')
-    complete=bool(valid_complete and rows and all(r['passed'] is not None and r['signed_violation'] is not None for r in rows))
-    comparable=complete and all(r['normalized_violation'] is not None for r in rows)
-    signed={r['constraint_id']:r['normalized_violation'] for r in rows if r['normalized_violation'] is not None}
+    numerical=[r for r in rows if (_number(r.get('normalization_scale')) and r['normalization_scale']>0) or _number(r['normalized_violation'])]
+    gates=[r for r in rows if r not in numerical]
+    gate_status=('not_required' if not gates else 'failed' if any(r['passed'] is False for r in gates) else
+        'passed' if all(r['passed'] is True for r in gates) else 'unknown')
+    complete=bool(valid_complete and rows and all(type(r['passed']) is bool and r['observed_value'] is not None and
+        (type(r['observed_value']) not in (int,float) or math.isfinite(r['observed_value'])) for r in rows) and
+        all(_number(r['normalized_violation']) and _number(r['signed_violation']) for r in numerical))
+    comparable=bool(complete and numerical and gate_status in ('passed','not_required'))
+    signed={r['constraint_id']:r['normalized_violation'] for r in numerical if _number(r['normalized_violation'])}
     worst=max(signed.values()) if comparable else None
+    numerical_worst=max(signed.values()) if complete and signed else None
     dominant=[{**r,'value':r['observed_value'],'limit':r['bound'],
         'normalized_signed_excess':r['normalized_violation'],'scope':'physical_task'} for r in rows
-        if (comparable and r['normalized_violation']==worst) or (not comparable and r['passed'] is False)]
+        if (numerical_worst is not None and r in numerical and r['normalized_violation']==numerical_worst) or
+            (r in gates and r['passed'] is False)]
     return dict(normalized_gap=max(0.,worst) if worst is not None else None,
         signed_task_gap=worst,components={k:max(0.,v) for k,v in signed.items()},
-        constraints=rows,unscaled_constraints=[r['constraint_id'] for r in rows if r['normalized_violation'] is None],
+        constraints=rows,unscaled_constraints=[r['constraint_id'] for r in gates],
+        hard_gate_status=gate_status,hard_gate_constraints=[r['constraint_id'] for r in gates],
+        observation_feasible=bool(complete and all(r['passed'] is True for r in rows)),
+        objective_status='incomplete_or_invalid' if not complete else 'hard_gate_failed' if gate_status=='failed' else
+            'feasibility_comparison_only' if not numerical else 'comparable',
         valid_complete=complete,comparable=comparable,accepted=accepted,dominant_constraints=dominant,
-        interpretation='Read-only research ranking. Every frozen bound retained; independent evaluator and certificate own acceptance.')
+        interpretation='Numerical maximum conditional on all unscaled hard gates. All frozen constraints retained; independent certificate owns acceptance.')
 
 
 def _number(value):

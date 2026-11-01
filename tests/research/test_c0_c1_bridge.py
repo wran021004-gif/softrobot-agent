@@ -17,7 +17,9 @@ class C0BridgeTests(unittest.TestCase):
         self.assertEqual(gap['signed_task_gap'],.5)
         self.assertEqual(lower['signed_violation'],1.)
         self.assertEqual(len(gap['dominant_constraints']),2)
-        self.assertIsNone(constraint_gap([upper,row('zero',0.,0.)],valid_complete=True)['normalized_gap'])
+        gated=constraint_gap([upper,row('zero',0.,0.)],valid_complete=True)
+        self.assertEqual(gated['normalized_gap'],.5);self.assertEqual(gated['hard_gate_status'],'passed')
+        self.assertIsNone(constraint_gap([upper,row('zero',1.,0.)],valid_complete=True)['normalized_gap'])
         self.assertIsNone(constraint_gap([upper],valid_complete=False)['normalized_gap'])
         passing=constraint_gap([row('upper',1.,2.)],valid_complete=True)
         self.assertEqual(passing['signed_task_gap'],-.5)
@@ -112,14 +114,14 @@ class C1BridgeTests(unittest.TestCase):
         self.assertEqual(select_method(effect_semantics='reoptimized_task_capability',capabilities=active,saved_conic=True)['method'],
             'saved_conic_capability_sensitivity')
 
-    def test_v4_dynamic_compile_and_zero_threshold_prevents_objective(self):
+    def test_v4_dynamic_compile_with_unscaled_hard_gate(self):
         from tests.research.test_passive_physical_acceptance import prepared_host
         from tests.research.test_p63g3_action_handoff import diagnosis
         from tools.research import core
         from tools.research.scientific_intent import question_schema,compile_question
         from tools.research.state import state
         from jsonschema import Draft202012Validator
-        h,c=prepared_host(budget=4)
+        h,c=prepared_host(budget=10)
         with patch.object(core,'guard'):core.dispatch(h,diagnosis(c,'mechanism_research'),'dynamic-diagnose')
         q=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='inspect',
             effect_semantics='finite_time_task_response',target='finite_time_task_violation',
@@ -131,10 +133,10 @@ class C1BridgeTests(unittest.TestCase):
         self.assertEqual(result['status'],'ready',result)
         self.assertEqual(result['dynamic_cost_bound'],dict(model_builds=1,episodes=2,physics_steps=800))
         self.assertEqual(state(h)['mathematical_evaluations'],before['mathematical_evaluations'])
-        q['structure'].update(operation='differentiate',parameter_paths=['segments.0.length_m'],requested_budget=5)
-        result=compile_question(h,q,tool_use_id='unscaled-objective')
-        self.assertEqual(result['status'],'unsupported',result)
-        self.assertIn('FROZEN_NORMALIZATION_SCALE',result['reason'])
+        q['structure'].update(operation='differentiate',parameter_paths=['payout_lengths_m.tendon_0'],requested_budget=5)
+        result=compile_question(h,q,tool_use_id='gated-objective')
+        self.assertEqual(result['status'],'ready',result)
+        self.assertEqual(result['dynamic_cost_bound']['episodes'],10)
 
     def test_full_task_reduction_cannot_drop_condition_or_zero_bound(self):
         from tools.research_tasks import task_adapter,constraint_gap
@@ -144,9 +146,13 @@ class C1BridgeTests(unittest.TestCase):
         components['evaluator:vertical_speed_maximum']=dict(value=6.,passed=False)
         rows=adapter.constraint_observations(components)
         gap=constraint_gap(rows,valid_complete=True)
-        self.assertIsNone(gap['signed_task_gap'])
+        self.assertAlmostEqual(gap['signed_task_gap'],.2)
         self.assertIn('evaluator:no_contact',gap['unscaled_constraints'])
         self.assertEqual(gap['dominant_constraints'][0]['condition_id'],'vertical')
+        components['evaluator:no_contact']=dict(value=1,passed=False)
+        blocked=constraint_gap(adapter.constraint_observations(components),valid_complete=True)
+        self.assertIsNone(blocked['signed_task_gap']);self.assertFalse(blocked['observation_feasible'])
+        self.assertEqual(blocked['hard_gate_status'],'failed')
         del components['evaluator:lateral_response_maximum']
         self.assertFalse(constraint_gap(adapter.constraint_observations(components),valid_complete=True)['valid_complete'])
 
@@ -161,10 +167,8 @@ class C1BridgeTests(unittest.TestCase):
         from tools.research.state import state
         from tests.research.test_passive_physical_acceptance import prepared_host
         h,c=prepared_host();spec=state(h)['spec'];candidate=deepcopy(h.store.artifact(c))
-        # A separate synthetic mathematical fixture, never a modified frozen Study
-        # or a scientific/acceptance result. Original real task is untouched.
+        # Synthetic observations only; the unchanged frozen no-contact gate stays.
         task=candidate['configuration']['task'];task['task_id']='synthetic_normalized_dynamic_fixture'
-        task['evaluator']['parameters']['data']['prohibit_contact']=False
         candidate['task_identity']=digest(task)
         row=next(r for r in parameters(spec,candidate) if r['mechanism_differentiation']['supported'] and r['parameter_id'].startswith('payout_lengths_m.'))
         origin=row['current_value'];width=row['maximum']-row['minimum']
@@ -193,7 +197,7 @@ class C1BridgeTests(unittest.TestCase):
                 result=calculate(candidate['configuration'],dict(candidate=c),q,dict(actual_time_s=0.),context)
             self.assertEqual(result['status'],'computed',result)
             evidence=result['structure_research'];self.assertEqual(evidence['cost']['physics_steps'],0)
-            self.assertEqual(len(evidence['records'][0]['observation']['task_gap']['constraints']),16)
+            self.assertEqual(len(evidence['records'][0]['observation']['task_gap']['constraints']),17)
             self.assertTrue(evidence['structure_direction'])
             self.assertEqual(evidence['structure_direction']['generation_handoff']['tool'],'research_plan')
             self.assertFalse(evidence['structure_direction']['formal_candidate_created'])

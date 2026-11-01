@@ -44,8 +44,8 @@ def prepare_context(spec, candidate, study, comparisons):
             raise ValueError('DYNAMIC_TASK_ALWAYS_REQUIRES_ALL_FROZEN_LOADS')
         if study.operation in ('differentiate','optimize'):
             definitions=task_adapter(candidate['configuration']).constraint_observations({})
-            unscaled=[d['constraint_id'] for d in definitions if not d['normalization_scale']]
-            if unscaled:raise ValueError('TASK_OBJECTIVE_REQUIRES_FROZEN_NORMALIZATION_SCALE: '+','.join(unscaled))
+            if not any(d['normalization_scale'] for d in definitions):
+                raise ValueError('TASK_HAS_NO_NUMERICAL_OBJECTIVE_FEASIBILITY_COMPARISON_ONLY')
     problem=candidate['configuration']['task'].get('physical_problem')
     mode=problem['mode'] if problem else 'active_ideal_tension'
     metadata=PRIMITIVES[study.target.quantity]
@@ -213,7 +213,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             gap=constraint_gap(task_adapter(cfg).constraint_observations(components),valid_complete=measured['validity']=='valid')
             observation=dict(status='computed' if measured['validity']=='valid' else 'unavailable',
                 value=gap['signed_task_gap'],unit='1',reason=measured.get('reason'),
-                objective_status='comparable' if gap['comparable'] else 'no_common_normalization_scale',
+                objective_status=gap['objective_status'],
                 task_gap=gap,task_acceptance='unmeasured')
             mechanics=dict(dynamic_execution=raw,task_constraints=gap['constraints'],
                 reference_semantics=dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
