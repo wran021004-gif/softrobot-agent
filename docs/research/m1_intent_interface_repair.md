@@ -171,12 +171,12 @@ workers. The seven new cases cover M1 T1 admission, mechanism inspect and explic
 decrease, shared source uniqueness/ambiguity, generation grants, rejected inputs,
 STOP sends, and candidate-change barriers. Existing targeted V1/V2/V3, passive
 V4 and heterogeneous Direct checks cover compatibility. A first passive check was
-blocked by the original commit-before-bind rule; it must be rerun after committing
-the implementation. A test-class spelling error is retained in local logs and is
+blocked by the original commit-before-bind rule; after committing, it was
+successfully rerun with the passive contract intact. A test-class spelling error is retained in local logs and is
 not counted as a passing test. No real scientific worker or Replay is authorized.
 
 The user subsequently explicitly approved real model calls without another
-permission request. A bounded engineering model-interface probe may use at most
+permission request. The bounded engineering model-interface probe used exactly
 8 actual Provider requests through the original accounted transport. It validates
 generated requests against actual projected schemas and the original compiler;
 it executes no numerical/physical workers and establishes no autonomous M1 result.
@@ -185,9 +185,8 @@ the future formal Study. There is no automatic full research run. The first
 engineering window made four actual requests: the control case corrected a root
 field error and compiled to original T1 on request two; an inspect case submitted
 an unregistered parameter pointer, and request four returned confirmed HTTP 502
-`empty_response`. Its four charges and engineering STOP are preserved. After the
-registry projection repair, at most four remaining requests may be used under a
-new committed implementation, keeping the cumulative engineering ceiling at eight.
+`empty_response`. Its four charges and engineering STOP are preserved. The registry projection repair was followed by a separately committed
+three-request window, preserving the original cumulative ceiling of eight.
 
 The second window used three requests: inspect compiled immediately; a legal
 Schema request for differentiation selected an unreduced matrix, correctly
@@ -195,7 +194,9 @@ rejected by the original scalar-direction rule; its next response was again
 confirmed HTTP 502 empty_response. Both failed windows retain their own source
 identities, receipts and engineering STOP. The scalar requirement is now projected
 using the exact original admission set, with no automatic choice of norm/min/max.
-Only one original engineering request remains for a final check.
+The last original engineering request was Schema-valid after scalar projection,
+but Main selected a mathematical cap below the original required 10. It was
+rejected without changing the question or running science. All eight are charged.
 
 ## New formal M1 proposal
 
@@ -219,3 +220,30 @@ The source/configuration/tests must be committed before new prepare/bind. The
 formal scientific authorization remains identity-bound and unrecorded during
 this engineering task. The proposal is delivered without starting a formal M1
 Worker, replaying an old STOP, merging main or executing nine-task benchmarks.
+
+
+## Final sealed engineering result
+
+Final targeted suite: 10 passed. One additional exact original M1 check passed
+for all three conditions on two segments/six tendons, including initialization,
+original T1 compilation, Replay request contract and curated Knowledge. Mock
+numbers are not science. Raw failed preflights remain local.
+
+Actual engineering Provider requests: 8 total, 6 HTTP 200 and 2 confirmed HTTP 502
+empty_response. Successful responses report 37,445 input + 817 output = 38,262
+tokens; failed-request usage and money are unknown. Control T1 and mechanism
+inspect compiled. The final differentiation request obeyed the projected Schema
+but Main's mathematical cap was below the original required 10; no science ran.
+All three engineering windows are sealed with receipts and zero pending work.
+
+No real mathematics Worker, independent Replay or physics integration was launched.
+Prior research costs remain 43 Provider calls / 1 math / 19,200 steps; combined
+actual Provider calls are now 51. No autonomous research success is established.
+
+The unexecuted formal proposal is bound to the final committed implementation;
+its earlier zero-use binding is preserved through original migration. It has zero
+Provider/science use and retains the original formal gate. See
+[validation.json](../../evidence/m1_intent_interface_repair/validation.json),
+[real_model_probe.json](../../evidence/m1_intent_interface_repair/real_model_probe.json),
+[compiled_examples.json](../../evidence/m1_intent_interface_repair/compiled_examples.json)
+and [next_study_prepared.json](../../evidence/m1_intent_interface_repair/next_study_prepared.json).

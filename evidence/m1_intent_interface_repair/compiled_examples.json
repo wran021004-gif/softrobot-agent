@@ -1,0 +1,134 @@
+{
+  "scope": "Actual SDK/Mock fixture only; all worker numerical values are fabricated, not scientific evidence.",
+  "source_commit": "7229c1a922545e0577f9685397b76a031650e55f",
+  "compilation_reference": {
+    "artifact_id": "aa3d220c64e63f48ab5b4b7592c358776ea39a971e82d257b01f26216e5c4d08",
+    "media_type": "application/json"
+  },
+  "raw_main_intent": {
+    "control": {
+      "control_scope": {
+        "mode": "full_task"
+      },
+      "control_search_effort": {
+        "evaluation_requests": 4,
+        "iterations": 2,
+        "knot_count": 4,
+        "method": "pattern"
+      }
+    },
+    "domain": "control"
+  },
+  "compiled_v4": {
+    "control": {
+      "control_scope": {
+        "mode": "full_task"
+      },
+      "control_search_effort": {
+        "evaluation_requests": 4,
+        "iterations": 2,
+        "knot_count": 4,
+        "method": "pattern"
+      },
+      "effect_semantics": "reoptimized_task_capability",
+      "question_type": "control_feasibility"
+    },
+    "domain": "control"
+  },
+  "deterministic_field_sources": {
+    "control.effect_semantics": "control feasibility contract",
+    "control.question_type": "control domain"
+  },
+  "original_AnalysisRequest": {
+    "candidate": {
+      "artifact_id": "e897dad767d5fc01677433bd8d113834e1e3a3080732fd3248d64bce8ab8069d",
+      "media_type": "application/json"
+    },
+    "control_optimization": {
+      "settings": {
+        "coefficient_limit_n": 2.0,
+        "correction_window_s": [
+          0.0,
+          0.6
+        ],
+        "difference_step_n": 0.01,
+        "evaluation_requests": 4,
+        "initial_radius_n": 0.1,
+        "iterations": 2,
+        "knots_s": [
+          0.0,
+          0.19999999999999998,
+          0.39999999999999997,
+          0.6
+        ],
+        "method": "pattern",
+        "minimum_radius_n": 0.0001,
+        "version": "local_control_search_v2"
+      },
+      "source": {
+        "artifact_id": "1026181e925dcebf20f05bb83f6ff1bca688e7bb8b91b9f1d56ec5b72936b71d",
+        "media_type": "application/json"
+      }
+    },
+    "model_source": "mujoco",
+    "operating_point": "standardized_initial_pretension",
+    "operation": "mujoco_nonlinear_task_capability_v1",
+    "protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 0.6,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.02,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.34
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.05,
+        0.1,
+        0.35
+      ]
+    }
+  },
+  "full_contract_validation": "passed",
+  "real_workers": 0
+}
