@@ -94,7 +94,8 @@ class GeneralTaskAdaptationTests(unittest.TestCase):
                 self.assertEqual(full['control_optimization']['settings']['evaluation_requests'],1)
                 self.assertEqual(full['protocol'],spec['analysis_protocol'])
                 rejected=compile_question(h,v4_question(numerical_method=T1),tool_use_id='mock-invalid-t1')
-                self.assertEqual(rejected['status'],'unsupported')
+                self.assertEqual(rejected['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
+                self.assertFalse(rejected['scientific_execution_started'])
                 closed=deepcopy(spec);closed['budgets']['mathematical_evaluations']=0
                 update(h,spec=closed)
                 self.assertNotEqual(compile_question(h,q,tool_use_id='mock-no-budget')['status'],'ready')
