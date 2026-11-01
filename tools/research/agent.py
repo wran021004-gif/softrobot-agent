@@ -80,6 +80,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             for name in ('segment_count','tendon_count'):
                 lower,upper=space[name+'_bounds']
                 schema['$defs'][generation]['properties'][name].update(minimum=lower,maximum=upper)
+                scoped=(study or {}).get('topology_scope',{}).get(name+'s')
+                if scoped:schema['$defs'][generation]['properties'][name]['enum']=scoped
+            schema['$defs'][generation]['properties']['segment_count'].setdefault('enum',space['executable_segment_counts'])
+            lower,upper=space['executable_tendon_count_bounds']
+            schema['$defs'][generation]['properties']['tendon_count'].update(minimum=lower,maximum=upper)
             if space['conditional_rules']=='base_only_consecutive_spans_v1':
                 schema['$defs']['Span']['properties']['first_segment'].update(const=0,
                     description='Frozen FamilySpace requires a fixed-base start. last_segment chooses the anchor segment; other span variables remain selectable.')

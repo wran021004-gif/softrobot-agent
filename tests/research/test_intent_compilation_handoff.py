@@ -123,6 +123,12 @@ class IntentCompilationHandoffTests(unittest.TestCase):
         broader=agent.plan_schema(['generate'],decision_required=True,
             family_version=spec['family_space']['version'],study=other)
         self.assertNotIn('const',broader['$defs']['Span']['properties']['first_segment'])
+        narrowed=deepcopy(spec);narrowed['topology_scope']=dict(segment_counts=[2],tendon_counts=[6])
+        constrained=agent.plan_schema(['generate'],decision_required=True,
+            family_version=spec['family_space']['version'],study=narrowed)
+        generation_name='GenerationRequestV2' if spec['family_space']['version']=='serial_family_space_v2' else 'GenerationRequest'
+        self.assertEqual(constrained['$defs'][generation_name]['properties']['segment_count']['enum'],[2])
+        self.assertEqual(constrained['$defs'][generation_name]['properties']['tendon_count']['enum'],[6])
         self.assertEqual(state(h)['analysis_results'],[])
 
     def test_illegal_root_semantics_direction_and_sealed_state_never_start_science(self):
