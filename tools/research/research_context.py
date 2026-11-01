@@ -963,7 +963,9 @@ def tool_continuation(host):
     """Reconstruct navigation intent from existing events, separately from science."""
     recent=[];selection=None;plan_action=None;plan_selection=None
     for event in host.store.events(host.run_id):
-        if event['kind']=='research_tool_route':
+        if event['kind']=='authorized_continuation_activated':
+            selection=None;plan_action=None;plan_selection=None
+        elif event['kind']=='research_tool_route':
             route=host.store.artifact(event['outputs'][0])
             selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],sequence=event['sequence'],
                 source=event['outputs'][0],status='selected_not_submitted')
@@ -1462,7 +1464,7 @@ def agent_decision_brief(host):
     if s.get('research_continuations'):
         ref=s['research_continuations'][-1];continuation=host.store.artifact(ref)
         brief['authorized_continuation']=dict(reference=ref,previous_stop=continuation['previous_final_disposition'],
-            scope='Explicit user-authorized additional segment in the same Study. Previous STOP is historical; all evidence and cumulative costs retained. No additional scientific allowance.')
+            scope='Explicit user-authorized additional segment in the same Study. Previous STOP is historical; all evidence and cumulative costs retained. Current frozen budgets and method grants govern this segment.')
     if s['spec'].get('family_search'):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])

@@ -1083,6 +1083,10 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     or prior.get('success_gate') or approval['previous_final_disposition']!=prior['final_disposition']):
                 raise ValueError('EXPLICIT_NONPASS_STOP_CONTINUATION_REQUIRED')
             guard(host)
+            if on_demand:
+                current=state(host);pilot=deepcopy(current['pilot'])
+                pilot.pop('tool_route',None)  # The previous STOP selection is historical.
+                update(host,pilot=pilot)
             preparation=state(host)['pilot'].get('handoff')
             source=(host.store.artifact(host.store.artifact(preparation)['source_state']) if preparation else {})
             if source.get('pending_authorized_continuation')!=continuation:
