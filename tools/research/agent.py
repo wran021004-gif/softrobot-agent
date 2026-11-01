@@ -1133,144 +1133,145 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         guard(host)
         if s['spec'].get('research_decisions'):
             await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
-        if on_demand:
-            for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
-            agent.tool_registry.registry.pop('retrieve_context',None)
-        for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
-            tool=agent.tool_registry.registry.get(name)
-            if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
-            from tools.research.config import bounded_evidence_enabled
-            if tool and name=='evidence_read' and bounded_evidence_enabled(s['spec']):
-                tool.tool_spec['description']='Read exact named facts via fields/range/JSON pointers. Large raw reads return bounded facts/navigation. For formal SELECT read the complete acceptance_certificate of each independently evaluated result; actual delivery and original admission are required. STOP uses the complete fresh result-reference index.'
-        current=decision_packet(host)
-        from tools.research.experience import knowledge_enabled
-        if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
-        from tools.research.evidence_policy import english_native
-        if 'research' in current:
-            from tools.research.scientific_intent import enabled as question_enabled
-            native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
-                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
-                diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
-            if question_enabled(s['spec']):
-                native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
-                from tools.research.scientific_intent import explicit_actions
-                if explicit_actions(s['spec']):
-                    native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
-        if english_native(s['spec']):
-            tool=next((t for t in native if t.tool_name=='research_analysis'),None)
-            from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema
-            question_mode=question_enabled(s['spec'])
-            selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
-            if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
-                tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
-                    'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'))}}
-                agent.tool_registry.registry['research_analysis']=tool
-            elif selected:
-                method,detail=selected
-                tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
-                    'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}
-                agent.tool_registry.registry['research_analysis']=tool
-            else:agent.tool_registry.registry.pop('research_analysis',None)
-        if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
-            agent.tool_registry.registry.pop('research_analysis',None)
-        # Provider readiness is checked per selected model by analysis.dispatch;
-        # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
-        if english_native(s['spec']):
-            from tools.research.research_context import research_decision_brief_v3
-            delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research'],
-                complete_interpretations=s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2'))
-        else:delivered=current
-        if not on_demand:record(host,'model_decision_packet',delivered)
-        agent.system_prompt=instructions
-        boundary.research_packet=deepcopy(delivered)
-        if (current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)) or
-                bounded_evidence_enabled(s['spec']) and protected(host)):
-            permitted=closeout_operations(host)
-            schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
-            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
-            agent.tool_registry.registry.pop('experience_retrieve',None)
-            agent.tool_registry.registry.pop('research_analysis',None)
-            if rl_mode:
-                rl_tool=next(t for t in native if t.tool_name=='research_rl')
-                schema=deepcopy(rl_tool.tool_spec['inputSchema']['json'])
-                schema['properties']['operation']['enum']=permitted['research_rl']
-                schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
-                rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
-            agent.tool_registry.registry.pop('research_investigate',None)
-            if on_demand:agent.tool_registry.registry.pop('research_recall',None)
-            schema=evidence_query_schema(s['spec'])
-            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
-            native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
-            retrieval=agent.tool_registry.registry.get('retrieve_context')
-            if retrieval:
-                from strands.tools.tools import normalize_tool_spec
-                spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
-                spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
-                retrieval.tool_spec=spec
-            boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
-        if on_demand:
-            registry=agent.tool_registry.registry;directory=tool_directory(host,registry)
-            pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
-            loaded=load_selected_tool_schema(host,registry,directory)
-            boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
-                tool_loading='Submit an already loaded tool directly. Use research_route only to switch tool/action; direct reads preserve the loaded Plan. Selection alone executes nothing.')
-            handoff=boundary.research_packet['research'].get('analysis_handoff')
-            if handoff:
-                analysis_tool=registry.get('research_analysis')
-                schema=analysis_tool.tool_spec['inputSchema']['json'] if analysis_tool else {}
-                handoff['remaining_scientific_fields']=schema.get('required',[])
-                handoff['conditional_scientific_inputs']=([dict(when=dict(operating_point='saved_state'),
-                    exactly_one_of=[['saved_state'],['execution','update_id']],
-                    rule='Use an exact candidate-bound state source. Other operating points must omit these sources; a legal point enum does not imply a saved source exists.')]
-                    if 'saved_state' in schema.get('properties',{}).get('operating_point',{}).get('enum',[]) else [])
-            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
-                boundary.research_packet['research']['generation_contract']=dict(
-                    family_space_identity=s['spec']['family_space_identity'],
-                    version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
-                    domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
-                    generation_inputs=current['family_space']['generation_inputs'],
-                    scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
-            if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')):
-                from tools.research.research_context import compact_tool_delivery
-                compact_tool_delivery(boundary.research_packet['research'])
-            from tools.research.config import information_flow_v1
-            if information_flow_v1(s['spec']):
-                from tools.research.research_context import information_flow_brief
-                boundary.research_packet['research']=information_flow_brief(current['research'],boundary.research_packet['research'])
-            if enabled(s['spec'],'physical_replay'):
-                from tools.research.object_choices import replay_choices,choice_schema
-                options=replay_choices(host,current['research'].get('scientific_results') or {})
-                boundary.research_packet['saved_replay_choices']=dict(options=options,
-                    scope='Bounded saved-result options. Main chooses; no physical execution or acceptance is implied. Other saved results remain queryable from Store.')
+        with host.store.read_snapshot():
+            if on_demand:
+                for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
+                agent.tool_registry.registry.pop('retrieve_context',None)
+            for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
+                tool=agent.tool_registry.registry.get(name)
+                if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
+                from tools.research.config import bounded_evidence_enabled
+                if tool and name=='evidence_read' and bounded_evidence_enabled(s['spec']):
+                    tool.tool_spec['description']='Read exact named facts via fields/range/JSON pointers. Large raw reads return bounded facts/navigation. For formal SELECT read the complete acceptance_certificate of each independently evaluated result; actual delivery and original admission are required. STOP uses the complete fresh result-reference index.'
+            current=decision_packet(host)
+            from tools.research.experience import knowledge_enabled
+            if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
+            from tools.research.evidence_policy import english_native
+            if 'research' in current:
+                from tools.research.scientific_intent import enabled as question_enabled
+                native[0].tool_spec={**native[0].tool_spec,'description':DECISION_PLAN_DESCRIPTION if english_native(s['spec']) else PLAN_TOOL_DESCRIPTION,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
+                    family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None,
+                    diagnose_candidate_required=s['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=s['spec'])}}
+                if question_enabled(s['spec']):
+                    native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
+                    from tools.research.scientific_intent import explicit_actions
+                    if explicit_actions(s['spec']):
+                        native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
+            if english_native(s['spec']):
+                tool=next((t for t in native if t.tool_name=='research_analysis'),None)
+                from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, question_schema
+                question_mode=question_enabled(s['spec'])
+                selected=selected_analysis(host,current['research']) if not question_mode and tool and enabled(s['spec'],'analysis') else None
+                if question_mode and tool and completed_question_plan(host) and enabled(s['spec'],'analysis'):
+                    tool.tool_spec={**tool.tool_spec,'description':'Submit a scientific question for the candidate and hypothesis in the completed diagnose Plan. Deterministic compilation preserves original execution admission and charges; unsupported semantics are never replaced.',
+                        'inputSchema':{'json':question_schema(s['spec'],host.store.artifact(completed_question_plan(host)['candidate']),completed_question_plan(host)['agent_hypothesis'].get('next_research_action'))}}
+                    agent.tool_registry.registry['research_analysis']=tool
+                elif selected:
+                    method,detail=selected
+                    tool.tool_spec={**tool.tool_spec,'description':'Execute the selected registered mathematical method. Full backend Study and source admission applies; selection alone performs no calculation.',
+                        'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}
+                    agent.tool_registry.registry['research_analysis']=tool
+                else:agent.tool_registry.registry.pop('research_analysis',None)
+            if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
+                agent.tool_registry.registry.pop('research_analysis',None)
+            # Provider readiness is checked per selected model by analysis.dispatch;
+            # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
+            if english_native(s['spec']):
+                from tools.research.research_context import research_decision_brief_v3
+                delivered=dict(study_id=host.run_id,research=research_decision_brief_v3(current['research'],
+                    complete_interpretations=s['spec'].get('research_decisions',{}).get('role_policy',{}).get('version')=='research_roles_v2'))
+            else:delivered=current
+            if not on_demand:record(host,'model_decision_packet',delivered)
+            agent.system_prompt=instructions
+            boundary.research_packet=deepcopy(delivered)
+            if (current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)) or
+                    bounded_evidence_enabled(s['spec']) and protected(host)):
+                permitted=closeout_operations(host)
+                schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
+                native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
+                agent.tool_registry.registry.pop('experience_retrieve',None)
+                agent.tool_registry.registry.pop('research_analysis',None)
+                if rl_mode:
+                    rl_tool=next(t for t in native if t.tool_name=='research_rl')
+                    schema=deepcopy(rl_tool.tool_spec['inputSchema']['json'])
+                    schema['properties']['operation']['enum']=permitted['research_rl']
+                    schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
+                    rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
+                agent.tool_registry.registry.pop('research_investigate',None)
+                if on_demand:agent.tool_registry.registry.pop('research_recall',None)
+                schema=evidence_query_schema(s['spec'])
+                schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
+                native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
+                retrieval=agent.tool_registry.registry.get('retrieve_context')
+                if retrieval:
+                    from strands.tools.tools import normalize_tool_spec
+                    spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
+                    spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
+                    retrieval.tool_spec=spec
+                boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
+            if on_demand:
+                registry=agent.tool_registry.registry;directory=tool_directory(host,registry)
+                pilot=deepcopy(state(host)['pilot']);pilot['tool_directory']=directory;update(host,pilot=pilot)
+                loaded=load_selected_tool_schema(host,registry,directory)
+                boundary.research_packet['research'].update(tool_directory=directory,loaded_tool=loaded,
+                    tool_loading='Submit an already loaded tool directly. Use research_route only to switch tool/action; direct reads preserve the loaded Plan. Selection alone executes nothing.')
+                handoff=boundary.research_packet['research'].get('analysis_handoff')
+                if handoff:
+                    analysis_tool=registry.get('research_analysis')
+                    schema=analysis_tool.tool_spec['inputSchema']['json'] if analysis_tool else {}
+                    handoff['remaining_scientific_fields']=schema.get('required',[])
+                    handoff['conditional_scientific_inputs']=([dict(when=dict(operating_point='saved_state'),
+                        exactly_one_of=[['saved_state'],['execution','update_id']],
+                        rule='Use an exact candidate-bound state source. Other operating points must omit these sources; a legal point enum does not imply a saved source exists.')]
+                        if 'saved_state' in schema.get('properties',{}).get('operating_point',{}).get('enum',[]) else [])
+                if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v2'),dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')) and s.get('family_space_reference'):
+                    boundary.research_packet['research']['generation_contract']=dict(
+                        family_space_identity=s['spec']['family_space_identity'],
+                        version='serial_family_generation_v2' if s['spec']['family_space']['version']=='serial_family_space_v2' else 'serial_family_generation_v1',
+                        domain_query=dict(reference=s['family_space_reference'],view='full',pointer=''),
+                        generation_inputs=current['family_space']['generation_inputs'],
+                        scope='Frozen generation inputs and domain query; choose your own legal parameters. No candidate or Plan is submitted.')
+                if tool_schema_policy(s['spec']) in (dict(version='on_demand_tools_v3'),dict(version='research_information_flow_v1')):
+                    from tools.research.research_context import compact_tool_delivery
+                    compact_tool_delivery(boundary.research_packet['research'])
+                from tools.research.config import information_flow_v1
+                if information_flow_v1(s['spec']):
+                    from tools.research.research_context import information_flow_brief
+                    boundary.research_packet['research']=information_flow_brief(current['research'],boundary.research_packet['research'])
+                if enabled(s['spec'],'physical_replay'):
+                    from tools.research.object_choices import replay_choices,choice_schema
+                    options=replay_choices(host,current['research'].get('scientific_results') or {})
+                    boundary.research_packet['saved_replay_choices']=dict(options=options,
+                        scope='Bounded saved-result options. Main chooses; no physical execution or acceptance is implied. Other saved results remain queryable from Store.')
+                    plan=registry.get('research_plan')
+                    if options and plan and plan.tool_spec['inputSchema']['json']['properties']['action'].get('enum')==['physical_replay']:
+                        plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':choice_schema(plan.tool_spec['inputSchema']['json'],options)}}
                 plan=registry.get('research_plan')
-                if options and plan and plan.tool_spec['inputSchema']['json']['properties']['action'].get('enum')==['physical_replay']:
-                    plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':choice_schema(plan.tool_spec['inputSchema']['json'],options)}}
-            plan=registry.get('research_plan')
-            if plan:
-                from tools.research.object_choices import reference_choices,reference_schema
-                choices=reference_choices(host);schema=plan.tool_spec['inputSchema']['json']
-                action=schema['properties']['action'].get('enum',[])
-                if len(action)==1:
-                    plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':reference_schema(schema,choices,action[0])}}
-                    from tools.research.research_context import ordered_candidates
-                    wanted=[*ordered_candidates(host,s)[-3:],
-                        *[r['candidate'] for r in boundary.research_packet.get('saved_replay_choices',{}).get('options',[])],
-                        *s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
-                    boundary.research_packet['saved_object_choices']=[dict(choice=k,reference=v,
-                        **(host.store.artifact(v,paths=('acceptance','candidate')) if k.startswith('evaluation_') else {}))
-                        for k,v in choices.items() if v in wanted]
-                    boundary.research_packet['object_choice_rule']='Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.'
-            if operator_request:
-                boundary.research_packet['operator_request']=dict(reference=operator_request,
-                    instruction=host.store.artifact(operator_request))
-        from tools.research.object_choices import main_context_enabled,main_tool_schema,reference_choices,main_packet
-        if main_context_enabled(s['spec']):
-            choices=reference_choices(host,include_all=True)
-            for tool in agent.tool_registry.registry.values():
-                tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
-            boundary.research_packet=main_packet(host,boundary.research_packet)
-        # Record the actual L0 after its final presentation projection.
-        if on_demand:record(host,'model_decision_packet',boundary.research_packet)
+                if plan:
+                    from tools.research.object_choices import reference_choices,reference_schema
+                    choices=reference_choices(host);schema=plan.tool_spec['inputSchema']['json']
+                    action=schema['properties']['action'].get('enum',[])
+                    if len(action)==1:
+                        plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':reference_schema(schema,choices,action[0])}}
+                        from tools.research.research_context import ordered_candidates
+                        wanted=[*ordered_candidates(host,s)[-3:],
+                            *[r['candidate'] for r in boundary.research_packet.get('saved_replay_choices',{}).get('options',[])],
+                            *s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
+                        boundary.research_packet['saved_object_choices']=[dict(choice=k,reference=v,
+                            **(host.store.artifact(v,paths=('acceptance','candidate')) if k.startswith('evaluation_') else {}))
+                            for k,v in choices.items() if v in wanted]
+                        boundary.research_packet['object_choice_rule']='Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.'
+                if operator_request:
+                    boundary.research_packet['operator_request']=dict(reference=operator_request,
+                        instruction=host.store.artifact(operator_request))
+            from tools.research.object_choices import main_context_enabled,main_tool_schema,reference_choices,main_packet
+            if main_context_enabled(s['spec']):
+                choices=reference_choices(host,include_all=True)
+                for tool in agent.tool_registry.registry.values():
+                    tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
+                boundary.research_packet=main_packet(host,boundary.research_packet)
+            # Record the actual L0 after its final presentation projection.
+            if on_demand:record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
         paired=bool(agent.messages and agent.messages[-1]['role']=='user'
             and any('toolResult' in b for b in agent.messages[-1]['content']))

@@ -60,14 +60,19 @@ def task_gap(result):
                 e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
             accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
     components=acceptance.get('components',{})
+    if acceptance.get('constraint_observations') is not None:
+        from tools.research_tasks import constraint_gap,_outcome_issue,_source_issue
+        return constraint_gap(acceptance['constraint_observations'],
+            valid_complete=_outcome_issue(acceptance) is None and _source_issue(acceptance) is None,
+            accepted=acceptance.get('accepted'))
     if acceptance.get('task_family')=='task.passive_response':
         from tools.research_tasks import _outcome_issue,_source_issue
-        return dict(normalized_gap=None,components={},
-            valid_complete=_outcome_issue(acceptance) is None and _source_issue(acceptance) is None,
-            accepted=bool(acceptance.get('accepted')),
-            dominant_constraints=[dict(constraint_id=k,value=v['value'],limit=v['limit'],unit=v['unit'],scope='physical_task')
-                for k,v in components.items() if k.startswith('evaluator:') and v['passed'] is False],
-            interpretation='Every frozen dynamic bound is authoritative; no static or active-control score substitution.')
+        from tools.research_tasks import constraint_observation,constraint_gap
+        rows=[constraint_observation(dict(constraint_id=k,condition_id=None,load_condition=None,time_window=None,
+            bound=v['limit'],unit=v.get('unit'),bound_type='lower' if k.endswith('_minimum') else 'upper'),v)
+            for k,v in components.items() if k.startswith('evaluator:')]
+        return constraint_gap(rows,valid_complete=_outcome_issue(acceptance) is None and _source_issue(acceptance) is None,
+            accepted=acceptance.get('accepted'))
     tracking=acceptance.get('task_family')=='task.tracking'
     scored=(('evaluator:tracking_max_error','evaluator:path_coverage','evaluator:path_start',
         'evaluator:path_end','evaluator:path_progress_regression') if tracking else

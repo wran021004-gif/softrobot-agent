@@ -413,6 +413,10 @@ def context(host, *, evidence_references=None):
 
 
 def confirmed_tool_deliveries(host):
+    return host.store.snapshot_value(('confirmed_tool_deliveries',host.run_id),lambda:_confirmed_tool_deliveries(host))
+
+
+def _confirmed_tool_deliveries(host):
     """Reuse confirmed Provider wires for exact tool feedback and summary markers."""
     import json
     from tools.research.session_handoff import packet_feedback

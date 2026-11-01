@@ -32,6 +32,34 @@ class ResearchTaskAdapter:
         if self.task.get('physical_problem'):
             raise ValueError('NOT_APPLICABLE_PASSIVE_HAS_NO_ACTIVE_REFERENCE_OR_CONTROL')
 
+    def constraint_observations(self, components):
+        """Join frozen task meanings to recorded evaluator values; never evaluate physics."""
+        definitions=[]
+        if passive_registered(self.task):
+            from extensions.reference.contracts import PassiveResponseEvaluation
+            goal=self.task['goal']['data'];duration=self.task['timing']['duration_s']
+            windows=dict(full=[0.,duration],unloaded=[0.,goal['unloaded_until_s']],hold=goal['hold_window_s'])
+            for bound in PassiveResponseEvaluation.model_validate(self.task['evaluator']['parameters']['data']).bounds:
+                b=bound.model_dump()
+                for side in ('minimum','maximum'):
+                    if b.get(side) is None:continue
+                    definitions.append(dict(constraint_id='evaluator:'+b['name']+'_'+side,
+                        condition_id=b['load_condition'],load_condition=b['load_condition'],time_window=windows[b['window']],
+                        bound_type='lower' if side=='minimum' else 'upper',bound=b[side],unit=bound.physical_unit,
+                        signal=b['quantity'],material_s=b.get('material_s'),frame='world'))
+            if self.task['evaluator']['parameters']['data'].get('prohibit_contact',True):
+                definitions.append(dict(constraint_id='evaluator:no_contact',condition_id='all_load_conditions',
+                    time_window=[0.,duration],bound_type='upper',bound=0,unit='count',signal='maximum_contacts'))
+        else:
+            for row in self.condition_view()['conditions']:
+                binding=row.get('evaluation_binding',{})
+                name=binding.get('component') or 'evaluator:'+binding.get('constraint',row['condition_id'])
+                sampling=row.get('sampling',{})
+                definitions.append(dict(constraint_id=name,condition_id=row['condition_id'],
+                    time_window=sampling.get('window_s',sampling.get('time_s')),bound_type='upper',
+                    bound=row['limit'],unit=row['units'],signal=row.get('signal')))
+        return [constraint_observation(d,components.get(d['constraint_id'],{})) for d in definitions]
+
     def condition_view(self):
         """Generate hard conditions on demand from task + legacy frozen protocol.
 
@@ -488,6 +516,36 @@ def _component(value, passed, unit=None, limit=None, reason=None):
     return dict(value=value, passed=passed, unit=unit, limit=limit, reason=reason)
 
 
+def constraint_observation(definition, component):
+    """Signed excess with explicit scale provenance; zero bounds stay unscaled."""
+    row=dict(definition);value=component.get('value');bound=row.get('bound',component.get('limit'))
+    numeric=type(value) in (int,float) and math.isfinite(value) and type(bound) in (int,float) and math.isfinite(bound)
+    signed=(bound-value if row['bound_type']=='lower' else value-bound) if numeric else None
+    scale=abs(bound) if numeric and bound!=0 else None
+    key=row['constraint_id'].replace('~','~0').replace('/','~1')
+    row.update(observed_value=value,bound=bound,passed=component.get('passed'),signed_violation=signed,
+        normalization_scale=scale,normalization_source='absolute_frozen_bound' if scale else None,
+        normalized_violation=signed/scale if scale else None,
+        source_pointer='/acceptance/components/'+key)
+    return row
+
+
+def constraint_gap(rows, *, valid_complete, accepted=None):
+    """Common TaskGap contract; unscaled/missing bounds cannot mint a score."""
+    complete=bool(valid_complete and rows and all(r['passed'] is not None and r['signed_violation'] is not None for r in rows))
+    comparable=complete and all(r['normalized_violation'] is not None for r in rows)
+    signed={r['constraint_id']:r['normalized_violation'] for r in rows if r['normalized_violation'] is not None}
+    worst=max(signed.values()) if comparable else None
+    dominant=[{**r,'value':r['observed_value'],'limit':r['bound'],
+        'normalized_signed_excess':r['normalized_violation'],'scope':'physical_task'} for r in rows
+        if (comparable and r['normalized_violation']==worst) or (not comparable and r['passed'] is False)]
+    return dict(normalized_gap=max(0.,worst) if worst is not None else None,
+        signed_task_gap=worst,components={k:max(0.,v) for k,v in signed.items()},
+        constraints=rows,unscaled_constraints=[r['constraint_id'] for r in rows if r['normalized_violation'] is None],
+        valid_complete=complete,comparable=comparable,accepted=accepted,dominant_constraints=dominant,
+        interpretation='Read-only research ranking. Every frozen bound retained; independent evaluator and certificate own acceptance.')
+
+
 def _number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
@@ -694,7 +752,9 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     else:
         accepted = all((c['passed'] for c in components.values()))
         status = 'accepted' if accepted else 'valid_failure'
-    return dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=[t['id'] for t in cfg['robot']['structure']['data']['tendons']] if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
+    result=dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=[t['id'] for t in cfg['robot']['structure']['data']['tendons']] if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
+    result['constraint_observations']=adapter.constraint_observations(components)
+    return result
 
 
 def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None):

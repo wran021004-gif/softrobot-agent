@@ -40,6 +40,8 @@ def scientific_actions(spec):
         actions.append(dict(scientific_goal='mechanism_research',domain='structure',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
             scope='inspect / differentiate / optimize / compare instantaneous mechanisms and explicit M1/M2 evidence. Main owns target, direction and adoption.'))
+    if spec['research_decisions']['analysis_interface']=='scientific_question_v4':
+        actions=[row for row in actions if row['scientific_goal']!='single_parameter_effect']
     for row in actions:
         if spec.get('canonical_task',{}).get('physical_problem') and row['scientific_goal']!='mechanism_research':
             row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive Replay is available through research_plan only for a registered dynamic task.')
@@ -51,6 +53,8 @@ def scientific_actions(spec):
 
 
 def action_entry(spec, choice):
+    if choice=='single_parameter_effect' and spec['research_decisions']['analysis_interface']=='scientific_question_v4':
+        choice='mechanism_research'
     return next((r for r in scientific_actions(spec) if r['scientific_goal']==choice),None)
 
 

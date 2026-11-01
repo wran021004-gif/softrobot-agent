@@ -18,13 +18,20 @@ def remove_fields(schema,names):
 
 
 def reference_choices(host, *, include_all=False):
+    build=lambda:_reference_choices(host,include_all=include_all)
+    if hasattr(host.store,'snapshot_value'):
+        return host.store.snapshot_value(('reference_choices',include_all),build)
+    return build()
+
+
+def _reference_choices(host, *, include_all=False):
     """Short selectors in this original Store; immutable references remain authoritative."""
     s=state(host);choices={}
     candidates=list(s.get('candidates',{}).values())
     evaluations=[r for key in ('results','physical_replays','rl_evaluations') for r in s.get(key,[])]
     analyses=s.get('analysis_results',[])
     from tools.research.evidence_policy import registered_references
-    refs=[*readable_results(s),*registered_references(host)]
+    refs=[] if include_all else [*readable_results(s),*registered_references(host)]
     # Row identities are local selectors, not portable scientific identities.
     # Each advertised schema retains the exact alias-to-reference binding below.
     with host.store.connect(True) as db:
@@ -288,6 +295,12 @@ def main_packet(host, packet):
     seen={}
     def deduplicate(item,path):
         if isinstance(item,dict):
+            if 'signed_task_gap' in item and 'constraints' in item:
+                item={k:v for k,v in item.items() if k not in ('constraints','components','interpretation')}
+                fingerprint=json.dumps(item,sort_keys=True)
+                if fingerprint in seen:return dict(facts_at=seen[fingerprint])
+                seen[fingerprint]=path
+                item['constraint_details']='/acceptance/constraint_observations'
             # Exact repeated scientific cards become navigation; distinct scopes
             # and estimates keep their own content even when values coincide.
             if item.get('reference') and any(k in item for k in ('metrics','J','structure_research')):

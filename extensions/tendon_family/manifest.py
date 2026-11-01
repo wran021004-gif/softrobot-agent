@@ -296,7 +296,8 @@ for _i,_entry in enumerate(EXTENSIONS):
 
 # Controller-free execution is a distinct registered pairing; active versions stay frozen.
 _PASSIVE_SOURCES=PLATFORM_SOURCES+PHYSICAL_SOURCES+('extensions/reference/passive_response.py',
-    'extensions/reference/contracts.py','extensions/tendon_family/passive.py','extensions/tendon_family/passive_execution.py')
+    'extensions/reference/contracts.py','extensions/tendon_family/passive.py','extensions/tendon_family/passive_execution.py',
+    'extensions/tendon_family/passive_equilibrium.py','extensions/tendon_family/passive_inverse.py')
 EXTENSIONS.extend([
     Extension(extension_id='task.passive_response',kind='task',version='1.0.0',input_schema=m6.TaskDefinition,output_schema=m6.TaskDefinition,description='Frozen finite-time passive load response',
         binding='extensions.reference.passive_response:task_definition',sources=_PASSIVE_SOURCES),

@@ -4,6 +4,10 @@ Working directories are not transactions. External side effects can finish witho
 a commit; such reservations remain unknown and are never automatically replayed.
 """
 from contextlib import contextmanager, closing, nullcontext
+from copy import deepcopy
+from contextvars import ContextVar
+
+_READ_SNAPSHOT=ContextVar("store_read_snapshot",default=None)
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -45,6 +49,24 @@ class Store:
             db.execute('PRAGMA synchronous=FULL')
         db.row_factory = sqlite3.Row
         return db
+
+    @contextmanager
+    def read_snapshot(self):
+        """Request-local immutable reads; discarded on exit, never persisted."""
+        current=_READ_SNAPSHOT.get()
+        if current is not None and current[0] is self:
+            yield current[1]
+            return
+        token=_READ_SNAPSHOT.set((self,{}))
+        try:yield _READ_SNAPSHOT.get()[1]
+        finally:_READ_SNAPSHOT.reset(token)
+
+    def snapshot_value(self, key, build):
+        current=_READ_SNAPSHOT.get()
+        if current is None or current[0] is not self:return build()
+        cache=current[1]
+        if key not in cache:cache[key]=build()
+        return deepcopy(cache[key])
 
     def create_context_archive(self):
         """Artifact-only offline checkpoint Store; never an execution grant.
@@ -152,8 +174,10 @@ class Store:
         """Hash-verified artifact; optional dot paths avoid decoding unrelated arrays."""
         ref = EvidenceRef.model_validate(ref)
         if db is None:
-            with self.connect(True) as conn:
-                return self.artifact(ref, raw=raw, db=conn, paths=paths)
+            def read():
+                with self.connect(True) as conn:
+                    return self.artifact(ref, raw=raw, db=conn, paths=paths)
+            return self.snapshot_value(('artifact',ref.artifact_id,raw,tuple(paths) if paths is not None else None),read)
         row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
         if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
             raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)

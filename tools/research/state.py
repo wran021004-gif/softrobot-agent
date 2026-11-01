@@ -69,6 +69,7 @@ SCIENCE_FILES += ['extensions/tendon_family/family_space.py','extensions/tendon_
     'extensions/tendon_family/passive_execution.py','extensions/reference/passive_response.py','extensions/reference/contracts.py']
 SCIENCE_FILES += ['extensions/tendon_family/mujoco_analysis.py']
 SCIENCE_FILES += ['extensions/math_analysis/mechanism_registry.py','extensions/math_analysis/differentiation_router.py']
+SCIENCE_FILES += ['extensions/tendon_family/passive_equilibrium.py','extensions/tendon_family/passive_inverse.py']
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
 CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']
