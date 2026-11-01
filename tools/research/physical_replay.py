@@ -368,6 +368,13 @@ def calculate(request,folder):
             or pending.get('kind')!='physical_replay' or pending.get('worker_request_id')!=request['request_id']
             or Path(pending['folder']).resolve()!=Path(folder).resolve()):
         raise ValueError('OWNED_ACTIVE_PHYSICAL_REPLAY_RESERVATION_REQUIRED')
+    if request.get('route')=='passive_protocol':
+        from extensions.tendon_family.passive_execution import execute,source_binding
+        expected=dict(**source_binding(request['configuration']),candidate=request['candidate'])
+        if (request['passive_source']!=expected or pending.get('candidate')!=request['candidate'] or
+                store.artifact(request['source_reference'])!=expected):
+            raise ValueError('PASSIVE_WORKER_SOURCE_BINDING_MISMATCH')
+        return execute(SessionInput.model_validate(request['configuration']),folder).data.data
     inp,physics,scene=binding(request['configuration'],request['trajectory'])
     result=playback_tensions(inp,physics,scene,request['trajectory']['tensions_n'],folder)
     result.update(candidate=request['candidate'],source_reference=request['source_reference'],
@@ -391,14 +398,26 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     candidate=plain(arguments.candidate)
     cfg=verify_candidate(host,candidate)['configuration']
-    if cfg['task'].get('physical_problem'):raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
-    source_ref=plain(arguments.source)
-    source=host.store.artifact(source_ref)
+    from tools.research_tasks import passive_registered
+    passive=passive_registered(cfg['task'])
+    episodes=len(cfg['task']['goal']['data']['load_conditions']) if passive else 1
+    route='passive_protocol' if passive else 'fixed_tension'
+    if cfg['task'].get('physical_problem') and not passive:raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
+    if passive:
+        from extensions.tendon_family.passive_execution import source_binding
+        expected=dict(**source_binding(cfg),candidate=candidate)
+        source_ref=plain(arguments.source) if arguments.source else save(host,expected,'frozen_passive_protocol')
+        source=host.store.artifact(source_ref)
+        if source!=expected:raise ValueError('FROZEN_PASSIVE_PROTOCOL_CANDIDATE_MISMATCH')
+    else:
+        if arguments.source is None:raise ValueError('ACTIVE_REPLAY_REQUIRES_CONTROL_SOURCE')
+        source_ref=plain(arguments.source)
+        source=host.store.artifact(source_ref)
     if explicit_control_source(source) and 'control_correction' not in s['spec']['capabilities']:
         raise ValueError('EXPLICIT_CONTROL_SCHEDULE_CAPABILITY_REQUIRED')
-    if not (numerically_verified_source(source) or explicit_control_source(source)):
+    if not passive and not (numerically_verified_source(source) or explicit_control_source(source)):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
-    binding(cfg,source['trajectory'],mathematical_outputs=source.get('mathematical_outputs'))
+    if not passive:binding(cfg,source['trajectory'],mathematical_outputs=source.get('mathematical_outputs'))
     from tools.research.feedback import experiment_preflight,eligibility
     if confirmation:
         if s.get('selected')!=plain(selected):raise ValueError('CONFIRM_REQUIRES_PRIOR_FORMAL_SELECT')
@@ -408,15 +427,16 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
         choice=eligibility(host,selected,selection=False,root_operation=False)
         if not choice['eligible']:raise ValueError('; '.join(choice['reasons']))
     from tools.research.budget import capacity
-    if capacity(host,1,confirmation,route='fixed_tension')['admitted']<1:
+    if capacity(host,episodes,confirmation,route=route)['admitted']<episodes:
         raise ValueError('PHYSICAL_REPLAY_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
-    novelty=experiment_preflight(host,candidate,'fixed_tension',source_ref=source_ref,repeat=confirmation)
+    novelty=experiment_preflight(host,candidate,route,source_ref=source_ref,repeat=confirmation)
     if not novelty['admitted']:
         raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
             +json.dumps(novelty,sort_keys=True))
     request=dict(kind='physical_replay',implementation=s['freeze'],study_id=host.run_id,
         store_root=str(host.store.root),request_id=key+'-physical',candidate=candidate,
-        source_reference=source_ref,configuration=cfg,trajectory=source['trajectory'],
+        source_reference=source_ref,configuration=cfg,route=route,episode_count=episodes,
+        **(dict(passive_source=source) if passive else dict(trajectory=source['trajectory'])),
         role=role,selected_execution=plain(selected),operation_key=key)
     worker_key=request['request_id']
     old=host.store.lookup(host.run_id,worker_key)
@@ -427,17 +447,17 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
         from tools.research.budget import backend_capacity
-        if backend_capacity(host,db)<1:raise ValueError('BACKEND_CAPACITY_PROTECTS_RESERVED_RL_EVALUATIONS')
-        current['physical_replay_launches']=current.get('physical_replay_launches',0)+1
+        if backend_capacity(host,db)<episodes:raise ValueError('BACKEND_CAPACITY_PROTECTS_RESERVED_RL_EVALUATIONS')
+        current['physical_replay_launches']=current.get('physical_replay_launches',0)+episodes
         host.store.update_state(db,host.run_id,current)
     row,_=host.store.reserve(host.run_id,worker_key,digest(request),host.actor,
-        {**zero(),'backend_solves':1},resources=('backend.family_mujoco',),guard=charge)
+        {**zero(),'backend_solves':episodes},resources=('backend.family_mujoco',),guard=charge)
     folder=host.store.root/'physical_replay'/row['execution_id']
     folder.mkdir(parents=True,exist_ok=True)
     atomic_json(folder/'request.json',request)
     update(host,pending=dict(kind='physical_replay',worker_request_id=worker_key,folder=str(folder),
         implementation=s['freeze'],candidate=candidate,source_reference=source_ref,
-        role=role,selected_execution=plain(selected),operation_key=key))
+        role=role,selected_execution=plain(selected),operation_key=key,route=route,episode_count=episodes))
     from tools.service_execution import _run_contained
     started=time.perf_counter()
     try:
@@ -502,6 +522,22 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
     """Registered endpoint evaluation and original profile from fresh backend data."""
     from tools.platform_registry import registry
     inp=SessionInput.model_validate(configuration)
+    if inp.task.family=='task.passive_response':
+        from extensions.tendon_family.passive_execution import backend_result,source_binding
+        from extensions.reference.passive_response import inspect_evidence
+        result=backend_result(inp,raw)
+        evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
+        evaluation=evaluator(inp.task,result,raw_reference,registry(),comparison_identity)
+        validity,reason=inspect_evidence(inp.task,raw)
+        complete=raw.get('status')=='completed' and all(e.get('complete') for e in raw.get('episodes',[]))
+        profile=dict(complete=complete,task=plain(inp.task),official_task_success=evaluation.task_success,
+            solver_error_count=int(bool(raw.get('numerical_failure') or raw.get('reason'))),
+            dynamic_sampling=validity=='valid',all_load_cases=[e.get('load_condition') for e in raw.get('episodes',[])]==inp.task.goal.data['load_conditions'],
+            physical_source=raw.get('physical_binding')==source_binding(configuration),
+            evaluation_validity=evaluation.validity,valid_complete_execution=validity=='valid',
+            physics_steps=raw.get('physics_steps'),cost=raw.get('cost'),execution_failure_reason=reason,
+            simulation_wall_s=raw.get('timings_s',{}).get('total'))
+        return evaluation,profile
     samples=raw.get('samples',[])
     signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
     signals=[Signal(spec=signal,times_s=[v['time_s'] for v in samples[1:]],values=[v['tip_m'] for v in samples[1:]])]
@@ -527,6 +563,11 @@ def recover(host):
     if not boundary['termination_confirmed']:
         raise ValueError('UNKNOWN_PHYSICAL_REPLAY_OUTCOME_RETAINS_RESERVATION')
     raw=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',reason='worker_result_missing')
+    if p.get('route')=='passive_protocol' and raw.get('status')!='completed' and (folder/'passive_progress.json').exists():
+        partial=read(folder/'passive_progress.json')
+        partial.update(status='incomplete',reason=raw.get('reason','worker_interrupted'))
+        if raw.get('numerical_failure'):partial['numerical_failure']=raw['numerical_failure']
+        raw=partial
     # Preserve compiled-load and first-contact facts even if a later engine call raises.
     if (folder/'rigid_tool_binding.json').exists():raw.setdefault('rigid_tool_binding',read(folder/'rigid_tool_binding.json'))
     if (folder/'first_environment_contact.json').exists():raw.setdefault('environment_contact',read(folder/'first_environment_contact.json'))
@@ -536,6 +577,10 @@ def recover(host):
     raw_ref=save(host,raw,'physical_playback_raw')
     source=host.store.artifact(p['source_reference'])
     candidate=verify_candidate(host,p['candidate']);cfg=candidate['configuration']
+    if p.get('route')=='passive_protocol':
+        from extensions.tendon_family.passive_execution import backend_result
+        backend_reference=save(host,plain(backend_result(SessionInput.model_validate(cfg),raw)),'physical_playback_backend_result')
+    else:backend_reference=None
     samples=raw.get('samples',[])
     evaluation,profile=evaluate_playback(cfg,raw,raw_ref,digest(dict(candidate=p['candidate'],source=p['source_reference'])))
     evaluation_ref=save(host,plain(evaluation),'physical_playback_endpoint_evaluation')
@@ -565,12 +610,15 @@ def recover(host):
         role=p.get('role','development'),selected_execution=p.get('selected_execution'),operation_key=p.get('operation_key',p['worker_request_id']),
         scientific_configuration=candidate['scientific_configuration'],profile_identity=candidate['profile_identity'],
         evaluation_version=candidate['evaluation_version'],
-        model_identity=source['trajectory']['model_identity'],design_identity=source['trajectory']['design_identity'],
+        route=p.get('route','fixed_tension'),
+        model_identity=(source if p.get('route')=='passive_protocol' else source['trajectory'])['model_identity'],
+        design_identity=(source if p.get('route')=='passive_protocol' else source['trajectory'])['design_identity'],
         owning_study=host.run_id,execution_id=folder.name,request_id=p['worker_request_id'],
         source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,profile_reference=profile_ref,
         acceptance=acceptance,comparison=comparison,profile=profile,boundary=boundary,
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
-        physical_launches=1,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
+        physical_launches=p.get('episode_count',1),actual_resource_consumption=raw.get('cost'),
+        backend_reference=backend_reference,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
     ref=save(host,final,'physical_playback_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:

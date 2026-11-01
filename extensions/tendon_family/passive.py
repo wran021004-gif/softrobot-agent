@@ -30,13 +30,13 @@ SOLVER=dict(version='passive_equilibrium_v1',hessian_step_rad=1e-5,active_tolera
 
 
 class PassiveModel:
-    def __init__(self,physics,problem,path=None):
+    def __init__(self,physics,problem,path=None,*,scene=None):
         problem=ConstrainedPhysicalProblem.model_validate(problem)
         if not physics.get('fixed_payout_lengths_m') or physics['actuators']:raise ValueError('COMPILED_PASSIVE_ASSEMBLY_REQUIRED')
         self.physics=physics;self.problem=problem;self.unrestricted=False
         self.protocol=dict(static_solver=dict(SOLVER),monitor_s=problem.monitor_s)
         self.payout=np.array([physics['fixed_payout_lengths_m'][t['entity']] for t in physics['tendons']])
-        scene=dict(mount_position=problem.mount_position,mount_rotation=problem.mount_rotation,gravity=problem.gravity,
+        scene=scene or dict(mount_position=problem.mount_position,mount_rotation=problem.mount_rotation,gravity=problem.gravity,
             floor_id='floor',floor_z_m=-100.,timestep_s=.001,control=dict(tension_execution_mode='passive_fixed_payout_v1'))
         xml=BytesIO();compile_xml(physics,scene,None,xml)
         if path is not None:path.write_bytes(xml.getvalue())

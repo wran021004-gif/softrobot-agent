@@ -696,7 +696,7 @@ class CrossReplayRequest(Contract):
 
 class PhysicalReplayRequest(Contract):
     candidate: EvidenceRef = Field(description='Replay candidate; decision.selected_candidate must equal this reference. Both candidate and source belong inside physical_replay.')
-    source: EvidenceRef = Field(description='Exact candidate-bound complete control schedule; a control/result reference, not the candidate.')
+    source: EvidenceRef | None = Field(default=None,description='Active: exact complete control schedule. Registered passive task: omit to bind its frozen loading protocol.')
 
 
 class ControlCorrectionSettings(Contract):

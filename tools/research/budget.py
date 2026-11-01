@@ -208,13 +208,13 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     remaining = host.store.remaining()['remaining']
     reserve = 0 if confirmation else repetition_reserve(s)
     slots = s['spec']['nmpc_limits']['executions'] - s.get('nmpc_launches', 0)
-    if route=='fixed_tension':
+    if route in ('fixed_tension','passive_protocol'):
         limit=s['spec'].get('physical_replay_limit')
         slots=(s['spec']['budgets']['physical_launches'] if limit is None else limit)-s.get('physical_replay_launches',0)
     operations = max(0, remaining['tool_calls'] - (0 if confirmation else s['spec']['budgets'].get('protected_public_operations', 0)))
     # Fixed replay has one public Plan and no charged child tool calls. Inside
     # that admitted Plan, its current public call has already been paid.
-    operation_slots=operations+int(not root_operation) if route=='fixed_tension' else (operations-int(root_operation))//3
+    operation_slots=operations+int(not root_operation) if route in ('fixed_tension','passive_protocol') else (operations-int(root_operation))//3
     fit = max(0, min(requested, slots-reserve, backend_capacity(host)-reserve, operation_slots))
     return dict(requested=requested, admitted=fit, internal_launches=fit,
         numerical_reservation_s=0., confirmation_launch_reserve=reserve,

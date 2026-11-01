@@ -113,6 +113,8 @@ RESEARCH_SOURCES = (
 )
 CONTRACTS=[('experiment.assembly','1.0.0',m0.Assembly),
 ('optimization.ipopt_parameters','1.0.0',m1.IpoptParameters),
+('reference.passive_response_goal','1.0.0',m2.PassiveResponseGoal),
+('reference.passive_response_evaluation','1.0.0',m2.PassiveResponseEvaluation),
 ('reference.reach_goal','1.0.0',m2.ReachGoal),
 ('reference.reach_evaluation','1.0.0',m2.ReachEvaluation),
 ('reference.tracking_goal','1.0.0',m2.TrackingGoal),
@@ -290,3 +292,24 @@ for _i,_entry in enumerate(EXTENSIONS):
             'backend':[*_support['backend'],'backend.family_mujoco@1.3.0','backend.family_mujoco@1.4.0'],
             'task_families':[*_support['task_families'],'task.position_tool_axis','task.oriented_tracking']},
             'tool_axis_scope':'Explicit native sequence and physical_replay only; GVS/NMPC orientation optimization not applicable'})
+
+# Controller-free execution is a distinct registered pairing; active versions stay frozen.
+_PASSIVE_SOURCES=PLATFORM_SOURCES+PHYSICAL_SOURCES+('extensions/reference/passive_response.py',
+    'extensions/reference/contracts.py','extensions/tendon_family/passive.py','extensions/tendon_family/passive_execution.py')
+EXTENSIONS.extend([
+    Extension(extension_id='task.passive_response',kind='task',version='1.0.0',input_schema=m6.TaskDefinition,output_schema=m6.TaskDefinition,description='Frozen finite-time passive load response',
+        binding='extensions.reference.passive_response:task_definition',sources=_PASSIVE_SOURCES),
+    Extension(extension_id='evaluate.passive_response',kind='evaluator',version='1.0.0',input_schema=m2.PassiveResponseEvaluation,description='Independent measured passive dynamic response',
+        output_schema=m6.EvaluationResult,binding='extensions.reference.passive_response:evaluate',sources=_PASSIVE_SOURCES),
+    Extension(extension_id='controller.no_active_control',kind='controller',version='1.0.0',input_schema=Empty,output_schema=m6.Payload,description='No active commands or actuators',
+        binding='extensions.tendon_family.passive_execution:NoActiveControl',sources=_PASSIVE_SOURCES,
+        capabilities=dict(channel='no_active_control',backend_executable=True,command_space='none',
+            observations=[],reset=False,restore=False,profile_id='passive_fixed_payout_v1')),
+    replace(_backend,extension_id='backend.family_passive_mujoco',version='1.0.0',
+        binding='extensions.tendon_family.passive_execution:PassiveBackend',sources=_PASSIVE_SOURCES,
+        capabilities={**_backend.capabilities,'families':['task.passive_response'],'channels':[],
+            'controllers':['controller.no_active_control'],
+            'signals':['tip_position','tip_velocity','material_position','material_velocity','joint_position','joint_velocity',
+                'tendon_length','tendon_tension','length_residual'],
+            'signal_phases':['post_step'],'signal_specs_resolver':'extensions.tendon_family.passive_execution:observation_specs'}),
+])

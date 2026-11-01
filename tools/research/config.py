@@ -454,9 +454,18 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('GVS_NMPC_REPLAN_PERIOD_REQUIRED')
         controller['parameters']['data']['recipe']['replan_period_s']=replan_period
         study['nmpc_replan_period_s']=replan_period
-    controller['parameters']['data']['settling'] = deepcopy(task['settling'])
-    for name in ('holding_tip_speed_weight', 'terminal_tip_speed_weight'):
-        controller['parameters']['data']['recipe'][name] = study['reference_parameters'][name]
+    from tools.research_tasks import passive_registered
+    passive=passive_registered(task['task'])
+    if passive:
+        if study['confirmation']['fresh_independent_repetitions'] or conditions is not None:
+            raise ValueError('PASSIVE_V1_REQUIRES_ZERO_EXTRA_CONFIRMATIONS_AND_ONE_MULTILOAD_TASK')
+        if set(study['allowed_plan_actions'])-{'generate','propose','diagnose','physical_replay','select','stop'}:
+            raise ValueError('PASSIVE_V1_DISALLOWS_ACTIVE_EXECUTION_ACTIONS')
+        controller=dict(extension_id='controller.no_active_control',version='1.0.0',parameters=dict(contract='platform.empty',version='1.0.0',data={}))
+    else:
+        controller['parameters']['data']['settling'] = deepcopy(task['settling'])
+        for name in ('holding_tip_speed_weight', 'terminal_tip_speed_weight'):
+            controller['parameters']['data']['recipe'][name] = study['reference_parameters'][name]
     cfg = dict(run_id=study['study_id'], seed=task['seed'], robot=robot['robot'], task=task['task'], policy={})
     cfg['policy'].update(controller=controller, backend=robot['backend'], dynamics_model=robot['dynamics_model'],
         discretization=robot['discretization'], candidate_builder=dict(extension_id='candidate.family', version='3.0.0',
@@ -483,17 +492,19 @@ def resolve(path, profile=None, *, backend_profile=None):
         backend_name=backend['extension_id']+'@'+backend['version']
         if any(level['backend']!=backend_name for level in [*policy['screening'].values(),policy['final_evaluation']]):
             raise ValueError('FIDELITY_REQUIRES_FROZEN_BACKEND')
-    from extensions.tendon_family.gvs_profile import ReachControl
-    if cfg['policy']['controller']['extension_id'] == 'controller.sorosim_matlab_nmpc':
-        from extensions.tendon_family.sorosim_control import SorosimReachControl
-        ReachControl = SorosimReachControl
-    from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
-    data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
-    data['recipe'] = current_nmpc_recipe(data['recipe'])
-    if replan_period is not None:
-        from extensions.tendon_family.contracts import GVSTrajectoryParameters
-        GVSTrajectoryParameters.model_validate(data['recipe']).replan_steps(cfg['task']['timing']['control_period_s'])
-    cfg['policy']['controller']['parameters']['data'] = data
+    from extensions.tendon_family.contracts import MujocoParameters
+    if not passive:
+        from extensions.tendon_family.gvs_profile import ReachControl
+        if cfg['policy']['controller']['extension_id'] == 'controller.sorosim_matlab_nmpc':
+            from extensions.tendon_family.sorosim_control import SorosimReachControl
+            ReachControl = SorosimReachControl
+        from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
+        data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
+        data['recipe'] = current_nmpc_recipe(data['recipe'])
+        if replan_period is not None:
+            from extensions.tendon_family.contracts import GVSTrajectoryParameters
+            GVSTrajectoryParameters.model_validate(data['recipe']).replan_steps(cfg['task']['timing']['control_period_s'])
+        cfg['policy']['controller']['parameters']['data'] = data
     cfg['policy']['backend']['parameters']['data'] = MujocoParameters.model_validate(
         cfg['policy']['backend']['parameters']['data']).model_dump(mode='json')
     study['analysis_protocol'].update(baseline_lengths_m={k:v['length_m'] for k,v in segments.items()},

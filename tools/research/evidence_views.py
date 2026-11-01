@@ -44,6 +44,20 @@ def acceptance_certificate(host, reference):
             not sources.get('profile') or host.store.artifact(sources['profile'])!=raw.get('profile') or
             raw.get('profile',{}).get('task')!=cfg['task']):issues.append('ACCEPTANCE_SOURCE_BINDING_MISMATCH')
     if not issues:
+        if raw.get('route')=='passive_protocol':
+            from tools.research.physical_replay import evaluate_playback
+            from extensions.tendon_family.passive_execution import source_binding
+            source=host.store.artifact(raw['source_reference'])
+            simulation=host.store.artifact(raw['raw_reference'])
+            expected=dict(**source_binding(cfg),candidate=raw['candidate'])
+            if (source!=expected or simulation.get('physical_binding')!={k:v for k,v in expected.items() if k!='candidate'} or
+                    raw.get('model_identity')!=expected['model_identity'] or raw.get('design_identity')!=expected['design_identity']):
+                issues.append('PASSIVE_PHYSICAL_SOURCE_BINDING_MISMATCH')
+            replayed,profile=evaluate_playback(cfg,simulation,raw['raw_reference'],
+                digest(dict(candidate=raw['candidate'],source=raw['source_reference'])))
+            profile.update(execution_id=raw['execution_id'],simulation=raw['raw_reference'],evaluation=raw['evaluation_reference'])
+            if plain(replayed)!=host.store.artifact(sources['evaluation']) or profile!=raw['profile']:
+                issues.append('PASSIVE_EVALUATOR_OR_PROFILE_DIFFERS_FROM_RAW_SAMPLES')
         motion_ref=view['evaluation_evidence'].get('trajectory')
         motion=host.store.artifact(motion_ref) if motion_ref else None
         if motion is None and raw.get('raw_reference'):

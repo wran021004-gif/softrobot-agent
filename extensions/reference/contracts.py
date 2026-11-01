@@ -11,6 +11,61 @@ class Empty(Contract):
     pass
 
 
+class PassiveResponseGoal(Contract):
+    """One reset per load; the unloaded prefix is part of every episode."""
+    version: Literal['passive_response_v1'] = 'passive_response_v1'
+    load_conditions: list[str] = Field(min_length=1)
+    unloaded_until_s: FiniteFloat = Field(gt=0)
+    ramp_until_s: FiniteFloat = Field(gt=0)
+    hold_window_s: tuple[FiniteFloat, FiniteFloat]
+    reset: Literal['frozen_named_state_each_episode'] = 'frozen_named_state_each_episode'
+    force_interpolation: Literal['linear_ramp_then_hold'] = 'linear_ramp_then_hold'
+    displacement_reference: Literal['last_unloaded_sample_same_episode'] = 'last_unloaded_sample_same_episode'
+
+    @model_validator(mode='after')
+    def protocol(self):
+        if (len(set(self.load_conditions)) != len(self.load_conditions) or
+                not self.unloaded_until_s < self.ramp_until_s <= self.hold_window_s[0] < self.hold_window_s[1]):
+            raise ValueError('ORDERED_PASSIVE_PROTOCOL_REQUIRED')
+        return self
+
+
+from extensions.tendon_family.contracts import ConstrainedObservation
+
+
+class PassiveResponseBound(ConstrainedObservation):
+    """Spatial reductions reuse static observation semantics; time is explicit."""
+    quantity: Literal['material_displacement','tip_displacement','displacement_ratio','displacement_difference',
+        'maximum_tension','maximum_length_excess','material_speed','tip_speed','unloaded_tip_drift',
+        'maximum_joint_position','maximum_joint_speed']
+    window: Literal['unloaded','hold','full'] = 'hold'
+    unit: Literal['m','N','1','m/s','rad','rad/s'] | None = None
+
+    @property
+    def physical_unit(self):
+        return {'maximum_tension':'N','displacement_ratio':'1','material_speed':'m/s',
+            'tip_speed':'m/s','maximum_joint_position':'rad','maximum_joint_speed':'rad/s'}.get(self.quantity,'m')
+
+    @model_validator(mode='after')
+    def hard_bound(self):
+        if self.minimum is None and self.maximum is None:
+            raise ValueError('DYNAMIC_HARD_BOUND_REQUIRED')
+        if self.reference_load is not None:
+            raise ValueError('DYNAMIC_REFERENCE_IS_THE_SAME_EPISODE_UNLOADED_PREFIX')
+        return self
+
+
+class PassiveResponseEvaluation(Contract):
+    bounds: list[PassiveResponseBound] = Field(min_length=1)
+    prohibit_contact: bool = True
+
+    @model_validator(mode='after')
+    def names(self):
+        if len({b.name for b in self.bounds}) != len(self.bounds):
+            raise ValueError('UNIQUE_PASSIVE_BOUND_NAMES_REQUIRED')
+        return self
+
+
 class ReachGoal(Contract):
     target_m: tuple[float, float, float]
 

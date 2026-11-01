@@ -334,7 +334,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
             exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(cfg)
     h.resume()
-    recipe = deepcopy(cfg['policy']['controller']['parameters']['data']['recipe'])
+    recipe = deepcopy(cfg['policy']['controller']['parameters']['data'].get('recipe'))
     profile = dict(adapter='unified_recovery_profile_v1',version=spec['evaluation_version'],
         configuration=full_science(cfg), recipe=recipe, science_hashes=science_hashes(),
         recording=dict(complete_update_inputs=spec['complete_update_inputs'],update_ids=spec['record_update_ids']),
@@ -593,7 +593,10 @@ def dispatch(host, value, request_id, origin='model'):
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         origin='engineering'
     plan=Plan.model_validate(value)
-    if state(host)['spec']['configuration']['task'].get('physical_problem') and plan.action not in ('generate','propose','diagnose','stop'):
+    from tools.research_tasks import passive_registered
+    passive_task=state(host)['spec']['configuration']['task']
+    passive_actions=('generate','propose','diagnose','stop','physical_replay','select') if passive_registered(passive_task) else ('generate','propose','diagnose','stop')
+    if passive_task.get('physical_problem') and plan.action not in passive_actions:
         raise ValueError('PASSIVE_HAS_NO_ACTIVE_CONTROL_OR_REGISTERED_DYNAMIC_ACCEPTANCE')
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')

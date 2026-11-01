@@ -237,8 +237,12 @@ def family_configuration(base_configuration, space, request, owner):
     serial=build.request.version=='serial_family_generation_v2'
     cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
         parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
-    for key,d in build.space.control_domains.items():
-        cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
+    passive=bool(cfg['task'].get('physical_problem'))
+    if passive and (build.request.control_weights or (serial and (build.request.controller_recipe or build.request.controller_solver))):
+        raise ValueError('PASSIVE_HAS_NO_CONTROL_PARAMETERS')
+    if not passive:
+        for key,d in build.space.control_domains.items():
+            cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
     if serial:
         from tools.research.config import patch
         control=cfg['policy']['controller']['parameters']['data']
@@ -305,7 +309,8 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             controller_update_tested=False,complete_task_evaluated=False)
         if cfg['task'].get('physical_problem'):
             resolved['capabilities']['gvs_basis_resolved']=False
-            resolved['controller_preparation']=dict(status='no_active_control',registered_acceptance='not_registered')
+            from tools.research_tasks import passive_registered
+            resolved['controller_preparation']=dict(status='no_active_control',registered_acceptance='offline_passive_response_v1' if passive_registered(cfg['task']) else 'not_registered')
         if identity in s['candidates']:
             ref=s['candidates'][identity]
             save(host,dict(candidate=ref,request=plain(request),provenance=provenance),'candidate_reused')

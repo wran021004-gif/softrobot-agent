@@ -60,6 +60,14 @@ def task_gap(result):
                 e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
             accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
     components=acceptance.get('components',{})
+    if acceptance.get('task_family')=='task.passive_response':
+        from tools.research_tasks import _outcome_issue,_source_issue
+        return dict(normalized_gap=None,components={},
+            valid_complete=_outcome_issue(acceptance) is None and _source_issue(acceptance) is None,
+            accepted=bool(acceptance.get('accepted')),
+            dominant_constraints=[dict(constraint_id=k,value=v['value'],limit=v['limit'],unit=v['unit'],scope='physical_task')
+                for k,v in components.items() if k.startswith('evaluator:') and v['passed'] is False],
+            interpretation='Every frozen dynamic bound is authoritative; no static or active-control score substitution.')
     tracking=acceptance.get('task_family')=='task.tracking'
     scored=(('evaluator:tracking_max_error','evaluator:path_coverage','evaluator:path_start',
         'evaluator:path_end','evaluator:path_progress_regression') if tracking else
@@ -258,10 +266,15 @@ def solution_identity(host, result, candidate):
         controller = dict(route='rl', configuration=effective, policy_sha256=policy_sha)
     elif result.get('source_reference'):
         source=host.store.artifact(result['source_reference'])
-        from tools.research.physical_replay import binding
-        binding(candidate['configuration'],source['trajectory'])
-        controller=dict(route='fixed_tension',source=result['source_reference'],
-            sequence=source['trajectory'])
+        if result.get('route')=='passive_protocol':
+            from extensions.tendon_family.passive_execution import source_binding
+            expected=dict(**source_binding(candidate['configuration']),candidate=result['candidate'])
+            if source!=expected:raise ValueError('PASSIVE_SOLUTION_SOURCE_MISMATCH')
+            controller=dict(route='passive_protocol',protocol={k:v for k,v in source.items() if k!='candidate'})
+        else:
+            from tools.research.physical_replay import binding
+            binding(candidate['configuration'],source['trajectory'])
+            controller=dict(route='fixed_tension',source=result['source_reference'],sequence=source['trajectory'])
     else:
         from extensions.tendon_family.contracts import GVSTrajectoryParameters
         controller_configuration = science['policy']['controller']
@@ -293,6 +306,15 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     design.pop('metadata',None)
     policy=science['policy']
     inp=SessionInput.model_validate(candidate['configuration'])
+    if route=='passive_protocol':
+        from extensions.tendon_family.passive_execution import source_binding
+        expected=source_binding(candidate['configuration'])
+        if {k:v for k,v in (source or {}).items() if k!='candidate'}!=expected:
+            raise ValueError('PASSIVE_EXPERIMENT_SOURCE_MISMATCH')
+        return canonical(dict(identity_version='effective_experiment_v3',identity_precision_significant_digits=12,
+            physical=dict(robot=science['robot'],backend=policy['backend'],discretization=policy['discretization']),
+            task=dict(task=science['task'],seed=science['seed']),controller=dict(route=route),
+            action=expected,runtime=dict(profile_identity=candidate['profile_identity']),missing_effective_fields=[]))
     physics=physics_for(inp)
     scene=assemble(inp,physics)
     # Compile canonical source numbers for the fingerprint, so cancellation in
@@ -421,11 +443,11 @@ def experiment_preflight(host, candidate_ref, route, *, source_ref=None, repeat=
             consider(imported['identity'],imported['evaluation'],imported['outcome'],imported['study'])
     for ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:
         row=host.store.artifact(ref)
-        prior_route='rl' if row.get('independent_evaluation_executed') is not None else 'fixed_tension' if row.get('source_reference') else 'nmpc'
+        prior_route='rl' if row.get('independent_evaluation_executed') is not None else row.get('route','fixed_tension') if row.get('source_reference') else 'nmpc'
         if prior_route!=route:
             continue
         prior_candidate=host.store.artifact(row['candidate'])
-        prior_source=host.store.artifact(row['source_reference']) if prior_route=='fixed_tension' else None
+        prior_source=host.store.artifact(row['source_reference']) if prior_route in ('fixed_tension','passive_protocol') else None
         prior_config=host.store.artifact(row['configuration']) if route=='rl' else None
         previous=experiment_identity(prior_candidate,route,source=prior_source,result=row,
             rl_configuration=prior_config)
@@ -560,7 +582,7 @@ def result_view(host, reference):
     episodes=r.get('episodes',[]) if rl else []
     complete=bool(r.get('independent_evaluation_executed') and episodes and all(e['complete'] for e in episodes)) if rl else r.get('status')=='evaluated'
     passed=bool(complete and (r.get('passed') if rl else (r.get('acceptance') or {}).get('accepted')))
-    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='fixed_tension',source=r['source_reference']) if r.get('source_reference') else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
+    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route=r.get('route','fixed_tension'),source=r['source_reference']) if r.get('source_reference') else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
     identity=solution_identity(host,r,c)
     owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
     s=state(host)
@@ -680,7 +702,7 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
         if revise_selection and count:
             reasons.append('revised solution already has a confirmation attempt; allowance cannot restart')
         remaining=required if revise_selection else required-count
-        fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=root_operation if v['controller_route']=='fixed_tension' else True,candidate=r['candidate'],route=v['controller_route'])
+        fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=root_operation if v['controller_route'] in ('fixed_tension','passive_protocol') else True,candidate=r['candidate'],route=v['controller_route'])
         if selection and required==0 and progress['current_study_confirmations']:
             reasons.append('unexpected extra confirmations in zero-repetition study')
         if fit['admitted']<remaining:
