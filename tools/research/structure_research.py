@@ -49,6 +49,8 @@ def prepare_context(spec, candidate, study, comparisons):
         names=[study.load_condition,*loads]
         if len(set(names))!=len(names) or not set(names)<={x['name'] for x in problem['loads']}:
             raise ValueError('DISTINCT_FROZEN_LOAD_CONDITIONS_REQUIRED')
+        if study.load_aggregation and study.target.reduction=='identity' and metadata['shape']:
+            raise ValueError('LOAD_AGGREGATION_REQUIRES_SCALAR_REDUCTION')
     rows={r['parameter_id']:r for r in parameters(spec,candidate)};selected=[]
     if study.operation in ('differentiate','optimize'):
         if spec.get('fixed_structure_reference'):raise ValueError('FROZEN_FIXED_STRUCTURE_FORBIDS_STRUCTURAL_PROBES')

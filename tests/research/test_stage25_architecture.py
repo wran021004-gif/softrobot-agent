@@ -59,6 +59,10 @@ class Stage25ArchitectureTests(unittest.TestCase):
         self.assertTrue(list(validator.iter_errors(q)))
         self.assertEqual(state(h)['mathematical_evaluations'],0)
         self.assertTrue(list(validator.iter_errors(passive_question('compare'))))
+        invalid=passive_question('compare');invalid['structure'].update(comparison_load_conditions=['unloaded'],load_aggregation='maximum')
+        invalid['structure']['target']['reduction']='identity'
+        self.assertEqual(compile_question(h,invalid,tool_use_id='matrix-aggregation')['reason'],'LOAD_AGGREGATION_REQUIRES_SCALAR_REDUCTION')
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
         from tests.research.test_r3_b_stage1 import integrated_host
         a,ac=integrated_host();active=question_schema(state(a)['spec'],a.store.artifact(ac),'mechanism_research')
         self.assertEqual(active['$defs']['PhysicalMechanismTarget']['properties']['quantity']['enum'],mechanism_ids('active_ideal_tension'))
