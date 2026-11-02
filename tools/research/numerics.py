@@ -141,9 +141,10 @@ def native_point(host, query, configuration):
         return dict(actual_time_s=0.,dof_order=physics['dofs'],tendon_order=[],u=[],
             qpos_rad=[0.]*len(physics['dofs']),qvel_rad_s=[0.]*len(physics['dofs']))
     if query.saved_state:
-        point=deepcopy(host.store.artifact(query.saved_state))
         if plain(query.saved_state) in state(host).get('analysis_results',[]):
-            result=point
+            result=host.store.artifact(query.saved_state,paths=('status','operation','candidate',
+                'binding.effective_configuration_identity','native_dynamics.baseline_peak_speed_state',
+                'native_dynamics.original_schedule'))
             point=deepcopy(result.get('native_dynamics',{}).get('baseline_peak_speed_state') or {})
             if (result.get('status')!='computed' or result.get('operation') not in
                     ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') or result.get('candidate')!=plain(query.candidate)
@@ -162,6 +163,7 @@ def native_point(host, query, configuration):
             point['provenance']=dict(**point.get('provenance',{}),analysis=plain(query.saved_state),
                 pointer='/native_dynamics/baseline_peak_speed_state',
                 scope='Baseline holding-speed peak checkpoint, not optimized best or an arbitrary requested time.')
+        else:point=deepcopy(host.store.artifact(query.saved_state))
         if (point.get('candidate')!=plain(query.candidate) or
                 point.get('configuration_identity')!=digest(configuration) or
                 point.get('phase')!='interval_start_native' or point.get('input_units')!='N'):

@@ -71,7 +71,7 @@ def selected_operating_point_guidance(host, reference, method, detail):
     sources=[];unavailable=[]
     if native:
         for ref in s.get('analysis_results',[]):
-            result=host.store.artifact(ref)
+            result=host.store.artifact(ref,paths=('candidate','native_dynamics.baseline_peak_speed_state.actual_time_s'))
             if result.get('candidate')!=reference:continue
             checkpoint=result.get('native_dynamics',{}).get('baseline_peak_speed_state')
             if not checkpoint:continue

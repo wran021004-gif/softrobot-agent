@@ -39,7 +39,7 @@ def legal_control_sources(host, candidate, selected=None):
     s=state(host);configuration=verify_candidate(host,candidate)['configuration']
     sources=[r['source'] for r in s.get('control_initializations',[]) if r['candidate']==candidate]
     for ref in s.get('analysis_results',[]):
-        raw=host.store.artifact(ref)
+        raw=host.store.artifact(ref,paths=('candidate','control_schedule_reference'))
         if raw.get('candidate')==candidate and raw.get('control_schedule_reference'):
             sources.append(raw['control_schedule_reference'])
     legal=[];trajectories=[]
