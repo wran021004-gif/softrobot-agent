@@ -14,9 +14,44 @@ def default(query, key, domain):
 
 
 def initial(space, query, previous=None):
-    n=query.segment_counts[0];t=query.tendon_counts[0]
-    p=dict(segment_count=n,tendon_count=t,span_strategy=query.span_strategies[0],segments={},routing={})
+    n=query.initial_segment_count or query.segment_counts[0];t=query.initial_tendon_count or query.tendon_counts[0]
+    p=dict(segment_count=n,tendon_count=t,span_strategy=query.initial_span_strategy or query.span_strategies[0],segments={},routing={})
     return reshape(space,query,p,previous)
+
+
+def candidate_seed(space, query, candidate):
+    """Preserve the existing coordinate representation, or reject lossy seeding."""
+    from extensions.tendon_family.family_space import resolved_request
+    r=resolved_request(space,candidate['parameters']);n=r['segment_count'];t=r['tendon_count']
+    if r.get('route_overrides') or r.get('tendon_parameters')!= {k:v['default'] for k,v in space['tendon_domains'].items()}:
+        raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: route overrides or tendon parameters')
+    expanded=[]
+    for span in r['spans']:
+        if (len(span['guide_s'])!=1 or span['guide_angle_offset_rad'] or span['anchor_angle_offset_rad']):
+            raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: guide geometry')
+        for j in range(span['count']):
+            expanded.append(dict(first=span['first_segment'],last=span['last_segment'],radius=span['radius_m'],
+                angle=span['phase_rad']+2*math.pi*j/span['count']+span['angular_offsets_rad'][j],
+                guide=span['guide_s'][0],anchor=span['anchor_s']))
+    patterns=dict(whole_chain=[(0,n-1)]*t,distal=[(n-1,n-1)]*t,
+        base_to_distributed_anchors=[(0,j%n) for j in range(t)],
+        distributed_consecutive=[(j%n,min(n-1,j%n+max(1,n//2))) for j in range(t)])
+    strategy=next((k for k in query.span_strategies if patterns[k]==[(v['first'],v['last']) for v in expanded]),None)
+    if strategy is None or len({(v['guide'],v['anchor']) for v in expanded})!=1:
+        raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: span strategy or stations')
+    defaults=resolved_request(space,dict(version='serial_family_generation_v2',family_space_identity=r['family_space_identity'],segment_count=n,tendon_count=t))
+    segments={}
+    for i,v in r['segments'].items():
+        if v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters') or len({str((s['kind'],s['parameters'])) for s in v['sections']})!=1:
+            raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: station-dependent sections or extra physics')
+        s=v['sections'][0]
+        if [s.get('angle_rad',0) for s in v['sections']]!=[s.get('angle_rad',0) for s in defaults['segments'][i]['sections']]:raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: section rotation')
+        segments[i]=dict(length_m=v['length_m'],young_pa=v['young_pa'],section_kind=s['kind'],section_dimensions=s['parameters'])
+    routing={k:v['default'] for k,v in space['routing_domains'].items()}
+    phase=expanded[0]['angle']%(2*math.pi);routing.update(phase_rad=phase,guide_s=expanded[0]['guide'],anchor_s=expanded[0]['anchor'],radius_m=expanded[0]['radius'])
+    return dict(segment_count=n,tendon_count=t,span_strategy=strategy,segments=segments,routing=routing,
+        radii_m=[v['radius'] for v in expanded],
+        angular_offsets_rad=[(v['angle']-phase-2*math.pi*j/t+math.pi)%(2*math.pi)-math.pi for j,v in enumerate(expanded)])
 
 
 def reshape(space, query, point, previous=None):

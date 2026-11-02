@@ -162,4 +162,3 @@ def parameter_effect_semantics(path, execution_mode, *, input_source='operation_
         result['identification']='Check selected actuator/controller input binding and operating point; Native ideal-tension conclusions do not establish this mode response.'
     else:result['identification']='Native methods use absolute nonnegative tensions in N, with force=-tension. Instantaneous derivatives identify local effects only; fixed-input response is not reoptimized task capability.'
     return result
-

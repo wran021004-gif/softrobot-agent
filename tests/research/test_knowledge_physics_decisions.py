@@ -34,6 +34,9 @@ class KnowledgePhysicsTests(unittest.TestCase):
                     np.testing.assert_array_equal(getattr(other.model,field),getattr(native.model,field))
                 self.assertEqual(other.cost['physics_steps'],0)
             rows={r['parameter_id']:r for r in family_analysis_parameters(state(h)['spec'],h.store.artifact(base))}
+            from tools.research.config import ROOT
+            historical=json.loads((ROOT/'tests/research/fixtures/m1_parameter_errors.json').read_text(encoding='utf8'))
+            self.assertEqual({r['parameter'] for r in historical['errors']},{'tendon_parameters.pretension_n','tendon_parameters.diameter_m'})
             for key in ('pretension_n','diameter_m'):
                 row=rows['tendon_parameters.'+key]
                 self.assertFalse(row['continuous_perturbation']);self.assertFalse(row['execution_semantics']['method_identifiable'])

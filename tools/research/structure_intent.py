@@ -39,6 +39,20 @@ def compile_search(host, value, request_id):
             issue(field,'Outside frozen topology; no automatic replacement',choices=grant[field])
         topology[field]=choices
     native=q.evaluation_model=='native_mujoco'
+    starts={}
+    prior_ref=(value.get('decision') or {}).get('selected_candidate')
+    prior=host.store.artifact(prior_ref)['parameters'] if prior_ref else {}
+    for name,choices,previous in (('initial_segment_count',topology['segment_counts'],prior.get('segment_count')),
+            ('initial_tendon_count',topology['tendon_counts'],prior.get('tendon_count')),
+            ('initial_span_strategy',q.span_strategies or (span_strategies(space) if 'spans' in groups else ['whole_chain']),None)):
+        selected=getattr(q,name)
+        if selected is None and previous in (choices or []):selected=previous
+        if selected is None and choices and len(choices)==1:selected=choices[0]
+        if selected is None and grant.get('require_explicit_start'):
+            issue(name,'Main must choose an initial point; list order is not a scientific preference',choices=choices)
+        elif selected is not None:
+            if selected not in (choices or []):issue(name,'Initial point outside selected range',choices=choices)
+            else:starts[name]=selected
     if native and (q.research_goal!='structure_control_codesign' or q.control_treatment!='reoptimized' or q.proxy_objective is not None):
         issue('control_treatment','Native task codesign requires reoptimized control and no proxy objective')
     proxy_treatment='proxy_optimized' if q.proxy_objective=='task_violation' else 'not_optimized'
@@ -60,9 +74,11 @@ def compile_search(host, value, request_id):
         variable_groups=groups,**topology,
         span_strategies=q.span_strategies or (span_strategies(space) if 'spans' in groups else ['whole_chain']),
         section_types=q.section_types,screening_fidelity=exact[0],
+        bounds=q.bounds,
         objective='task_violation' if native else q.proxy_objective,
         operating_point='standardized_initial_pretension' if native or q.proxy_objective!='target_equilibrium_residual' else 'target_equilibrium',
         **plain(q.structure_search_effort),evaluation_mode='mujoco_control' if native else 'mathematical_proxy',
+        **starts,
         evidence_used=value.get('supporting_evidence',[]))
     decision=deepcopy(value.get('decision') or {})
     if decision.get('selected_candidate'):query['previous_candidate_ref']=decision['selected_candidate']
@@ -74,11 +90,12 @@ def compile_search(host, value, request_id):
             'requested_budget':q.structure_search_effort.max_evaluations}}
     compiled=plain(Plan.model_validate(compiled))
     from tools.research.search import search_problem
-    problem=search_problem(host,compiled['search'],q.structure_search_effort.max_evaluations)
+    from tools.research.analysis import admission
+    problem=search_problem(host,compiled['search'],admission(host,q.structure_search_effort.max_evaluations)['admitted'])
     save(host,dict(version=INTERFACE,request_id=request_id,original_plan=value,compiled_plan=compiled,
         original_admission=problem,decision_owner='Main scientific choices; program binds frozen implementation fields',
         initial_tension_source=('Main' if q.initial_tension_n is not None else 'frozen tendon_domains.pretension_n.default') if native else 'not_applicable_proxy',
-        initialization_scope='Original mixed_moves initialization; previous candidate seeds segment parameters only, not its full routing/control. Each proposed structure is re-evaluated; no inherited acceptance.'),
+        initialization_scope='Main-selected start. A representable previous candidate seeds structure coordinates; unsupported routes require generate. Every condition receives fresh controls; no inherited acceptance.'),
         'structure_search_intent_binding')
     return compiled
 

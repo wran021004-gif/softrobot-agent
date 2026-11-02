@@ -43,8 +43,8 @@ class Overlay:
     def __getattr__(self,name):return getattr(self.own,name)
 
 
-def prepare(out):
-    h,wire,source=historical_decision(73);s=state(h);schemas={}
+def prepare(out,context=73):
+    h,wire,source=historical_decision(context);s=state(h);schemas={}
     for e in h.store.events(h.run_id):
         if e['kind']!='r3_request':continue
         w=h.store.artifact(h.store.artifact(e['outputs'][0])['request'])
@@ -61,17 +61,18 @@ def prepare(out):
             catalog=[r for r in parameter_catalog(s['spec'],c) if r['parameter_id'] in ('tendon_parameters.pretension_n','tendon_parameters.diameter_m')];break
     protocol=dict(version='m1_knowledge_reasoning_engineering_v1',source=source,original_wire=digest(wire),
         implementation_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-        source_model=s['pilot']['provider']['model'],arms=ARMS,per_arm_request_ceiling=3,total_request_ceiling=21,
-        scientific_workers=0,replay=0,remaining_science_budget=current['budget'],diagnostics=TASK,
+        source_model=s['pilot']['provider']['model'],arms=ARMS,context_number=context,per_arm_request_ceiling=2 if context==70 else 3,total_request_ceiling=21,
+        scientific_workers=0,replay=0,remaining_science_budget=current['budget'],diagnostics=TASK.replace('three Provider','two Provider') if context==70 else TASK,
         taxonomy_control='Same none reasoning, deterministic parameter facts, original task/history/tools/candidates/remaining allowance; only optional allowed Knowledge catalogue/hints differ.',
         reasoning_control='repair_none vs repair_medium differ only reasoning_effort; original_none vs repair_none also adds timely existing Knowledge + deterministic facts.',
         limitations='One bundled three-diagnostic context per arm, sequential order/cache differences; no population or causal effect estimate. Existing history is retained; original hints cannot be unseen.')
-    out.mkdir(parents=True,exist_ok=True);atomic_json(out/'protocol.json',protocol)
+    out.mkdir(parents=True,exist_ok=True);atomic_json(out/('protocol-context70.json' if context==70 else 'protocol.json'),protocol)
     return h,wire,schemas,facts,catalog,protocol
 
 
-async def run(out,live=False):
-    h,base,schemas,facts,catalog,protocol=prepare(out);s=state(h);provider=s['pilot']['provider']
+async def run(out,live=False,followup_context70=False):
+    h,base,schemas,facts,catalog,protocol=prepare(out,70 if followup_context70 else 73);s=state(h);provider=s['pilot']['provider']
+    results_path=out/('results-context70.json' if followup_context70 else 'results.json')
     key=credential(provider,s['spec']['runtime']['credentials_reference'])
     with httpx.Client(trust_env=False,timeout=45,headers={'Authorization':'Bearer '+key}) as client:
         response=client.get(provider['base_url']+'/models');response.raise_for_status()
@@ -80,12 +81,17 @@ async def run(out,live=False):
     preflight=dict(exact_model_available=exact,medium_local_contract='none/medium accepted by pinned convertRequest',inference_requests=0)
     atomic_json(out/'preflight.json',preflight)
     if not live:return preflight
-    if (out/'provider/platform.sqlite').exists():raise ValueError('EXISTING_ENGINEERING_LEDGER_NO_AUTOMATIC_RESEND')
+    if (out/'provider/platform.sqlite').exists() and not followup_context70:raise ValueError('EXISTING_ENGINEERING_LEDGER_NO_AUTOMATIC_RESEND')
     own=Store(out/'provider');run_id=h.run_id
     project=ProjectConfig(project_id='m1-knowledge-reasoning-engineering',grant_id='current-user-bounded-probe',
         authorization_source='Current user sections 5 and appended section 9: bounded independently charged real Provider diagnostics; no scientific Worker or formal Study continuation.',
         budget=dict(model_calls=21,tool_calls=84,worker_calls=0,backend_solves=0,wall_s=None),exclusive_resources={'provider_request':1})
-    own.create(project);own.create_session(dict(input=dict(run_id=run_id,policy=dict(budget=plain(project.budget))),purpose='Engineering comparison only; not formal research'))
+    if followup_context70:
+        if own.remaining()['used']['model_calls']!=7:raise ValueError('EXACT_SEVEN_PRIOR_CALLS_REQUIRED_FOR_ONE_BOUNDED_NEUTRAL_CONTEXT_FOLLOWUP')
+        protocol.update(prior_actual_requests=7,additional_request_ceiling=14,reason='Correct the selected-STOP entry bias within the original total ceiling; not a statistical expansion or retry.')
+        atomic_json(out/'protocol-context70.json',protocol)
+    else:
+        own.create(project);own.create_session(dict(input=dict(run_id=run_id,policy=dict(budget=plain(project.budget))),purpose='Engineering comparison only; not formal research'))
     update(SimpleNamespace(store=own,run_id=run_id),spec=deepcopy(s['spec']),pilot=dict(provider=provider,live_model_requests=0))
     engine=SimpleNamespace(store=own,run_id=run_id);record(engine,'provider_egress_authorization',protocol)
     choices=reference_choices(h,include_all=True);rows=[];original=deepcopy(s)
@@ -115,16 +121,16 @@ async def run(out,live=False):
             if arm.startswith('taxonomy') and not IDS[arm]:current['knowledge']['access']=None
             if arm=='original_none':wire['reasoning_effort']='none'
             else:wire['reasoning_effort']='medium' if arm=='repair_medium' else 'none'
-            packet['engineering_decision_diagnostics']=TASK
+            packet['engineering_decision_diagnostics']=protocol['diagnostics']
             wire['messages'][-1]['content']='CURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':'))
-            for turn in range(1,4):
-                label=f'{arm}-{turn}';atomic_json(out/(label+'-request.json'),wire)
+            for turn in range(1,protocol['per_arm_request_ceiling']+1):
+                label=('context70-' if followup_context70 else '')+f'{arm}-{turn}';atomic_json(out/(label+'-request.json'),wire)
                 response=await boundary.handle_async_request(httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire,
                     headers={'Authorization':'Bearer '+key},extensions={'timeout':dict(connect=30,read=provider['timeout_s'],write=30,pool=30)}))
                 body=response.json();atomic_json(out/(label+'-response.json'),body)
                 row=dict(arm=arm,turn=turn,http_status=response.status_code,usage=body.get('usage'),decisions=[],scientific_dispatch=False);rows.append(row)
                 if response.status_code!=200:
-                    row['error']=body;atomic_json(out/'results.json',dict(protocol=protocol,results=rows,ledger=own.remaining()));raise ValueError('PROVIDER_REJECTED_NO_RETRY: '+arm)
+                    row['error']=body;atomic_json(results_path,dict(protocol=protocol,results=rows,ledger=own.remaining()));raise ValueError('PROVIDER_REJECTED_NO_RETRY: '+arm)
                 boundary.consumed();message=body['choices'][0]['message'];wire['messages'].append(message);terminal=False
                 for call in message.get('tool_calls',[]):
                     name=call['function']['name'];payload=json.loads(call['function']['arguments'])
@@ -152,6 +158,12 @@ async def run(out,live=False):
                             feedback=dict(status='original_plan_and_evidence_admission_passed',knowledge_bindings=bindings,
                                 scientific_execution=False,scope='Plan/generation admission only. A prose next experiment is not an executed or fully admitted AnalysisRequest.')
                             terminal=True
+                        elif name=='research_analysis':
+                            from tools.research.scientific_intent import compile_question
+                            expanded=expand_references(payload,reference_schema(deepcopy(schema),choices,None))
+                            feedback=compile_question(rh,expanded,tool_use_id=label+'-'+call['id'])
+                            feedback['scientific_execution']=False
+                            terminal=True
                         else:feedback=dict(status='unexecuted_proposal',scientific_execution=False);terminal=True
                     except (ValueError,KeyError,StopIteration,SchemaError) as exc:feedback=dict(status='rejected',reason=str(exc)[:1400],scientific_execution=False)
                     row['decisions'].append(dict(tool=name,input=payload,feedback=feedback))
@@ -159,7 +171,7 @@ async def run(out,live=False):
                     own.complete(reservation,dict(request_id=reservation['request_id'],execution_id=reservation['execution_id'],caller='engineering-decision',
                         tool_id='engineering.decision_feedback',tool_version='1',execution_status='completed',charged={**zero(),'tool_calls':1}),feedback)
                     wire['messages'].append(dict(role='tool',tool_call_id=call['id'],content=json.dumps(feedback)))
-                atomic_json(out/'results.json',dict(protocol=protocol,results=rows,ledger=own.remaining()))
+                atomic_json(results_path,dict(protocol=protocol,results=rows,ledger=own.remaining()))
                 print(json.dumps(dict(arm=arm,turn=turn,http_status=response.status_code,tools=[r['tool'] for r in row['decisions']])),flush=True)
                 if terminal or not message.get('tool_calls'):break
     finally:await boundary.aclose()
@@ -167,7 +179,7 @@ async def run(out,live=False):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('out',type=Path);p.add_argument('--live',action='store_true');p.add_argument('--history-root',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('out',type=Path);p.add_argument('--live',action='store_true');p.add_argument('--followup-context70',action='store_true');p.add_argument('--history-root',type=Path,required=True);a=p.parse_args()
     import tests.research.m1_stop_review as history
     history.ROOT=a.history_root
-    asyncio.run(run(a.out,a.live))
+    asyncio.run(run(a.out,a.live,a.followup_context70))

@@ -37,6 +37,9 @@ def search_problem(host,query,count):
         if q.evaluation_mode not in grant.get('evaluation_modes',['mathematical_proxy']):
             raise ValueError('SEARCH_MODE_OUTSIDE_FROZEN_GRANT')
         domains=search_domains(s['spec']['family_space'],q,grant)
+        if grant.get('require_explicit_start'):
+            for name,choices in (('initial_segment_count',q.segment_counts),('initial_tendon_count',q.tendon_counts),('initial_span_strategy',q.span_strategies)):
+                if len(choices)>1 and getattr(q,name) is None:raise ValueError('EXPLICIT_INITIAL_SEARCH_POINT_REQUIRED: '+name)
         if native:
             spec=s['spec']
             if ('mujoco_control' not in grant.get('evaluation_modes',[]) or
@@ -54,6 +57,8 @@ def search_problem(host,query,count):
             previous=verify_candidate(host,q.previous_candidate_ref)
             if previous.get('generation_version')!='serial_family_generation_v2' or previous['family_space_identity']!=q.family_space_identity:
                 raise ValueError('PREVIOUS_CANDIDATE_REQUIRES_EXACT_SERIAL_FAMILY')
+            from tools.research.mixed_moves import candidate_seed
+            candidate_seed(s['spec']['family_space'],q,previous)
         from tools.research.state import readable_results
         for ref in q.evidence_used:
             if plain(ref) not in readable_results(s,host):
@@ -242,7 +247,9 @@ def native_evaluation(host, query, proposal, operation, persist, guard):
             record['analysis']=out['reference'];persist()
         a=host.store.artifact(record['analysis']);t=a.get('nonlinear_capability',{})
         attributed=a.get('operation_key')==key+'-analysis'
+        opt=a.get('native_dynamics',{}).get('optimization',{})
         record.update(candidate=seed['candidate'],status=a['status'],J=t.get('J'),initial_J=t.get('initial_J'),
+            iterations_started=opt.get('iterations_started'),measure=(opt.get('best') or {}).get('measure'),
             control_source=a.get('control_schedule_reference'),callbacks=t.get('callbacks'),
             stop_reason=t.get('stop_reason'),cost=a.get('native_dynamics',a.get('native_progress',{})).get('cost'),
             charged_analysis_evaluations=a.get('charged_analysis_evaluations',1) if attributed else 0,
@@ -323,12 +330,10 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 if not rows:
                     point=initial(space,q)
                     if q.previous_candidate_ref:
-                        prior=verify_candidate(host,q.previous_candidate_ref)['resolved_parameters']
-                        seed={str(i):dict(length_m=v['length_m'],young_pa=v['physics']['young_pa'],
-                            section_kind=v['sections'][0]['section']['kind'],section_dimensions=v['sections'][0]['section']['parameters'])
-                            for i,v in enumerate(prior['segments'])}
-                        point=initial(space,q,dict(segments=seed))
-                    changes=['family_defaults_and_authorized_ranges']
+                        from tools.research.mixed_moves import candidate_seed
+                        seed=candidate_seed(space,q,verify_candidate(host,q.previous_candidate_ref))
+                        point=initial(space,q,seed)
+                    changes=['previous_candidate_structure_coordinates' if q.previous_candidate_ref else 'family_defaults_and_authorized_ranges']
                 else:
                     base=best['point'] if best else initial(space,q)
                     point,changes,checkpoint['step']=next_move(space,q,base,checkpoint['iteration'],q.step)
@@ -490,8 +495,14 @@ def run_search(host,query,key,*,guard,execute,capacity):
         result.update(best_native_candidate=best if supported else None,
             score_semantics=checkpoint['problem']['score_semantics'],task_acceptance='unmeasured',
             cost_scope='Original per-condition receipts attributed to this search; checkpoint/result reuse does not charge those receipts again.',
+            comparison_scope=dict(control_settings=plain(q.control_settings),
+                eligible_candidates=[r['evidence']['candidate'] for r in rows if r.get('computation_status')=='computed'],
+                excluded_candidates=[dict(candidate=r.get('evidence',{}).get('candidate'),reason=r.get('computation_status')) for r in rows if r.get('computation_status')!='computed'],
+                actual_effort_rule='Common requested settings; compare recorded callbacks/iterations per condition before asserting equal actual search opportunity.',
+                rule='Compare complete same-condition results under identical task/fidelity/settings; changed tendon count changes control dimension. Multiple changed physical variables do not identify a tendon-count cause.',
+                unsearched='Only recorded coordinate proposals were evaluated; remaining selected ranges and all unselected groups remain unresolved.'),
             comparison_summary=[dict(candidate=r.get('evidence',{}).get('candidate'),shared_J=r.get('proxy_values',{}).get('task_violation'),
-                conditions={cid:{k:v.get(k) for k in ('status','J','initial_J','callbacks','stop_reason','cost','analysis','control_source')}
+                conditions={cid:{k:v.get(k) for k in ('status','J','initial_J','measure','iterations_started','callbacks','stop_reason','cost','analysis','control_source')}
                     for cid,v in r.get('evidence',{}).get('conditions',{}).items()}) for r in rows])
     changed=None if mixed else sum(host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot'] for row in rows)
     ref=save(host,dict(result=result,structurally_changed_evaluations=changed,admission=fit),'design_search_result')

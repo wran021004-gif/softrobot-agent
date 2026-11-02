@@ -110,16 +110,23 @@ class FamilyMixedSearch(Contract):
     evaluation_mode: Literal['mathematical_proxy','mujoco_control'] = 'mathematical_proxy'
     control_settings: 'LocalControlSearchSettings | None' = None
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0)
+    initial_segment_count: StrictInt | None = None
+    initial_tendon_count: StrictInt | None = None
+    initial_span_strategy: str | None = None
 
     @model_serializer(mode='wrap')
     def preserve_proxy_requests(self,handler):
         value=handler(self)
+        for key in ('initial_segment_count','initial_tendon_count','initial_span_strategy'):
+            if getattr(self,key) is None:value.pop(key,None)
         if self.evaluation_mode=='mathematical_proxy':
             for key in ('evaluation_mode','control_settings','initial_tension_n'):value.pop(key,None)
         return value
 
     @model_validator(mode='after')
     def selected_coordinates(self):
+        for key,choices in (('initial_segment_count',self.segment_counts),('initial_tendon_count',self.tendon_counts),('initial_span_strategy',self.span_strategies)):
+            if getattr(self,key) is not None and getattr(self,key) not in choices:raise ValueError('INITIAL_SEARCH_POINT_OUTSIDE_SELECTED_RANGE: '+key)
         native=self.evaluation_mode=='mujoco_control'
         if native:
             settings=self.control_settings
@@ -381,6 +388,10 @@ class ScientificStructureSearch(Contract):
     tendon_counts: list[StrictInt] | None = None
     span_strategies: list[str] | None = Field(default=None,description='Omit to explore legal strategies when spans is selected, otherwise retain original whole_chain search default.')
     section_types: list[str] = Field(default_factory=list,description='Omit to retain original prototype section kinds; dimension changes still use frozen domains.')
+    initial_segment_count: StrictInt | None = Field(default=None,description='Explicit numerical starting point within selected range, not a claim of optimal topology.')
+    initial_tendon_count: StrictInt | None = None
+    initial_span_strategy: str | None = None
+    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,description='Optional subranges of selected existing coordinates: length_m, young_pa, section.<kind>.<dimension>, routing.<name>. Original FamilySpace admission applies.')
 
 
 class MechanismTarget(Contract):

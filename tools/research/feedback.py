@@ -131,7 +131,8 @@ def search_feedback(host, reference):
             independent_task_acceptance='unmeasured',scientific_citation_eligible=False)
         checkpoint=host.store.artifact(result['search_state']);query=checkpoint['problem']['query']
         fixed['method']=query.get('method',fixed['method'])
-        fixed['search_scope']={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','span_strategies','section_types','bounds','step','minimum_step','initial_tension_n','previous_candidate_ref','objective','evaluation_mode','operating_point','screening_fidelity','max_proposals','max_evaluations','stop_score') if k in query}
+        fixed['search_scope']={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','initial_segment_count','initial_tendon_count','initial_span_strategy','span_strategies','section_types','bounds','step','minimum_step','initial_tension_n','previous_candidate_ref','objective','evaluation_mode','operating_point','screening_fidelity','max_proposals','max_evaluations','stop_score') if k in query}
+        fixed['comparison_scope']=result.get('comparison_scope')
         fixed['search_scope']['resolved_domains']=checkpoint['problem'].get('domains')
         if not fixed['best_mathematical']:fixed['control_search_settings']=query.get('control_settings')
         fixed['cost']=dict(known_attributed_numerical_s=sum(row['mathematical_numerical_s'] for row in result['evaluated'] if row.get('mathematical_numerical_s') is not None),
