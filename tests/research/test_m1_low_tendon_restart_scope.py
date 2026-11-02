@@ -13,6 +13,18 @@ SPEC=config.ROOT/'configs/research/study_m1_low_tendon_speed004_v1.json'
 
 
 class LowTendonRestartScopeTests(unittest.TestCase):
+    def test_compact_context_preserves_existing_nmpc_and_conic_initialization_paths(self):
+        from tools.research.research_context import agent_decision_brief,research_decision_brief_v3,information_flow_brief
+        with patch.object(fixtures,'SPEC',SPEC),fixtures.scoped_fixture() as h:
+            before=h.store.remaining()
+            brief=agent_decision_brief(h)
+            compact=information_flow_brief(brief,research_decision_brief_v3(brief))
+            sources=compact['control_initialization_methods']
+            self.assertIn('actually applied SI tensions',sources['measured_nmpc'])
+            self.assertIn('response_evidence',sources['capability_sequence'])
+            self.assertIn('inherits no physical acceptance',sources['capability_sequence'])
+            self.assertEqual(h.store.remaining(),before)
+
     def test_new_speed_threshold_reaches_every_condition_without_changing_geometry_or_positions(self):
         old=config.resolve(fixtures.SPEC);new=config.resolve(SPEC)
         self.assertNotEqual(old['resolved_identity'],new['resolved_identity'])
