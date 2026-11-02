@@ -100,6 +100,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         from tools.research.contracts import ScientificStructureSearch
         intent_schema=ScientificStructureSearch.model_json_schema()
         properties=intent_schema['properties'];grant=study['family_search']
+        from extensions.tendon_family.family_space import span_strategies
+        applicable_spans=span_strategies(study['family_space'])
+        for branch in properties['span_strategies']['anyOf']:
+            if branch.get('type')=='array':branch['items']['enum']=applicable_spans
+        for branch in properties['initial_span_strategy']['anyOf']:
+            if branch.get('type')=='string':branch['enum']=applicable_spans
         properties['design_variable_groups']['items']['enum']=[g for g in grant['variable_groups'] if g!='control']
         for name in ('segment_counts','tendon_counts'):
             for branch in properties[name]['anyOf']:

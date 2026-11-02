@@ -170,7 +170,8 @@ def request_guidance(spec):
             program_bound=['FamilySpace identity','singleton topology','exact final screening fidelity','Native operating point','internal research_intent'],
             control_effort='method, knot_count, iterations and evaluation_requests are separate choices; omitted iterations=min(callback cap, original/Study iteration caps). Original settings own numerical limits and termination.',
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),
-            initialization='Original mixed search defaults; previous candidate seeds segment parameters, not its complete routing/control. Independent evaluation remains required.')
+            applicable_span_strategies=span_strategies(spec['family_space']),
+            initialization='Main chooses explicit discrete starts; continuous defaults are numerical starting assumptions. An optional representable candidate preserves its structure coordinates; unsupported routes/sections require generate or a fresh search. Every condition receives fresh controls.')
     return guidance
 
 

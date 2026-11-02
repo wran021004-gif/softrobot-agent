@@ -55,6 +55,19 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'INDEPENDENT_FORMAL_STUDY_APPROVAL'):require_research_authorization(h)
             self.assertEqual(h.store.remaining()['used']['model_calls'],0)
 
+    def test_schema_and_guidance_expose_only_frozen_span_strategies(self):
+        from tools.research.agent import plan_schema
+        from extensions.tendon_family.family_space import span_strategies
+        spec=resolve(SPEC);allowed=span_strategies(spec['family_space'])
+        schema=plan_schema(['search'],decision_required=True,family_version='serial_family_space_v2',study=spec)
+        variants=schema['$defs']['ScientificStructureSearch']['properties']['span_strategies']['anyOf']
+        self.assertEqual(next(b['items']['enum'] for b in variants if b.get('type')=='array'),allowed)
+        self.assertEqual(search.request_guidance(spec)['search']['applicable_span_strategies'],allowed)
+        with scoped_fixture() as h:
+            with self.assertRaises(StructureChoiceError) as caught:
+                compile_search(h,proposal(span_strategies=['whole_chain','distal']),'forbidden-span')
+            self.assertEqual(caught.exception.issues[0]['choices'],allowed)
+
     def test_no_historical_raw_context_or_acceptance_is_imported(self):
         from tools.research.research_context import import_history
         from tools.research.design import verify_candidate

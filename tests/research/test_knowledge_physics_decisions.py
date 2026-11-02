@@ -136,5 +136,19 @@ class KnowledgePhysicsTests(unittest.TestCase):
             full=experience.retrieve(h,dict(operation='read',entry_id='skill-parameter-model',revision='1'))
             self.assertIn('content',full['results'][0]);self.assertEqual(len(state(h)['retrievals']),1)
 
+    def test_condition_aliases_of_one_structure_trigger_one_relevant_skill(self):
+        with fixture() as h:
+            spec=deepcopy(state(h)['spec']);spec['knowledge']=dict(mode='enabled',delivery='compact_skill_v1',include_entry_ids=['skill-finite-search'])
+            spec['knowledge_manifest']=experience.freeze_knowledge(spec['knowledge']);update(h,spec=spec)
+            generated=self.generate(h)
+            candidate=save(h,dict(h.store.artifact(generated),physical_design_identity='synthetic-shared-structure'))
+            alias=save(h,dict(h.store.artifact(candidate),condition_id='other-frozen-condition'))
+            p=save(h,dict(original_plan=dict(action='search')),'original_research_plan')
+            refs=[save(h,dict(candidate=c,native_dynamics=dict(optimization=dict(best=dict(task_gap=dict(accepted=False)),stop_reason='iteration_limit')))) for c in (candidate,alias)]
+            update(h,plans=[p],analysis_results=refs)
+            hint=experience.retrieval_hint(h)
+            self.assertIsNotNone(hint)
+            self.assertEqual(hint['skill']['key'],'summary:skill-finite-search@1')
+
 
 if __name__=='__main__':unittest.main()

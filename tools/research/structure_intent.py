@@ -27,6 +27,8 @@ def compile_search(host, value, request_id):
     grant=spec['family_search'];space=spec['family_space'];issues=[]
     def issue(field,reason,**extra):issues.append(dict(field='search.'+field,reason=reason,**extra))
     groups=q.design_variable_groups
+    if q.span_strategies and not set(q.span_strategies)<=set(span_strategies(space)):
+        issue('span_strategies','Outside the frozen FamilySpace rule',choices=span_strategies(space))
     if len(groups)!=len(set(groups)) or not set(groups)<=set(grant['variable_groups'])-{'control'}:
         issue('design_variable_groups','Choose unique authorized structural groups',choices=[g for g in grant['variable_groups'] if g!='control'])
     topology={}

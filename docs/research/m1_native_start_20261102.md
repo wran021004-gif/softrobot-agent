@@ -52,3 +52,13 @@ authorizes this startup; it does not authorize publishing new private raw runs.
 No additional language-only Provider comparisons are planned. Scientific value
 will be judged by actual tool-admissible hypotheses, matched conditions,
 finite-search termination, alternatives and observed decision revisions.
+
+The first real search completed two structures and all six condition Workers.
+It also exposed two delivery defects: the scientific Schema advertised globally
+defined span strategies outside this frozen FamilySpace, and condition-specific
+candidate references prevented one physical structure from triggering its finite
+search Skill. The Schema/guidance now use existing FamilySpace choices, and the
+compact Skill boundary groups by the existing physical design identity. Two
+additional regressions passed; twenty-one distinct focused checks are covered.
+This implementation repair requires same-Study bind with costs/results retained.
+The first six analyses remain bound to their actual earlier implementation.

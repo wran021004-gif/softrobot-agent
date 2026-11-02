@@ -176,8 +176,12 @@ def decision_phase(host):
         a=host.store.artifact(ref);search=native_search_summary(a,ref)
         if search and not search['model_predicates_passed']:failed.append(a)
     if len(failed)>=2:
-        candidate=failed[-1]['candidate']['artifact_id']
-        if sum(a['candidate']['artifact_id']==candidate for a in failed)>=2:
+        def structure(a):
+            ref=a['candidate']
+            return (host.store.artifact(ref).get('physical_design_identity',ref['artifact_id'])
+                if s['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1' else ref['artifact_id'])
+        candidate=structure(failed[-1])
+        if sum(structure(a)==candidate for a in failed)>=2:
             return dict(phase='finite_search_structural_review',notice_id='structural_review:'+candidate,
                 reason='Repeated finite control searches have not established acceptance. Before changing structure, distinguish solver limits, unresolved parameter effects and missing matched-condition controls; reinitialize/reoptimize every required condition after a change.')
     return None
