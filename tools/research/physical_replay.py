@@ -155,7 +155,9 @@ def _seed_control(host,request,operation_key):
         time_rule='zero-order hold; hold last input beyond source horizon; new channels use candidate pretension')
     if request.source:
         parent=host.store.artifact(request.parent)
-        source=host.store.artifact(request.source)
+        source=host.store.artifact(request.source,paths=('candidate','execution_id','trajectory','control_schedule_reference'))
+        if not source.get('trajectory') and not source.get('execution_id'):
+            raise ValueError('CONTROL_INITIALIZATION_REQUIRES_EXECUTABLE_SOURCE')
         if source.get('execution_id') and not source.get('trajectory'):
             from tools.research.rl import measured_nmpc_trajectory
             if plain(request.parent)!=plain(request.candidate) or source.get('candidate')!=plain(request.candidate) or request.channel_map is not None:

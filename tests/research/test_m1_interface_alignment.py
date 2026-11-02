@@ -89,6 +89,35 @@ class AlignmentTests(unittest.TestCase):
         out=method_alignment(intent,{},'mujoco_direct_control_v1',dict(operation='mujoco_direct_control_v1'))
         self.assertEqual(out['original_hypothesis_status'],'not_tested')
 
+    def test_native_result_seed_rejection_guides_exact_schedule_without_acceptance(self):
+        from tools.research.agent import error_feedback
+        source=seed_control(self.h,ControlSeedRequest(candidate=self.c))['source']
+        native=save(self.h,dict(status='computed',candidate=self.c,
+            operation='mujoco_direct_control_v1',control_schedule_reference=source,
+            fixture='Synthetic reference distinction; no Worker'), 'synthetic_native_result')
+        request=ControlSeedRequest(candidate=self.c,parent=self.c,source=native)
+        before=deepcopy(state(self.h));ledger=self.h.store.remaining()
+        with self.assertRaisesRegex(ValueError,'CONTROL_INITIALIZATION_REQUIRES_EXECUTABLE_SOURCE') as caught:
+            seed_control(self.h,request)
+        feedback=error_feedback(self.h,dict(name='research_plan',input=dict(
+            action='initialize_control',control_seed=request.model_dump(mode='json'))),caught.exception,before)
+        self.assertEqual(feedback['field'],'control_seed.source')
+        self.assertIn('/control_schedule_reference',feedback['expected'])
+        self.assertFalse(feedback['worker_started'])
+        self.assertEqual(state(self.h)['control_initializations'],before['control_initializations'])
+        corrected=self.h.store.artifact(native)['control_schedule_reference']
+        copied=seed_control(self.h,ControlSeedRequest(candidate=self.c,parent=self.c,source=corrected))
+        actual=self.h.store.artifact(copied['source'])
+        self.assertEqual(actual['trajectory'],self.h.store.artifact(source)['trajectory'])
+        self.assertEqual(actual['task_acceptance'],'unmeasured')
+        self.assertFalse(actual['provenance']['inherited_acceptance'])
+        self.assertEqual(self.h.store.remaining(),ledger)
+
+    def test_source_without_schedule_or_measured_execution_is_actionably_rejected(self):
+        source=save(self.h,dict(fixture='No executable sequence'),'synthetic_missing_schedule')
+        with self.assertRaisesRegex(ValueError,'CONTROL_INITIALIZATION_REQUIRES_EXECUTABLE_SOURCE'):
+            seed_control(self.h,ControlSeedRequest(candidate=self.c,parent=self.c,source=source))
+
     def test_native_residual_import_requires_owned_computed_exact_source(self):
         source=seed_control(self.h,ControlSeedRequest(candidate=self.c))['source']
         with self.assertRaisesRegex(ValueError,'VERIFIED_MATHEMATICAL_TRAJECTORY_REQUIRED'):

@@ -809,7 +809,7 @@ class ControlSearchRequest(ControlSearchStart):
 class ControlSeedRequest(Contract):
     condition_id: str | None = Field(default=None,min_length=1,description='Optional frozen task condition. Returns a candidate bound to this condition on the identical structure; use the returned candidate for analysis, search and replay.')
     candidate: EvidenceRef = Field(description='Target candidate; decision.selected_candidate must equal control_seed.candidate.')
-    source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
+    source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. For Native T1/Direct, read /control_schedule_reference from the completed analysis result and use that schedule reference here, not the analysis result itself. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
     parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
