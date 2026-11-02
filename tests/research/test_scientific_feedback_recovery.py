@@ -79,4 +79,51 @@ class ScientificFeedbackRecoveryTests(unittest.TestCase):
                 asyncio.run(recover_feedback(h,agent))
 
 
+class ScientificStructureFeedbackRecoveryTests(unittest.TestCase):
+    def fixture(self):
+        from tests.research.test_p63g2_structure_intent import provision,search_plan
+        from tools.research.structure_intent import compile_search
+        h=provision();raw=search_plan();key='native-structure-recovery-fixture'
+        compiled=compile_search(h,raw,key)
+        use=dict(toolUseId='structure-recovery-fixture',name='research_plan',input=raw)
+        save(h,dict(tool_use=use),'model_original_tool_request')
+        accepted=save(h,dict(request_id=key,original_plan=compiled),'original_research_plan')
+        update(h,plans=[*state(h)['plans'],accepted])
+        row,_=h.store.reserve(h.run_id,key,digest(compiled),h.actor,zero())
+        h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
+            tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),
+            dict(plan=accepted,result=dict(status='search_execution_incomplete')))
+        a=SimpleNamespace(messages=[dict(role='assistant',content=[dict(toolUse=use)])],
+            _session_manager=SimpleNamespace(session_id=state(h)['pilot']['framework_session_id'],save_snapshot=AsyncMock()))
+        return h,a,raw,compiled,key
+
+    def test_saved_structure_binding_recovers_without_recompiling_or_launching(self):
+        h,a,_,_,_=self.fixture();before=h.store.remaining()
+        with (patch('tools.research.structure_intent.compile_search',side_effect=AssertionError('NO_RECOMPILE')),
+              patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')),
+              patch('tools.research.research_context.tool_feedback',side_effect=lambda _h,v:v),
+              patch('tools.research.reporter.scientific_feedback',return_value=None)):
+            self.assertEqual(asyncio.run(recover_feedback(h,a)),1)
+            self.assertEqual(asyncio.run(recover_feedback(h,a)),0)
+        self.assertFalse(unmatched(a.messages));self.assertEqual(before,h.store.remaining())
+
+    def test_conflicting_saved_structure_binding_is_rejected(self):
+        h,a,raw,compiled,key=self.fixture();wrong=deepcopy(compiled);wrong['hypothesis']='changed fixture'
+        save(h,dict(request_id=key,original_plan=raw,compiled_plan=wrong),'structure_search_intent_binding')
+        with self.assertRaisesRegex(ValueError,'ORIGINAL_TOOL_IDENTITY_MISMATCH'):
+            asyncio.run(recover_feedback(h,a))
+        self.assertTrue(unmatched(a.messages))
+
+    def test_changed_original_structure_input_is_rejected(self):
+        h,a,raw,_,_=self.fixture();raw['hypothesis']='changed input fixture'
+        save(h,dict(tool_use=a.messages[0]['content'][0]['toolUse']),'model_original_tool_request')
+        with self.assertRaisesRegex(ValueError,'ORIGINAL_TOOL_IDENTITY_MISMATCH'):
+            asyncio.run(recover_feedback(h,a))
+
+    def test_unowned_accepted_structure_plan_is_rejected(self):
+        h,a,_,_,_=self.fixture();update(h,plans=[])
+        with self.assertRaisesRegex(ValueError,'ORIGINAL_TOOL_IDENTITY_MISMATCH'):
+            asyncio.run(recover_feedback(h,a))
+
+
 if __name__=='__main__':unittest.main()

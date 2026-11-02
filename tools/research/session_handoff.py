@@ -756,6 +756,16 @@ async def recover_feedback(host,agent):
                 if exact:
                     if any(r['expanded_plan']!=exact[0]['expanded_plan'] for r in exact):raise ValueError('CONFLICTING_SAVED_PLAN_CHOICE_BINDING')
                     payload=exact[0]['expanded_plan']
+                structures=[host.store.artifact(e['outputs'][0]) for e in events
+                    if e['kind']=='structure_search_intent_binding'
+                    and host.store.artifact(e['outputs'][0]).get('request_id')==row['request_id']]
+                if structures:
+                    if (any(b.get('original_plan')!=payload or b.get('compiled_plan')!=structures[0].get('compiled_plan') for b in structures)
+                            or value.get('plan') not in s['plans']):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                    accepted=host.store.artifact(value['plan'])
+                    if (accepted.get('request_id')!=row['request_id']
+                            or accepted.get('original_plan')!=structures[0]['compiled_plan']):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                    payload=structures[0]['compiled_plan']  # Reuse saved compilation; never compile or execute here.
                 if row['request_hash']!=digest(plain(Plan.model_validate(payload))):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             elif use['name']=='research_analysis':
                 # Recover the frozen request; a newer admission contract must not reinterpret it.
