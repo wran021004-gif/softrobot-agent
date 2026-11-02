@@ -1,0 +1,238 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "m1-low-tendon-speed004-20261102-campaign3",
+  "base_commit": "8b7aabfaf3eaa335b2991b115f7b3799ddbb5865",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: Current user explicitly requests archiving campaign2 and starting a fresh, low-tendon-priority Study with holding speed limit at least 0.04 m/s and all executable existing research permissions. User separately renewed 87 Provider requests, 569 public operations, 18 independent Replay launches; no mathematical count quota. Bind the actual new committed identity and registered mathematics using original authorization events. Predecessor costs remain archived; its unused balances are retired, not added to this new grant.",
+  "evidence_destination": "runs/research/m1-low-tendon-speed004-20261102-campaign3/private-evidence",
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay",
+    "search",
+    "control_search",
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "control_search",
+    "execute",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 8000,
+    "iterations": 1000,
+    "knots_s": 16
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": [],
+    "architecture": "english_decision_v1",
+    "analysis_interface": "scientific_question_v4",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "none"
+      },
+      "reporter": {
+        "reasoning": "none"
+      }
+    },
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "evidence_read_policy": {
+      "version": "bounded_scientific_evidence_v1"
+    },
+    "structure_search_interface": "scientific_structure_search_v1"
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "../../tasks/m1_elevated_free_space_v3_speed004_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "../../tasks/m1_elevated_free_space_v3_speed004_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "../../tasks/m1_elevated_free_space_v3_speed004_central_high.json"
+    }
+  ],
+  "mode": "formal_research",
+  "scoring_window_s": 0.6,
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.58
+    ]
+  },
+  "budgets": {
+    "provider_requests": 87,
+    "protected_provider_requests": 12,
+    "public_operations": 569,
+    "protected_public_operations": 16,
+    "physical_launches": 18,
+    "mathematical_evaluations": null,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "initial_structure_strategy": "agent_choice",
+  "knowledge": {
+    "version": "curated_knowledge_policy_v1",
+    "mode": "enabled",
+    "allowed_kinds": [
+      "procedure",
+      "case"
+    ],
+    "allow_benchmark_answers": false,
+    "include_entry_ids": [
+      "skill-parameter-model",
+      "skill-finite-search",
+      "skill-matched-comparison",
+      "skill-local-to-experiment",
+      "skill-continue-or-stop",
+      "skill-witness-replay",
+      "experience-accepted-control",
+      "experience-structure-readaptation",
+      "experience-premature-stop"
+    ],
+    "delivery": "compact_skill_v1"
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "mechanism_structure_v1": "Existing registered physical mechanism, exact-input and short-response diagnostics; domain/model/task admission remains mandatory.",
+    "mujoco-nonlinear-task-capability-v1": "Existing Native T1 and Direct control optimization for the actual frozen condition, registered finite request limits and real costs. No global infeasibility inference.",
+    "mujoco-reoptimized-structure-response-v1": "Existing T2 comparison of compatible current-Study saved T1 results; no inherited task acceptance.",
+    "sampled-affine-conic-minimax-v1": "Existing local sampled affine capability method, within its actual registered model and assumptions. Mathematical proxy only; never full nonlinear Native performance or independent acceptance.",
+    "controlled-capability-sensitivity-v1": "Existing qualified local sensitivity over saved model/solution stencils and differentiability checks; not a global structure gradient or task acceptance."
+  },
+  "runtime": "runtime_p63b1_sol_none.json",
+  "execution_instructions": "Find one legal structure and condition-specific controls that pass all three frozen tasks. Start with zero scientific candidates and no predecessor controls/results. Prefer fewer tendons. Do not select high tendon counts, especially seven, without stating a specific task or actuation need in the hypothesis and why a lower-count alternative is inadequate; generic extra authority is insufficient. Task feasibility remains mandatory; tendon savings cannot compensate for task failure. Main freely chooses structural parameters, topology, starts, methods and useful effort. Counts are explicit discrete choices: [1,7] means only one and seven; all integers one through seven require [1,2,3,4,5,6,7]. The three goal positions and 0.6 s duration are frozen. Terminal and final-0.06-second holding position errors must be <=0.01 m; holding speed must be <=0.04 m/s. There is no cumulative mathematical request quota and no first-pilot or per-round mathematical call restriction. Main may deepen control, change parameterization or structure, and revise hypotheses from actual evidence; finite search truncation is not structural infeasibility. Available registered methods retain their deterministic applicability and real-cost admission. Local affine/proxy evidence is not full nonlinear task performance; Native control and independent three-condition Replay/SELECT retain the frozen acceptance. Current model facts prevail over at most one compact relevant Skill; Experience is optional. No historical winning answers or raw predecessor evidence is imported. Provider reserve and evidence-based STOP remain; engineering interruption preserves work and costs, not a scientific STOP. Immediately SELECT/STOP after the original full success gate; no extra post-success simplification.",
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "segments.*.sections.*.parameters.*",
+      "spans.*.radius_m",
+      "spans.*.phase_rad"
+    ]
+  },
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.1.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_frictionless_normal_v1",
+          "friction": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "evaluation_modes": [
+      "mujoco_control",
+      "mathematical_proxy"
+    ],
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_proposals": 1024,
+    "max_evaluations": 3072,
+    "require_explicit_start": true
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 0
+  },
+  "analysis_cap_s": 600,
+  "nmpc_limits": {
+    "executions": 18
+  }
+}

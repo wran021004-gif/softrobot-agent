@@ -1,0 +1,63 @@
+{
+  "extends": "reach_hold.json",
+  "seed": 17,
+  "settling": {
+    "window_s": 0.06,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.04
+  },
+  "task": {
+    "task_id": "m1-elevated-free-space-v3-speed004-negative_low",
+    "task_version": "3.0.0",
+    "name": "Elevated M1 v3 shared-structure reach, 0.04 m/s holding limit: negative_low",
+    "source": "Explicit user-authorized derivative of Elevated M1 v2: only holding speed limit relaxed from 0.03 to 0.04 m/s; task IDs/version changed. Goal points, 0.6 s duration, 0.06 s hold, 0.01 m position thresholds, high mount and physics retained. No inherited acceptance.",
+    "goal": {
+      "data": {
+        "target_m": [
+          0.275,
+          -0.04,
+          2.485
+        ]
+      }
+    },
+    "evaluator": {
+      "parameters": {
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "initializer": {
+      "parameters": {
+        "data": {
+          "qpos_rad": {},
+          "qvel_rad_s": {},
+          "unspecified": "zero"
+        }
+      }
+    },
+    "sampling": {
+      "window_s": [
+        0.0,
+        0.6
+      ]
+    },
+    "timing": {
+      "duration_s": 0.6,
+      "timestep_s": 0.001,
+      "control_period_s": 0.02,
+      "sample_period_s": 0.02
+    },
+    "environment": {
+      "data": {
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            2.5
+          ]
+        }
+      }
+    }
+  }
+}
