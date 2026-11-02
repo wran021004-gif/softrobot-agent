@@ -1,0 +1,152 @@
+{
+  "scope": "Isolated configuration and deterministic no-training environment preflight",
+  "formal_candidate": {
+    "artifact_id": "3634c476a5d0092d185d425c99318c150a9a4b6238fb9b9621b335462ac8f2a5",
+    "media_type": "application/json"
+  },
+  "conditions": [
+    {
+      "condition": "positive_high",
+      "prepare_input": "accepted",
+      "environment": {
+        "mode": "direct",
+        "candidate": "d9c2a20ce057b590dc1c7ef7a11bf979666a9493237cd6a46e8e25a3ec1a6ecc",
+        "task": "a749a4140dc4ba3f98195b2617123abee730114ecd2b5c3e27d89a2a0d881077",
+        "control_object": {
+          "joint_names": [
+            "segment_0_cell_0_y",
+            "segment_0_cell_0_z",
+            "segment_0_cell_1_y",
+            "segment_0_cell_1_z",
+            "segment_0_cell_2_y",
+            "segment_0_cell_2_z",
+            "segment_0_cell_3_y",
+            "segment_0_cell_3_z",
+            "segment_0_cell_4_y",
+            "segment_0_cell_4_z",
+            "segment_0_cell_5_y",
+            "segment_0_cell_5_z",
+            "segment_0_cell_6_y",
+            "segment_0_cell_6_z",
+            "segment_0_cell_7_y",
+            "segment_0_cell_7_z",
+            "segment_0_cell_8_y",
+            "segment_0_cell_8_z",
+            "segment_0_cell_9_y",
+            "segment_0_cell_9_z",
+            "segment_0_cell_10_y",
+            "segment_0_cell_10_z",
+            "segment_0_cell_11_y",
+            "segment_0_cell_11_z",
+            "segment_1_cell_0_y",
+            "segment_1_cell_0_z",
+            "segment_1_cell_1_y",
+            "segment_1_cell_1_z",
+            "segment_1_cell_2_y",
+            "segment_1_cell_2_z",
+            "segment_1_cell_3_y",
+            "segment_1_cell_3_z",
+            "segment_1_cell_4_y",
+            "segment_1_cell_4_z",
+            "segment_1_cell_5_y",
+            "segment_1_cell_5_z",
+            "segment_1_cell_6_y",
+            "segment_1_cell_6_z",
+            "segment_1_cell_7_y",
+            "segment_1_cell_7_z",
+            "segment_1_cell_8_y",
+            "segment_1_cell_8_z",
+            "segment_1_cell_9_y",
+            "segment_1_cell_9_z",
+            "segment_1_cell_10_y",
+            "segment_1_cell_10_z",
+            "segment_1_cell_11_y",
+            "segment_1_cell_11_z",
+            "segment_2_cell_0_y",
+            "segment_2_cell_0_z",
+            "segment_2_cell_1_y",
+            "segment_2_cell_1_z",
+            "segment_2_cell_2_y",
+            "segment_2_cell_2_z",
+            "segment_2_cell_3_y",
+            "segment_2_cell_3_z",
+            "segment_2_cell_4_y",
+            "segment_2_cell_4_z",
+            "segment_2_cell_5_y",
+            "segment_2_cell_5_z",
+            "segment_2_cell_6_y",
+            "segment_2_cell_6_z",
+            "segment_2_cell_7_y",
+            "segment_2_cell_7_z",
+            "segment_2_cell_8_y",
+            "segment_2_cell_8_z",
+            "segment_2_cell_9_y",
+            "segment_2_cell_9_z",
+            "segment_2_cell_10_y",
+            "segment_2_cell_10_z",
+            "segment_2_cell_11_y",
+            "segment_2_cell_11_z"
+          ],
+          "tendon_names": [
+            "tendon_0",
+            "tendon_1"
+          ],
+          "actuator_names": [
+            "tendon_0_direct_tension",
+            "tendon_1_direct_tension"
+          ],
+          "tip_site": "tip_site",
+          "semantics": "ideal_tension"
+        },
+        "tension_limits_n": [
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ]
+        ],
+        "residual_scale_n": [
+          8.0,
+          8.0
+        ],
+        "physics_dt_s": 0.001,
+        "control_dt_s": 0.02,
+        "substeps": 20,
+        "horizon": 30,
+        "holding_steps": [
+          27,
+          28,
+          29,
+          30
+        ],
+        "observation_dimension": 153,
+        "action_dimension": 2,
+        "reward": {
+          "failure_penalty": -10000.0,
+          "holding_speed": 1.0,
+          "position": 1.0,
+          "smoothness": 0.001
+        },
+        "reference": null
+      },
+      "deterministic_3_step_rollout": true,
+      "episodes_trained": 0
+    },
+    {
+      "condition": "negative_low",
+      "prepare_input": "blocked",
+      "reason": "Candidate changed frozen study task"
+    },
+    {
+      "condition": "central_high",
+      "prepare_input": "blocked",
+      "reason": "Candidate changed frozen study task"
+    }
+  ],
+  "training_stages_admitted": 0,
+  "training_actions_allocated": 0,
+  "formal_store_unchanged": true
+}
