@@ -65,10 +65,17 @@ def _index_rows():
 
 
 def freeze_knowledge(policy):
-    """Freeze authorized catalogue metadata only; bodies are read on demand."""
+    """Freeze authorized metadata and optional short principles; no full bodies."""
     policy=plain(policy)
     if policy.get('mode')=='off':return dict(entries=[])
-    return dict(entries=[entry for entry in _index_rows() if _permitted(entry,policy)])
+    rows=deepcopy([entry for entry in _index_rows() if _permitted(entry,policy)])
+    if policy.get('delivery')=='compact_skill_v1':
+        for row in rows:
+            if knowledge_type(row)!='skill' or row.get('introduced_in')!='knowledge_organization_v1':continue
+            body=(ROOT/row['path']).read_bytes();value=json.loads(body)
+            row['compact_skill']=dict(principle=value['principle'][:280],
+                when=value['problem_or_trigger'][:180],source_sha256=hashlib.sha256(body).hexdigest())
+    return dict(entries=rows)
 
 
 def knowledge_enabled(spec):
@@ -103,6 +110,17 @@ def retrieval_hint(host):
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')
+    if s['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
+        phase=decision_phase(host)
+        rows=[r for r in entries(host) if r.get('compact_skill') and phase and
+            phase['phase'] in r.get('applicable_triggers',[]) and name in [r['task'],*r.get('applicable_tasks',[])]]
+        if not rows:return None
+        # One relevant principle, delivered directly. Experience stays on demand.
+        row=sorted(rows,key=lambda r:(r['task']!=name,r['entry_id']))[0]
+        key='summary:'+row['entry_id']+'@'+row['revision']
+        if any(key in r.get('summary_keys',[]) and r['notice_id']==phase['notice_id'] for r in hint_progress(host)):return None
+        return dict(skill=dict(key=key,principle=row['compact_skill']['principle'],when=row['compact_skill']['when']),
+            boundary=phase['notice_id'],scope='Current model facts prevail; cross-task transfer unverified. Summary only; full Skill/Experience via experience_retrieve.')
     from tools.research.evidence_policy import english_sources
     eligible=[r for r in entries(host) if not english_sources(s['spec']) or english_source_ready(r)]
     available=sorted({r['task'] for r in eligible})
@@ -180,6 +198,13 @@ def hint_progress(host):
                 if not isinstance(content,str) or not content.startswith('CURRENT_RESEARCH_PACKET\n'):continue
                 research=json.loads(content.split('\n',1)[1]).get('research',{})
                 hint=(research.get('knowledge') or {}).get('access') or research.get('experience_guidance') or {}
+                if hint.get('skill'):
+                    notice_id=hint['boundary'];skill=hint['skill']
+                    if notice_id in seen:continue
+                    seen.add(notice_id)
+                    rows.append(dict(notice_id=notice_id,request=event['outputs'][0],wire=meta['request'],
+                        summary_keys=[skill['key']],summary=skill,evidence_role='confirmed_skill_summary_delivery_only'))
+                    continue
                 notice=hint.get('decision_notice')
                 if not notice or notice['notice_id'] in seen:continue
                 seen.add(notice['notice_id'])
@@ -283,6 +308,11 @@ def disposition_bindings(host,dispositions):
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
             content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding
+    if state(host)['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
+        for delivery in hint_progress(host):
+            for key in delivery.get('summary_keys',[]):
+                reads[key]=dict(summary_delivery=delivery['request'],entry_key=key,
+                    source_kind='skill_summary',full_read=False)
     if set(dispositions)-set(reads):raise ValueError('DISPOSITION_REQUIRES_EXACT_ACTUAL_READ; SEARCH_OR_STARTUP_TEXT_IS_INSUFFICIENT')
     return [dict(**reads[key],disposition=value) for key,value in dispositions.items()]
 

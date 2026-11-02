@@ -110,5 +110,31 @@ class KnowledgePhysicsTests(unittest.TestCase):
             else:
                 for key in ('skill_id','principle','assumptions','applicability','diagnostic_questions','possible_actions','expected_observations','cannot_conclude','evidence_sources','validation_status'):self.assertIn(key,body)
 
+    def test_compact_skill_is_delivered_without_read_and_citation_remains_distinct(self):
+        with fixture() as h:
+            from tests.research.test_cross_task_integration import plan
+            spec=deepcopy(state(h)['spec']);spec['knowledge']=dict(mode='enabled',delivery='compact_skill_v1',
+                allowed_kinds=['procedure','case'],include_entry_ids=['skill-parameter-model','experience-premature-stop'])
+            spec['knowledge_manifest']=experience.freeze_knowledge(spec['knowledge']);update(h,spec=spec)
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE]);hint=experience.retrieval_hint(h)
+            self.assertNotIn('decision_notice',hint);self.assertNotIn('hints',hint)
+            self.assertEqual(set(hint['skill']),{'key','principle','when'})
+            self.assertLess(len(json.dumps(hint)),850)
+            key=hint['skill']['key'];self.assertEqual(key,'summary:skill-parameter-model@1')
+            with self.assertRaisesRegex(ValueError,'EXACT_ACTUAL_READ'):experience.disposition_bindings(h,{key:'adopted'})
+            candidate=self.generate(h)
+            value=plan('diagnose',candidate);value['experience_disposition']={key:'adopted'}
+            with patch('tools.research.agent.credential',return_value='offline'):
+                sent=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),('research_plan',value),None],limit=3)
+            self.assertEqual(len(experience.hint_progress(h)),1);self.assertIsNone(experience.read_progress(h))
+            self.assertTrue(state(h)['plans'],[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+                if e['kind']=='model_original_tool_feedback'])
+            original=h.store.artifact(state(h)['plans'][0])
+            self.assertEqual(original['experience_read_bindings'],[])
+            self.assertFalse(original['skill_summary_citations'][0]['full_read'])
+            self.assertIsNone(experience.retrieval_hint(h));self.assertFalse(state(h)['retrievals'])
+            full=experience.retrieve(h,dict(operation='read',entry_id='skill-parameter-model',revision='1'))
+            self.assertIn('content',full['results'][0]);self.assertEqual(len(state(h)['retrievals']),1)
+
 
 if __name__=='__main__':unittest.main()

@@ -892,7 +892,7 @@ class Plan(Contract):
     nmpc_prediction_diagnostic: NMPCPredictionDiagnostic | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict,
-        description='Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.')
+        description='Actual full-read receipt IDs / entry_id@revision, or a confirmed delivered summary:entry_id@revision. Summary citation does not imply full reading. Omit without a matching source.')
 
     @model_serializer(mode='wrap')
     def preserve_legacy_plan(self, handler):
@@ -933,6 +933,13 @@ class KnowledgePolicy(Contract):
     include_entry_ids: list[str] | None = None
     allowed_kinds: list[str] | None = None
     allow_benchmark_answers: bool = False
+    delivery: Literal['optional_reads_v1','compact_skill_v1'] = 'optional_reads_v1'
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_policy(self,handler):
+        result=handler(self)
+        if self.delivery=='optional_reads_v1':result.pop('delivery',None)
+        return result
 
 
 class ExperienceQuery(Contract):

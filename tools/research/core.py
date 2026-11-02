@@ -699,7 +699,9 @@ def dispatch(host, value, request_id, origin='model'):
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
         scientific_preflight=scientific_preflight,
         decision_admission=decision_admission,
-        experience_read_bindings=experience_bindings),'original_research_plan')
+        experience_read_bindings=[r for r in experience_bindings if r.get('source_kind')!='skill_summary'],
+        **(dict(skill_summary_citations=[r for r in experience_bindings if r.get('source_kind')=='skill_summary'])
+            if any(r.get('source_kind')=='skill_summary' for r in experience_bindings) else {})),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
         if plan.action=='initialize_control':

@@ -55,18 +55,16 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'INDEPENDENT_FORMAL_STUDY_APPROVAL'):require_research_authorization(h)
             self.assertEqual(h.store.remaining()['used']['model_calls'],0)
 
-    def test_hash_verified_prior_context_does_not_inherit_candidates_acceptance_or_cost(self):
+    def test_no_historical_raw_context_or_acceptance_is_imported(self):
         from tools.research.research_context import import_history
         from tools.research.design import verify_candidate
         with scoped_fixture() as h:
             before=h.store.remaining();import_history(h);s=state(h)
-            background=s['spec']['research_decisions']['background'][0]
-            self.assertIn(background['reference'],s['scoped_context'])
-            for ref in background['dependencies']:self.assertIsInstance(h.store.artifact(ref),dict)
+            self.assertEqual(s['spec']['research_decisions']['background'],[])
+            self.assertEqual(s['scoped_context'],[])
             self.assertFalse(s['candidates']);self.assertFalse(s['analysis_results']);self.assertFalse(s['physical_replays'])
             self.assertEqual(s['mathematical_evaluations'],0);self.assertEqual(h.store.remaining(),before)
-            candidate=next(ref for ref in background['dependencies'] if h.store.artifact(ref).get('generation_version'))
-            with self.assertRaises(ValueError):verify_candidate(h,candidate)
+            self.assertIsNone(s['reference_candidate'])
 
     def test_fixed_topology_continuous_block_changes_structure_and_evaluates_all_conditions(self):
         with scoped_fixture() as h,patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
