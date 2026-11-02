@@ -5,6 +5,7 @@ from unittest.mock import patch
 import numpy as np
 from tools.platform_store import plain
 from tools.research import config
+from tools.research import core
 from tools.research.contracts import ScientificControlEffort,ControlSeedRequest,AnalysisRequest,REGISTERED_MATHEMATICS_SCOPE
 from tools.research.scientific_intent import control_settings,compile_question,selected_question_schema
 from tools.research.structure_intent import compile_search
@@ -24,6 +25,38 @@ EFFORT=dict(method='pattern',evaluation_requests=24,iterations=8,knot_count=2,co
 
 
 class ControlMechanismScopeTests(unittest.TestCase):
+    def test_reference_alias_expansion_survives_unrelated_invalid_scientific_field(self):
+        from tools.research.object_choices import reference_schema,expand_references
+        from tools.research.scientific_intent import question_schema
+        with patch.object(fixtures,'SPEC',SPEC),fixtures.scoped_fixture() as h:
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE]);c=generate(h)
+            source=seed_control(h,ControlSeedRequest(candidate=c))['source'];diagnose(h,c,'scientific_question')
+            schema=reference_schema(question_schema(state(h)['spec'],h.store.artifact(c),'control_feasibility'),{'evidence_start':source},'analysis')
+            raw=dict(version='scientific_question_v4',domain='control',control=dict(question_type='control_feasibility',
+                effect_semantics='reoptimized_task_capability',numerical_method='mujoco_direct_control_v1',
+                control_scope=dict(mode='full_task'),control_search_effort={**EFFORT,'iterations':0},source_selection=dict(control_source='evidence_start')))
+            expanded=expand_references(raw,schema)
+            self.assertEqual(expanded['control']['source_selection']['control_source'],source)
+            self.assertEqual(raw['control']['source_selection']['control_source'],'evidence_start')
+            rejected=compile_question(h,expanded,tool_use_id='invalid-effort-field')
+            self.assertEqual(rejected['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
+            self.assertIn('iterations',str(rejected['issues']))
+            self.assertNotIn('64',str(rejected['issues']))
+            expanded['control']['control_search_effort']['iterations']=8
+            self.assertEqual(compile_question(h,expanded,tool_use_id='valid-aliased-control')['status'],'ready')
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+
+    def test_domain_handoff_precedes_unadvertised_reference_validation(self):
+        from tests.research.test_p63g3_action_handoff import diagnosis
+        with patch.object(fixtures,'SPEC',SPEC),fixtures.scoped_fixture() as h:
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE]);c=generate(h)
+            with patch.object(core,'guard'):core.dispatch(h,diagnosis(c,'mechanism_research'),'mechanism-handoff')
+            out=compile_question(h,dict(version='scientific_question_v4',domain='control',
+                control=dict(source_selection=dict(control_source={'artifact_id':'not-a-hash'}))),tool_use_id='wrong-domain')
+            self.assertEqual(out['reason'],'DIAGNOSE_DOMAIN_MISMATCH')
+            self.assertEqual(out['next']['next_research_action'],'control_feasibility')
+            self.assertFalse(out['scientific_execution_started'])
+
     def test_legacy_defaults_and_invalid_scales(self):
         spec=config.resolve(SPEC);old=dict(method='pattern',evaluation_requests=4)
         self.assertNotIn('coefficient_limit_n',plain(ScientificControlEffort.model_validate(old)))

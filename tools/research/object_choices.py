@@ -87,11 +87,21 @@ def expand_references(payload, schema, *, strict=True):
         elif isinstance(value,list) and 'items' in node:result=[expand(v,node['items']) for v in value]
         else:result=value
         for keyword in ('anyOf','allOf','oneOf'):
-            for branch in node.get(keyword,[]):
+            branches=node.get(keyword,[])
+            matching=[]
+            for branch in branches:
                 from jsonschema import Draft202012Validator
                 if Draft202012Validator({**branch,'$defs':definitions}).is_valid(value):
-                    result=expand(result,branch)
+                    matching.append(branch)
                     if keyword!='allOf':break
+            if not matching and keyword in ('anyOf','oneOf') and isinstance(value,(dict,list)):
+                # An unrelated invalid scientific field must not suppress typed
+                # reference expansion in a unique object/array branch. Original
+                # validation still rejects that field; scientific text is untouched.
+                shaped=[b for b in branches if (definitions.get(b.get('$ref','').rsplit('/',1)[-1],b).get('type')
+                    ==('object' if isinstance(value,dict) else 'array' if isinstance(value,list) else None))]
+                if len(shaped)==1:matching=shaped
+            for branch in matching:result=expand(result,branch)
         return result
     return expand(payload,schema)
 

@@ -348,14 +348,16 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='blocked',reason='ORIGINAL_PROTECTED_CLOSEOUT_OR_STOP',scientific_execution_started=False)
         intent=completed_question_plan(host)
         candidate=host.store.artifact(intent['candidate']) if intent else None
+        choice=(intent or {}).get('agent_hypothesis',{}).get('next_research_action')
+        if choice in ('mechanism_research','single_parameter_effect') and payload.get('domain')=='control' or choice=='control_feasibility' and payload.get('domain')=='structure':
+            return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False,
+                next=dict(tool='research_plan',action='diagnose',next_research_action='control_feasibility' if payload['domain']=='control' else 'mechanism_research'),
+                explanation='Record your new hypothesis and chosen research action in a candidate-bound diagnose before submitting the matching domain. No Worker or reference-hash entry is required for this handoff.')
         expanded,field_sources=expand_v4(spec,payload,candidate)
         try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
             return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
                 dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
-        choice=(intent or {}).get('agent_hypothesis',{}).get('next_research_action')
-        if choice in ('mechanism_research','single_parameter_effect') and q.domain!='structure' or choice=='control_feasibility' and q.domain!='control':
-            return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False)
         if q.domain=='structure':
             structure=payload['structure']
             if (q.structure.operation in ('differentiate','optimize') and
