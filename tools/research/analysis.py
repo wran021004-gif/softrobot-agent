@@ -583,13 +583,51 @@ def dispatch(host,query,key,*,guard,origin='model'):
     return recover(host)
 
 
+def record_orphan_exit(host):
+    """Trusted operator recovery of an exited contained analysis; never relaunch."""
+    from tools.service_execution import process_exit_observation
+    p=state(host).get('pending')
+    if not p or p.get('kind')!='candidate_analysis':raise ValueError('PENDING_ANALYSIS_REQUIRED')
+    folder=io_path(p['folder'])
+    if (folder/'boundary.json').exists():raise ValueError('USE_ORIGINAL_ANALYSIS_BOUNDARY')
+    recovered=folder/'recovery_boundary.json'
+    if recovered.exists():return read(recovered)
+    lifecycle=read(folder/'worker_lifecycle.json')
+    request=read(folder/'request.json');runtime=read(folder/'worker_runtime.json')
+    command=lifecycle['command']
+    row=host.store.lookup(host.run_id,p['worker_request_id'])
+    if (not row or row['receipt'] or row['execution_id']!=folder.name
+            or command[1:3]!=['-m','tools.research.execution_worker'] or len(command)!=4
+            or io_path(command[3]).resolve()!=io_path(folder/'request.json').resolve()
+            or request.get('kind')!='candidate_analysis'
+            or request.get('implementation')!=p['implementation']
+            or runtime.get('implementation')!=p['implementation']
+            or not p['started_unix']<=lifecycle['started_unix']<=time.time()):
+        raise ValueError('ORIGINAL_ANALYSIS_WORKER_IDENTITY_REQUIRED')
+    # execution_worker writes runtime only after installing its kill-on-close Job.
+    observation=process_exit_observation(lifecycle['pid'])
+    observed=time.time()
+    proof=save(host,dict(worker_request_id=p['worker_request_id'],lifecycle=lifecycle,
+        worker_runtime=runtime,process_exit=observation,observed_unix=observed,
+        containment='execution_worker installs kill-on-close Job before worker_runtime',
+        classification='Verified orphan exit; original exit code/time unknown; no relaunch'),
+        'verified_analysis_orphan_exit')
+    boundary=dict(termination_confirmed=True,timed_out=False,returncode=None,worker_started=True,
+        elapsed_s=observed-p['started_unix'],original_boundary_missing=True,recovery_source=proof,
+        elapsed_semantics='conservative upper bound through verified exit observation')
+    atomic_json(recovered,boundary)
+    return boundary
+
+
 def recover(host):
     s=state(host)
     p=s['pending']
     folder=io_path(p['folder'])
-    if not (folder/'boundary.json').exists() or not read(folder/'boundary.json')['termination_confirmed']:
+    outcome=folder/'boundary.json'
+    if not outcome.exists():outcome=folder/'recovery_boundary.json'
+    if not outcome.exists() or not read(outcome)['termination_confirmed']:
         raise ValueError('UNKNOWN_ANALYSIS_TERMINATION_RETAINS_RESERVATION; NO_RELAUNCH')
-    boundary=read(folder/'boundary.json')
+    boundary=read(outcome)
     elapsed=boundary['elapsed_s']
     value=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',task_acceptance='unmeasured',boundary=boundary)
     if p.get('dynamic_cost_bound'):

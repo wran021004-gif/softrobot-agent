@@ -199,6 +199,71 @@ class MainlineTests(unittest.TestCase):
         self.assertEqual(self.host.store.remaining()['used']['backend_solves'],1)
         self.assertIsNone(again['execution'])
 
+    def analysis_orphan_fixture(self):
+        from tools.state_io import atomic_json
+        key='analysis-orphan-fixture'
+        row,_=self.host.store.reserve(self.host.run_id,key,'fixture',self.host.actor,zero(),kind='candidate_analysis')
+        folder=self.host.store.root/'analyses'/row['execution_id'];folder.mkdir(parents=True)
+        started=time.time()-5
+        update(self.host,pending=dict(kind='candidate_analysis',worker_request_id=key,folder=str(folder),
+            request=dict(candidate=self.candidate,operation='equilibrium'),origin='fixture',implementation='fixture',
+            started_unix=started,reserved_s=0.,analysis_evaluations=1))
+        atomic_json(folder/'request.json',dict(kind='candidate_analysis',implementation='fixture'))
+        atomic_json(folder/'worker_runtime.json',dict(implementation='fixture'))
+        atomic_json(folder/'worker_lifecycle.json',dict(pid=123,started_unix=started+1,
+            command=['python','-m','tools.research.execution_worker',str(folder/'request.json')]))
+        (folder/'worker.log').write_text('offline fixture interrupted',encoding='utf-8')
+        return folder
+
+    def test_analysis_orphan_requires_original_identity(self):
+        from tools.state_io import atomic_json,read
+        folder=self.analysis_orphan_fixture();life=read(folder/'worker_lifecycle.json')
+        life['command'][-1]=str(folder/'unrelated.json');atomic_json(folder/'worker_lifecycle.json',life)
+        with patch('tools.service_execution.process_exit_observation') as probe:
+            with self.assertRaisesRegex(ValueError,'ORIGINAL_ANALYSIS_WORKER_IDENTITY_REQUIRED'):
+                analysis.record_orphan_exit(self.host)
+            probe.assert_not_called()
+        self.assertFalse((folder/'recovery_boundary.json').exists())
+
+    def test_analysis_orphan_live_or_unknown_exit_stays_pending(self):
+        folder=self.analysis_orphan_fixture();before=self.host.store.remaining()
+        for reason in ('PROCESS_STILL_PRESENT_OR_PID_REUSED','PROCESS_EXIT_UNCONFIRMED'):
+            with patch('tools.service_execution.process_exit_observation',side_effect=ValueError(reason)):
+                with self.assertRaisesRegex(ValueError,reason):analysis.record_orphan_exit(self.host)
+        with self.assertRaisesRegex(ValueError,'UNKNOWN_ANALYSIS_TERMINATION'):
+            analysis.recover(self.host)
+        self.assertFalse((folder/'recovery_boundary.json').exists())
+        self.assertEqual(before,self.host.store.remaining())
+        self.assertIsNotNone(state(self.host)['pending'])
+
+    def test_analysis_orphan_seals_incomplete_without_relaunch(self):
+        from tools.state_io import atomic_json
+        folder=self.analysis_orphan_fixture();before=self.host.store.remaining()
+        atomic_json(folder/'numerical_native_progress_001.json',dict(completed_rollouts=2,
+            cost=dict(rollouts=2,physics_steps=1200)))
+        with patch('tools.service_execution.process_exit_observation',return_value=dict(pid=123,exited=True)) as probe:
+            first=analysis.record_orphan_exit(self.host);second=analysis.record_orphan_exit(self.host)
+            self.assertEqual(first,second);self.assertEqual(probe.call_count,1)
+        self.assertIsNone(first['returncode']);self.assertFalse((folder/'boundary.json').exists())
+        with patch('tools.service_execution._run_contained') as launch:
+            result=analysis.recover(self.host);launch.assert_not_called()
+        self.assertIsNone(state(self.host)['pending'])
+        value=self.host.store.artifact(state(self.host)['analysis_results'][-1])
+        self.assertEqual(value['status'],'incomplete');self.assertEqual(value['task_acceptance'],'unmeasured')
+        self.assertEqual(value['physics_steps_lower_bound'],1200)
+        self.assertEqual(before['used']['model_calls'],self.host.store.remaining()['used']['model_calls'])
+        self.assertEqual(before['used']['backend_solves'],self.host.store.remaining()['used']['backend_solves'])
+        self.assertIsNotNone(self.host.store.lookup(self.host.run_id,'analysis-orphan-fixture')['receipt'])
+
+    def test_analysis_orphan_preserves_original_boundary(self):
+        from tools.state_io import atomic_json,read
+        folder=self.analysis_orphan_fixture();original=dict(termination_confirmed=False)
+        atomic_json(folder/'boundary.json',original)
+        with self.assertRaisesRegex(ValueError,'USE_ORIGINAL_ANALYSIS_BOUNDARY'):
+            analysis.record_orphan_exit(self.host)
+        self.assertEqual(read(folder/'boundary.json'),original)
+        self.assertFalse((folder/'recovery_boundary.json').exists())
+
     def test_disabled_time_and_environment(self):
         runtime=self.spec['runtime']
         update(self.host,rl_runs={},spec=self.spec,numerical_s=1e12)
