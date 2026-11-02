@@ -1,4 +1,4 @@
-"""Curated procedural guidance; immutable read receipts never grant science credit."""
+"""Scoped Skills and Experience patterns; read receipts never grant science credit."""
 from pathlib import Path
 from copy import deepcopy
 from tools.research.state import save,update,state,protected
@@ -111,7 +111,7 @@ def retrieval_hint(host):
         study_private_entries=[dict(entry_id=r['entry_id'],revision=r['revision'],task=r['task'],
             read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision']))
             for r in eligible if r['status']==PRIVATE_STATUS],
-        scope='Optional experience_retrieve search then exact read; procedural guidance only, never current Study evidence or permission to act. research_investigate may request experience_queries alongside saved evidence. No cases preloaded.')
+        scope='Optional Experience/Skill search then exact read; context only, never current Study evidence or permission. No bodies preloaded.')
     if 'knowledge_manifest' in s['spec']:
         latest={}
         for row in eligible:
@@ -255,7 +255,7 @@ def retrieve(host,query,*,reader='agent'):
     record=dict(query=plain(q),results=rows,supplied_startup_context=False,
         matched_count=matched,
         evidence_role='context_only',
-        reader=reader,scientific_evidence=False,scope='Historical procedural guidance, not current Study scientific evidence; transfer analytical principles only, not historical task values or control results. Cross-task validity is unverified; no acceptance or action authorization')
+        reader=reader,scientific_evidence=False,scope='Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified.')
     if q.operation=='search':record['read_guidance']='Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.'
     from tools.research.structure_intent import enabled as structure_enabled
     if structure_enabled(state(host)['spec']):
