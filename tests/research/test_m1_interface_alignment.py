@@ -105,4 +105,18 @@ class AlignmentTests(unittest.TestCase):
             import_mathematical_reference(self.h,self.c,source)
 
 
+class SignedBrakingSemanticsTests(unittest.TestCase):
+    def test_signed_range_extrema_are_preserved_without_braking_sign_conversion(self):
+        from extensions.math_analysis.mechanism_registry import observe
+        mechanics=dict(coordinates=dict(dof_order=['q'],tendon_order=['t']),
+            function_metrics=dict(instantaneous_speed_derivative_range_m_s2=[-3.,5.]),
+            time_s=.4,qpos_rad=[0.],qvel_rad_s=[1.],actual_tensions_n=[1.],input_bounds_n=[[0.,8.]])
+        maximum=observe(mechanics,dict(quantity='instantaneous_braking',reduction='maximum',goal='increase'))
+        minimum=observe(mechanics,dict(quantity='instantaneous_braking',reduction='minimum',goal='decrease'))
+        self.assertEqual(maximum['value'],5.)
+        self.assertEqual(minimum['value'],-3.)
+        self.assertEqual(maximum['target']['goal'],'increase')
+        self.assertEqual(minimum['target']['goal'],'decrease')
+
+
 if __name__=='__main__':unittest.main()

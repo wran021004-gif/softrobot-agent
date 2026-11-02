@@ -945,7 +945,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         alignment=deepcopy(compilation['method_alignment'])
                         result=value.get('result',value)
                         reference=result.get('reference')
-                        raw=host.store.artifact(reference) if reference else {}
+                        raw=host.store.artifact(reference,paths=('operation','boundary.worker_started','status')) if reference else {}
                         started=(raw.get('boundary') or {}).get('worker_started')
                         alignment.update(worker_operation=raw.get('operation') if started else None,
                             worker_started=started,scientific_result_status=raw.get('status'))

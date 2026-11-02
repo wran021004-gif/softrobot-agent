@@ -1819,6 +1819,7 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
         from tools.research.task_constraints import selected_operating_point_guidance
         result['target_semantics']=dict(mechanism_effect='PhysicalMechanismTarget object: registered quantity, applicable reduction and explicit goal.',
             reoptimized_task_capability='Task constraint string or best_found_J (finite Native T1), optimal_task_violation (affine Conic). T2 aggregates matched saved baseline/minus/plus; it generates no structures or control optimizations.')
+        result['target_semantics']['instantaneous_braking']='instantaneous_braking is the signed d(speed)/dt range [minimum, maximum], in m/s^2. Strongest deceleration corresponds to the minimum endpoint (more negative); maximum/increase raises the upper speed-up endpoint. No sign inversion or target conversion is automatic.'
         result['conic_entry']=conic_entry()
         if METHOD in view['methods']:
             guidance=selected_operating_point_guidance(host,candidate,METHOD,view['methods'][METHOD])

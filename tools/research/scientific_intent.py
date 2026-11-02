@@ -185,7 +185,8 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         from extensions.math_analysis.mechanism_registry import mechanism_ids,PRIMITIVES
         mode='passive_unilateral_equilibrium' if passive else 'active_ideal_tension'
         target=schema['$defs']['PhysicalMechanismTarget']
-        target['properties']['quantity']={'type':'string','enum':mechanism_ids(mode)}
+        target['properties']['quantity']={'type':'string','enum':mechanism_ids(mode),
+            'description':'instantaneous_braking is the signed d(speed)/dt range [minimum, maximum], in m/s^2. Strongest deceleration corresponds to the minimum endpoint (more negative); maximum/increase raises the upper speed-up endpoint. No sign inversion or target conversion is automatic.'}
         target.setdefault('allOf',[]).append(dict(
             **{'if':dict(properties=dict(quantity=dict(enum=['constraint_output_row_residual','all_tendon_output_row_residual'])),required=['quantity'])},
             then=dict(required=['projection_world'],properties=dict(projection_world=dict(type='array')))))
@@ -430,6 +431,7 @@ def method_alignment(intent,payload,method,request):
         compiled_operation=request['operation'],worker_operation=None,
         structured_request_status='not_tested' if declared and declared!=method else 'pending_worker',
         original_hypothesis_status='not_tested' if plan_method and plan_method!=method else 'pending_worker' if plan_method else 'requires_main_review',
+        signed_target_semantics=('instantaneous_braking is the signed d(speed)/dt range [minimum, maximum], in m/s^2. Strongest deceleration corresponds to the minimum endpoint (more negative); maximum/increase raises the upper speed-up endpoint. No sign inversion or target conversion is automatic.' if isinstance(body.get('target'),dict) and body['target'].get('quantity')=='instantaneous_braking' else None),
         reason='Only registered structured method identities are compared; free-text Plan method and broader hypothesis require Main review.')
 
 
