@@ -38,6 +38,55 @@ class AlignmentTests(unittest.TestCase):
             target=dict(quantity='joint_damping',reduction='norm'),
             operating_point='frozen_task_initial_state',requested_budget=1))
 
+    def test_domain_handoff_loads_actual_diagnose_schema_before_plan(self):
+        from tools.research import agent
+        directory=[dict(tool='research_plan',actions=['initialize_control','diagnose'])]
+        update(self.h,pilot={**state(self.h)['pilot'],'tool_directory':directory})
+        for current,domain,chosen in (('mechanism_research','control','control_feasibility'),
+                                     ('control_feasibility','structure','mechanism_research')):
+            with self.subTest(domain=domain):
+                with patch.object(core,'guard'):
+                    core.dispatch(self.h,diagnosis(self.c,current),'fixture-choice-'+domain)
+                agent.select_tool_route(self.h,dict(tool='research_plan',action='initialize_control'),'fixture-init-'+domain)
+                registry={k:SimpleNamespace(tool_spec={}) for k in ('research_route','research_plan')}
+                loaded=agent.load_selected_tool_schema(self.h,registry,directory)
+                self.assertEqual(loaded['plan_action'],'initialize_control')
+                ledger=self.h.store.remaining()
+                before=deepcopy(state(self.h))
+                out=compile_question(self.h,dict(version='scientific_question_v4',domain=domain,
+                    **{domain:{}}),tool_use_id='fixture-mismatch-'+domain)
+                self.assertEqual(out['reason'],'DIAGNOSE_DOMAIN_MISMATCH')
+                self.assertFalse(out['scientific_execution_started'])
+                self.assertEqual(state(self.h),before)
+                self.assertEqual(out['next']['tool'],'research_route')
+                agent.select_tool_route(self.h,out['next']['input'],'fixture-load-diagnose-'+domain)
+                loaded=agent.load_selected_tool_schema(self.h,registry,directory)
+                self.assertEqual(loaded['plan_action'],'diagnose')
+                self.assertEqual(out['then']['next_research_action'],chosen)
+                schema=registry['research_plan'].tool_spec['inputSchema']['json']
+                self.assertIn('next_research_action',schema['properties'])
+                Draft202012Validator(schema).validate(diagnosis(self.c,chosen))
+                self.assertEqual(self.h.store.remaining(),ledger)
+        self.assertEqual(state(self.h)['analysis_results'],[])
+
+    def test_loaded_plan_action_error_exposes_explicit_route_without_execution(self):
+        from tools.research import agent
+        update(self.h,pilot={**state(self.h)['pilot'],'tool_directory':[
+            dict(tool='research_plan',actions=['initialize_control','diagnose'])]})
+        schema=agent.plan_schema(['initialize_control'],decision_required=True)
+        request=dict(action='diagnose')
+        error=next(e for e in Draft202012Validator(schema).iter_errors(request)
+            if e.validator=='enum' and list(e.absolute_path)==['action'])
+        before=deepcopy(state(self.h));ledger=self.h.store.remaining()
+        feedback=agent.error_feedback(self.h,dict(name='research_plan',input=request),error,before)
+        self.assertEqual(feedback['error_code'],'TOOL_SCHEMA_ENUM')
+        self.assertEqual(feedback['field'],'action')
+        self.assertIn('research_route',feedback['expected'])
+        self.assertIn('"action": "diagnose"',feedback['expected'])
+        self.assertFalse(feedback['scientific_execution_started'])
+        self.assertEqual(state(self.h),before)
+        self.assertEqual(self.h.store.remaining(),ledger)
+
     def test_delivered_schema_discriminates_targets_and_exclusive_sources(self):
         q=self.question();schema=selected_question_schema(self.h)
         Draft202012Validator(schema).validate(q)

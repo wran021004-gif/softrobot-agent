@@ -590,6 +590,11 @@ def error_feedback(host, use, exc, before):
         if missing is not None:path.append(missing)
         field='.'.join(map(str,path)) or None
         code='TOOL_SCHEMA_'+str(exc.validator).upper();expected=exc.message
+        if field=='action' and exc.validator=='enum' and use.get('name')=='research_plan':
+            action=use.get('input',{}).get('action')
+            entry=next((r for r in s['pilot'].get('tool_directory',[]) if r['tool']=='research_plan'),{})
+            if action in entry.get('actions',[]):
+                expected='First call research_route with '+json.dumps(dict(tool='research_plan',action=action))+'. This loads the requested Plan Schema only; then submit your complete Plan with your own scientific decision. Do not submit an action against the previously loaded Schema.'
         if field=='decision.selected_candidate' and use.get('name')=='research_plan' and use.get('input',{}).get('action')=='diagnose':
             code='SELECTED_ANALYSIS_CANDIDATE_REQUIRED';message=code+': '+exc.message
         if (use.get('input',{}).get('search') or {}).get('version')=='scientific_structure_search_v1' or 'research_goal' in (use.get('input',{}).get('search') or {}):

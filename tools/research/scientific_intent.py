@@ -366,8 +366,9 @@ def compile_question(host, payload, *, tool_use_id):
         choice=(intent or {}).get('agent_hypothesis',{}).get('next_research_action')
         if choice in ('mechanism_research','single_parameter_effect') and payload.get('domain')=='control' or choice=='control_feasibility' and payload.get('domain')=='structure':
             return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False,
-                next=dict(tool='research_plan',action='diagnose',next_research_action='control_feasibility' if payload['domain']=='control' else 'mechanism_research'),
-                explanation='Record your new hypothesis and chosen research action in a candidate-bound diagnose before submitting the matching domain. No Worker or reference-hash entry is required for this handoff.')
+                next=dict(tool='research_route',input=dict(tool='research_plan',action='diagnose')),
+                then=dict(tool='research_plan',action='diagnose',next_research_action='control_feasibility' if payload['domain']=='control' else 'mechanism_research'),
+                explanation='First call research_route with the supplied input to load the diagnose Schema. Then submit your complete candidate-bound diagnose Plan with your own hypothesis and chosen next_research_action before the matching research_analysis domain. The previously loaded Plan Schema may still allow only initialize_control. Route selection performs no scientific execution and does not replace the required diagnose. No Worker or reference-hash entry is required for this handoff.')
         if payload.get('domain')=='control' and (payload.get('control') or {}).get('numerical_method')=='sampled-affine-conic-minimax-v1':
             return dict(status='needs_choice',reason='CONIC_REQUIRES_SEPARATE_AFFINE_TASK_CAPABILITY_ENTRY',
                 conic_entry=conic_entry(),scientific_execution_started=False)
