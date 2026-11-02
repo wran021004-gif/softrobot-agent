@@ -760,7 +760,21 @@ async def recover_feedback(host,agent):
             elif use['name']=='research_analysis':
                 # Recover the frozen request; a newer admission contract must not reinterpret it.
                 query=value['requested_operation']
-                if row['request_hash']!=digest(query) or any(query.get(k)!=v for k,v in use['input'].items()):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                if row['request_hash']!=digest(query):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                bindings=[(e['outputs'][0],host.store.artifact(e['outputs'][0])) for e in events
+                    if e['kind']=='analysis_request_binding' and host.store.artifact(e['outputs'][0]).get('tool_use_id')==key]
+                if bindings:
+                    from tools.research.object_choices import reference_schema,reference_choices,expand_references
+                    validated=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='analysis_request_binding_validated']
+                    for ref,binding in bindings:
+                        # Resolve only typed append-only Store aliases. Verify the
+                        # original saved binding; never compile the question again.
+                        schema=reference_schema(binding['provider_schema'],reference_choices(host,include_all=True),None)
+                        original=expand_references(use['input'],schema)
+                        if (original!=binding['raw_main_input'] or any(query.get(k)!=v for k,v in binding['full_request'].items())
+                                or not any(v.get('binding')==ref and v.get('json_schema_valid') and v.get('pydantic_valid') for v in validated)):
+                            raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+                elif any(query.get(k)!=v for k,v in use['input'].items()):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             elif use['name'] in ('research_investigate','research_route','research_recall'):
                 if row['request_hash']!=digest(use['input']):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             else:raise ValueError('SDK_RECOVERY_REQUIRES_SAVED_FEEDBACK_FOR_THIS_TOOL')
