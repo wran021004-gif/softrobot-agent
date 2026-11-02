@@ -590,14 +590,24 @@ def import_mathematical_reference(host, candidate_ref, source_ref):
     candidate_ref=plain(candidate_ref);source_ref=plain(source_ref)
     candidate=verify_candidate(host,candidate_ref)
     source=host.store.artifact(source_ref)
-    from tools.research.physical_replay import numerically_verified_source
-    if not numerically_verified_source(source):
+    from tools.research.physical_replay import numerically_verified_source,explicit_control_source
+    native_origin=None
+    if explicit_control_source(source):
+        for ref in state(host).get('analysis_results',[]):
+            raw=host.store.artifact(ref)
+            if (raw.get('status')=='computed' and raw.get('candidate')==candidate_ref
+                    and raw.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1')
+                    and raw.get('control_schedule_reference')==source_ref
+                    and raw.get('native_dynamics',{}).get('optimized_schedule')==source):
+                native_origin=ref;break
+    if not numerically_verified_source(source) and native_origin is None:
         raise ValueError('VERIFIED_MATHEMATICAL_TRAJECTORY_REQUIRED')
     binding(candidate['configuration'],source['trajectory'])
     relation=dict(candidate=candidate_ref,source=source_ref,
         mathematical_model_identity=source['trajectory']['model_identity'],
         task_identity=source['trajectory']['task_identity'],
         scope='Complete compatible tension reference; physical acceptance is separate')
+    if native_origin:relation['native_analysis']=native_origin
     existing=state(host).get('imported_mathematical_references',[])
     if relation not in existing:
         update(host,imported_mathematical_references=[*existing,relation])

@@ -523,7 +523,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         raise ValueError('EXACT_STATE_DIMENSION_MISMATCH')
     if point:
         actual=point.get('actual_time_s',point.get('time_s'))
-        if actual is None or not 0<=actual<=cfg['task']['timing']['duration_s']:
+        atol=q.protocol.horizon_alignment_atol_s
+        if actual is None or not -atol<=actual<=cfg['task']['timing']['duration_s']+atol:
             raise ValueError('EXACT_SAVED_STATE_ACTUAL_TIME_REQUIRED')
         point['remaining_task_s']=max(0.,cfg['task']['timing']['duration_s']-actual)
         if q.operation in ('linearization','controllability') and q.scoring_window_s>point['remaining_task_s']+q.protocol.horizon_alignment_atol_s:

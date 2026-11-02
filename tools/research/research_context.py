@@ -1815,6 +1815,15 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
             query=dict(reference=ref,pointer='/structure_research/structure_direction'))
             for ref,raw in list(directions.values())[::-1] if ref not in s.get('analysis_results',[]) or raw.get('candidate')!=candidate][:2])
     if not current['configuration']['task'].get('physical_problem'):
+        from tools.research.scientific_intent import conic_entry
+        from tools.research.task_constraints import selected_operating_point_guidance
+        result['target_semantics']=dict(mechanism_effect='PhysicalMechanismTarget object: registered quantity, applicable reduction and explicit goal.',
+            reoptimized_task_capability='Task constraint string or best_found_J (finite Native T1), optimal_task_violation (affine Conic). T2 aggregates matched saved baseline/minus/plus; it generates no structures or control optimizations.')
+        result['conic_entry']=conic_entry()
+        if METHOD in view['methods']:
+            guidance=selected_operating_point_guidance(host,candidate,METHOD,view['methods'][METHOD])
+            result['operating_point_sources']={k:guidance[k] for k in
+                ('available_source_references','source_selection_rule','nonzero_state_status','preparation')}
         from extensions.math_analysis.mechanism_registry import PRIMITIVES
         result['mechanism_purposes']={name:PRIMITIVES[name]['meaning'] for name in
             ('tip_jacobian','input_force_map','tip_acceleration_input_map','directional_drive',
@@ -2092,7 +2101,9 @@ def information_flow_brief(brief, delivered):
             if brief['analysis_interface']=='scientific_question_v4':
                 handoff=continuation['analysis_handoff'];parameters=handoff.pop('parameter_catalog')
                 from collections import Counter
+                from tools.research.scientific_intent import conic_entry
                 handoff.update(parameter_groups=dict(Counter(r['parameter_group'] for r in parameters if r['selectable'])),
+                    conic_entry=conic_entry(),
                     parameters_query=dict(reference=intent['candidate'],view='mathematical_capabilities',pointer='/structure_research/parameters'),
                     already_bound=['diagnose hypothesis and candidate','frozen task, protocol and condition','control treatment implied by chosen effect semantics'],
                     input_shape='Outer domain plus structure OR control. Structure chooses operation/effect_semantics/target and parameters; control chooses scope/effort. Put execution options inside the selected payload; hypothesis remains in the Plan.')
@@ -2138,7 +2149,8 @@ def information_flow_brief(brief, delivered):
             result['mechanism_research']={k:mechanism[k] for k in ('direction_query','suggestion_adopted',
                 'formal_candidate_created','generation_plan_cited_evidence','generation_relations',
                 'formal_candidate_query','historical_directions','details_query','operation_admission',
-                'mechanism_categories','mechanism_purposes','effective_parameter_groups','parameter_domains','task_scope') if k in mechanism}
+                'mechanism_categories','mechanism_purposes','effective_parameter_groups','parameter_domains','task_scope',
+                'target_semantics','conic_entry','operating_point_sources') if k in mechanism}
         control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
         task=result['study_goal'].get('task',{})
         if task.get('physical_problem'):

@@ -142,6 +142,26 @@ def native_point(host, query, configuration):
             qpos_rad=[0.]*len(physics['dofs']),qvel_rad_s=[0.]*len(physics['dofs']))
     if query.saved_state:
         point=deepcopy(host.store.artifact(query.saved_state))
+        if plain(query.saved_state) in state(host).get('analysis_results',[]):
+            result=point
+            point=deepcopy(result.get('native_dynamics',{}).get('baseline_peak_speed_state') or {})
+            if (result.get('status')!='computed' or result.get('operation') not in
+                    ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') or result.get('candidate')!=plain(query.candidate)
+                    or result.get('binding',{}).get('effective_configuration_identity')!=digest(configuration)
+                    or not point.get('integration_state') or 'state_spec' not in point):
+                raise ValueError('OWNED_COMPLETE_NATIVE_ANALYSIS_CHECKPOINT_REQUIRED')
+            from tools.research.physical_replay import binding
+            source=point.get('provenance',{}).get('source')
+            schedule=host.store.artifact(source)
+            binding(configuration,schedule['trajectory'])
+            if schedule!=result['native_dynamics']['original_schedule']:
+                raise ValueError('NATIVE_CHECKPOINT_BASELINE_CONTROL_SOURCE_MISMATCH')
+            times=schedule['trajectory']['times_s']
+            if not any(abs(t-point['actual_time_s'])<1e-12 for t in times):
+                raise ValueError('NATIVE_CHECKPOINT_TIME_OUTSIDE_SOURCE_GRID')
+            point['provenance']=dict(**point.get('provenance',{}),analysis=plain(query.saved_state),
+                pointer='/native_dynamics/baseline_peak_speed_state',
+                scope='Baseline holding-speed peak checkpoint, not optimized best or an arbitrary requested time.')
         if (point.get('candidate')!=plain(query.candidate) or
                 point.get('configuration_identity')!=digest(configuration) or
                 point.get('phase')!='interval_start_native' or point.get('input_units')!='N'):

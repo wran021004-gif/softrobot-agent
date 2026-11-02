@@ -941,6 +941,22 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                             validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
                     value=compilation if compilation is not None and compilation['status']!='ready' else analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
+                    if compilation is not None and compilation.get('method_alignment'):
+                        alignment=deepcopy(compilation['method_alignment'])
+                        result=value.get('result',value)
+                        reference=result.get('reference')
+                        raw=host.store.artifact(reference) if reference else {}
+                        started=(raw.get('boundary') or {}).get('worker_started')
+                        alignment.update(worker_operation=raw.get('operation') if started else None,
+                            worker_started=started,scientific_result_status=raw.get('status'))
+                        if alignment['worker_operation'] and alignment['worker_operation']!=alignment['compiled_operation']:
+                            alignment['structured_request_status']='not_tested'
+                            alignment['original_hypothesis_status']='not_tested'
+                        elif alignment['main_structured_method'] in (None,alignment['compiled_method']):
+                            alignment['structured_request_status']='method_executed' if started and raw.get('status')=='computed' else 'not_tested'
+                            if alignment['original_hypothesis_status']=='pending_worker':
+                                alignment['original_hypothesis_status']=alignment['structured_request_status']
+                        value['method_alignment']=alignment
                 elif kind=='rl':
                     from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -976,6 +992,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 if result.get('execution_feedback'):value['execution_feedback']=result['execution_feedback']
                 if isinstance(original,dict) and original.get('inference_assessment'):
                     value['inference_assessment']=original['inference_assessment']
+                if isinstance(original,dict) and original.get('method_alignment'):
+                    value['method_alignment']=original['method_alignment']
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']

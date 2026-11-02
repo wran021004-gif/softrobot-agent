@@ -70,6 +70,20 @@ def selected_operating_point_guidance(host, reference, method, detail):
     operation=detail['operation'];native=detail['request_template'].get('model_source')=='mujoco'
     sources=[];unavailable=[]
     if native:
+        for ref in s.get('analysis_results',[]):
+            result=host.store.artifact(ref)
+            if result.get('candidate')!=reference:continue
+            checkpoint=result.get('native_dynamics',{}).get('baseline_peak_speed_state')
+            if not checkpoint:continue
+            try:
+                point=native_point(host,SimpleNamespace(candidate=reference,saved_state=ref),cfg)
+                sources.append(dict(saved_state=ref,actual_time_s=point['actual_time_s'],
+                    checkpoint_pointer='/native_dynamics/baseline_peak_speed_state',
+                    nonzero_generalized_velocity=any(v!=0 for v in point['qvel_rad_s']),
+                    source_control=point['provenance'].get('source'),
+                    readiness='complete recorded integration state; exact restore verified inside Worker',
+                    scope=point['provenance']['scope']))
+            except (ValueError,KeyError,IndexError) as exc:unavailable.append(dict(reference=ref,reason=str(exc)))
         for ref in [*s.get('results',[]),*s.get('physical_replays',[])]:
             result=host.store.artifact(ref)
             if result.get('candidate')!=reference:continue
@@ -106,6 +120,9 @@ def selected_operating_point_guidance(host, reference, method, detail):
                 'Declared model operating point; no measured terminal state is implied.'))
     return dict(method=method,scientific_purpose=detail['scientific_purpose'],operating_points=points,
         available_source_references=sources,unavailable_sources=unavailable,
+        source_selection_rule='Choose saved_state alone OR execution plus an actual update_id; never combine. Analysis results qualify only for their explicitly recorded complete baseline peak checkpoint; control schedules and sampled tip arrays are not states.',
+        nonzero_state_status='recorded_sources_require_Main_choice_and_Worker_validation' if sources else '当前没有合法的非零速度机制工作点来源',
+        preparation=dict(tool='research_plan',action='physical_replay',scope='A complete candidate-bound measured execution provides trajectory intervals; independent Replay charges and all original prerequisites apply.'),
         key_state_selection='For speed/braking hypotheses prefer an actual recorded interval before hold, with nonzero velocity or a large measured task violation. Main reads the cited trajectory, selects its update_id, and original native_point admission verifies the source; time-zero zero-speed braking is not substituted.',
         saved_state_requirements='Exact candidate/configuration identity, model state, channel order, input units and phase; native requires integration checkpoint, reduced state cannot substitute. Unlisted states remain subject to original source admission.',
         coverage=detail['coverage'],scientific_scope=detail.get('scientific_scope'),limitations=[detail['description'],*detail['limitations']],

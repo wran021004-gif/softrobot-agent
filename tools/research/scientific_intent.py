@@ -35,6 +35,14 @@ def control_method_choices(view):
     return choices
 
 
+def conic_entry():
+    """The existing V4 Conic entry, distinct from Native control search."""
+    return dict(tool='research_plan',action='diagnose',next_research_action='mechanism_research',
+        then=dict(tool='research_analysis',input=dict(version='scientific_question_v4',domain='structure',
+            structure=dict(operation='inspect',effect_semantics='reoptimized_task_capability',target='optimal_task_violation',parameter_paths=[]))),
+        scope='Sampled affine Conic minimax at frozen initial pretension; no linearization around a selected Native schedule. After a numerically valid result, initialize_control(method=capability_sequence, response_evidence=result) imports its complete bound sequence; Native evaluation and independent Replay remain separate.')
+
+
 def explicit_actions(spec):
     return spec.get('research_decisions',{}).get('analysis_interface') in ('scientific_question_v3','scientific_question_v4')
 
@@ -57,7 +65,7 @@ def scientific_actions(spec):
             scope='One registered continuous physical parameter: fixed-input comparison, or T2 aggregation of comparable saved T1 results. No new T1 or structures.'),
         dict(scientific_goal='control_feasibility',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
-            scope='Candidate-registered Native control optimization on the current structure: Reach/Hold T1 or applicable Direct. Independent replay establishes acceptance.')]
+            scope='Candidate-registered Native control optimization on the current structure: Reach/Hold T1 or applicable Direct. Conic uses mechanism_research / inspect / reoptimized_task_capability / optimal_task_violation, not this Native control interface. Independent replay establishes acceptance.')]
     if mechanism_interface(spec):
         actions.append(dict(scientific_goal='mechanism_research',domain='structure',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
@@ -134,7 +142,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         if control_methods is not None:
             legal=[r['method'] for r in control_methods if r['selectable']]
             control['numerical_method']={'enum':[None,*legal],
-                'description':'Optional numerical identity from the current candidate catalog; Reach/Hold preserves its default T1 semantics. See analysis_handoff.control_methods for admission and scientific purpose.'}
+                'description':'Native method identity only; Reach/Hold preserves its default finite T1 semantics. Conic/SOCP uses the separate structure inspect / reoptimized_task_capability / optimal_task_violation entry in analysis_handoff.conic_entry.'}
         sources=schema['$defs']['ScientificSources']['properties']
         for name in ('comparison_candidates','t1_results'):sources.pop(name,None)
         passive=bool((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec.get('canonical_task',{}).get('physical_problem'))
@@ -190,6 +198,12 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             target['allOf'].append({'if':{'properties':{'reduction':{'const':reduction}},'required':['reduction']},
                 'then':{'properties':{'quantity':{'enum':quantities}}}})
         structure=schema['$defs']['ScientificStructureV4']
+        structure['properties']['target']['description']='mechanism_effect requires PhysicalMechanismTarget {quantity, reduction, goal}. fixed_input_response requires a task constraint or tip observable string. reoptimized_task_capability requires a task constraint string, best_found_J (finite Native T1), or optimal_task_violation (affine Conic). Never wrap task metrics in a mechanism object; these values are not interchangeable.'
+        if not passive:
+            structure['allOf'].append({'oneOf':[
+                {'properties':{'saved_state':{'type':'null'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
+                {'required':['saved_state'],'properties':{'saved_state':{'$ref':'#/$defs/EvidenceRef'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
+                {'required':['execution','update_id'],'properties':{'saved_state':{'type':'null'},'execution':{'$ref':'#/$defs/EvidenceRef'},'update_id':{'type':'integer','minimum':0}}}]})
         if candidate:
             registered=parameter_catalog(spec,candidate)
             groups=sorted({r['parameter_group'] for r in registered if r['selectable']})
@@ -353,6 +367,21 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='needs_choice',reason='DIAGNOSE_DOMAIN_MISMATCH',scientific_execution_started=False,
                 next=dict(tool='research_plan',action='diagnose',next_research_action='control_feasibility' if payload['domain']=='control' else 'mechanism_research'),
                 explanation='Record your new hypothesis and chosen research action in a candidate-bound diagnose before submitting the matching domain. No Worker or reference-hash entry is required for this handoff.')
+        if payload.get('domain')=='control' and (payload.get('control') or {}).get('numerical_method')=='sampled-affine-conic-minimax-v1':
+            return dict(status='needs_choice',reason='CONIC_REQUIRES_SEPARATE_AFFINE_TASK_CAPABILITY_ENTRY',
+                conic_entry=conic_entry(),scientific_execution_started=False)
+        body=payload.get('structure') or {}
+        if body.get('effect_semantics')=='reoptimized_task_capability' and isinstance(body.get('target'),dict):
+            return dict(status='needs_choice',reason='REOPTIMIZED_TASK_TARGET_REQUIRES_STRING',
+                choices=['best_found_J','optimal_task_violation','registered frozen task constraint ID'],
+                explanation='A PhysicalMechanismTarget object describes a mechanism quantity. Native best observed value and affine Conic optimum have distinct evidence requirements; Main must choose.',
+                scientific_execution_started=False)
+        if intent and body.get('saved_state') and (body.get('execution') or body.get('update_id') is not None):
+            from tools.research.task_constraints import mathematical_method_view,selected_operating_point_guidance
+            detail=mathematical_method_view(host,intent['candidate'])['methods']['mechanism_structure_v1']
+            return dict(status='needs_choice',reason='UNAMBIGUOUS_NATIVE_SOURCE_AND_INTERVAL_REQUIRED',
+                operating_point_sources=selected_operating_point_guidance(host,intent['candidate'],'mechanism_structure_v1',detail),
+                scientific_execution_started=False)
         expanded,field_sources=expand_v4(spec,payload,candidate)
         try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
@@ -378,13 +407,30 @@ def compile_question(host, payload, *, tool_use_id):
             compile_v1(host,expanded['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload))
         if result['status']!='ready':return result
         from tools.research.state import save
+        result['method_alignment']=method_alignment(intent,payload,result['method'],result['request'])
         result['intent_compilation']=save(host,dict(version='scientific_intent_compilation_v1',
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference'],raw_main_input=deepcopy(payload),
             provider_schema=schema,compiled_question=expanded,deterministic_field_sources=field_sources,
-            full_request=result['request'],scientific_execution_started=False),'scientific_intent_compilation')
+            full_request=result['request'],method_alignment=result['method_alignment'],scientific_execution_started=False),'scientific_intent_compilation')
         return result
     if mechanism_interface(spec):return compile_mechanism(host,payload,tool_use_id=tool_use_id)
     return compile_v1(host,payload,tool_use_id=tool_use_id,contract=question_contract(spec))
+
+
+def method_alignment(intent,payload,method,request):
+    """Compare structured identities; never infer a solver from prose."""
+    from tools.research.task_constraints import registered_analysis_method_names
+    selected=(intent.get('agent_hypothesis',{}).get('decision') or {}).get('selected_method')
+    explicit=(payload.get('control') or {}).get('numerical_method')
+    plan_method=selected if selected in registered_analysis_method_names() else None
+    declared=explicit or plan_method
+    body=payload.get(payload.get('domain')) or {}
+    return dict(plan_selected_method=selected,plan_registered_method=plan_method,main_structured_method=declared,
+        main_structured_choice={k:body[k] for k in ('operation','effect_semantics','target','numerical_method') if k in body},compiled_method=method,
+        compiled_operation=request['operation'],worker_operation=None,
+        structured_request_status='not_tested' if declared and declared!=method else 'pending_worker',
+        original_hypothesis_status='not_tested' if plan_method and plan_method!=method else 'pending_worker' if plan_method else 'requires_main_review',
+        reason='Only registered structured method identities are compared; free-text Plan method and broader hypothesis require Main review.')
 
 
 def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=ScientificQuestion):
@@ -668,7 +714,11 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     if q.operating_point=='saved_native_state' and not saved:
         return feedback('needs_prerequisite','SAVED_NATIVE_POINT_REQUIRES_REAL_OWNED_STATE_SOURCE')
     if (q.execution is None)!=(q.update_id is None) or q.saved_state and q.execution:
-        return feedback('needs_choice','UNAMBIGUOUS_NATIVE_SOURCE_AND_INTERVAL_REQUIRED')
+        from tools.research.task_constraints import selected_operating_point_guidance
+        detail=mathematical_method_view(host,intent['candidate'])['methods'][METHOD]
+        return feedback('needs_choice','UNAMBIGUOUS_NATIVE_SOURCE_AND_INTERVAL_REQUIRED',
+            alternatives=['saved_state only: exact complete owned checkpoint','execution plus actual update_id only: owned measured trace'],
+            operating_point_sources=selected_operating_point_guidance(host,intent['candidate'],METHOD,detail))
     candidate=intent['candidate'];c=verify_candidate(host,candidate);view=mathematical_method_view(host,candidate)
     rows=parameters(spec,c);by_path={r['parameter_id']:r for r in rows}
     paths=q.parameter_paths
@@ -855,11 +905,16 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
     metrics={r['constraint']['constraint_id'] for r in view['research_opportunities']['metrics'] if r.get('constraint')}
     if not isinstance(q.target,str) or q.target not in metrics|{'best_found_J','optimal_task_violation'}:
         return feedback('needs_choice','M2_REQUIRES_REGISTERED_TASK_CONSTRAINT_OR_TASK_VIOLATION',choices=sorted(metrics))
-    paths=q.parameter_paths or intent['agent_hypothesis']['decision'].get('selected_variables') or []
+    paths=(q.parameter_paths if 'parameter_paths' in q.model_fields_set else
+        intent['agent_hypothesis']['decision'].get('selected_variables') or [])
     sources=q.source_selection
     if sources.model_results and sources.t1_results:return feedback('needs_choice','SELECT_CONIC_MODELS_OR_NATIVE_T1_NOT_A_MIXED_GRADIENT')
     if q.target=='best_found_J' and sources.model_results or q.target=='optimal_task_violation' and sources.t1_results:
-        return feedback('needs_choice','NAMED_VALUE_AND_MODEL_SEMANTICS_DISAGREE')
+        return feedback('needs_choice','NAMED_VALUE_AND_MODEL_SEMANTICS_DISAGREE',
+            target_semantics=dict(best_found_J='Finite-budget Native T1 best observed value; no strict optimum.',
+                optimal_task_violation='Sampled affine Conic optimum; not a Native T1 value.'),
+            next_choice='Main must choose the intended metric and matching evidence; no automatic target conversion.',
+            conic_entry=conic_entry())
     if q.operation=='optimize':
         if q.target=='optimal_task_violation':return feedback('needs_choice','FINITE_NATIVE_SEARCH_DOES_NOT_RETURN_A_CONIC_OPTIMAL_VALUE')
         if paths:return feedback('needs_prerequisite','GENERATE_CONTRAST_THEN_OPTIMIZE_CONTROL_PER_CANDIDATE',
@@ -872,7 +927,9 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
         if q.target in metrics:legacy['focus_metric']=q.target
         return compile_v1(host,legacy,tool_use_id=tool_use_id,source_question=payload)
     if q.control_scope or q.search_strategy or sources.control_source:
-        return feedback('unsupported','SAVED_M2_REUSES_MATCHED_RECORDED_SEARCH_SETTINGS')
+        return feedback('unsupported','SAVED_M2_REUSES_MATCHED_RECORDED_SEARCH_SETTINGS',
+            next_choice='Select matched saved T1 results or Conic models only; remove the control source and new search settings. Generate contrasts and run T1 separately when evidence is missing.',
+            automatic_T1=False)
     if not paths:
         if q.operation!='inspect':return feedback('needs_choice','M2_STRUCTURAL_PARAMETER_PATH_REQUIRED')
         if q.target=='best_found_J':return feedback('needs_prerequisite','NATIVE_BEST_FOUND_REQUIRES_SAVED_T1_OR_EXPLICIT_CONTROL_SEARCH')
@@ -920,7 +977,11 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
                 (not selected or r['nonlinear_response']['t1_results'][0]==selected[0] and
                     all(ref in selected for ref in r['nonlinear_response']['t1_results']))]
             if not found:return feedback('needs_prerequisite','COMPARABLE_COMPLETED_BASELINE_MINUS_PLUS_T1_REQUIRED',
-                missing=['matched frozen task, state, absolute initial sequence, search settings and finite budget'],
+                missing=['admitted baseline/minus/plus T1 stencil for '+path,
+                    'matched frozen task, state, absolute initial sequence, search settings and finite budget'],
+                selected_evidence=[dict(reference=ref,operation=host.store.artifact(ref).get('operation'),
+                    status=host.store.artifact(ref).get('status'),
+                    recorded_t1_method=host.store.artifact(ref).get('nonlinear_capability',{}).get('method')) for ref in selected],
                 preparation=[dict(tool='research_plan',action='generate',parameter_path=path),
                     dict(tool='research_plan',action='initialize_control'),dict(tool='research_plan',action='diagnose')],
                 next_question='Choose reoptimized_task_capability/optimize for each candidate only if you decide to fund its original control search.',

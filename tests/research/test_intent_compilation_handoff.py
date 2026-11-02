@@ -115,6 +115,14 @@ class IntentCompilationHandoffTests(unittest.TestCase):
         self.assertEqual(compilations[-1]['raw_main_input'],control_question())
         ScientificQuestionV4.model_validate(compilations[-1]['compiled_question'])
         self.assertIn('control.question_type',compilations[-1]['deterministic_field_sources'])
+        delivered=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+            if e['kind']=='model_original_tool_feedback']
+        delivered=next(row for row in reversed(delivered) if row['tool_use']['name']=='research_analysis')
+        alignment=json.loads(delivered['result']['content'][0]['text'])['method_alignment']
+        self.assertEqual(alignment['compiled_operation'],seen[0].operation)
+        self.assertEqual(alignment['worker_operation'],seen[0].operation)
+        self.assertEqual(alignment['structured_request_status'],'method_executed')
+        self.assertEqual(alignment['original_hypothesis_status'],'requires_main_review')
 
     def test_structure_inspect_and_explicit_direction_use_original_worker_and_keep_scope(self):
         h,c=integrated_host()

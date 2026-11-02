@@ -93,7 +93,13 @@ def compile_search(host, value, request_id):
     compiled=plain(Plan.model_validate(compiled))
     from tools.research.search import search_problem
     from tools.research.analysis import admission
-    problem=search_problem(host,compiled['search'],admission(host,q.structure_search_effort.max_evaluations)['admitted'])
+    try:problem=search_problem(host,compiled['search'],admission(host,q.structure_search_effort.max_evaluations)['admitted'])
+    except ValueError as exc:
+        if not str(exc).startswith('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE'):raise
+        raise StructureChoiceError([dict(field='decision.selected_candidate',reason=str(exc),
+            preparation=dict(tool='research_plan',action='generate',parent=prior_ref,
+                parameters_query=dict(reference=prior_ref,view='full',pointer='/parameters'),
+                instruction='Copy the complete original generation parameters and change only the explicitly chosen coordinates. Preserve section rotations and all other fixed parameters. This search cannot seed that structure without loss.'))]) from exc
     save(host,dict(version=INTERFACE,request_id=request_id,original_plan=value,compiled_plan=compiled,
         original_admission=problem,decision_owner='Main scientific choices; program binds frozen implementation fields',
         initial_tension_source=('Main' if q.initial_tension_n is not None else 'frozen tendon_domains.pretension_n.default') if native else 'not_applicable_proxy',
