@@ -2,6 +2,7 @@
 
 No candidate creation, alternate Store, worker launcher or budget owner lives here.
 """
+from tools.research.budget import mathematical_remaining
 from copy import deepcopy
 import math
 import sys
@@ -142,7 +143,7 @@ def method_admission(spec, query, used=0, *, requirements=None):
     models=1+2*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 1
     dual=2*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 0
     count = models*branches+dual+(0 if query.optimal_sensitivity else 1)
-    remaining = max(0, spec['budgets']['mathematical_evaluations']-used)
+    remaining = mathematical_remaining(spec,used)
     reasons = []
     if requirements is None and spec.get('canonical_task'):
         reasons.append('TASK_REQUIREMENTS_REQUIRED_FOR_INTERNAL_SOLVE_ACCOUNTING')
@@ -150,7 +151,7 @@ def method_admission(spec, query, used=0, *, requirements=None):
         reasons.append('EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     environment = dependencies()
     if not environment['available']:reasons.append('OPTIONAL_CVXPY_CLARABEL_UNAVAILABLE_IN_WORKER_PYTHON')
-    if remaining < count:reasons.append('INSUFFICIENT_MATHEMATICAL_EVALUATIONS')
+    if remaining is not None and remaining < count:reasons.append('INSUFFICIENT_MATHEMATICAL_EVALUATIONS')
     return dict(status='not_applicable' if reasons else 'admissible', reasons=reasons,
         methods=required, expected_mathematical_evaluations=count, remaining_evaluations=remaining,
         model_builds=0 if query.optimal_sensitivity else 1,
@@ -175,7 +176,7 @@ def sensitivity_cost(steps, reused, remaining, *, conic_authorized=False, subpro
     totals=[kernel+missing*m['evaluations'] for m in methods] if missing is not None else None
     return dict(required_models=required,validated_reusable_models=reused,missing_models=missing,
         kernel_evaluations=kernel,kernel_subproblems_per_model=subproblems,preparation_methods=methods,remaining_total_range=totals,
-        budget_sufficient=None if totals is None else remaining>=max(totals),
+        budget_sufficient=None if totals is None else remaining is None or remaining>=max(totals),
         wall_cost='unknown',other_budgets='Candidate generation, Provider and physical launches are separate.',
         assumptions='Preparation methods require their own task/model admission; no automatic generation or solve.')
 
@@ -188,7 +189,7 @@ def candidate_methods(host, reference, *, analysis_metadata=None):
     from tools.research.task_constraints import describe_analysis_requirements
     requirements=describe_analysis_requirements(candidate['configuration'],{})
     branches=conic_subproblems(requirements)
-    methods=spec.get('mathematical_methods',{});remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+    methods=spec.get('mathematical_methods',{});remaining=mathematical_remaining(spec,s.get('mathematical_evaluations',0))
     variables=(spec.get('family_sensitivity_variables',{}).get('variables',[]) if spec.get('start_mode')=='family_space'
         else [p for p in spec['allowed_parameters'] if p.endswith(('.length_m','.young_pa'))])
     if spec.get('family_sensitivity_variables',{}).get('version')=='family_sensitivity_v2':
@@ -251,7 +252,7 @@ def candidate_methods(host, reference, *, analysis_metadata=None):
     reasons=[]
     if not all(methods.get(m) for m in (CONIC,SENSITIVITY)):reasons.append('method_not_authorized')
     if not dependencies()['available']:reasons.append('worker_dependency_unavailable')
-    if remaining<3*branches+2:reasons.append('insufficient_budget')
+    if remaining is not None and remaining<3*branches+2:reasons.append('insufficient_budget')
     if not variables:reasons.append('no_authorized_continuous_variable')
     if not any(r['ready_stencils'] for r in rows):reasons.append('missing_validated_model_stencil')
     return dict(method=SENSITIVITY,status='executable' if not reasons and any(r['status']=='executable' for r in rows) else 'not_applicable',

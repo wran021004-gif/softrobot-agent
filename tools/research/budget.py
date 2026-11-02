@@ -3,6 +3,17 @@ from tools.platform_store import plain
 from contextlib import contextmanager
 
 
+def mathematical_remaining(spec, used=0):
+    """None is an authorized absence of a count quota; usage is still recorded."""
+    limit=spec['budgets']['mathematical_evaluations']
+    return None if limit is None else max(0,limit-used)
+
+
+def mathematics_fits(spec, used=0, requested=1):
+    remaining=mathematical_remaining(spec,used)
+    return remaining is None or remaining>=requested
+
+
 def provider_allowance(host, db=None):
     """One count boundary; frozen legacy Studies retain the pre-debit margin.
 
@@ -111,7 +122,8 @@ def decision_budget(host):
         science_budget=dict(remaining_physical=backend_capacity(host),
             owning_study=host.run_id,
             charged_mathematical_evaluations=s.get('mathematical_evaluations',0),
-            remaining_mathematical=max(0,b['mathematical_evaluations']-s.get('mathematical_evaluations',0)),
+            mathematical_quota_scope='No cumulative mathematical count quota; actual costs remain recorded.' if b['mathematical_evaluations'] is None else 'Frozen cumulative mathematical count quota.',
+            remaining_mathematical=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0)),
             remaining_full_replays=max(0,(s['spec'].get('physical_replay_limit') if s['spec'].get('physical_replay_limit') is not None else b['physical_launches'])-s.get('physical_replay_launches',0)),
             available_full_replays=capacity(host,b['physical_launches'],root_operation=True,route='fixed_tension')['admitted'],
             full_replay_scope='remaining_full_replays is the method sublimit, not an additional shared pool. available_full_replays also applies shared launches, confirmation reserve and public-operation capacity; full request admission still applies.',
@@ -119,6 +131,7 @@ def decision_budget(host):
                 declared_callback_maximum=b['physical_launches']+1,
                 scope='Frozen request cap, not remaining launches. Native analysis callbacks use native_control_limits and the mathematical allowance instead.'),
             native=dict(per_request_control_limits=s['spec'].get('native_control_limits'),
+                research_effort=('Mathematical search has no cumulative count quota. Main may deepen control optimization, change parameterization or choose another legal method; finite search failure is not structural infeasibility. Main chooses useful effort, not necessarily the maximum.' if b['mathematical_evaluations'] is None else None),
                 accounting_scope='Current Study registered analysis_results only; imported historical results and proposed actions are excluded.',
                 recorded_rollouts=sum(v['rollouts'] for _,v,_,_ in native_costs if v.get('rollouts') is not None),
                 recorded_physics_steps=sum(v['physics_steps'] for _,v,_,_ in native_costs if v.get('physics_steps') is not None),
@@ -148,7 +161,7 @@ def science_fits(host):
         (not capabilities and spec.get('start_mode')=='family_space'
             and 'generate' in spec.get('allowed_plan_actions',[])
             and set(spec['allowed_plan_actions'])<={'generate','stop'} and not s.get('candidates')) or
-        ('analysis' in capabilities and s.get('mathematical_evaluations',0)<b['mathematical_evaluations']) or
+        ('analysis' in capabilities and mathematics_fits(spec,s.get('mathematical_evaluations',0))) or
         ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
         ('physical_replay' in capabilities and backend>=1 and s.get('physical_replay_launches',0)<
             (spec.get('physical_replay_limit') if spec.get('physical_replay_limit') is not None else b['physical_launches'])) or

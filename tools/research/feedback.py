@@ -134,6 +134,42 @@ def search_feedback(host, reference):
         fixed['search_scope']={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','initial_segment_count','initial_tendon_count','initial_span_strategy','span_strategies','section_types','bounds','step','minimum_step','initial_tension_n','previous_candidate_ref','objective','evaluation_mode','operating_point','screening_fidelity','max_proposals','max_evaluations','stop_score') if k in query}
         fixed['comparison_scope']=result.get('comparison_scope')
         fixed['search_scope']['resolved_domains']=checkpoint['problem'].get('domains')
+        plan=host.store.artifact(result['requesting_plan']).get('original_plan',{}) if result.get('requesting_plan') else {}
+        fixed['research_question']=dict(hypothesis=plan.get('hypothesis'),
+            selected_parameter_groups=query['variable_groups'],
+            expected_observation=plan.get('expected_observation'),weakening_observation=plan.get('weakening_observation'))
+        # Re-project immutable results, including later control improvements;
+        # task/model/profile bindings prevent borrowing another experiment.
+        observations={}
+        def scope(c):
+            key=tuple(c.get(k) for k in ('physical_design_identity','task_identity','profile_identity','numerical_model_identity'))
+            return key if all(key) else ('candidate',c.get('identity'))
+        for ref in state(host).get('analysis_results',[]):
+            a=host.store.artifact(ref);opt=(a.get('native_dynamics') or {}).get('optimization') or {}
+            j=(opt.get('best') or {}).get('measure',{}).get('signed_maximum_excess')
+            if a.get('status')!='computed' or not isinstance(j,(float,int)) or not math.isfinite(j):continue
+            c=host.store.artifact(a['candidate']);key=scope(c)
+            if key not in observations or j<observations[key][0]:observations[key]=(j,ref,a)
+        fixed['structures']=[]
+        for row in result['evaluated']:
+            conditions={}
+            for cid,v in row.get('evidence',{}).get('conditions',{}).items():
+                ref=v.get('analysis');a=host.store.artifact(ref) if ref else {}
+                c=host.store.artifact(a['candidate']) if a.get('candidate') else {}
+                best_j,best_ref,best_a=observations.get(scope(c),(v.get('J'),ref,a))
+                opt=(best_a.get('native_dynamics') or {}).get('optimization') or {}
+                conditions[cid]=dict(candidate=best_a.get('candidate',v.get('candidate')),analysis=best_ref,
+                    best_J=best_j,status=best_a.get('status',v.get('status')),
+                    control_source=best_a.get('control_schedule_reference',v.get('control_source')),
+                    stop_reason=opt.get('stop_reason',v.get('stop_reason')),
+                    callbacks=(best_a.get('nonlinear_capability') or {}).get('callbacks',v.get('callbacks')),
+                    iterations_started=opt.get('iterations_started',v.get('iterations_started')))
+            fixed['structures'].append(dict(candidate=row.get('evidence',{}).get('candidate'),
+                segment_count=row['parameters']['segment_count'],tendon_count=row['parameters']['tendon_count'],
+                changed_coordinates=(row.get('lineage') or {}).get('variables_or_topology_changed',[]),conditions=conditions,
+                unmeasured_conditions=[c['condition_id'] for c in state(host)['spec'].get('task_conditions',[]) if
+                    c['condition_id'] not in conditions or conditions[c['condition_id']]['status']!='computed']))
+        fixed['unsearched_parameter_groups']=[g for g in state(host)['spec']['family_search']['variable_groups'] if g not in query['variable_groups']]
         if not fixed['best_mathematical']:fixed['control_search_settings']=query.get('control_settings')
         fixed['cost']=dict(known_attributed_numerical_s=sum(row['mathematical_numerical_s'] for row in result['evaluated'] if row.get('mathematical_numerical_s') is not None),
             rows_without_numerical_cost=sum(row.get('mathematical_numerical_s') is None for row in result['evaluated']),
@@ -170,7 +206,10 @@ def native_mathematical_fact(host, reference, *, control_source=None, condition_
         scope='Registration only; original inference, task, model and candidate admission still applies. No independent acceptance or formal reading credit.')
     profile=candidate.get('profile_identity');current=state(host)['profile']['identity']
     return dict(reference=reference,candidate=value['candidate'],control_source=control_source or value.get('control_schedule_reference'),
-        condition_id=condition_id,status=value['status'],J=measure.get('signed_maximum_excess'),
+        structure={k:candidate.get('parameters',{}).get(k) for k in ('segment_count','tendon_count')},
+        condition_id=condition_id or candidate.get('condition_id') or next((c['condition_id'] for c in state(host)['spec'].get('task_conditions',[])),None),
+        stop_reason=optimization.get('stop_reason'),iterations_started=optimization.get('iterations_started'),
+        callbacks=(value.get('nonlinear_capability') or {}).get('callbacks'),status=value['status'],J=measure.get('signed_maximum_excess'),
         metrics=metrics,valid_complete=bool(value['status']=='computed' and (best.get('task_gap') or {}).get('valid_complete')),
         method=value.get('operation'),model_source=request.get('model_source'),task_identity=binding.get('canonical_task_identity') or binding.get('task_identity'),
         model_identity=value.get('model_identity'),profile_identity=profile,

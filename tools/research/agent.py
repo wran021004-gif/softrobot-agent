@@ -1,4 +1,5 @@
 """Production Strands harness, accounted provider transport and persisted conversation."""
+from tools.research.budget import mathematics_fits
 import asyncio
 from copy import deepcopy
 import json, time
@@ -343,7 +344,7 @@ def load_selected_tool_schema(host, registry, directory):
             if bounded_evidence_enabled(s['spec']) and action not in entry['actions']:action=entry['actions'][0]
             if (chosen not in entry['actions'] and 'diagnose' in entry['actions'] and not protected(host)
                     and 'analysis' in s['spec'].get('capabilities',[])
-                    and s['spec']['budgets']['mathematical_evaluations']>s.get('mathematical_evaluations',0)):
+                    and mathematics_fits(s['spec'],s.get('mathematical_evaluations',0))):
                 from tools.research.research_context import decision_candidate,research_intent
                 from tools.research.task_constraints import mathematical_method_view
                 candidate=decision_candidate(host,{},research_intent(host))
@@ -1220,7 +1221,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         'inputSchema':{'json':selected_analysis_schema(method,detail,bound=bound_analysis_enabled(s['spec']))}}
                     agent.tool_registry.registry['research_analysis']=tool
                 else:agent.tool_registry.registry.pop('research_analysis',None)
-            if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
+            if not enabled(s['spec'],'analysis') or not mathematics_fits(s['spec'],s.get('mathematical_evaluations',0)):
                 agent.tool_registry.registry.pop('research_analysis',None)
             # Provider readiness is checked per selected model by analysis.dispatch;
             # unavailable MATLAB must not hide authorized native MuJoCo mathematics.

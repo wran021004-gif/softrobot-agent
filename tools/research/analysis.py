@@ -1,4 +1,5 @@
 """Candidate-bound mathematics, persistence and cumulative execution accounting."""
+from tools.research.budget import mathematical_remaining, mathematics_fits
 from copy import deepcopy
 import json
 import math
@@ -325,8 +326,9 @@ def scoped_result(result, requirements, applicability, query):
 
 def admission(host,requested=1,engineering=False):
     s=state(host)
-    count=max(0,min(requested,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
-    return dict(admitted=count,requested=requested,reservation_s=0.,timeout_s=None,remaining_numerical_s=None)
+    remaining=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0))
+    count=requested if remaining is None else max(0,min(requested,remaining))
+    return dict(admitted=count,requested=requested,reservation_s=0.,timeout_s=s['spec'].get('analysis_cap_s'),remaining_numerical_s=None)
 
 
 def dispatch(host,query,key,*,guard,origin='model'):
@@ -538,7 +540,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
         if episodes and episodes>backend_capacity(host,db):raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
-        if current.get('success_gate') or current.get('mathematical_evaluations',0)+count>current['spec']['budgets']['mathematical_evaluations']:
+        if current.get('success_gate') or not mathematics_fits(current['spec'],current.get('mathematical_evaluations',0),count):
             raise ValueError('MATHEMATICAL_COUNT_OR_SUCCESS_GATE')
         current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+count
         current['numerical_reserved_s']+=reserve
@@ -568,7 +570,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     started=time.perf_counter()
     try:
         with io_path(folder/'worker.log').open('w',encoding='utf8') as log:
-            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,None,
+            done=_run_contained([executable,'-m','tools.research.execution_worker',str(folder/'request.json')],log,fit['timeout_s'],
                 lifecycle_path=folder/'worker_lifecycle.json')
         boundary=dict(termination_confirmed=True,returncode=done.returncode,timed_out=False,worker_started=True)
     except subprocess.TimeoutExpired as exc:

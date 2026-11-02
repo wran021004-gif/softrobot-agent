@@ -365,7 +365,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         if grant and (grant['method']!='bounded_mixed_coordinate_v1' or
                 not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
                 any(not family_space['executable_tendon_count_bounds'][0]<=v<=family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
-                not all(type(grant[k]) is int and 1<=grant[k]<=128 for k in ('max_proposals','max_evaluations'))):
+                not all(type(grant[k]) is int and grant[k]>=1 for k in ('max_proposals','max_evaluations'))):
             raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
         if grant and 'evaluation_modes' in grant and (not grant['evaluation_modes'] or
                 not set(grant['evaluation_modes'])<={'mathematical_proxy','mujoco_control'}):
@@ -442,8 +442,10 @@ def resolve(path, profile=None, *, backend_profile=None):
     count_keys = ('provider_requests', 'protected_provider_requests', 'public_operations',
         'protected_public_operations', 'physical_launches', 'local_solves', 'offline_nlp',
         'bdf_replays', 'mathematical_evaluations')
-    if any(type(b[k]) is not int or b[k] < 0 for k in count_keys):
+    if any((b[k] is not None or k!='mathematical_evaluations') and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
         raise ValueError('FINITE_NONNEGATIVE_COUNT_REQUIRED')
+    if b['mathematical_evaluations'] is None and (study['mode']!='formal_research' or 'analysis' not in study['capabilities']):
+        raise ValueError('UNMETERED_MATHEMATICS_REQUIRES_FORMAL_ANALYSIS_SCOPE')
     if study['mode']=='engineering_investigation':
         if (study['capabilities']!=['investigation']
                 or not set(study['allowed_plan_actions'])<= {'diagnose','stop'}
@@ -455,7 +457,12 @@ def resolve(path, profile=None, *, backend_profile=None):
         if b[reserved] > b[total]:
             raise ValueError('PROTECTION_IS_PART_OF_TOTAL: ' + reserved)
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
-    time_values += [study[k] for k in ('analysis_cap_s', 'nmpc_execution_cap_s', 'standalone_watchdog_s')]
+    analysis_timeout=study['analysis_cap_s']
+    if b['mathematical_evaluations'] is None:
+        if not isinstance(analysis_timeout,(int,float)) or not 0<analysis_timeout<=3600:
+            raise ValueError('FINITE_ENGINEERING_ANALYSIS_WATCHDOG_REQUIRED')
+    else:time_values.append(analysis_timeout)
+    time_values += [study[k] for k in ('nmpc_execution_cap_s', 'standalone_watchdog_s')]
     time_values += list(study['execution_allowances'].values())
     time_values += [runtime[k] for k in ('rl_evaluation_hard_cap_s', 'rl_diagnostic_hard_cap_s')]
     if any(v is not None for v in time_values):
@@ -553,6 +560,9 @@ def resolve(path, profile=None, *, backend_profile=None):
             training='initialization and continuation share admitted stage count; exact recovery retains stage',
             steps='ceil requested positive steps to a complete rollout before admission; declared action ceilings apply when present',
             protection='requests and operations reserved within totals for evaluation, evidence and closeout'))
+    if b['mathematical_evaluations'] is None:
+        study['budget_semantics'].update(mathematical_evaluations='usage_only_no_count_quota',
+            engineering_worker_timeout_s=study['analysis_cap_s'])
     if family_mode:
         initial=cfg['task']['initializer']['parameters']['data']
         if initial['unspecified']!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial[key].values()):

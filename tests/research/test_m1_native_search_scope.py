@@ -93,9 +93,39 @@ class M1NativeSearchScopeTests(unittest.TestCase):
                 sources += [v['control_source'] for v in row['evidence']['conditions'].values()]
             self.assertEqual(len({r['artifact_id'] for r in sources}),6)
             self.assertIn('comparison_scope',out['result']);self.assertFalse(state(h).get('success_gate'));self.assertFalse(state(h)['physical_replays'])
+            from tools.research.feedback import search_feedback
+            delivery=search_feedback(h,out['reference'])['fixed_result']
+            self.assertEqual(len(delivery['structures']),2)
+            for row in delivery['structures']:
+                self.assertEqual((row['segment_count'],row['tendon_count']),(3,4))
+                self.assertEqual(len(row['conditions']),3);self.assertEqual(row['unmeasured_conditions'],[])
+                for cid,item in row['conditions'].items():
+                    raw=h.store.artifact(item['analysis'])
+                    self.assertEqual(item['candidate'],raw['candidate'])
+                    self.assertEqual(item['control_source'],raw['control_schedule_reference'])
+            self.assertEqual(delivery['research_question']['selected_parameter_groups'],['lengths'])
+            self.assertIn('tendon_count',delivery['unsearched_parameter_groups'])
             with patch.object(analysis,'dispatch',side_effect=AssertionError('NO_RECOMPUTE')):
                 again=search.run_search(h,p['search'],'same-query-new-id',guard=lambda *a:None,execute=None,capacity=None)
             self.assertTrue(again['reused']);self.assertEqual(state(h)['mathematical_evaluations'],6)
+
+    def test_delivery_updates_only_matching_structure_condition_from_saved_improvement(self):
+        from tools.research.feedback import search_feedback
+        with scoped_fixture() as h:
+            p=compile_search(h,proposal(),'delivery-improvement')
+            with patch.object(analysis,'dispatch',side_effect=native_fixture.NativeMixedSearchTests().scored):
+                out=search.run_search(h,p['search'],'delivery-improvement',guard=lambda *a:None,execute=None,capacity=None)
+            raw=out['result']['evaluated'][0]['evidence']['conditions']['negative_low']['analysis']
+            value=deepcopy(h.store.artifact(raw));value['native_dynamics']['optimization']=dict(best=dict(measure=dict(signed_maximum_excess=-.5)))
+            improved=save(h,value,'synthetic_delivery_improvement')
+            update(h,analysis_results=[*state(h)['analysis_results'],improved])
+            before=h.store.remaining();count=state(h)['mathematical_evaluations']
+            rows=search_feedback(h,out['reference'])['fixed_result']['structures']
+            self.assertEqual(rows[0]['conditions']['negative_low']['analysis'],improved)
+            self.assertEqual(rows[0]['conditions']['negative_low']['best_J'],-.5)
+            self.assertNotEqual(rows[1]['conditions']['negative_low']['analysis'],improved)
+            self.assertNotEqual(rows[0]['conditions']['positive_high']['analysis'],improved)
+            self.assertEqual(h.store.remaining(),before);self.assertEqual(state(h)['mathematical_evaluations'],count)
 
     def test_main_selects_mixed_start_independently_of_list_order(self):
         with scoped_fixture() as h:
@@ -160,6 +190,11 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             self.assertEqual(len(state(h)['search_results']),1)
             packet=json.loads(sent[-1]['messages'][-1]['content'].split('\n',1)[1])['research']
             self.assertIn('search',json.dumps(packet));self.assertEqual(state(h)['mathematical_evaluations'],6)
+            structures=packet['scientific_results']['latest_search']['fixed_result']['structures']
+            self.assertEqual(len(structures),2)
+            self.assertEqual(structures[0]['tendon_count'],4)
+            self.assertRegex(structures[0]['conditions']['negative_low']['candidate'],r'^candidate_')
+            self.assertRegex(structures[0]['conditions']['negative_low']['control_source'],r'^evidence_')
 
 
 if __name__=='__main__':unittest.main()

@@ -1,4 +1,5 @@
 """Pure task translation and existing local-tool applicability; no Store or solver."""
+from tools.research.budget import mathematical_remaining
 from copy import deepcopy
 from tools.research.scientific_intent import mechanism_interface
 from schemas.platform import Binding, Payload
@@ -137,7 +138,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     bound_sources=legal_control_sources(host,reference) if binding_error is None else []
     from tools.research.config import frozen_analysis_protocol
     protocol=frozen_analysis_protocol(spec,c)
-    remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+    remaining=mathematical_remaining(spec,s.get('mathematical_evaluations',0))
     rows=analysis_capabilities(cfg,requirements,protocol,
         remaining_evaluations=remaining,mathematical_methods={CONIC:spec.get('mathematical_methods',{}).get(CONIC),
             SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})
@@ -252,7 +253,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
             if issubclass(question_contract(spec),ScientificQuestionV2):
                 methods[key]['cost_scope']+=' control_search_effort independently selects method, knot_count, iterations and callback cap. Uniform knot times cover the chosen adjustment window; evaluation covers the full frozen task. Omitted iterations=min(callback cap, original/Study iteration caps); original early termination still applies.'
             else:
-                methods[key]['cost_scope']+=' ScientificQuestion full_task uses two endpoint knots and original default 16 iterations. For richer existing search, research_plan(action=control_search) accepts LocalControlSearchSettings with up to four knots and 100 iterations, under the frozen grant; its callbacks are independent physical replays, with backend charges, rather than Native mathematical rollouts. Neither interface changes task constraints or makes focus_metric an objective override.'
+                methods[key]['cost_scope']+=' Explicit control_search_effort selects parameterization and finite effort within the current frozen grant. Legacy fixed-quota ScientificQuestion defaults retain their historical settings; unmetered mathematics defaults iterations to the chosen callback/Study limit. research_plan(control_search) uses independent physical replay callbacks with separate backend charges. Neither interface changes task constraints or makes focus_metric an objective override.'
             methods[key]['supported_task_families']=['task.reach','task.tracking:timed','task.position_tool_axis','task.oriented_tracking']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']
             methods[key]['kernel_supported']=row['planning_status']!='unsupported'
@@ -307,9 +308,9 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
                     item['missing']=[m for m in item['missing'] if m!='three comparable completed T1 results']
             item.update(registered=True,authorized=item['formal_execution_authorized'],
                 applicable=bool(item.get('ready_requests')),executable=bool(item.get('ready_requests') and
-                    item['formal_execution_authorized'] and remaining>=1 and not closed))
+                    item['formal_execution_authorized'] and (remaining is None or remaining>=1) and not closed))
             item['planning_status']=('unauthorized' if not item['authorized'] else 'blocked' if closed else
-                'insufficient_budget' if remaining<1 else 'ready' if item['executable'] else 'requires_comparable_t1_results')
+                'insufficient_budget' if remaining is not None and remaining<1 else 'ready' if item['executable'] else 'requires_comparable_t1_results')
             if item.get('ready_requests'):
                 item['applicability'].update(status='applicable',parameter_requirements=[])
             item['execution_status']='conditional_on_admission' if item['executable'] else 'blocked'
@@ -337,7 +338,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
                 operating_point='standardized_initial_pretension',protocol=protocol),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+METHOD))
         if cfg['task'].get('physical_problem'):
-            ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and remaining>=1
+            ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and (remaining is None or remaining>=1)
             item.update(planning_status='ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
                 description='Shared geometry, qualified unilateral equilibrium, active sets and re-equilibrated structural response. No dynamic task acceptance.',
                 missing=[] if ready else ['original_scope_budget_or_candidate_admission'],

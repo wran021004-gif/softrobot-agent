@@ -1,4 +1,5 @@
 """Compact trusted research views and declared archive import using the existing Store."""
+from tools.research.budget import mathematical_remaining
 from copy import deepcopy
 from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
 import json
@@ -257,7 +258,7 @@ def legacy_context(host, *, evidence_references=None):
         method_limits=dict(mathematical_evaluations=spec['budgets']['mathematical_evaluations'],offline_nlp=spec['budgets']['offline_nlp'],
             bdf_replays=spec['budgets']['bdf_replays'],nmpc=spec['nmpc_limits'],rl=spec['rl_limits']),
         method_used={k:s.get(k,0) for k in ('mathematical_evaluations','offline_nlp','bdf_replays','nmpc_launches','admitted_training_stages','physical_replay_launches')},
-        method_remaining={k:max(0,total-used) for k,total,used in (
+        method_remaining={k:None if total is None else max(0,total-used) for k,total,used in (
             ('mathematical_evaluations',spec['budgets']['mathematical_evaluations'],s.get('mathematical_evaluations',0)),
             ('offline_nlp',spec['budgets']['offline_nlp'],s.get('offline_nlp',0)),('bdf_replays',spec['budgets']['bdf_replays'],s.get('bdf_replays',0)),
             ('nmpc',spec['nmpc_limits']['executions'],s.get('nmpc_launches',0)),('rl_stages',spec['rl_limits']['training_stages'],s.get('admitted_training_stages',0)))},
@@ -1293,6 +1294,8 @@ def current_research_state(host, brief, intent, trace, coverage=None, *, method_
     from tools.research.state import protected,readable_results
     provenance_readable=ref and (not (closeout or protected(host)) or ref in readable_results(s,host))
     return dict(phase=phase,object=dict(candidate=ref,origin=owner,
+            structure={k:host.store.artifact(ref).get('parameters',{}).get(k) for k in ('segment_count','tendon_count')} if ref else None,
+            condition_id=host.store.artifact(ref).get('condition_id') or next((c['condition_id'] for c in s['spec'].get('task_conditions',[])),None) if ref else None,
             provenance_query=dict(reference=ref,view='full',pointer='/provenance') if provenance_readable else None,
             compiled=bool(candidate.get('compiled')),control_initialized=bool(candidate.get('control_initialized')),
             mathematical_result=bool(candidate.get('mathematically_evaluated')),
@@ -1575,7 +1578,7 @@ def agent_decision_brief(host):
         brief['structure_actions']=request_guidance(s['spec'])
         if 'mujoco_control' in s['spec']['family_search'].get('evaluation_modes',[]):
             conditions=len(s['spec'].get('task_conditions',[])) or 1
-            remaining=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+            remaining=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0))
             brief['structure_actions']['native_budget']=dict(remaining_analysis_entries=remaining, analysis_entries_per_structure=conditions,
                 per_condition_control_limits=s['spec'].get('native_control_limits'), scope='Shared analysis allowance; independent replay has a separate physical budget.')
         from tools.research.core import initial_structure_action
@@ -1844,7 +1847,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
             actions[-1]['read_only_investigation']=dict(tool='research_investigate',scientific_execution=False)
             actions[-1]['analysis_selection']=dict(
                 status='requires_owned_candidate' if not candidate.get('candidate') else
-                    'insufficient_mathematical_budget' if science.get('remaining_mathematical',0)<1 else 'requires_registered_method_and_authorization',
+                    'insufficient_mathematical_budget' if (science.get('remaining_mathematical',0) is not None and science.get('remaining_mathematical',0)<1) else 'requires_registered_method_and_authorization',
                 candidate_query=candidate.get('details_query'),
                 methods_query=dict(reference=candidate['candidate'],view='mathematical_capabilities',pointer='/methods') if candidate.get('candidate') else None,
                 required_fields=['decision.selected_candidate','decision.selected_method'],
@@ -1852,7 +1855,7 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
     if 'analysis' in (brief.get('capabilities') or []):
         science=(brief.get('budget') or {}).get('science_budget') or {}
         closed=(brief.get('budget') or {}).get('closeout',{}).get('next_request_will_protect')
-        blocked=closed or science.get('remaining_mathematical',0)<1
+        blocked=closed or (science.get('remaining_mathematical',0) is not None and science.get('remaining_mathematical',0)<1)
         actions.append(dict(action='research_analysis',status='blocked' if blocked else 'conditional',
             methods_at='mathematical_research',
             reason=('Protected closeout or no mathematical allowance.' if blocked else

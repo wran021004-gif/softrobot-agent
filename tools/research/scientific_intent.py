@@ -2,6 +2,7 @@
 
 No optimizer, state machine, source ledger or execution admission lives here.
 """
+from tools.research.budget import mathematical_remaining, mathematics_fits
 from copy import deepcopy
 
 from tools.platform_store import plain
@@ -242,7 +243,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
                 'then':{'required':['comparison_load_conditions'],'properties':{'comparison_load_conditions':{'minItems':1}}}})
     if issubclass(question_contract(spec),ScientificQuestionV2):
         for key in ('search_strategy','requested_budget'):schema['properties'].pop(key)
-        schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort specifies 2–4 uniform knots; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
+        schema['$defs']['ScientificControlScope']['properties']['mode']['description']='Choose the full frozen task or a local correction window. control_search_effort selects uniform knots within the frozen Native grant; local corrections require interior knots and zero endpoint corrections. Evaluation always covers the full frozen task.'
     if question_contract(spec) is ScientificQuestionV3:
         schema['properties'].pop('parameter_paths')
         schema['properties']['effect_semantics']['description']='fixed_input_response compares unchanged input; reoptimized_task_capability aggregates already saved comparable T1 results and performs no new control or structure search.'
@@ -529,6 +530,8 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
             active = list(range(channels,2*channels))
         settings = dict(version='local_control_search_v2',method=q.search_strategy,knots_s=knots,
             correction_window_s=[0.,duration],evaluation_requests=budget)
+        if spec['budgets']['mathematical_evaluations'] is None:
+            settings['iterations']=min(budget,spec.get('native_control_limits',{}).get('iterations',10000))
         if active is not None:settings['active_coefficients']=active
         if effort:
             try:
@@ -699,7 +702,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         if q.operation=='optimize':return feedback('unsupported','SHORT_RESPONSE_DOES_NOT_OPTIMIZE_A_STRUCTURE_OR_CONTROL')
         method='short_input_response_v1' if q.operation=='inspect' else 'fixed_input_structure_v1'
         needed=1 if method=='short_input_response_v1' else 1+max(1,len(q.comparison_candidates))
-        if budget<needed or spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)<needed:
+        if budget<needed or not mathematics_fits(spec,s.get('mathematical_evaluations',0),needed):
             return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed)
         if method=='fixed_input_structure_v1':
             if len(paths)!=1:return feedback('needs_choice','SHORT_STRUCTURE_RESPONSE_REQUIRES_ONE_REGISTERED_PATH')
@@ -732,15 +735,15 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     try:context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
     except MechanismBudgetError as exc:
         return feedback('blocked',str(exc),minimum_evaluations=exc.minimum_evaluations,
-            requested_evaluations=budget,remaining_evaluations=spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0),
+            requested_evaluations=budget,remaining_evaluations=mathematical_remaining(spec,s.get('mathematical_evaluations',0)),
             cost_dependencies=exc.cost_dependencies,
             next_choice='Main must reduce the question or choose a legal cap within the remaining budget; no automatic increase.')
     except ValueError as exc:return feedback('blocked' if str(exc).startswith('MECHANISM_QUESTION_BUDGET') else 'unsupported',str(exc))
     needed=context['evaluations']
-    if spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)<needed:
+    if not mathematics_fits(spec,s.get('mathematical_evaluations',0),needed):
         return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed,
             minimum_evaluations=context['minimum_evaluations'],requested_evaluations=budget,
-            remaining_evaluations=spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0),
+            remaining_evaluations=mathematical_remaining(spec,s.get('mathematical_evaluations',0)),
             cost_dependencies=context['cost_dependencies'],next_choice='Main must reduce the question to fit the remaining budget.')
     compiled={**point_fields,'mechanism_study':plain(study)}
     if q.tensions_n is not None:compiled['native']=dict(tensions_n=q.tensions_n)
@@ -780,7 +783,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         detail=mathematical_method_view(host,intent['candidate'])['methods'][METHOD]
     except ValueError as exc:return fail(str(exc))
     if detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED')
-    if context['evaluations']>spec['budgets']['mathematical_evaluations']-state(host)['mathematical_evaluations']:
+    if not mathematics_fits(spec,state(host)['mathematical_evaluations'],context['evaluations']):
         return fail('SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
     from tools.research.budget import backend_capacity
     if backend_capacity(host)<context['dynamic_cost_bound']['episodes']:return fail('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
@@ -821,7 +824,7 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
         detail=mathematical_method_view(host,candidate)['methods'][METHOD]
     except ValueError as exc:return fail(str(exc))
     if detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED')
-    if context['evaluations']>spec['budgets']['mathematical_evaluations']-state(host)['mathematical_evaluations']:
+    if not mathematics_fits(spec,state(host)['mathematical_evaluations'],context['evaluations']):
         return fail('SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT')
     request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
         tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
@@ -941,7 +944,7 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
     detail=view['methods'][method]
     if detail['planning_status'] in ('unauthorized','blocked','insufficient_budget','unsupported'):
         return feedback('blocked','ORIGINAL_M2_METHOD_ADMISSION_BLOCKED',missing=detail['missing'],method=method)
-    if (q.requested_budget is not None and q.requested_budget<needed) or view['remaining_evaluations']<needed:
+    if (q.requested_budget is not None and q.requested_budget<needed) or (view['remaining_evaluations'] is not None and view['remaining_evaluations']<needed):
         return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed)
     full=bind_selected_analysis_request(host,compiled,tool_use_id=tool_use_id,selection=(method,detail),scientific_question=payload)
     return dict(status='ready',method=method,request=full,required_evaluations=needed,scientific_execution_started=False,

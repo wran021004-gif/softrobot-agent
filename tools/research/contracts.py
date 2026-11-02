@@ -100,8 +100,8 @@ class FamilyMixedSearch(Contract):
     objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue','task_violation'] = Field(
         description='Default proxy task_violation retains single-task CONIC semantics and charges model builds/internal solves. Explicit mujoco_control instead reoptimizes each frozen condition with Native T1; max_evaluations counts condition analysis entries, control_settings caps callbacks per entry. Shared score is the worst best-found J, no global optimum or physical acceptance.')
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium']
-    max_proposals: int = Field(ge=1, le=128, strict=True)
-    max_evaluations: int = Field(ge=1, le=128, strict=True)
+    max_proposals: int = Field(ge=1, strict=True)
+    max_evaluations: int = Field(ge=1, strict=True)
     previous_candidate_ref: EvidenceRef | None = None
     evidence_used: list[EvidenceRef] = Field(default_factory=list)
     step: FiniteFloat = Field(default=.25, gt=0, le=.5)
@@ -180,13 +180,13 @@ class LocalControlSearchSettings(Contract):
     correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = Field(default=None,description='Time range in which control corrections are allowed, not the Reach/Hold task scoring holding window. Native optimization must cover the selected state through the frozen task deadline.')
     safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound. Positive margin requires method=response; method=pattern requires exactly 0. Original physical acceptance is unchanged.')
     method: Literal['response','pattern'] = Field(default='response',description='pattern requires safety_margin_fraction=0; a positive safety margin requires compatible v2 response settings. Main selects the method.')
-    knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
+    knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=64)
     coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
     difference_step_n: FiniteFloat = Field(default=.01,gt=0)
     initial_radius_n: FiniteFloat = Field(default=.1,gt=0)
     minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
-    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True,description='Search callback cap, not mathematical charges or integration steps. Plan control_search callbacks request physical replay; Native research_analysis callbacks integrate cloned native trajectories. Actual costs and independent validation are recorded separately.')
-    iterations: int = Field(default=16,ge=1,le=100,strict=True)
+    evaluation_requests: int = Field(default=24,ge=1,le=100000,strict=True,description='Finite per-request callback guard, not a Study-wide mathematical quota. Frozen Native resource grants and actual integration costs still apply. Physical control_search callbacks retain Replay charges.')
+    iterations: int = Field(default=16,ge=1,le=10000,strict=True)
     active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.')
 
     @model_serializer(mode='wrap')
@@ -339,7 +339,7 @@ class ScientificQuestion(Contract):
     focus_metric: str | None = Field(default=None,description='Registered task constraint ID or native observable; focus does not remove any frozen acceptance constraint.')
     control_scope: ScientificControlScope | None = None
     search_strategy: Literal['response','pattern'] | None = Field(default=None,description='Finite local response or pattern search; neither certifies a global optimum.')
-    requested_budget: StrictInt | None = Field(default=None,ge=1,le=1000,description='Maximum native rollout callbacks for this T1 search; original model/rollout/physics charges still apply. T2 uses one aggregation evaluation and references prior charges.')
+    requested_budget: StrictInt | None = Field(default=None,ge=1,le=100000,description='Finite per-request Native callback guard; original model/rollout/physics charges still apply. T2 uses one aggregation evaluation and references prior charges.')
     source_selection: ScientificSources = Field(default_factory=ScientificSources)
     fixed_input: Literal['frozen_initial_tensions','constant_tensions'] | None = Field(default=None,description='Fixed-input structure comparison only: retain frozen initial pretensions or supply a constant absolute tension vector.')
     tensions_n: list[FiniteFloat] | None = None
@@ -370,8 +370,8 @@ class ScientificQuestionV3(ScientificQuestionV2):
 
 
 class StructureSearchEffort(Contract):
-    max_proposals: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_proposals']['maximum'])
-    max_evaluations: int = Field(strict=True,ge=1,le=FamilyMixedSearch.model_json_schema()['properties']['max_evaluations']['maximum'],description='Condition analysis entries, not Native callbacks. Must cover every frozen condition for at least one structure.')
+    max_proposals: int = Field(strict=True,ge=1)
+    max_evaluations: int = Field(strict=True,ge=1,description='Finite condition analysis entries for this request, not a cumulative quota or Native callbacks. Must cover every frozen condition for at least one structure.')
 
 
 class ScientificStructureSearch(Contract):

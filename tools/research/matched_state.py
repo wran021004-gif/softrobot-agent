@@ -1,4 +1,5 @@
 """Three saved-state, fixed-tension SoRoSim/MuJoCo interval comparisons."""
+from tools.research.budget import mathematics_fits
 from extensions.tendon_family.mjcf import load_model
 import hashlib
 import json
@@ -167,7 +168,7 @@ def dispatch(host, query, key):
     count=len(query.indices)
     if s.get('matched_state_probes',0)+count>s['spec']['budgets']['physical_launches']:
         raise ValueError('MATCHED_STATE_PHYSICAL_PROBE_BUDGET_EXHAUSTED')
-    if s.get('mathematical_evaluations',0)+count*len(query.resolutions)>s['spec']['budgets']['mathematical_evaluations']:
+    if not mathematics_fits(s['spec'],s.get('mathematical_evaluations',0),count*len(query.resolutions)):
         raise ValueError('MATCHED_STATE_MATHEMATICAL_PROBE_BUDGET_EXHAUSTED')
     request=dict(kind='matched_state',implementation=s['freeze'],study_id=host.run_id,
         store_root=str(host.store.root),request_id=key+'-matched',candidate=candidate,

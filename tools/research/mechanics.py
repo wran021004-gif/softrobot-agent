@@ -42,7 +42,7 @@ def dispatch(host,operation,arguments,key):
     s=state(host)
     counter=('mathematical_evaluations' if operation=='nmpc_prediction_diagnostic' else
         ('mathematical_evaluations' if arguments.check_only else 'offline_nlp') if operation=='solve' else 'bdf_replays')
-    if s.get(counter,0)>=s['spec']['budgets'][counter]:
+    if s['spec']['budgets'][counter] is not None and s.get(counter,0)>=s['spec']['budgets'][counter]:
         raise ValueError('CAPABILITY_NOT_ALLOCATED_IN_THIS_STUDY: '+operation)
     grant=0.
     if operation=='nmpc_prediction_diagnostic':

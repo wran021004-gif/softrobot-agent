@@ -3,6 +3,7 @@
 No persistence, scientific dispatch, report generation or evidence registration.
 L0/L2 stay in research_context; L3 stays in core.read_evidence/EvidenceQuery.
 """
+from tools.research.budget import mathematical_remaining
 from copy import deepcopy
 from schemas.research_reporting import (
     ControlSearchEvidence, ControlSearchStep, CriticalObservation, EvidenceLocation,
@@ -216,7 +217,7 @@ def diagnostic_relations(host, reference):
     if chosen:
         pr,p=chosen;diagnosis=physical_diagnostic(host,pr)
         req=describe_analysis_requirements(cfg,{})
-        methods=analysis_capabilities(cfg,req,s['spec']['analysis_protocol'],remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
+        methods=analysis_capabilities(cfg,req,s['spec']['analysis_protocol'],remaining_evaluations=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0)))
         diagnosis.update(task_conditions=task_adapter(cfg).condition_view(),
             temporal_support=dict(kind='selected_discrete_observations',
                 times_s=[r['time_s'] for r in diagnosis['critical_samples']],
