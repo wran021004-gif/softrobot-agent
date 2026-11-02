@@ -119,8 +119,15 @@ def retrieval_hint(host):
         row=sorted(rows,key=lambda r:(r['task']!=name,r['entry_id']))[0]
         key='summary:'+row['entry_id']+'@'+row['revision']
         if any(key in r.get('summary_keys',[]) and r['notice_id']==phase['notice_id'] for r in hint_progress(host)):return None
-        return dict(skill=dict(key=key,principle=row['compact_skill']['principle'],when=row['compact_skill']['when']),
+        result=dict(skill=dict(key=key,principle=row['compact_skill']['principle'],when=row['compact_skill']['when']),
             boundary=phase['notice_id'],scope='Current model facts prevail; cross-task transfer unverified. Summary only; full Skill/Experience via experience_retrieve.')
+        if phase['phase']=='finite_search_structural_review':
+            experience=next((r for r in entries(host) if r['entry_id']=='experience-structure-readaptation' and
+                knowledge_type(r)=='experience'),None)
+            if experience:
+                result['experience']=dict(summary=experience['summary'][:160],
+                    read_query=dict(operation='read',entry_id=experience['entry_id'],revision=experience['revision']))
+        return result
     from tools.research.evidence_policy import english_sources
     eligible=[r for r in entries(host) if not english_sources(s['spec']) or english_source_ready(r)]
     available=sorted({r['task'] for r in eligible})
@@ -181,6 +188,9 @@ def decision_phase(host):
             return (host.store.artifact(ref).get('physical_design_identity',ref['artifact_id'])
                 if s['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1' else ref['artifact_id'])
         candidate=structure(failed[-1])
+        if s.get('plans'):
+            selected=(host.store.artifact(s['plans'][-1]).get('original_plan',{}).get('decision') or {}).get('selected_candidate')
+            if selected:candidate=structure(dict(candidate=selected))
         if sum(structure(a)==candidate for a in failed)>=2:
             return dict(phase='finite_search_structural_review',notice_id='structural_review:'+candidate,
                 reason='Repeated finite control searches have not established acceptance. Before changing structure, distinguish solver limits, unresolved parameter effects and missing matched-condition controls; reinitialize/reoptimize every required condition after a change.')
@@ -207,7 +217,9 @@ def hint_progress(host):
                     if notice_id in seen:continue
                     seen.add(notice_id)
                     rows.append(dict(notice_id=notice_id,request=event['outputs'][0],wire=meta['request'],
-                        summary_keys=[skill['key']],summary=skill,evidence_role='confirmed_skill_summary_delivery_only'))
+                        summary_keys=[skill['key']],summary=skill,
+                        **(dict(experience_hint=hint['experience']) if hint.get('experience') else {}),
+                        evidence_role='confirmed_skill_summary_delivery_only'))
                     continue
                 notice=hint.get('decision_notice')
                 if not notice or notice['notice_id'] in seen:continue

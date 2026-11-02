@@ -357,7 +357,8 @@ def context(host, *, evidence_references=None):
     current['control_start_domains']=domains
     current['control_initialization_methods']=dict(baseline='Pretension, explicit tensions_n, or source+parent with optional channel_map',
         measured_nmpc='Optional NMPC can control directly or supply a starting schedule for MuJoCo-direct. Use initialize_control method=baseline, candidate=current candidate, parent=same candidate, source=complete current-Study same-candidate NMPC result, without channel_map. Complete valid task failures remain useful. Only actually applied SI tensions are used, never unexecuted predictions or stitched incomplete traces. The new open-loop ZOH schedule is task_acceptance=unmeasured and needs full independent evaluation. NMPC is not a prerequisite for mathematics or control optimization.',
-        capability_sequence='Current candidate-bound complete task_capability sequence via response_evidence; inherits no physical acceptance.',
+        capability_sequence='Conic/SOCP only: current candidate-bound complete sampled-affine-conic-minimax-v1 task_capability result via response_evidence; Native T1/Direct results do not qualify. Conversion performs no new solve and inherits no physical acceptance.',
+        native_best='Use the saved same-candidate/task Native optimized schedule source directly for control optimization; optional initialize_control uses baseline with source+parent. No solve or Replay is needed to copy an already legal sequence.',
         mathematical_response='response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization',
         physical_response='Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget')
     current['control_search_domain']=dict(coefficient_order='knot_index * tendon_count + tendon_index',
@@ -1365,6 +1366,8 @@ def mathematical_discovery_observations(host, current, candidate):
             latest['actual_cost']=dict(evaluations=raw.get('charged_analysis_evaluations'),
                 numerical_s=raw.get('charged_numerical_s'))
         if optimized:
+            from tools.research.evidence_views import native_control_domain
+            latest['control_search_domain']=native_control_domain(raw)
             latest['actual_experiment']=dict(operation=raw['operation'],
                 initial_control_source=optimized.get('provenance',{}).get('source'),
                 evaluated_optimized_control_query=dict(reference=reference,view='full',pointer='/native_dynamics/optimized_schedule/provenance'),
@@ -1774,7 +1777,7 @@ def agent_decision_brief(host):
 
 def mechanism_direction_view(host, candidate, view, *, execution_block=None):
     """Project owned directions and original generation provenance; no new state."""
-    from tools.research.structure_research import discovery,matches_direction,METHOD
+    from tools.research.structure_research import discovery,matches_direction,METHOD,parameters
     from tools.research.design import verify_candidate
     s=state(host);directions={}
     for ref in [*s.get('analysis_results',[]),*s.get('research_mathematics',[])]:
@@ -1804,11 +1807,18 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
         formal_candidate_created=bool(generated),method_detail=view['methods'].get(METHOD),
         remaining_evaluations=view['remaining_evaluations'],execution_block=execution_block)
     result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
+        parameter_domains=[{k:r[k] for k in ('parameter_id','current_value','minimum','maximum','unit')}
+            for r in parameters(s['spec'],current) if r['mechanism_differentiation']['supported']],
         suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
         formal_candidate_query=dict(reference=generated[-1]) if generated else None,
         historical_directions=[dict(candidate=raw['candidate'],relation='declared_historical_mathematics' if ref not in s.get('analysis_results',[]) else 'other_candidate_history',
             query=dict(reference=ref,pointer='/structure_research/structure_direction'))
             for ref,raw in list(directions.values())[::-1] if ref not in s.get('analysis_results',[]) or raw.get('candidate')!=candidate][:2])
+    if not current['configuration']['task'].get('physical_problem'):
+        from extensions.math_analysis.mechanism_registry import PRIMITIVES
+        result['mechanism_purposes']={name:PRIMITIVES[name]['meaning'] for name in
+            ('tip_jacobian','input_force_map','tip_acceleration_input_map','directional_drive',
+             'directional_acceleration_bounds','instantaneous_braking','joint_damping','joint_stiffness','mass_matrix')}
     return result
 
 
@@ -2127,7 +2137,8 @@ def information_flow_brief(brief, delivered):
         if mechanism:
             result['mechanism_research']={k:mechanism[k] for k in ('direction_query','suggestion_adopted',
                 'formal_candidate_created','generation_plan_cited_evidence','generation_relations',
-                'formal_candidate_query','historical_directions','details_query') if k in mechanism}
+                'formal_candidate_query','historical_directions','details_query','operation_admission',
+                'mechanism_categories','mechanism_purposes','effective_parameter_groups','parameter_domains','task_scope') if k in mechanism}
         control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
         task=result['study_goal'].get('task',{})
         if task.get('physical_problem'):

@@ -268,6 +268,8 @@ def control_settings(spec, effort, *, window=None, channels=None):
         knots_s=[a+(b-a)*i/(q.knot_count-1) for i in range(q.knot_count)],
         correction_window_s=[0.,duration],iterations=iterations,evaluation_requests=q.evaluation_requests)
     settings['knots_s'][-1]=b
+    for name in ('coefficient_limit_n','initial_radius_n'):
+        if getattr(q,name) is not None:settings[name]=getattr(q,name)
     if window is not None:
         settings['active_coefficients']=list(range(channels,(q.knot_count-1)*channels))
     result=LocalControlSearchSettings.model_validate(settings)

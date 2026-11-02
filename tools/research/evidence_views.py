@@ -494,6 +494,38 @@ def _search(value, reference):
         all_steps=_location(reference, '/candidates'))
 
 
+def native_control_domain(value):
+    """Actual saved input ranges and declared local box; no physics or coverage claim."""
+    import numpy as np
+    from tools.research.contracts import LocalControlSearchSettings
+    from tools.research.control_correction import corrected_tensions
+    raw=value.get('native_dynamics') or {};search=raw.get('optimization') or {}
+    settings=(value.get('requested_operation',{}).get('control_optimization') or {}).get('settings')
+    tr=(raw.get('original_schedule') or {}).get('trajectory') or {}
+    bounds=value.get('binding',{}).get('tension_bounds_n')
+    if not settings or not tr.get('tensions_n') or not bounds or not search.get('best') or not raw.get('optimized_schedule'):return None
+    cfg=LocalControlSearchSettings.model_validate(settings);base=np.asarray(tr['tensions_n']);limits=np.asarray(bounds)
+    best=np.asarray(raw['optimized_schedule']['trajectory']['tensions_n'])
+    def ranges(u):return np.stack([u.min(axis=0),u.max(axis=0)],axis=1).tolist()
+    visited=None
+    if search.get('start_count',1)==1 and all('coefficients_n' in r for r in search.get('candidates',[])):
+        lo=base.min(axis=0);hi=base.max(axis=0)
+        for row in search.get('candidates',[]):
+            u=corrected_tensions(base,tr['times_s'][:-1],cfg.knots_s,row['coefficients_n'],limits[:,1],cfg.correction_window_s)
+            lo=np.minimum(lo,u.min(axis=0));hi=np.maximum(hi,u.max(axis=0))
+        visited=np.stack([lo,hi],axis=1).tolist()
+    return dict(tendon_order=tr['tendon_order'],physical_bounds_n=bounds,
+        method=cfg.method,knot_count=len(cfg.knots_s),active_coefficient_count=search.get('search_dimension'),
+        final_search_radii_n=list(search.get('trust_radii_n',{}).values()),
+        initial_range_n=ranges(base),best_range_n=ranges(best),recorded_schedule_range_n=visited,
+        local_envelope_n=np.stack([np.maximum(limits[:,0],base.min(axis=0)-cfg.coefficient_limit_n),
+            np.minimum(limits[:,1],base.max(axis=0)+cfg.coefficient_limit_n)],axis=1).tolist(),
+        settings={k:getattr(cfg,k) for k in ('coefficient_limit_n','initial_radius_n','minimum_radius_n','difference_step_n')},
+        coefficient_boundary=bool(max(abs(x) for x in search['best']['coefficients_n'])>=cfg.coefficient_limit_n-1e-10),
+        input_saturation=dict(lower=bool(np.any(best<=limits[:,0]+1e-10)),upper=bool(np.any(best>=limits[:,1]-1e-10))),
+        scope='Per-channel extrema of saved schedules, not joint control-space coverage. The temporal basis can further restrict the envelope. Local failure does not establish structural inability. Main may choose a wider correction domain, another explicit/Native/Conic/NMPC start, or another experiment; no fixed order.')
+
+
 def native_search_summary(value, reference):
     """Recorded effort and termination, without controls or a convergence claim."""
     search=(value.get('native_dynamics') or {}).get('optimization')
@@ -509,6 +541,7 @@ def native_search_summary(value, reference):
         iterations_started=search.get('iterations_started'),search_dimension=search.get('search_dimension'),
         callbacks=cost.get('evaluation_callbacks'),requested_callbacks=cost.get('request_budget'),
         baseline=metrics(baseline),best=metrics(search.get('best') or {}),
+        control_domain=native_control_domain(value),
         model_predicates_passed=(search.get('best') or {}).get('task_gap',{}).get('accepted'),
         interpretation='Recorded finite search only. Iteration/callback limits are not convergence or structural infeasibility. Model predicates are not independent acceptance.')
 

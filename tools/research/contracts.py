@@ -355,6 +355,15 @@ class ScientificControlEffort(Contract):
     knot_count: int = Field(default=4,strict=True,ge=_CONTROL_DOMAIN['knots_s']['minItems'],le=_CONTROL_DOMAIN['knots_s']['maxItems'],description='Uniform knots over the chosen adjustment window. Evaluation always covers the complete frozen task. Local windows require at least one interior knot; endpoint corrections remain zero.')
     iterations: int | None = Field(default=None,strict=True,ge=_CONTROL_DOMAIN['iterations']['minimum'],le=_CONTROL_DOMAIN['iterations']['maximum'],description='Independent iteration cap. If omitted: min(callback cap, frozen Study iteration cap, original contract maximum). Early convergence can use fewer callbacks/iterations.')
     evaluation_requests: int = Field(strict=True,ge=_CONTROL_DOMAIN['evaluation_requests']['minimum'],le=_CONTROL_DOMAIN['evaluation_requests']['maximum'],description='Maximum Native rollout callbacks per condition; separate from iterations and formal mathematical evaluation charges.')
+    coefficient_limit_n: FiniteFloat | None = Field(default=None,gt=0,description='Maximum absolute tension correction about the chosen starting sequence, in N. Omitted retains the original 2 N local domain. A wider correction domain never changes physical tension bounds or proves control-space coverage.')
+    initial_radius_n: FiniteFloat | None = Field(default=None,gt=0,description='Initial local search step/trust radius in N; must fit coefficient_limit_n. Omitted retains 0.1 N. Main chooses scale separately from callbacks and iterations.')
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_effort(self,handler):
+        result=handler(self)
+        for key in ('coefficient_limit_n','initial_radius_n'):
+            if getattr(self,key) is None:result.pop(key,None)
+        return result
 
 
 class ScientificQuestionV2(ScientificQuestion):
@@ -805,7 +814,7 @@ class ControlSeedRequest(Contract):
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
     method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = Field(default='baseline',description='baseline with only candidate uses candidate pretensions over the full task grid, without task evaluation. Use the returned source as control_optimization.source, never candidate. An initialization Plan replaces the latest diagnose; submit diagnose again with your own candidate and method before research_analysis.')
-    response_evidence: EvidenceRef | None = None
+    response_evidence: EvidenceRef | None = Field(default=None,description='capability_sequence requires a verified current-candidate Conic/SOCP task_capability result, never a Native T1/Direct result. mathematical_response requires verified input_sensitivity. A saved Native optimized schedule instead uses baseline source+parent or serves directly as Native control_optimization.source.')
     channels: list[str] | None = Field(default=None,min_length=1)
     difference_step_n: FiniteFloat = Field(default=.02,gt=0)
     trust_radius_n: FiniteFloat = Field(default=.2,gt=0)
