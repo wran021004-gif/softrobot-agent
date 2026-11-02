@@ -55,11 +55,11 @@ class LowTendonRestartScopeTests(unittest.TestCase):
             self.assertEqual(spec['family_search']['segment_counts'],list(range(1,10)))
             self.assertEqual(spec['family_search']['tendon_counts'],list(range(1,8)))
             value=fixtures.proposal(['tendon_count','lengths'],segment_counts=[2],tendon_counts=[1,2,3],initial_tendon_count=1,
-                control_search_effort=dict(method='pattern',evaluation_requests=8000,iterations=1000,knot_count=16))
+                control_search_effort=dict(method='pattern',evaluation_requests=8000,iterations=1000,knot_count=64))
             with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
                 compiled=compile_search(h,value,'low-tendon-resource-fixture')
             self.assertEqual(compiled['search']['tendon_counts'],[1,2,3])
-            self.assertEqual(len(compiled['search']['control_settings']['knots_s']),16)
+            self.assertEqual(len(compiled['search']['control_settings']['knots_s']),64)
             self.assertEqual(compiled['search']['control_settings']['iterations'],1000)
 
 
