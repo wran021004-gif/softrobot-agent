@@ -934,6 +934,8 @@ class ExperienceQuery(Contract):
     failure_type: str | None = None
     version: str | None = None
     kind: str | None = None
+    knowledge_type: Literal['experience','skill'] | None = Field(default=None,
+        description='Logical type: procedure maps to skill; case/success_case maps to experience. Original frozen authorization still applies.')
     limit: int | None = Field(default=None,ge=1,
         description='Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.')
 

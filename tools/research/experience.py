@@ -11,6 +11,11 @@ from tools.platform_store import plain
 
 PUBLIC_STATUS='public_procedural_guidance; generalization_unverified'
 PRIVATE_STATUS='private_owner_authorized; generalization_unverified'
+PATTERN_STATUS='public_decision_pattern; generalization_unverified'
+
+
+def knowledge_type(entry):
+    return 'skill' if entry['kind']=='procedure' else 'experience'
 
 
 def freeze_study_entries(spec, index, policy=None):
@@ -47,6 +52,9 @@ def _permitted(entry, policy, *, legacy=False):
     if legacy:return True
     return ((entry['kind']=='procedure' and (entry['status']==PUBLIC_STATUS or
         entry.get('introduced_in')=='p3_knowledge_v1' and entry['status']=='reference_backed_scoped'))
+        or (entry['kind']=='case' and entry['status']==PATTERN_STATUS and
+            entry.get('introduced_in')=='knowledge_organization_v1' and not entry.get('benchmark_sensitive')
+            and entry.get('disclosure')=='abstract_decision_pattern_only')
         or (entry['kind'] in ('case','success_case') and entry.get('benchmark_sensitive')
             and policy.get('allow_benchmark_answers',False) and entry['status']=='reference_backed_scoped'))
 
@@ -107,17 +115,79 @@ def retrieval_hint(host):
     if 'knowledge_manifest' in s['spec']:
         latest={}
         for row in eligible:
-            if row['kind']!='procedure' or not row.get('summary'):continue
+            if not row.get('summary'):continue
             key=row['entry_id'];revision=lambda r:(r['revision'].isdigit(),int(r['revision']) if r['revision'].isdigit() else r['revision'])
             if key not in latest or revision(row)>revision(latest[key]):latest[key]=row
         def matches(row):return name in [row['task'],*row.get('applicable_tasks',[])]
-        choices=sorted(latest.values(),key=lambda r:(r['task']!=name,not matches(r),r['entry_id']))
-        choices=[r for r in choices if matches(r)][:2]
-        hint['hints']=[dict(entry_id=r['entry_id'],revision=r['revision'],method=r['summary'][:200],
+        phase=decision_phase(host)
+        choices=sorted(latest.values(),key=lambda r:(not (phase and phase['phase'] in r.get('applicable_triggers',[])),r['task']!=name,not matches(r),r['entry_id']))
+        choices=[r for r in choices if matches(r)]
+        # At most one per type when both are authorized. Never widen a manifest.
+        types=('skill','experience') if phase and phase['phase']!='first_scientific_plan' else ('skill',)
+        selected=[next((r for r in choices if knowledge_type(r)==t),None) for t in types]
+        choices=[r for r in selected if r]
+        if len(choices)==1 and not any(knowledge_type(r)=='experience' for r in latest.values()):
+            choices += [r for r in latest.values() if matches(r) and r not in choices][:1]
+        delivered=hint_progress(host)
+        if phase and not any(r['notice_id']==phase['notice_id'] for r in delivered):
+            hint['decision_notice']=dict(**phase,
+                instruction='Before this decision, optionally read one or two relevant entries using the exact read_query. Check trigger and assumptions against current model facts, which take precedence. If used in a Plan, bind experience_disposition to the actual read and explain applicability, affected experiment and weakening observation in interpretation; receipt, declared adoption and observable decision influence are distinct.')
+        hint['hints']=[dict(entry_id=r['entry_id'],revision=r['revision'],knowledge_type=knowledge_type(r),method=r['summary'][:200],
             task=r['task'],scope='context_only; cross-task generalization unverified',
-            read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision'])) for r in choices]
+            read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision'])) for r in choices] if hint.get('decision_notice') else []
+        hint['confirmed_hint_deliveries']=delivered[-3:]
         hint['query']=dict(operation='search',task=name) if choices else dict(operation='search')
     return hint
+
+
+def decision_phase(host):
+    """Finite reminders at scientific boundaries; no new action or STOP gate."""
+    s=state(host);route_ref=s.get('pilot',{}).get('tool_route')
+    route=host.store.artifact(route_ref) if route_ref else {}
+    results=s.get('analysis_results',[])
+    if route.get('tool')=='research_plan' and route.get('action')=='stop':
+        boundary=results[-1]['artifact_id'] if results else 'empty'
+        return dict(phase='voluntary_stop',notice_id='stop:'+boundary,
+            reason='Review untried legal experiments, evidence for declining them and uncertainty in Plan interpretation. A nonpassing witness or an iteration/callback cap alone does not establish scientific closure.')
+    if not s.get('plans'):
+        return dict(phase='first_scientific_plan',notice_id='first_plan',
+            reason='Check model/input semantics and how condition-specific experiments can distinguish competing explanations before selecting the first research plan.')
+    from tools.research.evidence_views import native_search_summary
+    failed=[]
+    for ref in results:
+        a=host.store.artifact(ref);search=native_search_summary(a,ref)
+        if search and not search['model_predicates_passed']:failed.append(a)
+    if len(failed)>=2:
+        candidate=failed[-1]['candidate']['artifact_id']
+        if sum(a['candidate']['artifact_id']==candidate for a in failed)>=2:
+            return dict(phase='finite_search_structural_review',notice_id='structural_review:'+candidate,
+                reason='Repeated finite control searches have not established acceptance. Before changing structure, distinguish solver limits, unresolved parameter effects and missing matched-condition controls; reinitialize/reoptimize every required condition after a change.')
+    return None
+
+
+def hint_progress(host):
+    """Confirmed wires prove hint delivery, never a read or understanding."""
+    def collect():
+        events=host.store.events(host.run_id)
+        confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and
+            200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
+        rows=[];seen=set()
+        for event in events:
+            if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
+            meta=host.store.artifact(event['outputs'][0]);wire=host.store.artifact(meta['request'])
+            for message in wire.get('messages',[]):
+                content=message.get('content')
+                if not isinstance(content,str) or not content.startswith('CURRENT_RESEARCH_PACKET\n'):continue
+                research=json.loads(content.split('\n',1)[1]).get('research',{})
+                hint=(research.get('knowledge') or {}).get('access') or research.get('experience_guidance') or {}
+                notice=hint.get('decision_notice')
+                if not notice or notice['notice_id'] in seen:continue
+                seen.add(notice['notice_id'])
+                rows.append(dict(notice_id=notice['notice_id'],phase=notice['phase'],request=event['outputs'][0],
+                    wire=meta['request'],entries=[dict(entry_id=r['entry_id'],revision=r['revision']) for r in hint.get('hints',[])],
+                    evidence_role='confirmed_hint_delivery_only'))
+        return rows
+    return host.store.snapshot_value(('knowledge_hint_deliveries',host.run_id),collect)
 
 
 def english_source_ready(entry):
@@ -136,6 +206,7 @@ def retrieve(host,query,*,reader='agent'):
         if q.key is not None and q.key not in (entry.get('legacy_key'),entry['entry_id'],canonical):continue
         if q.entry_id is not None and q.entry_id!=entry['entry_id']:continue
         if q.revision is not None and q.revision!=entry['revision']:continue
+        if q.knowledge_type is not None and q.knowledge_type!=knowledge_type(entry):continue
         if any(getattr(q,name) is not None and getattr(q,name)!=entry[name]
             and getattr(q,name) not in entry.get('applicable_'+name+'s',[])
             for name in ('task','structure','failure_type','version','kind')):continue
@@ -171,6 +242,7 @@ def retrieve(host,query,*,reader='agent'):
                 for child in value:walk(child)
         if q.operation=='read':walk(content)
         rows.append(dict(**{k:v for k,v in entry.items() if k!='content_sha256'},key=entry.get('legacy_key',canonical),exact_key=canonical,
+            knowledge_type=knowledge_type(entry),
             **(dict(content_sha256=body_hash) if q.operation=='read' else {}),original_evidence_references=refs,
             read_query=dict(operation='read',entry_id=entry['entry_id'],revision=entry['revision']),
             content_role='research_trace' if entry['kind'] in ('case','success_case') else 'procedural_knowledge',
@@ -227,14 +299,15 @@ def read_progress(host):
         if row.get('status')=='source_unavailable':continue
         receipts[(row['entry_id'],row['revision'])]=(ref,receipt)
     if not receipts:return None
-    deliveries,_=confirmed_tool_deliveries(host);provided={}
+    from tools.research.object_choices import main_projection
+    deliveries,_=confirmed_tool_deliveries(host);provided=[]
     for contents in deliveries.values():
         for content in contents:
             try:value=json.loads(content)
             except (ValueError,TypeError):continue
-            if isinstance(value,dict) and isinstance(value.get('reference'),dict) and value.get('query',{}).get('operation')=='read':
-                provided[value['reference']['artifact_id']]=value
+            if isinstance(value,dict) and value.get('query',{}).get('operation')=='read':provided.append(value)
     return dict(reads=[dict(entry_id=key[0],revision=key[1],read_receipt=ref,
-        tool_read_completed=True,body_delivered=provided.get(ref['artifact_id'])==dict(reference=ref,**receipt))
+        tool_read_completed=True,body_delivered=any(value in (dict(reference=ref,**receipt),
+            main_projection(host,dict(reference=ref,**receipt))) for value in provided))
         for key,(ref,receipt) in receipts.items()],
         scope='Main read receipts only; body_delivered requires exact feedback in a confirmed Provider request. No card bodies preloaded here; delivery proves neither understanding, adoption nor scientific evidence.')

@@ -103,7 +103,8 @@ def parameter_catalog(spec, candidate, group=None, method=None):
             physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
             effective=row['effective_in_current_execution'],continuous=row['continuous_perturbation'],
             selectable=bool(legal and (method in methods if method else methods)),applicable_methods=methods,
-            validity=row['analysis_reason'],study_authorized=row['study_authorized']))
+            validity=row['analysis_reason'],study_authorized=row['study_authorized'],
+            execution_semantics=row['execution_semantics']))
     return rows
 
 

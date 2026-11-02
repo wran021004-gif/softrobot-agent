@@ -1,0 +1,35 @@
+{
+  "schema": "research_skill_v1",
+  "skill_id": "skill-finite-search",
+  "revision": "1",
+  "skill_type": "Failure Diagnosis",
+  "problem_or_trigger": "A finite control search did not pass.",
+  "principle": "A nonpassing finite search is an observation about its parameterization, initialization and allowance, not a verified exclusion of the structure.",
+  "assumptions": [
+    "Check the frozen model, input binding and method admission."
+  ],
+  "applicability": "Model-based tendon-robot research; cross-task transfer unverified.",
+  "diagnostic_questions": [
+    "Were callbacks/iterations exhausted?",
+    "Are physical input saturation and algorithmic limits distinguished?"
+  ],
+  "possible_actions": [
+    "Compare a changed control parameterization at a matched condition.",
+    "Inspect residuals or a model-supported structural contrast if control changes no longer discriminate."
+  ],
+  "expected_observations": [
+    "Improvement under a changed parameterization weakens the structural-limitation explanation.",
+    "Repeated limited failures alone still do not prove infeasibility."
+  ],
+  "cannot_conclude": [
+    "Global infeasibility",
+    "A guaranteed benefit from more compute"
+  ],
+  "evidence_sources": [
+    {
+      "entry_id": "research-bounded-continuation",
+      "revision": "2"
+    }
+  ],
+  "validation_status": "Conditional method; no cross-task success guarantee."
+}

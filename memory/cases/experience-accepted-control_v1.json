@@ -1,0 +1,51 @@
+{
+  "schema": "research_experience_v1",
+  "case_id": "experience-accepted-control",
+  "revision": "1",
+  "historical_case": "M2 control continuation",
+  "task_context": "Serial tendon robot; condition-bound controls; independent registered evaluation.",
+  "initial_problem": "A changed candidate had a complete independent task failure on a remaining condition.",
+  "decision_trace": [
+    {
+      "observation": "Independent evaluation did not pass.",
+      "hypothesis": "A control correction might remove the residual.",
+      "scientific_action": "Inspect unrounded predicates.",
+      "result": "The original threshold still classified failure.",
+      "judgment_revision": "Retain the failure and its cost."
+    },
+    {
+      "observation": "One condition remained unresolved.",
+      "hypothesis": "A finite same-candidate continuation might help.",
+      "scientific_action": "Compute a new condition-bound control within authorization.",
+      "result": "A new mathematical control was recorded.",
+      "judgment_revision": "Do not infer independent acceptance yet."
+    },
+    {
+      "observation": "A new control was available.",
+      "hypothesis": "The unchanged evaluator may accept a fresh execution.",
+      "scientific_action": "Independently replay the exact candidate/control.",
+      "result": "The original condition predicates accepted.",
+      "judgment_revision": "The joint original result set could be selected."
+    }
+  ],
+  "outcome": "success under original registered protocol; not current evidence",
+  "evidence": [
+    {
+      "path": "memory/cases/m2_research_v1/success_trace.json",
+      "sha256": "92e71847c6ef62b42965d849afed54af17762ebebcea4981b23b0a548c6d77cf"
+    }
+  ],
+  "cost": {
+    "mathematical_evaluations": 6,
+    "physical_replay_launches": 5,
+    "provider_requests": 0,
+    "money_cost": "unknown"
+  },
+  "applicability": "Decision pattern only; check current model and condition identities.",
+  "limitations": "No winning geometry/control disclosed; no current acceptance, causal superiority or autonomous-discovery claim.",
+  "related_skills": [
+    "skill-finite-search",
+    "skill-witness-replay"
+  ],
+  "disclosure": "abstract_decision_pattern_only"
+}

@@ -120,3 +120,46 @@ def compile_xml(physics, scene, config, path):
                 forcelimited='true',forcerange=fmt([-t['force_limit_n'],0]))
     ET.ElementTree(root).write(path,encoding='utf-8',xml_declaration=True)
     return path
+def parameter_effect_semantics(path, execution_mode, *, input_source='operation_selected_input'):
+    """Describe this emitter's force law; this does not grant method admission."""
+    key=path.rsplit('.',1)[-1]
+    effects=(['geometry','mass','backbone_stiffness'] if '.sections.' in path or key=='length_m' else
+        ['backbone_stiffness'] if key=='young_pa' else ['mass'] if key=='density_kg_m3' else
+        ['backbone_damping'] if key.startswith('viscosity_') else
+        ['rest_geometry','passive_force'] if key.startswith('curvature_') else
+        ['section_geometry','backbone_stiffness'] if key=='section_angle_rad' else
+        ['numerical_discretization'] if key=='cells' else
+        ['constraint_activation'] if path.startswith('payout_lengths_m.') else
+        ['routing_geometry','drive_mapping'] if path.startswith(('spans.','route_overrides.')) else
+        ['topology','geometry','mass','drive_mapping'] if key in ('segment_count','tendon_count','spans') else [])
+    result=dict(version='execution_parameter_effect_v1',execution_mode=execution_mode,
+        parameter_id=path,effect_channels=effects,input_source=input_source,
+        scope='Current compiler/emitter and selected input only; other actuator models require their own semantics.',
+        source_functions=['extensions/tendon_family/compiler.py:resolve','extensions/tendon_family/mjcf.py:compile_xml'])
+    if key=='diameter_m':
+        result.update(effect_channels=['visual_geometry','clearance_legality'],
+            motion_effect_at_fixed_legal_geometry=False,
+            excluded_effects=['tendon_elastic_stiffness','tendon_mass','tendon_friction'],
+            explanation='Compiler checks guide-hole clearance; generator also checks section/pairwise clearance. XML width/site size do not change route coordinates or the tendon force law. No tendon elasticity is emitted.')
+    elif key=='pretension_n':
+        result.update(effect_channels=['default_input','legality'],
+            overridden_by=['native.tensions_n','saved_state.u','complete absolute-tension schedule'],
+            fixed_absolute_input_effect=False,
+            explanation='Used when preparing default input, not added to an explicit absolute input. Fixed-input comparison holds state and absolute input fixed; changing a default alone cannot change that response. Reinitializing controls may change inputs and is a different experiment.')
+    elif key=='force_limit_n':
+        result.update(effect_channels=['input_bounds','legality'],
+            explanation='Changes saturation and admissible input set; not a fixed-input stiffness parameter.')
+    elif key=='length_servo_gain_n_m':
+        result.update(effect_channels=['drive'] if execution_mode=='actuator_realistic' else [],
+            motion_effect_at_fixed_legal_geometry=execution_mode=='actuator_realistic',
+            explanation='Affine length-servo gain in actuator_realistic; bypassed by ideal_tension and passive payout constraints.')
+    if execution_mode!='ideal_tension':
+        result.pop('fixed_absolute_input_effect',None)
+        if key=='pretension_n':
+            result.pop('overridden_by',None)
+            result['explanation']='Default pretension is consumed by actuator/controller preparation; determine the actual selected input binding before making a response claim.'
+        # No universal prohibition inferred from the Native ideal-tension model.
+        result['identification']='Check selected actuator/controller input binding and operating point; Native ideal-tension conclusions do not establish this mode response.'
+    else:result['identification']='Native methods use absolute nonnegative tensions in N, with force=-tension. Instantaneous derivatives identify local effects only; fixed-input response is not reoptimized task capability.'
+    return result
+

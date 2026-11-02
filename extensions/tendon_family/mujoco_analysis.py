@@ -296,6 +296,11 @@ def calculate(configuration, point, options, operation, comparisons=None):
     u=point['u'] if options.tensions_n is None else options.tensions_n
     mechanics=native.mechanics(start,u)
     raw=dict(initial_state=point,mechanics=mechanics,physics_identity=native.physics['identity'],design_identity=native.physics['design_identity'],
+        input_binding=dict(execution_mode='ideal_tension',operation=operation,
+            source='native.tensions_n' if options.tensions_n is not None else 'saved operating point u',
+            absolute_tensions_n=list(u),default_pretension_added=False,
+            fixed_input_structure_rule='All contrasted models use the same named qpos/qvel and the same absolute input; candidate pretension is not re-added.',
+            scope='Selected Native operation only; other actuator/controller modes retain their own bindings.'),
         physical_scene_identity=native.scene['identity'],
         external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')),
         representation='native named MuJoCo hinges; world tip; ideal absolute SI tensions',

@@ -1,0 +1,35 @@
+{
+  "schema": "research_skill_v1",
+  "skill_id": "skill-parameter-model",
+  "revision": "1",
+  "skill_type": "Physical / Mathematical Reasoning",
+  "problem_or_trigger": "A parameter name is being used as a causal mechanism.",
+  "principle": "Trace a parameter through the actual generator, compiler, force law and operation input before proposing its effect. Explicit inputs may override defaults.",
+  "assumptions": [
+    "Check the frozen model, input binding and method admission."
+  ],
+  "applicability": "Model-based tendon-robot research; cross-task transfer unverified.",
+  "diagnostic_questions": [
+    "What actuator mode actually runs?",
+    "Is the operation using a fixed absolute input, a default input or reoptimized control?",
+    "Does the force law contain the claimed constitutive relation?"
+  ],
+  "possible_actions": [
+    "Read the candidate parameter execution_semantics and method admission.",
+    "Use a legal one-factor matched contrast only if the method can identify the proposed effect."
+  ],
+  "expected_observations": [
+    "No compiled dynamics change at identical state/input weakens a proposed dynamics mechanism.",
+    "A changed default-input experiment cannot identify a fixed-input structural effect."
+  ],
+  "cannot_conclude": [
+    "Diameter always means tendon elasticity",
+    "All actuator models share ideal-tension semantics"
+  ],
+  "evidence_sources": [
+    {
+      "code_contract": "mjcf.compile_xml; NativeModel.apply; structure_research.prepare_context"
+    }
+  ],
+  "validation_status": "Conditional method; no cross-task success guarantee."
+}

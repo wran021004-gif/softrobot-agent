@@ -2103,7 +2103,8 @@ def information_flow_brief(brief, delivered):
         verified_facts=facts[:8],mathematical_research=value.get('mathematical_research'),mechanism_research=value.get('mechanism_research'),
         research_trace=trace,**(dict(post_result_decision=post_result) if post_result else {}),
         capabilities=capabilities,tool_continuation=continuation,
-        knowledge=dict(role='procedural_knowledge',access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
+        knowledge=dict(role='context_only',types=dict(skill='Conditional methods; current model facts take precedence.',experience='Scoped historical decision traces; no autonomous-discovery claim, current evidence or authorization.'),
+            access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])
     if brief.get('analysis_interface')=='scientific_question_v4':
         # Presentation only: Store, pending feedback, budgets and read admission

@@ -52,8 +52,14 @@ def family_variable_authorized(spec,path):
 
 def family_analysis_parameters(spec,candidate):
     from extensions.tendon_family.family_space import parameter_capabilities
+    from extensions.tendon_family.mjcf import parameter_effect_semantics
     rows=parameter_capabilities(spec['family_space'],candidate['parameters'])
     for row in rows:
+        mode='passive_fixed_payout_v1' if candidate['configuration']['task'].get('physical_problem') else 'ideal_tension'
+        row['execution_semantics']=parameter_effect_semantics(row['parameter_id'],mode)
+        row['execution_semantics']['model_scope']='Registered mathematical model; Replay/controller binding must be checked independently.'
+        row['execution_semantics']['method_identifiable']=bool(row['continuous_perturbation'])
+        row['execution_semantics']['method_limitation']=row['analysis_reason']
         path=row['parameter_id'];row['study_authorized']=family_variable_authorized(spec,path) and '*' not in path
         legacy_fixed=path.startswith('segments.') and (path.endswith('.young_pa') or '.sections.' in path)
         row['applicable_mathematical_methods']=[m for m in row['supported_methods'] if m!='generate' and
