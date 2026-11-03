@@ -811,13 +811,12 @@ def mechanics_context(host,candidate):
 def mathematical_context(host,candidate):
     """Exact candidate links to calculated evidence; no recomputation or interpretation."""
     from tools.research.state import state
-    records=[]
+    records=[];fields=('operation','origin','status','operating_point','proxy_values','local_model_constraints','charged_numerical_s')
     for ref in state(host).get('analysis_results',[]):
-        value=host.store.artifact(ref)
+        value=host.store.artifact(ref,paths=('candidate',*fields))
         if value['candidate']!=plain(candidate):
             continue
-        records.append(dict(reference=ref,**{k:value.get(k) for k in
-            ('operation','origin','status','operating_point','proxy_values','local_model_constraints','charged_numerical_s')}))
+        records.append(dict(reference=ref,**{k:value.get(k) for k in fields}))
     return records
 
 
