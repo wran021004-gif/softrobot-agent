@@ -66,6 +66,145 @@ class PassiveResponseEvaluation(Contract):
         return self
 
 
+class PassiveStageV2(Contract):
+    name: str = Field(min_length=1,max_length=80)
+    start_s: FiniteFloat = Field(ge=0)
+    end_s: FiniteFloat = Field(gt=0)
+    force_start_world_n: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+    force_end_world_n: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+    interpolation: Literal['hold','linear','smoothstep']
+    ramp_until_s: FiniteFloat
+    observation_window_s: tuple[FiniteFloat,FiniteFloat]
+    scoring_window_s: tuple[FiniteFloat,FiniteFloat]
+
+    @model_validator(mode='after')
+    def intervals(self):
+        if not self.start_s<self.end_s or not self.start_s<=self.ramp_until_s<=self.end_s:
+            raise ValueError('ORDERED_PASSIVE_STAGE_REQUIRED')
+        for window in (self.observation_window_s,self.scoring_window_s):
+            if not self.start_s<=window[0]<window[1]<=self.end_s:raise ValueError('WINDOW_INSIDE_PASSIVE_STAGE_REQUIRED')
+        if self.interpolation=='hold':
+            if self.force_start_world_n!=self.force_end_world_n:raise ValueError('HOLD_REQUIRES_CONSTANT_FORCE')
+        elif self.ramp_until_s<=self.start_s:raise ValueError('POSITIVE_PASSIVE_RAMP_REQUIRED')
+        return self
+
+
+class PassiveQualificationV2(Contract):
+    stage: str
+    window_s: tuple[FiniteFloat,FiniteFloat]
+    tip_speed_max_m_s: FiniteFloat = Field(ge=0)
+    monitor_speed_max_m_s: FiniteFloat = Field(ge=0)
+    qvel_max_rad_s: FiniteFloat = Field(ge=0)
+    tail_drift_max_m: FiniteFloat = Field(ge=0)
+    static_balance_max_nm: FiniteFloat = Field(ge=0)
+    length_excess_max_m: FiniteFloat = Field(ge=0)
+    initial_lateral_max_m: FiniteFloat | None = Field(default=None,ge=0)
+    sampling: Literal['score_grid','every_physics_step']
+
+
+class PassiveResponseGoalV2(Contract):
+    """Finite frozen programs; the Agent chooses owned objects, never engine state."""
+    version: Literal['passive_response_v2'] = 'passive_response_v2'
+    load_conditions: list[str] = Field(min_length=1,max_length=32)
+    programs: dict[str,list[PassiveStageV2]]
+    protocol_source: EvidenceRef
+    force_unit: Literal['N'] = 'N'
+    time_unit: Literal['s'] = 's'
+    frame: Literal['world'] = 'world'
+    force_sampling: Literal['interval_start','interval_end']
+    static_balance_reference: Literal['cold_zero_velocity','copied_integration_zero_velocity']
+    reset: Literal['same_complete_initial_state_each_episode'] = 'same_complete_initial_state_each_episode'
+    initial_source: Literal['frozen_named_state','qualified_unloaded']
+    allow_saved_state: bool = False
+    unloaded_stage: str
+    qualifications: list[PassiveQualificationV2] = Field(min_length=1,max_length=32)
+    solreflimit: tuple[FiniteFloat,FiniteFloat]
+    solimplimit: tuple[FiniteFloat,FiniteFloat,FiniteFloat,FiniteFloat,FiniteFloat]
+    length_tolerance_m: FiniteFloat = Field(gt=0)
+    tension_tolerance_n: FiniteFloat = Field(ge=0)
+    multiplier_sign_tolerance_n: FiniteFloat = Field(ge=0)
+    constraint_direction_tolerance: FiniteFloat = Field(ge=0)
+    force_map_tolerance_nm: FiniteFloat = Field(ge=0)
+    allowed_ablation: Literal['none','disable_selected_passive_limits'] = 'none'
+    recording: Literal['score_and_qualification','full_physics_csv'] = 'score_and_qualification'
+    route_check: Literal['not_required','score_grid','every_physics_step'] = 'not_required'
+
+    @model_validator(mode='after')
+    def programs_match(self):
+        if len(set(self.load_conditions))!=len(self.load_conditions) or set(self.programs)!=set(self.load_conditions):
+            raise ValueError('EXACT_ORDERED_EPISODE_PROGRAMS_REQUIRED')
+        for stages in self.programs.values():
+            if not stages or len(stages)>32 or len({s.name for s in stages})!=len(stages):raise ValueError('BOUNDED_UNIQUE_PASSIVE_STAGES_REQUIRED')
+            if stages[0].start_s!=0 or stages[0].name!=self.unloaded_stage:
+                raise ValueError('EXPLICIT_INITIAL_UNLOADED_STAGE_REQUIRED')
+            if any(stages[0].force_start_world_n) or any(stages[0].force_end_world_n):raise ValueError('INITIAL_STAGE_MUST_BE_UNLOADED')
+            for left,right in zip(stages,stages[1:]):
+                if left.end_s!=right.start_s or left.force_end_world_n!=right.force_start_world_n:
+                    raise ValueError('CONTINUOUS_PASSIVE_TIME_AND_FORCE_REQUIRED')
+        if len({q.stage for q in self.qualifications})!=len(self.qualifications) or not any(q.stage==self.unloaded_stage for q in self.qualifications):
+            raise ValueError('UNIQUE_UNLOADED_DYNAMIC_QUALIFICATION_REQUIRED')
+        if self.solreflimit[0]<=0 or self.solreflimit[1]<=0 or self.solimplimit[2]<=0:
+            raise ValueError('EXPLICIT_VALID_PASSIVE_LIMIT_SOLVER_REQUIRED')
+        return self
+
+
+class PassiveResponseBoundV2(PassiveResponseBound):
+    window: str
+    reference_window: str
+    reference_reduction: Literal['last','mean'] = 'last'
+    aggregation: Literal['range','mean','mean_state','last'] = 'range'
+    tip_projection_world: list[tuple[FiniteFloat,FiniteFloat,FiniteFloat]] | None = Field(default=None,min_length=1,max_length=3)
+    material_projection_world: list[tuple[FiniteFloat,FiniteFloat,FiniteFloat]] | None = Field(default=None,min_length=1,max_length=3)
+    denominator_floor_m: FiniteFloat = Field(default=0.,ge=0)
+
+
+class PassiveStiffnessV2(Contract):
+    """Registered interval stiffness, not an arbitrary evaluation expression."""
+    load_condition: str
+    stages: tuple[str,str,str]
+    reference_stage: str
+    material_s: FiniteFloat = Field(ge=0,le=1)
+    direction_world: tuple[FiniteFloat,FiniteFloat,FiniteFloat]
+    denominator_min_m: FiniteFloat = Field(gt=0)
+    denominator_uncertainty_multiplier: FiniteFloat = Field(ge=0)
+    stiffness_ratio_min: FiniteFloat = Field(gt=0)
+    low_tension_max_n: FiniteFloat = Field(ge=0)
+    high_tension_min_n: FiniteFloat = Field(gt=0)
+    low_slack_min_m: FiniteFloat = Field(gt=0)
+    high_constraint_residual_max_m: FiniteFloat = Field(gt=0)
+
+    @model_validator(mode='after')
+    def direction(self):
+        import math
+        if abs(math.hypot(*self.direction_world)-1)>1e-10 or len(set(self.stages))!=3:raise ValueError('ORDERED_STIFFNESS_STAGES_AND_UNIT_DIRECTION_REQUIRED')
+        return self
+
+
+class PassiveMechanismV2(Contract):
+    high_displacement_increase_min: FiniteFloat = Field(gt=0)
+    late_stiffness_ratio_max: FiniteFloat = Field(gt=0)
+    require_stable_comparable: Literal[True] = True
+
+
+class PassiveResponseEvaluationV2(Contract):
+    bounds: list[PassiveResponseBoundV2] = Field(min_length=1)
+    prohibit_contact: bool = True
+    progressive_stiffness: list[PassiveStiffnessV2] = Field(default_factory=list,max_length=32)
+    mechanism: PassiveMechanismV2 | None = None
+
+    @model_validator(mode='after')
+    def names(self):
+        if len({b.name for b in self.bounds})!=len(self.bounds):raise ValueError('UNIQUE_PASSIVE_BOUND_NAMES_REQUIRED')
+        if self.mechanism and not self.progressive_stiffness:raise ValueError('MECHANISM_REQUIRES_FROZEN_RESPONSE_COMPARISON')
+        return self
+
+
+class PassiveInitialExecutionV2(Contract):
+    source: Literal['frozen_named_state','qualified_unloaded','saved_integration_state']
+    state_identities: dict[str,str]
+    source_result: EvidenceRef | None = None
+
+
 class ReachGoal(Contract):
     target_m: tuple[float, float, float]
 

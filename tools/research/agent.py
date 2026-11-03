@@ -241,10 +241,14 @@ def compact_plan_schema(schema, action, study):
             for branch in choice['cells']['anyOf']:
                 if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
             choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
-    if action=='physical_replay' and passive_registered(study.get('canonical_task',{})):
+    if action=='physical_replay':
         request=schema['$defs']['PhysicalReplayRequest']
-        request['properties'].pop('source',None)
-        request['description']='Select an owned passive candidate. The host binds its frozen loading protocol; no control sequence or source hash is required.'
+        task=study.get('canonical_task',{})
+        if passive_registered(task):
+            request['properties'].pop('source',None)
+            request['description']='Select an owned passive candidate. The host binds its frozen loading protocol. Optional v2 intervention uses exact tendon names; saved initialization uses a result choice and episode name, never engine vectors.'
+        if task.get('goal',{}).get('data',{}).get('version')!='passive_response_v2':
+            for field in ('passive_ablation','initial_state_result','initial_state_episode'):request['properties'].pop(field,None)
     from tools.research.contracts import compact_schema
     return compact_schema(schema)
 

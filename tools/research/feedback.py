@@ -324,8 +324,8 @@ def solution_identity(host, result, candidate):
     elif result.get('source_reference'):
         source=host.store.artifact(result['source_reference'])
         if result.get('route')=='passive_protocol':
-            from extensions.tendon_family.passive_execution import source_binding
-            expected=dict(**source_binding(candidate['configuration']),candidate=result['candidate'])
+            from tools.research.physical_replay import passive_source
+            expected=passive_source(candidate['configuration'],result['candidate'],source.get('execution',{}))
             if source!=expected:raise ValueError('PASSIVE_SOLUTION_SOURCE_MISMATCH')
             controller=dict(route='passive_protocol',protocol={k:v for k,v in source.items() if k!='candidate'})
         else:
@@ -364,8 +364,9 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     policy=science['policy']
     inp=SessionInput.model_validate(candidate['configuration'])
     if route=='passive_protocol':
-        from extensions.tendon_family.passive_execution import source_binding
-        expected=source_binding(candidate['configuration'])
+        from tools.research.physical_replay import passive_source
+        expected={k:v for k,v in passive_source(candidate['configuration'],source.get('candidate') if source else {'artifact_id':'0'*64},
+            source.get('execution',{}) if source else {}).items() if k!='candidate'}
         if source is not None and {k:v for k,v in source.items() if k!='candidate'}!=expected:
             raise ValueError('PASSIVE_EXPERIMENT_SOURCE_MISMATCH')
         return canonical(dict(identity_version='effective_experiment_v3',identity_precision_significant_digits=12,

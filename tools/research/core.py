@@ -709,6 +709,7 @@ def _dispatch(host, value, request_id, origin='model'):
         if plan.action=='physical_replay':route='passive_protocol' if passive_registered(passive_task) else 'fixed_tension'
         elif plan.action=='confirm':route=result_view(host,plan.selected_execution)['controller_route']
         requested=len(passive_task['goal']['data']['load_conditions']) if route=='passive_protocol' else plan.search.max_evaluations if plan.search else 1
+        if route=='passive_protocol' and plan.physical_replay and plan.physical_replay.passive_ablation:requested*=2
         admission=capacity(host,requested,plan.action=='confirm',root_operation=True,candidate=plan.candidate,route=route)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)

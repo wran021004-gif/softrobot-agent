@@ -767,6 +767,9 @@ class CrossReplayRequest(Contract):
 class PhysicalReplayRequest(Contract):
     candidate: EvidenceRef = Field(description='Replay candidate; decision.selected_candidate must equal this reference. Both candidate and source belong inside physical_replay.')
     source: EvidenceRef | None = Field(default=None,description='Active: exact complete control schedule. Registered passive task: omit to bind its frozen loading protocol.')
+    passive_ablation: list[str] | None = Field(default=None,min_length=1,max_length=64,description='passive_response_v2 only: exact passive tendon entities; two fresh paired native executions, double episode budget.')
+    initial_state_result: EvidenceRef | None = Field(default=None,description='passive_response_v2 only: current owned completed physical result containing a qualified complete integration state.')
+    initial_state_episode: str | None = None
 
 
 class ControlCorrectionSettings(Contract):

@@ -16,6 +16,10 @@ def passive_registered(task):
         task.get('goal',{}).get('contract')=='reference.passive_response_goal')
 
 
+def passive_protocol(task):
+    return 'offline_passive_response_v2' if task.get('goal',{}).get('data',{}).get('version')=='passive_response_v2' else 'offline_passive_response_v1'
+
+
 @dataclass(frozen=True)
 class ResearchTaskAdapter:
     configuration: dict
@@ -73,17 +77,27 @@ class ResearchTaskAdapter:
         """Join frozen task meanings to recorded evaluator values; never evaluate physics."""
         definitions=[]
         if passive_registered(self.task):
-            from extensions.reference.contracts import PassiveResponseEvaluation
+            from extensions.reference.passive_response import evaluation_definition
             goal=self.task['goal']['data'];duration=self.task['timing']['duration_s']
-            windows=dict(full=[0.,duration],unloaded=[0.,goal['unloaded_until_s']],hold=goal['hold_window_s'])
-            for bound in PassiveResponseEvaluation.model_validate(self.task['evaluator']['parameters']['data']).bounds:
+            v2=goal.get('version')=='passive_response_v2'
+            windows={} if v2 else dict(full=[0.,duration],unloaded=[0.,goal['unloaded_until_s']],hold=goal['hold_window_s'])
+            from types import SimpleNamespace
+            task=SimpleNamespace(goal=SimpleNamespace(data=goal),evaluator=SimpleNamespace(parameters=SimpleNamespace(data=self.task['evaluator']['parameters']['data'])))
+            evaluation=evaluation_definition(task)
+            for bound in evaluation.bounds:
                 b=bound.model_dump()
+                window=next(s['scoring_window_s'] for s in goal['programs'][b['load_condition']] if s['name']==b['window']) if v2 else windows[b['window']]
                 for side in ('minimum','maximum'):
                     if b.get(side) is None:continue
                     definitions.append(dict(constraint_id='evaluator:'+b['name']+'_'+side,
-                        condition_id=b['load_condition'],load_condition=b['load_condition'],time_window=windows[b['window']],
+                        condition_id=b['load_condition'],load_condition=b['load_condition'],time_window=window,
                         bound_type='lower' if side=='minimum' else 'upper',bound=b[side],unit=bound.physical_unit,
                         signal=b['quantity'],material_s=b.get('material_s'),frame='world'))
+            if v2:
+                for s in evaluation.progressive_stiffness:
+                    for suffix,limit in [('stiffness_ratio',s.stiffness_ratio_min),('slack_to_taut',1)]+([('paired_mechanism',1)] if evaluation.mechanism else []):
+                        definitions.append(dict(constraint_id='evaluator:'+s.load_condition+'_'+suffix,condition_id=s.load_condition,
+                            time_window=[0.,duration],bound_type='lower',bound=limit,unit='1',signal=suffix))
             if self.task['evaluator']['parameters']['data'].get('prohibit_contact',True):
                 definitions.append(dict(constraint_id='evaluator:no_contact',condition_id='all_load_conditions',
                     time_window=[0.,duration],bound_type='upper',bound=0,unit='count',signal='maximum_contacts'))
@@ -111,7 +125,7 @@ class ResearchTaskAdapter:
                         scope='measured_dynamic_samples',expressibility='unsupported',
                         expression_reason='Static hard equilibrium is diagnostic, not this finite-time soft-constraint execution.') for i,b in enumerate(bounds)],
                     mathematical_observations=[dict(**o,scope='mathematical_equilibrium_only') for o in self.task['physical_problem'].get('observations',[])],
-                    missing=[],registered_acceptance='offline_passive_response_v1',authority='Frozen registered evaluator parameters',
+                    missing=[],registered_acceptance=passive_protocol(self.task),authority='Frozen registered evaluator parameters',
                     continuous_time_guarantee=False)
             return dict(contract='research.task_conditions',version='1.0.0',task_identity=digest(self.task),
                 conditions=[],mathematical_observations=[dict(condition_id=o['name'],**o,
@@ -196,11 +210,11 @@ class ResearchTaskAdapter:
         if task.get('physical_problem'):
             if passive_registered(task):
                 return dict(task_family=task['family'],task_status=task['status'],actuator_channels=[],
-                    protocol_id='offline_passive_response_v1',protocol_template_id='offline_passive_response_v1',
-                    signals=task['observations'],registered_acceptance='offline_passive_response_v1',execution_admission='not_assessed',
+                    protocol_id=passive_protocol(task),protocol_template_id=passive_protocol(task),
+                    signals=task['observations'],registered_acceptance=passive_protocol(task),execution_admission='not_assessed',
                     known_blockers=[],unsupported_control_methods=['ppo','nmpc','native','baseline','mathematical_response'],
                     physical_inputs=self._physical_inputs(),ppo=self.ppo_applicability(),
-                    protocol_components=sorted(_protocol_requirements(dict(protocol_id='offline_passive_response_v1',task_family=task['family']))),
+                    protocol_components=sorted(_protocol_requirements(dict(protocol_id=passive_protocol(task),task_family=task['family']))),
                     applicability='Frozen passive protocol; Registry, Study grants, owned candidate and shared physical budget govern admission.')
             return dict(task_family=task['physical_problem']['mode'],task_status=task['status'],
                 actuator_channels=[],protocol_id=None,protocol_template_id=None,signals=[],
@@ -344,7 +358,7 @@ class ResearchTaskAdapter:
             if passive_registered(task):
                 return dict(kind='passive_loading_protocol',task_family=task['family'],frame='world',
                     goal=task['goal'],evaluator=task['evaluator'],control_channels=[],
-                    registered_acceptance='offline_passive_response_v1',condition_source='/task/evaluator/parameters',
+                    registered_acceptance=passive_protocol(task),condition_source='/task/evaluator/parameters',
                     horizon_semantics='complete_finite_time_per_load_episode')
             return dict(kind='static_load_cases',task_family=task['physical_problem']['mode'],
                 frame='world',goal=None,evaluator=None,control_channels=[],registered_acceptance='not_registered',
@@ -464,7 +478,7 @@ class ResearchTaskAdapter:
         if task.get('physical_problem'):
             if passive_registered(task):
                 return dict(contract='research.task_adapter',version='1.0.0',family=task['family'],
-                    research_mode='passive_mechanism_and_dynamic_execution',registered_acceptance='offline_passive_response_v1',
+                    research_mode='passive_mechanism_and_dynamic_execution',registered_acceptance=passive_protocol(task),
                     evaluator=task['evaluator'],reference=self.control_reference(),metrics=self.condition_view()['conditions'],
                     timing=task['timing'],context='Static hard KKT diagnostics and real MuJoCo soft-constraint dynamic acceptance are distinct.')
             return dict(contract='research.task_adapter',version='1.0.0',family=task['physical_problem']['mode'],
@@ -610,9 +624,9 @@ def _protocol_requirements(result):
     """Required meanings come from the supported protocol, never submitted keys."""
     common = {'evaluation_validity', 'execution_complete', 'task_evaluator', 'solver_errors', 'force_bounds'}
     protocol, family = (result.get('protocol_id'), result.get('task_family'))
-    if (protocol,family)==('offline_passive_response_v1','task.passive_response'):
+    if protocol in ('offline_passive_response_v1','offline_passive_response_v2') and family=='task.passive_response':
         return {'evaluation_validity','execution_complete','task_evaluator','solver_errors',
-            'dynamic_sampling','all_load_cases','physical_source','task_bounds'}
+            'dynamic_sampling','all_load_cases','physical_source','task_bounds'} | ({'initial_qualification','stage_program','actual_constraints'} if protocol.endswith('_v2') else set())
     if (protocol, family) == ('offline_reach_hold_v1', 'task.reach'):
         return common | {'holding_coverage', 'holding_position', 'holding_speed', 'evaluator:task_bound'}
     if (protocol, family) == ('development_tracking_v1', 'task.tracking'):
@@ -671,7 +685,7 @@ def _source_issue(result, evidence=None):
             evaluation_binding.get('original_execution_id') not in (None,execution) or
             evaluation_binding.get('source') not in (None,evidence['simulation'])):
         return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
-    if result['protocol_id'] in ('offline_passive_response_v1','offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1','offline_oriented_tracking_v1','offline_oriented_tracking_v2'):
+    if result['protocol_id'] in ('offline_passive_response_v1','offline_passive_response_v2','offline_reach_hold_v1', 'offline_timed_tracking_v1','offline_position_tool_axis_v1','offline_oriented_tracking_v1','offline_oriented_tracking_v2'):
         for kind in ('evaluation', 'simulation', 'execution_id'):
             if not binding.get(kind):
                 return 'PROTOCOL_REQUIRED_SOURCE_MISSING:profile_' + kind
@@ -747,6 +761,12 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         expected={b['name']+'_'+side for b in task['evaluator']['parameters']['data']['bounds']
             for side in ('minimum','maximum') if b.get(side) is not None}
         if task['evaluator']['parameters']['data'].get('prohibit_contact',True):expected.add('no_contact')
+        if passive_protocol(task)=='offline_passive_response_v2':
+            from extensions.reference.passive_evaluation_v2 import constraint_names
+            from types import SimpleNamespace
+            expected=constraint_names(SimpleNamespace(evaluator=SimpleNamespace(parameters=SimpleNamespace(data=task['evaluator']['parameters']['data']))))
+            for key in ('initial_qualification','stage_program','actual_constraints'):
+                components[key]=_component(report.get(key),report.get(key))
         actual={c['name'] for c in constraints}
         matched=ev is not None and actual==expected
         components['task_bounds']=_component(sorted(actual),bool(matched and all(c['satisfied'] for c in constraints)) if ev and validity=='valid' else None,

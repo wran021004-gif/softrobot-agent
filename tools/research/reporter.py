@@ -59,6 +59,9 @@ def _card(host, reference):
     """Adapt RL episode fields locally; F0 and mathematical methods stay frozen."""
     card=result_card(host,reference)
     value=read_evidence(host,dict(reference=reference),record_read=False)
+    if value.get('profile',{}).get('passive_program'):
+        card=card.model_copy(update=dict(recorded_context=[*card.recorded_context,RecordedField(name='passive_program',
+            value=value['profile']['passive_program'],source=EvidenceLocation(reference=reference,pointer='/profile/passive_program'))]))
     if 'mathematical_facts' in value:
         # Legacy mechanics predates scoped_claim. Copy its recorded solver facts
         # without manufacturing a MathematicalEvidence certificate or conclusion.

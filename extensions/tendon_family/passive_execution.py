@@ -1,5 +1,7 @@
 """Controller-free finite-time execution using the existing fixed-payout compiler."""
 import time
+import csv
+import hashlib
 from pathlib import Path
 import numpy as np
 import mujoco
@@ -19,10 +21,12 @@ def source_binding(configuration):
     from tools.platform_tasks import compile_input
     compile_input(plain(inp))
     p=physics_for(inp)
-    return dict(source_kind='frozen_passive_protocol_v1',task_identity=digest(plain(inp.task)),
+    v2=inp.task.goal.data.get('version')=='passive_response_v2'
+    numerical=(dict(passive_limit_solver={k:inp.task.goal.data[k] for k in ('solreflimit','solimplimit')}) if v2 else {})
+    return dict(source_kind='frozen_passive_protocol_v2' if v2 else 'frozen_passive_protocol_v1',task_identity=digest(plain(inp.task)),
         design_identity=p['design_identity'],model_identity=digest(dict(physics=p['identity'],
             backend=plain(inp.policy.backend),model=plain(inp.policy.dynamics_model),
-            environment=plain(inp.task.environment),initial=plain(inp.task.initializer),timing=plain(inp.task.timing))),
+            environment=plain(inp.task.environment),initial=plain(inp.task.initializer),timing=plain(inp.task.timing),**numerical)),
         protocol=plain(inp.task.goal),initial=plain(inp.task.initializer))
 
 
@@ -57,18 +61,89 @@ def backend_result(inp,raw):
         else:index=None
         signals.append(Signal(spec=spec,times_s=[r['time_s'] for r in rows],
             values=[r[field] if index is None else r[field][index] if spec.dimension==3 else [r[field][index]] for r in rows]))
+    v2=inp.task.goal.data.get('version')=='passive_response_v2'
+    initial=(Payload(contract='reference.passive_initial_execution',version='2.0.0',data=dict(
+        source=raw['initial_state_source'],state_identities={e['load_condition']:e['integration_initial']['state_identity'] for e in raw['episodes']},
+        source_result=raw.get('initial_state_result'))) if v2 else inp.task.initializer.parameters)
     return BackendResult(solver_status='completed' if raw['status']=='completed' else 'failed',
-        backend_id='backend.family_passive_mujoco',model_id='mujoco_passive_fixed_payout_v1',signals=signals,
-        data=Payload(contract='family.passive_dynamic_data',data=raw),initial_state=inp.task.initializer.parameters,seed=inp.seed,
+        backend_id='backend.family_passive_mujoco',model_id='mujoco_passive_fixed_payout_v2' if v2 else 'mujoco_passive_fixed_payout_v1',signals=signals,
+        data=Payload(contract='family.passive_dynamic_data',version='2.0.0' if v2 else '1.0.0',data=raw),initial_state=initial,seed=inp.seed,
         limitations=['MuJoCo unilateral soft tendon limits; static hard KKT feasibility does not imply dynamic acceptance.',
             'Contact-free serial bending model; no hardware, friction, mixed actuation or robustness claim.'])
 
 
-def execute(inp,folder=None):
+def model_signature(model,*,exclude_limits=False):
+    """Compiled numeric assembly identity; the intervention may change one array."""
+    h=hashlib.sha256()
+    for name in sorted(dir(model)):
+        if exclude_limits and name=='tendon_limited':continue
+        value=getattr(model,name)
+        if isinstance(value,np.ndarray):
+            h.update(name.encode());h.update(str((value.shape,value.dtype.str)).encode());h.update(value.tobytes())
+    h.update(str((model.opt.timestep,int(model.opt.integrator),model.opt.iterations,model.opt.tolerance)).encode())
+    return h.hexdigest()
+
+
+def integration_state(model,data,binding):
+    spec=int(mujoco.mjtState.mjSTATE_INTEGRATION)
+    vector=np.empty(mujoco.mj_stateSize(model,spec));mujoco.mj_getState(model,data,vector,spec)
+    value=dict(version='passive_integration_state_v2',state_spec=spec,state_vector=vector.tolist(),
+        physical_binding=binding,mujoco_version=mujoco.__version__,time_s=float(data.time),
+        qpos_rad=data.qpos.tolist(),qvel_rad_s=data.qvel.tolist())
+    return dict(**value,state_identity=digest(value))
+
+
+def restore_state(model,data,value,binding):
+    supplied={k:v for k,v in value.items() if k!='state_identity'}
+    vector=np.asarray(value.get('state_vector',[]),dtype=float)
+    spec=int(mujoco.mjtState.mjSTATE_INTEGRATION)
+    if (digest(supplied)!=value.get('state_identity') or value.get('physical_binding')!=binding or
+            value.get('mujoco_version')!=mujoco.__version__ or value.get('state_spec')!=spec or
+            vector.shape!=(mujoco.mj_stateSize(model,spec),) or not np.isfinite(vector).all()):
+        raise ValueError('COMPLETE_MATCHED_PASSIVE_INTEGRATION_STATE_REQUIRED')
+    mujoco.mj_setState(model,data,vector,spec)
+    if data.qpos.tolist()!=value['qpos_rad'] or data.qvel.tolist()!=value['qvel_rad_s'] or float(data.time)!=value['time_s']:
+        raise ValueError('PASSIVE_STATE_LAYOUT_OR_CLOCK_MISMATCH')
+
+
+def constraint_mechanism(native,data,goal):
+    m=native.model;count=m.ntendon
+    tension=np.zeros(count);states=[[] for _ in range(count)];residual=[[] for _ in range(count)]
+    E=np.zeros((data.nefc,m.nv));J=native.tendon_jac(data)
+    if mujoco.mj_isSparse(m):mujoco.mju_sparse2dense(E,data.efc_J,data.efc_J_rownnz,data.efc_J_rowadr,data.efc_J_colind)
+    else:E[:]=data.efc_J.reshape(data.nefc,m.nv)
+    error=0.
+    for row in range(data.nefc):
+        if data.efc_type[row]!=int(mujoco.mjtConstraint.mjCNSTR_LIMIT_TENDON):continue
+        index=int(data.efc_id[row]);tension[index]+=float(data.efc_force[row])
+        states[index].append(int(data.efc_state[row]));residual[index].append(float(data.efc_pos[row]))
+        error=max(error,float(np.max(abs(E[row]+J[index]))))
+    gap=data.ten_length-native.payout;labels=[]
+    for i in range(count):
+        if not m.tendon_limited[i]:label='disabled'
+        elif tension[i]>goal.tension_tolerance_n and states[i] and max(states[i])>0 and gap[i]>=-goal.length_tolerance_m:label='taut'
+        elif gap[i]<-goal.length_tolerance_m and tension[i]<=goal.tension_tolerance_n and not states[i]:label='slack'
+        else:label='transition_or_indeterminate'
+        labels.append(label)
+    return dict(actual_tension_n=tension.tolist(),constraint_states=states,constraint_residuals_m=residual,
+        constraint_active=[bool(v and max(v)>0) for v in states],constraint_classification=labels,
+        constraint_direction_error=error)
+
+
+def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None):
     from tools.platform_registry import registry
     goal,bounds,problem=task_definition(inp.task,registry())
+    v2=goal.version=='passive_response_v2'
+    if (disabled_limits or initial_state is not None) and not v2:raise ValueError('PASSIVE_V2_STATE_OR_INTERVENTION_REQUIRED')
+    if initial_state is not None and not goal.allow_saved_state:raise ValueError('SAVED_PASSIVE_STATE_NOT_ALLOWED_BY_FROZEN_TASK')
     p=physics_for(inp);scene=assemble_physical(inp,p)
+    order=[t['entity'] for t in p['tendons']]
+    if v2 and (len(set(disabled_limits))!=len(disabled_limits) or any(name not in order for name in disabled_limits)):
+        raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
+    if disabled_limits and goal.allowed_ablation!='disable_selected_passive_limits':raise ValueError('PASSIVE_LIMIT_ABLATION_NOT_GRANTED_BY_TASK')
+    if v2 and goal.recording=='full_physics_csv' and folder is None:raise ValueError('L2_FOLDER_REQUIRED_FOR_FULL_PHYSICS_TRACE')
     scene['control']=dict(tension_execution_mode='passive_fixed_payout_v1')
+    if v2:scene['control'].update(solreflimit=goal.solreflimit,solimplimit=goal.solimplimit)
     folder=Path(folder) if folder else None
     if folder:
         folder.mkdir(parents=True,exist_ok=True)
@@ -76,6 +151,7 @@ def execute(inp,folder=None):
             raise ValueError('PRESERVE_EXISTING_PASSIVE_EXECUTION_RECOVER_WITHOUT_RELAUNCH')
     started=time.perf_counter()
     native=PassiveModel(p,plain(problem),folder/'passive.xml' if folder else None,scene=scene)
+    if v2:native.design_components=inp.robot.structure.data['components']
     model=native.model
     compile_s=time.perf_counter()-started
     binding=source_binding(plain(inp))
@@ -87,69 +163,254 @@ def execute(inp,folder=None):
         timings_s=dict(model_compile=compile_s),mujoco_version=mujoco.__version__,
         solver_options=dict(timestep_s=float(model.opt.timestep),integrator=int(model.opt.integrator),
             iterations=int(model.opt.iterations),tolerance=float(model.opt.tolerance)))
+    base_limited=model.tendon_limited.copy();disabled=[];unchanged=None
+    if v2:
+        if len(set(disabled_limits))!=len(disabled_limits) or any(name not in raw['tendon_order'] for name in disabled_limits):raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
+        if disabled_limits and goal.allowed_ablation!='disable_selected_passive_limits':raise ValueError('PASSIVE_LIMIT_ABLATION_NOT_GRANTED_BY_TASK')
+        disabled=[model.tendon(name).id for name in disabled_limits]
+        unchanged=model_signature(model,exclude_limits=True)
+        raw.update(kind='passive_dynamic_execution_v2',base_model_signature=model_signature(model),
+            initial_state_source='saved_integration_state' if initial_state is not None else goal.initial_source,
+            initial_state_result=plain(initial_state_result),trace_files=[],
+            intervention=dict(kind='disable_selected_passive_limits' if disabled else 'none',tendons=list(disabled_limits),
+                timing='after_identical_unloaded_qualification',only_limit_array_changed=True))
     dt=inp.task.timing.timestep_s;steps=round(inp.task.timing.duration_s/dt);stride=round(inp.task.timing.sample_period_s/dt)
     failure=MujocoFailureSnapshot(model,binding['model_identity'],folder)
     tendon_ids={model.tendon(t['entity']).id:i for i,t in enumerate(p['tendons'])}
+    state_saves=0;state_restores=0;static_forwards=0;constraint_checks=0
+    def saved_state(data):
+        nonlocal state_saves
+        state_saves+=1
+        return integration_state(model,data,binding)
     def checkpoint():
         raw.update(physics_steps=failure.completed_steps,attempted_steps=failure.attempted_steps,
             native_forward_calls=failure.forward_evaluations)
         raw['cost']=dict(model_builds=1,physics_steps=failure.completed_steps,attempted_steps=failure.attempted_steps,
             native_forward_calls=failure.forward_evaluations,episodes_started=len(raw['episodes']),
             episodes_completed=sum(e['complete'] for e in raw['episodes']),material_point_jacobian_calls=native.cost['material_point_jacobian_calls'])
+        if v2:raw['cost'].update(integration_state_saves=state_saves,integration_state_restores=state_restores,
+            static_balance_forwards=static_forwards,constraint_observations=constraint_checks,
+            tendon_jacobian_extractions=native.cost['tendon_jacobian_extractions'],
+            route_checked_poses=sum(e.get('route_geometry',{}).get('checked_poses',0) for e in raw['episodes']),
+            route_segment_body_checks=sum(e.get('route_geometry',{}).get('segment_body_checks',0) for e in raw['episodes']))
         raw['timings_s']['total']=time.perf_counter()-started
         if folder:atomic_json(folder/'passive_progress.json',raw)
+    if v2:checkpoint()
     for case in goal.load_conditions:
+        if v2:model.tendon_limited[:]=base_limited
         data=mujoco.MjData(model);mujoco.mj_resetData(model,data)
         data.qpos[:]=scene['qpos_rad'];data.qvel[:]=scene['qvel_rad_s']
+        if initial_state is not None:restore_state(model,data,initial_state,binding);state_restores+=1
         load=native.load(case)
         episode=dict(load_condition=case,initial_state=raw['initial_state'],complete=False,samples=[],
             physics_steps=0,checked_physics_steps=0,maximum_contacts=0,
             maximum_tension_n=0.,maximum_length_excess_m=0.)
         raw['episodes'].append(episode)
+        mechanism=None;map_error=0.;trace=None;writer=None
+        if v2:
+            episode.update(integration_initial=saved_state(data),engine_origin_s=float(data.time),state_resets=1,
+                qualification_samples=[],qualifications={},phase_boundaries=[],maximum_constraint_direction_error=0.,
+                maximum_force_map_error_nm=0.,minimum_constraint_multiplier_n=0.,maximum_capacity_ratio=0.,
+                maximum_enabled_length_excess_m=0.,stage_extrema={},constraint_transitions=[])
+            episode['route_geometry']=dict(sampling=goal.route_check,checked_poses=0,segment_body_checks=0,status='not_required',first_issue=None)
+            if goal.recording=='full_physics_csv':
+                path=folder/('episode_'+str(len(raw['episodes'])-1)+'.csv');trace=path.open('x',newline='')
+                writer=csv.writer(trace)
+                columns=['time_s','stage','engine_time_s','force_x_n','force_y_n','force_z_n']
+                for prefix,count in [('qpos',model.nq),('qvel',model.nv),('length_m',model.ntendon),
+                        ('tension_n',model.ntendon),('length_residual_m',model.ntendon),('constraint_state',model.ntendon),('constraint_residual_m',model.ntendon)]:
+                    columns.extend(prefix+'_'+str(i) for i in range(count))
+                columns+=['contacts','warnings','constraint_direction_error_m_rad','force_map_error_nm']
+                writer.writerow(columns)
         def refresh(t):
+            nonlocal map_error
             force,phase=load_at(goal,load,t)
             failure.call(data,mujoco.mj_forward,'passive_state_geometry')
-            native.apply_force(data,load.material_s,force)
+            _,J=native.apply_force(data,load.material_s,force)
+            if v2:map_error=float(np.max(abs(data.qfrc_applied-J.T@np.asarray(force))))
             failure.call(data,mujoco.mj_forward,'passive_loaded_constraints')
             return force,phase
         def tension():
+            if v2:return mechanism['actual_tension_n']
             values=np.zeros(model.ntendon)
             for j in range(data.nefc):
                 if data.efc_type[j]==int(mujoco.mjtConstraint.mjCNSTR_LIMIT_TENDON):
                     values[tendon_ids[int(data.efc_id[j])]]+=abs(float(data.efc_force[j]))
             return values.tolist()
-        def safety():
+        def safety(time_s=0.):
+            nonlocal mechanism,constraint_checks
+            if v2:
+                mechanism=constraint_mechanism(native,data,goal);constraint_checks+=1
+                episode['maximum_constraint_direction_error']=max(episode['maximum_constraint_direction_error'],mechanism['constraint_direction_error'])
+                episode['maximum_force_map_error_nm']=max(episode['maximum_force_map_error_nm'],map_error)
+                episode['minimum_constraint_multiplier_n']=min(episode['minimum_constraint_multiplier_n'],min(tension()))
+                episode['maximum_capacity_ratio']=max(episode['maximum_capacity_ratio'],max(v/t['force_limit_n'] for v,t in zip(tension(),p['tendons'])))
+                enabled=[i for i in range(model.ntendon) if model.tendon_limited[i]]
+                episode['maximum_enabled_length_excess_m']=max(episode['maximum_enabled_length_excess_m'],max([0.]+[float(data.ten_length[i]-native.payout[i]) for i in enabled]))
+                phase=load_at(goal,load,time_s)[1]
+                stage=next(s for s in goal.programs[case] if s.name==phase)
+                extrema=episode['stage_extrema'].setdefault(phase,dict(physics_steps=0,observation={},scoring={}))
+                extrema['physics_steps']+=int(time_s>0)
+                for scope,window in (('observation',stage.observation_window_s),('scoring',stage.scoring_window_s)):
+                    if not window[0]-1e-10<=time_s<=window[1]+1e-10:continue
+                    values=dict(maximum_tension=max(tension()),maximum_length_excess=max([0.]+[float(data.ten_length[i]-native.payout[i]) for i in enabled]),
+                        maximum_joint_position=float(max(abs(data.qpos))),maximum_joint_speed=float(max(abs(data.qvel))))
+                    for name,value in values.items():extrema[scope][name]=max(extrema[scope].get(name,0.),value)
+                previous=episode.get('last_constraint_classification')
+                if previous is not None and previous!=mechanism['constraint_classification']:
+                    episode['constraint_transitions'].append(dict(time_s=time_s,stage=phase,previous=previous,
+                        current=mechanism['constraint_classification'],actual_tension_n=tension(),
+                        length_residual_m=(data.ten_length-native.payout).tolist(),constraint_states=mechanism['constraint_states']))
+                episode['last_constraint_classification']=mechanism['constraint_classification']
+                if goal.route_check=='every_physics_step' or goal.route_check=='score_grid' and abs(time_s/inp.task.timing.sample_period_s-round(time_s/inp.task.timing.sample_period_s))<1e-8:
+                    from .route_validation import validate_routes
+                    check=validate_routes(native,[data.qpos],data=data);record=episode['route_geometry']
+                    record['checked_poses']+=1;record['segment_body_checks']+=check['segment_body_checks']
+                    if check['issues'] and record['first_issue'] is None:record['first_issue']=dict(time_s=time_s,**check['issues'][0])
+                    record['status']='illegal' if record['first_issue'] else 'legal_at_checked_poses'
             episode['maximum_contacts']=max(episode['maximum_contacts'],int(data.ncon))
             episode['maximum_tension_n']=max(episode['maximum_tension_n'],max(tension()))
             episode['maximum_length_excess_m']=max(episode['maximum_length_excess_m'],max(0.,float(max(data.ten_length-native.payout))))
         def sample(t,force,phase):
+            nonlocal static_forwards
             points=[native.point(data,b) for b in native.points]
-            return dict(time_s=t,engine_time_s=float(data.time),qpos_rad=data.qpos.tolist(),qvel_rad_s=data.qvel.tolist(),
+            value=dict(time_s=t,engine_time_s=float(data.time),qpos_rad=data.qpos.tolist(),qvel_rad_s=data.qvel.tolist(),
                 tip_m=points[-1][0].tolist(),tip_velocity_m_s=(points[-1][1]@data.qvel).tolist(),
                 material_positions_m=[x[0].tolist() for x in points[:-1]],material_velocities_m_s=[(x[1]@data.qvel).tolist() for x in points[:-1]],
                 tendon_length_m=data.ten_length.tolist(),length_residual_m=(data.ten_length-native.payout).tolist(),
                 actual_tension_n=tension(),taut=[bool(v>0) for v in tension()],force_world_n=force,phase=phase,
                 ncon=int(data.ncon),nefc=int(data.nefc),solver_iterations=int(np.max(data.solver_niter)),
                 warnings=[dict(number=int(w.number),lastinfo=int(w.lastinfo)) for w in data.warning])
+            if v2:
+                static=mujoco.MjData(model)
+                if goal.static_balance_reference=='copied_integration_zero_velocity':mujoco.mj_copyData(static,model,data)
+                else:static.qpos[:]=data.qpos
+                static.qvel[:]=0.
+                failure.call(static,mujoco.mj_forward,'passive_static_geometry')
+                native.apply_force(static,load.material_s,force)
+                failure.call(static,mujoco.mj_forward,'passive_static_balance');static_forwards+=2
+                balance=static.qfrc_passive+static.qfrc_applied-static.qfrc_bias+static.qfrc_constraint
+                value.update(**mechanism,static_balance_inf_nm=float(np.max(abs(balance))),force_map_error_nm=map_error,
+                    taut=[label=='taut' for label in mechanism['constraint_classification']])
+            return value
         try:
-            force,phase=refresh(0.);safety();episode['samples'].append(sample(0.,force,phase));checkpoint()
+            force,phase=refresh(0.);safety();first=sample(0.,force,phase);episode['samples'].append(first)
+            if v2 and any(q.sampling=='every_physics_step' and q.window_s[0]==0 for q in goal.qualifications):episode['qualification_samples'].append(first)
+            checkpoint()
             for tick in range(steps):
-                # Force is evaluated at each integration interval start, in world N.
-                force,phase=refresh(tick*dt)
+                if v2 and disabled and tick==round(goal.programs[case][0].end_s/dt):
+                    if not episode.get('qualified_state'):raise ValueError('QUALIFIED_COMMON_INITIAL_STATE_REQUIRED_BEFORE_ABLATION')
+                    model.tendon_limited[disabled]=False
+                    if model_signature(model,exclude_limits=True)!=unchanged:raise ValueError('ABLATION_CHANGED_BASE_PHYSICAL_ASSEMBLY')
+                    episode['intervention_at_s']=tick*dt
+                # v1 is unchanged. v2 explicitly freezes interval-start/end force semantics.
+                applied_time=(tick+1)*dt if v2 and goal.force_sampling=='interval_end' else tick*dt
+                force,phase=refresh(applied_time)
                 failure.call(data,mujoco.mj_step,'passive_time_integration')
                 episode['physics_steps']+=1
-                force,phase=refresh((tick+1)*dt);safety();episode['checked_physics_steps']+=1
-                if (tick+1)%stride==0:
-                    episode['samples'].append(sample((tick+1)*dt,force,phase));checkpoint()
+                force,phase=refresh(applied_time if v2 else (tick+1)*dt)
+                now=(tick+1)*dt
+                if v2:phase=load_at(goal,load,now)[1]
+                safety(now);episode['checked_physics_steps']+=1
+                dense=v2 and any(q.sampling=='every_physics_step' and q.window_s[0]-1e-10<=now<=q.window_s[1]+1e-10 for q in goal.qualifications)
+                if (tick+1)%stride==0 or dense:
+                    row=sample(now,force,phase)
+                    if (tick+1)%stride==0:episode['samples'].append(row)
+                    if dense:episode['qualification_samples'].append(row)
+                    if not v2:checkpoint()
+                if writer:
+                    writer.writerow([now,phase,float(data.time),*force,*data.qpos,*data.qvel,*data.ten_length,*tension(),
+                        *(data.ten_length-native.payout),*[max(s) if s else -1 for s in mechanism['constraint_states']],
+                        *[s[0] if s else '' for s in mechanism['constraint_residuals_m']],
+                        int(data.ncon),sum(w.number for w in data.warning),mechanism['constraint_direction_error'],map_error])
+                if v2 and any(abs(now-stage.end_s)<1e-10 for stage in goal.programs[case]):
+                    from extensions.reference.passive_program import qualification
+                    boundary_state=saved_state(data)
+                    episode['phase_boundaries'].append(dict(stage=phase,time_s=now,integration_state=boundary_state))
+                    for rule in goal.qualifications:
+                        if abs(rule.window_s[1]-now)>1e-10:continue
+                        selected=episode['qualification_samples'] if rule.sampling=='every_physics_step' else episode['samples']
+                        qualified=qualification(selected,rule,disabled_limits=disabled if disabled and episode.get('intervention_at_s') is not None else ())
+                        episode['qualifications'][rule.stage]=qualified
+                        if rule.stage==goal.unloaded_stage:
+                            if not qualified['passed']:raise ValueError('UNLOADED_DYNAMIC_QUALIFICATION_FAILED')
+                            episode['qualified_state']=boundary_state
+                    checkpoint()
             episode['complete']=True
         except Exception as exc:
             raw['reason']=str(exc)
+            if v2:raw['status']='invalid'
             if getattr(exc,'mujoco_diagnostic',None):raw['numerical_failure']=exc.mujoco_diagnostic
             checkpoint();break
+        finally:
+            if trace:
+                trace.close()
+                with path.open('rb') as stream:identity=hashlib.file_digest(stream,'sha256').hexdigest()
+                raw['trace_files'].append(dict(path=path.name,sha256=identity,bytes=path.stat().st_size,
+                    physics_steps=episode['physics_steps'],load_condition=case,format='full_physics_csv_v2'))
         checkpoint()
     if len(raw['episodes'])==len(goal.load_conditions) and all(e['complete'] for e in raw['episodes']):raw['status']='completed'
     checkpoint()
     return backend_result(inp,raw)
+
+
+def baseline_arm(raw):
+    """Recover the exact primary arm from a composite result without its twin."""
+    pair=raw['paired_ablation'];value={k:v for k,v in raw.items() if k not in ('paired_ablation','boundary','implementation')}
+    value.update(cost=pair['baseline_cost'],timings_s=pair['baseline_timings_s'],
+        trace_files=pair['baseline_trace_files'],model_builds=1,status=pair['baseline_status'])
+    if pair.get('baseline_reason') is None:value.pop('reason',None)
+    else:value['reason']=pair['baseline_reason']
+    return value
+
+
+def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None):
+    """Two fresh native executions in one contained, fully accounted Worker.
+
+    Each arm owns a complete raw record and a separate immutable execution
+    receipt; the existing parent reservation owns the aggregate physical cost.
+    """
+    names=[t['entity'] for t in physics_for(inp)['tendons']]
+    if not disabled_limits or len(set(disabled_limits))!=len(disabled_limits) or any(name not in names for name in disabled_limits):
+        raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
+    folder=Path(folder);started=time.perf_counter()
+    first=execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result).data.data
+    if first['status']!='completed':
+        first['paired_ablation']=dict(status='not_executed_baseline_invalid',requested_tendons=list(disabled_limits),
+            baseline_cost=first['cost'],baseline_timings_s=first['timings_s'],baseline_trace_files=first['trace_files'],
+            baseline_status=first['status'],baseline_reason=first.get('reason'))
+        first['trace_files']=[dict(v,path='baseline/'+v['path']) for v in first['trace_files']]
+        atomic_json(folder/'passive_progress.json',first)
+        return backend_result(inp,first)
+    pair=dict(status='incomplete',requested_tendons=list(disabled_limits),
+        baseline_cost=first['cost'],baseline_timings_s=first['timings_s'],baseline_trace_files=first['trace_files'],
+        baseline_status=first['status'],baseline_reason=first.get('reason'))
+    combined={**first,'paired_ablation':pair,'status':'incomplete'}
+    atomic_json(folder/'passive_progress.json',combined)
+    try:
+        second=execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
+            initial_state_result=initial_state_result).data.data
+    except Exception as exc:
+        from tools.state_io import read
+        path=folder/'ablation/passive_progress.json'
+        second=read(path) if path.exists() else dict(status='incomplete',reason=str(exc),cost={})
+        second.update(status='incomplete',reason=str(exc))
+    pair.update(ablation=second,status='completed' if second['status']=='completed' else 'incomplete')
+    for arm,value in (('baseline',first),('ablation',second)):
+        pair.setdefault('arm_receipts',{})[arm]=dict(version='passive_native_arm_receipt_v2',
+            parent_execution_id=folder.name,execution_id=folder.name+'/'+arm,execution_status=value['status'],
+            raw_identity=digest(value),physical_binding=value.get('physical_binding'),
+            intervention=value.get('intervention'),cost=value.get('cost'),elapsed_s=value.get('timings_s',{}).get('total'),
+            qualified_states={e['load_condition']:e.get('qualified_state',{}).get('state_identity') for e in value.get('episodes',[])},
+            scope='One fresh native model/data execution, owned by the enclosing Worker reservation; no separate autonomous Study.')
+    combined.update(status='completed' if pair['status']=='completed' else 'incomplete',model_builds=1+second.get('model_builds',0),
+        cost={key:first['cost'].get(key,0)+second.get('cost',{}).get(key,0) for key in set(first['cost'])|set(second.get('cost',{}))},
+        timings_s=dict(total=time.perf_counter()-started,baseline=first['timings_s']['total'],ablation=second.get('timings_s',{}).get('total',0.)),
+        trace_files=[dict(v,path=arm+'/'+v['path']) for arm,value in (('baseline',first),('ablation',second)) for v in value.get('trace_files',[])])
+    combined['cost'].update(observation_scope='complete_exact_counts' if pair['status']=='completed' else 'last_durable_observed_lower_bounds',
+        unobserved_work_possible=pair['status']!='completed')
+    atomic_json(folder/'passive_progress.json',combined)
+    return backend_result(inp,combined)
 
 
 class NoActiveControl:

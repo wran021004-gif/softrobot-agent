@@ -395,11 +395,18 @@ def calculate(request,folder):
         raise ValueError('OWNED_ACTIVE_PHYSICAL_REPLAY_RESERVATION_REQUIRED')
     if request.get('route')=='passive_protocol':
         from extensions.tendon_family.passive_execution import execute,source_binding
-        expected=dict(**source_binding(request['configuration']),candidate=request['candidate'])
+        expected=passive_source(request['configuration'],request['candidate'],request['passive_source'].get('execution',{}))
         if (request['passive_source']!=expected or pending.get('candidate')!=request['candidate'] or
                 store.artifact(request['source_reference'])!=expected):
             raise ValueError('PASSIVE_WORKER_SOURCE_BINDING_MISMATCH')
-        return execute(SessionInput.model_validate(request['configuration']),folder).data.data
+        options=request['passive_source'].get('execution',{})
+        initial=resolve_passive_state(store,request['study_id'],request['candidate'],request['configuration'],options)
+        if options.get('passive_ablation'):
+            from extensions.tendon_family.passive_execution import execute_pair
+            return execute_pair(SessionInput.model_validate(request['configuration']),folder,options['passive_ablation'],
+                initial_state=initial,initial_state_result=options.get('initial_state_result')).data.data
+        return execute(SessionInput.model_validate(request['configuration']),folder,initial_state=initial,
+            initial_state_result=options.get('initial_state_result')).data.data
     inp,physics,scene=binding(request['configuration'],request['trajectory'])
     result=playback_tensions(inp,physics,scene,request['trajectory']['tensions_n'],folder)
     result.update(candidate=request['candidate'],source_reference=request['source_reference'],
@@ -410,6 +417,43 @@ def calculate(request,folder):
             mathematical_model_identity=source['provenance']['mathematical_model_identity'],
             local_model_identity=source['provenance']['local_model_identity'])
     return result
+
+
+def passive_source(configuration,candidate,options=None):
+    """Frozen protocol and explicit finite execution choices share one identity."""
+    from extensions.tendon_family.passive_execution import source_binding
+    from extensions.tendon_family.backends import physics_for
+    from extensions.reference.passive_response import goal_definition
+    from tools.research.contracts import PhysicalReplayRequest
+    parsed=PhysicalReplayRequest.model_validate(dict(candidate=candidate,**(options or {})))
+    options={k:plain(getattr(parsed,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode') if getattr(parsed,k) is not None}
+    inp=SessionInput.model_validate(configuration);goal=goal_definition(inp.task)
+    if options and goal.version!='passive_response_v2':raise ValueError('PASSIVE_V2_EXECUTION_CHOICES_REQUIRED')
+    names=options.get('passive_ablation',[])
+    if names and (goal.allowed_ablation!='disable_selected_passive_limits' or len(set(names))!=len(names)
+            or set(names)-{t['entity'] for t in physics_for(inp)['tendons']}):raise ValueError('EXACT_GRANTED_PASSIVE_LIMIT_NAMES_REQUIRED')
+    if bool(options.get('initial_state_result'))!=bool(options.get('initial_state_episode')):raise ValueError('SAVED_STATE_RESULT_AND_EPISODE_REQUIRED')
+    if options.get('initial_state_result') and not goal.allow_saved_state:raise ValueError('SAVED_STATE_NOT_GRANTED_BY_TASK')
+    return dict(**source_binding(configuration),candidate=plain(candidate),**(dict(execution=options) if options else {}))
+
+
+def resolve_passive_state(store,study_id,candidate,configuration,options):
+    ref=options.get('initial_state_result')
+    if ref is None:return None
+    from extensions.tendon_family.passive_execution import source_binding,baseline_arm
+    from extensions.reference.passive_evaluation_v2 import inspect
+    current=store.session(study_id)['state']
+    if ref not in current.get('physical_replays',[]):raise ValueError('CURRENT_OWNED_PHYSICAL_STATE_SOURCE_REQUIRED')
+    result=store.artifact(ref)
+    if (result.get('owning_study')!=study_id or result.get('candidate')!=candidate or result.get('status')!='evaluated'
+            or not result.get('boundary',{}).get('termination_confirmed')):raise ValueError('COMPLETED_OWNED_PHYSICAL_STATE_SOURCE_REQUIRED')
+    raw=store.artifact(result['raw_reference'])
+    if raw.get('paired_ablation',{}).get('baseline_cost'):raw=baseline_arm(raw)
+    if raw.get('physical_binding')!=source_binding(configuration) or inspect(SessionInput.model_validate(configuration).task,raw)[0]!='valid':
+        raise ValueError('QUALIFIED_MATCHED_DYNAMIC_STATE_SOURCE_REQUIRED')
+    episode=next((e for e in raw['episodes'] if e['load_condition']==options['initial_state_episode']),None)
+    if episode is None or not episode.get('qualified_state'):raise ValueError('SAVED_QUALIFIED_EPISODE_STATE_REQUIRED')
+    return episode['qualified_state']
 
 
 def dispatch(host,arguments,key,*,role='development',selected=None):
@@ -429,8 +473,13 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     route='passive_protocol' if passive else 'fixed_tension'
     if cfg['task'].get('physical_problem') and not passive:raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
     if passive:
-        from extensions.tendon_family.passive_execution import source_binding
-        expected=dict(**source_binding(cfg),candidate=candidate)
+        options={k:plain(getattr(arguments,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode') if getattr(arguments,k) is not None}
+        if arguments.source and not options:options=host.store.artifact(arguments.source).get('execution',{})
+        expected=passive_source(cfg,candidate,options)
+        resolve_passive_state(host.store,host.run_id,candidate,cfg,options)
+        if options.get('passive_ablation'):episodes*=2
+        if cfg['task']['goal']['data'].get('version')=='passive_response_v2':
+            host.store.artifact(cfg['task']['goal']['data']['protocol_source'])
         source_ref=plain(arguments.source) if arguments.source else save(host,expected,'frozen_passive_protocol')
         source=host.store.artifact(source_ref)
         if source!=expected:raise ValueError('FROZEN_PASSIVE_PROTOCOL_CANDIDATE_MISMATCH')
@@ -566,6 +615,10 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
             evaluation_validity=evaluation.validity,valid_complete_execution=evaluation.validity=='valid' and complete,
             physics_steps=raw.get('physics_steps'),cost=raw.get('cost'),execution_failure_reason=reason,
             simulation_wall_s=raw.get('timings_s',{}).get('total'))
+        if inp.task.goal.data.get('version')=='passive_response_v2':
+            from extensions.reference.passive_evaluation_v2 import summary
+            profile.update(initial_qualification=validity=='valid',stage_program=validity=='valid',actual_constraints=validity=='valid',
+                passive_program=summary(inp.task,raw),physics_steps=raw.get('cost',{}).get('physics_steps'))
         return evaluation,profile
     samples=raw.get('samples',[])
     signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
@@ -602,6 +655,29 @@ def recover(host):
     if (folder/'first_environment_contact.json').exists():raw.setdefault('environment_contact',read(folder/'first_environment_contact.json'))
     if raw.get('status')!='completed' and (folder/'samples.json').exists():
         raw['samples']=read(folder/'samples.json')
+    passive_l2=None
+    if raw.get('kind')=='passive_dynamic_execution_v2':
+        # Import immutable bytes and arm receipts into the existing Store. Keep
+        # native arm bodies unchanged so their measured identities remain valid.
+        passive_l2=dict(traces=[],arms={})
+        with host.store.transaction() as db:
+            for manifest in raw.get('trace_files',[]):
+                path=(folder/manifest['path']).resolve()
+                if not path.is_relative_to(folder.resolve()):raise ValueError('PASSIVE_TRACE_OUTSIDE_OWNED_WORKER_FOLDER')
+                body=path.read_bytes()
+                if len(body)!=manifest['bytes'] or hashlib.sha256(body).hexdigest()!=manifest['sha256']:
+                    raise ValueError('PASSIVE_TRACE_IMMUTABILITY_MISMATCH')
+                passive_l2['traces'].append(dict(**manifest,reference=plain(host.store.put(db,body,media='text/csv'))))
+            pair=raw.get('paired_ablation') or {}
+            if pair.get('arm_receipts'):
+                from extensions.tendon_family.passive_execution import baseline_arm
+                for arm,value in [('baseline',baseline_arm(raw)),('ablation',pair['ablation'])]:
+                    native=pair['arm_receipts'][arm]
+                    if native['raw_identity']!=digest(value):raise ValueError('PASSIVE_ARM_RECEIPT_RAW_MISMATCH')
+                    ref=plain(host.store.put(db,value))
+                    receipt=dict(**native,raw_reference=ref,parent_request_id=p['worker_request_id'],
+                        owning_study=host.run_id,parent_boundary=boundary,parent_implementation=p['implementation'])
+                    passive_l2['arms'][arm]=dict(raw_reference=ref,receipt_reference=plain(host.store.put(db,receipt)))
     raw.update(boundary=boundary,implementation=p['implementation'])
     raw_ref=save(host,raw,'physical_playback_raw')
     source=host.store.artifact(p['source_reference'])
@@ -648,6 +724,7 @@ def recover(host):
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
         physical_launches=p.get('episode_count',1),actual_resource_consumption=raw.get('cost'),
         backend_reference=backend_reference,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
+    if passive_l2 is not None:final['passive_l2']=passive_l2
     ref=save(host,final,'physical_playback_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:

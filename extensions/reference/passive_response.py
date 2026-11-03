@@ -4,7 +4,25 @@ No equilibrium solve, controller, integration, Store or acceptance state machine
 """
 import numpy as np
 from schemas.platform import EvaluationResult, Metric, ConstraintResult
-from .contracts import PassiveResponseGoal, PassiveResponseEvaluation
+from .contracts import (PassiveResponseGoal,PassiveResponseEvaluation,
+    PassiveResponseGoalV2,PassiveResponseEvaluationV2)
+from .passive_evaluation_v2 import metrics as task_metrics_v2
+
+
+def inspect_evidence_v2(task,raw):
+    from .passive_evaluation_v2 import inspect
+    if (raw.get('paired_ablation') or {}).get('baseline_cost'):
+        from extensions.tendon_family.passive_execution import baseline_arm
+        raw=baseline_arm(raw)
+    return inspect(task,raw)
+
+
+def goal_definition(task):
+    return (PassiveResponseGoalV2 if task.goal.data.get('version')=='passive_response_v2' else PassiveResponseGoal).model_validate(task.goal.data)
+
+
+def evaluation_definition(task):
+    return (PassiveResponseEvaluationV2 if task.goal.data.get('version')=='passive_response_v2' else PassiveResponseEvaluation).model_validate(task.evaluator.parameters.data)
 
 
 def task_definition(task, reg):
@@ -16,8 +34,8 @@ def task_definition(task, reg):
             task.evaluator.parameters.contract!='reference.passive_response_evaluation' or
             task.actuator_channels or task.initializer.extension_id!='initialize.family'):
         raise ValueError('PASSIVE_TASK_BINDINGS_REQUIRED')
-    goal=PassiveResponseGoal.model_validate(task.goal.data)
-    bounds=PassiveResponseEvaluation.model_validate(task.evaluator.parameters.data)
+    goal=goal_definition(task)
+    bounds=evaluation_definition(task)
     problem=ConstrainedPhysicalProblem.model_validate(task.physical_problem)
     assembly=Assembly.model_validate(task.environment.data)
     loads={v.name:v for v in problem.loads}
@@ -32,6 +50,12 @@ def task_definition(task, reg):
             assembly.external_forces):
         raise ValueError('PASSIVE_PHYSICAL_PROBLEM_AND_ASSEMBLY_MISMATCH')
     timing=task.timing
+    if goal.version=='passive_response_v2':
+        if (task.goal.version!='2.0.0' or task.evaluator.version!='2.0.0' or task.evaluator.parameters.version!='2.0.0'):
+            raise ValueError('EXPLICIT_PASSIVE_V2_CONTRACT_AND_EVALUATOR_VERSION_REQUIRED')
+        from .passive_program import validate_program
+        validate_program(task,goal,bounds,problem)
+        return goal,bounds,problem
     if goal.hold_window_s[1]!=timing.duration_s:
         raise ValueError('PASSIVE_HOLD_MUST_COVER_TASK_ENDPOINT')
     for t in [goal.unloaded_until_s,goal.ramp_until_s,*goal.hold_window_s]:
@@ -43,6 +67,9 @@ def task_definition(task, reg):
 
 
 def load_at(goal, load, time_s):
+    if goal.version=='passive_response_v2':
+        from .passive_program import force_at
+        return force_at(goal,load.name,time_s)
     alpha=float(np.clip((time_s-goal.unloaded_until_s)/(goal.ramp_until_s-goal.unloaded_until_s),0.,1.))
     return (np.asarray(load.force_world_n)*alpha).tolist(),('unloaded' if time_s<=goal.unloaded_until_s else
         'ramp' if time_s<goal.ramp_until_s else 'hold')
@@ -51,6 +78,7 @@ def load_at(goal, load, time_s):
 def inspect_evidence(task, raw):
     """Validate complete local clocks, shapes, loads and measured engine state."""
     from tools.state_io import digest
+    if task.goal.data.get('version')=='passive_response_v2':return inspect_evidence_v2(task,raw)
     goal=PassiveResponseGoal.model_validate(task.goal.data)
     problem=task.physical_problem
     source=raw.get('physical_binding',{})
@@ -120,6 +148,7 @@ def reduce_vector(bound, vector):
 
 def task_metrics(task, raw):
     """Pure frozen metric extraction shared by research observations and evaluation."""
+    if task.goal.data.get('version')=='passive_response_v2':return task_metrics_v2(task,raw)
     from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
     goal=PassiveResponseGoal.model_validate(task.goal.data)
     bounds=PassiveResponseEvaluation.model_validate(task.evaluator.parameters.data)
@@ -173,8 +202,13 @@ def task_metrics(task, raw):
 def evaluate(task, result, source, reg, identity):
     task_definition(task,reg)
     observation=task_metrics(task,result.data.data)
-    if (result.backend_id!='backend.family_passive_mujoco' or result.model_id!='mujoco_passive_fixed_payout_v1' or
-            result.data.contract!='family.passive_dynamic_data' or result.initial_state!=task.initializer.parameters or
+    v2=task.goal.data.get('version')=='passive_response_v2'
+    initial_ok=(result.initial_state.contract=='reference.passive_initial_execution' and result.initial_state.version=='2.0.0' and
+        result.initial_state.data.get('source')==result.data.data.get('initial_state_source') and
+        result.initial_state.data.get('source_result')==result.data.data.get('initial_state_result') and
+        result.initial_state.data.get('state_identities')=={e['load_condition']:e['integration_initial']['state_identity'] for e in result.data.data['episodes']}) if v2 else result.initial_state==task.initializer.parameters
+    if (result.backend_id!='backend.family_passive_mujoco' or result.model_id!=('mujoco_passive_fixed_payout_v2' if v2 else 'mujoco_passive_fixed_payout_v1') or
+            result.data.contract!='family.passive_dynamic_data' or not initial_ok or
             result.seed not in task.sampling.seeds):
         observation=dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='BACKEND_INITIALIZER_OR_SEED_BINDING_MISMATCH')
     if result.solver_status!='completed' and observation['validity']=='valid':

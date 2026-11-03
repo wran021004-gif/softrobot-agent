@@ -107,6 +107,8 @@ def compile_xml(physics, scene, config, path):
         if execution_mode=='passive_fixed_payout_v1':
             route.set('limited','true');route.set('range',fmt([0.,payout[t['entity']]]))
             route.set('solreflimit','.002 1');route.set('solimplimit','.99 .999 .0001')
+            for name in ('solreflimit','solimplimit'):
+                if name in scene['control']:route.set(name,fmt(scene['control'][name]))
         elif execution_mode=='ideal_tension':
             # Positive controller tension maps to MuJoCo's negative tendon force.
             ET.SubElement(actuators,'general',name=t['entity']+'_direct_tension',tendon=t['entity'],

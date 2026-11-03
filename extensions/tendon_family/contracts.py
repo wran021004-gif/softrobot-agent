@@ -425,6 +425,18 @@ class PassiveDynamicData(Contract):
     implementation: str | None = None
 
 
+class PassiveDynamicDataV2(PassiveDynamicData):
+    kind: Literal['passive_dynamic_execution_v2']
+    status: Literal['completed','incomplete','invalid']
+    model_builds: int = Field(ge=1)
+    base_model_signature: str
+    initial_state_source: Literal['frozen_named_state','qualified_unloaded','saved_integration_state']
+    initial_state_result: EvidenceRef | None = None
+    intervention: dict
+    trace_files: list[dict]
+    paired_ablation: dict | None = None
+
+
 class ExperimentSpec(Contract):
     """Immutable composition view; editable values remain in their source objects."""
     version: Literal['family_experiment_v1'] = 'family_experiment_v1'
