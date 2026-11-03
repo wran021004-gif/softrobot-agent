@@ -6,7 +6,8 @@ separate from the sealed original M1 Store. Its final SHA-256 remains
 `e8cec2b77000b622617c1ac0e9eb213685fbcc5dd8b9b52e3741485454b8c9d4`.
 
 Implementation: `03b626e`, certificate integration `e2337e6`, full-tail metric /
-partial recovery integration `36cf0d9`. Final targeted test code is `8b83ff7`.
+partial recovery integration `36cf0d9`. Saved-state tests use `8b83ff7`;
+Reporter aggregate-cost and interrupted lower-bound delivery use `88c6e3b`.
 Protocol integration observations below retain actual execution identity
 `e2337e6`; later numerical reanalysis is explicitly zero-integration evidence,
 not a new physical Replay or a rewritten historical acceptance result.
@@ -127,6 +128,9 @@ scientific decision quality or real Provider token savings. Main never supplied
 engine state vectors/matrices. Wire bodies were about 37–45 kB. Reporter received
 source-bound phase/qualification facts; large traces and full states stayed in L2.
 Control feasibility, Native active optimization and RL remained unavailable.
+Reporter resources take the parent result's aggregate actual cost, avoiding
+reporting the primary arm's 320,000 steps as a 640,000-step pair's total.
+Interrupted resources are explicitly named lower bounds and retain uncertainty.
 
 Saved-state result/episode references also reached the original Worker, restored
 the exact recorded engine clock/full state, and rejected unowned source refs.
