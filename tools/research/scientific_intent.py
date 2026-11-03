@@ -266,19 +266,21 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             rows=parameter_catalog(spec,candidate)
             schema['properties']['parameter_id']['anyOf'][0]['enum']=[r['parameter_id'] for r in rows if r['selectable']]
     from tools.research.contracts import prune_schema_definitions,compact_schema
-    if question_contract(spec) is ScientificQuestionV4:project_control_effort(schema)
+    if question_contract(spec) is ScientificQuestionV4:project_control_effort(schema,spec)
     elif 'ScientificControlEffort' in schema.get('$defs',{}):
         schema['$defs']['ScientificControlEffort']['required'].append('method')
     schema=prune_schema_definitions(schema)
     return compact_schema(schema) if question_contract(spec) is ScientificQuestionV4 else schema
 
 
-def project_control_effort(schema):
+def project_control_effort(schema,spec=None):
     """Provider projection only; historical numerical effort remains readable."""
     effort=schema.get('$defs',{}).get('ScientificControlEffort')
     if effort:
         effort['properties']={k:v for k,v in effort['properties'].items() if k in ('resolution','exploration','evaluation_requests')}
         effort['required']=['resolution','exploration','evaluation_requests']
+        maximum=(spec or {}).get('native_control_limits',{}).get('evaluation_requests')
+        if maximum is not None:effort['properties']['evaluation_requests']['maximum']=maximum
         for key in ('resolution','exploration'):
             effort['properties'][key]={**next(b for b in effort['properties'][key]['anyOf'] if b.get('type')!='null')}
         effort['description']='Choose temporal freedom, physical exploration scale and a shared finite callback cap. The program binds the numerical method, knots, active coefficients and step sizes; all starts share the cap. Every frozen task constraint remains scored.'
@@ -333,7 +335,7 @@ def control_settings(spec, effort, *, window=None, channels=None, physical_limit
     result=LocalControlSearchSettings.model_validate(settings)
     for name,limit in limits.items():
         actual=len(result.knots_s) if name=='knots_s' else getattr(result,name)
-        if actual>limit:raise ValueError('ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT: '+name)
+        if actual>limit:raise ValueError('ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT: '+name+f'; requested={actual}; maximum={limit}')
     return result
 
 

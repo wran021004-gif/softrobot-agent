@@ -185,9 +185,19 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             with patch('tools.research.agent.credential',return_value='offline'),patch.object(core,'guard'),patch('tools.research.state.guard'), \
                     patch.object(analysis,'dispatch',side_effect=scored), \
                     patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
-                sent=run_fixture(h,[('research_route',dict(tool='research_plan',action='search')),('research_plan',value),None],limit=3)
+                too_much=deepcopy(value);too_much['search']['control_search_effort']['evaluation_requests']=8192
+                sent=run_fixture(h,[('research_route',dict(tool='research_plan',action='search')),
+                    ('research_plan',too_much),('research_plan',value),None],limit=4)
             schema=next(t['function']['parameters'] for t in sent[1]['tools'] if t['function']['name']=='research_plan')
             self.assertIn('ScientificStructureSearch',schema.get('$defs',{}))
+            self.assertEqual(schema['$defs']['ScientificControlEffort']['properties']['evaluation_requests']['maximum'],
+                state(h)['spec']['native_control_limits']['evaluation_requests'])
+            rejected=next(h.store.artifact(e['outputs'][0])['result'] for e in h.store.events(h.run_id)
+                if e['kind']=='model_original_tool_feedback' and h.store.artifact(e['outputs'][0])['tool_use']['toolUseId']=='offline-use-1')
+            rejected=json.loads(rejected['content'][0]['text'])
+            self.assertEqual(rejected['field'],'search.control_search_effort.evaluation_requests')
+            self.assertIn(str(state(h)['spec']['native_control_limits']['evaluation_requests']),rejected['expected'])
+            self.assertFalse(rejected['worker_started'])
             self.assertEqual(len(state(h)['search_results']),1)
             packet=json.loads(sent[-1]['messages'][-1]['content'].split('\n',1)[1])['research']
             self.assertIn('search',json.dumps(packet));self.assertEqual(state(h)['mathematical_evaluations'],6)

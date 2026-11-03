@@ -118,7 +118,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
                 if branch.get('type')=='array':branch['items']['enum']=grant[name]
         schema['$defs'].update(intent_schema.pop('$defs'))
         from tools.research.scientific_intent import project_control_effort
-        project_control_effort(schema)
+        project_control_effort(schema,study)
         schema['$defs']['ScientificStructureSearch']=intent_schema
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/ScientificStructureSearch'},{'type':'null'}]
         decision=schema['$defs']['ResearchDecision']
@@ -593,6 +593,9 @@ def error_feedback(host, use, exc, before):
     elif isinstance(exc,SchemaValidationError):
         # Keep the exact validator dump in Store; send a field-specific repair
         # instead of Schema internals on the focused-tool correction turn.
+        related=[exc]
+        for issue in related:related.extend(issue.context)
+        exc=next((e for e in related if e.validator=='maximum' and list(e.absolute_path)[-1:]==['evaluation_requests']),exc)
         path=list(exc.absolute_path);message=exc.message
         missing=next((k for k in exc.validator_value if k not in exc.instance),None) if exc.validator=='required' else None
         if missing is not None:path.append(missing)

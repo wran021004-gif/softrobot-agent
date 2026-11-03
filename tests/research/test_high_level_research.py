@@ -49,6 +49,7 @@ class HighLevelTests(unittest.TestCase):
         schema=selected_question_schema(self.h)
         effort=schema['$defs']['ScientificControlEffort']
         self.assertEqual(set(effort['properties']),{'resolution','exploration','evaluation_requests'})
+        self.assertEqual(effort['properties']['evaluation_requests']['maximum'],state(self.h)['spec']['native_control_limits']['evaluation_requests'])
         payload=dict(version='scientific_question_v4',domain='control',control=dict(
             control_scope=dict(mode='full_task'),control_search_effort=dict(resolution='coarse',exploration='broad',evaluation_requests=4),
             source_selection=dict(control_source=source,additional_control_sources=[source])))
@@ -69,6 +70,8 @@ class HighLevelTests(unittest.TestCase):
         self.assertGreater(cfg['knots_s'][0],0.)
         channels=len(self.h.store.artifact(self.c)['configuration']['robot']['structure']['data']['tendons'])
         self.assertEqual(cfg['active_coefficients'],list(range(channels,2*channels)))
+        with self.assertRaisesRegex(ValueError,'requested=8192; maximum=8000'):
+            control_settings(state(self.h)['spec'],dict(resolution='fine',exploration='broad',evaluation_requests=8192),channels=2)
 
     def test_physical_edit_preserves_every_other_resolved_parent_parameter(self):
         from extensions.tendon_family.family_space import resolved_request
