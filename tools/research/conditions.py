@@ -45,7 +45,8 @@ def shared_physics(configuration):
         dynamics_model=plain(cfg.policy.dynamics_model),discretization=plain(cfg.policy.discretization))
 
 
-def condition_candidate(host, reference, condition_id):
+def condition_candidate(host, reference, condition_id, *, create=True):
+    """Resolve an exact frozen-condition clone; preparation may only look up."""
     from tools.research.design import verify_candidate, full_science, family_candidate_identity
     from tools.platform_tasks import compile_input
     s=state(host)
@@ -58,6 +59,7 @@ def condition_candidate(host, reference, condition_id):
     if cfg==parent['configuration']:return root
     identity=family_candidate_identity(cfg,s)
     if identity in s['candidates']:return s['candidates'][identity]
+    if not create:return None
     compile_input(cfg,host.reg)
     candidate=deepcopy(parent)
     candidate.update(identity=identity,candidate_id='core-'+identity,condition_id=condition_id,

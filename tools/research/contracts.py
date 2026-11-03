@@ -610,6 +610,8 @@ def compact_schema(node):
 
 
 class ScientificControlV4(ScientificQuestionV3):
+    condition_id: str | None = Field(default=None,min_length=1,
+        description='One explicitly selected frozen task condition. The candidate and every control source must bind this same condition; changing conditions uses the existing initialize_control condition preparation, not a task override.')
     numerical_method: Literal['mujoco-nonlinear-task-capability-v1','mujoco_direct_control_v1'] | None = Field(default=None,
         description='Optional registered numerical identity from the candidate control-method catalog. Reach/Hold retains its historical T1 interpretation; other task families use an applicable authorized Direct method. Never changes the scientific goal or grants execution permission.')
 

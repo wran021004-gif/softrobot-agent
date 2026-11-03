@@ -33,6 +33,7 @@ class ControlMechanismScopeTests(unittest.TestCase):
             source=seed_control(h,ControlSeedRequest(candidate=c))['source'];diagnose(h,c,'scientific_question')
             schema=reference_schema(question_schema(state(h)['spec'],h.store.artifact(c),'control_feasibility'),{'evidence_start':source},'analysis')
             raw=dict(version='scientific_question_v4',domain='control',control=dict(question_type='control_feasibility',
+                condition_id=state(h)['spec']['task_conditions'][0]['condition_id'],
                 effect_semantics='reoptimized_task_capability',numerical_method='mujoco_direct_control_v1',
                 control_scope=dict(mode='full_task'),control_search_effort=dict(resolution='coarse',exploration='broad',evaluation_requests=0),source_selection=dict(control_source='evidence_start')))
             expanded=expand_references(raw,schema)
@@ -74,6 +75,7 @@ class ControlMechanismScopeTests(unittest.TestCase):
             with self.assertRaises(ValueError):seed_control(h,ControlSeedRequest(candidate=c,tensions_n=[[9.]*4]))
             effort=dict(resolution='coarse',exploration='broad',evaluation_requests=24)
             q=dict(version='scientific_question_v4',domain='control',control=dict(
+                condition_id=state(h)['spec']['task_conditions'][0]['condition_id'],
                 effect_semantics='reoptimized_task_capability',numerical_method='mujoco_direct_control_v1',
                 control_scope=dict(mode='full_task'),control_search_effort=effort,source_selection=dict(control_source=source)))
             compiled=compile_question(h,q,tool_use_id='wide-v4')

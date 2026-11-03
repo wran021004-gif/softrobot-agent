@@ -51,6 +51,7 @@ class HighLevelTests(unittest.TestCase):
         self.assertEqual(set(effort['properties']),{'resolution','exploration','evaluation_requests'})
         self.assertEqual(effort['properties']['evaluation_requests']['maximum'],state(self.h)['spec']['native_control_limits']['evaluation_requests'])
         payload=dict(version='scientific_question_v4',domain='control',control=dict(
+            condition_id=state(self.h)['spec']['task_conditions'][0]['condition_id'],
             control_scope=dict(mode='full_task'),control_search_effort=dict(resolution='coarse',exploration='broad',evaluation_requests=4),
             source_selection=dict(control_source=source,additional_control_sources=[source])))
         Draft202012Validator(schema).validate(payload)
@@ -95,6 +96,42 @@ class HighLevelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'FROZEN_TIME_GRID'):
             control_settings(limited,dict(base,resolution='very_fine'),channels=3)
 
+    def test_control_condition_is_explicit_and_mismatch_only_prepares_original_action(self):
+        source=seed_control(self.h,ControlSeedRequest(candidate=self.c))['source']
+        with patch.object(core,'guard'):core.dispatch(self.h,diagnosis(self.c,'control_feasibility'),'condition-diagnose')
+        spec=state(self.h)['spec'];ids=[c['condition_id'] for c in spec['task_conditions']]
+        schema=selected_question_schema(self.h);control=schema['$defs']['ScientificControlV4']
+        self.assertEqual(control['properties']['condition_id']['enum'],ids)
+        self.assertIn('condition_id',control['required'])
+        payload=dict(version='scientific_question_v4',domain='control',control=dict(
+            control_scope=dict(mode='full_task'),source_selection=dict(control_source=source),
+            control_search_effort=dict(resolution='very_fine',exploration='broad',evaluation_requests=16)))
+        before=deepcopy(state(self.h));ledger=self.h.store.remaining()
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+            missing=compile_question(self.h,payload,tool_use_id='missing-condition')
+            self.assertEqual(missing['reason'],'SELECT_ONE_FROZEN_TASK_CONDITION')
+            payload['control']['condition_id']=ids[1]
+            wrong=compile_question(self.h,payload,tool_use_id='wrong-condition')
+            self.assertEqual(wrong['reason'],'CONDITION_BOUND_CANDIDATE_REQUIRED')
+            self.assertEqual(wrong['preparation']['plan']['control_seed']['condition_id'],ids[1])
+            self.assertEqual(state(self.h),before);self.assertEqual(self.h.store.remaining(),ledger)
+            prepared=seed_control(self.h,ControlSeedRequest(candidate=self.c,condition_id=ids[1]))
+            child=prepared['candidate']
+            self.assertEqual(self.h.store.artifact(child)['configuration']['robot'],self.h.store.artifact(self.c)['configuration']['robot'])
+            before=deepcopy(state(self.h))
+            reuse=compile_question(self.h,payload,tool_use_id='existing-condition')
+            self.assertEqual(reuse['existing_candidate'],child)
+            self.assertTrue(reuse['legal_control_sources'])
+            self.assertEqual(state(self.h),before)
+            with patch.object(core,'guard'):core.dispatch(self.h,diagnosis(child,'control_feasibility'),'matched-condition-diagnose')
+            payload['control']['source_selection']['control_source']=prepared['source']
+            Draft202012Validator(selected_question_schema(self.h)).validate(payload)
+            ready=compile_question(self.h,payload,tool_use_id='matched-condition')
+        self.assertEqual(ready['status'],'ready',ready)
+        self.assertEqual(ready['request']['candidate'],child)
+        self.assertEqual(len(ready['request']['control_optimization']['settings']['knots_s']),17)
+        self.assertFalse(state(self.h)['analysis_results'])
+
     def test_physical_edit_preserves_every_other_resolved_parent_parameter(self):
         from extensions.tendon_family.family_space import resolved_request
         from tools.research.design import set_parameter
@@ -107,6 +144,22 @@ class HighLevelTests(unittest.TestCase):
         self.assertEqual(compile_generation(self.h,payload)['generation'],expected)
         payload['generation']['changes']={'segments.0.length_m':10.}
         with self.assertRaisesRegex(ValueError,'OUTSIDE_FROZEN_DOMAIN'):compile_generation(self.h,payload)
+        self.assertFalse(state(self.h)['analysis_results'])
+
+    def test_actual_sdk_advertises_condition_and_delivers_missing_choice_without_worker(self):
+        from tests.research.test_p63g3_action_handoff import diagnosis
+        from tests.research.test_recent_round_tools import run_fixture
+        source=seed_control(self.h,ControlSeedRequest(candidate=self.c))['source']
+        payload=dict(version='scientific_question_v4',domain='control',control=dict(
+            control_scope=dict(mode='full_task'),source_selection=dict(control_source=source),
+            control_search_effort=dict(resolution='very_fine',exploration='broad',evaluation_requests=16)))
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+            wires=run_fixture(self.h,[('research_route',dict(tool='research_plan',action='diagnose')),
+                ('research_plan',diagnosis(self.c,'control_feasibility')),('research_analysis',payload),None],limit=4)
+        schema=next(t['function']['parameters'] for t in wires[2]['tools'] if t['function']['name']=='research_analysis')
+        self.assertIn('condition_id',schema['$defs']['ScientificControlV4']['required'])
+        self.assertIn('SELECT_ONE_FROZEN_TASK_CONDITION',json.dumps(wires[-1]))
+        self.assertEqual(state(self.h)['mathematical_evaluations'],0)
         self.assertFalse(state(self.h)['analysis_results'])
 
     def test_actual_sdk_generation_binds_legacy_identity_only_after_physical_edit_compilation(self):

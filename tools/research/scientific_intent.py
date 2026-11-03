@@ -139,6 +139,13 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         control['effect_semantics']={'type':'string','const':'reoptimized_task_capability'}
         schema['$defs']['ScientificControlV4']['required']=[
             k for k in schema['$defs']['ScientificControlV4']['required'] if k!='question_type']
+        conditions=spec.get('task_conditions',[])
+        if len(conditions)>1:
+            current=(candidate or {}).get('condition_id',conditions[0]['condition_id'])
+            control['condition_id']=dict(type='string',enum=[c['condition_id'] for c in conditions],
+                description=f'Choose one frozen condition explicitly. This candidate binds {current}. Another condition requires diagnosing its exact same-structure condition candidate; mismatched input returns an existing candidate and legal source choices, or initialize_control preparation if absent. Condition clones are not different physical designs.')
+            schema['$defs']['ScientificControlV4']['required'].append('condition_id')
+        else:control.pop('condition_id',None)
         if control_methods is not None:
             legal=[r['method'] for r in control_methods if r['selectable']]
             control['numerical_method']={'enum':[None,*legal],
@@ -429,6 +436,34 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='needs_choice',reason='UNAMBIGUOUS_NATIVE_SOURCE_AND_INTERVAL_REQUIRED',
                 operating_point_sources=selected_operating_point_guidance(host,intent['candidate'],'mechanism_structure_v1',detail),
                 scientific_execution_started=False)
+        conditions=spec.get('task_conditions',[])
+        if payload.get('domain')=='control' and len(conditions)>1:
+            selected=(payload.get('control') or {}).get('condition_id')
+            choices=[c['condition_id'] for c in conditions]
+            current=(candidate or {}).get('condition_id',choices[0])
+            if selected not in choices:
+                return dict(status='needs_choice',reason='SELECT_ONE_FROZEN_TASK_CONDITION',
+                    field='control.condition_id',choices=choices,current_candidate_condition=current,
+                    scientific_execution_started=False)
+            if candidate and selected!=current:
+                from tools.research.conditions import condition_candidate
+                from tools.research.physical_replay import legal_control_sources
+                existing=condition_candidate(host,intent['candidate'],selected,create=False)
+                if existing:
+                    return dict(status='needs_prerequisite',reason='CONDITION_BOUND_CANDIDATE_REQUIRED',
+                        selected_condition=selected,current_candidate_condition=current,
+                        existing_candidate=existing,legal_control_sources=legal_control_sources(host,existing),
+                        next=dict(tool='research_plan',action='diagnose',decision=dict(selected_candidate=existing)),
+                        explanation='This exact same-structure condition candidate already exists. Diagnose it with your hypothesis and choose its legal sources; no new candidate, source or Worker was created, and no other-condition evidence transfers.',
+                        scientific_execution_started=False)
+                return dict(status='needs_prerequisite',reason='CONDITION_BOUND_CANDIDATE_REQUIRED',
+                    selected_condition=selected,current_candidate_condition=current,
+                    preparation=dict(route=dict(tool='research_route',input=dict(tool='research_plan',action='initialize_control')),
+                        plan=dict(tool='research_plan',action='initialize_control',
+                            decision=dict(selected_candidate=intent['candidate']),
+                            control_seed=dict(candidate=intent['candidate'],condition_id=selected,method='baseline'))),
+                    then='Diagnose the returned condition-bound candidate with your hypothesis and choose its legal control sources. The physical structure is unchanged; results and acceptance from other conditions do not transfer.',
+                    scientific_execution_started=False)
         expanded,field_sources=expand_v4(spec,payload,candidate)
         try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
