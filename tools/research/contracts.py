@@ -371,7 +371,7 @@ _CONTROL_DOMAIN = LocalControlSearchSettings.model_json_schema()['properties']
 class ScientificControlEffort(Contract):
     """Scientific effort, compiled to the existing LocalControlSearchSettings."""
     method: Literal['pattern','response'] = 'response'
-    resolution: Literal['coarse','moderate','fine'] | None = Field(default=None,description='Temporal correction freedom; the compiler binds actual knots to the frozen control grid.')
+    resolution: Literal['coarse','moderate','fine','very_fine'] | None = Field(default=None,description='Increasing temporal correction freedom from coarse through very_fine; the compiler binds actual knots to the frozen control grid and rejects unsupported resolution.')
     exploration: Literal['local_refinement','broad'] | None = Field(default=None,description='Local refinement uses 10% of the physical tension range; broad permits the complete physical range about each selected start. Actual scales are returned; no coverage claim.')
     knot_count: int = Field(default=4,strict=True,ge=_CONTROL_DOMAIN['knots_s']['minItems'],le=_CONTROL_DOMAIN['knots_s']['maxItems'],description='Uniform knots over the chosen adjustment window. Evaluation always covers the complete frozen task. Local windows require at least one interior knot; endpoint corrections remain zero.')
     iterations: int | None = Field(default=None,strict=True,ge=_CONTROL_DOMAIN['iterations']['minimum'],le=_CONTROL_DOMAIN['iterations']['maximum'],description='Independent iteration cap. If omitted: min(callback cap, frozen Study iteration cap, original contract maximum). Early convergence can use fewer callbacks/iterations.')

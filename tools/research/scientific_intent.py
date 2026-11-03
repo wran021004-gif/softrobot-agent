@@ -298,7 +298,7 @@ def control_settings(spec, effort, *, window=None, channels=None, physical_limit
         limit=physical_limit_n
         if limit is None:limit=spec['family_space']['tendon_domains']['force_limit_n']['default']
         if limit<=0:raise ValueError('POSITIVE_PHYSICAL_TENSION_RANGE_REQUIRED')
-        n={'coarse':3,'moderate':5,'fine':9}[q.resolution]
+        n={'coarse':3,'moderate':5,'fine':9,'very_fine':17}[q.resolution]
         maximum=min(64,spec.get('native_control_limits',{}).get('knots_s',64))
         if n>maximum:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_KNOT_GRANT')
         period=spec['analysis_protocol']['period_s']

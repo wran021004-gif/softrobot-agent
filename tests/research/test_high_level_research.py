@@ -73,6 +73,28 @@ class HighLevelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'requested=8192; maximum=8000'):
             control_settings(state(self.h)['spec'],dict(resolution='fine',exploration='broad',evaluation_requests=8192),channels=2)
 
+    def test_denser_resolution_increases_native_basis_rank_with_original_limits(self):
+        import numpy as np
+        from tools.research.control_correction import correction_basis
+        spec=state(self.h)['spec'];base=dict(exploration='broad',evaluation_requests=8000)
+        counts=[];ranks=[]
+        period=spec['analysis_protocol']['period_s'];duration=spec['analysis_protocol']['duration_s']
+        times=np.arange(round(duration/period)+1)*period
+        for resolution in ('coarse','moderate','fine','very_fine'):
+            cfg=control_settings(spec,dict(base,resolution=resolution),channels=3,physical_limit_n=8.)
+            counts.append(len(cfg.knots_s))
+            ranks.append(np.linalg.matrix_rank(correction_basis(times,cfg.knots_s,3)))
+            self.assertEqual(cfg.evaluation_requests,8000)
+            self.assertEqual(cfg.iterations,1000)
+            self.assertEqual(cfg.coefficient_limit_n,8.)
+        self.assertEqual(counts,[3,5,9,17]);self.assertEqual(ranks,[9,15,27,51])
+        limited=deepcopy(spec);limited['native_control_limits']['knots_s']=9
+        with self.assertRaisesRegex(ValueError,'FROZEN_KNOT_GRANT'):
+            control_settings(limited,dict(base,resolution='very_fine'),channels=3)
+        limited=deepcopy(spec);limited['analysis_protocol']['period_s']=duration/8
+        with self.assertRaisesRegex(ValueError,'FROZEN_TIME_GRID'):
+            control_settings(limited,dict(base,resolution='very_fine'),channels=3)
+
     def test_physical_edit_preserves_every_other_resolved_parent_parameter(self):
         from extensions.tendon_family.family_space import resolved_request
         from tools.research.design import set_parameter
