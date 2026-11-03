@@ -746,7 +746,10 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
     model=build_model(provider,api_key=api_key,transport=transport,model_class=model_class)
     # Public offload stores originals for retrieval; no auxiliary model requests.
     compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
-    context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
+    # Deliver the newest requested evidence once before offloading its history.
+    # Eager truncation otherwise withholds even the just-requested STOP index.
+    context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(
+        threshold=1500 if compact else 4096,preserve_recent=1)])
     storage=session_storage(session_directory)
     from strands.session import SnapshotSessionManager
     manager=SnapshotSessionManager(session_id or s['pilot']['framework_session_id'],storage=storage,save_latest_on='message')
@@ -758,6 +761,7 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=session_id or s['pilot']['framework_session_id'],
         retry_controllers=0,context='public tool-result offload and retrieval',offload_threshold=1500 if compact else 4096,
         offload_preview_tokens=500 if compact else 1024,
+        offload_preserve_recent=1,
         dynamic_context='request-only tail via public OpenAIModel.format_request; native SDK history unchanged',
         transport='accounted live boundary'))
     return agent
@@ -990,7 +994,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         elif kind=='route':
                             value=select_tool_route(host,use['input'],use['toolUseId'])
                         else:
-                            value=read_tool_evidence(host,use['input'])
+                            with host.store.read_snapshot():
+                                value=read_tool_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 original=value
@@ -1137,7 +1142,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             preparation=state(host)['pilot'].get('handoff')
             source=(host.store.artifact(host.store.artifact(preparation)['source_state']) if preparation else {})
             if source.get('pending_authorized_continuation')!=continuation:
-                current=decision_packet(host)['research']
+                with host.store.read_snapshot():
+                    current=decision_packet(host)['research']
                 native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
                     decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'),
                     diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=state(host)['spec'])}}

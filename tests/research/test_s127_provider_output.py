@@ -26,6 +26,53 @@ def wire(h):
 
 
 class ProviderOutputTests(unittest.TestCase):
+    def test_sdk_delivers_latest_index_before_offloading_history(self):
+        from strands.tools.executors import SequentialToolExecutor
+        from strands.tools.tools import PythonAgentTool
+        from tools.research.agent import record
+        from tools.research.state import save,update
+        from tools.research.research_context import read_coverage,result_index_progress
+        h=cold_host();spec=deepcopy(state(h)['spec'])
+        spec.setdefault('research_decisions',{})['context_limits']={'candidates':3}
+        update(h,spec=spec)
+        refs=[save(h,dict(offline_fixture_result=i)) for i in range(39)]
+        payload=dict(index_kind='all_fresh_results',results=refs,
+            read_progress=dict(result_count=39,unread_bodies=refs))
+        text=json.dumps(payload,separators=(',',':'));sent=[]
+        query=dict(reference=refs[0],view='working_set',pointer='/all_fresh_results')
+        def respond(request):
+            sent.append(json.loads(request.content));body=reply('stop')
+            if len(sent)<3:
+                body=reply();call=body['choices'][0]['message']['tool_calls'][0]
+                call.update(id='index-'+str(len(sent)))
+                call['function']=dict(name='evidence_read',arguments=json.dumps(query))
+            else:body['choices'][0]['message']['content']='Offline delivery check complete'
+            return httpx.Response(200,json=body)
+        def execute(use,**kwargs):
+            result=dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=text)])
+            record(h,'model_original_tool_feedback',dict(tool_use=use,result=result))
+            return result
+        b=LiveBoundary(h,httpx.MockTransport(respond))
+        tool=PythonAgentTool('evidence_read',dict(name='evidence_read',description='Offline index fixture',
+            inputSchema={'json':dict(type='object',properties={})}),execute)
+        agent=build_harness(h,transport=b,api_key='offline',instructions='Fixture',model_class=live_model_class(b),
+            tool_executor=SequentialToolExecutor(),research_tools=[tool],configuration_path=h.store.root/'framework.json',
+            session_directory=h.store.root/'sdk')
+        async def exercise():
+            await agent.invoke_async('Offline fixture')
+            first=next(m for m in sent[1]['messages'] if m.get('role')=='tool')
+            self.assertEqual(json.loads(first['content']),payload)
+            tools=[m for m in sent[2]['messages'] if m.get('role')=='tool']
+            self.assertTrue(tools[0]['content'].startswith('[Truncated:'))
+            self.assertEqual(json.loads(tools[-1]['content']),payload)
+            coverage=read_coverage(h)
+            self.assertTrue(all(r['successfully_provided'] for r in coverage))
+            self.assertTrue(result_index_progress(refs,coverage)['current_index_confirmed'])
+            self.assertFalse(any(r['complete_data'] for r in coverage))
+            self.assertFalse(pending(h));self.assertEqual(h.store.remaining()['used']['model_calls'],3)
+            await b.aclose()
+        asyncio.run(exercise())
+
     def test_context_reserves_output_before_any_send_or_charge(self):
         from tools.research.state import update
         h=cold_host();p=deepcopy(state(h)['pilot'])
