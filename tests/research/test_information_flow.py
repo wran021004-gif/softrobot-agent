@@ -29,6 +29,9 @@ def flow_host():
     spec['research_decisions'].update(tool_schema_policy=dict(version='research_information_flow_v1'),
         language_policy=dict(version='english_sources_v1',authored_language='en'))
     update(h,spec=spec)
+    from tests.research.test_research_authorization_preflight import approve
+    from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+    approve(h,[REGISTERED_MATHEMATICS_SCOPE])
     return h
 
 
@@ -48,6 +51,8 @@ def packet(wire):
 class InformationFlowTests(unittest.TestCase):
     def test_direct_reads_preserve_generate_and_stable_prompt(self):
         h=flow_host();ref=state(h)['family_space_reference']
+        update(h,pilot={**state(h)['pilot'],'tool_directory':[dict(tool='research_plan',actions=['generate'])]})
+        agent.select_tool_route(h,dict(tool='research_plan',action='generate'),'offline-explicit-generate')
         wires=run_fixture(h,[('evidence_read',dict(reference=ref,view='working_set',pointer='/candidate_index')),
             ('research_plan',generation(h)),('research_recall',dict(trace='milestones')),None])
         for wire in wires:

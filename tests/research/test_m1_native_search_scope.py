@@ -181,6 +181,7 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             return dict(reference=ref)
         with scoped_fixture() as h:
             approve(h,[REGISTERED_MATHEMATICS_SCOPE]);value=proposal()
+            value['search']['control_search_effort']=dict(resolution='coarse',exploration='local_refinement',evaluation_requests=2)
             with patch('tools.research.agent.credential',return_value='offline'),patch.object(core,'guard'),patch('tools.research.state.guard'), \
                     patch.object(analysis,'dispatch',side_effect=scored), \
                     patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):

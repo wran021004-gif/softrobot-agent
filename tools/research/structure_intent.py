@@ -17,6 +17,33 @@ class StructureChoiceError(ValueError):
         super().__init__('; '.join(i['field']+': '+i['reason'] for i in issues))
 
 
+def compile_generation(host, value):
+    """Explicit physical changes -> the existing exact family generation request."""
+    from tools.research.contracts import ScientificGeneration
+    from tools.research.design import verify_candidate,set_parameter
+    from tools.research.optimal_capability import family_analysis_parameters
+    from extensions.tendon_family.family_space import resolved_request,parse_build
+    s=state(host)
+    if s['spec']['research_decisions']['analysis_interface']!='scientific_question_v4':
+        raise ValueError('SCIENTIFIC_GENERATION_REQUIRES_V4')
+    parent=(value.get('decision') or {}).get('selected_candidate')
+    if not parent:raise ValueError('PHYSICAL_CHANGES_REQUIRE_SELECTED_PARENT')
+    candidate=verify_candidate(host,parent);space=s['spec']['family_space']
+    q=ScientificGeneration.model_validate(value['generation'])
+    rows={r['parameter_id']:r for r in family_analysis_parameters(s['spec'],candidate)}
+    params=resolved_request(space,candidate['parameters'])
+    for path,new in q.changes.items():
+        row=rows.get(path)
+        if not row or '*' in path or row['category'] in ('controller','discretization') or not row['effective_in_current_execution'] or not row['continuous_perturbation']:
+            raise ValueError('SELECT_REGISTERED_EFFECTIVE_CONTINUOUS_PHYSICAL_PARAMETER: '+path)
+        if not row['minimum']<=new<=row['maximum']:raise ValueError('PHYSICAL_CHANGE_OUTSIDE_FROZEN_DOMAIN: '+path)
+        set_parameter(params,path,new)
+    # The family validator, construction admission and frozen topology remain
+    # authoritative. No candidate, control or T1 is created by this compiler.
+    parse_build(dict(space=space,request=params))
+    return {**deepcopy(value),'generation':params}
+
+
 def compile_search(host, value, request_id):
     """Bind frozen implementation fields, then use original contract/admission."""
     from extensions.tendon_family.family_space import span_strategies
@@ -61,7 +88,7 @@ def compile_search(host, value, request_id):
     if not native and (q.control_treatment!=proxy_treatment or q.research_goal!='structural_capability_screening' or q.proxy_objective is None
             or q.control_search_effort is not None or q.initial_tension_n is not None):
         issue('evaluation_model','Mathematical proxy requires explicit proxy_objective and structural_capability_screening; task_violation uses proxy_optimized, static/held-input proxies use not_optimized; no Native control effort')
-    if native and q.control_search_effort is None:issue('control_search_effort','Choose method, knot count and independent callback/iteration effort')
+    if native and q.control_search_effort is None:issue('control_search_effort','Choose temporal resolution, exploration scale and a shared finite callback cap')
     tension=q.initial_tension_n
     if native and tension is None:
         tension=space.get('tendon_domains',{}).get('pretension_n',{}).get('default')

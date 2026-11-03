@@ -152,7 +152,9 @@ def read_evidence(host, query, *, record_read=True):
             derived=dict(bottleneck_diagnosis=bottleneck_diagnosis(host,plain(q.reference),detailed=True))
         elif q.pointer=='/t2_preparation' or q.pointer.startswith('/t2_preparation/'):
             from tools.research.nonlinear_capability import preparation_view
-            derived=dict(t2_preparation=preparation_view(host,plain(q.reference)))
+            detailed=q.pointer.startswith('/t2_preparation/details')
+            preparation=preparation_view(host,plain(q.reference),detailed=detailed)
+            derived=dict(t2_preparation=dict(details=preparation) if detailed else preparation)
         elif q.pointer=='/mathematical_decision_view' or q.pointer.startswith('/mathematical_decision_view/'):
             from tools.research.evidence_views import result_card
             from tools.research.research_context import mathematical_decision_view
@@ -589,6 +591,14 @@ def dispatch(host, value, request_id, origin='model'):
     from tools.research.scientific_intent import enabled as question_enabled
     from tools.research.structure_intent import compile_search,enabled as structure_enabled
     from tools.research.scientific_intent import explicit_actions, action_entry, scientific_actions
+    generation_condition=None
+    if value.get('action')=='generate' and 'changes' in (value.get('generation') or {}):
+        from tools.research.structure_intent import compile_generation
+        parent=(value.get('decision') or {}).get('selected_candidate')
+        if parent:generation_condition=host.store.artifact(parent).get('condition_id')
+        value=compile_generation(host,value)
+    elif value.get('action')=='generate' and state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':
+        value={**value,'generation':{'family_space_identity':state(host)['spec']['family_space_identity'],**(value.get('generation') or {})}}
     if value.get('next_research_action') is not None:
         entry=action_entry(state(host)['spec'],value['next_research_action'])
         if not explicit_actions(state(host)['spec']) or not entry or not entry['available']:
@@ -716,6 +726,10 @@ def dispatch(host, value, request_id, origin='model'):
         elif plan.action=='generate':
             from tools.research.design import generate_candidate
             result=generate_candidate(host,plan.generation,dict(origin=origin,plan=ref))
+            if generation_condition and result.get('candidate'):
+                from tools.research.conditions import condition_candidate
+                root=result['candidate'];result={**result,'structure_candidate':root,
+                    'candidate':condition_candidate(host,root,generation_condition)}
         elif plan.action=='propose':
             if plan.mechanics_source:
                 from tools.research.mechanics import handoff

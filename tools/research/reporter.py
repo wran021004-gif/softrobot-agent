@@ -410,6 +410,14 @@ def reporter_handoff_summary(host, reference, saved):
             fact['control_search']=dict(stop_reason=search['stop_reason'],all_steps=search['all_steps'],
                 best={k:v for k,v in best.items() if k!='metrics'} if best else None)
             if best:fact['metrics']=best['metrics']
+        if raw.get('native_dynamics',{}).get('optimization'):
+            from tools.research.evidence_views import bottleneck_diagnosis
+            fact['bottleneck_diagnosis']=bottleneck_diagnosis(host,card['identity']['result']['reference'])
+        if raw.get('nonlinear_capability') or raw.get('nonlinear_response'):
+            from tools.research.nonlinear_capability import preparation_view
+            preparation=preparation_view(host,card['identity']['result']['reference'])
+            fact['t2_preparation']={k:preparation[k] for k in ('baseline_T1_available',
+                'excluded_historical_or_incomplete_T1','executable_T2_count','aggregation_mathematical_evaluations','detail_query','scope')}
         task_family=(raw.get('acceptance') or {}).get('task_family')
         if task_family=='task.reach':
             names={'evaluator:task_bound':'terminal_position_error','holding_position':'holding_max_position_error',

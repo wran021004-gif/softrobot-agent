@@ -168,7 +168,7 @@ def request_guidance(spec):
             native='structure_control_codesign + native_mujoco + reoptimized, with control_search_effort; full frozen task and every constraint retained.',
             proxy='structural_capability_screening + mathematical_proxy, explicit proxy_objective. CONIC task_violation requires proxy_optimized (affine-model control solve); static/held-input objectives require not_optimized. No Native substitution.',
             program_bound=['FamilySpace identity','singleton topology','exact final screening fidelity','Native operating point','internal research_intent'],
-            control_effort='method, knot_count, iterations and evaluation_requests are separate choices; omitted iterations=min(callback cap, original/Study iteration caps). Original settings own numerical limits and termination.',
+            control_effort='Choose resolution=coarse/moderate/fine, exploration=local_refinement/broad and evaluation_requests as a shared finite callback cap. The compiler binds response search, actual time knots, physical scales and iteration/Worker limits; actual settings remain recoverable.',
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),
             applicable_span_strategies=span_strategies(spec['family_space']),
             initialization='Main chooses explicit discrete starts; continuous defaults are numerical starting assumptions. An optional representable candidate preserves its structure coordinates; unsupported routes/sections require generate or a fresh search. Every condition receives fresh controls.')

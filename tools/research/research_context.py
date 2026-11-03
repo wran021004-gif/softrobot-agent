@@ -1758,6 +1758,16 @@ def agent_decision_brief(host):
         brief['mathematical_research']=mathematical_opportunity_summary(view,observations=observations,
             latest_result=latest_math,control_sources=brief['current_candidate']['control_sources'],
             execution_block='protected_closeout' if brief['budget'].get('closeout',{}).get('next_request_will_protect') else None)
+        from tools.research.nonlinear_capability import T1,T2
+        baseline=any((r.get('candidate')==candidate and r.get('status')=='computed' and r.get('implementation')==s['freeze'] and
+            r.get('nonlinear_capability',{}).get('method')==T1) for r in
+            (host.store.artifact(ref,paths=('candidate','status','implementation','nonlinear_capability.method')) for ref in s.get('analysis_results',[])))
+        t2=view['methods'].get(T2,{})
+        brief['mathematical_research']['t2_preparation']=dict(
+            baseline_T1_available=baseline,executable_T2_count=len(t2.get('ready_requests',[])),
+            aggregation_mathematical_evaluations=1,missing=t2.get('missing',[]),
+            query=dict(reference=candidate,view='working_set',pointer='/t2_preparation'),
+            purpose='Read compact baseline/contrast/matching readiness before choosing T2. Full stencil and numerical templates are on demand; structure modification does not require T2.')
         latest_intent=intent.get('latest_decision') or {}
         if latest_math:
             completed=next((r for r in reversed(trace['recent']) if latest_math['reference'] in r.get('result_references',[])),None)
@@ -2164,6 +2174,20 @@ def information_flow_brief(brief, delivered):
         if findings and findings[-1]['status']=='unavailable':
             result['reporter_findings']=[{k:findings[-1][k] for k in ('status','report_reference','result_references','interpretation_query')}]
         science=result.get('scientific_results') or {}
+        progress=(access.get('stop_index') or {}).get('read_progress') or {}
+        for key in ('unread_bodies','unread_summaries'):
+            if key in progress:progress[key+'_count']=len(progress.pop(key))
+        for row in science.get('study_best_mathematical',[]):
+            fact=row.get('fact') or {};settings=fact.pop('control_search_settings',None)
+            if settings:
+                fact['control_search_effort']=dict(method=settings['method'],knot_count=len(settings['knots_s']),
+                    callback_cap=settings['evaluation_requests'],iteration_cap=settings['iterations'],
+                    correction_limit_n=settings['coefficient_limit_n'],initial_radius_n=settings['initial_radius_n'])
+                fact['settings_query']=dict(reference=fact['reference'],view='full',pointer='/requested_operation/control_optimization/settings')
+            fact.pop('comparison_scope',None) # exact task/model/profile identities remain above
+            for key in ('control_binding','citation','formal_acceptance_read_credit'):fact.pop(key,None)
+            if fact.get('reference'):
+                fact['bottleneck_query']=dict(reference=fact['reference'],view='working_set',pointer='/bottleneck_diagnosis')
         if not any(science.get(k) for k in ('latest_search','study_best_mathematical','critical_failures','best_independent_physical')) and math_result:
             result.pop('scientific_results',None)
     return result

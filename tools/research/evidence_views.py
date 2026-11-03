@@ -494,7 +494,7 @@ def _search(value, reference):
         all_steps=_location(reference, '/candidates'))
 
 
-def native_control_domain(value):
+def native_control_domain(value, *, detailed=False):
     """Actual saved input ranges and declared local box; no physics or coverage claim."""
     import numpy as np
     from tools.research.contracts import LocalControlSearchSettings
@@ -508,7 +508,7 @@ def native_control_domain(value):
     best=np.asarray(raw.get('best_schedule',raw['optimized_schedule'])['trajectory']['tensions_n'])
     def ranges(u):return np.stack([u.min(axis=0),u.max(axis=0)],axis=1).tolist()
     visited=None
-    if all('coefficients_n' in r for r in search.get('candidates',[])):
+    if detailed and all('coefficients_n' in r for r in search.get('candidates',[])):
         lo=base.min(axis=0);hi=base.max(axis=0)
         for row in search.get('candidates',[]):
             start=next((r['schedule']['trajectory'] for r in raw.get('start_sources',[]) if r['start']==row['start']),tr)
@@ -527,7 +527,7 @@ def native_control_domain(value):
         scope='Per-channel extrema of saved schedules, not joint control-space coverage. The temporal basis can further restrict the envelope. Local failure does not establish structural inability. Main may choose a wider correction domain, another explicit/Native/Conic/NMPC start, or another experiment; no fixed order.')
 
 
-def native_search_summary(value, reference):
+def native_search_summary(value, reference, *, detailed=False):
     """Recorded effort and termination, without controls or a convergence claim."""
     search=(value.get('native_dynamics') or {}).get('optimization')
     if not search:return None
@@ -537,7 +537,7 @@ def native_search_summary(value, reference):
         measure=row.get('measure') or {}
         return {k:measure[k] for k in ('normalized_gap','terminal_position_error_m',
             'holding_max_position_error_m','holding_max_speed_m_s','signed_maximum_excess') if k in measure}
-    domain=native_control_domain(value);stop=search.get('stop_reason','');termination=[]
+    domain=native_control_domain(value,detailed=detailed);stop=search.get('stop_reason','');termination=[]
     if stop=='evaluation_request_budget':termination.append('recorded_callback_cap')
     if stop=='iteration_limit':termination.append('recorded_iteration_cap')
     if domain and domain['final_search_radii_n'] and all(r<domain['settings']['minimum_radius_n'] for r in domain['final_search_radii_n']):
@@ -552,6 +552,10 @@ def native_search_summary(value, reference):
         algorithm=search.get('algorithm'),stop_reason=search.get('stop_reason'),
         iterations_started=search.get('iterations_started'),search_dimension=search.get('search_dimension'),
         callbacks=cost.get('evaluation_callbacks'),requested_callbacks=cost.get('request_budget'),
+        starts=dict(selected=search.get('start_count',1),unique_executed_sequences=cost.get('unique_input_sequences'),
+            duplicate_sequence_reuses=cost.get('cache_reuses',0),
+            outcomes=[dict(start=r['start'],initial_gap=r.get('initial_gap'),
+                best_gap=(r.get('best') or {}).get('measure',{}).get('normalized_gap')) for r in search.get('start_feedback',[])]),
         baseline=metrics(baseline),best=metrics(search.get('best') or {}),
         control_domain=domain,termination_facts=termination,
         bottleneck_query=dict(reference=reference,view='working_set',pointer='/bottleneck_diagnosis'),
@@ -579,7 +583,7 @@ def bottleneck_diagnosis(host, reference, *, detailed=False):
     explanations=[];missing=[];facts=None;mechanism_facts=[];questions=[]
     if chosen:
         ref=chosen[0];value=host.store.artifact(ref);search=value['native_dynamics']['optimization'];best=search['best']
-        facts=native_search_summary(value,ref)
+        facts=native_search_summary(value,ref,detailed=detailed)
         measure=best['measure'];failed=measure['signed_maximum_excess']>0
         facts.update(worst_constraint=measure.get('worst_constraint'),start_count=search.get('start_count',1),
             source_control=value.get('requested_operation',{}).get('control_optimization',{}).get('source'),
@@ -619,7 +623,9 @@ def bottleneck_diagnosis(host, reference, *, detailed=False):
             row=records[0];mechanics=row.get('mechanics',{});velocity=mechanics.get('tip_velocity_m_s')
             interval=mechanics.get('function_metrics',{}).get('instantaneous_speed_derivative_range_m_s2')
             observation=row.get('observation') or {}
-            fact=dict(reference=mr,target=target,observation={k:observation[k] for k in ('status','value','unit','reason') if k in observation},operating_point=point,
+            fact=dict(reference=mr,target=target,observation={k:observation[k] for k in ('status','value','unit','reason') if k in observation},
+                operating_point={k:point[k] for k in ('name','actual_time_s','remaining_task_s','phase','input_units') if k in point},
+                operating_point_query=dict(reference=mr,view='full',pointer='/operating_point'),
                 from_selected_best_control=relevant,remaining_task_s=origin.get('remaining_task_s'),
                 scope='Local instantaneous mechanics; not a certificate for the complete task.')
             if interval is not None:

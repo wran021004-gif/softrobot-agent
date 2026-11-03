@@ -84,6 +84,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
         generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
         schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
+        if (study or {}).get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':
+            schema['properties']['generation']['anyOf'].insert(0,{'$ref':'#/$defs/ScientificGeneration'})
+            schema['properties']['generation']['description']='For a selected parent, submit changes={registered physical parameter ID: absolute SI value}; the compiler preserves every other parent field and binds FamilySpace identity. Use the full generation form for a new topology.'
+            schema['$defs'][generation]['properties'].pop('family_space_identity',None)
+            schema['$defs'][generation]['required']=[k for k in schema['$defs'][generation]['required'] if k!='family_space_identity']
         space=(study or {}).get('family_space',{})
         if space:
             for name in ('segment_count','tendon_count'):
@@ -112,6 +117,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             for branch in properties[name]['anyOf']:
                 if branch.get('type')=='array':branch['items']['enum']=grant[name]
         schema['$defs'].update(intent_schema.pop('$defs'))
+        from tools.research.scientific_intent import project_control_effort
+        project_control_effort(schema)
         schema['$defs']['ScientificStructureSearch']=intent_schema
         schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/ScientificStructureSearch'},{'type':'null'}]
         decision=schema['$defs']['ResearchDecision']

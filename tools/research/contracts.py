@@ -332,7 +332,7 @@ class NonlinearStructureResponse(Contract):
 
 
 class ScientificControlScope(Contract):
-    mode: Literal['full_task','time_window'] = Field(description='Finite correction basis over the full task or an explicit interior window with zero endpoint corrections. control_search_effort selects legal knot count, scales and active knot-major coefficients. Evaluation retains the complete frozen task and physical input grid.')
+    mode: Literal['full_task','time_window','reach_phase','holding_phase'] = Field(description='Choose the whole task, an explicit correction window, or a frozen Reach/Hold phase. Phase/window corrections have zero endpoints. Evaluation always retains the complete frozen task and every constraint.')
     window_s: tuple[FiniteFloat,FiniteFloat] | None = Field(default=None,description='Only control corrections inside this interval; evaluation still covers the complete frozen task.')
 
 
@@ -370,7 +370,9 @@ _CONTROL_DOMAIN = LocalControlSearchSettings.model_json_schema()['properties']
 
 class ScientificControlEffort(Contract):
     """Scientific effort, compiled to the existing LocalControlSearchSettings."""
-    method: Literal['pattern','response']
+    method: Literal['pattern','response'] = 'response'
+    resolution: Literal['coarse','moderate','fine'] | None = Field(default=None,description='Temporal correction freedom; the compiler binds actual knots to the frozen control grid.')
+    exploration: Literal['local_refinement','broad'] | None = Field(default=None,description='Local refinement uses 10% of the physical tension range; broad permits the complete physical range about each selected start. Actual scales are returned; no coverage claim.')
     knot_count: int = Field(default=4,strict=True,ge=_CONTROL_DOMAIN['knots_s']['minItems'],le=_CONTROL_DOMAIN['knots_s']['maxItems'],description='Uniform knots over the chosen adjustment window. Evaluation always covers the complete frozen task. Local windows require at least one interior knot; endpoint corrections remain zero.')
     iterations: int | None = Field(default=None,strict=True,ge=_CONTROL_DOMAIN['iterations']['minimum'],le=_CONTROL_DOMAIN['iterations']['maximum'],description='Independent iteration cap. If omitted: min(callback cap, frozen Study iteration cap, original contract maximum). Early convergence can use fewer callbacks/iterations.')
     evaluation_requests: int = Field(strict=True,ge=_CONTROL_DOMAIN['evaluation_requests']['minimum'],le=_CONTROL_DOMAIN['evaluation_requests']['maximum'],description='Maximum Native rollout callbacks per condition; separate from iterations and formal mathematical evaluation charges.')
@@ -380,10 +382,16 @@ class ScientificControlEffort(Contract):
     minimum_radius_n: FiniteFloat | None = Field(default=None,gt=0)
     active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Optional unique knot-major indices within the selected full-task or interior-window basis.')
 
+    @model_validator(mode='after')
+    def legacy_method_choice(self):
+        if self.resolution is None and self.exploration is None and 'method' not in self.model_fields_set:
+            raise ValueError('LEGACY_NUMERICAL_EFFORT_REQUIRES_EXPLICIT_METHOD')
+        return self
+
     @model_serializer(mode='wrap')
     def preserve_legacy_effort(self,handler):
         result=handler(self)
-        for key in ('coefficient_limit_n','initial_radius_n','difference_step_n','minimum_radius_n','active_coefficients'):
+        for key in ('resolution','exploration','coefficient_limit_n','initial_radius_n','difference_step_n','minimum_radius_n','active_coefficients'):
             if getattr(self,key) is None:result.pop(key,None)
         return result
 
@@ -403,6 +411,11 @@ class ScientificQuestionV3(ScientificQuestionV2):
 class StructureSearchEffort(Contract):
     max_proposals: int = Field(strict=True,ge=1)
     max_evaluations: int = Field(strict=True,ge=1,description='Finite condition analysis entries for this request, not a cumulative quota or Native callbacks. Must cover every frozen condition for at least one structure.')
+
+
+class ScientificGeneration(Contract):
+    """An explicit physical edit of the selected parent; no automatic experiment."""
+    changes: dict[str,FiniteFloat] = Field(min_length=1,max_length=8,description='Registered physical parameter IDs mapped to absolute values in their declared SI units. Copy all other parent parameters exactly. The selected parent is decision.selected_candidate.')
 
 
 class ScientificStructureSearch(Contract):
@@ -913,7 +926,7 @@ class Plan(Contract):
     stopping_condition: str = Field(min_length=1)
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
-    generation: GenerationRequest | GenerationRequestV2 | None = None
+    generation: GenerationRequest | GenerationRequestV2 | ScientificGeneration | None = None
     search: Search | FamilyMixedSearch | None = None
     candidate: EvidenceRef | None = Field(default=None,description='Required top-level candidate for action=execute only. For initialize_control or physical_replay use the nested action payload candidate instead.')
     selected_execution: EvidenceRef | list[EvidenceRef] | None = Field(default=None, description='Exact publicly read passing evaluation. A frozen multi-condition Study requires a list containing one independent physical_replay result per condition on the identical structure; order is irrelevant.')

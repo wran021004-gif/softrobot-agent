@@ -266,14 +266,51 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             rows=parameter_catalog(spec,candidate)
             schema['properties']['parameter_id']['anyOf'][0]['enum']=[r['parameter_id'] for r in rows if r['selectable']]
     from tools.research.contracts import prune_schema_definitions,compact_schema
+    if question_contract(spec) is ScientificQuestionV4:project_control_effort(schema)
+    elif 'ScientificControlEffort' in schema.get('$defs',{}):
+        schema['$defs']['ScientificControlEffort']['required'].append('method')
     schema=prune_schema_definitions(schema)
     return compact_schema(schema) if question_contract(spec) is ScientificQuestionV4 else schema
 
 
-def control_settings(spec, effort, *, window=None, channels=None):
+def project_control_effort(schema):
+    """Provider projection only; historical numerical effort remains readable."""
+    effort=schema.get('$defs',{}).get('ScientificControlEffort')
+    if effort:
+        effort['properties']={k:v for k,v in effort['properties'].items() if k in ('resolution','exploration','evaluation_requests')}
+        effort['required']=['resolution','exploration','evaluation_requests']
+        for key in ('resolution','exploration'):
+            effort['properties'][key]={**next(b for b in effort['properties'][key]['anyOf'] if b.get('type')!='null')}
+        effort['description']='Choose temporal freedom, physical exploration scale and a shared finite callback cap. The program binds the numerical method, knots, active coefficients and step sizes; all starts share the cap. Every frozen task constraint remains scored.'
+    return schema
+
+
+def control_settings(spec, effort, *, window=None, channels=None, physical_limit_n=None):
     """Shared v2 effort mapping; original LocalControlSearchSettings is final authority."""
     q=ScientificControlEffort.model_validate(effort)
     duration=spec['analysis_protocol']['duration_s'];a,b=window or (0.,duration)
+    if q.resolution is not None or q.exploration is not None:
+        if q.resolution is None or q.exploration is None:raise ValueError('SELECT_RESOLUTION_AND_EXPLORATION')
+        internal=('method','knot_count','iterations','coefficient_limit_n','initial_radius_n','difference_step_n','minimum_radius_n','active_coefficients')
+        if any(k in q.model_fields_set for k in internal):raise ValueError('HIGH_LEVEL_EFFORT_CANNOT_MIX_NUMERICAL_OVERRIDES')
+        limit=physical_limit_n
+        if limit is None:limit=spec['family_space']['tendon_domains']['force_limit_n']['default']
+        if limit<=0:raise ValueError('POSITIVE_PHYSICAL_TENSION_RANGE_REQUIRED')
+        n={'coarse':3,'moderate':5,'fine':9}[q.resolution]
+        maximum=min(64,spec.get('native_control_limits',{}).get('knots_s',64))
+        if n>maximum:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_KNOT_GRANT')
+        period=spec['analysis_protocol']['period_s']
+        # Whole-task knots use the actual frozen control samples. An explicit
+        # interior window retains its chosen endpoints and zero corrections there.
+        grid=[a+(b-a)*i/(n-1) for i in range(n)]
+        if window is None:grid=[round(t/period)*period for t in grid]
+        if len(set(grid))!=n:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_TIME_GRID')
+        scale=limit*(1. if q.exploration=='broad' else .1)
+        numeric=dict(evaluation_requests=q.evaluation_requests,method='response',knot_count=n,
+            coefficient_limit_n=scale,initial_radius_n=scale*.25,
+            difference_step_n=scale*.01,minimum_radius_n=scale*.0001)
+        result=control_settings(spec,numeric,window=window,channels=channels)
+        return result.model_copy(update=dict(knots_s=grid))
     if not 0<=a<b<=duration:raise ValueError('LOCAL_WINDOW_MUST_BE_INSIDE_FROZEN_TASK')
     if window is not None and q.knot_count<3:raise ValueError('LOCAL_WINDOW_REQUIRES_INTERIOR_KNOT_AND_ZERO_ENDPOINTS')
     domain=LocalControlSearchSettings.model_json_schema()['properties']
@@ -579,6 +616,14 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
             knots = [0.,duration];active = None
         else:
             window = q.control_scope.window_s
+            if q.control_scope.mode in ('reach_phase','holding_phase'):
+                if window is not None:return feedback('needs_choice','PHASE_SCOPE_CANNOT_OVERRIDE_FROZEN_PHASE_TIME')
+                from tools.research_tasks import task_adapter
+                try:options=task_adapter(c['configuration']).control_search_options()
+                except (ValueError,NotImplementedError):return feedback('unsupported','FROZEN_TASK_HAS_NO_REACH_HOLD_PHASE')
+                start=options.get('holding_start')
+                if start is None:return feedback('unsupported','FROZEN_TASK_HAS_NO_REACH_HOLD_PHASE')
+                window=(0.,start) if q.control_scope.mode=='reach_phase' else (start,duration)
             if window is None or not 0<=window[0]<window[1]<=duration:
                 return feedback('needs_choice','LOCAL_WINDOW_MUST_BE_INSIDE_FROZEN_TASK',task_duration_s=duration)
             a,b = window
@@ -594,8 +639,9 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
         if active is not None:settings['active_coefficients']=active
         if effort:
             try:
-                settings=plain(control_settings({**spec,'analysis_protocol':protocol},effort,window=q.control_scope.window_s if q.control_scope.mode=='time_window' else None,
-                    channels=len(c['configuration']['robot']['structure']['data']['tendons'])))
+                settings=plain(control_settings({**spec,'analysis_protocol':protocol},effort,window=window if q.control_scope.mode!='full_task' else None,
+                    channels=len(c['configuration']['robot']['structure']['data']['tendons']),
+                    physical_limit_n=max(t['force_limit_n'] for t in c['configuration']['robot']['structure']['data']['tendons'])))
                 knots=settings['knots_s']
             except ValueError as exc:
                 return feedback('needs_choice','SEARCH_SETTINGS_OUTSIDE_ORIGINAL_CONTRACT',field='control_search_effort',reason_detail=str(exc))
@@ -997,16 +1043,18 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
             found=[r for r in detail.get('ready_requests',[]) if r['nonlinear_response']['variable']==path and
                 (not selected or r['nonlinear_response']['t1_results'][0]==selected[0] and
                     all(ref in selected for ref in r['nonlinear_response']['t1_results']))]
-            if not found:return feedback('needs_prerequisite','COMPARABLE_COMPLETED_BASELINE_MINUS_PLUS_T1_REQUIRED',
-                missing=['admitted baseline/minus/plus T1 stencil for '+path,
-                    'matched frozen task, state, absolute initial sequence, search settings and finite budget'],
-                selected_evidence=[dict(reference=ref,operation=host.store.artifact(ref).get('operation'),
-                    status=host.store.artifact(ref).get('status'),
-                    recorded_t1_method=host.store.artifact(ref).get('nonlinear_capability',{}).get('method')) for ref in selected],
-                preparation=[dict(tool='research_plan',action='generate',parameter_path=path),
-                    dict(tool='research_plan',action='initialize_control'),dict(tool='research_plan',action='diagnose')],
-                next_question='Choose reoptimized_task_capability/optimize for each candidate only if you decide to fund its original control search.',
-                conic_detail_query=conic.get('detail_query'),detail_query=detail.get('detail_query'),automatic_T1=False)
+            if 'local_radius_fraction' in q.model_fields_set:
+                row=rows[path];value=row['current_value']
+                step=min((row['maximum']-row['minimum'])*q.local_radius_fraction,
+                    value-row['minimum'],row['maximum']-value)
+                import math
+                found=[r for r in found if math.isclose(step,abs(parameter_value(
+                    family_parameters(spec,verify_candidate(host,host.store.artifact(r['nonlinear_response']['t1_results'][1])['candidate']),path)[0],path)-value),rel_tol=1e-10)]
+            if not found:
+                from tools.research.nonlinear_capability import preparation_view
+                preparation=preparation_view(host,candidate,paths=paths,step_fraction=q.local_radius_fraction)
+                return feedback('needs_prerequisite','COMPARABLE_COMPLETED_BASELINE_MINUS_PLUS_T1_REQUIRED',
+                    preparation=preparation,automatic_T1=False)
             if len(found)>1 and not selected:return feedback('needs_choice','MULTIPLE_COMPARABLE_T1_STENCILS',
                 choices=[r['nonlinear_response'] for r in found])
             choices.extend(found)

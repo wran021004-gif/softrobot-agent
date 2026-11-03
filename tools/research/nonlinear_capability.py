@@ -216,7 +216,7 @@ def saved_context(host, query):
 def candidate_responses(host, reference):
     """Derive exact requests from saved observations, using the execution gate."""
     from tools.research.state import state
-    from tools.research.design import verify_candidate,parameter_value
+    from tools.research.design import verify_candidate,parameter_value,set_parameter
     from tools.research.optimal_capability import family_analysis_parameters
     from extensions.tendon_family.family_space import resolved_request
     from tools.research.contracts import AnalysisRequest
@@ -229,6 +229,7 @@ def candidate_responses(host, reference):
         if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or raw.get('protocol')!=protocol
                 or raw.get('nonlinear_capability',{}).get('method')!=T1):continue
         c=verify_candidate(host,raw['candidate'])
+        if c['configuration']['task']!=candidate['configuration']['task']:continue
         inventory.append(dict(reference=ref,candidate=raw['candidate'],parameters=resolved_request(spec['family_space'],c['parameters'])))
     for base in [r for r in inventory if r['candidate']==plain(reference)]:
         for row in parameters:
@@ -239,8 +240,12 @@ def candidate_responses(host, reference):
                 except (KeyError,IndexError):continue
             for low,minus in points:
                 if low>=0:continue
+                expected=deepcopy(base['parameters']);set_parameter(expected,path,zero+low)
+                if minus['parameters']!=expected:continue
                 for high,plus in points:
                     if high<=0 or not math.isclose(-low,high,rel_tol=1e-10):continue
+                    expected=deepcopy(base['parameters']);set_parameter(expected,path,zero+high)
+                    if plus['parameters']!=expected:continue
                     query=dict(candidate=plain(reference),operation=T2_OPERATION,model_source='mujoco',
                         operating_point='standardized_initial_pretension',protocol=protocol,
                         nonlinear_response=dict(variable=path,unit=row['unit'],t1_results=[base['reference'],minus['reference'],plus['reference']]))
@@ -265,7 +270,7 @@ def candidate_responses(host, reference):
         direction_semantics='V1 is one symmetric parameter; V2 explicitly records independent axes, coupled dp/ds paths or finite discrete contrasts.')
 
 
-def preparation_view(host, reference):
+def preparation_view(host, reference, *, detailed=False, paths=None, step_fraction=.02):
     """Explain actual missing T2 evidence through the existing saved-context gate."""
     from tools.research.state import state
     from tools.research.design import verify_candidate,parameter_value,set_parameter
@@ -309,7 +314,7 @@ def preparation_view(host, reference):
             family_domain=parameter,baseline_T1=baseline,negative=minus,positive=plus,
             ready=bool(ready),ready_requests=ready,missing=missing,
             rejected_stencils=[r for r in prepared['rejected_stencils'] if r['request']['nonlinear_response']['variable']==path]))
-    return dict(candidate=candidate,parameters=rows,excluded_T1=excluded,
+    full=dict(candidate=candidate,parameters=rows,excluded_T1=excluded,
         baseline_T1=baseline,ready_requests=prepared['ready_requests'],
         query=dict(reference=candidate,view='working_set',pointer='/t2_preparation'),
         preparation_actions=['generate an explicitly chosen legal single-parameter minus/plus candidate',
@@ -317,6 +322,45 @@ def preparation_view(host, reference):
         matching_requirements=['same frozen condition and comparable own initialization','same legal initial sequence and tendon order',
             'same control-search settings and protocol','current frozen implementation','symmetric parameter-only stencil within FamilySpace'],
         scope='Read-only preparation. No generated candidates, source changes, new T1, automatic step choice or mandatory T2. Coordinate lineage alone is not a stencil.')
+    if detailed:return full
+    if not 0<step_fraction<=.1:raise ValueError('LOCAL_T2_RANGE_FRACTION_MUST_BE_IN_0_TO_0_1')
+    selected=[]
+    for row in rows:
+        if not paths or row['parameter_id'] not in paths:continue
+        domain=row['family_domain'];value=row['current_value'];path=row['parameter_id']
+        step=min((domain['maximum']-domain['minimum'])*step_fraction,
+            value-domain['minimum'],domain['maximum']-value)
+        minus=[p for p in row['negative'] if math.isclose(-p['delta'],step,rel_tol=1e-10)]
+        plus=[p for p in row['positive'] if math.isclose(p['delta'],step,rel_tol=1e-10)]
+        ready=[r for r in row['ready_requests'] if
+            any(r['nonlinear_response']['t1_results'][1] in p['t1_results'] for p in minus) and
+            any(r['nonlinear_response']['t1_results'][2] in p['t1_results'] for p in plus)]
+        missing=[]
+        if not baseline:missing.append('completed_current_implementation_baseline_T1')
+        if not minus:missing.append('negative_candidate_at_selected_step')
+        if not plus:missing.append('positive_candidate_at_selected_step')
+        if any(not p['t1_results'] for p in [*minus,*plus]):missing.append('completed_matching_perturbation_T1')
+        if not ready and not missing:missing.append('original_T2_state_input_protocol_or_search_matching')
+        item=dict(parameter_id=path,unit=row['unit'],current_value=value,
+            baseline_T1_available=bool(baseline),negative_candidate_available=bool(minus),
+            positive_candidate_available=bool(plus),executable_T2=bool(ready),missing=missing)
+        if step>0:
+            item['legal_perturbation']=dict(requested_domain_fraction=step_fraction,actual_step=step,
+                minus=value-step,plus=value+step,limited_by_physical_domain=step<(domain['maximum']-domain['minimum'])*step_fraction)
+            item['next_actions']=[dict(tool='research_plan',action='generate',
+                decision=dict(selected_candidate=candidate),generation=dict(changes={path:v})) for v in (value-step,value+step)]
+            item['next_actions'].append(dict(tool='research_analysis',domain='control',
+                instruction='Main may fund matched T1 on each candidate with an explicit common legal input and identical effort; no automatic execution.'))
+        else:item['missing']=[*item['missing'],'no_symmetric_step_at_current_physical_boundary']
+        selected.append(item)
+    return dict(candidate=candidate,condition_id=c.get('condition_id'),baseline_T1_available=bool(baseline),
+        excluded_historical_or_incomplete_T1=len(excluded),parameters=selected,
+        parameter_choices=[r['parameter_id'] for r in rows] if not paths else [],
+        executable_T2_count=len(prepared['ready_requests']),aggregation_mathematical_evaluations=1,
+        new_rollouts_for_aggregation=0,
+        next_action='Choose a physical parameter and local range in V4 structure differentiate / reoptimized_task_capability / best_found_J. Existing evidence is checked first; Main decides whether to generate contrasts and fund missing T1.',
+        detail_query=dict(reference=candidate,view='working_set',pointer='/t2_preparation/details'),
+        scope=full['scope'])
 
 
 def observations(context):
