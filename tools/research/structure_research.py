@@ -81,12 +81,17 @@ def prepare_context(spec, candidate, study, comparisons):
     capabilities=task_adapter(candidate['configuration']).physical_capabilities()
     if capabilities['status']=='unsupported':raise ValueError('UNSUPPORTED_PHYSICAL_CAPABILITIES: '+','.join(capabilities['missing']))
     dynamic=study.effect_semantics=='finite_time_task_response'
+    if study.passive_ablation and not dynamic:raise ValueError('PAIRED_LIMIT_INTERVENTION_REQUIRES_FINITE_TIME_RESPONSE')
     if dynamic:
         if not capabilities['evaluation']['finite_time_structure_response']:raise ValueError('REGISTERED_FINITE_TIME_STRUCTURE_RESPONSE_REQUIRED')
         if study.point_semantics!='frozen_task_initial_state' or study.target.quantity!='finite_time_task_violation':
             raise ValueError('DYNAMIC_TASK_REQUIRES_FROZEN_INITIAL_STATE_AND_COMPLETE_TASK_TARGET')
         if study.load_condition is not None or study.comparison_load_conditions or study.load_aggregation:
             raise ValueError('DYNAMIC_TASK_ALWAYS_REQUIRES_ALL_FROZEN_LOADS')
+        from tools.research.physical_replay import passive_source
+        passive_source(candidate['configuration'],{'artifact_id':'0'*64},dict(passive_ablation=study.passive_ablation) if study.passive_ablation else {})
+        if candidate['configuration']['task']['evaluator']['parameters']['data'].get('mechanism') and not study.passive_ablation:
+            raise ValueError('FROZEN_MECHANISM_TASK_REQUIRES_EXPLICIT_PAIRED_LIMIT_SELECTION')
         if study.operation in ('differentiate','optimize'):
             definitions=task_adapter(candidate['configuration']).constraint_observations({})
             if not any(d['normalization_scale'] for d in definitions):
@@ -140,8 +145,9 @@ def prepare_context(spec, candidate, study, comparisons):
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
     if dynamic:
         task=candidate['configuration']['task'];episodes=len(task['goal']['data']['load_conditions'])
-        result['dynamic_cost_bound']=dict(model_builds=result['evaluations'],episodes=result['evaluations']*episodes,
-            physics_steps=result['evaluations']*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
+        arms=2 if study.passive_ablation else 1
+        result['dynamic_cost_bound']=dict(model_builds=arms*result['evaluations'],episodes=arms*result['evaluations']*episodes,
+            physics_steps=arms*result['evaluations']*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
     return result
 
 
@@ -253,11 +259,12 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         if dynamic:
             from types import SimpleNamespace
             from schemas.platform import SessionInput
-            from extensions.tendon_family.passive_execution import execute
+            from extensions.tendon_family.passive_execution import execute,execute_pair
             from extensions.reference.passive_response import task_metrics
             from tools.research_tasks import task_adapter,constraint_gap
             directory=getattr(checkpoint,'directory',None)
-            backend=execute(SessionInput.model_validate(cfg),directory/('dynamic_'+str(index)) if directory else None)
+            folder=directory/('dynamic_'+str(index)) if directory else None
+            backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder))
             raw=backend.data.data
             measured=task_metrics(SessionInput.model_validate(cfg).task,raw)
             components={'evaluator:'+c.name:dict(value=c.observed,passed=c.satisfied,limit=c.limit,unit=c.units)
@@ -270,7 +277,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             mechanics=dict(dynamic_execution=raw,task_constraints=gap['constraints'],
                 reference_semantics=dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
                     unloaded_tip_drift='same_episode_initial_sample',constraint_model='mujoco_unilateral_soft_limits',
-                    reference_time_s=cfg['task']['goal']['data']['unloaded_until_s'],time_grid=cfg['task']['timing']),
+                    reference_time_s=(cfg['task']['goal']['data']['programs'][cfg['task']['goal']['data']['load_conditions'][0]][0]['end_s']
+                        if cfg['task']['goal']['data'].get('version')=='passive_response_v2' else cfg['task']['goal']['data']['unloaded_until_s']),
+                    time_grid=cfg['task']['timing'],protocol_version=cfg['task']['goal']['data'].get('version','passive_response_v1')),
                 task_observations=[],constraint_state=dict(status='finite_time_soft_constraints',qualified=False),
                 point_binding=dict(reference='frozen_dynamic_initial_state'))
             native=SimpleNamespace(cost=raw['cost'],physics=dict(identity=raw['physical_binding']['model_identity']))

@@ -435,6 +435,8 @@ class PassiveDynamicDataV2(PassiveDynamicData):
     intervention: dict
     trace_files: list[dict]
     paired_ablation: dict | None = None
+    cost_observation_scope: str | None = None
+    unobserved_work_possible: bool = False
 
 
 class ExperimentSpec(Contract):

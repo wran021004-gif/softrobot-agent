@@ -57,6 +57,9 @@ qualification measurements, actual constraints and coverage. Registered metrics
 reuse spatial reductions and add named stage/reference windows, last/mean/range
 and mean-state aggregation, explicit spatial projections, interval stiffness,
 precision-limited denominators and a same-tendon slack-to-taut requirement.
+Metrics use a stage's declared qualification grid when it covers that scoring
+window, otherwise the score grid. This matters for original P3 final full-tail
+means and uncertainty: subsampling only the score grid changes these quantities.
 Mechanism evidence requires two valid comparable arms and exact native receipts;
 its scope is the frozen intervention, program and observed assembly only.
 
@@ -73,3 +76,29 @@ in L2. The production evaluator contains no PHS/P3 task-name dispatch.
 Initial regression: six bounded real-engine tests passed, including v1 behavior,
 continuous five-stage execution, state restore, two-arm intervention and evidence
 mutations. Store/SDK and original-protocol validation follow this identity freeze.
+
+Integration follow-up: paired partial recovery now reconstructs already observed
+arms from the existing durable progress files without relaunch. Interrupted
+counts are explicitly lower bounds; incomplete CSV bytes are retained as
+unsealed evidence, never a complete trajectory. Native cost entries remain
+numeric, so the existing mechanism research kernel can aggregate them. The
+existing scientific structure question accepts exact `passive_ablation` names
+for finite-time v2 research; its original physical episode reservation doubles.
+Missing required mechanism intervention is rejected before execution. The v2
+reference boundary replaces the v1-only `unloaded_until_s` lookup in that kernel.
+
+Original-protocol engineering observations (execution identity `e2337e6`):
+PHS representative plus/minus 0.1 N at material s=0.5, 12 cells per segment,
+completed 128,000 steps with qualified tails and a valid task failure. P3 at
+two and four cells each completed four native episodes / 640,000 steps, but
+original stage stability failed and acceptance remained INVALID. Original
+P3 source trajectories agreed within 5.24e-16 m in these bounded comparisons.
+Full-tail metric reanalysis corrected an initially detected score-grid aliasing
+error; the earlier audit and consumption remain retained. No successful P3
+mechanism claim follows from unsettled arms. PHS original loaded execution
+resets velocity and warm start from baseline qpos, whereas v2 retains full
+qualified state continuously; original PHS cross-implementation trajectory
+tolerance was not found. This initialization/equivalence decision remains a
+formal-study readiness prerequisite, even though final point differences were
+about 1.2e-10 m in this ordinary assembly. No benchmark-winning parameters or
+new autonomous benchmark Study were used.

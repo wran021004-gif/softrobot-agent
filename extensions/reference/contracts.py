@@ -195,6 +195,7 @@ class PassiveResponseEvaluationV2(Contract):
     @model_validator(mode='after')
     def names(self):
         if len({b.name for b in self.bounds})!=len(self.bounds):raise ValueError('UNIQUE_PASSIVE_BOUND_NAMES_REQUIRED')
+        if len({s.load_condition for s in self.progressive_stiffness})!=len(self.progressive_stiffness):raise ValueError('ONE_REGISTERED_STIFFNESS_DEFINITION_PER_EPISODE_REQUIRED')
         if self.mechanism and not self.progressive_stiffness:raise ValueError('MECHANISM_REQUIRES_FROZEN_RESPONSE_COMPARISON')
         return self
 

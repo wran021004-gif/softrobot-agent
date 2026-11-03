@@ -539,6 +539,8 @@ class ScientificStructureV4(MechanismQuestionV2):
     target: PhysicalMechanismTarget | str
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop','no_active_control']
     physical_problem: Literal['passive_unilateral_equilibrium'] | None = None
+    passive_ablation: list[str] | None = Field(default=None,min_length=1,max_length=64,
+        description='Passive v2 finite-time research only: exact tendon limit names for each paired evaluation; twice the episode budget.')
     load_condition: str | None = None
     comparison_load_conditions: list[str] = Field(default_factory=list,
         description='compare only: additional frozen loads on the identical assembly. Do not also select a comparison candidate.')
@@ -556,6 +558,7 @@ class MechanismStudy(Contract):
     comparison_load_conditions: list[str] = Field(default_factory=list)
     load_aggregation: Literal['minimum','maximum'] | None = None
     effect_semantics: Literal['mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'] = 'mechanism_effect'
+    passive_ablation: list[str] | None = Field(default=None,min_length=1,max_length=64)
     max_evaluations: StrictInt = Field(ge=1,le=64)
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
@@ -579,6 +582,7 @@ class MechanismStudy(Contract):
         if not self.comparison_load_conditions:value.pop('comparison_load_conditions',None)
         if self.load_aggregation is None:value.pop('load_aggregation',None)
         if self.effect_semantics=='mechanism_effect':value.pop('effect_semantics',None)
+        if self.passive_ablation is None:value.pop('passive_ablation',None)
         return value
 
 

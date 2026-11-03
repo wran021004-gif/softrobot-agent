@@ -313,8 +313,8 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             controller_update_tested=False,complete_task_evaluated=False)
         if cfg['task'].get('physical_problem'):
             resolved['capabilities']['gvs_basis_resolved']=False
-            from tools.research_tasks import passive_registered
-            resolved['controller_preparation']=dict(status='no_active_control',registered_acceptance='offline_passive_response_v1' if passive_registered(cfg['task']) else 'not_registered')
+            from tools.research_tasks import passive_registered,passive_protocol
+            resolved['controller_preparation']=dict(status='no_active_control',registered_acceptance=passive_protocol(cfg['task']) if passive_registered(cfg['task']) else 'not_registered')
         if identity in s['candidates']:
             ref=s['candidates'][identity]
             save(host,dict(candidate=ref,request=plain(request),provenance=provenance),'candidate_reused')

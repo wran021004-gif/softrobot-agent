@@ -599,6 +599,14 @@ def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
     if inp.task.family=='task.passive_response':
         from extensions.tendon_family.passive_execution import backend_result,source_binding
         from extensions.reference.passive_response import inspect_evidence
+        if raw.get('kind') not in ('passive_dynamic_execution_v1','passive_dynamic_execution_v2'):
+            from schemas.platform import EvaluationResult
+            evaluation=EvaluationResult(validity='incomplete',task_success=None,metrics=[],constraints=[],
+                reason=raw.get('reason','PASSIVE_NATIVE_RECORD_UNAVAILABLE'),source=raw_reference,evaluator=inp.task.evaluator.extension_id,
+                evaluator_version=inp.task.evaluator.version,comparison_identity=comparison_identity)
+            return evaluation,dict(complete=False,task=plain(inp.task),official_task_success=None,solver_error_count=1,
+                dynamic_sampling=False,all_load_cases=False,physical_source=False,initial_qualification=False,stage_program=False,actual_constraints=False,
+                cost=raw.get('cost'),execution_failure_reason=evaluation.reason)
         result=backend_result(inp,raw)
         evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
         evaluation=evaluator(inp.task,result,raw_reference,registry(),comparison_identity)
@@ -645,11 +653,21 @@ def recover(host):
     if not boundary['termination_confirmed']:
         raise ValueError('UNKNOWN_PHYSICAL_REPLAY_OUTCOME_RETAINS_RESERVATION')
     raw=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',reason='worker_result_missing')
+    if p.get('route')=='passive_protocol' and raw.get('status')!='completed' and (folder/'baseline/passive_progress.json').exists():
+        from extensions.tendon_family.passive_execution import paired_raw
+        first=read(folder/'baseline/passive_progress.json')
+        second=read(folder/'ablation/passive_progress.json') if (folder/'ablation/passive_progress.json').exists() else None
+        options=read(folder/'request.json')['passive_source'].get('execution',{})
+        if options.get('passive_ablation'):
+            outer_reason=raw.get('reason','worker_interrupted')
+            raw=paired_raw(first,second,folder,options['passive_ablation'],boundary['elapsed_s'],interrupted=True)
+            raw['reason']=outer_reason
     if p.get('route')=='passive_protocol' and raw.get('status')!='completed' and (folder/'passive_progress.json').exists():
-        partial=read(folder/'passive_progress.json')
-        partial.update(status='incomplete',reason=raw.get('reason','worker_interrupted'))
-        if raw.get('numerical_failure'):partial['numerical_failure']=raw['numerical_failure']
-        raw=partial
+        if not raw.get('unobserved_work_possible'):
+            partial=read(folder/'passive_progress.json')
+            partial.update(status='incomplete',reason=raw.get('reason','worker_interrupted'))
+            if raw.get('numerical_failure'):partial['numerical_failure']=raw['numerical_failure']
+            raw=partial
     # Preserve compiled-load and first-contact facts even if a later engine call raises.
     if (folder/'rigid_tool_binding.json').exists():raw.setdefault('rigid_tool_binding',read(folder/'rigid_tool_binding.json'))
     if (folder/'first_environment_contact.json').exists():raw.setdefault('environment_contact',read(folder/'first_environment_contact.json'))
@@ -671,18 +689,26 @@ def recover(host):
             pair=raw.get('paired_ablation') or {}
             if pair.get('arm_receipts'):
                 from extensions.tendon_family.passive_execution import baseline_arm
-                for arm,value in [('baseline',baseline_arm(raw)),('ablation',pair['ablation'])]:
+                for arm in pair['arm_receipts']:
+                    value=baseline_arm(raw) if arm=='baseline' else pair['ablation']
                     native=pair['arm_receipts'][arm]
                     if native['raw_identity']!=digest(value):raise ValueError('PASSIVE_ARM_RECEIPT_RAW_MISMATCH')
                     ref=plain(host.store.put(db,value))
                     receipt=dict(**native,raw_reference=ref,parent_request_id=p['worker_request_id'],
                         owning_study=host.run_id,parent_boundary=boundary,parent_implementation=p['implementation'])
                     passive_l2['arms'][arm]=dict(raw_reference=ref,receipt_reference=plain(host.store.put(db,receipt)))
+            accounted={v['path'] for v in raw.get('trace_files',[])}
+            for path in sorted(folder.glob('*/episode_*.csv')):
+                relative=path.relative_to(folder).as_posix()
+                if relative in accounted:continue
+                body=path.read_bytes()
+                passive_l2.setdefault('unsealed_traces',[]).append(dict(path=relative,reference=plain(host.store.put(db,body,media='text/csv')),
+                    bytes=len(body),sha256=hashlib.sha256(body).hexdigest(),scope='Interrupted file; no complete-grid, state or qualification assertion.'))
     raw.update(boundary=boundary,implementation=p['implementation'])
     raw_ref=save(host,raw,'physical_playback_raw')
     source=host.store.artifact(p['source_reference'])
     candidate=verify_candidate(host,p['candidate']);cfg=candidate['configuration']
-    if p.get('route')=='passive_protocol':
+    if p.get('route')=='passive_protocol' and raw.get('kind') in ('passive_dynamic_execution_v1','passive_dynamic_execution_v2'):
         from extensions.tendon_family.passive_execution import backend_result
         backend_reference=save(host,plain(backend_result(SessionInput.model_validate(cfg),raw)),'physical_playback_backend_result')
     else:backend_reference=None

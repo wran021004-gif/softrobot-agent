@@ -81,6 +81,8 @@ def inspect(task,raw,*,intervention=False):
                 if not np.allclose(np.asarray(r['tendon_length_m'])-raw['payout_lengths_m'],r['length_residual_m'],rtol=0,atol=1e-12):
                     return 'invalid','MEASURED_LENGTH_RESIDUAL_MISMATCH'
                 if any(w['number'] for w in r['warnings']):return 'invalid','MUJOCO_WARNING'
+                if not isinstance(r['ncon'],int) or r['ncon']<0 or r['solver_iterations']<0 or r['nefc']<sum(map(len,r['constraint_states'])):
+                    return 'invalid','INVALID_RECORDED_SOLVER_STATE'
                 if len(r['constraint_states'])!=nt or len(r['constraint_residuals_m'])!=nt:return 'incomplete','ACTUAL_CONSTRAINT_ROWS_MISSING'
                 for i,(tension,gap,states,residuals,label) in enumerate(zip(r['actual_tension_n'],r['length_residual_m'],r['constraint_states'],r['constraint_residuals_m'],r['constraint_classification'])):
                     if len(states)!=len(residuals) or not np.isfinite(residuals).all():return 'invalid','MALFORMED_CONSTRAINT_ROWS'
@@ -117,10 +119,18 @@ def inspect(task,raw,*,intervention=False):
     return 'valid',None
 
 
+def stage_rows(goal,episode,name):
+    """Use the frozen stage qualification grid when it covers the score window."""
+    stage=next(s for s in goal.programs[episode['load_condition']] if s.name==name)
+    dense=any(q.stage==name and q.sampling=='every_physics_step' and q.window_s[0]<=stage.scoring_window_s[0]
+        and q.window_s[1]>=stage.scoring_window_s[1] for q in goal.qualifications)
+    return window_rows(episode['qualification_samples'] if dense else episode['samples'],stage.scoring_window_s)
+
+
 def stiffness(task,raw,spec):
     goal=PassiveResponseGoalV2.model_validate(task.goal.data);case=spec.load_condition
     e=next(e for e in raw['episodes'] if e['load_condition']==case);stages={s.name:s for s in goal.programs[case]}
-    tails={name:window_rows(e['samples'],s.scoring_window_s) for name,s in stages.items()}
+    tails={name:stage_rows(goal,e,name) for name in stages}
     i=task.physical_problem['monitor_s'].index(spec.material_s);direction=np.asarray(spec.direction_world)
     positions={name:np.array([r['material_positions_m'][i] for r in rows]) for name,rows in tails.items()}
     projected={name:values@direction for name,values in positions.items()}
@@ -167,7 +177,7 @@ def metrics(task,raw):
         constraints.append(ConstraintResult(name=name,observed=float(value),limit=float(limit),units=unit,satisfied=bool(satisfied)))
     for b in ev.bounds:
         e=next(e for e in primary['episodes'] if e['load_condition']==b.load_condition);stages={s.name:s for s in goal.programs[b.load_condition]}
-        rows=window_rows(e['samples'],stages[b.window].scoring_window_s);refs=window_rows(e['samples'],stages[b.reference_window].scoring_window_s)
+        rows=stage_rows(goal,e,b.window);refs=stage_rows(goal,e,b.reference_window)
         if b.aggregation=='mean_state':
             rows=[{**rows[-1],**{key:np.mean([r[key] for r in rows],axis=0).tolist() for key in ('material_positions_m','tip_m','material_velocities_m_s','tip_velocity_m_s')}}]
         reference=lambda key:np.asarray(refs[-1][key]) if b.reference_reduction=='last' else np.mean([r[key] for r in refs],axis=0)
@@ -223,9 +233,29 @@ def metrics(task,raw):
 
 def summary(task,raw):
     """Bounded L0 stage facts; full arrays and traces remain in L2."""
+    goal=PassiveResponseGoalV2.model_validate(task.goal.data);phases=[]
+    loads={v['name']:v for v in task.physical_problem['loads']}
+    for episode_index,e in enumerate(raw.get('episodes',[])):
+        case=e['load_condition'];i=task.physical_problem['monitor_s'].index(loads[case]['material_s'])
+        base_stage=goal.programs[case][0];base=stage_rows(goal,e,base_stage.name)
+        reference=np.mean([r['material_positions_m'][i] for r in base],axis=0) if base else None
+        for stage in goal.programs[case]:
+            rows=stage_rows(goal,e,stage.name)
+            if not rows:continue
+            mean=np.mean([r['material_positions_m'][i] for r in rows],axis=0)
+            phases.append(dict(load_condition=case,stage=stage.name,window_s=list(stage.scoring_window_s),material_s=loads[case]['material_s'],
+                actual_last_force_world_n=rows[-1]['force_world_n'],mean_material_position_m=mean.tolist(),
+                displacement_from_unloaded_tail_mean_m=(mean-reference).tolist() if reference is not None else None,
+                maximum_tip_speed_m_s=float(max(np.linalg.norm(r['tip_velocity_m_s']) for r in rows)),
+                maximum_tension_n=max(max(r['actual_tension_n']) for r in rows),
+                last_constraint_classification=rows[-1]['constraint_classification'],
+                qualifications=e.get('qualifications',{}).get(stage.name),
+                source_pointer='/episodes/'+str(episode_index),
+                scope='Recorded scoring window on its frozen qualification grid where available; failed qualification prevents a mechanism or acceptance claim.'))
     return dict(version='passive_program_summary_v2',initial_state_source=raw.get('initial_state_source'),
+        phase_measurements=phases,
         stages=[dict(load_condition=e['load_condition'],complete=e['complete'],qualifications=e.get('qualifications'),
             state_resets=e.get('state_resets'),qualified_state_identity=e.get('qualified_state',{}).get('state_identity'),
             maximum_tension_n=e.get('maximum_tension_n'),maximum_enabled_length_excess_m=e.get('maximum_enabled_length_excess_m'),
             transition_count=len(e.get('constraint_transitions',[]))) for e in raw.get('episodes',[])],
-        paired_status=raw.get('paired_ablation',{}).get('status'),cost=raw.get('cost'))
+        paired_status=(raw.get('paired_ablation') or {}).get('status'),cost=raw.get('cost'))

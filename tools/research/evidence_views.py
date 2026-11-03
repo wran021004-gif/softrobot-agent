@@ -875,7 +875,8 @@ def result_card(host, reference):
             input_source=EvidenceLocation.model_validate(r['input_query']) if r.get('input_query') else None)
             for r in diagnostic['critical_samples']]
         if value.get('raw_reference'):
-            raw_ref=value['raw_reference'];raw=host.store.artifact(raw_ref)
+            raw_ref=value['raw_reference'];raw=host.store.artifact(raw_ref,paths=('model_identity','mathematical_model_identity',
+                'physical_backend','scene_identity','tendon_order','physics_timestep_s','physics_steps'))
             details.append(_location(raw_ref))
             context.extend(RecordedField(name=key,value=raw[key],source=_location(raw_ref,'/'+key))
                 for key in ('model_identity','mathematical_model_identity','physical_backend','scene_identity',

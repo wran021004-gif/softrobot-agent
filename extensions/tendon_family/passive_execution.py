@@ -356,12 +356,38 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
 
 def baseline_arm(raw):
     """Recover the exact primary arm from a composite result without its twin."""
-    pair=raw['paired_ablation'];value={k:v for k,v in raw.items() if k not in ('paired_ablation','boundary','implementation')}
+    pair=raw['paired_ablation'];value={k:v for k,v in raw.items() if k not in ('paired_ablation','boundary','implementation','cost_observation_scope','unobserved_work_possible')}
     value.update(cost=pair['baseline_cost'],timings_s=pair['baseline_timings_s'],
         trace_files=pair['baseline_trace_files'],model_builds=1,status=pair['baseline_status'])
     if pair.get('baseline_reason') is None:value.pop('reason',None)
     else:value['reason']=pair['baseline_reason']
     return value
+
+
+def paired_raw(first,second,folder,requested_tendons,elapsed,*,interrupted=False):
+    """Assemble measured arms, including durable partials; never execute here."""
+    pair=dict(status='incomplete' if interrupted else 'not_executed_baseline_invalid' if second is None else
+        'completed' if first['status']=='completed' and second['status']=='completed' else 'incomplete',
+        requested_tendons=list(requested_tendons),baseline_cost=first['cost'],baseline_timings_s=first['timings_s'],
+        baseline_trace_files=first['trace_files'],baseline_status=first['status'],baseline_reason=first.get('reason'))
+    arms=[('baseline',first)]+([('ablation',second)] if second else [])
+    if second is not None:pair['ablation']=second
+    for arm,value in arms:
+        pair.setdefault('arm_receipts',{})[arm]=dict(version='passive_native_arm_receipt_v2',
+            parent_execution_id=Path(folder).name,execution_id=Path(folder).name+'/'+arm,execution_status=value['status'],
+            raw_identity=digest(value),physical_binding=value.get('physical_binding'),intervention=value.get('intervention'),
+            cost=value.get('cost'),elapsed_s=value.get('timings_s',{}).get('total'),
+            qualified_states={e['load_condition']:e.get('qualified_state',{}).get('state_identity') for e in value.get('episodes',[])},
+            scope='One fresh native model/data execution owned by the enclosing Worker reservation; no separate autonomous Study.')
+    complete=pair['status']=='completed'
+    return dict(**{k:v for k,v in first.items() if k not in ('status','model_builds','cost','timings_s','trace_files')},
+        status='completed' if complete else 'incomplete' if interrupted or second is not None else first['status'],
+        paired_ablation=pair,model_builds=sum(v.get('model_builds',0) for _,v in arms),
+        cost={key:sum(v['cost'].get(key,0) for _,v in arms) for key in set().union(*(v['cost'] for _,v in arms))},
+        timings_s=dict(total=elapsed,**{arm:v.get('timings_s',{}).get('total',0.) for arm,v in arms}),
+        trace_files=[dict(v,path=arm+'/'+v['path']) for arm,value in arms for v in value.get('trace_files',[])],
+        cost_observation_scope='last_durable_observed_lower_bounds' if interrupted else 'complete_observed_native_counts',
+        unobserved_work_possible=interrupted)
 
 
 def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None):
@@ -376,16 +402,10 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
     folder=Path(folder);started=time.perf_counter()
     first=execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result).data.data
     if first['status']!='completed':
-        first['paired_ablation']=dict(status='not_executed_baseline_invalid',requested_tendons=list(disabled_limits),
-            baseline_cost=first['cost'],baseline_timings_s=first['timings_s'],baseline_trace_files=first['trace_files'],
-            baseline_status=first['status'],baseline_reason=first.get('reason'))
-        first['trace_files']=[dict(v,path='baseline/'+v['path']) for v in first['trace_files']]
-        atomic_json(folder/'passive_progress.json',first)
-        return backend_result(inp,first)
-    pair=dict(status='incomplete',requested_tendons=list(disabled_limits),
-        baseline_cost=first['cost'],baseline_timings_s=first['timings_s'],baseline_trace_files=first['trace_files'],
-        baseline_status=first['status'],baseline_reason=first.get('reason'))
-    combined={**first,'paired_ablation':pair,'status':'incomplete'}
+        combined=paired_raw(first,None,folder,disabled_limits,time.perf_counter()-started)
+        atomic_json(folder/'passive_progress.json',combined)
+        return backend_result(inp,combined)
+    combined=paired_raw(first,None,folder,disabled_limits,time.perf_counter()-started,interrupted=True)
     atomic_json(folder/'passive_progress.json',combined)
     try:
         second=execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
@@ -395,20 +415,7 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
         path=folder/'ablation/passive_progress.json'
         second=read(path) if path.exists() else dict(status='incomplete',reason=str(exc),cost={})
         second.update(status='incomplete',reason=str(exc))
-    pair.update(ablation=second,status='completed' if second['status']=='completed' else 'incomplete')
-    for arm,value in (('baseline',first),('ablation',second)):
-        pair.setdefault('arm_receipts',{})[arm]=dict(version='passive_native_arm_receipt_v2',
-            parent_execution_id=folder.name,execution_id=folder.name+'/'+arm,execution_status=value['status'],
-            raw_identity=digest(value),physical_binding=value.get('physical_binding'),
-            intervention=value.get('intervention'),cost=value.get('cost'),elapsed_s=value.get('timings_s',{}).get('total'),
-            qualified_states={e['load_condition']:e.get('qualified_state',{}).get('state_identity') for e in value.get('episodes',[])},
-            scope='One fresh native model/data execution, owned by the enclosing Worker reservation; no separate autonomous Study.')
-    combined.update(status='completed' if pair['status']=='completed' else 'incomplete',model_builds=1+second.get('model_builds',0),
-        cost={key:first['cost'].get(key,0)+second.get('cost',{}).get(key,0) for key in set(first['cost'])|set(second.get('cost',{}))},
-        timings_s=dict(total=time.perf_counter()-started,baseline=first['timings_s']['total'],ablation=second.get('timings_s',{}).get('total',0.)),
-        trace_files=[dict(v,path=arm+'/'+v['path']) for arm,value in (('baseline',first),('ablation',second)) for v in value.get('trace_files',[])])
-    combined['cost'].update(observation_scope='complete_exact_counts' if pair['status']=='completed' else 'last_durable_observed_lower_bounds',
-        unobserved_work_possible=pair['status']!='completed')
+    combined=paired_raw(first,second,folder,disabled_limits,time.perf_counter()-started,interrupted=second.get('physical_binding') is None)
     atomic_json(folder/'passive_progress.json',combined)
     return backend_result(inp,combined)
 

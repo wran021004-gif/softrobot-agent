@@ -144,8 +144,76 @@ class PassiveProgramTests(unittest.TestCase):
         self.assertNotIn('state_vector',json.dumps(schema));self.assertNotIn('efc_J',json.dumps(wires))
         card=plain(_card(h,ref));self.assertTrue(any(f['name']=='passive_program' for f in card['recorded_context']))
         cert=acceptance_certificate(h,ref);self.assertTrue(cert['complete_acceptance_view'],cert)
+        from tools.research.scientific_intent import scientific_actions
+        actions={r['scientific_goal']:r for r in scientific_actions(state(h)['spec'])}
+        self.assertFalse(actions['control_feasibility']['available']);self.assertTrue(actions['mechanism_research']['available'])
+        self.assertTrue(result['profile']['passive_program']['phase_measurements'])
+        from tests.research.test_p63r3_closure import selection
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_ADDITIONAL_PHYSICS')),patch('tools.research.reporter._wire',side_effect=ValueError('Mock Reporter transport disabled')):
+            wires+=run_fixture(h,[('evidence_read',dict(reference=ref,view='acceptance_certificate')),
+                ('research_route',dict(tool='research_plan',action='select')),('research_plan',selection(c,ref))],id_offset=2)
+        self.assertEqual(state(h)['selected'],ref);self.assertEqual(state(h)['research_status'],'stopped')
         atomic_json(ROOT/'runs/u3_tests/wire_validation.json',dict(study=h.run_id,store=str(h.store.root),result=ref,certificate=cert,
             reporter_card=card,wire=wires,provider='SDK Mock HTTP only; no external Provider'))
+
+    def test_interrupted_pair_recovers_durable_lower_bounds_without_relaunch(self):
+        import mujoco
+        from types import SimpleNamespace
+        from tools.research import core
+        from tools.research.state import state
+        from tools.state_io import read,atomic_json
+        from tools.research.physical_replay import calculate
+        from tests.research.test_passive_physical_acceptance import replay_plan
+        h,c=prepared_host_v2();plan=replay_plan(c);plan['physical_replay']['passive_ablation']=['tendon_0']
+        engine_step=mujoco.mj_step;attempts=0
+        def kill(model,data):
+            nonlocal attempts
+            attempts+=1
+            if attempts==507:raise KeyboardInterrupt('ENGINEERING_HARD_INTERRUPTION_AFTER_BASELINE')
+            engine_step(model,data)
+        def worker(command,log,timeout):
+            path=Path(command[-1])
+            try:
+                with patch.object(mujoco,'mj_step',kill):calculate(read(path),path.parent)
+            except KeyboardInterrupt:pass
+            return SimpleNamespace(returncode=1)
+        with patch.object(core,'guard'),patch('tools.research.physical_replay.guard'),patch('tools.service_execution._run_contained',worker):
+            result=core.dispatch(h,plan,'u3-interruption')['result']
+        raw=h.store.artifact(result['raw_reference'])
+        self.assertIsNone(result['acceptance']['accepted']);self.assertEqual(result['acceptance']['status'],'incomplete')
+        self.assertTrue(raw['unobserved_work_possible']);self.assertEqual(raw['cost']['physics_steps'],500)
+        self.assertTrue(result['passive_l2']['unsealed_traces']);self.assertIsNone(state(h)['pending'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
+        with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_RELAUNCH')):
+            core.dispatch(h,plan,'u3-interruption')
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
+        atomic_json(ROOT/'runs/u3_tests/interruption_validation.json',dict(study=h.run_id,result=result['reference'],
+            injected_actual_completed_steps=506,durable_observed_lower_bound=raw['cost']['physics_steps'],unobserved_work_possible=True,
+            pending=state(h)['pending'],reserved_backend_solves=2,no_relaunch=True))
+
+    def test_bad_unloaded_state_and_wrong_state_reference(self):
+        cfg=deepcopy(self.cfg);cfg['task']['initializer']['parameters']['data']['qvel_rad_s'][self.raw['coordinate_order'][0]]=1.
+        inp=SessionInput.model_validate(cfg);b=execute_pair(inp,ROOT/'runs/u3_tests'/uuid4().hex,[self.raw['tendon_order'][0]])
+        self.assertEqual(b.data.data['paired_ablation']['status'],'not_executed_baseline_invalid')
+        self.assertEqual(b.data.data['cost']['model_builds'],1);self.assertEqual(inspect_evidence(inp.task,b.data.data)[0],'invalid')
+        from tools.research.physical_replay import passive_source
+        with self.assertRaisesRegex(ValueError,'EXACT_GRANTED'):passive_source(self.cfg,plain(self.ref),dict(passive_ablation=['wrong_tendon']))
+
+    def test_existing_dynamic_mechanism_uses_same_v2_pair_executor(self):
+        from tools.research.structure_research import calculate
+        from tools.research.contracts import AnalysisRequest,MechanismStudy
+        from tools.state_io import atomic_json
+        study=MechanismStudy(operation='inspect',target=dict(quantity='finite_time_task_violation',goal='decrease'),
+            point_semantics='frozen_task_initial_state',effect_semantics='finite_time_task_response',max_evaluations=1,passive_ablation=['tendon_0'])
+        query=AnalysisRequest(candidate=self.ref,operation='mechanism_structure_v1',mechanism_study=study,operating_point='standardized_initial_pretension',model_source='mujoco',
+            protocol=resolve(ROOT/'configs/research/study_passive_engineering_v1.json')['analysis_protocol'])
+        folder=ROOT/'runs/u3_tests'/uuid4().hex;folder.mkdir(parents=True)
+        def checkpoint(name,value):atomic_json(folder/(name+'.json'),value)
+        checkpoint.directory=folder
+        result=calculate(self.cfg,dict(candidate=plain(self.ref)),query,dict(actual_time_s=0.),dict(selected_parameters=[],evaluations=1),checkpoint=checkpoint)
+        self.assertEqual(result['status'],'computed',result.get('reason'))
+        execution=result['structure_research']['records'][0]['mechanics']['dynamic_execution']
+        self.assertEqual(execution['cost']['physics_steps'],1000);self.assertEqual(execution['model_builds'],2)
 
 
 if __name__=='__main__':unittest.main()

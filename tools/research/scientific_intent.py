@@ -798,6 +798,8 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         return feedback('unsupported','UNSUPPORTED_PHYSICAL_CAPABILITIES',missing=capabilities['missing'])
     if v4 and q.effect_semantics=='finite_time_task_response':
         return compile_dynamic(host,q,payload,intent,tool_use_id=tool_use_id)
+    if v4 and q.passive_ablation:
+        return feedback('unsupported','PAIRED_LIMIT_SELECTION_REQUIRES_FINITE_TIME_RESPONSE')
     if c['configuration']['task'].get('physical_problem'):
         if not v4:return feedback('unsupported','PASSIVE_REQUIRES_V4_PHYSICAL_SEMANTICS')
         return compile_constrained(host,q,payload,intent,tool_use_id=tool_use_id)
@@ -945,7 +947,8 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
     if q.requested_budget is None:return fail('EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
         parameter_paths=q.parameter_paths,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
-        max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
+        max_evaluations=q.requested_budget,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates,
+        passive_ablation=q.passive_ablation)
     try:
         context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates])
         detail=mathematical_method_view(host,intent['candidate'])['methods'][METHOD]

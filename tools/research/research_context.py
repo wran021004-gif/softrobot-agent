@@ -804,7 +804,10 @@ def action_feedback(host,current, *, analysis_metadata=None):
                 fit=replay_capacity(host,episodes,route='passive_protocol')
                 rows.append(dict(action='physical_replay',candidate=candidate,route='passive_protocol',
                     status='preflight_eligible' if not closed and 'physical_replay' in current['actions'] and fit['admitted']>=episodes else 'unavailable',
-                    new_physical_evaluations=episodes,source_kind='frozen_passive_protocol_v1',
+                    new_physical_evaluations=episodes,source_kind='frozen_passive_protocol_v2' if cfg['task']['goal']['data'].get('version')=='passive_response_v2' else 'frozen_passive_protocol_v1',
+                    optional_paired_intervention=dict(allowed=cfg['task']['goal']['data'].get('allowed_ablation','none'),
+                        new_physical_evaluations=2*episodes,field='physical_replay.passive_ablation',
+                        scope='Exact tendon names; fresh two-arm execution after common qualification; shared budget applies.'),
                     remaining_checks=['full_plan_admission','owned_candidate','frozen_protocol_source','shared_budget'],
                     requires_agent_fields=['decision','hypothesis','physical_replay.candidate']))
             rows.extend(dict(action=action,candidate=candidate,status='not_applicable',
