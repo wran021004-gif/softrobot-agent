@@ -87,7 +87,7 @@ def selected_evidence_facts(parsed, query, limit):
     return facts
 
 
-def feedback_delivery(host, tool_ids, *, compact=False, db=None):
+def feedback_delivery(host, tool_ids, *, compact=False, exact=False, db=None):
     """Project the verified last tool round, without synthesizing SDK messages."""
     from tools.research.research_context import compact_evidence
     rows=[];remaining=6000 if compact else 16000
@@ -102,6 +102,12 @@ def feedback_delivery(host, tool_ids, *, compact=False, db=None):
         row=dict(tool_id=key,tool=value['tool_use']['name'],query=value['tool_use']['input'],
             status=result['status'],feedback_reference=reference,
             original_result_query=dict(reference=reference,view='full',pointer='/result'))
+        if exact:
+            # The last settled round has not yet been consumed by Main. Its
+            # original result must cross the first new request intact, even
+            # when the historical compact navigation allowance is exhausted.
+            rows.append(dict(**row,delivery='exact_feedback',result=result,preserve_once=True))
+            continue
         if compact and len(json.dumps(row['query']).encode())>1000:
             query=row.pop('query')
             row['query_summary']={k:query[k] for k in ('action','operation','model_source','operating_point') if k in query}
@@ -235,6 +241,7 @@ def main_feedback_projection(host, delivery):
     from tools.research.object_choices import main_projection
     value=deepcopy(delivery)
     for row in value.get('items',[]):
+        if row.get('preserve_once'):continue
         if row.get('tool')=='research_analysis' and row.get('status')=='success':
             saved=host.store.artifact(row['feedback_reference'])['result']
             payload=json.loads(''.join(b.get('text','') for b in saved['content']))
@@ -272,7 +279,9 @@ def schemas(agent):
 
 def settled_boundary(current,db,messages):
     if current['research_status']=='stopped':raise ValueError('STOPPED')
-    if current.get('success_gate'):raise ValueError('SELECT_REQUIRED')
+    # A context handoff is read-only scientific work. The original guard still
+    # requires immediate closeout after success; a large SDK history must not
+    # prevent that closeout from receiving its latest complete certificates.
     if current.get('pending') or current['pilot'].get('unconsumed_response'):raise ValueError('PENDING_FEEDBACK_OR_EXECUTION')
     if db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]:raise ValueError('UNSETTLED_OUTCOME')
     if any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True)
@@ -282,6 +291,7 @@ def settled_boundary(current,db,messages):
 
 def safe_boundary(host,current,db,messages,*,boundary='completed_invocation'):
     settled_boundary(current,db,messages)
+    if current.get('success_gate') and boundary!='request_feedback':raise ValueError('SELECT_REQUIRED')
     if boundary=='request_feedback':
         anchors=[host.store.artifact(e['outputs'][0]) for e in host.store.events(host.run_id)
             if e['kind']=='request_feedback_boundary']
@@ -602,7 +612,7 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
                 anchor=next(host.store.artifact(e['outputs'][0],db=db) for e in reversed(host.store.events(host.run_id,db=db))
                     if e['kind']=='request_feedback_boundary')
                 from tools.research.config import conversation_policy
-                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'],compact=bool(conversation_policy(s['spec'])),db=db)
+                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'],exact=True,db=db)
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
             host.store.update_state(db,host.run_id,s)

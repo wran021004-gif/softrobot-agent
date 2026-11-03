@@ -74,6 +74,14 @@ def condition_candidate(host, reference, condition_id, *, create=True):
 
 
 def joint_assessment(host, references, *, require_reads=True):
+    """Reuse one qualification only while Store and scientific state agree."""
+    references=[plain(ref) for ref in references]
+    # Preserve the complete ordered input, including duplicates and extras.
+    key=('joint_assessment',host.run_id,require_reads,digest(references),digest(state(host)))
+    return host.store.snapshot_value(key,lambda:_joint_assessment(host,references,require_reads=require_reads))
+
+
+def _joint_assessment(host, references, *, require_reads=True):
     """Check actual Store receipts and original acceptance, independent of order."""
     from tools.research.config import same_robot_structure
     from tools.research.design import verify_candidate

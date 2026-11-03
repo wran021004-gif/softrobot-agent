@@ -88,6 +88,14 @@ def _pointer_exists(value,pointer):
     except (KeyError,IndexError,ValueError,TypeError):return False
 
 
+def summarize_saved_evidence(host,reference):
+    """Project Native summaries without materializing their recorded rollouts."""
+    from tools.research.feedback import native_result_metadata
+    value=native_result_metadata(host,reference)
+    if not value.get('native_dynamics'):value=host.store.artifact(reference)
+    return summarize_evidence(value,reference)
+
+
 def summarize_evidence(value,reference=None,*,refinement=None):
     """Add a view without rewriting a sealed scoped_claim or raw result.
 
@@ -266,7 +274,7 @@ def citation_inventory(host, *, references=None):
     from tools.research.state import state
     rows=[];current=state(host);known=registered_references(host)
     for ref in {r['artifact_id']:r for r in (known if references is None else references)}.values():
-        value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
+        summary=summarize_saved_evidence(host,ref)
         rows.append(dict(reference=ref,role=citation_role(host,ref,current=current,known=known),registered=True,
             supports_scientific_conclusion=bool(summary['supported_inferences']),
             candidate=summary['candidate_identity'],task_identity=summary['task_identity'],

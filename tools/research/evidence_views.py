@@ -119,8 +119,9 @@ def diagnostic_relations(host, reference):
     candidate=selected.get('candidate',reference if reference in s['candidates'].values() else None)
     if candidate is None:return dict(status='candidate_selection_required',relations=[])
     c=host.store.artifact(candidate);cfg=c['configuration']
-    mathematics=[(r,host.store.artifact(r)) for r in s.get('analysis_results',[])]
+    mathematics=[(r,host.store.artifact(r,paths=('candidate','trajectory'))) for r in s.get('analysis_results',[])]
     math=[(r,v) for r,v in mathematics if v.get('candidate')==candidate and v.get('trajectory')][-3:]
+    math=[(r,host.store.artifact(r)) for r,v in math]
     physics=[(r,host.store.artifact(r)) for r in [*s.get('physical_replays',[]),*s.get('results',[])]]
     physics=[(r,v) for r,v in physics if v.get('candidate')==candidate][-6:]
     selected_physics=next((row for row in physics if row[0]==reference),physics[-1] if physics else None)

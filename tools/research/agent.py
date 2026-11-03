@@ -1031,7 +1031,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
         def paid_tool(use,**kwargs):
             from tools.research.budget import provider_request_scope
-            with provider_request_scope(host,boundary.request_phase):
+            with provider_request_scope(host,boundary.request_phase),host.store.read_snapshot():
                 return run(use,**kwargs)
         return paid_tool
     rl_mode=enabled(state(host)['spec'],'rl')

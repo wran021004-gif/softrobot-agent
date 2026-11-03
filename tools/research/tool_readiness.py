@@ -117,7 +117,7 @@ def native_baseline_failures(host, candidate):
     """Existing settled results are the only owner; no cache or blanket method ban."""
     s=state(host);rows=[]
     for ref in s.get('analysis_results',[]):
-        raw=host.store.artifact(ref);failure=raw.get('native_baseline_failure')
+        raw=host.store.artifact(ref,paths=('candidate','implementation','status','native_baseline_failure'));failure=raw.get('native_baseline_failure')
         if (failure and raw.get('candidate')==plain(candidate) and raw.get('implementation')==s.get('freeze')
                 and raw.get('status')=='execution_incomplete'):
             rows.append(dict(reference=ref,**failure))

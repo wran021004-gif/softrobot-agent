@@ -57,14 +57,21 @@ class Store:
         if current is not None and current[0] is self:
             yield current[1]
             return
-        token=_READ_SNAPSHOT.set((self,{}))
-        try:yield _READ_SNAPSHOT.get()[1]
-        finally:_READ_SNAPSHOT.reset(token)
+        # Keep a connection open only to observe commits, not a SQLite read
+        # transaction. PRAGMA data_version on a fresh connection is always 1.
+        with closing(self.connect(True)) as observer:
+            revision=observer.execute('PRAGMA data_version').fetchone()[0]
+            token=_READ_SNAPSHOT.set((self,{},observer,[revision]))
+            try:yield _READ_SNAPSHOT.get()[1]
+            finally:_READ_SNAPSHOT.reset(token)
 
     def snapshot_value(self, key, build):
         current=_READ_SNAPSHOT.get()
         if current is None or current[0] is not self:return build()
         cache=current[1]
+        revision=current[2].execute('PRAGMA data_version').fetchone()[0]
+        if revision!=current[3][0]:
+            cache.clear();current[3][0]=revision
         if key not in cache:cache[key]=build()
         return deepcopy(cache[key])
 
@@ -170,17 +177,71 @@ class Store:
         db.execute('INSERT OR IGNORE INTO artifacts VALUES (?,?,?)', (identity, media, body))
         return EvidenceRef(artifact_id=identity, media_type=media)
 
-    def artifact(self, ref, *, raw=False, db=None, paths=None):
+    def artifact(self, ref, *, raw=False, db=None, paths=None, pointers=None):
         """Hash-verified artifact; optional dot paths avoid decoding unrelated arrays."""
         ref = EvidenceRef.model_validate(ref)
         if db is None:
             def read():
-                with self.connect(True) as conn:
-                    return self.artifact(ref, raw=raw, db=conn, paths=paths)
-            return self.snapshot_value(('artifact',ref.artifact_id,raw,tuple(paths) if paths is not None else None),read)
+                current=_READ_SNAPSHOT.get()
+                if paths and not raw and pointers is None and current is not None and current[0] is self:
+                    # Metadata consumers often ask for different overlapping
+                    # field sets. Reuse verified fields, including absent ones,
+                    # without retaining a second copy of a large raw JSON blob.
+                    fields=current[1].setdefault(('artifact_fields',ref.artifact_id,ref.media_type),{})
+                    def field(path):
+                        if path in fields:return fields[path]
+                        for prefix,(present,value) in fields.items():
+                            if present and path.startswith(prefix+'.'):
+                                for key in path[len(prefix)+1:].split('.'):
+                                    if not isinstance(value,dict) or key not in value:return False,None
+                                    value=value[key]
+                                return True,value
+                        return None
+                    missing=[path for path in paths if field(path) is None]
+                    if missing:
+                        with closing(self.connect(True)) as conn:
+                            selected=self.artifact(ref,db=conn,paths=missing)
+                        for path in missing:
+                            value=selected;present=True
+                            for key in path.split('.'):
+                                if not isinstance(value,dict) or key not in value:present=False;value=None;break
+                                value=value[key]
+                            fields[path]=(present,value)
+                    result={}
+                    for path in paths:
+                        present,value=field(path)
+                        if not present:continue
+                        target=result;keys=path.split('.')
+                        for key in keys[:-1]:target=target.setdefault(key,{})
+                        target[keys[-1]]=value
+                    return result
+                with closing(self.connect(True)) as conn:
+                    return self.artifact(ref, raw=raw, db=conn, paths=paths,pointers=pointers)
+            return self.snapshot_value(('artifact',ref.artifact_id,raw,tuple(paths) if paths is not None else None,
+                tuple(pointers) if pointers is not None else None),read)
         row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
         if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
             raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)
+        if pointers is not None:
+            if raw or paths is not None or row['media']!='application/json':raise ValueError('JSON_POINTER_PROJECTION_REQUIRED')
+            queries=[]
+            for pointer in pointers:
+                if pointer and not pointer.startswith('/'):raise ValueError('JSON_POINTER_REQUIRED')
+                path='$'
+                for token in pointer[1:].split('/') if pointer else []:
+                    token=token.replace('~1','/').replace('~0','~')
+                    kind=(db.execute('SELECT json_type(?,?)',(row['body'],path)).fetchone()[0]
+                        if token.isdecimal() else None)
+                    if kind=='array':
+                        if not token.isdecimal() or str(int(token))!=token:raise KeyError(pointer)
+                        path+='['+token+']'
+                    else:path+='.'+json.dumps(token,ensure_ascii=False)
+                queries.append(path)
+            if not queries:return {}
+            args=[row['body'],*queries,queries[0]]
+            values=json.loads(db.execute('SELECT json_extract('+','.join('?' for _ in args)+')',args).fetchone()[0])
+            return {pointer:value for pointer,path,value in zip(pointers,queries,values)
+                if value is not None or db.execute('SELECT json_type(?,?)',(row['body'],path)).fetchone()[0] is not None}
         if paths is not None:
             if raw or row['media']!='application/json':raise ValueError('JSON_PATH_PROJECTION_REQUIRED')
             result={}
@@ -199,8 +260,10 @@ class Store:
 
     def session(self, run_id, db=None):
         if db is None:
-            with self.connect(True) as conn:
-                return self.session(run_id, conn)
+            def read():
+                with closing(self.connect(True)) as conn:
+                    return self.session(run_id, conn)
+            return self.snapshot_value(('session',run_id),read)
         row = db.execute('SELECT * FROM sessions WHERE run_id=?', (run_id,)).fetchone()
         if row is None:
             raise ValueError('SESSION_NOT_FOUND')

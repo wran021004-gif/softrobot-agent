@@ -242,7 +242,8 @@ def legacy_context(host, *, evidence_references=None):
     pareto=[r['reference'] for r in valid if not any(dominates(q,r) for q in valid)]
     references=([*s.get('research_mathematics',[]),*s.get('analysis_results',[]),*s.get('mechanics_results',[])]
         if evidence_references is None else evidence_references)
-    evidence=[summarize_evidence(host.store.artifact(r),r) for r in references]
+    from tools.research.evidence_policy import summarize_saved_evidence
+    evidence=[summarize_saved_evidence(host,r) for r in references]
     evidence=[{k:v[k] for k in ('claim_kind','verification_status','model_identity','candidate_identity','task_identity',
         'supported_inferences','unsupported_inferences','evidence_reference','numerical_evidence_pointer','prospective_guarantee')} for v in evidence]
     return dict(version='research_context_v1',task_identity=spec.get('canonical_task_identity',digest(s['base_configuration']['task'])),
@@ -475,16 +476,19 @@ def _read_coverage(host):
             if q.view=='working_set' and q.pointer=='/all_fresh_results' and isinstance(delivered,dict) and delivered.get('index_kind')=='all_fresh_results':
                 delivered=delivered['results']
             expected=None
-            if q.view=='acceptance_certificate':
+            if provided and q.view=='acceptance_certificate':
                 from tools.research.core import read_evidence
                 expected=read_evidence(host,plain(q),record_read=False)
-            if q.view in ('full','summary','fields','range'):
-                expected=host.store.artifact(q.reference)
-                if isinstance(expected,bytes):expected=json.loads(expected)
-                for part in q.pointer[1:].split('/') if q.pointer else []:
-                    part=part.replace('~1','/').replace('~0','~');expected=expected[int(part)] if isinstance(expected,list) else expected[part]
-                if q.view=='fields':expected={k:expected[k] for k in q.fields}
-                elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
+            # A summary cannot earn complete-read credit. Reopening its source
+            # decoded entire Native trajectories only to discard that value.
+            if provided and q.view in ('full','fields','range'):
+                if q.view=='fields':
+                    pointers={key:q.pointer+'/'+key.replace('~','~0').replace('/','~1') for key in q.fields}
+                    selected=host.store.artifact(q.reference,pointers=list(pointers.values()))
+                    expected={key:selected[pointer] for key,pointer in pointers.items()}
+                else:
+                    expected=host.store.artifact(q.reference,pointers=[q.pointer])[q.pointer]
+                    if q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
             complete=provided and q.view in ('full','fields','range') and delivered==expected
             certificate=provided and q.view=='acceptance_certificate' and delivered==expected and expected.get('complete_acceptance_view') is True
         except (ValueError,KeyError,IndexError,TypeError):continue
@@ -640,7 +644,7 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
         for source in sources[-3:]:
             control=host.store.artifact(source);tr=control['trajectory']
             provenance=control.get('provenance',{})
-            prediction=next((r for r in math if host.store.artifact(r).get('control_schedule_reference')==source),None)
+            prediction=next((r for r in math if host.store.artifact(r,paths=('control_schedule_reference',)).get('control_schedule_reference')==source),None)
             historical=next((e for e in s.get('research_history',[]) if e['source'] in (source,provenance.get('source')) or e['reference']==provenance.get('source')),None)
             links.append(dict(candidate=candidate,source=source,source_kind=control.get('source_kind'),
                 initialized=source in controls,full_control_sequence=True,task_acceptance=control.get('task_acceptance','unmeasured'),
@@ -652,7 +656,7 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
                 grid=dict(intervals=len(tr['tensions_n']),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr['tendon_order']),
                 execution_references=[r for r,v in results if v.get('source_reference')==source]))
         for ref in math[-3:]:
-            value=host.store.artifact(ref)
+            value=host.store.artifact(ref,paths=('control_schedule_reference','status','operation','trajectory'))
             links.append(dict(candidate=candidate,source=ref,evaluation_reference=ref,source_kind='mathematical_prediction',
                 initialized=value.get('control_schedule_reference') in controls if value.get('control_schedule_reference') else False,
                 full_control_sequence=bool(value.get('control_schedule_reference')),
@@ -674,9 +678,9 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
             has_completed_nmpc_execution=any(v.get('execution_id') and not v.get('source_reference') and not v.get('run_id') and task_gap(v)['valid_complete'] for r,v in results),
             has_measured_nmpc_reference=any(r['source_kind']=='nmpc' for r in residual),
             has_local_search_start=any(r.get('candidate')==candidate and r['action']=='control_search' and r['status']=='preflight_eligible' for r in current['decision_feedback']['actions']),
-            has_residual_ppo_reference=bool(residual),methods_used=sorted({host.store.artifact(r).get('operation','mathematics') for r in math} |
+            has_residual_ppo_reference=bool(residual),methods_used=sorted({host.store.artifact(r,paths=('operation',)).get('operation','mathematics') for r in math} |
                 {'fixed_tension' if v.get('source_reference') else 'ppo' if v.get('run_id') else 'nmpc' for r,v in results}),
-            mathematically_evaluated=any(host.store.artifact(r).get('status')=='computed' for r in math),mathematical_records=math,
+            mathematically_evaluated=any(host.store.artifact(r,paths=('status',)).get('status')=='computed' for r in math),mathematical_records=math,
             physically_evaluated=bool(valid),physical_records=[r for r,v in results],accepted=any(r['task_gap']['accepted'] for r in valid),
             best_valid=valid[0] if valid else None))
         for ref,value in results[-6:]:
@@ -1130,6 +1134,12 @@ def research_recall(host, query):
 
 
 def research_action_trace(host, limit=5):
+    value=host.store.snapshot_value(('research_action_trace',host.run_id),lambda:_research_action_trace(host,None))
+    if limit is not None:value['recent']=value['recent'][-limit:]
+    return value
+
+
+def _research_action_trace(host, limit=5):
     """Project original plans/receipts and rejected native actions; never infer causes."""
     import json
     from tools.research.reporter import RESULT_KEYS
@@ -1148,7 +1158,10 @@ def research_action_trace(host, limit=5):
         if row is None and request_id.endswith('-analysis'):
             row=host.store.lookup(host.run_id,request_id.removesuffix('-analysis'))
         receipt=json.loads(row['receipt']) if row and row['receipt'] else None
-        output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
+        fields=('candidate','reference','status','task_passed','stop_reason','error','execution_feedback',
+            'scientific_execution_started','worker_started','error_code','local_comparison')
+        output=host.store.artifact(receipt['output'],paths=('toolUseId','content','scientific_results',
+            *fields,*('result.'+key for key in fields))) if receipt and receipt.get('output') else {}
         if 'toolUseId' in output and 'content' in output:
             try:output=json.loads(''.join(b.get('text','') for b in output['content']))
             except ValueError:output={}
@@ -1495,7 +1508,7 @@ def research_opportunity_review(host, *, details=False):
             latest=dict(reference=last['reference'],condition=last['condition'],**{k:last_search[k] for k in ('stop_reason','iterations_started','search_dimension','callbacks','requested_callbacks','baseline','best')}) if last else None,
             scope='Iteration/callback exhaustion is not convergence, structural infeasibility or independent acceptance.'),
         mechanism_scope='Local point/model only. Parameter names imply no physical effect; consult candidate mathematical_capabilities /research_opportunities/parameters.',
-        comparison=dict(cross_structure_common_task=any(len({candidates[host.store.artifact(r)['candidate']['artifact_id']][0] for r in refs})>1 for refs in grouped.values()),
+        comparison=dict(cross_structure_common_task=any(len({candidates[host.store.artifact(r,paths=('candidate',))['candidate']['artifact_id']][0] for r in refs})>1 for refs in grouped.values()),
             rule='Match condition, initial state/loading, scoring scope, fidelity, protocol and effort. Common task alone is insufficient; cross-condition errors do not identify topology effects.'),
         remaining=dict(provider=provider['remaining_total'],provider_closeout=provider['reserved_for_closeout'],
             public_operations=budget['public_operation_budget']['remaining_total'],mathematics=science['remaining_mathematical'],replay=science['remaining_full_replays']),
@@ -1797,7 +1810,7 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
     from tools.research.design import verify_candidate
     s=state(host);directions={}
     for ref in [*s.get('analysis_results',[]),*s.get('research_mathematics',[])]:
-        raw=host.store.artifact(ref);direction=raw.get('structure_research',{}).get('structure_direction')
+        raw=host.store.artifact(ref,paths=('candidate','status','structure_research.structure_direction'));direction=raw.get('structure_research',{}).get('structure_direction')
         if raw.get('status')=='computed' and direction and direction.get('candidate',raw.get('candidate'))==raw.get('candidate'):
             directions[ref['artifact_id']]=(ref,raw)
     own=[(ref,raw) for ref,raw in directions.values() if ref in s.get('analysis_results',[]) and raw.get('candidate')==candidate]
@@ -2538,7 +2551,7 @@ def tool_feedback(host,value):
             full_routes=dict(reference=result['candidate'],pointer='/resolved_parameters/tendons'),
             full_structure=dict(reference=candidate['configuration_reference'],pointer='/robot/structure/data'),
             control_source_initialized=any(e['candidate']==result['candidate'] for e in state(host).get('control_initializations',[])),
-            mathematical_observations=[r for k in ('analysis_results','mechanics_results') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']],
+            mathematical_observations=[r for k in ('analysis_results','mechanics_results') for r in state(host).get(k,[]) if host.store.artifact(r,paths=('candidate',)).get('candidate')==result['candidate']],
             physical_observations=[r for k in ('results','physical_replays','rl_evaluations') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']])
         ordered=ordered_candidates(host,state(host));position=ordered.index(result['candidate'])
         if position:

@@ -129,7 +129,7 @@ def search_feedback(host, reference):
             results_query=dict(reference=reference,view='full',pointer='/result/comparison_summary'),
             search_scope_query=dict(reference=result['search_state'],view='full',pointer='/problem'),
             independent_task_acceptance='unmeasured',scientific_citation_eligible=False)
-        checkpoint=host.store.artifact(result['search_state']);query=checkpoint['problem']['query']
+        checkpoint=host.store.artifact(result['search_state'],paths=('problem.query','problem.domains'));query=checkpoint['problem']['query']
         fixed['method']=query.get('method',fixed['method'])
         fixed['search_scope']={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','initial_segment_count','initial_tendon_count','initial_span_strategy','span_strategies','section_types','bounds','step','minimum_step','initial_tension_n','previous_candidate_ref','objective','evaluation_mode','operating_point','screening_fidelity','max_proposals','max_evaluations','stop_score') if k in query}
         fixed['comparison_scope']=result.get('comparison_scope')
@@ -145,7 +145,7 @@ def search_feedback(host, reference):
             key=tuple(c.get(k) for k in ('physical_design_identity','task_identity','profile_identity','numerical_model_identity'))
             return key if all(key) else ('candidate',c.get('identity'))
         for ref in state(host).get('analysis_results',[]):
-            a=host.store.artifact(ref);opt=(a.get('native_dynamics') or {}).get('optimization') or {}
+            a=native_result_metadata(host,ref);opt=(a.get('native_dynamics') or {}).get('optimization') or {}
             j=(opt.get('best') or {}).get('measure',{}).get('signed_maximum_excess')
             if a.get('status')!='computed' or not isinstance(j,(float,int)) or not math.isfinite(j):continue
             c=host.store.artifact(a['candidate']);key=scope(c)
@@ -154,7 +154,7 @@ def search_feedback(host, reference):
         for row in result['evaluated']:
             conditions={}
             for cid,v in row.get('evidence',{}).get('conditions',{}).items():
-                ref=v.get('analysis');a=host.store.artifact(ref) if ref else {}
+                ref=v.get('analysis');a=native_result_metadata(host,ref) if ref else {}
                 c=host.store.artifact(a['candidate']) if a.get('candidate') else {}
                 best_j,best_ref,best_a=observations.get(scope(c),(v.get('J'),ref,a))
                 opt=(best_a.get('native_dynamics') or {}).get('optimization') or {}
@@ -184,10 +184,20 @@ def search_feedback(host, reference):
             if result.get('comparison_summary') is not None else {}))
 
 
+def native_result_metadata(host, reference):
+    """Hash-verified fact fields; trajectories and iteration arrays stay in L2."""
+    return host.store.artifact(reference,paths=('candidate','status','operation','control_schedule_reference',
+        'task_analysis','requested_operation','binding','model_identity','protocol','charged_numerical_s','limitations',
+        'scoped_claim','analysis_applicability','task_identity','design_identity','mathematical_model_identity',
+        'nonlinear_capability.callbacks','native_dynamics.cost','native_dynamics.optimization.best.measure',
+        'native_dynamics.optimization.best.task_gap','native_dynamics.optimization.stop_reason',
+        'native_dynamics.optimization.iterations_started'))
+
+
 def native_mathematical_fact(host, reference, *, control_source=None, condition_id=None):
     """Recorded Native facts, not a new evaluation or a physical certificate."""
     from tools.research.state import state
-    value=host.store.artifact(reference);candidate=host.store.artifact(value['candidate'])
+    value=native_result_metadata(host,reference);candidate=host.store.artifact(value['candidate'])
     native=value.get('native_dynamics') or {};optimization=native.get('optimization') or {}
     best=optimization.get('best') or {};measure=best.get('measure') or {}
     constraints={r['constraint_id']:r for r in (value.get('task_analysis') or {}).get('constraints',[])}
@@ -241,7 +251,7 @@ def scientific_result_delivery(host):
             key=digest(fact['comparison_scope'])
             if key not in groups or fact['J']<groups[key]['fact']['J']:
                 groups[key]=dict(fact=fact,search=search)
-        raw=host.store.artifact(search['reference'])['result']
+        raw=host.store.artifact(search['reference'],paths=('result.comparison_summary',))['result']
         covered.update(v['analysis']['artifact_id'] for row in raw.get('comparison_summary',[]) for v in row['conditions'].values() if v.get('analysis'))
         for i,row in enumerate(raw.get('comparison_summary',[])):
             for condition,value in row['conditions'].items():
@@ -258,9 +268,10 @@ def scientific_result_delivery(host):
     # Search owns its batch summary; standalone Native results share its fact card.
     for ref in s.get('analysis_results',[]):
         if ref['artifact_id'] in covered:continue
-        value=host.store.artifact(ref)
+        value=native_result_metadata(host,ref)
         if not value.get('native_dynamics'):
             from tools.research.analysis import decision_result
+            value=host.store.artifact(ref)
             latest_evaluation=decision_result(value,ref);continue
         fact=native_mathematical_fact(host,ref);latest_evaluation=fact
         if fact['valid_complete'] and isinstance(fact['J'],(float,int)) and math.isfinite(fact['J']):

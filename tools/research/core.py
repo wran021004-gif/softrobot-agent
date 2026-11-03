@@ -587,6 +587,11 @@ def initial_structure_action(host):
 
 
 def dispatch(host, value, request_id, origin='model'):
+    with host.store.read_snapshot():
+        return _dispatch(host,value,request_id,origin)
+
+
+def _dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     from tools.research.scientific_intent import enabled as question_enabled
     from tools.research.structure_intent import compile_search,enabled as structure_enabled
