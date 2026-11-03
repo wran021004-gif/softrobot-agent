@@ -932,7 +932,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                         payload,selection=expand_choice(host,payload)
                         record(host,'replay_choice_resolution',dict(tool_use_id=use['toolUseId'],
                             selected_result=selection,expanded_plan=payload,scientific_execution_started=False))
-                    if main_context_enabled(before['spec']) and payload.get('action')=='generate':
+                    if (main_context_enabled(before['spec']) and payload.get('action')=='generate'
+                            and 'changes' not in payload['generation']):
                         payload=deepcopy(payload)
                         payload['generation'].setdefault('family_space_identity',before['spec']['family_space_identity'])
                     if main_context_enabled(before['spec']) and (payload.get('search') or {}).get('version')=='family_mixed_search_v1':

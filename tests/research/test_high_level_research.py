@@ -84,6 +84,29 @@ class HighLevelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'OUTSIDE_FROZEN_DOMAIN'):compile_generation(self.h,payload)
         self.assertFalse(state(self.h)['analysis_results'])
 
+    def test_actual_sdk_generation_binds_legacy_identity_only_after_physical_edit_compilation(self):
+        from tools.research.state import update
+        from tests.research.test_cross_task_integration import plan
+        from tests.research.test_recent_round_tools import run_fixture
+        from tools.research.design import verify_candidate
+        original=self.h.store.artifact(self.c)
+        update(self.h,profile={**state(self.h)['profile'],'identity':'synthetic-new-profile'})
+        p=plan('generate',generation=dict(changes={}));p['decision']['selected_candidate']=self.c
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+            wires=run_fixture(self.h,[('research_route',dict(tool='research_plan',action='generate')),
+                ('research_plan',p),None])
+        self.assertEqual(len(wires),3)
+        fresh=list(state(self.h)['candidates'].values())[-1]
+        self.assertNotEqual(fresh,self.c)
+        self.assertEqual(verify_candidate(self.h,fresh)['configuration'],original['configuration'])
+        plans=state(self.h)['plans'];self.assertTrue(plans)
+        self.assertEqual(self.h.store.artifact(plans[-1])['original_plan']['generation']['family_space_identity'],
+            state(self.h)['spec']['family_space_identity'])
+        uses=[self.h.store.artifact(e['outputs'][0])['tool_use'] for e in self.h.store.events(self.h.run_id)
+            if e['kind']=='model_original_tool_request']
+        self.assertEqual(next(u for u in uses if u['name']=='research_plan')['input']['generation'],{'changes':{}})
+        self.assertFalse(state(self.h)['analysis_results'])
+
     def test_real_plan_schema_exposes_physical_edits_and_scientific_search_effort(self):
         from tools.research.agent import plan_schema
         spec=state(self.h)['spec']
