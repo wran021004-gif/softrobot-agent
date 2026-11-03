@@ -115,10 +115,14 @@ def bind_plan_selection(host,payload):
     elif action in ('select','confirm','replay'):
         selected=value['mechanics_source'] if action=='replay' else value['selected_execution']
         refs=selected if isinstance(selected,list) else [selected]
-        results=[host.store.artifact(ref,paths=('candidate','design_candidate')) for ref in refs]
-        candidate=results[0].get('candidate') or results[0].get('design_candidate')
-        if any((r.get('candidate') or r.get('design_candidate'))!=candidate for r in results):
-            raise ValueError('SELECTION_REQUIRES_IDENTICAL_CANDIDATE')
+        if action=='select' and isinstance(selected,list):
+            from tools.research.conditions import joint_assessment
+            candidate=joint_assessment(host,refs)['candidate']
+        else:
+            results=[host.store.artifact(ref,paths=('candidate','design_candidate')) for ref in refs]
+            candidate=results[0].get('candidate') or results[0].get('design_candidate')
+            if any((r.get('candidate') or r.get('design_candidate'))!=candidate for r in results):
+                raise ValueError('SELECTION_REQUIRES_IDENTICAL_CANDIDATE')
         value['supporting_evidence']=refs
     if candidate:value['decision']['selected_candidate']=candidate
     return value

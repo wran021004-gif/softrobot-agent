@@ -173,6 +173,15 @@ class BoundedEvidenceTests(unittest.TestCase):
             choice=eligibility(h,results,selection=True)
             self.assertTrue(choice['eligible'],choice)
             self.assertEqual(joint_assessment(h,results)['condition_results'],results)
+            from tools.research.object_choices import bind_plan_selection
+            original=dict(action='select',selected_execution=results,decision=dict(hypothesis_id='joint-fixture'))
+            bound=bind_plan_selection(h,original)
+            self.assertEqual(bound['decision']['selected_candidate'],c)
+            self.assertEqual(bound['supporting_evidence'],results)
+            self.assertEqual(bound['selected_execution'],results)
+            self.assertNotIn('selected_candidate',original['decision'])
+            with self.assertRaisesRegex(ValueError,'ALL_FROZEN_TASK_CONDITIONS_REQUIRED'):
+                bind_plan_selection(h,{**original,'selected_execution':results[:1]})
 
 
 if __name__=='__main__':unittest.main()

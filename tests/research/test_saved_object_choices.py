@@ -88,11 +88,13 @@ class SavedChoiceTests(unittest.TestCase):
         expanded=bind_plan_selection(self.h,expand_references(value,schema));Plan.model_validate(expanded)
         self.assertEqual(expanded['candidate'],expanded['decision']['selected_candidate'])
 
-    def test_joint_select_rejects_different_candidates(self):
+    def test_joint_select_preserves_original_qualification_rejection(self):
         first,second=ref('e'),ref('f')
         self.records[first['artifact_id']]=dict(candidate=self.c);self.records[second['artifact_id']]=dict(candidate=ref('d'))
         value=rationale('select');value['selected_execution']=[first,second]
-        with self.assertRaisesRegex(ValueError,'IDENTICAL_CANDIDATE'):bind_plan_selection(self.h,value)
+        with patch('tools.research.conditions.joint_assessment',side_effect=ValueError('JOINT_SELECTION_REQUIRES_IDENTICAL_STRUCTURE_AND_DISCRETIZATION')) as qualified:
+            with self.assertRaisesRegex(ValueError,'IDENTICAL_STRUCTURE'):bind_plan_selection(self.h,value)
+        qualified.assert_called_once_with(self.h,[first,second])
 
 
 class SelectAdmissionTests(unittest.TestCase):
