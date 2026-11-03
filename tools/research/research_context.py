@@ -447,6 +447,10 @@ def _confirmed_tool_deliveries(host):
 
 
 def read_coverage(host):
+    return host.store.snapshot_value(('read_coverage',host.run_id),lambda:_read_coverage(host))
+
+
+def _read_coverage(host):
     """Only paired successful feedback counts as delivery; summary is never full."""
     import json
     from tools.research.contracts import EvidenceQuery
@@ -2187,17 +2191,31 @@ def information_flow_brief(brief, delivered):
         progress=(access.get('stop_index') or {}).get('read_progress') or {}
         for key in ('unread_bodies','unread_summaries'):
             if key in progress:progress[key+'_count']=len(progress.pop(key))
-        for row in science.get('study_best_mathematical',[]):
-            fact=row.get('fact') or {};settings=fact.pop('control_search_settings',None)
+        def effort(owner,key,reference,pointer):
+            settings=owner.pop(key,None)
             if settings:
-                fact['control_search_effort']=dict(method=settings['method'],knot_count=len(settings['knots_s']),
+                owner['control_search_effort']=dict(method=settings['method'],knot_count=len(settings['knots_s']),
                     callback_cap=settings['evaluation_requests'],iteration_cap=settings['iterations'],
                     correction_limit_n=settings['coefficient_limit_n'],initial_radius_n=settings['initial_radius_n'])
-                fact['settings_query']=dict(reference=fact['reference'],view='full',pointer='/requested_operation/control_optimization/settings')
+                owner['settings_query']=dict(reference=reference,view='full',pointer=pointer)
+        latest=science.get('latest_search') or {};fixed=latest.get('fixed_result') or {}
+        native_facts=[r.get('fact') or {} for r in science.get('study_best_mathematical',[])]
+        native_facts.extend(fixed.get('best_mathematical',[]))
+        for fact in native_facts:
+            effort(fact,'control_search_settings',fact.get('reference'),'/requested_operation/control_optimization/settings')
             fact.pop('comparison_scope',None) # exact task/model/profile identities remain above
             for key in ('control_binding','citation','formal_acceptance_read_credit'):fact.pop(key,None)
             if fact.get('reference'):
                 fact['bottleneck_query']=dict(reference=fact['reference'],view='working_set',pointer='/bottleneck_diagnosis')
+        settings_pointer='/result/comparison_scope/control_settings'
+        effort(fixed.get('comparison_scope') or {},'control_settings',latest.get('reference'),settings_pointer)
+        effort(fixed,'control_search_settings',latest.get('reference'),settings_pointer)
+        if fixed.get('structures'):
+            from collections import Counter
+            fixed['control_search_termination']=dict(counts=dict(Counter(
+                c.get('stop_reason') or 'unrecorded' for row in fixed['structures'] for c in row['conditions'].values())),
+                source_at='scientific_results.latest_search.fixed_result.structures.*.conditions.*',
+                interpretation='Common requested settings do not imply equal actual search or convergence. Numerical failure and stagnation do not establish structural inadequacy; mechanism evidence remains separate.')
         if not any(science.get(k) for k in ('latest_search','study_best_mathematical','critical_failures','best_independent_physical')) and math_result:
             result.pop('scientific_results',None)
     return result

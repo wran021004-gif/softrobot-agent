@@ -196,6 +196,16 @@ class M1NativeSearchScopeTests(unittest.TestCase):
             self.assertEqual(structures[0]['tendon_count'],4)
             self.assertRegex(structures[0]['conditions']['negative_low']['candidate'],r'^candidate_')
             self.assertRegex(structures[0]['conditions']['negative_low']['control_source'],r'^evidence_')
+            fixed=packet['scientific_results']['latest_search']['fixed_result']
+            self.assertNotIn('"knots_s"',json.dumps(packet['scientific_results']))
+            self.assertEqual(sum(fixed['control_search_termination']['counts'].values()),6)
+            from tools.research.object_choices import reference_choices
+            fact=fixed['best_mathematical'][0];query=fact['settings_query']
+            raw=core.read_evidence(h,dict(query,reference=reference_choices(h,include_all=True)[query['reference']]),record_read=False)
+            self.assertEqual(len(raw['knots_s']),fact['control_search_effort']['knot_count'])
+            scope=fixed['comparison_scope'];query=scope['settings_query']
+            raw=core.read_evidence(h,dict(query,reference=reference_choices(h,include_all=True)[query['reference']]),record_read=False)
+            self.assertEqual(raw['evaluation_requests'],scope['control_search_effort']['callback_cap'])
 
 
 if __name__=='__main__':unittest.main()
