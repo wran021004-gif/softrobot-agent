@@ -141,6 +141,9 @@ def native_point(host, query, configuration):
         return dict(actual_time_s=0.,dof_order=physics['dofs'],tendon_order=[],u=[],
             qpos_rad=[0.]*len(physics['dofs']),qvel_rad_s=[0.]*len(physics['dofs']))
     if query.saved_state:
+        selection=getattr(query,'native_state_selection',None)
+        if selection is not None:
+            return best_native_point(host,query,configuration)
         if plain(query.saved_state) in state(host).get('analysis_results',[]):
             result=host.store.artifact(query.saved_state,paths=('status','operation','candidate',
                 'binding.effective_configuration_identity','native_dynamics.baseline_peak_speed_state',
@@ -216,4 +219,86 @@ def native_point(host, query, configuration):
         native_replay=dict(rows=rows[:k],scene=scene),
         provenance=dict(execution=reference,update_id=k,trajectory=source['files']['trajectory.json.gz'],
             input_phase='actual command for requested interval; not previous applied input'))
+
+
+def best_native_point(host, query, configuration):
+    """Select a saved best-control state or describe a charged exact prefix replay.
+
+    Admission performs no physics. Tip samples select a time, never substitute
+    for integration state. The worker materializes missing state in NativeModel.
+    """
+    from tools.research.physical_replay import binding
+    from tools.research.control_correction import corrected_tensions
+    from tools.research.contracts import LocalControlSearchSettings
+    ref=plain(query.saved_state)
+    if ref not in state(host).get('analysis_results',[]):
+        raise ValueError('OWNED_COMPLETE_NATIVE_ANALYSIS_CHECKPOINT_REQUIRED')
+    result=host.store.artifact(ref)
+    if (result.get('status')!='computed' or result.get('operation') not in
+            ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') or
+            result.get('candidate')!=plain(query.candidate) or
+            result.get('binding',{}).get('effective_configuration_identity')!=digest(configuration)):
+        raise ValueError('OWNED_COMPLETE_NATIVE_ANALYSIS_CHECKPOINT_REQUIRED')
+    raw=result['native_dynamics'];best=raw['optimization']['best'];selection=query.native_state_selection
+    settings=LocalControlSearchSettings.model_validate(result['requested_operation']['control_optimization']['settings'])
+    row=next((r for r in raw.get('start_sources',[]) if r['start']==best['start']),None)
+    schedule=deepcopy(row['schedule'] if row else raw['original_schedule']);tr=schedule['trajectory']
+    tr['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],settings.knots_s,
+        best['coefficients_n'],np.asarray(result['binding']['tension_bounds_n'])[:,1],settings.correction_window_s).tolist()
+    binding(configuration,tr)
+    if digest(tr['tensions_n'])!=best['sequence_hash']:
+        raise ValueError('BEST_NATIVE_SEQUENCE_HASH_MISMATCH')
+    times=np.asarray(best['outputs']['times_s']);speeds=np.linalg.norm(best['outputs']['tip_velocities_m_s'],axis=1)
+    from tools.research_tasks import task_adapter
+    options=task_adapter(configuration).control_search_options();hold=options.get('holding_start')
+    kind=selection.kind
+    if kind=='best_sample':wanted=selection.time_s
+    elif kind=='best_holding_start':
+        if hold is None:raise ValueError('FROZEN_HOLDING_WINDOW_REQUIRED')
+        wanted=hold
+    else:
+        indices=np.arange(len(times))
+        if kind=='best_pre_hold_peak_speed':
+            if hold is None:raise ValueError('FROZEN_HOLDING_WINDOW_REQUIRED')
+            indices=indices[times<hold-1e-12]
+        if not len(indices):raise ValueError('NO_SAVED_SAMPLES_IN_SELECTED_WINDOW')
+        wanted=float(times[indices[np.argmax(speeds[indices])]])
+    atol=result['protocol']['horizon_alignment_atol_s'];grid=np.asarray(tr['times_s'])
+    index=int(np.argmin(abs(grid-wanted)))
+    if abs(grid[index]-wanted)>atol or wanted<raw['initial_state']['actual_time_s']-atol:
+        raise ValueError('EXACT_BEST_NATIVE_CONTROL_GRID_SAMPLE_REQUIRED')
+    wanted=float(grid[index]);remaining=max(0.,float(grid[-1]-wanted))
+    provenance=dict(method='best_native_control_trajectory',analysis=ref,
+        sequence_hash=best['sequence_hash'],state_selection=plain(selection),control_grid_time_s=wanted,
+        source=row['source'] if row else result['requested_operation']['control_optimization']['source'],
+        remaining_task_s=remaining,scope='Instantaneous diagnostic only; no remaining control horizon at task deadline.' if remaining==0 else
+            'Real best-control trajectory state; instantaneous mechanics do not establish remaining-task feasibility.',inherited_acceptance=False)
+    saved=raw.get('best_control_states',{}).get(kind)
+    reused_from=None
+    if saved is None:
+        for other_ref in reversed(state(host).get('analysis_results',[])):
+            meta=host.store.artifact(other_ref,paths=('status','operation','candidate'))
+            if (meta.get('status')!='computed' or meta.get('operation')!='mechanism_structure_v1'
+                    or meta.get('candidate')!=plain(query.candidate)):continue
+            previous=host.store.artifact(other_ref,paths=('structure_research.records',))
+            records=previous.get('structure_research',{}).get('records',[])
+            state0=(records[0].get('state') or {}) if records else {}
+            origin=state0.get('provenance') or {}
+            if (origin.get('analysis')==ref and origin.get('sequence_hash')==best['sequence_hash'] and
+                    abs(state0.get('actual_time_s',-1)-wanted)<=atol and state0.get('integration_state')):
+                saved=state0;reused_from=dict(reference=other_ref,pointer='/structure_research/records/0/state');break
+    if (saved and abs(saved['actual_time_s']-wanted)<=atol and
+            saved.get('provenance',{}).get('sequence_hash')==best['sequence_hash'] and
+            saved.get('candidate')==plain(query.candidate) and saved.get('configuration_identity')==digest(configuration)):
+        point=deepcopy(saved);point.update(provenance=provenance,source=ref,remaining_task_s=remaining)
+        if reused_from:point['provenance']['checkpoint_reuse']=reused_from
+        return point
+    initial=deepcopy(raw['initial_state'])
+    return dict(candidate=plain(query.candidate),configuration_identity=digest(configuration),
+        physics_identity=initial['physics_identity'],dof_order=initial['dof_order'],tendon_order=tr['tendon_order'],
+        actual_time_s=wanted,phase='interval_start_native',input_units='N',
+        u=tr['tensions_n'][min(index,len(tr['tensions_n'])-1)],remaining_task_s=remaining,source=ref,provenance=provenance,
+        native_replay=dict(control_schedule=schedule,initial_state=initial,sample_index=index,
+            native_model_identity=initial.get('native_model_identity'),
+            expected_outputs={key:best['outputs'][key] for key in ('times_s','tip_positions_m','tip_velocities_m_s')}))
 

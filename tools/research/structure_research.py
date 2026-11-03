@@ -316,6 +316,10 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
             configuration=cfg,observation=observation,mechanics=mechanics,state=data if passive else native.checkpoint(data),
             physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None)
+        if not passive and not records and study.point_semantics=='saved_native_state':
+            record['state'].update(candidate=binding['candidate'],configuration_identity=binding['effective_configuration_identity'],
+                provenance=baseline_point.get('provenance'),prefix_tensions_n=baseline_point.get('prefix_tensions_n'),
+                remaining_task_s=point.get('remaining_task_s'))
         record['compiled_physical_changes']=physical_changes(records[0]['mechanics'],mechanics) if records else {}
         records.append(record);cache[key]=record
         if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation))

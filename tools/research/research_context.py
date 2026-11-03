@@ -1378,6 +1378,8 @@ def mathematical_discovery_observations(host, current, candidate):
                 requested_callbacks=search.get('cost_feedback',{}).get('request_budget'),
                 completed_response_steps=raw.get('nonlinear_capability',{}).get('response_steps_completed'),
                 scope='One baseline + D finite-difference probes + one proposal for one response update. Clipping, inactive directions, failures and additional starts/updates change actual cost; saved callback counts are authoritative.')
+        from tools.research.evidence_views import bottleneck_diagnosis
+        latest['bottleneck_diagnosis']=bottleneck_diagnosis(host,reference)
         break
     # A measured failure stays a physical observation, distinct from a model
     # sample. Do not borrow a different candidate's or historical task outcome.

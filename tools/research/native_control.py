@@ -103,7 +103,10 @@ def calculate(configuration, binding, query, point, requirements, context, check
     baseline_key=baseline_identity(configuration,binding['candidate'],point,source)
     k=round(point['actual_time_s']/query.protocol.period_s)
     prefix=point.get('prefix_tensions_n')
-    if point.get('native_replay'):prefix=[r['tension_n'] for r in point['native_replay']['rows']]
+    if point.get('native_replay'):
+        replay=point['native_replay']
+        prefix=(replay['control_schedule']['trajectory']['tensions_n'][:k] if 'control_schedule' in replay else
+            [r['tension_n'] for r in replay['rows']])
     if prefix is None or not np.array_equal(np.asarray(prefix).reshape(k,len(tr['tendon_order'])),np.asarray(tr['tensions_n'])[:k]):
         raise ValueError('CHECKPOINT_REQUIRES_IDENTICAL_VERIFIED_CONTROL_PREFIX')
     native=NativeModel(configuration)
@@ -115,22 +118,36 @@ def calculate(configuration, binding, query, point, requirements, context, check
     if abs(configuration['task']['timing']['sample_period_s']-query.protocol.period_s)>1e-12:
         raise ValueError('NATIVE_CONTROL_V1_REQUIRES_MATCHED_SAMPLE_AND_CONTROL_GRIDS')
     initial=dict(id='native',schedule=source,limits=native.limits[:,1].tolist(),task_options=options)
+    starts=[initial,*[dict(initial,id='native-'+str(i+1),schedule=row['schedule'])
+        for i,row in enumerate(context.get('additional_starts',[]))]]
+    start_sources={'native':context['source'],**{'native-'+str(i+1):row['source']
+        for i,row in enumerate(context.get('additional_starts',[]))}}
+    for item in starts:
+        if not np.array_equal(np.asarray(item['schedule']['trajectory']['tensions_n'])[:k],np.asarray(tr['tensions_n'])[:k]):
+            raise ValueError('CHECKPOINT_REQUIRES_IDENTICAL_VERIFIED_CONTROL_PREFIX')
     evaluations=[]
     reused=context.get('resume',{}).get('candidates',[])
-    peak_state=None
+    peak_state=context.get('resume_checkpoints',{}).get('baseline_peak_speed_state')
+    retained_states={};best_scores={}
+    resume_best=context.get('resume',{}).get('best')
+    if resume_best and context.get('resume_checkpoints',{}).get('best_control_states'):
+        retained_states['best']=(resume_best['sequence_hash'],context['resume_checkpoints']['best_control_states'])
+        best_scores['best']=(resume_best['measure']['signed_maximum_excess'],resume_best['measure']['sum_normalized_excess'])
     def evaluate(_start, schedule, metadata):
         nonlocal peak_state
-        if len(evaluations)<len(reused):
-            row=reused[len(evaluations)]
+        if metadata['callback_index']<len(reused):
+            row=reused[metadata['callback_index']]
             if (row['sequence_hash']!=metadata['sequence_hash'] or row['label']!=metadata['label']
-                    or row['coefficients_n']!=metadata['coefficients_n']):
+                    or row['coefficients_n']!=metadata['coefficients_n'] or row.get('start','native')!=metadata['start']):
                 raise ValueError('NATIVE_CONTINUATION_DIVERGED_NO_RESTART')
             evaluations.append(row['measure'])
             return {k:row[k] for k in ('reference','outputs','measure','task_gap','cost_s','independent_evaluation_executed')}
         try:
             outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:],
+                capture_control_states=True,holding_start_s=options.get('holding_start'),
                 **(dict(capture_speed_after_s=options['holding_start']) if not tracking and not axis_task and not evaluations else {}))
             peak_state=outputs.pop('peak_speed_state',peak_state)
+            control_states=outputs.pop('control_states')
         except Exception as exc:
             diagnostic=getattr(exc,'mujoco_diagnostic',None) or getattr(exc,'native_diagnostic',None)
             if metadata['label']=='baseline' and not evaluations and diagnostic:
@@ -161,6 +178,10 @@ def calculate(configuration, binding, query, point, requirements, context, check
                 time_s=float(sample_times[worst]),normalized_signed_excess=float(ratios[worst]-1))
             components=dict(terminal=float(ratios[0]-1),position=float(max(p[hold])/options['position_limit']-1),
                 speed=float(max(v[hold])/options['speed_limit']-1))
+        score=(measure['signed_maximum_excess'],measure['sum_normalized_excess'])
+        for group,eligible in (('best',True),('validation',metadata['sequence_hash'] not in context.get('rejected_sequences',[]))):
+            if eligible and (group not in best_scores or score<best_scores[group]):
+                best_scores[group]=score;retained_states[group]=(metadata['sequence_hash'],control_states)
         evaluations.append(measure)
         if checkpoint:checkpoint('native_progress_'+str(len(evaluations)).zfill(4),dict(completed_rollouts=len(evaluations),latest=measure,
             cost={**native.cost,'kernel_wall_s':time.perf_counter()-started}))
@@ -168,21 +189,24 @@ def calculate(configuration, binding, query, point, requirements, context, check
             task_gap=dict(valid_complete=True,accepted=False,normalized_gap=measure['normalized_gap'],
                 components=components),
             cost_s=0.,independent_evaluation_executed=False)
-    result=search([initial],evaluate,settings,evaluation_kind='native_short_rollout',
+    result=search(starts,evaluate,settings,evaluation_kind='native_short_rollout',reuse_sequences=True,
         rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
         stop_when=lambda row:(row['measure']['signed_maximum_excess']<=-settings.safety_margin_fraction
             and row['sequence_hash'] not in context.get('rejected_sequences',[])))
-    best=result['best'];optimized=deepcopy(source)
+    best=result['best']
     if best is None:raise ValueError('NO_VALID_NATIVE_CONTROL_PREDICTION')
     validation=(result['candidates'][-1] if result['stop_reason']=='local_target_reached' else
         min((r for r in result['candidates'] if r['sequence_hash'] not in context.get('rejected_sequences',[])),
             key=lambda r:(r['measure']['signed_maximum_excess'],r['measure']['sum_normalized_excess']),default=best))
     if reused:result['proposed_validation']=validation['reference']
     from tools.research.control_correction import corrected_tensions
-    optimized['trajectory']['tensions_n']=corrected_tensions(tr['tensions_n'],times[:-1],settings.knots_s,
+    selected_start=next(s for s in starts if s['id']==validation['start'])
+    optimized=deepcopy(selected_start['schedule'])
+    optimized['trajectory']['tensions_n']=corrected_tensions(selected_start['schedule']['trajectory']['tensions_n'],times[:-1],settings.knots_s,
         validation['coefficients_n'],native.limits[:,1],settings.correction_window_s).tolist()
     optimized.update(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured')
-    optimized['provenance']=dict(method=query.operation,source=context['source'],candidate=binding['candidate'],
+    optimized['provenance']=dict(method=query.operation,source=start_sources[validation['start']],candidate=binding['candidate'],
+        selected_start=validation['start'],
         state_provenance=point.get('provenance'),settings=plain(settings),inherited_acceptance=False)
     cost=dict(**native.cost,optimization_iterations=result['iterations_started'],
         completed_response_steps=len(result['local_responses']),
@@ -190,6 +214,29 @@ def calculate(configuration, binding, query, point, requirements, context, check
     if reused:cost['reused_native_callbacks']=len(reused)
     raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost,
         external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')))
+    best_start=next(s for s in starts if s['id']==best['start'])
+    best_tr=deepcopy(best_start['schedule']['trajectory'])
+    best_tr['tensions_n']=corrected_tensions(best_tr['tensions_n'],times[:-1],settings.knots_s,
+        best['coefficients_n'],native.limits[:,1],settings.correction_window_s).tolist()
+    if best['sequence_hash']!=validation['sequence_hash']:
+        raw['best_schedule']=deepcopy(optimized)
+        raw['best_schedule']['trajectory']=best_tr
+        raw['best_schedule']['provenance'].update(source=start_sources[best['start']],selected_start=best['start'])
+        raw['exported_control_role']='next_validation_proposal_distinct_from_best_model_prediction'
+    if len(starts)>1:
+        raw['start_sources']=[dict(start=s['id'],source=start_sources[s['id']],schedule=s['schedule']) for s in starts]
+    if retained_states.get('best',(None,))[0]==best['sequence_hash']:
+        from tools.state_io import digest
+        raw['best_control_states']={}
+        for name,saved in retained_states['best'][1].items():
+            index=int(np.argmin(abs(times-saved['actual_time_s'])))
+            saved.update(candidate=binding['candidate'],configuration_identity=binding['effective_configuration_identity'],
+                prefix_tensions_n=best_tr['tensions_n'][:index],remaining_task_s=max(0.,float(times[-1]-saved['actual_time_s'])),
+                provenance=dict(method='best_native_control_checkpoint',source=start_sources[best['start']],
+                    sequence_hash=digest(best_tr['tensions_n']),state_selection=name,
+                    control_grid_time_s=float(times[index]),inherited_acceptance=False))
+            saved['u']=best_tr['tensions_n'][min(index,len(best_tr['tensions_n'])-1)]
+            raw['best_control_states'][name]=saved
     if configuration['task']['family']=='task.oriented_tracking':raw['rigid_tool_binding']=native.tool_load_binding
     if peak_state is not None:
         peak_state.update(candidate=binding['candidate'],configuration_identity=binding['effective_configuration_identity'],

@@ -155,16 +155,18 @@ def _seed_control(host,request,operation_key):
         time_rule='zero-order hold; hold last input beyond source horizon; new channels use candidate pretension')
     if request.source:
         parent=host.store.artifact(request.parent)
-        source=host.store.artifact(request.source,paths=('candidate','execution_id','trajectory','control_schedule_reference'))
+        source=host.store.artifact(request.source,paths=('candidate','execution_id','trajectory','control_schedule_reference','independent_evaluation_executed'))
         if not source.get('trajectory') and not source.get('execution_id'):
             raise ValueError('CONTROL_INITIALIZATION_REQUIRES_EXECUTABLE_SOURCE')
         if source.get('execution_id') and not source.get('trajectory'):
-            from tools.research.rl import measured_nmpc_trajectory
+            from tools.research.rl import measured_nmpc_trajectory,measured_rl_trajectory
+            rl_source=bool(source.get('independent_evaluation_executed'))
             if plain(request.parent)!=plain(request.candidate) or source.get('candidate')!=plain(request.candidate) or request.channel_map is not None:
                 raise ValueError('EXACT_NMPC_CANDIDATE_WITHOUT_CHANNEL_MAPPING_REQUIRED')
-            trajectory,origin=measured_nmpc_trajectory(host,request.source)
+            trajectory,origin=(measured_rl_trajectory(host,request.source) if rl_source else
+                measured_nmpc_trajectory(host,request.source))
             source=dict(trajectory=trajectory)
-            provenance.update(source_kind='measured_nmpc_execution_v1',**origin)
+            provenance.update(source_kind='measured_rl_evaluation_v1' if rl_source else 'measured_nmpc_execution_v1',**origin)
         binding(parent['configuration'],source['trajectory'])
         old=source['trajectory'];old_order=old['tendon_order']
         mapping=request.channel_map

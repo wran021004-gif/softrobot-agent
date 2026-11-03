@@ -221,13 +221,14 @@ class LocalControlSearchSettings(Contract):
 class NativeControlOptimization(Contract):
     source: EvidenceRef = Field(description='Complete executable control sequence reference bound to this candidate, frozen task, input channels, time grid and tension bounds; never the structure candidate reference. If absent, research_plan(action=initialize_control, control_seed={candidate,method:baseline}) can create an unmeasured baseline. Use its returned source. After an initialization Plan, submit diagnose again with your chosen candidate and method before research_analysis.')
     settings: LocalControlSearchSettings
+    additional_sources: list[EvidenceRef] = Field(default_factory=list,max_length=15,description='Explicit additional complete controls for the same candidate and condition, grid and tendon order. Each start is evaluated separately under the shared callback cap; identical applied sequences reuse computation.')
     resume_from: EvidenceRef | None = None
     failed_replays: list[EvidenceRef] = Field(default_factory=list)
 
     @model_serializer(mode='wrap')
     def preserve_native_request(self,handler):
         result=handler(self)
-        for key in ('resume_from','failed_replays'):
+        for key in ('resume_from','failed_replays','additional_sources'):
             if key not in self.model_fields_set:result.pop(key,None)
         return result
 
@@ -235,6 +236,17 @@ class NativeControlOptimization(Contract):
     def bounded_native_window(self):
         if self.settings.version!="local_control_search_v2" or self.settings.correction_window_s is None:
             raise ValueError("NATIVE_OPTIMIZATION_REQUIRES_V2_AND_EXPLICIT_WINDOW")
+        return self
+
+
+class NativeStateSelection(Contract):
+    kind: Literal['best_peak_speed','best_holding_start','best_pre_hold_peak_speed','best_sample']
+    time_s: FiniteFloat | None = Field(default=None,ge=0,description='best_sample only: exact saved control-grid time; never interpolated. Missing integration state requires charged prefix reconstruction in the original model.')
+
+    @model_validator(mode='after')
+    def explicit_sample(self):
+        if (self.kind=='best_sample') != (self.time_s is not None):
+            raise ValueError('BEST_SAMPLE_REQUIRES_EXPLICIT_TIME_ONLY')
         return self
 
 
@@ -320,14 +332,21 @@ class NonlinearStructureResponse(Contract):
 
 
 class ScientificControlScope(Contract):
-    mode: Literal['full_task','time_window'] = Field(description='C2 finite search parameterization: full_task adjusts all tendon channels with two independent endpoint knots over the frozen task; time_window adjusts all channels with one triangular pulse per channel and zero endpoint corrections. Choose a scope only when this parameterization answers the question; arbitrary waveform or channel-subset search is not adapted.')
+    mode: Literal['full_task','time_window'] = Field(description='Finite correction basis over the full task or an explicit interior window with zero endpoint corrections. control_search_effort selects legal knot count, scales and active knot-major coefficients. Evaluation retains the complete frozen task and physical input grid.')
     window_s: tuple[FiniteFloat,FiniteFloat] | None = Field(default=None,description='Only control corrections inside this interval; evaluation still covers the complete frozen task.')
 
 
 class ScientificSources(Contract):
     control_source: EvidenceRef | None = None
+    additional_control_sources: list[EvidenceRef] = Field(default_factory=list,max_length=15,description='Optional explicitly selected additional starts for the same candidate and frozen condition. No automatic source selection.')
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=2)
     t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3,description='Saved comparable T1 evidence, baseline/minus/plus. Does not request new T1 calculations.')
+
+    @model_serializer(mode='wrap')
+    def preserve_sources(self,handler):
+        result=handler(self)
+        if not self.additional_control_sources:result.pop('additional_control_sources',None)
+        return result
 
 
 class ScientificQuestion(Contract):
@@ -357,11 +376,14 @@ class ScientificControlEffort(Contract):
     evaluation_requests: int = Field(strict=True,ge=_CONTROL_DOMAIN['evaluation_requests']['minimum'],le=_CONTROL_DOMAIN['evaluation_requests']['maximum'],description='Maximum Native rollout callbacks per condition; separate from iterations and formal mathematical evaluation charges.')
     coefficient_limit_n: FiniteFloat | None = Field(default=None,gt=0,description='Maximum absolute tension correction about the chosen starting sequence, in N. Omitted retains the original 2 N local domain. A wider correction domain never changes physical tension bounds or proves control-space coverage.')
     initial_radius_n: FiniteFloat | None = Field(default=None,gt=0,description='Initial local search step/trust radius in N; must fit coefficient_limit_n. Omitted retains 0.1 N. Main chooses scale separately from callbacks and iterations.')
+    difference_step_n: FiniteFloat | None = Field(default=None,gt=0)
+    minimum_radius_n: FiniteFloat | None = Field(default=None,gt=0)
+    active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Optional unique knot-major indices within the selected full-task or interior-window basis.')
 
     @model_serializer(mode='wrap')
     def preserve_legacy_effort(self,handler):
         result=handler(self)
-        for key in ('coefficient_limit_n','initial_radius_n'):
+        for key in ('coefficient_limit_n','initial_radius_n','difference_step_n','minimum_radius_n','active_coefficients'):
             if getattr(self,key) is None:result.pop(key,None)
         return result
 
@@ -488,6 +510,7 @@ class MechanismQuestionV2(Contract):
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop']
     tensions_n: list[FiniteFloat] | None = None
     saved_state: EvidenceRef | None = None
+    native_state_selection: NativeStateSelection | None = Field(default=None,description='With saved_state set to an owned completed Native T1/Direct result, choose a real state from its best complete control. Omit to retain legacy saved-state semantics.')
     execution: EvidenceRef | None = None
     update_id: StrictInt | None = Field(default=None,ge=0)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
@@ -607,6 +630,7 @@ class AnalysisRequest(Contract):
     capability_method: Literal['sampled-affine-conic-minimax-v1'] | None = None
     optimal_sensitivity: OptimalCapabilitySensitivity | None = None
     saved_state: EvidenceRef | None = None
+    native_state_selection: NativeStateSelection | None = None
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,strict=True)
     protocol: TaskAnalysisProtocol = Field(description='Complete frozen analysis_protocol from the method request_template. No additional fields or changed task conditions.')
@@ -632,6 +656,8 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.native_state_selection and (not self.saved_state or self.model_source!='mujoco'):
+            raise ValueError('NATIVE_TRAJECTORY_SELECTION_REQUIRES_SAVED_NATIVE_RESULT')
         native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1')
         if (self.operation=='mechanism_structure_v1') != (self.mechanism_study is not None):
             raise ValueError('MECHANISM_OPERATION_REQUIRES_VERSIONED_STUDY')
@@ -683,7 +709,7 @@ class AnalysisRequest(Contract):
             if getattr(self,key) is None:value.pop(key,None)
         if self.model_source=='controller':value.pop('model_source',None)
         if self.model_source!='mujoco':value.pop('native',None)
-        for key in ('structure_response','control_optimization','nonlinear_response','mechanism_study'):
+        for key in ('structure_response','control_optimization','nonlinear_response','mechanism_study','native_state_selection'):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 
@@ -809,7 +835,7 @@ class ControlSearchRequest(ControlSearchStart):
 class ControlSeedRequest(Contract):
     condition_id: str | None = Field(default=None,min_length=1,description='Optional frozen task condition. Returns a candidate bound to this condition on the identical structure; use the returned candidate for analysis, search and replay.')
     candidate: EvidenceRef = Field(description='Target candidate; decision.selected_candidate must equal control_seed.candidate.')
-    source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. For Native T1/Direct, read /control_schedule_reference from the completed analysis result and use that schedule reference here, not the analysis result itself. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
+    source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution / independent RL evaluation with a sealed actual-input trace. For Native T1/Direct use /control_schedule_reference, not the analysis result. Measured NMPC/RL conversion requires exact parent=candidate without channel_map; the new schedule inherits no acceptance. Use independent physical_replay for each frozen condition before joint SELECT.')
     parent: EvidenceRef | None = Field(default=None,description='Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result.')
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None

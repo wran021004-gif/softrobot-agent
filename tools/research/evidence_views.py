@@ -505,13 +505,14 @@ def native_control_domain(value):
     bounds=value.get('binding',{}).get('tension_bounds_n')
     if not settings or not tr.get('tensions_n') or not bounds or not search.get('best') or not raw.get('optimized_schedule'):return None
     cfg=LocalControlSearchSettings.model_validate(settings);base=np.asarray(tr['tensions_n']);limits=np.asarray(bounds)
-    best=np.asarray(raw['optimized_schedule']['trajectory']['tensions_n'])
+    best=np.asarray(raw.get('best_schedule',raw['optimized_schedule'])['trajectory']['tensions_n'])
     def ranges(u):return np.stack([u.min(axis=0),u.max(axis=0)],axis=1).tolist()
     visited=None
-    if search.get('start_count',1)==1 and all('coefficients_n' in r for r in search.get('candidates',[])):
+    if all('coefficients_n' in r for r in search.get('candidates',[])):
         lo=base.min(axis=0);hi=base.max(axis=0)
         for row in search.get('candidates',[]):
-            u=corrected_tensions(base,tr['times_s'][:-1],cfg.knots_s,row['coefficients_n'],limits[:,1],cfg.correction_window_s)
+            start=next((r['schedule']['trajectory'] for r in raw.get('start_sources',[]) if r['start']==row['start']),tr)
+            u=corrected_tensions(start['tensions_n'],start['times_s'][:-1],cfg.knots_s,row['coefficients_n'],limits[:,1],cfg.correction_window_s)
             lo=np.minimum(lo,u.min(axis=0));hi=np.maximum(hi,u.max(axis=0))
         visited=np.stack([lo,hi],axis=1).tolist()
     return dict(tendon_order=tr['tendon_order'],physical_bounds_n=bounds,
@@ -535,15 +536,112 @@ def native_search_summary(value, reference):
     def metrics(row):
         measure=row.get('measure') or {}
         return {k:measure[k] for k in ('normalized_gap','terminal_position_error_m',
-            'holding_max_position_error_m','holding_max_speed_m_s') if k in measure}
+            'holding_max_position_error_m','holding_max_speed_m_s','signed_maximum_excess') if k in measure}
+    domain=native_control_domain(value);stop=search.get('stop_reason','');termination=[]
+    if stop=='evaluation_request_budget':termination.append('recorded_callback_cap')
+    if stop=='iteration_limit':termination.append('recorded_iteration_cap')
+    if domain and domain['final_search_radii_n'] and all(r<domain['settings']['minimum_radius_n'] for r in domain['final_search_radii_n']):
+        termination.append('local_radii_below_declared_minimum')
+    if any(r.get('diagnostic')=='no_effective_response' for r in search.get('local_responses',[])):
+        termination.append('recorded_degenerate_local_response')
+    if domain and domain['coefficient_boundary']:termination.append('best_coefficients_at_declared_boundary')
+    if domain and any(domain['input_saturation'].values()):termination.append('best_inputs_at_physical_bound')
+    if stop.startswith('numerical_failure'):termination.append('recorded_local_numerical_failure')
+    if stop=='local_target_reached':termination.append('sampled_model_target_reached_without_independent_acceptance')
     return dict(source=dict(reference=reference,pointer='/native_dynamics/optimization'),
         algorithm=search.get('algorithm'),stop_reason=search.get('stop_reason'),
         iterations_started=search.get('iterations_started'),search_dimension=search.get('search_dimension'),
         callbacks=cost.get('evaluation_callbacks'),requested_callbacks=cost.get('request_budget'),
         baseline=metrics(baseline),best=metrics(search.get('best') or {}),
-        control_domain=native_control_domain(value),
+        control_domain=domain,termination_facts=termination,
+        bottleneck_query=dict(reference=reference,view='working_set',pointer='/bottleneck_diagnosis'),
         model_predicates_passed=(search.get('best') or {}).get('task_gap',{}).get('accepted'),
         interpretation='Recorded finite search only. Iteration/callback limits are not convergence or structural infeasibility. Model predicates are not independent acceptance.')
+
+
+def bottleneck_diagnosis(host, reference, *, detailed=False):
+    """Compose source-linked explanations from saved evidence; never run physics."""
+    import numpy as np
+    from tools.research.state import state
+    from tools.state_io import digest
+    s=state(host);anchor=host.store.artifact(reference)
+    candidate=anchor.get('candidate') or reference
+    record=host.store.artifact(candidate);cfg=record.get('configuration')
+    if cfg is None:raise ValueError('CANDIDATE_OR_CANDIDATE_BOUND_RESULT_REQUIRED')
+    controls=[];mechanisms=[]
+    for ref in s.get('analysis_results',[]):
+        meta=host.store.artifact(ref,paths=('candidate','status','operation'))
+        if meta.get('candidate')!=candidate or meta.get('status')!='computed':continue
+        if meta.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1'):
+            controls.append((ref,meta))
+        elif meta.get('operation')=='mechanism_structure_v1':mechanisms.append((ref,host.store.artifact(ref)))
+    chosen=next((r for r in controls if r[0]==reference),controls[-1] if controls else None)
+    explanations=[];missing=[];facts=None;mechanism_facts=[];questions=[]
+    if chosen:
+        ref=chosen[0];value=host.store.artifact(ref);search=value['native_dynamics']['optimization'];best=search['best']
+        facts=native_search_summary(value,ref)
+        measure=best['measure'];failed=measure['signed_maximum_excess']>0
+        facts.update(worst_constraint=measure.get('worst_constraint'),start_count=search.get('start_count',1),
+            source_control=value.get('requested_operation',{}).get('control_optimization',{}).get('source'),
+            best_control_query=dict(reference=ref,view='full',pointer='/best_control_schedule_reference' if value.get('best_control_schedule_reference') else '/control_schedule_reference'))
+        if detailed:
+            facts.update(start_feedback=[dict(start=r['start'],initial_gap=r.get('initial_gap'),
+                best_metrics=(r.get('best') or {}).get('measure'),best_sequence_hash=(r.get('best') or {}).get('sequence_hash'))
+                for r in search.get('start_feedback',[])],settings=value['requested_operation']['control_optimization']['settings'],
+                local_responses=search.get('local_responses'),cost=value['native_dynamics'].get('cost'),
+                best_metrics=measure,baseline_metrics=search['candidates'][0]['measure'])
+        if failed:
+            reasons=['Finite local search found no passing control; existence of another legal control remains untested.']
+            if search.get('start_count',1)==1:reasons.append('One recorded starting sequence in this request.')
+            if search['stop_reason'] in ('evaluation_request_budget','iteration_limit','stagnation','degenerate_local_response'):
+                reasons.append('Recorded stop: '+search['stop_reason'])
+            explanations.append(dict(status='control_search_evidence_insufficient',reasons=reasons,
+                source=dict(reference=ref,pointer='/native_dynamics/optimization')))
+            questions.append('Would another explicitly chosen start, knot basis or legal search scale change the full-task result?')
+        comparable=[]
+        for other_ref,_ in controls:
+            if other_ref==ref:continue
+            other=host.store.artifact(other_ref,paths=('binding','protocol','native_dynamics.initial_state',
+                'requested_operation.control_optimization','native_dynamics.optimization.best.measure'))
+            same=all(other.get('binding',{}).get(k)==value.get('binding',{}).get(k)
+                for k in ('effective_configuration_identity','task_identity'))
+            same=same and other.get('protocol')==value.get('protocol') and digest(other['native_dynamics']['initial_state'])==digest(value['native_dynamics']['initial_state'])
+            if same:comparable.append(dict(reference=other_ref,source=other['requested_operation']['control_optimization']['source'],
+                settings=other['requested_operation']['control_optimization']['settings'],
+                best_metrics=other['native_dynamics']['optimization']['best']['measure']))
+        facts['comparable_search_count']=len(comparable)
+        if detailed:facts['comparable_searches']=comparable
+        for mr,m in mechanisms:
+            study=m.get('structure_research',{});records=study.get('records',[])
+            if not records:continue
+            point=m.get('operating_point',{});origin=point.get('source') or {};target=study.get('target',{})
+            relevant=(origin.get('analysis')==ref and origin.get('sequence_hash')==best['sequence_hash'])
+            row=records[0];mechanics=row.get('mechanics',{});velocity=mechanics.get('tip_velocity_m_s')
+            interval=mechanics.get('function_metrics',{}).get('instantaneous_speed_derivative_range_m_s2')
+            observation=row.get('observation') or {}
+            fact=dict(reference=mr,target=target,observation={k:observation[k] for k in ('status','value','unit','reason') if k in observation},operating_point=point,
+                from_selected_best_control=relevant,remaining_task_s=origin.get('remaining_task_s'),
+                scope='Local instantaneous mechanics; not a certificate for the complete task.')
+            if interval is not None:
+                fact.update(speed_derivative_range_m_s2=interval,interpretation='Minimum and maximum signed d(speed)/dt over the recorded legal tension box; a negative minimum permits instantaneous slowing at this state.')
+                if (relevant and failed and interval[0]>=0 and origin.get('remaining_task_s',0)>0):
+                    explanations.append(dict(status='structural_drive_concern',
+                        reason='At this best-control state the saved legal tension box provides no negative instantaneous speed derivative.',
+                        source=dict(reference=mr,pointer='/structure_research/records/0/mechanics/function_metrics/instantaneous_speed_derivative_range_m_s2')))
+            if detailed:fact['raw_query']=dict(reference=mr,view='full',pointer='/structure_research/records/0')
+            mechanism_facts.append(fact)
+        if not any(r['from_selected_best_control'] for r in mechanism_facts):
+            missing.append('No saved mechanism result bound to the selected best-control trajectory; baseline mechanisms cannot explain its failure.')
+            questions.append('What drive or braking authority exists at a selected real best-control state with remaining task time?')
+    else:missing.append('No completed Native control search for this exact candidate and condition.')
+    explanations.append(dict(status='unresolved',reason='Saved finite search and local mechanisms do not distinguish global structural infeasibility from unexplored controls.'))
+    return dict(version='structure_control_diagnosis_v1',candidate=candidate,
+        condition_id=record.get('condition_id') or next((r['condition_id'] for r in s['spec'].get('task_conditions',[]) if record.get('task_identity')==digest(r['task'])),None),
+        task_identity=digest(cfg['task']),selected_result=chosen[0] if chosen else None,
+        control_search=facts,mechanisms=mechanism_facts[-3:],explanations=explanations,missing_evidence=missing,
+        optional_scientific_questions=questions,
+        detail_query=dict(reference=reference,view='working_set',pointer='/bottleneck_diagnosis'),
+        scope='On-demand interpretation of original evidence; no action selection, elimination rule or new scientific acceptance.')
 
 
 def _resources(value, reference):

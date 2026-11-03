@@ -147,6 +147,12 @@ def read_evidence(host, query, *, record_read=True):
         elif q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
             from tools.research.evidence_views import diagnostic_relations
             derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))
+        elif q.pointer=='/bottleneck_diagnosis' or q.pointer.startswith('/bottleneck_diagnosis/'):
+            from tools.research.evidence_views import bottleneck_diagnosis
+            derived=dict(bottleneck_diagnosis=bottleneck_diagnosis(host,plain(q.reference),detailed=True))
+        elif q.pointer=='/t2_preparation' or q.pointer.startswith('/t2_preparation/'):
+            from tools.research.nonlinear_capability import preparation_view
+            derived=dict(t2_preparation=preparation_view(host,plain(q.reference)))
         elif q.pointer=='/mathematical_decision_view' or q.pointer.startswith('/mathematical_decision_view/'):
             from tools.research.evidence_views import result_card
             from tools.research.research_context import mathematical_decision_view

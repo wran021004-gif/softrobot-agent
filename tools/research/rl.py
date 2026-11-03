@@ -64,7 +64,16 @@ def prepare_input(host, request):
                 if k*period>=scene['duration_s']-settling['window_s']-1e-12]))
     elif cfg['reward']['holding_speed']:
         raise ValueError('TRACKING_REQUIRES_EXPLICIT_ZERO_HOLDING_REWARD')
-    task_ref=state_api.state(host)['rl_task']
+    current=state_api.state(host);spec=current['spec']
+    condition_id=c.get('condition_id')
+    conditions=spec.get('task_conditions',[])
+    if conditions:
+        condition_id=condition_id or conditions[0]['condition_id']
+        condition=next((r for r in conditions if r['condition_id']==condition_id),None)
+        if condition is None:raise ValueError('UNKNOWN_FROZEN_TASK_CONDITION')
+        frozen_task=deepcopy(condition['task'])
+        task_ref=state_api.save(host,frozen_task,'rl_frozen_condition_task')
+    else:task_ref=current['rl_task']
     if request.task is not None and plain(request.task)!=task_ref:
         raise ValueError('Owned frozen study task required')
     compared_task=deepcopy(task)
@@ -73,6 +82,9 @@ def prepare_input(host, request):
             rule=state_api.state(host)['spec']['candidate_initialization'])
     if compared_task!=host.store.artifact(task_ref):
         raise ValueError('Candidate changed frozen study task')
+    cfg['condition_binding']=dict(condition_id=condition_id,frozen_task=task_ref,
+        effective_task_identity=digest(task),configuration_identity=digest(c['configuration']),
+        candidate=plain(request.candidate),physical_design_identity=c.get('physical_design_identity'))
     cfg['requested_allocation']=plain(request.allocation)
     cfg['budget']['actions']=align_steps(cfg['budget']['actions'],cfg['ppo']['n_steps'])
     if cfg['budget']['actions']<2*cfg['ppo']['n_steps']:
@@ -329,7 +341,7 @@ def dispatch(host, value, request_id, selected=None):
         stage_id=host.run_id+'-'+uuid4().hex[:8]
         config['stage_identity']=dict(run_id=stage_id,study=host.run_id,implementation=s['freeze'],
             candidate=plain(q.candidate) if q.operation=='start' else (s['rl_runs'].get(q.run_id) or s['rl_parent_sources'][q.run_id])['candidate'],
-            task=task_ref,rationale=q.rationale,requested_changes=plain(q))
+            task=task_ref,condition_binding=config.get('condition_binding'),rationale=q.rationale,requested_changes=plain(q))
         stage_entry=dict(candidate=config['stage_identity']['candidate'],task=task_ref,
             configuration=state_api.save(host,config,'rl_frozen_stage_input'),
             allocation=config['budget'],request_identity=key,requested_allocation=config['requested_allocation'],
@@ -451,6 +463,13 @@ def dispatch(host, value, request_id, selected=None):
                 independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
                 result.update(execution_id=row['execution_id'],operation_key=request_id,checkpoint=generation,checkpoint_training_step=run.read_json(policy.with_name('metadata.json')).get('inherited',{}).get('num_timesteps'),policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
+                trace_path=Path(result['trajectory']).resolve()
+                if trace_path.parent!=output.resolve():raise ValueError('OWNED_RL_EVALUATION_TRACE_REQUIRED')
+                text=trace_path.read_bytes().decode('utf-8')
+                result['measured_control_trace']=state_api.save(host,dict(version='rl_measured_control_trace_v1',
+                    csv_text=text,sha256=hashlib.sha256(text.encode()).hexdigest(),configuration=entry['configuration'],
+                    candidate=entry['candidate'],task_identity=config['candidate']['task_identity']), 'rl_measured_control_trace')
+                result['condition_binding']=config.get('condition_binding')
             reference=state_api.save(host,result,'rl_'+q.operation+'_evidence')
             if q.operation=='evaluate':
                 state_api.update(host,rl_evaluations=[*state_api.state(host).get('rl_evaluations',[]),reference])
@@ -474,6 +493,47 @@ def dispatch(host, value, request_id, selected=None):
     finally:
         if operation_started is not None:
             state_api.update(host,numerical_s=state_api.state(host)['numerical_s']+time.perf_counter()-operation_started)
+
+
+def measured_rl_trajectory(host, reference):
+    """Export a sealed complete RL episode as an unmeasured Replay input.
+
+    This proves no policy acceptance: the existing independent physical replay,
+    condition certificates and joint SELECT remain the only formal route.
+    """
+    import csv,io,hashlib,math
+    from tools.research.state import state
+    from tools.research.physical_replay import binding,model_context
+    reference=plain(reference)
+    if reference not in state(host).get('rl_evaluations',[]):raise ValueError('OWNED_INDEPENDENT_RL_EVALUATION_REQUIRED')
+    value=host.store.artifact(reference);episodes=value.get('episodes',[])
+    row=host.store.lookup(host.run_id,value['operation_key'])
+    receipt=json.loads(row['receipt']) if row and row.get('receipt') else None
+    if (not receipt or receipt.get('execution_status')!='completed' or receipt.get('output')!=reference
+            or receipt.get('tool_id')!='research.core_rl' or receipt.get('execution_id')!=value.get('execution_id')):
+        raise ValueError('COMPLETED_OWNED_RL_EVALUATION_RECEIPT_REQUIRED')
+    if (not value.get('independent_evaluation_executed') or len(episodes)!=1 or not episodes[0].get('complete')
+            or episodes[0].get('numerical_failure') or not value.get('checkpoint') or not value.get('policy_sha256')):
+        raise ValueError('COMPLETE_MEASURED_RL_EPISODE_REQUIRED')
+    cfg=verify_candidate(host,value['candidate'])['configuration'];frozen=host.store.artifact(value['configuration'])
+    trace=host.store.artifact(value['measured_control_trace'])
+    if (trace['configuration']!=value['configuration'] or trace['candidate']!=value['candidate']
+            or frozen['candidate']['reference']!=value['candidate'] or trace['task_identity']!=digest(cfg['task'])
+            or frozen['task']['original']!=cfg['task'] or hashlib.sha256(trace['csv_text'].encode()).hexdigest()!=trace['sha256']):
+        raise ValueError('EXACT_RL_TRACE_CANDIDATE_TASK_AND_CONFIGURATION_REQUIRED')
+    rows=list(csv.DictReader(io.StringIO(trace['csv_text'])));_,physics,scene,model=model_context(cfg)
+    order=[t['entity'] for t in physics['tendons']];period=cfg['task']['timing']['control_period_s'];n=round(cfg['task']['timing']['duration_s']/period)
+    if (len(rows)!=n+1 or [int(r['control_step']) for r in rows]!=list(range(n+1)) or
+            any(not math.isfinite(float(r[name])) or abs(float(r[name])-i*period)>1e-10 for i,r in enumerate(rows) for name in ('time_s','engine_time_s'))
+            or frozen['control_object']['tendon_names']!=order):
+        raise ValueError('COMPLETE_ALIGNED_RL_APPLIED_INPUT_GRID_REQUIRED')
+    trajectory=dict(times_s=[i*period for i in range(n+1)],tendon_order=order,
+        tensions_n=[[float(r[t+'_applied_n']) for t in order] for r in rows[1:]],
+        task_identity=digest(cfg['task']),model_identity=model['identity'],design_identity=model['design_identity'])
+    binding(cfg,trajectory)
+    return trajectory,dict(rl_evaluation=reference,measured_control_trace=value['measured_control_trace'],
+        checkpoint=value['checkpoint'],policy_sha256=value['policy_sha256'],
+        input_phase='Recorded post-step applied tensions for each completed preceding interval',inherited_acceptance=False)
 
 
 def measured_nmpc_trajectory(host, reference, *, bind_model=True):
@@ -597,8 +657,8 @@ def import_mathematical_reference(host, candidate_ref, source_ref):
             raw=host.store.artifact(ref)
             if (raw.get('status')=='computed' and raw.get('candidate')==candidate_ref
                     and raw.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1')
-                    and raw.get('control_schedule_reference')==source_ref
-                    and raw.get('native_dynamics',{}).get('optimized_schedule')==source):
+                    and ((raw.get('control_schedule_reference')==source_ref and raw.get('native_dynamics',{}).get('optimized_schedule')==source)
+                        or (raw.get('best_control_schedule_reference')==source_ref and raw.get('native_dynamics',{}).get('best_schedule')==source))):
                 native_origin=ref;break
     if not numerically_verified_source(source) and native_origin is None:
         raise ValueError('VERIFIED_MATHEMATICAL_TRAJECTORY_REQUIRED')

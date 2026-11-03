@@ -394,6 +394,7 @@ def selected_analysis_schema(method, detail, *, bound=False):
         elif method==CONIC:extra={'capability_method'}
         else:extra={'capability_comparison'}
     allowed=common|extra
+    if detail.get('request_template',{}).get('model_source')=='mujoco':allowed.add('native_state_selection')
     schema['properties']={k:v for k,v in schema['properties'].items() if k in allowed}
     schema['properties']['operation']={'type':'string','const':operation}
     template=detail.get('request_template',{})
@@ -435,10 +436,10 @@ def selected_analysis_schema(method, detail, *, bound=False):
         schema['allOf']=[{'if':{'properties':{'operating_point':{'const':'saved_state'}},'required':['operating_point']},
             'then':{'oneOf':[{'required':['saved_state'],'properties':{'saved_state':{'$ref':'#/$defs/EvidenceRef'},'execution':{'type':'null'},'update_id':{'type':'null'}}},
                 {'required':['execution','update_id'],'properties':{'execution':{'$ref':'#/$defs/EvidenceRef'},'update_id':{'type':'integer','minimum':0},'saved_state':{'type':'null'}}}]},
-            'else':{'properties':{k:{'type':'null'} for k in ('saved_state','execution','update_id')}}}]
+            'else':{'properties':{k:{'type':'null'} for k in ('saved_state','execution','update_id','native_state_selection')}}}]
         if len(points)==1 and points[0]!='saved_state':
             schema.pop('allOf')
-            for key in ('saved_state','execution','update_id'):schema['properties'].pop(key,None)
+            for key in ('saved_state','execution','update_id','native_state_selection'):schema['properties'].pop(key,None)
         if 'scoring_window_s' in schema['properties'] and template.get('protocol'):
             windows=template['protocol']['windows_s']
             schema['properties']['scoring_window_s']['anyOf']=[{'type':'number','enum':windows},{'type':'null'}]

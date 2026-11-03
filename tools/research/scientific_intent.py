@@ -283,10 +283,16 @@ def control_settings(spec, effort, *, window=None, channels=None):
         knots_s=[a+(b-a)*i/(q.knot_count-1) for i in range(q.knot_count)],
         correction_window_s=[0.,duration],iterations=iterations,evaluation_requests=q.evaluation_requests)
     settings['knots_s'][-1]=b
-    for name in ('coefficient_limit_n','initial_radius_n'):
+    for name in ('coefficient_limit_n','initial_radius_n','difference_step_n','minimum_radius_n','active_coefficients'):
         if getattr(q,name) is not None:settings[name]=getattr(q,name)
     if window is not None:
+        allowed=set(range(channels,(q.knot_count-1)*channels))
+        if q.active_coefficients is not None and not set(q.active_coefficients)<=allowed:
+            raise ValueError('LOCAL_WINDOW_ACTIVE_COEFFICIENTS_REQUIRE_INTERIOR_KNOTS')
         settings['active_coefficients']=list(range(channels,(q.knot_count-1)*channels))
+        if q.active_coefficients is not None:settings['active_coefficients']=q.active_coefficients
+    if channels and any(i>=channels*q.knot_count for i in settings.get('active_coefficients',[])):
+        raise ValueError('ACTIVE_COEFFICIENT_OUTSIDE_BOUND_DIMENSIONS')
     result=LocalControlSearchSettings.model_validate(settings)
     for name,limit in limits.items():
         actual=len(result.knots_s) if name=='knots_s' else getattr(result,name)
@@ -461,7 +467,7 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
     candidate = intent['candidate']
     if (q.question_type=='structure_parameter_effect' and
             (q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or
-             q.source_selection.control_source or q.requested_budget is not None)):
+             q.source_selection.control_source or q.source_selection.additional_control_sources or q.requested_budget is not None)):
         return feedback('needs_choice','SCIENTIFIC_OPERATION_MISMATCH',
             scientific_result_produced=False,
             explanation='Structural effect analysis reuses fixed input or comparable saved T1 results; it does not search new structures or run new T1 optimization.',
@@ -602,9 +608,19 @@ def compile_v1(host, payload, *, tool_use_id, source_question=None, contract=Sci
             if actual>limit:
                 return feedback('blocked','ORIGINAL_STUDY_NATIVE_CONTROL_LIMIT',field=name,requested=actual,maximum=limit)
         compiled = dict(control_optimization=dict(source=legal[0],settings=settings))
+        if q.source_selection.additional_control_sources:
+            additional=[]
+            for ref in q.source_selection.additional_control_sources:
+                choices=legal_control_sources(host,candidate,plain(ref))
+                if len(choices)!=1:
+                    return feedback('needs_prerequisite','COMPLETE_LEGAL_ADDITIONAL_CONTROL_SOURCE_REQUIRED',source=plain(ref))
+                additional.append(choices[0])
+            if budget<len(additional)+1:
+                return feedback('needs_choice','CALLBACK_CAP_MUST_COVER_SELECTED_STARTS',required_callbacks=len(additional)+1)
+            compiled['control_optimization']['additional_sources']=additional
         if method==DIRECT:compiled['operating_point']='standardized_initial_pretension'
     else:
-        if q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or q.source_selection.control_source:
+        if q.control_scope or q.search_strategy or getattr(q,'control_search_effort',None) or q.source_selection.control_source or q.source_selection.additional_control_sources:
             return feedback('unsupported','STRUCTURAL_COMPARISON_REUSES_FIXED_INPUT_OR_SAVED_T1_SETTINGS')
         path = q.parameter_paths[0]
         if method==T2:
@@ -712,6 +728,8 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     if q.operating_point in ('re_equilibrated','preserved_physical_state'):
         return feedback('unsupported','WORKING_POINT_MAPPING_NOT_IMPLEMENTED')
     saved=bool(q.saved_state or q.execution)
+    if q.native_state_selection and not q.saved_state:
+        return feedback('needs_choice','NATIVE_TRAJECTORY_SELECTION_REQUIRES_SAVED_NATIVE_RESULT')
     if q.operating_point=='frozen_task_initial_state' and (saved or q.update_id is not None):
         return feedback('needs_choice','FROZEN_INITIAL_STATE_CANNOT_USE_SAVED_STATE_SOURCE')
     if q.operating_point=='saved_native_state' and not saved:
@@ -748,7 +766,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     budget=q.requested_budget or intent['agent_hypothesis']['decision'].get('requested_budget')
     if not budget:return feedback('needs_choice','EXPLICIT_LOCAL_EVALUATION_CAP_REQUIRED')
     point_fields=dict(operating_point='saved_state' if saved else 'standardized_initial_pretension')
-    for name in ('saved_state','execution','update_id'):
+    for name in ('saved_state','execution','update_id','native_state_selection'):
         if getattr(q,name) is not None:point_fields[name]=plain(getattr(q,name))
     if q.effect_semantics=='fixed_input_response':
         if not isinstance(q.target,str):return feedback('needs_choice','SHORT_RESPONSE_REQUIRES_REGISTERED_TASK_CONSTRAINT_OR_NATIVE_OBSERVABLE')
@@ -827,7 +845,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
     if (q.target!='finite_time_task_violation' or q.operating_point!='frozen_task_initial_state' or
             q.control_treatment!='no_active_control' or q.physical_problem!=c['configuration']['task']['physical_problem']['mode']):
         return fail('EXPLICIT_COMPLETE_DYNAMIC_TASK_AND_FROZEN_INITIAL_STATE_REQUIRED')
-    if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.response_horizon_s is not None or q.control_scope or q.search_strategy or any(plain(q.source_selection).values()):
+    if q.tensions_n is not None or q.saved_state or q.native_state_selection or q.execution or q.update_id is not None or q.response_horizon_s is not None or q.control_scope or q.search_strategy or any(plain(q.source_selection).values()):
         return fail('DYNAMIC_PASSIVE_RESPONSE_CANNOT_BIND_ACTIVE_CONTROL_OR_SHORT_HORIZON')
     if q.load_condition not in (None,'all_frozen_conditions') or q.comparison_load_conditions or q.load_aggregation:
         return fail('ALL_FROZEN_CONDITIONS_REQUIRED')
@@ -865,7 +883,7 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
         return fail('PASSIVE_REQUIRES_EXPLICIT_FROZEN_MODE_RE_EQUILIBRATION_AND_NO_ACTIVE_CONTROL')
     if q.effect_semantics not in ('mechanism_effect','re_equilibrated_passive_response'):return fail('UNSUPPORTED_PASSIVE_EFFECT')
     if q.load_condition not in [x['name'] for x in problem['loads']]:return fail('SELECT_FROZEN_LOAD_CONDITION')
-    if q.tensions_n is not None or q.saved_state or q.execution or q.update_id is not None or q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
+    if q.tensions_n is not None or q.saved_state or q.native_state_selection or q.execution or q.update_id is not None or q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
         return fail('PASSIVE_STATIC_QUESTION_CANNOT_BIND_ACTIVE_OR_DYNAMIC_CONTROL')
     from extensions.math_analysis.mechanism_registry import PRIMITIVES
     if isinstance(q.target,str) or problem['mode'] not in PRIMITIVES[q.target.quantity]['physical_modes']:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
@@ -929,7 +947,7 @@ def compile_reoptimized(host,q,payload,*,tool_use_id,intent):
             if getattr(q,key) is not None:legacy[key]=plain(getattr(q,key))
         if q.target in metrics:legacy['focus_metric']=q.target
         return compile_v1(host,legacy,tool_use_id=tool_use_id,source_question=payload)
-    if q.control_scope or q.search_strategy or sources.control_source:
+    if q.control_scope or q.search_strategy or sources.control_source or sources.additional_control_sources:
         return feedback('unsupported','SAVED_M2_REUSES_MATCHED_RECORDED_SEARCH_SETTINGS',
             next_choice='Select matched saved T1 results or Conic models only; remove the control source and new search settings. Generate contrasts and run T1 separately when evidence is missing.',
             automatic_T1=False)

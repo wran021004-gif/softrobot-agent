@@ -286,7 +286,7 @@ def training_summary(directory, state=None):
     ended = None if failed is None or complete is None else failed + complete
     candidate = config.get('candidate', {})
     return dict(run_id=directory.name, candidate={k: candidate.get(k) for k in ('identity', 'reference', 'provenance')},
-        task_identity=candidate.get('task_identity'), task=config.get('task'), scope='Recorded training evidence; task acceptance requires independent evaluation',
+        task_identity=candidate.get('task_identity'), task=config.get('task'), condition_binding=config.get('condition_binding'), scope='Recorded training evidence; task acceptance requires independent evaluation',
         mode=config['mode'], seed=config.get('seed'), requested_allocation=config.get('requested_allocation'), ppo=state.get('effective_ppo', config['ppo']), reward=config['reward'], allocation=config['budget'],
         status=state['status'], stop_reason=state.get('stop_reason'), error=state.get('error'),
         policy_initialization=state.get('policy_initialization'),

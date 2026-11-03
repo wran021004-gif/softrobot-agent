@@ -463,12 +463,26 @@ def dispatch(host,query,key,*,guard,origin='model'):
             schedule_binding(cfg,source['trajectory'])
             binding['physical_design_identity']=source['trajectory']['design_identity']
             sensitivity_context=dict(schedule=source,source=plain(q.control_optimization.source))
+            additional=[]
+            for ref in q.control_optimization.additional_sources:
+                other=host.store.artifact(ref)
+                if not (explicit_control_source(other) or numerically_verified_source(other)):
+                    raise ValueError('BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED')
+                schedule_binding(cfg,other['trajectory'])
+                if any(other['trajectory'][name]!=source['trajectory'][name] for name in ('times_s','tendon_order')):
+                    raise ValueError('COMPATIBLE_TENDON_ORDER_AND_GRID_REQUIRED')
+                additional.append(dict(source=plain(ref),schedule=other))
+            if additional:
+                if settings.evaluation_requests<len(additional)+1:
+                    raise ValueError('CALLBACK_CAP_MUST_COVER_SELECTED_STARTS')
+                sensitivity_context['additional_starts']=additional
             if q.control_optimization.resume_from:
                 previous=host.store.artifact(q.control_optimization.resume_from)
                 old=previous['requested_operation']['control_optimization']
                 if (plain(q.control_optimization.resume_from) not in state(host)['analysis_results']
                         or previous['candidate']!=plain(q.candidate) or previous['status']!='computed'
-                        or old['source']!=plain(q.control_optimization.source) or old['settings']!=plain(settings)):
+                        or old['source']!=plain(q.control_optimization.source) or old['settings']!=plain(settings)
+                        or old.get('additional_sources',[])!=[plain(r) for r in q.control_optimization.additional_sources]):
                     raise ValueError('EXACT_OWNED_NATIVE_CONTINUATION_REQUIRED')
                 rejected=[]
                 for ref in q.control_optimization.failed_replays:
@@ -479,6 +493,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
                     rejected.append(digest(host.store.artifact(replay['source_reference'])['trajectory']['tensions_n']))
                 if not rejected:raise ValueError('FAILED_VALIDATION_REQUIRED_FOR_NATIVE_CONTINUATION')
                 sensitivity_context.update(resume=previous['native_dynamics']['optimization'],rejected_sequences=rejected)
+                sensitivity_context['resume_checkpoints']={k:previous['native_dynamics'][k]
+                    for k in ('baseline_peak_speed_state','best_control_states') if k in previous['native_dynamics']}
             elif q.control_optimization.failed_replays:
                 raise ValueError('FAILED_VALIDATION_REQUIRES_NATIVE_CONTINUATION')
             from tools.research.native_control import baseline_identity
@@ -669,6 +685,9 @@ def recover(host):
         schedule=value['native_dynamics']['optimized_schedule']
         schedule_binding(verify_candidate(host,value['candidate'])['configuration'],schedule['trajectory'])
         value['control_schedule_reference']=save(host,schedule,'bound_applied_control_schedule')
+        if value['native_dynamics'].get('best_schedule'):
+            best_schedule=value['native_dynamics']['best_schedule'];schedule_binding(verify_candidate(host,value['candidate'])['configuration'],best_schedule['trajectory'])
+            value['best_control_schedule_reference']=save(host,best_schedule,'bound_applied_control_schedule')
     progress=sorted(folder.glob('numerical_native_progress_*.json'))
     if progress:
         value['native_progress']=read(progress[-1])
@@ -690,6 +709,8 @@ def recover(host):
         current.setdefault('analysis_results',[]).append(ref)
         if value.get('control_schedule_reference'):
             current.setdefault('control_initializations',[]).append(dict(candidate=value['candidate'],source=value['control_schedule_reference']))
+            if value.get('best_control_schedule_reference'):
+                current['control_initializations'].append(dict(candidate=value['candidate'],source=value['best_control_schedule_reference']))
         current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed+p.get('preparation_numerical_s',0.),
             mathematical_evaluations=p.get('analysis_evaluations',1),internal_calculations=value.get('internal_calculations',[])))
         host.store.update_state(db,host.run_id,current)

@@ -17,7 +17,7 @@ def trust_radius(radius,predicted,actual,maximum):
     return min(maximum,radius*1.5) if actual/predicted>.75 else radius
 
 
-def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,rank_key=ranking_key):
+def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,rank_key=ranking_key,reuse_sequences=False):
     """evaluate(start, source, metadata) returns task_gap, outputs, refs and costs.
 
     All probes participate in validity-first ranking. A failed model direction
@@ -46,7 +46,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,
                 or cfg.knots_s[-1]>times[-1] or (cfg.correction_window_s and cfg.correction_window_s[1]>times[-1])):
             raise ValueError('BOUND_ALIGNED_CONTROL_GRID_REQUIRED')
     rows=[];best=None;centers={};radii={s['id']:cfg.initial_radius_n for s in starts};stop='iteration_limit'
-    seen=set();information=set();ineffective=[];responses=[];iterations_started=0
+    seen=set();information=set();ineffective=[];responses=[];iterations_started=0;sequence_results={}
 
     def vectors(row,start):return constraint_vectors(row['outputs'],**start['task_options'])
     def applied(start,x):
@@ -61,6 +61,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,
         tr['tensions_n']=applied(start,x).tolist()
         identity=digest([tr[k] for k in ('task_identity','model_identity','design_identity','tendon_order','times_s','tensions_n')])
         meta=dict(algorithm=cfg.method,start=start['id'],coefficients_n=x.tolist(),label=label,
+            callback_index=len(rows),
             active_coefficients=selected,search_dimension=len(selected),
             safety_margin_fraction=cfg.safety_margin_fraction,
             sequence_hash=digest(tr['tensions_n']),duplicate_applied_sequence=identity in seen,
@@ -69,7 +70,12 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,
             applicability='Local sampled response at the stated candidate only; no regional error bound',
             extrapolation=bool(base and radius is not None and np.max(abs(x-np.asarray(base['coefficients_n'])))>radius+1e-12))
         source['provenance']=dict(source['provenance'],search=meta)
-        row=dict(evaluate(start,source,meta),**meta)
+        if reuse_sequences and identity in sequence_results:
+            measured=deepcopy(sequence_results[identity]);measured.update(cache_hit=True,cost_s=0.,independent_evaluation_executed=False)
+        else:
+            measured=evaluate(start,source,meta)
+            if reuse_sequences:sequence_results[identity]=deepcopy(measured)
+        row=dict(measured,**meta)
         if solver is not None:row['local_solver']={k:v for k,v in solver.items() if k!='delta'}
         seen.add(identity)
         valid=row['task_gap']['valid_complete'] and row['task_gap']['normalized_gap'] is not None
@@ -125,7 +131,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,
                     row=attempt(start,trial,'finite_difference',base=center,radius=radius)
                     if not row['task_gap']['valid_complete']:valid=False;break
                     projected=not np.allclose(delta_u.reshape(-1),basis[:,j]*h,rtol=0,atol=1e-12)
-                    token=(start['id'],center['sequence_hash'],row['sequence_hash'])
+                    token=tuple(tr[k] for k in ('model_identity','design_identity','task_identity'))+(center['sequence_hash'],row['sequence_hash'])
                     row.update(projected_response=projected,effective_input_change_inf_n=float(np.max(abs(delta_u))),
                         provides_new_local_information=token not in information,
                         derivative_scope='one-sided projected control response' if projected else 'one-sided unclipped control response')

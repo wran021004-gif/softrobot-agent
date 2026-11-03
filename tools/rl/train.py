@@ -93,6 +93,7 @@ def publish_checkpoint(directory, model, config, consumed, inherited=None):
     model.save(destination / "policy.zip")
     metadata = dict(config_sha256=config_digest(config), inherited=inherited or snapshot(model), consumed=consumed.copy(),
                     policy_file_sha256=hashlib.sha256((destination / "policy.zip").read_bytes()).hexdigest())
+    if config.get('condition_binding'):metadata['condition_binding']=config['condition_binding']
     write_json(destination / "metadata.json", metadata)
     previous = valid_checkpoint(directory, config)[0].name if (directory / "checkpoint.json").exists() else None
     write_json(directory / "checkpoint.json", dict(current=generation, previous=previous))

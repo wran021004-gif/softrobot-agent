@@ -74,6 +74,12 @@ def selected_operating_point_guidance(host, reference, method, detail):
             result=host.store.artifact(ref,paths=('candidate','native_dynamics.baseline_peak_speed_state.actual_time_s'))
             if result.get('candidate')!=reference:continue
             checkpoint=result.get('native_dynamics',{}).get('baseline_peak_speed_state')
+            best=host.store.artifact(ref,paths=('status','operation','native_dynamics.optimization.best.reference'))
+            if best.get('status')=='computed' and best.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') and best.get('native_dynamics',{}).get('optimization',{}).get('best'):
+                sources.append(dict(saved_state=ref,native_state_selection=dict(kind='best_peak_speed'),
+                    readiness='Exact best-control sample; saved checkpoint reused, otherwise charged prefix replay inside Worker.',
+                    alternatives=['best_holding_start','best_pre_hold_peak_speed','best_sample with explicit time_s'],
+                    scope='Real best-control state only. At deadline no remaining control horizon; no full-task feasibility claim.'))
             if not checkpoint:continue
             try:
                 point=native_point(host,SimpleNamespace(candidate=reference,saved_state=ref),cfg)
@@ -120,7 +126,7 @@ def selected_operating_point_guidance(host, reference, method, detail):
                 'Declared model operating point; no measured terminal state is implied.'))
     return dict(method=method,scientific_purpose=detail['scientific_purpose'],operating_points=points,
         available_source_references=sources,unavailable_sources=unavailable,
-        source_selection_rule='Choose saved_state alone OR execution plus an actual update_id; never combine. Analysis results qualify only for their explicitly recorded complete baseline peak checkpoint; control schedules and sampled tip arrays are not states.',
+        source_selection_rule='Choose saved_state alone OR execution plus an actual update_id; never combine. To select a best Native trajectory state, pair its result saved_state with native_state_selection. Tip arrays select time only; full integration state is restored or reconstructed with actual costs.',
         nonzero_state_status='recorded_sources_require_Main_choice_and_Worker_validation' if sources else '当前没有合法的非零速度机制工作点来源',
         preparation=dict(tool='research_plan',action='physical_replay',scope='A complete candidate-bound measured execution provides trajectory intervals; independent Replay charges and all original prerequisites apply.'),
         key_state_selection='For speed/braking hypotheses prefer an actual recorded interval before hold, with nonzero velocity or a large measured task violation. Main reads the cited trajectory, selects its update_id, and original native_point admission verifies the source; time-zero zero-speed braking is not substituted.',

@@ -162,7 +162,7 @@ class NativeControlTests(unittest.TestCase):
             def rollout_sequence(self,start,t,u,**kw):
                 self.cost['rollouts']+=1;self.cost['physics_steps']+=600
                 p=reference.copy();p[:,0]+=.0204-.04*np.asarray(u).mean()
-                return dict(times_s=t.tolist(),tip_positions_m=p.tolist(),tip_velocities_m_s=np.zeros_like(p).tolist())
+                return dict(times_s=t.tolist(),tip_positions_m=p.tolist(),tip_velocities_m_s=np.zeros_like(p).tolist(),control_states={})
         point=dict(actual_time_s=0.,prefix_tensions_n=[],phase='interval_start_native',input_units='N')
         binding=dict(candidate=ref,effective_configuration_identity='cfg')
         with patch('extensions.tendon_family.mujoco_analysis.NativeModel',Fake),patch('tools.research.native_analysis.applicability',return_value={}),patch('tools.research.native_analysis.assessment',return_value={}),patch('tools.research.analysis.scoped_result',side_effect=lambda v,*_:v):
@@ -176,6 +176,9 @@ class NativeControlTests(unittest.TestCase):
             self.assertLessEqual(len(new['candidates']),101)
             self.assertNotEqual(new['candidates'][-1]['sequence_hash'],rejected)
             self.assertFalse(new['best']['task_gap']['accepted'])
+            if raw.get('best_schedule'):
+                from tools.state_io import digest
+                self.assertEqual(digest(raw['best_schedule']['trajectory']['tensions_n']),new['best']['sequence_hash'])
 
 
 if __name__=='__main__':unittest.main()

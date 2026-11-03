@@ -54,7 +54,8 @@ class ControlMechanismScopeTests(unittest.TestCase):
             out=compile_question(h,dict(version='scientific_question_v4',domain='control',
                 control=dict(source_selection=dict(control_source={'artifact_id':'not-a-hash'}))),tool_use_id='wrong-domain')
             self.assertEqual(out['reason'],'DIAGNOSE_DOMAIN_MISMATCH')
-            self.assertEqual(out['next']['next_research_action'],'control_feasibility')
+            self.assertEqual(out['next'],dict(tool='research_route',input=dict(tool='research_plan',action='diagnose')))
+            self.assertEqual(out['then']['next_research_action'],'control_feasibility')
             self.assertFalse(out['scientific_execution_started'])
 
     def test_legacy_defaults_and_invalid_scales(self):

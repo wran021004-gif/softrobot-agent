@@ -27,6 +27,8 @@ class NativeModel:
         self.scene['control']=dict(tension_execution_mode='ideal_tension')
         xml=BytesIO()
         compile_xml(self.physics,self.scene,registry().parse(inp.policy.backend.parameters),xml)
+        from tools.state_io import digest
+        self.model_identity=digest(dict(xml=xml.getvalue().decode('utf8'),engine=mujoco.__version__))
         self.model=load_model(xml=xml.getvalue().decode('utf8'))
         m=self.model
         self.forces=_bind_mujoco_forces(m,self.scene)
@@ -73,6 +75,8 @@ class NativeModel:
             d.qpos[self.qi]=point['qpos_rad'];d.qvel[self.vi]=point['qvel_rad_s']
             d.time=point['actual_time_s']
         else:
+            if point.get('native_model_identity',self.model_identity)!=self.model_identity:
+                raise ValueError('NATIVE_CHECKPOINT_MODEL_OR_ENGINE_MISMATCH')
             if point['physics_identity']!=self.physics['identity']:
                 raise ValueError('NATIVE_STATE_PHYSICS_IDENTITY_MISMATCH')
             spec=mujoco.mjtState.mjSTATE_INTEGRATION
@@ -91,6 +95,36 @@ class NativeModel:
 
     def reconstruct(self, point):
         """Verify the saved prefix once and retain complete engine integration state."""
+        try:return self._reconstruct(point)
+        except Exception as exc:
+            if not getattr(exc,'native_diagnostic',None):
+                exc.native_diagnostic=dict(stage='native_prefix_reconstruction',cost=dict(self.cost),
+                    reason=str(exc),task_acceptance='unmeasured')
+            raise
+
+    def _reconstruct(self, point):
+        replay=point['native_replay']
+        if 'control_schedule' in replay:
+            initial=replay['initial_state']
+            initial,start=self.reconstruct(initial) if initial.get('native_replay') else (initial,self.restore(initial))
+            tr=replay['control_schedule']['trajectory'];k=replay['sample_index']
+            if replay['native_model_identity'] is not None and replay['native_model_identity']!=self.model_identity:
+                raise ValueError('NATIVE_TRAJECTORY_MODEL_OR_ENGINE_MISMATCH')
+            origin=int(np.argmin(abs(np.asarray(tr['times_s'])-start.time)))
+            if k>origin:
+                outputs=self.rollout_sequence(start,tr['times_s'][origin:k+1],tr['tensions_n'][origin:k],capture_speed_after_s=tr['times_s'][k])
+                expected=replay['expected_outputs']
+                for name in ('times_s','tip_positions_m','tip_velocities_m_s'):
+                    if not np.allclose(outputs[name],expected[name][:k-origin+1],rtol=0,atol=1e-10):
+                        raise ValueError('BEST_NATIVE_CONTROL_PREFIX_DOES_NOT_REPRODUCE_SAVED_OUTPUTS')
+                saved=outputs['peak_speed_state']
+                data=self.restore(saved)
+            else:
+                data=start;saved=self.checkpoint(data)
+            saved.update(candidate=point['candidate'],configuration_identity=point['configuration_identity'],
+                u=point['u'],prefix_tensions_n=tr['tensions_n'][:k],provenance=point['provenance'],
+                remaining_task_s=point['remaining_task_s'])
+            return saved,data
         scene=point['native_replay']['scene'];d=mujoco.MjData(self.model)
         if point['physics_identity']!=self.physics['identity']:raise ValueError('NATIVE_REPLAY_PHYSICS_MISMATCH')
         if any(scene[k]!=self.scene[k] for k in ('forces','qpos_rad','qvel_rad_s','control_period_s','timestep_s')):
@@ -119,7 +153,7 @@ class NativeModel:
     def checkpoint(self, d):
         spec=mujoco.mjtState.mjSTATE_INTEGRATION
         saved=np.empty(mujoco.mj_stateSize(self.model,spec));mujoco.mj_getState(self.model,d,saved,spec)
-        return dict(physics_identity=self.physics['identity'],dof_order=self.order,tendon_order=self.tendons,
+        return dict(physics_identity=self.physics['identity'],native_model_identity=self.model_identity,dof_order=self.order,tendon_order=self.tendons,
             state_spec=int(spec),integration_state=saved.tolist(),qpos_rad=d.qpos[self.qi].tolist(),
             qvel_rad_s=d.qvel[self.vi].tolist(),actual_time_s=float(d.time),
             phase='interval_start_native',input_units='N',u=d.ctrl[self.aids].tolist())
@@ -226,7 +260,7 @@ class NativeModel:
         self.forward(d);motion,_=self.motion(d)
         return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
 
-    def rollout_sequence(self, start, times, tensions, *, capture_speed_after_s=None):
+    def rollout_sequence(self, start, times, tensions, *, capture_speed_after_s=None,capture_control_states=False,holding_start_s=None):
         """Clone one integration state; sample its origin and every interval end."""
         times=np.asarray(times,dtype=float);tensions=np.asarray(tensions,dtype=float)
         steps=np.rint(np.diff(times)/self.model.opt.timestep).astype(int)
@@ -236,12 +270,18 @@ class NativeModel:
             raise ValueError('NATIVE_ALIGNED_SEQUENCE_REQUIRED')
         d=mujoco.MjData(self.model);mujoco.mj_copyData(d,self.model,start)
         self.forward(d);samples=[self.motion(d)[0]];actual=[]
-        peak=None;peak_speed=-1.
+        peak=None;peak_speed=-1.;states={};speeds={}
         def retain_peak():
             nonlocal peak,peak_speed
             if capture_speed_after_s is not None and d.time>=capture_speed_after_s-1e-12:
                 speed=float(np.linalg.norm(samples[-1]['tip_velocity_m_s']))
                 if speed>peak_speed:peak=self.checkpoint(d);peak_speed=speed
+            if capture_control_states:
+                speed=float(np.linalg.norm(samples[-1]['tip_velocity_m_s']))
+                for key,eligible in (('best_peak_speed',True),('best_pre_hold_peak_speed',holding_start_s is not None and d.time<holding_start_s-1e-12)):
+                    if eligible and speed>speeds.get(key,-1.):states[key]=self.checkpoint(d);speeds[key]=speed
+                if holding_start_s is not None and abs(d.time-holding_start_s)<1e-12:
+                    states['best_holding_start']=self.checkpoint(d)
         retain_peak()
         self.cost['rollouts']+=1
         for count,u in zip(steps,tensions):
@@ -256,6 +296,7 @@ class NativeModel:
         result=dict(times_s=[s['time_s'] for s in samples],
             tip_positions_m=[s['tip_position_m'] for s in samples],
             tip_velocities_m_s=[s['tip_velocity_m_s'] for s in samples],actual_tensions_n=actual)
+        if capture_control_states:result['control_states']=states
         if self.tool_axis_local is not None:result['tip_tool_axes_world']=[s['tip_tool_axis_world'] for s in samples]
         if peak is not None:result['peak_speed_state']=peak
         return result

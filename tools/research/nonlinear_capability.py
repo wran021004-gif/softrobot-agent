@@ -27,7 +27,8 @@ def t1_summary(value, settings):
     """Interpret one existing native search, without another rollout or score."""
     raw=value['native_dynamics'];search=raw['optimization'];best=search['best']
     initial=search['candidates'][0]['measure'];measure=best['measure']
-    u=np.asarray(raw['optimized_schedule']['trajectory']['tensions_n'])
+    best_schedule=raw.get('best_schedule',raw['optimized_schedule'])
+    u=np.asarray(best_schedule['trajectory']['tensions_n'])
     bounds=np.asarray(value['binding']['tension_bounds_n'])
     def metric_view(row):
         result=deepcopy(row);worst=result.get('worst_constraint')
@@ -43,7 +44,7 @@ def t1_summary(value, settings):
         improvement=initial['signed_maximum_excess']-measure['signed_maximum_excess'],
         initial_metrics=metric_view(initial),best_metrics=metric_view(measure),
         best_control=dict(rollout=best['reference'],label=best['label'],coefficients_n=best['coefficients_n'],
-            schedule_pointer='/native_dynamics/optimized_schedule',source=raw['optimized_schedule']['provenance']),
+            schedule_pointer='/native_dynamics/best_schedule' if 'best_schedule' in raw else '/native_dynamics/optimized_schedule',source=best_schedule['provenance']),
         settings=plain(settings),stop_reason=search['stop_reason'],
         callbacks=search['cost_feedback']['evaluation_callbacks'],rollouts=raw['cost']['rollouts'],
         physics_steps=raw['cost']['physics_steps'],iterations_started=search['iterations_started'],
@@ -103,6 +104,7 @@ def saved_context(host, query):
         row=dict(reference=reference,candidate=raw['candidate'],candidate_record=c,configuration=cfg,
             original_charges={k:raw.get(k) for k in ('charged_analysis_evaluations','charged_numerical_s','operation_key')},
             t1=raw['nonlinear_capability'],protocol=raw['protocol'],input=tr,initial_state=point,cost=native['cost'])
+        row['start_inputs']=[r['schedule']['trajectory'] for r in native.get('start_sources',[])] or [tr]
         row['control_response']=native.get('control_task_sensitivity',{})
         if native.get('optimization',{}).get('candidates'):
             from tools.research.task_constraints import describe_analysis_requirements
@@ -150,6 +152,8 @@ def saved_context(host, query):
                 raise ValueError('SINGLE_PARAMETER_FIXED_TASK_SCENE_AND_NUMERICS_REQUIRED')
             if row['t1']['settings']!=base['t1']['settings'] or row['input']['times_s']!=base['input']['times_s']:
                 raise ValueError('IDENTICAL_SEARCH_AND_COMMON_LEGAL_INITIAL_CONTROL_REQUIRED')
+            if [[tr[k] for k in ('times_s','tendon_order','tensions_n')] for tr in row['start_inputs']] != [[tr[k] for k in ('times_s','tendon_order','tensions_n')] for tr in base['start_inputs']]:
+                raise ValueError('IDENTICAL_MULTI_START_INPUTS_REQUIRED')
             if any(row['initial_state'].get(k)!=base['initial_state'].get(k) for k in ('phase','input_units','provenance')):
                 raise ValueError('MATCHED_INITIAL_STATE_CONVENTION_REQUIRED')
             if direction.mode=='finite_comparison' and row['candidate_record'].get('initialization_provenance'):
@@ -217,10 +221,12 @@ def candidate_responses(host, reference):
     from extensions.tendon_family.family_space import resolved_request
     from tools.research.contracts import AnalysisRequest
     s=state(host);spec=s['spec'];candidate=verify_candidate(host,reference)
-    parameters=family_analysis_parameters(spec,candidate);inventory=[];ready=[]
+    parameters=family_analysis_parameters(spec,candidate);inventory=[];ready=[];rejected=[]
+    from tools.research.config import frozen_analysis_protocol
+    protocol=frozen_analysis_protocol(spec,candidate)
     for ref in s.get('analysis_results',[]):
         raw=host.store.artifact(ref,paths=('status','implementation','protocol','candidate','nonlinear_capability.method'))
-        if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or raw.get('protocol')!=spec['analysis_protocol']
+        if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or raw.get('protocol')!=protocol
                 or raw.get('nonlinear_capability',{}).get('method')!=T1):continue
         c=verify_candidate(host,raw['candidate'])
         inventory.append(dict(reference=ref,candidate=raw['candidate'],parameters=resolved_request(spec['family_space'],c['parameters'])))
@@ -236,10 +242,11 @@ def candidate_responses(host, reference):
                 for high,plus in points:
                     if high<=0 or not math.isclose(-low,high,rel_tol=1e-10):continue
                     query=dict(candidate=plain(reference),operation=T2_OPERATION,model_source='mujoco',
-                        operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],
+                        operating_point='standardized_initial_pretension',protocol=protocol,
                         nonlinear_response=dict(variable=path,unit=row['unit'],t1_results=[base['reference'],minus['reference'],plus['reference']]))
-                    if 'not_comparable' not in saved_context(host,AnalysisRequest.model_validate(query)):
-                        ready.append(query)
+                    checked=saved_context(host,AnalysisRequest.model_validate(query))
+                    if 'not_comparable' not in checked:ready.append(query)
+                    else:rejected.append(dict(request=query,reason=checked['not_comparable']))
     batch=None
     if ready:
         baseline=ready[0]['nonlinear_response']['t1_results'][0];directions=[];seen=set()
@@ -252,9 +259,64 @@ def candidate_responses(host, reference):
             seen.add(path)
             if len(directions)==32:break
         batch={**ready[0],'nonlinear_response':dict(version='nonlinear_response_v2',directions=directions)}
-    return dict(parameters=parameters,ready_requests=ready,batch_request=batch,
+    return dict(parameters=parameters,ready_requests=ready,batch_request=batch,rejected_stencils=rejected,
+        preparation_query=dict(reference=plain(reference),view='working_set',pointer='/t2_preparation'),
         preparation='Choose a legal physical path/step, generate actual candidates, initialize legal controls and run authorized T1 per candidate. Reuse the common baseline. No automatic model, optimization or physical experiment.',
         direction_semantics='V1 is one symmetric parameter; V2 explicitly records independent axes, coupled dp/ds paths or finite discrete contrasts.')
+
+
+def preparation_view(host, reference):
+    """Explain actual missing T2 evidence through the existing saved-context gate."""
+    from tools.research.state import state
+    from tools.research.design import verify_candidate,parameter_value,set_parameter
+    from tools.research.optimal_capability import family_analysis_parameters
+    from extensions.tendon_family.family_space import resolved_request
+    s=state(host);anchor=host.store.artifact(reference);candidate=anchor.get('candidate') or reference
+    c=verify_candidate(host,candidate);spec=s['spec']
+    prepared=candidate_responses(host,candidate);base=resolved_request(spec['family_space'],c['parameters'])
+    inventory=[]
+    for ref in s['candidates'].values():
+        other=verify_candidate(host,ref)
+        if other['configuration']['task']!=c['configuration']['task']:continue
+        inventory.append((ref,resolved_request(spec['family_space'],other['parameters'])))
+    t1=[];excluded=[]
+    for ref in s.get('analysis_results',[]):
+        raw=host.store.artifact(ref,paths=('candidate','status','implementation','nonlinear_capability.method'))
+        if raw.get('nonlinear_capability',{}).get('method')!=T1:continue
+        row=dict(reference=ref,candidate=raw.get('candidate'))
+        if raw.get('status')=='computed' and raw.get('implementation')==s['freeze']:t1.append(row)
+        else:excluded.append(dict(row,reason='Completed T1 at the current frozen implementation required; no implicit migration.'))
+    baseline=[r['reference'] for r in t1 if r['candidate']==candidate];rows=[]
+    for parameter in prepared['parameters']:
+        if not parameter['study_authorized'] or not parameter['continuous_perturbation']:continue
+        path=parameter['parameter_id'];value=parameter_value(base,path);points=[]
+        for ref,params in inventory:
+            try:delta=parameter_value(params,path)-value
+            except (KeyError,IndexError):continue
+            expected=deepcopy(base);set_parameter(expected,path,value+delta)
+            if params!=expected or delta==0:continue
+            points.append(dict(candidate=ref,delta=delta,t1_results=[r['reference'] for r in t1 if r['candidate']==ref]))
+        minus=[r for r in points if r['delta']<0];plus=[r for r in points if r['delta']>0]
+        ready=[r for r in prepared['ready_requests'] if r['nonlinear_response']['variable']==path]
+        missing=[]
+        if not baseline:missing.append('completed_current_implementation_baseline_T1')
+        if not minus:missing.append('negative_single_parameter_candidate')
+        if not plus:missing.append('positive_single_parameter_candidate')
+        if not any(math.isclose(-a['delta'],b['delta'],rel_tol=1e-10) for a in minus for b in plus):missing.append('symmetric_Main_selected_step')
+        if any(not p['t1_results'] for p in points):missing.append('completed_matching_perturbation_T1')
+        if not ready and not missing:missing.append('original_T2_state_input_protocol_or_search_matching')
+        rows.append(dict(parameter_id=path,unit=parameter['unit'],current_value=value,
+            family_domain=parameter,baseline_T1=baseline,negative=minus,positive=plus,
+            ready=bool(ready),ready_requests=ready,missing=missing,
+            rejected_stencils=[r for r in prepared['rejected_stencils'] if r['request']['nonlinear_response']['variable']==path]))
+    return dict(candidate=candidate,parameters=rows,excluded_T1=excluded,
+        baseline_T1=baseline,ready_requests=prepared['ready_requests'],
+        query=dict(reference=candidate,view='working_set',pointer='/t2_preparation'),
+        preparation_actions=['generate an explicitly chosen legal single-parameter minus/plus candidate',
+            'initialize_control with an explicit common legal full input','run matched authorized T1 and reuse the common baseline'],
+        matching_requirements=['same frozen condition and comparable own initialization','same legal initial sequence and tendon order',
+            'same control-search settings and protocol','current frozen implementation','symmetric parameter-only stencil within FamilySpace'],
+        scope='Read-only preparation. No generated candidates, source changes, new T1, automatic step choice or mandatory T2. Coordinate lineage alone is not a stencil.')
 
 
 def observations(context):
