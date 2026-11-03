@@ -132,6 +132,45 @@ class HighLevelTests(unittest.TestCase):
         self.assertEqual(len(ready['request']['control_optimization']['settings']['knots_s']),17)
         self.assertFalse(state(self.h)['analysis_results'])
 
+    def test_control_grid_has_one_effective_coefficient_per_applied_interval(self):
+        import numpy as np
+        from tools.research.control_correction import correction_basis,corrected_tensions
+        spec=state(self.h)['spec'];effort=dict(resolution='control_grid',exploration='broad',evaluation_requests=8000)
+        cfg=control_settings(spec,effort,channels=3,physical_limit_n=8.)
+        times=np.arange(30)*spec['analysis_protocol']['period_s']
+        basis=correction_basis(times,cfg.knots_s,3)
+        self.assertEqual(len(cfg.knots_s),30);self.assertEqual(np.linalg.matrix_rank(basis),90)
+        np.testing.assert_allclose(basis,np.eye(90),atol=1e-12)
+        coefficients=np.zeros((30,3));coefficients[27,2]=.5
+        corrected=corrected_tensions(np.full((30,3),.2),times,cfg.knots_s,coefficients,[8.]*3,cfg.correction_window_s)
+        delta=corrected-.2
+        self.assertEqual(np.flatnonzero(abs(delta)>1e-12).tolist(),[27*3+2])
+        self.assertEqual((cfg.evaluation_requests,cfg.iterations,cfg.coefficient_limit_n),(8000,1000,8.))
+        with self.assertRaisesRegex(ValueError,'FULL_TASK_SCOPE'):
+            control_settings(spec,effort,channels=3,window=[.54,.6])
+        restricted=deepcopy(spec);restricted['native_control_limits']['knots_s']=17
+        with self.assertRaisesRegex(ValueError,'FROZEN_KNOT_GRANT'):
+            control_settings(restricted,effort,channels=3)
+        from tools.research.scientific_intent import question_schema
+        schema=question_schema(spec,self.h.store.artifact(self.c),'control_feasibility',control_methods=[])
+        self.assertIn('control_grid',schema['$defs']['ScientificControlEffort']['properties']['resolution']['enum'])
+        self.assertIn('effective full-task',schema['$defs']['ScientificControlEffort']['properties']['resolution']['description'])
+        self.assertIn('Both share',schema['$defs']['ScientificControlV4']['properties']['numerical_method']['description'])
+        source=seed_control(self.h,ControlSeedRequest(candidate=self.c))['source']
+        with patch.object(core,'guard'):core.dispatch(self.h,diagnosis(self.c,'control_feasibility'),'grid-diagnose')
+        for method,operation in (('mujoco-nonlinear-task-capability-v1','mujoco_nonlinear_task_capability_v1'),
+                ('mujoco_direct_control_v1','mujoco_direct_control_v1')):
+            payload=dict(version='scientific_question_v4',domain='control',control=dict(
+                condition_id=spec['task_conditions'][0]['condition_id'],numerical_method=method,
+                control_scope=dict(mode='full_task'),source_selection=dict(control_source=source),control_search_effort=effort))
+            Draft202012Validator(selected_question_schema(self.h)).validate(payload)
+            with patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+                ready=compile_question(self.h,payload,tool_use_id='full-grid-'+operation)
+            self.assertEqual(ready['status'],'ready',ready)
+            self.assertEqual(ready['request']['operation'],operation)
+            self.assertEqual(ready['request']['control_optimization']['settings']['knots_s'],cfg.knots_s)
+        self.assertFalse(state(self.h)['analysis_results'])
+
     def test_physical_edit_preserves_every_other_resolved_parent_parameter(self):
         from extensions.tendon_family.family_space import resolved_request
         from tools.research.design import set_parameter

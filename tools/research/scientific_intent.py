@@ -149,7 +149,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         if control_methods is not None:
             legal=[r['method'] for r in control_methods if r['selectable']]
             control['numerical_method']={'enum':[None,*legal],
-                'description':'Native method identity only; Reach/Hold preserves its default finite T1 semantics. Conic/SOCP uses the separate structure inspect / reoptimized_task_capability / optimal_task_violation entry in analysis_handoff.conic_entry.'}
+                'description':'Select task/result interpretation: Reach/Hold T1 for saved-T1/T2 semantics, or general Direct. Both share Native response/pattern search and the selected resolution; Direct does not change knots. Conic/SOCP uses the separate structure inspect / reoptimized_task_capability / optimal_task_violation entry.'}
         sources=schema['$defs']['ScientificSources']['properties']
         for name in ('comparison_candidates','t1_results'):sources.pop(name,None)
         passive=bool((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec.get('canonical_task',{}).get('physical_problem'))
@@ -289,7 +289,9 @@ def project_control_effort(schema,spec=None):
         maximum=(spec or {}).get('native_control_limits',{}).get('evaluation_requests')
         if maximum is not None:effort['properties']['evaluation_requests']['maximum']=maximum
         for key in ('resolution','exploration'):
-            effort['properties'][key]={**next(b for b in effort['properties'][key]['anyOf'] if b.get('type')!='null')}
+            original=effort['properties'][key]
+            effort['properties'][key]={**next(b for b in original['anyOf'] if b.get('type')!='null'),
+                **{k:v for k,v in original.items() if k=='description'}}
         effort['description']='Choose temporal freedom, physical exploration scale and a shared finite callback cap. The program binds the numerical method, knots, active coefficients and step sizes; all starts share the cap. Every frozen task constraint remains scored.'
     return schema
 
@@ -305,14 +307,22 @@ def control_settings(spec, effort, *, window=None, channels=None, physical_limit
         limit=physical_limit_n
         if limit is None:limit=spec['family_space']['tendon_domains']['force_limit_n']['default']
         if limit<=0:raise ValueError('POSITIVE_PHYSICAL_TENSION_RANGE_REQUIRED')
-        n={'coarse':3,'moderate':5,'fine':9,'very_fine':17}[q.resolution]
+        period=spec['analysis_protocol']['period_s']
+        if q.resolution=='control_grid':
+            if window is not None:raise ValueError('CONTROL_GRID_REQUIRES_FULL_TASK_SCOPE')
+            # Same effective-input count as the existing frozen schedule seed.
+            # The deadline is an observation, not another applied input interval.
+            n=round(duration/period)
+            if n<2:raise ValueError('CONTROL_GRID_REQUIRES_AT_LEAST_TWO_INTERVALS')
+            grid=[i*period for i in range(n)]
+        else:
+            n={'coarse':3,'moderate':5,'fine':9,'very_fine':17}[q.resolution]
+            grid=[a+(b-a)*i/(n-1) for i in range(n)]
+            if window is None:grid=[round(t/period)*period for t in grid]
         maximum=min(64,spec.get('native_control_limits',{}).get('knots_s',64))
         if n>maximum:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_KNOT_GRANT')
-        period=spec['analysis_protocol']['period_s']
         # Whole-task knots use the actual frozen control samples. An explicit
         # interior window retains its chosen endpoints and zero corrections there.
-        grid=[a+(b-a)*i/(n-1) for i in range(n)]
-        if window is None:grid=[round(t/period)*period for t in grid]
         if len(set(grid))!=n:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_TIME_GRID')
         scale=limit*(1. if q.exploration=='broad' else .1)
         numeric=dict(evaluation_requests=q.evaluation_requests,method='response',knot_count=n,

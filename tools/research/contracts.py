@@ -371,7 +371,7 @@ _CONTROL_DOMAIN = LocalControlSearchSettings.model_json_schema()['properties']
 class ScientificControlEffort(Contract):
     """Scientific effort, compiled to the existing LocalControlSearchSettings."""
     method: Literal['pattern','response'] = 'response'
-    resolution: Literal['coarse','moderate','fine','very_fine'] | None = Field(default=None,description='Increasing temporal correction freedom from coarse through very_fine; the compiler binds actual knots to the frozen control grid and rejects unsupported resolution.')
+    resolution: Literal['coarse','moderate','fine','very_fine','control_grid'] | None = Field(default=None,description='Increasing temporal correction freedom from coarse through very_fine. control_grid independently adjusts every effective full-task control interval; no unused terminal coefficient. The compiler binds the frozen grid and rejects unsupported scope or resolution.')
     exploration: Literal['local_refinement','broad'] | None = Field(default=None,description='Local refinement uses 10% of the physical tension range; broad permits the complete physical range about each selected start. Actual scales are returned; no coverage claim.')
     knot_count: int = Field(default=4,strict=True,ge=_CONTROL_DOMAIN['knots_s']['minItems'],le=_CONTROL_DOMAIN['knots_s']['maxItems'],description='Uniform knots over the chosen adjustment window. Evaluation always covers the complete frozen task. Local windows require at least one interior knot; endpoint corrections remain zero.')
     iterations: int | None = Field(default=None,strict=True,ge=_CONTROL_DOMAIN['iterations']['minimum'],le=_CONTROL_DOMAIN['iterations']['maximum'],description='Independent iteration cap. If omitted: min(callback cap, frozen Study iteration cap, original contract maximum). Early convergence can use fewer callbacks/iterations.')
@@ -613,7 +613,7 @@ class ScientificControlV4(ScientificQuestionV3):
     condition_id: str | None = Field(default=None,min_length=1,
         description='One explicitly selected frozen task condition. The candidate and every control source must bind this same condition; changing conditions uses the existing initialize_control condition preparation, not a task override.')
     numerical_method: Literal['mujoco-nonlinear-task-capability-v1','mujoco_direct_control_v1'] | None = Field(default=None,
-        description='Optional registered numerical identity from the candidate control-method catalog. Reach/Hold retains its historical T1 interpretation; other task families use an applicable authorized Direct method. Never changes the scientific goal or grants execution permission.')
+        description='Optional registered task/result interpretation: Reach/Hold T1 or general Direct. Both share Native response/pattern search and the selected temporal resolution; Direct does not automatically add interval freedom. No execution permission or acceptance is granted.')
 
 
 class ScientificQuestionV4(Contract):
