@@ -182,6 +182,26 @@ class BoundedEvidenceTests(unittest.TestCase):
             self.assertNotIn('selected_candidate',original['decision'])
             with self.assertRaisesRegex(ValueError,'ALL_FROZEN_TASK_CONDITIONS_REQUIRED'):
                 bind_plan_selection(h,{**original,'selected_execution':results[:1]})
+            selected_plan=plan('select',selected_execution=results)
+            selected_plan['decision']['claimed_inference']='observed_task_pass'
+            selected_plan=bind_plan_selection(h,selected_plan)
+            from tools.research.evidence_policy import admit_decision
+            from tools.research.contracts import Plan
+            self.assertEqual(admit_decision(h,Plan.model_validate(selected_plan))['claimed_inference'],'observed_task_pass')
+            # A separately registered fixture is not one of the exact accepted
+            # joint members, even if it copies a condition's result content.
+            extra=save(h,{**h.store.artifact(results[-1]),'fixture_extra_scope':True},'synthetic_extra_scope_fixture')
+            update(h,analysis_results=[*state(h)['analysis_results'],extra])
+            unrelated=deepcopy(selected_plan);unrelated['supporting_evidence']=[*unrelated['supporting_evidence'],extra]
+            with self.assertRaisesRegex(ValueError,'EVIDENCE_TASK_IDENTITY_MISMATCH'):
+                admit_decision(h,Plan.model_validate(unrelated))
+            # The actual full public SELECT, including inference admission and
+            # original joint result registration, must close without a Worker.
+            with patch('tools.research.core.guard'),patch('tools.research.state.guard'):
+                closed=core.dispatch(h,selected_plan,'offline-g0-joint-formal-select')
+            self.assertTrue(closed['result']['selected'])
+            self.assertEqual(state(h)['research_status'],'stopped')
+            self.assertTrue(state(h)['success_gate']['model_selection_complete'])
 
 
 if __name__=='__main__':unittest.main()

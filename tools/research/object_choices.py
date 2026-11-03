@@ -117,7 +117,8 @@ def bind_plan_selection(host,payload):
         refs=selected if isinstance(selected,list) else [selected]
         if action=='select' and isinstance(selected,list):
             from tools.research.conditions import joint_assessment
-            candidate=joint_assessment(host,refs)['candidate']
+            with host.store.read_snapshot():
+                candidate=joint_assessment(host,refs)['candidate']
         else:
             results=[host.store.artifact(ref,paths=('candidate','design_candidate')) for ref in refs]
             candidate=results[0].get('candidate') or results[0].get('design_candidate')

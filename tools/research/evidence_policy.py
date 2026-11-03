@@ -310,6 +310,12 @@ def admit_decision(host,plan):
             cfg=host.store.artifact(d.selected_candidate)['configuration']
     if plan.control_search and d.requested_budget!=plan.control_search.settings.evaluation_requests:
         raise ValueError('DECISION_SEARCH_BUDGET_MISMATCH')
+    joint_members=[]
+    if plan.action=='select' and isinstance(plan.selected_execution,list):
+        from tools.research.conditions import joint_assessment
+        with host.store.read_snapshot():joint=joint_assessment(host,plan.selected_execution)
+        if plain(d.selected_candidate)!=joint['candidate']:raise ValueError('DECISION_CANDIDATE_MISMATCH')
+        joint_members=joint['condition_results']
     known=registered_references(host)
     summaries=[];claim_scope_issues=[]
     experiment=plan.action not in ('select','confirm','stop')
@@ -322,7 +328,7 @@ def admit_decision(host,plan):
             task=comparable_task(s['spec'],source_cfg['task'])
             expected=comparable_task(s['spec'],cfg['task']) if cfg else s['spec'].get('canonical_task',s['base_configuration']['task'])
             background=[e['reference'] for e in s['spec'].get('research_decisions',{}).get('background',[])]
-            if task!=expected:
+            if task!=expected and plain(ref) not in joint_members:
                 condition_evidence=any(task==c['task'] for c in s['spec'].get('task_conditions',[]))
                 if (plain(ref) not in background and not condition_evidence) or (not experiment and d.claimed_inference!='empirical_search'):
                     raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')

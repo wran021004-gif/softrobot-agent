@@ -1,5 +1,6 @@
 """Synthetic selector contracts; no live Provider or scientific execution."""
 from copy import deepcopy
+from contextlib import nullcontext
 import unittest
 from unittest.mock import patch
 from jsonschema import Draft202012Validator,ValidationError
@@ -30,6 +31,7 @@ class SavedChoiceTests(unittest.TestCase):
                 native_dynamics=dict(optimization=dict(best=dict(measure=dict(signed_maximum_excess=-.1),task_gap=dict(valid_complete=True)))))}
         self.h=type('Host',(),{})();self.h.store=type('Store',(),{})()
         self.h.store.artifact=lambda reference,**kwargs:deepcopy(self.records[reference['artifact_id']])
+        self.h.store.read_snapshot=nullcontext
         p=patch('tools.research.object_choices.state',return_value=self.s);p.start();self.addCleanup(p.stop)
 
     def test_replay_choice_cannot_mix_hashes_or_other_evidence(self):
