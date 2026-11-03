@@ -543,6 +543,31 @@ def _wire(host, reference, saved):
         # Static initializer dictionaries may include every joint. The exact
         # construction stays recoverable; its scalar semantics have one owner.
         if finding.get('mathematics'):finding['mathematics'].pop('recorded_static_construction',None)
+        mathematics=finding.get('mathematics') or {};native=mathematics.get('native_analysis') or {}
+        search=(finding.get('bottleneck_diagnosis') or {}).get('control_search')
+        comparison=native.get('comparison',{})
+        if search and all('holding_max_speed_m_s' in comparison.get(k,{}) for k in ('baseline','best')):
+            # These are the same immutable values already owned by the complete
+            # baseline/best comparison. Keep distinct deltas, numerical error
+            # bounds, physical domains, mechanisms and provenance in full.
+            quantities=[]
+            for quantity in mathematics['quantities']:
+                pointer=(quantity.get('source') or {}).get('pointer','')
+                phase=('baseline' if pointer.startswith('/native_dynamics/optimization/candidates/0/measure/') else
+                    'best' if pointer.startswith('/native_dynamics/optimization/best/measure/') else None)
+                field=pointer.rsplit('/',1)[-1]
+                if phase is None or field not in comparison[phase] or quantity['value']!=comparison[phase][field]:quantities.append(quantity)
+            mathematics['quantities']=quantities
+            for key in ('baseline','best'):search.pop(key,None)
+            search['metrics_at']='mathematics.native_analysis.comparison'
+            capability=mathematics.get('nonlinear_capability')
+            if capability:
+                for key in ('J','initial_J','improvement','stop_reason','callbacks','physics_steps','worst_constraint'):
+                    capability.pop(key,None)
+                capability['search_facts_at']='bottleneck_diagnosis.control_search'
+            if native.get('cost'):
+                cost_fields={'native_model_builds','native_rollouts','native_physics_steps','native_optimization_evaluations'}
+                finding['resources']=[r for r in finding['resources'] if r['name'] not in cost_fields]
     compact_report=dict(mode=report.mode,question=report.question,results=findings,
         relations=summary['comparisons'],scope=summary['scope'],limitations=summary['limitations'])
     return dict(**request_settings(provider),
