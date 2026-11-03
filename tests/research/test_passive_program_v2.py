@@ -144,6 +144,7 @@ class PassiveProgramTests(unittest.TestCase):
         self.assertIn('passive_ablation',schema['$defs']['PhysicalReplayRequest']['properties'])
         self.assertNotIn('state_vector',json.dumps(schema));self.assertNotIn('efc_J',json.dumps(wires))
         card=plain(_card(h,ref));self.assertTrue(any(f['name']=='passive_program' for f in card['recorded_context']))
+        self.assertEqual([r['amount'] for r in card['resources'] if r['name']=='physics_steps'],[1000])
         cert=acceptance_certificate(h,ref);self.assertTrue(cert['complete_acceptance_view'],cert)
         from tools.research.scientific_intent import scientific_actions
         actions={r['scientific_goal']:r for r in scientific_actions(state(h)['spec'])}
@@ -183,6 +184,10 @@ class PassiveProgramTests(unittest.TestCase):
         raw=h.store.artifact(result['raw_reference'])
         self.assertIsNone(result['acceptance']['accepted']);self.assertEqual(result['acceptance']['status'],'incomplete')
         self.assertTrue(raw['unobserved_work_possible']);self.assertEqual(raw['cost']['physics_steps'],500)
+        self.assertTrue(result['physical_cost_status']['unobserved_work_possible'])
+        from tools.research.reporter import _card
+        card=plain(_card(h,result['reference']))
+        self.assertEqual([r['amount'] for r in card['resources'] if r['name']=='physics_steps_lower_bound'],[500])
         self.assertTrue(result['passive_l2']['unsealed_traces']);self.assertIsNone(state(h)['pending'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
         with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_RELAUNCH')):

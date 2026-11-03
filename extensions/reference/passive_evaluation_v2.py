@@ -258,4 +258,6 @@ def summary(task,raw):
             state_resets=e.get('state_resets'),qualified_state_identity=e.get('qualified_state',{}).get('state_identity'),
             maximum_tension_n=e.get('maximum_tension_n'),maximum_enabled_length_excess_m=e.get('maximum_enabled_length_excess_m'),
             transition_count=len(e.get('constraint_transitions',[]))) for e in raw.get('episodes',[])],
-        paired_status=(raw.get('paired_ablation') or {}).get('status'),cost=raw.get('cost'))
+        paired_status=(raw.get('paired_ablation') or {}).get('status'),cost=raw.get('cost'),
+        cost_observation_scope=raw.get('cost_observation_scope',raw.get('cost',{}).get('observation_scope','observed_native_counts')),
+        unobserved_work_possible=raw.get('unobserved_work_possible',raw.get('cost',{}).get('unobserved_work_possible',False)))

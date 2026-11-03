@@ -750,6 +750,9 @@ def recover(host):
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
         physical_launches=p.get('episode_count',1),actual_resource_consumption=raw.get('cost'),
         backend_reference=backend_reference,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
+    if raw.get('kind')=='passive_dynamic_execution_v2':
+        final['physical_cost_status']=dict(observation_scope=raw.get('cost_observation_scope',raw.get('cost',{}).get('observation_scope','observed_native_counts')),
+            unobserved_work_possible=raw.get('unobserved_work_possible',raw.get('cost',{}).get('unobserved_work_possible',False)))
     if passive_l2 is not None:final['passive_l2']=passive_l2
     ref=save(host,final,'physical_playback_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])

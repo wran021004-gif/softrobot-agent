@@ -690,6 +690,13 @@ def _resources(value, reference):
         add(value,key,unit)
     for key in ('charged_numerical_s','numerical_s','evaluation_elapsed_s'):
         add(value,key,'s',time_basis='recorded_elapsed_unspecified')
+    actual=value.get('actual_resource_consumption') or {}
+    uncertain=value.get('physical_cost_status',{}).get('unobserved_work_possible',False)
+    for key,unit in (('model_builds','models'),('physics_steps','steps'),('attempted_steps','steps'),
+            ('native_forward_calls','evaluations'),('episodes_started','episodes'),('episodes_completed','episodes')):
+        if key in actual:
+            resources.append(ResourceUse(name=key+('_lower_bound' if uncertain else ''),amount=actual[key],unit=unit,
+                source=_location(reference,'/actual_resource_consumption/'+key)))
     boundary=value.get('boundary') or {}
     add(boundary,'elapsed_s','s','/boundary','worker_wall')
     add(value,'cpu_time_s','s',time_basis='cpu')
@@ -882,7 +889,7 @@ def result_card(host, reference):
                 for key in ('model_identity','mathematical_model_identity','physical_backend','scene_identity',
                     'tendon_order','physics_timestep_s') if key in raw)
             # Physics steps and model identities may live only in the saved measurement.
-            if 'physics_steps' in raw:
+            if 'physics_steps' in raw and (value.get('actual_resource_consumption') or {}).get('physics_steps') is None:
                 resources.append(ResourceUse(name='physics_steps',amount=raw['physics_steps'],
                     unit='steps',source=_location(raw_ref,'/physics_steps')))
     elif 'best' in value and 'candidates' in value:
