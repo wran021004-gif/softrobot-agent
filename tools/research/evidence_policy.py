@@ -302,7 +302,12 @@ def admit_decision(host,plan):
     if plan.control_search:actual=plan.control_search.candidate
     if plan.physical_replay:actual=plan.physical_replay.candidate
     if actual is not None and plain(d.selected_candidate)!=plain(actual):raise ValueError('DECISION_CANDIDATE_MISMATCH')
-    cfg=verify_candidate(host,d.selected_candidate)['configuration'] if d.selected_candidate else None
+    cfg=None
+    if d.selected_candidate:
+        try:cfg=verify_candidate(host,d.selected_candidate)['configuration']
+        except ValueError as exc:
+            if plan.action!='generate' or str(exc)!='OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION':raise
+            cfg=host.store.artifact(d.selected_candidate)['configuration']
     if plan.control_search and d.requested_budget!=plan.control_search.settings.evaluation_requests:
         raise ValueError('DECISION_SEARCH_BUDGET_MISMATCH')
     known=registered_references(host)

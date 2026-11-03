@@ -110,5 +110,35 @@ class HighLevelTests(unittest.TestCase):
         self.assertEqual(self.h.store.remaining(),before)
         self.assertEqual(len(preparation_view(self.h,self.c,detailed=True)['parameters']),len(view['parameter_choices']) or len(preparation_view(self.h,self.c)['parameter_choices']))
 
+    def test_profile_migration_keeps_history_readable_and_requires_explicit_reconstruction(self):
+        from tools.research.state import update
+        from tools.research.task_constraints import mathematical_method_view
+        from tools.research.nonlinear_capability import preparation_view
+        from tools.research.research_context import mechanism_direction_view
+        from tools.research.design import verify_candidate
+        from tests.research.test_cross_task_integration import plan
+        old=self.h.store.artifact(self.c)
+        update(self.h,profile={**state(self.h)['profile'],'identity':'synthetic-new-profile'})
+        with self.assertRaisesRegex(ValueError,'OLD_EVALUATION_PROFILE'):verify_candidate(self.h,self.c)
+        before=self.h.store.remaining()
+        with self.h.store.read_snapshot():
+            view=mathematical_method_view(self.h,self.c)
+            mechanism=mechanism_direction_view(self.h,self.c,view)
+            preparation=preparation_view(self.h,self.c)
+        self.assertEqual(mechanism['status'],'requires_current_profile_candidate')
+        self.assertFalse(preparation['baseline_T1_available'])
+        self.assertEqual(self.h.store.remaining(),before)
+        p=plan('generate',generation=dict(changes={}));p['decision']['selected_candidate']=self.c
+        with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=AssertionError('NO_WORKER')):
+            fresh=core.dispatch(self.h,p,'explicit-profile-reconstruction')['result']['candidate']
+        new=verify_candidate(self.h,fresh)
+        self.assertNotEqual(fresh,self.c)
+        self.assertEqual(new['configuration'],old['configuration'])
+        from extensions.tendon_family.family_space import resolved_request
+        space=state(self.h)['spec']['family_space']
+        self.assertEqual(resolved_request(space,new['parameters']),resolved_request(space,old['parameters']))
+        self.assertFalse(preparation_view(self.h,fresh)['baseline_T1_available'])
+        self.assertFalse(state(self.h)['analysis_results'])
+
 
 if __name__=='__main__':unittest.main()

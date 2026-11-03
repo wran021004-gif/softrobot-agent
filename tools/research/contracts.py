@@ -415,7 +415,7 @@ class StructureSearchEffort(Contract):
 
 class ScientificGeneration(Contract):
     """An explicit physical edit of the selected parent; no automatic experiment."""
-    changes: dict[str,FiniteFloat] = Field(min_length=1,max_length=8,description='Registered physical parameter IDs mapped to absolute values in their declared SI units. Copy all other parent parameters exactly. The selected parent is decision.selected_candidate.')
+    changes: dict[str,FiniteFloat] = Field(max_length=8,description='Registered physical parameter IDs mapped to absolute SI values. Copy all other parent fields exactly. Empty explicitly reconstructs the unchanged selected parent at the current implementation; old results and acceptance do not transfer. Parent is decision.selected_candidate.')
 
 
 class ScientificStructureSearch(Contract):

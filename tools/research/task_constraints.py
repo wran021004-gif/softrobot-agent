@@ -62,7 +62,15 @@ def selected_operating_point_guidance(host, reference, method, detail):
     from tools.research.state import state
     from tools.research.numerics import native_point, execution_update
     from tools.research.design import verify_candidate
-    s=state(host);cfg=verify_candidate(host,reference)['configuration']
+    s=state(host)
+    try:cfg=verify_candidate(host,reference)['configuration']
+    except ValueError as exc:
+        if str(exc)!='OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION':raise
+        return dict(method=method,operating_points=[],saved_sources=[],available_source_references=[],
+            unavailable_sources=[str(exc)],source_selection_rule='Historical state/control evidence grants no current-profile execution permission.',
+            nonzero_state_status='requires_current_profile_candidate',
+            preparation=dict(tool='research_plan',action='generate',decision=dict(selected_candidate=reference),generation=dict(changes={})),
+            details_query=dict(reference=reference,view='full',pointer='/parameters'))
     if cfg['task'].get('physical_problem'):
         return dict(method=method,operating_points=[dict(name='re_equilibrated',meaning='Solve the frozen unilateral assembly under the selected load; no active input.')],
             saved_sources=[],unavailable=[],load_conditions=[x['name'] for x in cfg['task']['physical_problem']['loads']],
@@ -162,6 +170,7 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
     from tools.research.config import frozen_analysis_protocol
     protocol=frozen_analysis_protocol(spec,c)
     remaining=mathematical_remaining(spec,s.get('mathematical_evaluations',0))
+    readiness.setdefault('remaining_evaluations',remaining)
     rows=analysis_capabilities(cfg,requirements,protocol,
         remaining_evaluations=remaining,mathematical_methods={CONIC:spec.get('mathematical_methods',{}).get(CONIC),
             SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})

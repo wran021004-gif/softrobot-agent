@@ -28,10 +28,17 @@ def compile_generation(host, value):
         raise ValueError('SCIENTIFIC_GENERATION_REQUIRES_V4')
     parent=(value.get('decision') or {}).get('selected_candidate')
     if not parent:raise ValueError('PHYSICAL_CHANGES_REQUIRE_SELECTED_PARENT')
-    candidate=verify_candidate(host,parent);space=s['spec']['family_space']
+    try:candidate=verify_candidate(host,parent)
+    except ValueError as exc:
+        if str(exc)!='OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION':raise
+        # verify_candidate already checked ownership and the exact saved
+        # configuration. This parent is read-only lineage, never an executable
+        # candidate or transferable result. The original constructor owns the new profile.
+        candidate=host.store.artifact(parent)
+    space=s['spec']['family_space']
     q=ScientificGeneration.model_validate(value['generation'])
     rows={r['parameter_id']:r for r in family_analysis_parameters(s['spec'],candidate)}
-    params=resolved_request(space,candidate['parameters'])
+    params=resolved_request(space,candidate['parameters']) if q.changes else deepcopy(candidate['parameters'])
     for path,new in q.changes.items():
         row=rows.get(path)
         if not row or '*' in path or row['category'] in ('controller','discretization') or not row['effective_in_current_execution'] or not row['continuous_perturbation']:

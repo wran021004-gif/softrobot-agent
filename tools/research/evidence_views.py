@@ -647,6 +647,8 @@ def bottleneck_diagnosis(host, reference, *, detailed=False):
     else:missing.append('No completed Native control search for this exact candidate and condition.')
     explanations.append(dict(status='unresolved',reason='Saved finite search and local mechanisms do not distinguish global structural infeasibility from unexplored controls.'))
     return dict(version='structure_control_diagnosis_v1',candidate=candidate,
+        candidate_profile_current=(record['profile_identity']==s.get('profile',{}).get('identity')) if record.get('profile_identity') else None,
+        selected_result_implementation_current=(value.get('implementation')==s.get('freeze')) if chosen else None,
         condition_id=record.get('condition_id') or next((r['condition_id'] for r in s['spec'].get('task_conditions',[]) if record.get('task_identity')==digest(r['task'])),None),
         task_identity=digest(cfg['task']),selected_result=chosen[0] if chosen else None,
         control_search=facts,mechanisms=mechanism_facts[-3:],explanations=explanations,missing_evidence=missing,

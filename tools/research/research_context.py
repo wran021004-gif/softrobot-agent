@@ -1798,7 +1798,17 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
             directions[ref['artifact_id']]=(ref,raw)
     own=[(ref,raw) for ref,raw in directions.values() if ref in s.get('analysis_results',[]) and raw.get('candidate')==candidate]
     latest=own[-1][0] if own else None
-    current=verify_candidate(host,candidate);origin_plan=current.get('provenance',{}).get('plan')
+    try:current=verify_candidate(host,candidate)
+    except ValueError as exc:
+        if str(exc)!='OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION':raise
+        current=host.store.artifact(candidate)
+        result=discovery(s['spec'],current,candidate,method_detail=view['methods'].get(METHOD),
+            remaining_evaluations=view['remaining_evaluations'],execution_block=str(exc))
+        result.update(status='requires_current_profile_candidate',historical_only=True,
+            preparation=dict(tool='research_plan',action='generate',decision=dict(selected_candidate=candidate),generation=dict(changes={})),
+            details_query=dict(reference=candidate,view='full',pointer='/parameters'))
+        return result
+    origin_plan=current.get('provenance',{}).get('plan')
     cited=[];generated=[];adopted=[];relations=[]
     for plan_ref in s.get('plans',[]):
         plan=host.store.artifact(plan_ref).get('original_plan',{})
@@ -1807,9 +1817,9 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
             item=directions.get(ref['artifact_id'])
             if item is None or not (ref==latest or plan_ref==origin_plan):continue
             _,raw=item
-            source=(verify_candidate(host,raw['candidate']) if ref in s.get('analysis_results',[]) else host.store.artifact(raw['candidate']))
+            source=host.store.artifact(raw['candidate'])
             children=[r for r in s['candidates'].values() if host.store.artifact(r).get('provenance',{}).get('plan')==plan_ref]
-            matches=[r for r in children if matches_direction(s['spec'],source,verify_candidate(host,r),raw['structure_research']['structure_direction'])]
+            matches=[r for r in children if matches_direction(s['spec'],source,host.store.artifact(r),raw['structure_research']['structure_direction'])]
             cited.append(plan_ref);generated.extend(children);adopted.extend(matches)
             relations.append(dict(direction_source=dict(reference=ref,pointer='/structure_research/structure_direction'),
                 direction_candidate=raw['candidate'],relation='current_candidate_direction' if ref==latest else 'historical_parent_direction',

@@ -277,10 +277,23 @@ def preparation_view(host, reference, *, detailed=False, paths=None, step_fracti
     from tools.research.optimal_capability import family_analysis_parameters
     from extensions.tendon_family.family_space import resolved_request
     s=state(host);anchor=host.store.artifact(reference);candidate=anchor.get('candidate') or reference
-    c=verify_candidate(host,candidate);spec=s['spec']
+    spec=s['spec']
+    try:c=verify_candidate(host,candidate)
+    except ValueError as exc:
+        if str(exc)!='OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION':raise
+        return dict(status='requires_current_profile_candidate',candidate=candidate,historical_only=True,
+            baseline_T1_available=False,excluded_historical_or_incomplete_T1=sum(
+                host.store.artifact(ref,paths=('candidate','nonlinear_capability.method')).get('candidate')==candidate
+                for ref in s.get('analysis_results',[])),parameters=[],parameter_choices=[],executable_T2_count=0,
+            aggregation_mathematical_evaluations=1,new_rollouts_for_aggregation=0,
+            missing=[str(exc),'new_current_implementation_matching_T1'],
+            preparation=dict(tool='research_plan',action='generate',decision=dict(selected_candidate=candidate),generation=dict(changes={})),
+            detail_query=dict(reference=candidate,view='full',pointer='/parameters'),
+            scope='Historical evidence remains readable. Main may explicitly reconstruct the unchanged physical parent; old T1 and acceptance never become current-profile evidence.')
     prepared=candidate_responses(host,candidate);base=resolved_request(spec['family_space'],c['parameters'])
     inventory=[]
     for ref in s['candidates'].values():
+        if host.store.artifact(ref,paths=('profile_identity',)).get('profile_identity')!=s['profile']['identity']:continue
         other=verify_candidate(host,ref)
         if other['configuration']['task']!=c['configuration']['task']:continue
         inventory.append((ref,resolved_request(spec['family_space'],other['parameters'])))

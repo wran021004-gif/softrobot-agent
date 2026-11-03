@@ -34,15 +34,15 @@ class ControlMechanismScopeTests(unittest.TestCase):
             schema=reference_schema(question_schema(state(h)['spec'],h.store.artifact(c),'control_feasibility'),{'evidence_start':source},'analysis')
             raw=dict(version='scientific_question_v4',domain='control',control=dict(question_type='control_feasibility',
                 effect_semantics='reoptimized_task_capability',numerical_method='mujoco_direct_control_v1',
-                control_scope=dict(mode='full_task'),control_search_effort={**EFFORT,'iterations':0},source_selection=dict(control_source='evidence_start')))
+                control_scope=dict(mode='full_task'),control_search_effort=dict(resolution='coarse',exploration='broad',evaluation_requests=0),source_selection=dict(control_source='evidence_start')))
             expanded=expand_references(raw,schema)
             self.assertEqual(expanded['control']['source_selection']['control_source'],source)
             self.assertEqual(raw['control']['source_selection']['control_source'],'evidence_start')
             rejected=compile_question(h,expanded,tool_use_id='invalid-effort-field')
             self.assertEqual(rejected['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
-            self.assertIn('iterations',str(rejected['issues']))
+            self.assertIn('evaluation_requests',str(rejected['issues']))
             self.assertNotIn('64',str(rejected['issues']))
-            expanded['control']['control_search_effort']['iterations']=8
+            expanded['control']['control_search_effort']['evaluation_requests']=24
             self.assertEqual(compile_question(h,expanded,tool_use_id='valid-aliased-control')['status'],'ready')
             self.assertEqual(state(h)['mathematical_evaluations'],0)
 
@@ -72,16 +72,17 @@ class ControlMechanismScopeTests(unittest.TestCase):
             c=generate(h);source=seed_control(h,ControlSeedRequest(candidate=c,tensions_n=[[3.]*4]))['source'];diagnose(h,c,'scientific_question')
             self.assertEqual(h.store.artifact(source)['trajectory']['tensions_n'][0],[3.]*4)
             with self.assertRaises(ValueError):seed_control(h,ControlSeedRequest(candidate=c,tensions_n=[[9.]*4]))
+            effort=dict(resolution='coarse',exploration='broad',evaluation_requests=24)
             q=dict(version='scientific_question_v4',domain='control',control=dict(
                 effect_semantics='reoptimized_task_capability',numerical_method='mujoco_direct_control_v1',
-                control_scope=dict(mode='full_task'),control_search_effort=EFFORT,source_selection=dict(control_source=source)))
+                control_scope=dict(mode='full_task'),control_search_effort=effort,source_selection=dict(control_source=source)))
             compiled=compile_question(h,q,tool_use_id='wide-v4')
             self.assertEqual(compiled['status'],'ready',compiled)
             settings=compiled['request']['control_optimization']['settings']
-            self.assertEqual((settings['coefficient_limit_n'],settings['initial_radius_n']),(8.,4.))
+            self.assertEqual((settings['coefficient_limit_n'],settings['initial_radius_n']),(8.,2.))
             schema=selected_question_schema(h)
-            self.assertIn('coefficient_limit_n',str(schema));self.assertIn('initial_radius_n',str(schema))
-            batch=compile_search(h,fixtures.proposal(control_search_effort=EFFORT),'wide-batch')
+            self.assertEqual(set(schema['$defs']['ScientificControlEffort']['properties']),{'resolution','exploration','evaluation_requests'})
+            batch=compile_search(h,fixtures.proposal(control_search_effort=effort),'wide-batch')
             self.assertEqual(batch['search']['control_settings'],settings)
             self.assertEqual(state(h)['mathematical_evaluations'],0)
 
@@ -102,7 +103,7 @@ class ControlMechanismScopeTests(unittest.TestCase):
             raw=dict(requested_operation=dict(control_optimization=dict(settings=plain(settings))),
                 binding=dict(tension_bounds_n=[[0.,8.]]*n),native_dynamics=dict(original_schedule=src,
                     optimized_schedule=sources[out['best']['reference']],optimization=out))
-            domain=native_control_domain(raw)
+            domain=native_control_domain(raw,detailed=True)
             self.assertGreater(max(row[1] for row in domain['recorded_schedule_range_n']),2.2)
             self.assertEqual(domain['settings']['coefficient_limit_n'],8.)
             self.assertIn('not joint control-space coverage',domain['scope'])
