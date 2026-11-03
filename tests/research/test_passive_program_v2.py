@@ -228,7 +228,8 @@ class PassiveProgramTests(unittest.TestCase):
         self.assertEqual(second['acceptance']['status'],'valid_failure',second['acceptance'])
         self.assertEqual(raw['cost']['integration_state_restores'],1)
         self.assertEqual(raw['initial_state_result'],first['reference'])
-        self.assertEqual(raw['episodes'][0]['engine_origin_s'],.1)
+        source_raw=h.store.artifact(first['raw_reference'])
+        self.assertEqual(raw['episodes'][0]['engine_origin_s'],source_raw['episodes'][0]['qualified_state']['time_s'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
         cfg=h.store.artifact(c)['configuration']
         with self.assertRaisesRegex(ValueError,'CURRENT_OWNED'):
