@@ -42,12 +42,13 @@ def configuration_v2():
     return cfg
 
 
-def prepared_host_v2():
+def prepared_host_v2(*,failure=False):
     from tools.research import core
     from tools.research.state import state,save,update
     from tools.state_io import digest
     name='u3-wire-'+uuid4().hex[:10];cfg=json.loads((ROOT/'configs/research/study_passive_engineering_v1.json').read_text())
     task=configuration_v2()['task'];source=dict(version='u3_small_engineering_protocol',scope='Bounded zero-gravity test only; not a PHS/P3 substitute')
+    if failure:task['evaluator']['parameters']['data']['bounds'][0]['maximum']=1e-9
     task['goal']['data']['protocol_source']=dict(artifact_id=digest(source))
     task_path=ROOT/'tasks'/('._'+name+'.json');study_path=ROOT/'configs/research'/('._'+name+'.json')
     cfg.update(study_id=name,evidence_destination='runs/'+name,task='../../tasks/'+task_path.name,mode='formal_research')
@@ -214,6 +215,24 @@ class PassiveProgramTests(unittest.TestCase):
         self.assertEqual(result['status'],'computed',result.get('reason'))
         execution=result['structure_research']['records'][0]['mechanics']['dynamic_execution']
         self.assertEqual(execution['cost']['physics_steps'],1000);self.assertEqual(execution['model_builds'],2)
+
+    def test_saved_state_reference_reaches_original_worker(self):
+        from tools.research.physical_replay import dispatch,resolve_passive_state
+        from tools.research.contracts import PhysicalReplayRequest
+        from tools.research.state import state
+        h,c=prepared_host_v2(failure=True)
+        with patch('tools.research.physical_replay.guard'):
+            first=dispatch(h,PhysicalReplayRequest(candidate=c),'saved-state-source')
+            second=dispatch(h,PhysicalReplayRequest(candidate=c,initial_state_result=first['reference'],initial_state_episode='lateral'),'saved-state-target')
+        raw=h.store.artifact(second['raw_reference'])
+        self.assertEqual(second['acceptance']['status'],'valid_failure',second['acceptance'])
+        self.assertEqual(raw['cost']['integration_state_restores'],1)
+        self.assertEqual(raw['initial_state_result'],first['reference'])
+        self.assertEqual(raw['episodes'][0]['engine_origin_s'],.1)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],2)
+        cfg=h.store.artifact(c)['configuration']
+        with self.assertRaisesRegex(ValueError,'CURRENT_OWNED'):
+            resolve_passive_state(h.store,h.run_id,c,cfg,dict(initial_state_result=plain(self.ref),initial_state_episode='lateral'))
 
 
 if __name__=='__main__':unittest.main()

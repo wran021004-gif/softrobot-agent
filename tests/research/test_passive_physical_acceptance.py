@@ -272,6 +272,10 @@ class PassiveAcceptanceTests(unittest.TestCase):
         from tests.research.test_constrained_mechanics import physical_fixture
         cfg=resolve(ROOT/'configs/research/study_s125_cold.json')['configuration']
         cfg['task'].update(physical_problem=physical_fixture()[-1],actuator_channels=[])
+        # The intended fixture is an unregistered passive task. Retaining the
+        # active robot/controller instead tests the separate mixed-physics guard.
+        cfg['robot']['structure']['data']['actuators']=[];cfg['robot']['channels']=[]
+        cfg['policy']['controller']=resolve(CONFIG)['configuration']['policy']['controller']
         a=task_adapter(cfg)
         self.assertEqual(a.execution_requirements()['registered_acceptance'],'not_registered')
         self.assertFalse(a.ppo_applicability()['supported'])
