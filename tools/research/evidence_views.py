@@ -62,14 +62,33 @@ def acceptance_certificate(host, reference):
             raw.get('profile',{}).get('task')!=cfg['task']):issues.append('ACCEPTANCE_SOURCE_BINDING_MISMATCH')
     if not issues:
         if raw.get('route')=='passive_protocol':
-            from tools.research.physical_replay import evaluate_playback
+            from tools.research.physical_replay import evaluate_playback,passive_source
             from extensions.tendon_family.passive_execution import source_binding
             source=host.store.artifact(raw['source_reference'])
             simulation=host.store.artifact(raw['raw_reference'])
-            expected=dict(**source_binding(cfg),candidate=raw['candidate'])
-            if (source!=expected or simulation.get('physical_binding')!={k:v for k,v in expected.items() if k!='candidate'} or
+            expected=passive_source(cfg,raw['candidate'],source.get('execution',{}))
+            if (source!=expected or simulation.get('physical_binding')!=source_binding(cfg) or
                     raw.get('model_identity')!=expected['model_identity'] or raw.get('design_identity')!=expected['design_identity']):
                 issues.append('PASSIVE_PHYSICAL_SOURCE_BINDING_MISMATCH')
+            if simulation.get('kind')=='passive_dynamic_execution_v2':
+                from extensions.tendon_family.passive_execution import baseline_arm
+                import hashlib
+                l2=raw.get('passive_l2',{});pair=simulation.get('paired_ablation') or {}
+                for arm,native in pair.get('arm_receipts',{}).items():
+                    links=l2.get('arms',{}).get(arm,{})
+                    leaf=baseline_arm(simulation) if arm=='baseline' else pair['ablation']
+                    if not links:issues.append('PAIRED_ARM_STORE_RECEIPT_MISSING');continue
+                    receipt=host.store.artifact(links['receipt_reference'])
+                    if (host.store.artifact(links['raw_reference'])!=leaf or receipt.get('raw_reference')!=links['raw_reference']
+                            or any(receipt.get(k)!=v for k,v in native.items()) or receipt.get('owning_study')!=raw['owning_study']
+                            or receipt.get('parent_request_id')!=raw['request_id'] or receipt.get('parent_boundary')!=raw['boundary']):
+                        issues.append('PAIRED_ARM_STORE_RECEIPT_MISMATCH')
+                manifests=simulation.get('trace_files',[])
+                if len(l2.get('traces',[]))!=len(manifests):issues.append('PASSIVE_TRACE_STORE_MANIFEST_MISSING')
+                for original,trace in zip(manifests,l2.get('traces',[])):
+                    body=host.store.artifact(trace['reference'],raw=True)
+                    if any(trace.get(k)!=v for k,v in original.items()) or hashlib.sha256(body).hexdigest()!=trace['sha256'] or len(body)!=trace['bytes']:
+                        issues.append('PASSIVE_TRACE_STORE_BINDING_MISMATCH')
             replayed,profile=evaluate_playback(cfg,simulation,raw['raw_reference'],
                 digest(dict(candidate=raw['candidate'],source=raw['source_reference'])))
             profile.update(execution_id=raw['execution_id'],simulation=raw['raw_reference'],evaluation=raw['evaluation_reference'])
