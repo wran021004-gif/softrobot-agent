@@ -25,6 +25,20 @@ EFFORT=dict(method='pattern',evaluation_requests=24,iterations=8,knot_count=2,co
 
 
 class ControlMechanismScopeTests(unittest.TestCase):
+    def test_high_level_effort_preserves_exact_frozen_deadline(self):
+        from tools.research.contracts import LocalControlSearchSettings
+        spec=config.resolve(config.ROOT/'configs/research/study_multicondition_public.json')
+        before=deepcopy(spec)
+        settings=control_settings(spec,dict(resolution='coarse',exploration='local_refinement',evaluation_requests=1),
+            channels=6,physical_limit_n=8.)
+        deadline=spec['analysis_protocol']['duration_s']
+        self.assertEqual(settings.knots_s[-1],deadline)
+        self.assertEqual(LocalControlSearchSettings.model_validate(plain(settings)),settings)
+        self.assertEqual(spec,before)
+        invalid={**plain(settings),'knots_s':[0.,.18,.35000000000000003]}
+        with self.assertRaisesRegex(ValueError,'ORDERED_V2_CORRECTION_WINDOW_REQUIRED'):
+            LocalControlSearchSettings.model_validate(invalid)
+
     def test_reference_alias_expansion_survives_unrelated_invalid_scientific_field(self):
         from tools.research.object_choices import reference_schema,expand_references
         from tools.research.scientific_intent import question_schema

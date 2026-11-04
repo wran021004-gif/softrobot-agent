@@ -335,6 +335,8 @@ def control_settings(spec, effort, *, window=None, channels=None, physical_limit
             n={'coarse':3,'moderate':5,'fine':9,'very_fine':17}[q.resolution]
             grid=[a+(b-a)*i/(n-1) for i in range(n)]
             if window is None:grid=[round(t/period)*period for t in grid]
+            # Grid multiplication must not move the frozen window boundary.
+            grid[0],grid[-1]=a,b
         maximum=min(64,spec.get('native_control_limits',{}).get('knots_s',64))
         if n>maximum:raise ValueError('REQUESTED_RESOLUTION_EXCEEDS_FROZEN_KNOT_GRANT')
         # Whole-task knots use the actual frozen control samples. An explicit
