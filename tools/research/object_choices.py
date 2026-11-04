@@ -275,7 +275,8 @@ def main_packet(host, packet):
         row['facts_at']='research.scientific_results (result '+row['choice']+')'
     for row in value.get('saved_object_choices',[]):
         row.pop('reference',None)
-    # Repeated numeric summaries in latest/trace/feedback are already durable.
+    # Keep one current-packet owner for the latest numerical card. A past wire
+    # receipt is not current context after a handoff drops the old conversation.
     latest=(research.get('mathematical_research') or {}).get('latest_result') or {}
     if latest.get('structure_research'):
         reference=latest['reference']
@@ -285,25 +286,6 @@ def main_packet(host, packet):
         research['verified_facts']=[f for f in research.get('verified_facts',[]) if
             f.get('result_reference')!=reference and (f.get('source') or {}).get('reference')!=reference]
         research['verified_facts'].append(dict(result_reference=reference,facts_at='mathematical_research.latest_result'))
-        # Reuse the existing confirmed request receipts to distinguish first
-        # delivery from later unchanged turns; no extra delivery state is saved.
-        events=host.store.events(host.run_id)
-        requests={e['request_id']:e for e in events if e['kind']=='r3_request'}
-        for event in reversed(events):
-            if event['kind']!='r3_response':continue
-            receipt=host.store.artifact(event['outputs'][0])
-            if receipt.get('purpose')!='conversation' or receipt.get('http_status')!=200:continue
-            request=requests[event['request_id']]
-            wire=host.store.artifact(host.store.artifact(request['outputs'][0])['request'])
-            tail=wire['messages'][-1].get('content','')
-            prior=json.loads(tail.split('\n',1)[1]) if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n') else {}
-            prior_latest=((prior.get('research',{}).get('mathematical_research') or {}).get('latest_result') or {})
-            alias=next(k for k,v in reference_choices(host,include_all=True).items() if v==reference)
-            if prior_latest.get('reference') in (reference,alias):
-                research['mathematical_research']['latest_result']={k:latest[k] for k in
-                    ('reference','operation','status','conclusion','task_acceptance','detail_query') if k in latest}
-                research['mathematical_research']['latest_result']['direction_status']=latest['structure_research']['direction_status']
-            break
     continuation=research.get('tool_continuation') or {}
     if continuation.get('pending_feedback'):
         from tools.research.session_handoff import main_feedback_projection

@@ -290,5 +290,13 @@ class C1BridgeTests(unittest.TestCase):
         self.assertFalse(state(h).get('physical_replays'))
         atomic_json(Path(__file__).resolve().parents[2]/'runs/c11_validation/synthetic_wire.json',
             dict(scope='Synthetic SDK/Mock HTTP evidence, no engine or Provider',wire=wires[-1]))
-        again=packet(run_fixture(h,[None])[-1])['mathematical_research']['latest_result']
-        self.assertNotIn('structure_research',again)
+        # A successful old delivery is not memory after stateless handoff.
+        # Ordinary intervening reads must not remove the current fact owner.
+        later=run_fixture(h,[('evidence_read',dict(subject='current_task',topic='task')),None])
+        again=packet(later[-1])['mathematical_research']['latest_result']
+        self.assertEqual(again['structure_research']['candidate_improvement_status'],compact['candidate_improvement_status'])
+        self.assertEqual(again['structure_research']['baseline'],compact['baseline'])
+        self.assertEqual(again['structure_research']['generation_handoff'],compact['generation_handoff'])
+        self.assertEqual(again['task_acceptance'],'unmeasured')
+        self.assertEqual(state(h)['mathematical_evaluations'],5)
+        self.assertEqual(len(state(h)['candidates']),1)
