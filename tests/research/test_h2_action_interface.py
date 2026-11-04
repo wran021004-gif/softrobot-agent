@@ -86,8 +86,9 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertIn('at root',reply['expected']);self.assertIn('physical_replay',reply['expected'])
         self.assertFalse(reply['scientific_execution_started']);self.assertEqual(q,original)
         nested=deepcopy(q);nested.pop('selected_candidate');nested['physical_replay']['unknown_option']=1
-        error=next(e for e in Draft202012Validator(schema).iter_errors(nested)
-            if e.validator=='additionalProperties' and list(e.absolute_path)==['physical_replay'])
+        errors=list(Draft202012Validator(schema).iter_errors(nested))
+        for issue in errors:errors.extend(issue.context)
+        error=next(e for e in errors if e.validator=='additionalProperties' and list(e.absolute_path)==['physical_replay'])
         reply=agent.error_feedback(h,dict(name='research_plan',input=nested,toolUseId='offline-replay-nested'),error,before)
         self.assertEqual(reply['field'],'physical_replay.unknown_option')
         self.assertIn('at physical_replay',reply['expected'])
