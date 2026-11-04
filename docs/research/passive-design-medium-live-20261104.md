@@ -165,3 +165,13 @@ Main 175、185 各尝试一次同协议等价重放，均在 Worker 前拒绝，
 本边界为 Main 191 / Reporter 12，Provider 203、3950381 tokens；数学扣记 166 / 实际评价尝试 154；候选 12 / 独立 Replay 9；全部真实 build 165 / episode 启动 165 / 完成 160 / 积分 80500 步，backend 原扣记 177。4432 个 artifact 哈希通过，无 pending、未封口调用、未消费响应、未知 Worker 或占用。所有独立结果仍未通过冻结阈值，未 SELECT 或 Main STOP；下一结构建议和更广域性能仍未独立验证。
 
 Provider 在有效进展后依次 +8 至 200、208、216；现为 `203/216`，含原 4 次收尾。公共操作保持 `240/320`、原收尾 8；未再次增加或重置公共额度。增补后 identity 为 `ba6866aca3bdef6f7563a9592fcec61aea74e8926b5d348599d45ae840387c48`。科学 profile、精确参数授权、数学/分析/共享物理累计 null、单 Worker / 单问题合同与原接受门禁均不变。按用户持续授权继续有限监督窗口，仅为有效科研动作续费。
+
+## Main 199 增补：第十次 Replay 与路由 Schema 一致性修复
+
+Main 192 生成第十三候选，195 更正 diagnose 的非法根字段后通过；199 一次合法提交并完成第十次独立 Replay，仍为 valid_failure。唯一候选合同修复后，七次新 Replay 首次提交合法；diagnose 的模型根字段错误仍未消失，没有自动删除或搬移输入。
+
+Main 196 暴露一个不同的真实接口问题：实际 research_route 请求 `tool=research_analysis, action=research_analysis` 通过当次 SDK 广告 Schema，却被原执行器以 TOOL_ROUTE_ACTION_REQUIRED_OR_UNAVAILABLE 拒绝。197 省略 action 后通过。原路由 Schema 只限定 tool，没有表达目录中各工具的 action 依赖。3d2e0c9 从同一现有 tool_directory 派生条件 Schema：有 actions 的入口必须提供目录内 action；没有 actions 的入口可省略或为 null。执行器、Registry、科学 Plan、物理和预算均未改变，不过滤错误字段。
+
+在已有 SDK Mock 路由加载/复用测试中加入实际 wire Schema 断言，旧实现在“只读工具带 diagnose”处失败，修复后通过。共 10 项定向离线回归通过，覆盖路由加载复用与保护态、原监督结算、已有选择器规则；没有真实 Provider。下一真实窗口仍需核对实际发送 Schema，不能把广告修正当作模型必然遵循的保证。
+
+本边界 Main 199 / Reporter 12，Provider `211/216`、4135628 tokens；公共操作 `248/320`；数学扣记 166 / 实际评价尝试 154；候选 13 / Replay 10；全部实际 build 166 / episode 启动 166 / 完成 161 / 积分 81000 步，backend 原扣记 178。4601 个 artifact 哈希通过，无 pending、未封口调用、未消费响应、未知 Worker 或占用。没有 SELECT 或 Main STOP。按持续授权，在发布和绑定修复后可为这一新独立证据追加有限 +8 Provider 并继续四次 Main 内监督；数学、分析与共享物理累计 null、所有历史费用及冻结接受门禁保持不变。
