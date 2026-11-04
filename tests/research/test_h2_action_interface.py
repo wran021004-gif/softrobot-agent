@@ -233,7 +233,13 @@ class H2ActionInterfaceTests(unittest.TestCase):
             family_version=spec['family_space']['version'],focused=True,study=spec),reference_choices(h,include_all=True)))
         wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),('research_plan',q),None])
         actual=next(t['function']['parameters'] for t in wires[1]['tools'] if t['function']['name']=='research_plan')
-        self.assertEqual(actual,expected)
+        # The SDK adds property descriptions. Compare every executable constraint
+        # while allowing that documented annotation-only serialization step.
+        def constraints(node):
+            if isinstance(node,list):return [constraints(x) for x in node]
+            if isinstance(node,dict):return {k:constraints(v) for k,v in node.items() if k not in ('description','title')}
+            return node
+        self.assertEqual(constraints(actual),constraints(expected))
         self.assertNotIn('selected_candidate',actual['properties'])
         self.assertNotIn('research_intent',actual['$defs']['ResearchDecision']['properties'])
         self.assertNotIn('selected_method',actual['$defs']['ResearchDecision']['required'])

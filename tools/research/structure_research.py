@@ -27,12 +27,13 @@ def parameters(spec, candidate):
     from tools.research.optimal_capability import family_analysis_parameters
     rows=family_analysis_parameters(spec,candidate)
     for row in rows:
-        reason=('INPUT_FEASIBLE_SET_CHANGE_REQUIRES_SEPARATE_SEMANTICS' if row.get('input_set_changes') else
+        method_reason=('INPUT_FEASIBLE_SET_CHANGE_REQUIRES_SEPARATE_SEMANTICS' if row.get('input_set_changes') else
             'CONTROLLER_OR_NUMERICAL_PARAMETER_NOT_PHYSICAL_STRUCTURE' if row['category'] in ('controller','discretization') else
             'DISCRETE_PARAMETER_REQUIRES_COMPARISON' if row['data_type']!='number' else
-            row['analysis_reason'] if not row['continuous_perturbation'] or not row['effective_in_current_execution'] else
-            'ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED' if not row['study_authorized'] else None)
+            row['analysis_reason'] if not row['continuous_perturbation'] or not row['effective_in_current_execution'] else None)
+        reason=method_reason or ('ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED' if not row['study_authorized'] else None)
         row['mechanism_differentiation']=dict(supported=reason is None,reason=reason,
+            method_supported=method_reason is None,study_authorized=row['study_authorized'],working_point_admission='not_checked',
             method='normalized_two_scale_native_finite_difference' if reason is None else None)
     return rows
 
