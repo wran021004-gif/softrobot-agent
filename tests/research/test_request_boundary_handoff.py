@@ -442,6 +442,26 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         self.assertFalse(any(e['kind']=='model_original_turn' for e in events))
         self.assertFalse(state(h)['pending'])
 
+    def test_request_limit_review_reads_budget_without_rebuilding_scientific_packet(self):
+        from tools.research import agent
+        from tools.research.budget import decision_budget
+        h=self.provision();sent=[];packet=agent.decision_packet
+        def only_before_request(host):
+            if host.store.remaining()['used']['model_calls']>=1:
+                raise AssertionError('SETTLED_REVIEW_MUST_NOT_REBUILD_SCIENTIFIC_PACKET')
+            return packet(host)
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('tools.research.agent.decision_packet',side_effect=only_before_request),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+        self.assertEqual(len(sent),1)
+        pause=h.store.artifact(next(e['outputs'][0] for e in h.store.events(h.run_id) if e['kind']=='supervisor_pause'))
+        self.assertEqual(pause['boundary'],'request_feedback');self.assertFalse(pause['next_request_sent'])
+        self.assertEqual(pause['budget'],decision_budget(h))
+        self.assertEqual(pause['budget_source'],'tools.research.budget.decision_budget')
+        self.assertFalse(state(h)['pending']);self.assertFalse(state(h)['pilot'].get('unconsumed_response'))
+
     def test_failed_snapshot_verification_keeps_old_pointer_and_no_next_send(self):
         h=self.provision();original=state(h)['pilot']['framework_session_id'];sent=[]
         async def interrupted(*args,**kwargs):
