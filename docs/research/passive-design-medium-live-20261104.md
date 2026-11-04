@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04，含 Main 94 增补）
+# 被动自主科研与接口监督进展（2026-11-04，含 Main 112 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -117,3 +117,11 @@ Main 94 为 Main 94 / Reporter 5、Provider `99/104`、1634147 tokens；数学�
 另一次合同核查确认普通 physical_replay 分支有机械重复：L0 提示候选会自动绑定，SDK 的 bind_plan_selection 却漏了该分支，原 admit_decision 又要求 decision.selected_candidate 匹配 payload 候选。`bbeee70` 复用既有选择器绑定，仅将该 action 纳入现有候选字段投影，并从 physical_replay.candidate 确定性补齐 canonical decision。Main 只需一个候选位置；保存结果选择器 result_choice 仍由原 expand_choice 解析。没有接受非法根字段、删除错误输入或改写科学授权；旧输入的互相矛盾引用仍拒绝。该修复消除可证实的重复负担，不宣称已解释或根治模型的根字段复发。
 
 新增单候选/输入不变/冲突与根字段拒绝测试先在旧实现失败，修复后原选择器类 7 项通过。另 4 项定向回归全部通过：实际 SDK Mock 单候选成对被动 v2 Replay 与原 Worker/receipts/证书/SELECT/STOP、保存数学结果的 Replay 选择器及原证书关闭、各 action 的确定性意图绑定、未知根层与嵌套字段的精确拒绝。这些是已有 Mock 与冻结工程 fixture，不发送真实 Provider；不计作自主 Study 科研结果。验证后按用户持续授权继续同一 Study。
+
+## Main 112 增补：单候选 Replay 在真实 Main 一次通过
+
+绑定 bbeee70 后，核对 Provider 101 的实际 Schema：physical_replay.candidate 存在，根层及 decision 中均不提供 selected_candidate。Main 98–100 自选半轴加杨氏模量优化，先因明确上限 5 小于最低申请 11 而非执行拒绝，再明确更正为 11，真实完成 10 次评价、5000 步。后续目录读取包含合法 continuation 翻页，未误判为重复读取循环。Main 103–104 再以明确额度 20 执行同两参数的新优化，真实完成 19 次评价、9500 步；Main 106–109 读取具体结果、生成第六候选并自主选择 Replay，整个四次 Main 窗口无格式拒绝。构造事件顺序核对表明第六候选实际仍只改变 semi_y_m，未把被考察但未采用的杨氏模量算作结构变化。
+
+Main 110（Provider 116）首次提交即合法完成第四次独立 Replay。实际原请求根层及 decision 均无 selected_candidate，只有 physical_replay.candidate；原绑定函数补齐 canonical decision，未删除任何输入字段。结果有效、完整、无接触，位移约 `6.7234e-5 m`，较上一独立结果下降约 19.3%，仍高于冻结 `1e-9 m` 阈值，故为 valid_failure。这个具体真实请求验证了唯一候选合同，不能据此宣称所有模型根字段错误已根治。Main 111 读取新机会与参数，112 自主选择下一次 diagnose；没有 SELECT 或 Main STOP。
+
+Main 112 结算快照：Main 112 / Reporter 7、Provider `119/128`、2037603 tokens；数学账本 78 / 实际评价尝试 73；候选 6 / 独立 Replay 4；全部真实 build 79 / episode 启动 79 / 完成 74 / 积分 37500 步，backend 原扣记 84。2596 个 artifact 哈希全部通过，无 pending、未封口调用、未消费响应、未知 Worker 或占用。当前 identity 为 `8235c572face8398f6aac209b1af4a9e9843b3efaeeba49bc10a2f7ea511b0b2`，科学及接口绑定提交 `27878ae`；Provider 按有效科研进展逐次 +8 至 112、120、128。原各 Study 历史成本、精确参数授权、profile、数学与共享物理累计 null 均保留；继续按四次 Main 监督窗口推进。
