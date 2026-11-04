@@ -110,6 +110,10 @@ def parameter_catalog(spec, candidate, group=None, method=None):
         methods=row['applicable_mathematical_methods']
         rows.append(dict(parameter_group=kind,parameter_id=path,physical_meaning=path.rsplit('.',1)[-1].replace('_',' '),
             physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
+            domain={k:deepcopy(row[k]) for k in ('data_type','minimum','maximum','choices') if k in row},
+            design_supported='generate' in row['supported_methods'],
+            differentiation=deepcopy(row.get('mechanism_differentiation')),
+            authorization_reason=row.get('authorization_reason'),execution_admission='not_checked',
             effective=row['effective_in_current_execution'],continuous=row['continuous_perturbation'],
             selectable=bool(legal and (method in methods if method else methods)),applicable_methods=methods,
             validity=row['analysis_reason'],study_authorized=row['study_authorized'],

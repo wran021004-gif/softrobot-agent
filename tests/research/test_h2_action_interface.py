@@ -36,7 +36,7 @@ class H2ActionInterfaceTests(unittest.TestCase):
             p=patch(target,side_effect=AssertionError('NO_REAL_PROVIDER_WORKER_OR_PHYSICS'))
             p.start();self.addCleanup(p.stop)
 
-    def host(self):return prepared_host_v2(mathematical_budget=None,physical_budget=16,mock_provider_budget=20)
+    def host(self):return prepared_host_v2(mathematical_budget=8,physical_budget=16,mock_provider_budget=20)
 
     def schema(self,h,actions):
         spec=state(h)['spec']

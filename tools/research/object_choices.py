@@ -109,6 +109,9 @@ def expand_references(payload, schema, *, strict=True):
 def bind_plan_selection(host,payload):
     """One chosen object owns repeated candidate/evidence fields in the original Plan."""
     value=deepcopy(payload);action=value['action'];candidate=None
+    if value.get('decision') is not None:
+        from tools.research.contracts import PLAN_RESEARCH_INTENTS
+        value['decision'].setdefault('research_intent',PLAN_RESEARCH_INTENTS[action])
     if action=='execute':candidate=value['candidate']
     elif action=='initialize_control':candidate=value['control_seed']['candidate']
     elif action=='control_search':candidate=value['control_search']['candidate']
@@ -336,6 +339,9 @@ def main_packet(host, packet):
 def main_tool_schema(schema, choices):
     """Shared typed reference input projection; bindings remain SDK-only."""
     schema=deepcopy(schema)
+    if 'ResearchDecision' in schema.get('$defs',{}) and 'action' in schema.get('properties',{}):
+        remove_fields(schema,('research_intent',))
+        schema['$defs']['ResearchDecision']['description']='Main chooses hypothesis, candidate and scientific variables. The host derives research_intent from the explicit Plan action before original validation.'
     if 'EvidenceRef' in schema.get('$defs',{}):
         schema['$defs']['EvidenceRef']=dict(type='string',pattern=r'^(candidate|evaluation|result|evidence)_[1-9][0-9]*$',
             description='Use the stable short reference in the research packet or an evidence response.')

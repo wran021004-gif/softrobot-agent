@@ -81,7 +81,8 @@ def resolve_evidence_intent(host, query):
         if any(k not in ids for k in selected):return _choices('REGISTERED_PARAMETER_SELECTION_REQUIRED',ids)
         if selected:rows=[r for r in rows if r['parameter_id'] in selected]
         data=rows if q.detail_level!='summary' else [{k:r[k] for k in ('parameter_group','parameter_id',
-            'physical_meaning','unit','current_value','effective','continuous','selectable','study_authorized')} for r in rows]
+            'physical_meaning','unit','current_value','domain','design_supported','differentiation','authorization_reason',
+            'execution_admission','effective','continuous','selectable','study_authorized')} for r in rows]
         source(subject,'/parameters');source(subject,'/configuration')
     elif q.topic=='task':
         if subject not in [*candidates,snapshot]:raise ValueError('FROZEN_TASK_OR_OWNED_CANDIDATE_REQUIRED')
