@@ -335,7 +335,11 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             update(host,candidates={**state(host)['candidates'],identity:ref})
         return dict(status='generated',candidate=ref,resolved=resolved,task_success=None)
     except UnsupportedGeneration as exc:
-        return dict(status='not_yet_supported',unsupported_capability=str(exc),candidate=None,task_success=None)
+        return dict(status='not_yet_supported',unsupported_capability=
+            'segment_count='+str(request.get('segment_count','omitted'))+'; tendon_count='+str(request.get('tendon_count','omitted'))+
+            '; executable_segment_counts='+str(spec['family_space']['executable_segment_counts'])+
+            '; executable_tendon_count_bounds='+str(spec['family_space']['executable_tendon_count_bounds']),
+            candidate=None,task_success=None)
     except ValueError as exc:
         diagnostic=deepcopy(getattr(exc,'diagnostic',dict(status='unavailable',reason='No structured facts captured by this check')))
         reference=save(host,dict(request=request,reason=str(exc),diagnostic=diagnostic,

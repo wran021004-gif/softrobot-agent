@@ -306,4 +306,27 @@ class H2ActionInterfaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'CONFLICTING_CANDIDATE_REFERENCES'):
             bind_plan_selection(h,dict(action='execute',candidate=c,decision=dict(selected_candidate=other)))
 
+    def test_frozen_topology_schema_does_not_advertise_invalid_legacy_default(self):
+        from extensions.tendon_family.family_space import GenerationRequestV2
+        from tools.research.design import generate_candidate
+        h,c=self.host();spec=state(h)['spec']
+        schema=main_tool_schema(agent.plan_schema(['generate'],decision_required=True,focused=True,
+            family_version=spec['family_space']['version'],study=spec),reference_choices(h,include_all=True))
+        definition=schema['$defs']['GenerationRequestV2']
+        self.assertIn('segment_count',definition['required'])
+        self.assertEqual(definition['properties']['segment_count']['enum'],[1])
+        q=rationale(None);q.update(action='generate',generation=dict(version='serial_family_generation_v2',tendon_count=1))
+        q.pop('next_research_action');q['decision']['selected_method']='generate'
+        self.assertFalse(Draft202012Validator(schema).is_valid(q))
+        q['generation']['segment_count']=1
+        Draft202012Validator(schema).validate(q)
+        legacy=GenerationRequestV2.model_validate(dict(version='serial_family_generation_v2',
+            family_space_identity=spec['family_space_identity'],tendon_count=1))
+        self.assertEqual(legacy.segment_count,2)  # Sealed legacy contract unchanged.
+        out=generate_candidate(h,legacy,dict(origin='offline_invalid_legacy_default'))
+        self.assertEqual(out['status'],'not_yet_supported')
+        self.assertIn('executable_segment_counts=[1]',out['unsupported_capability'])
+        self.assertNotIn('only two',out['unsupported_capability'])
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+
 if __name__=='__main__':unittest.main()

@@ -97,6 +97,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
                 scoped=(study or {}).get('topology_scope',{}).get(name+'s')
                 if scoped:schema['$defs'][generation]['properties'][name]['enum']=scoped
             schema['$defs'][generation]['properties']['segment_count'].setdefault('enum',space['executable_segment_counts'])
+            count=schema['$defs'][generation]['properties']['segment_count']
+            if 'default' in count and count['default'] not in count['enum']:
+                schema['$defs'][generation]['required'].append('segment_count')
+                count.pop('default')
             lower,upper=space['executable_tendon_count_bounds']
             schema['$defs'][generation]['properties']['tendon_count'].update(minimum=lower,maximum=upper)
             if space['conditional_rules']=='base_only_consecutive_spans_v1':
