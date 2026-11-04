@@ -347,7 +347,12 @@ def load_selected_tool_schema(host, registry, directory):
             selected.tool_spec={**selected.tool_spec,'inputSchema':{'json':schema}}
     router=registry['research_route'];schema=ResearchRouteQuery.model_json_schema()
     schema['properties']['tool']['enum']=[r['tool'] for r in directory]
-    schema['description']='Choose one tool and its Plan action or RL operation from tool_directory. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.'
+    schema['allOf']=[]
+    for entry in directory:
+        branch=dict(properties=dict(action=dict(enum=entry.get('actions') or [None])))
+        if entry.get('actions'):branch['required']=['action']
+        schema['allOf'].append({'if':dict(properties=dict(tool=dict(const=entry['tool']))),'then':branch})
+    schema['description']='Choose one tool from tool_directory; provide action only when that entry lists Plan actions or RL operations, otherwise omit it. Selection performs no scientific execution. The loaded tool can be reused; call research_route to switch.'
     router.tool_spec={**router.tool_spec,'inputSchema':{'json':schema}}
     retained={'research_route'}
     if selected:retained.add(name)
