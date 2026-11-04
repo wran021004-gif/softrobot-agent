@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04，含 Main 82 增补）
+# 被动自主科研与接口监督进展（2026-11-04，含 Main 94 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -105,3 +105,15 @@ Main 72–74 核对生成能力与建议，75 以唯一 changes 路径生成第�
 Main 80 再次写入非法 Plan 根层 selected_candidate，原验证拒绝且不启动 Worker；81 在下一次提交中纠正，完成第四候选独立 Replay。执行、资格、协议和无接触检查有效，独立指标约 `8.5373e-5 m`，较上一独立 Replay 的 `8.7520e-5 m` 下降约 2.45%；仍远高于冻结 `1e-9 m` 阈值，结果为 valid_failure。没有自动删字段、改协议、SELECT 或成功声明。Reporter 记录解读，Main 82 查询新机会与参数。
 
 本快照为 Main 82 / Reporter 5，Provider `87/96`、1402650 tokens；候选 4 / 独立 Replay 2；数学账本 36 / 实际数学评价尝试 34；全部真实 build 38 / episode 启动 38 / 完成 33 / 积分 17000 步，backend 原扣记 40。1889 个 artifact 哈希全部通过，无 pending、未封口调用、未消费响应、未知 Worker 或资源占用。Provider 在有效科研进展后依次 +8 至 88、96；当前 resolved identity 为 `afe79ca993c7664ab75f998774e5eb58b78df9023a4319633643b550a879f098`。科学实现沿用 `2053bc4`，其后仅追加非敏感报告；profile 和数学/共享物理 null 不变。继续执行同一 Store，并按原监督规则检查信息增益。
+
+## Main 94 增补：双半轴研究及 Replay 唯一候选绑定
+
+Main 83–84 先出现非法根层字段，再尝试同一候选、同一协议的等价 Replay；原新颖性门禁在计算前拒绝。核对 Main 83 实际 wire：当前候选明确标为 independently_evaluated=true / not_accepted，两项原 valid_failure 均可见。没有发现这次重复由结果丢失造成，因此未增加结果保留兜底。Main 85–86 转入新的自主 diagnose，未持续重放。
+
+Main 87 自选双半轴 optimize，原明确上限 5 小于最低合法申请 11，获得包含依赖、精确上限字段与最坏 5500 步的非执行反馈；累计数学剩余额为 null。Main 88 在下一次提交中明确设为 11，真实 Worker 实际完成 10 次评价、10 个 episode、5000 步。申请上限、保留扣账和实际耗用分别记录；最低合法申请不表示每次必然耗尽全部预算。随后 Main 91 生成第五候选，实际唯一变化仍是 semi_y_m；92 自主选择 Replay，93 再次非法根层字段，94 自行纠正并完成第三次独立 Replay。其完整、有效、无接触指标约 `8.3318e-5 m`，仍为 valid_failure，未 SELECT 或 Main STOP。
+
+Main 94 为 Main 94 / Reporter 5、Provider `99/104`、1634147 tokens；数学账本 47 / 实际评价尝试 44；候选 5 / 独立 Replay 3；全部实际 build 49 / episode 启动 49 / 完成 44 / 积分 22500 步，backend 原扣记 52。2150 个 artifact 哈希通过，调用、Worker、响应和占用均已结算。资源增补后的 identity 为 `4d79e9931dc188744a1c054109400d9037297b72eea7e0618585b0dd8d389a81`，所有历史成本保留，科学 profile、精确求导授权及数学/共享物理 null 不变。
+
+另一次合同核查确认普通 physical_replay 分支有机械重复：L0 提示候选会自动绑定，SDK 的 bind_plan_selection 却漏了该分支，原 admit_decision 又要求 decision.selected_candidate 匹配 payload 候选。`bbeee70` 复用既有选择器绑定，仅将该 action 纳入现有候选字段投影，并从 physical_replay.candidate 确定性补齐 canonical decision。Main 只需一个候选位置；保存结果选择器 result_choice 仍由原 expand_choice 解析。没有接受非法根字段、删除错误输入或改写科学授权；旧输入的互相矛盾引用仍拒绝。该修复消除可证实的重复负担，不宣称已解释或根治模型的根字段复发。
+
+新增单候选/输入不变/冲突与根字段拒绝测试先在旧实现失败，修复后原选择器类 7 项通过。另 4 项定向回归全部通过：实际 SDK Mock 单候选成对被动 v2 Replay 与原 Worker/receipts/证书/SELECT/STOP、保存数学结果的 Replay 选择器及原证书关闭、各 action 的确定性意图绑定、未知根层与嵌套字段的精确拒绝。这些是已有 Mock 与冻结工程 fixture，不发送真实 Provider；不计作自主 Study 科研结果。验证后按用户持续授权继续同一 Study。
