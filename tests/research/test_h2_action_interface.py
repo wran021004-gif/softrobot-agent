@@ -40,8 +40,9 @@ class H2ActionInterfaceTests(unittest.TestCase):
 
     def schema(self,h,actions):
         spec=state(h)['spec']
-        return provider_schema(main_tool_schema(agent.plan_schema(actions,decision_required=True,
-            family_version=spec.get('family_space',{}).get('version'),study=spec),reference_choices(h,include_all=True)))
+        # Expansion uses the SDK-side alias binding; the wire adapter omits it.
+        return main_tool_schema(agent.plan_schema(actions,decision_required=True,
+            family_version=spec.get('family_space',{}).get('version'),study=spec),reference_choices(h,include_all=True))
 
     def test_intent_is_host_bound_for_every_action_without_changing_canonical_plan(self):
         schema=main_tool_schema(agent.plan_schema(list(PLAN_RESEARCH_INTENTS),decision_required=True),{})
