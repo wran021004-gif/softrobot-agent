@@ -615,6 +615,13 @@ def error_feedback(host, use, exc, before):
         if missing is not None:path.append(missing)
         field='.'.join(map(str,path)) or None
         code='TOOL_SCHEMA_'+str(exc.validator).upper();expected=exc.message
+        if use.get('name')=='research_plan' and exc.validator=='additionalProperties':
+            extra=sorted(set(exc.instance)-set(exc.schema.get('properties',{})))
+            if extra:
+                field='.'.join(map(str,[*path,extra[0]]))
+                owner='.'.join(map(str,path)) or 'root'
+                expected=('Omit unsupported field(s) '+', '.join(extra)+' at '+owner+'. Allowed fields there: '
+                    +', '.join(exc.schema.get('properties',{}))+'. Resubmit the complete Plan using its advertised nested candidate locations; this feedback changes no input and starts no execution.')
         if field=='action' and exc.validator=='enum' and use.get('name')=='research_plan':
             action=use.get('input',{}).get('action')
             entry=next((r for r in s['pilot'].get('tool_directory',[]) if r['tool']=='research_plan'),{})

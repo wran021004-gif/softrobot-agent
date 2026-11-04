@@ -73,6 +73,27 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
         self.assertTrue(any(e['kind']=='session_handoff' for e in h.store.events(h.run_id)))
 
+    def test_replay_unknown_fields_report_exact_schema_location_without_repair(self):
+        from tools.research.object_choices import main_projection
+        h,c=self.host();schema=self.schema(h,['physical_replay']);q=rationale(c)
+        q.update(action='physical_replay',physical_replay=dict(candidate=c));q.pop('next_research_action')
+        q=main_projection(h,q);q['selected_candidate']=q['decision']['selected_candidate']
+        original=deepcopy(q);before=state(h)
+        error=next(e for e in Draft202012Validator(schema).iter_errors(q)
+            if e.validator=='additionalProperties' and not e.absolute_path)
+        reply=agent.error_feedback(h,dict(name='research_plan',input=q,toolUseId='offline-replay-root'),error,before)
+        self.assertEqual(reply['field'],'selected_candidate')
+        self.assertIn('at root',reply['expected']);self.assertIn('physical_replay',reply['expected'])
+        self.assertFalse(reply['scientific_execution_started']);self.assertEqual(q,original)
+        nested=deepcopy(q);nested.pop('selected_candidate');nested['physical_replay']['unknown_option']=1
+        error=next(e for e in Draft202012Validator(schema).iter_errors(nested)
+            if e.validator=='additionalProperties' and list(e.absolute_path)==['physical_replay'])
+        reply=agent.error_feedback(h,dict(name='research_plan',input=nested,toolUseId='offline-replay-nested'),error,before)
+        self.assertEqual(reply['field'],'physical_replay.unknown_option')
+        self.assertIn('at physical_replay',reply['expected'])
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_intent_is_host_bound_for_every_action_without_changing_canonical_plan(self):
         schema=main_tool_schema(agent.plan_schema(list(PLAN_RESEARCH_INTENTS),decision_required=True),{})
         self.assertNotIn('research_intent',schema['$defs']['ResearchDecision']['properties'])
