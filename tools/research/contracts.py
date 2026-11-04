@@ -1,6 +1,6 @@
 """Native business fields for the bounded reach-and-hold research entry."""
 from typing import Literal
-from pydantic import Field, FiniteFloat, StrictInt, model_validator, model_serializer
+from pydantic import Field, FiniteFloat, StrictInt, RootModel, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
@@ -1015,7 +1015,28 @@ class ExperienceQuery(Contract):
         description='Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.')
 
 
+class EvidenceContinuation(Contract):
+    version: Literal['evidence_continuation_v1'] = 'evidence_continuation_v1'
+    study_id: str
+    query_identity: str
+    content_identity: str
+    offset: int = Field(ge=1, strict=True)
+
+
+class EvidenceIntentQuery(Contract):
+    """Scientific discovery; registered choices, never arbitrary JSON paths."""
+    subject: Literal['current_candidate','current_task','registered_results','reports'] | EvidenceRef
+    topic: Literal['structure','structure_parameters','task','mechanism_capabilities',
+        'mathematical_methods','mathematical_results','physical_results','comparison','reporter_explanations']
+    group: str | None = Field(default=None, description='Exact registered group returned by this topic; unknown groups return choices.')
+    selection: list[EvidenceRef | str] = Field(default_factory=list,
+        description='Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.')
+    detail_level: Literal['summary','targeted','evidence_review'] = 'summary'
+    continuation: EvidenceContinuation | None = None
+
+
 class EvidenceQuery(Contract):
+    """Exact evidence review and formal acceptance, also retained for saved callers."""
     model_config = dict(json_schema_extra={
         'allOf':[{'if':{'properties':{'view':{'const':'fields'}},'required':['view']},
                   'then':{'required':['fields'],'properties':{'fields':{'minItems':1}}}}]})
@@ -1033,6 +1054,10 @@ class EvidenceQuery(Contract):
         if self.view=='fields' and not self.fields:
             raise ValueError('EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS: empty fields return no information; use view=summary or select at least one immediate child key')
         return self
+
+
+class EvidenceReadQuery(RootModel[EvidenceIntentQuery | EvidenceQuery]):
+    """One tool: ordinary intent queries and explicit backward-compatible review."""
 
 
 class PPOOverrides(Contract):

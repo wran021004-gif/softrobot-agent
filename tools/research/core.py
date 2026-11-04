@@ -26,6 +26,9 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SPEC = ROOT/'configs/research/study_harness_v2.json'
 def read_tool_evidence(host,query,*,record_read=True):
     """Bound ordinary v2 Main reads; formal whole-result reads remain exact."""
+    if 'topic' in query or 'subject' in query:
+        from tools.research.evidence_intent import resolve_evidence_intent
+        return resolve_evidence_intent(host,query)
     from tools.research.contracts import EvidenceQuery
     spec=state(host)['spec'];decisions=spec.get('research_decisions',{})
     from tools.research.config import bounded_evidence_enabled,evidence_feedback_limit

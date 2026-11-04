@@ -255,11 +255,17 @@ def compact_plan_schema(schema, action, study):
 
 def evidence_query_schema(study):
     """Project the canonical evidence query through the shared wire adapter."""
-    from tools.research.contracts import EvidenceQuery
+    from tools.research.contracts import EvidenceReadQuery
     from tools.research.provider import provider_schema
     from tools.research.config import bounded_evidence_enabled
-    schema=deepcopy(EvidenceQuery.model_json_schema())
-    if not bounded_evidence_enabled(study):schema['properties']['view']['enum'].remove('acceptance_certificate')
+    schema=deepcopy(EvidenceReadQuery.model_json_schema())
+    # Flat properties support the existing typed short-reference adapter; the
+    # canonical union still rejects mixed intent/raw inputs and unknown fields.
+    schema.update(type='object',properties={k:v for name in ('EvidenceIntentQuery','EvidenceQuery')
+        for k,v in schema['$defs'][name]['properties'].items()})
+    schema['description']='Ordinary discovery: subject and topic, then exact registered group/selection or next_query. Legacy reference/view/pointer fields are explicit evidence review only.'
+    if not bounded_evidence_enabled(study):
+        schema['properties']['view']['enum'].remove('acceptance_certificate')
     else:schema['properties']['view']['description']='acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit.'
     return provider_schema(schema)
 
@@ -1050,7 +1056,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
             ('experience_retrieve','Search scoped Experience decision patterns or Skill methods, optionally filtering knowledge_type, then execute an exact read_query. A receipt artifact ID is not an entry_id. Knowledge grants no scientific evidence or action permission.',ExperienceQuery,'experience'),
-            ('evidence_read','Read a named missing fact using exact evidence and JSON pointer. For ordinary Reporter investigation, use compact findings or view=summary on the report; then use fields/range or interpretation_query for needed detail. Full reads remain available for formal SELECT/STOP requirements. Delegate explanation to research_investigate.',EvidenceQuery,'evidence')]]
+            ('evidence_read','Read scientific facts using subject/topic and registered group/selection. Reuse next_query for pagination. Exact reference/view/pointer inputs remain available for deliberate raw evidence review and formal SELECT/STOP. Delegate interpretation to research_investigate.',EvidenceQuery,'evidence')]]
     if recent_policy:
         from tools.research.contracts import ResearchRecallQuery
         native.append(PythonAgentTool('research_recall',dict(name='research_recall',
@@ -1236,7 +1242,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':evidence_query_schema(s['spec']) if name=='evidence_read' else contract.model_json_schema()}}
                 from tools.research.config import bounded_evidence_enabled
                 if tool and name=='evidence_read' and bounded_evidence_enabled(s['spec']):
-                    tool.tool_spec['description']='Read exact named facts via fields/range/JSON pointers. Large raw reads return bounded facts/navigation. For formal SELECT read the complete acceptance_certificate of each independently evaluated result; actual delivery and original admission are required. STOP uses the complete fresh result-reference index.'
+                    tool.tool_spec['description']='Read scientific facts using subject/topic, registered choices and next_query. Ordinary discovery grants no formal credit. Exact reference/view/pointer review remains available; formal SELECT requires complete acceptance_certificate delivery and original admission. STOP retains its complete fresh result-reference index.'
             current=decision_packet(host)
             from tools.research.experience import knowledge_enabled
             if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)

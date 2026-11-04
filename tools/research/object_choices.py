@@ -227,6 +227,10 @@ def main_projection(host, value):
         'interpretation','question','user_request','instruction'}
     def project(item):
         if isinstance(item,dict):
+            if item.get('version')=='evidence_continuation_v1':
+                # Executable opaque cursor, not a display-only scientific ID.
+                # Dropping/redacting its identities makes saved pages unusable.
+                return deepcopy(item)
             if isinstance(item.get('artifact_id'),str):
                 alias=aliases.get(item['artifact_id'],'unavailable_external_reference')
                 rest={k:project(v) for k,v in item.items() if k not in ('artifact_id','media_type')}

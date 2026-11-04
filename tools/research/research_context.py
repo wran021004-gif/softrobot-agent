@@ -1653,8 +1653,11 @@ def agent_decision_brief(host):
         brief['current_candidate']=facts
         facts['resolved_facts']=deepcopy(row['resolved_facts'])
         from tools.research.scientific_intent import parameter_catalog
-        facts['scientific_parameters']=[{k:r[k] for k in ('parameter_group','parameter_id','physical_meaning','unit','current_value')}
-            for r in parameter_catalog(s['spec'],host.store.artifact(candidate)) if r['selectable']]
+        parameters=parameter_catalog(s['spec'],host.store.artifact(candidate))
+        facts['scientific_parameters']=[dict(parameter_group=group,
+            selectable_count=sum(r['selectable'] for r in parameters if r['parameter_group']==group),
+            query=dict(subject=candidate,topic='structure_parameters',group=group))
+            for group in sorted({r['parameter_group'] for r in parameters if r['selectable']})]
         from tools.research.task_constraints import mathematical_method_view, mathematical_catalog, mathematical_opportunity_summary
         view=mathematical_method_view(host,candidate,budget_snapshot=brief['budget'])
         brief['mathematical_capabilities']=mathematical_catalog(view)
@@ -2123,7 +2126,7 @@ def information_flow_brief(brief, delivered):
     if value.get('generation_contract'):
         access['domain']=dict(query=value['generation_contract']['domain_query'],role='domain_reference')
     access['delegated_read']=dict(tool='research_investigate',
-        arguments='question and existing result references; optional exact reads',
+        arguments='question, legal subjects/references, scientific focus and optional semantic reads',
         scope='Preferred for detailed numerical reading and comparison. Reporter reads never grant SELECT/STOP credit.')
     focus=dict(candidate=current.get('current_candidate'),candidate_status=current.get('candidate_status'),
         task_accepted=current.get('task_accepted'),control=control,
@@ -2262,6 +2265,9 @@ def information_flow_brief(brief, delivered):
                 interpretation='Common requested settings do not imply equal actual search or convergence. Numerical failure and stagnation do not establish structural inadequacy; mechanism evidence remains separate.')
         if not any(science.get(k) for k in ('latest_search','study_best_mathematical','critical_failures','best_independent_physical')) and math_result:
             result.pop('scientific_results',None)
+    from tools.research.evidence_intent import evidence_intent_access,semantic_query_handles
+    result=semantic_query_handles(result)
+    result['evidence_access']['scientific_queries']=evidence_intent_access()
     return result
 
 
