@@ -528,7 +528,7 @@ class MechanismQuestionV2(Contract):
     update_id: StrictInt | None = Field(default=None,ge=0)
     comparison_candidates: list[EvidenceRef] = Field(default_factory=list,max_length=1)
     requested_budget: StrictInt | None = Field(default=None,ge=1,le=64,
-        description='Maximum original mathematical evaluations for this question. Mechanism cost depends on selected paths, central/one-sided stencils and bounded local search. Fixed-input short responses retain original accounting. For explicit control optimization this caps Native callbacks; saved M2 aggregation never requests new T1 rollouts.')
+        description='Optional maximum original mathematical evaluations for this question. An explicit cap is never increased. With no question or diagnose cap, the compiler selects the actual legal minimum after method/parameter/working-point admission. Costs include baseline, legal two-scale probes, joint check and bounded search; shared budgets still apply. Fixed-input short responses retain original accounting. For explicit control optimization this caps Native callbacks; saved M2 aggregation never requests new T1 rollouts.')
     local_radius_fraction: FiniteFloat = Field(default=.02,gt=0,le=.1,
         description='Bounded neighborhood in normalized parameter coordinates, used by the existing SciPy local optimizer.')
     response_horizon_s: FiniteFloat | None = Field(default=None,gt=0,le=.05)

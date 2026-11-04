@@ -15,10 +15,11 @@ SCALAR_DIRECTION_TARGETS=('mass_balance_residual','total_mass','body_inertia_tra
 
 class MechanismBudgetError(ValueError):
     """Original admission failure with the cost of Main's actual question."""
-    def __init__(self, minimum, dependencies):
+    def __init__(self, minimum, dependencies, dynamic_cost_bound=None):
         super().__init__('MECHANISM_QUESTION_BUDGET_CANNOT_FIT: requires '+str(minimum))
         self.minimum_evaluations=minimum
         self.cost_dependencies=dependencies
+        self.dynamic_cost_bound=dynamic_cost_bound
 
 
 def parameters(spec, candidate):
@@ -66,11 +67,12 @@ def finite_time_discovery(configuration):
     return dict(status='requires_explicit_intervention' if paired and legal else 'not_applicable' if paired else 'conditional_on_request_admission',
         effect_semantics='finite_time_task_response',target='finite_time_task_violation',
         operations=list(OPERATIONS),operating_point='frozen_task_initial_state',load_condition='all_frozen_conditions',
-        required_inputs=['operation','target','requested_budget','parameter_paths for differentiate/optimize',
+        required_inputs=['operation','target','parameter_paths for differentiate/optimize',
             'comparison_candidates for compare']+(['passive_ablation'] if paired else []),
         paired_required=paired,legal_intervention_tendons=tendons if legal else [],
         intervention_rule='Main selects exact passive limits; both baseline and ablation run every frozen episode. No legal intervention means no paired mechanism certification.',
         per_evaluation_cost=dynamic_cost(configuration,1,paired),
+        evaluation_cap='Optional explicit maximum; omitted question/diagnose cap uses the legal minimum. An explicit low cap is rejected without execution.',
         cost_rule='Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.',
         evidence_scope='Complete qualified finite-time numerical observation; static proxies cannot certify dynamic acceptance.')
 
@@ -103,7 +105,7 @@ def observed_task_improvement(records, rows=(), bounds=None):
         scope='Best recorded complete task objective under the same frozen protocol; no strict descent or global optimum.')
 
 
-def prepare_context(spec, candidate, study, comparisons):
+def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False):
     """Read-only actual-domain/source admission before the existing reservation."""
     from tools.research_tasks import task_adapter
     capabilities=task_adapter(candidate['configuration']).physical_capabilities()
@@ -167,9 +169,13 @@ def prepare_context(spec, candidate, study, comparisons):
         parameter_stencil_evaluations={row['parameter_id']:len(set(plan['coordinates'])) for row,plan in zip(selected,plans)},
         joint_check_evaluations=int(len(plans)==2),local_search=study.operation=='optimize',
         rule='Actual legal stencil coordinates depend on selected parameter domains and operating values; two paths add a joint check; optimize adds a trial and uses the requested cap.')
-    if study.max_evaluations<minimum:raise MechanismBudgetError(minimum,cost_dependencies)
+    cost=dynamic_cost(candidate['configuration'],minimum,bool(study.passive_ablation)) if dynamic else None
+    if not minimum_budget and study.max_evaluations<minimum:
+        raise MechanismBudgetError(minimum,cost_dependencies,cost)
+    cap=minimum if minimum_budget else study.max_evaluations
     result=dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
-        minimum_evaluations=minimum,evaluations=study.max_evaluations if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
+        minimum_evaluations=minimum,evaluation_cap=cap,
+        evaluations=cap if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
     if dynamic:
         result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
@@ -179,7 +185,8 @@ def prepare_context(spec, candidate, study, comparisons):
 def discovery(spec, candidate, reference, *, latest_direction=None, formal_candidate_created=False,
               method_detail=None, remaining_evaluations=None, execution_block=None):
     rows=parameters(spec,candidate);detail=method_detail or {}
-    minima=[1+len(set(stencil(r)['coordinates'])) for r in rows if r['mechanism_differentiation']['supported']]
+    probes={r['parameter_id']:len(set(stencil(r)['coordinates'])) for r in rows if r['mechanism_differentiation']['supported']}
+    minima=[1+n for n in probes.values()]
     problem=candidate['configuration']['task'].get('physical_problem')
     minimum=dict(inspect=1,compare=1 if problem and len(problem['loads'])>1 else 2,differentiate=min(minima) if minima else None,
         optimize=min(minima)+1 if minima else None)
@@ -195,6 +202,9 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
             minimum_evaluations=count,inputs_required=True)
     return dict(version='structure_mechanism_discovery_v2',candidate=reference,operations=list(OPERATIONS),
         operation_admission=operations,remaining_evaluations=remaining_evaluations,
+        evaluation_cost_preview=dict(baseline_evaluations=1,parameter_stencil_evaluations=probes,
+            two_parameter_joint_check_evaluations=1,optimize_additional_minimum=1,
+            rule='differentiate = baseline + selected path probes + one joint check for two paths. optimize adds at least one trial. Request compilation validates the actual method, point, intervention and budgets; finite-time physical cost multiplies this count by per_evaluation_cost.'),
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
             ['directional_drive','bounded_directional_acceleration','routing_geometry','inertia','stiffness','instantaneous_braking'],

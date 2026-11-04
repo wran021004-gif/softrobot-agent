@@ -103,7 +103,7 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertEqual(rows['segments.0.sections.0.parameters.semi_z_m']['differentiation']['reason'],
             'ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED')
         structure=question_schema(spec,raw)['$defs']['ScientificStructureV4']
-        self.assertIn('not authorization',structure['properties']['parameter_paths']['description'])
+        self.assertIn('frozen Study grant',structure['properties']['parameter_paths']['description'])
 
     def test_authorized_v4_compile_and_original_admission_without_worker(self):
         h,c=self.host();q=rationale(c);q['decision']['research_intent']='DIAGNOSE'
@@ -147,5 +147,105 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertIn('research_intent',schema(first)['$defs']['ResearchDecision']['properties'])
         self.assertNotIn('research_intent',schema(second)['$defs']['ResearchDecision']['properties'])
         self.assertEqual(state(h)['mathematical_evaluations'],0)
+
+    def admitted_question(self,*,variables=None,plan_cap=0,physical_budget=128):
+        h,c=prepared_host_v2(mathematical_budget=64,physical_budget=physical_budget,
+            mock_provider_budget=20,sensitivity_variables=variables)
+        plan=rationale(c);plan['decision']['requested_budget']=plan_cap
+        core.dispatch(h,bind_plan_selection(h,plan),'OFFLINE-cost-diagnose')
+        q=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='differentiate',
+            effect_semantics='finite_time_task_response',parameter_paths=['segments.0.young_pa'],
+            target='finite_time_task_violation',load_condition='all_frozen_conditions'))
+        return h,c,q
+
+    def test_default_minimum_and_explicit_low_caps_have_exact_shared_costs(self):
+        h,c,q=self.admitted_question()
+        single=compile_question(h,q,tool_use_id='single-minimum')
+        self.assertEqual(single['status'],'ready',single)
+        self.assertEqual(single['effective_evaluation_cap'],5)
+        self.assertEqual(single['request']['mechanism_study']['max_evaluations'],5)
+        q['structure']['parameter_paths'].append('payout_lengths_m.tendon_0')
+        dual=compile_question(h,q,tool_use_id='dual-minimum')
+        self.assertEqual(dual['status'],'ready',dual)
+        self.assertEqual(dual['minimum_evaluations'],10)
+        self.assertEqual(dual['dynamic_cost_bound'],dict(model_builds=10,episodes=10,physics_steps=5000))
+        self.assertEqual(dual['cost_dependencies']['joint_check_evaluations'],1)
+        self.assertEqual(list(dual['cost_dependencies']['parameter_stencil_evaluations'].values()),[4,4])
+        q['structure']['passive_ablation']=['tendon_0']
+        paired=compile_question(h,q,tool_use_id='dual-paired')
+        self.assertEqual(paired['dynamic_cost_bound'],dict(model_builds=20,episodes=20,physics_steps=10000))
+        for cap in (8,9):
+            q['structure']['requested_budget']=cap
+            denied=compile_question(h,q,tool_use_id='dual-low-'+str(cap))
+            self.assertEqual(denied['status'],'insufficient_budget',denied)
+            self.assertEqual(denied['minimum_evaluations'],10)
+            self.assertEqual(denied['requested_evaluations'],cap)
+            self.assertEqual(denied['dynamic_cost_bound']['physics_steps'],10000)
+            self.assertFalse(denied['scientific_execution_started'])
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_independent_expanded_study_and_operation_schema_preserve_old_grant(self):
+        old,old_c,q=self.admitted_question();frozen=deepcopy(state(old)['spec'])
+        paths=['segments.0.physical_parameters.section_angle_rad','segments.0.physical_parameters.curvature_y_rad_m']
+        q['structure']['parameter_paths']=paths
+        denied=compile_question(old,q,tool_use_id='unauthorized-section')
+        self.assertEqual(denied['status'],'unauthorized',denied)
+        self.assertFalse(denied['scientific_execution_started'])
+        grant=['segments.*.young_pa','payout_lengths_m.*',*paths,'segments.0.sections.0.parameters.semi_z_m']
+        new,c,q2=self.admitted_question(variables=grant)
+        self.assertNotEqual(state(new)['spec']['resolved_identity'],frozen['resolved_identity'])
+        for selected in (paths,[paths[0],'segments.0.sections.0.parameters.semi_z_m']):
+            q2['structure']['parameter_paths']=selected
+            ready=compile_question(new,q2,tool_use_id='expanded-section')
+            self.assertEqual(ready['status'],'ready',ready)
+            self.assertEqual(ready['required_evaluations'],10)
+            self.assertEqual(ready['dynamic_cost_bound']['physics_steps'],5000)
+            Draft202012Validator(question_schema(state(new)['spec'],new.store.artifact(c))).validate(q2)
+        self.assertFalse(Draft202012Validator(question_schema(frozen,old.store.artifact(old_c))).is_valid(q2))
+        self.assertEqual(state(old)['spec'],frozen)
+        self.assertEqual(state(old)['analysis_results'],[])
+        self.assertEqual(state(old)['mathematical_evaluations'],0)
+
+    def test_plan_cap_working_point_method_and_shared_budget_failures_are_distinct(self):
+        h,c,q=self.admitted_question(plan_cap=5,physical_budget=8)
+        q['structure']['parameter_paths'].append('payout_lengths_m.tendon_0')
+        denied=compile_question(h,q,tool_use_id='inherited-low-cap')
+        self.assertEqual(denied['requested_evaluations'],5)
+        self.assertEqual(denied['minimum_evaluations'],10)
+        q['structure']['requested_budget']=10
+        denied=compile_question(h,q,tool_use_id='shared-physics-low')
+        self.assertEqual(denied['reason'],'SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
+        self.assertEqual(denied['status'],'insufficient_budget')
+        q['structure']['parameter_paths']=['segment_count']
+        self.assertEqual(compile_question(h,q,tool_use_id='discrete')['status'],'unsupported')
+        q['structure']['parameter_paths']=['segments.0.young_pa']
+        q['structure']['operating_point']='re_equilibrated'
+        self.assertEqual(compile_question(h,q,tool_use_id='wrong-point')['status'],'not_applicable')
+        q['structure'].pop('operating_point');q['structure']['operation']='optimize';q['structure'].pop('requested_budget')
+        denied=compile_question(h,q,tool_use_id='optimize-cap')
+        self.assertEqual(denied['minimum_evaluations'],6)
+        self.assertEqual(denied['requested_evaluations'],5)
+
+    def test_focused_diagnose_wire_has_one_candidate_location_and_rejects_bad_fields(self):
+        h,c=self.host();spec=state(h)['spec'];q=rationale(c)
+        expected=provider_schema(main_tool_schema(agent.plan_schema(['diagnose'],decision_required=True,
+            family_version=spec['family_space']['version'],focused=True,study=spec),reference_choices(h,include_all=True)))
+        wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),('research_plan',q),None])
+        actual=next(t['function']['parameters'] for t in wires[1]['tools'] if t['function']['name']=='research_plan')
+        self.assertEqual(actual,expected)
+        self.assertNotIn('selected_candidate',actual['properties'])
+        self.assertNotIn('research_intent',actual['$defs']['ResearchDecision']['properties'])
+        self.assertNotIn('selected_method',actual['$defs']['ResearchDecision']['required'])
+        from tools.research.object_choices import main_projection
+        offered=main_projection(h,q)
+        Draft202012Validator(actual).validate(offered)
+        bad=deepcopy(offered);bad['selected_candidate']=bad['decision']['selected_candidate']
+        self.assertFalse(Draft202012Validator(actual).is_valid(bad))
+        bad=deepcopy(q);bad['candidate']=c
+        with self.assertRaises(ValueError):Plan.model_validate(bind_plan_selection(h,bad))
+        other=dict(artifact_id='f'*64,media_type='application/json')
+        with self.assertRaisesRegex(ValueError,'CONFLICTING_CANDIDATE_REFERENCES'):
+            bind_plan_selection(h,dict(action='execute',candidate=c,decision=dict(selected_candidate=other)))
 
 if __name__=='__main__':unittest.main()

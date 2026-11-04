@@ -72,7 +72,14 @@ def selected_operating_point_guidance(host, reference, method, detail):
             preparation=dict(tool='research_plan',action='generate',decision=dict(selected_candidate=reference),generation=dict(changes={})),
             details_query=dict(reference=reference,view='full',pointer='/parameters'))
     if cfg['task'].get('physical_problem'):
-        return dict(method=method,operating_points=[dict(name='re_equilibrated',meaning='Solve the frozen unilateral assembly under the selected load; no active input.')],
+        from tools.research.structure_research import finite_time_discovery
+        finite=finite_time_discovery(cfg)
+        points=[dict(name='re_equilibrated',meaning='Solve the frozen unilateral assembly under the selected load; no active input.')]
+        if finite['status']!='not_applicable':
+            points.append(dict(name='frozen_task_initial_state',effect_semantics='finite_time_task_response',
+                meaning='Complete registered frozen loading protocol, every condition and qualification gate; no active input.',
+                cost_preview=finite))
+        return dict(method=method,operating_points=points,
             saved_sources=[],unavailable=[],load_conditions=[x['name'] for x in cfg['task']['physical_problem']['loads']],
             details_query=dict(reference=reference,view='full',pointer='/configuration/task/physical_problem'))
     operation=detail['operation'];native=detail['request_template'].get('model_source')=='mujoco'

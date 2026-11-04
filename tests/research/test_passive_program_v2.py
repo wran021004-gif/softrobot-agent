@@ -42,7 +42,7 @@ def configuration_v2():
     return cfg
 
 
-def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,mock_provider_budget=None):
+def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,mock_provider_budget=None,sensitivity_variables=None):
     from tools.research import core
     from tools.research.state import state,save,update
     from tools.state_io import digest
@@ -55,6 +55,7 @@ def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,
     cfg['budgets']['physical_launches']=physical_budget;cfg['physical_replay_limit']=physical_budget
     if mathematical_budget is not None:cfg['budgets']['mathematical_evaluations']=mathematical_budget
     if mock_provider_budget is not None:cfg['budgets']['provider_requests']=mock_provider_budget
+    if sensitivity_variables is not None:cfg['family_sensitivity_variables']=dict(version='family_sensitivity_v2',variables=sensitivity_variables)
     task_path.write_text(json.dumps(dict(task=task,seed=1)));study_path.write_text(json.dumps(cfg))
     try:h=core.prepare(study_path,ROOT/'runs'/name)
     finally:task_path.unlink();study_path.unlink()
