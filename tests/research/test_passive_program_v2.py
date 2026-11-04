@@ -58,6 +58,7 @@ def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,
     if sensitivity_variables is not None:cfg['family_sensitivity_variables']=dict(version='family_sensitivity_v2',variables=sensitivity_variables)
     if unmetered:
         cfg['budgets'].update(mathematical_evaluations=None,physical_launches=None)
+        cfg['analysis_cap_s']=180
     task_path.write_text(json.dumps(dict(task=task,seed=1)));study_path.write_text(json.dumps(cfg))
     try:h=core.prepare(study_path,ROOT/'runs'/name)
     finally:task_path.unlink();study_path.unlink()
