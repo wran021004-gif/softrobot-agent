@@ -512,11 +512,16 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='unsupported',reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OPTIMIZATION',scientific_execution_started=False)
         if q.domain=='control' and q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
+        if q.domain=='structure' and candidate and q.structure.operation in ('differentiate','optimize'):
+            denial=mechanism_parameter_failure(spec,candidate,q.structure.parameter_paths)
+            if denial:return denial
         from jsonschema import Draft202012Validator
         schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
         errors=list(Draft202012Validator(schema).iter_errors(payload))
         if errors:
-            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
+            point_error=all(list(e.absolute_path)==['structure','operating_point'] for e in errors)
+            return dict(status='not_applicable' if point_error else 'needs_choice',
+                reason='SCIENTIFIC_WORKING_POINT_NOT_APPLICABLE' if point_error else 'INVALID_SCIENTIFIC_V4_INPUT',issues=[
                 dict(field='.'.join(map(str,e.absolute_path)),reason=e.message) for e in errors],
                 scientific_execution_started=False)
         result=(compile_mechanism(host,expanded['structure'],tool_use_id=tool_use_id,v4=True) if q.domain=='structure' else
@@ -934,7 +939,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
             next_choice='Main must reduce the question or choose a legal cap within the remaining budget; no automatic increase.')
     except ValueError as exc:return feedback('blocked' if str(exc).startswith('MECHANISM_QUESTION_BUDGET') else 'unsupported',str(exc))
     needed=context['evaluations']
-    study.max_evaluations=context['evaluation_cap']
+    study=study.model_copy(update=dict(max_evaluations=context['evaluation_cap']))
     if not mathematics_fits(spec,s.get('mathematical_evaluations',0),needed):
         return feedback('blocked','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',required_evaluations=needed,
             minimum_evaluations=context['minimum_evaluations'],requested_evaluations=budget,
@@ -948,9 +953,22 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         minimum_evaluations=context['minimum_evaluations'],limitations=detail['limitations'],cost_scope=detail['cost_scope'])
 
 
+def mechanism_parameter_failure(spec,c,paths):
+    """Explain unavailable execution choices using the original parameter rows."""
+    from tools.research.structure_research import parameters
+    rows={r['parameter_id']:r for r in parameters(spec,c)}
+    for path in paths:
+        row=rows.get(path)
+        if row and row['mechanism_differentiation']['supported']:continue
+        reason=row['mechanism_differentiation']['reason'] if row else 'REGISTERED_STRUCTURAL_PARAMETER_REQUIRED'
+        status=('unauthorized' if reason=='ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED' else
+            'not_applicable' if row and not row['effective_in_current_execution'] else 'unsupported')
+        return dict(status=status,reason=reason,path=path,scientific_execution_started=False)
+
+
 def mechanism_context(host,c,study,budget):
     """Project original request admission and its exact cost; never reserve or run."""
-    from tools.research.structure_research import prepare_context,parameters,MechanismBudgetError
+    from tools.research.structure_research import prepare_context,MechanismBudgetError
     from tools.research.design import verify_candidate
     from tools.research.budget import backend_capacity
     s=state(host);spec=s['spec']
@@ -965,16 +983,9 @@ def mechanism_context(host,c,study,budget):
             cost_dependencies=exc.cost_dependencies,dynamic_cost_bound=exc.dynamic_cost_bound,
             remaining_evaluations=mathematical_remaining(spec,s['mathematical_evaluations']))
     except ValueError as exc:
-        reason=str(exc)
-        if reason=='ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED':status='unauthorized'
-        else:
-            unavailable=[r for r in parameters(spec,c) if r['parameter_id'] in study.paths and
-                r['mechanism_differentiation']['reason']==reason]
-            status='not_applicable' if unavailable and any(not r['effective_in_current_execution'] for r in unavailable) else 'unsupported'
-        return fail(status,reason)
-    study.max_evaluations=context['evaluation_cap']
+        return None,mechanism_parameter_failure(spec,c,study.paths) or fail('unsupported',str(exc))[1]
     preview=dict(minimum_evaluations=context['minimum_evaluations'],required_evaluations=context['evaluations'],
-        requested_evaluations=budget,effective_evaluation_cap=study.max_evaluations,
+        requested_evaluations=budget,effective_evaluation_cap=context['evaluation_cap'],
         budget_selection='minimum_legal' if budget is None else 'explicit_cap',
         cost_dependencies=context['cost_dependencies'],
         **({'dynamic_cost_bound':context['dynamic_cost_bound']} if 'dynamic_cost_bound' in context else {}))
@@ -1020,6 +1031,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED',detail['planning_status'],missing=detail['missing'])
     context,preview=mechanism_context(host,c,study,budget)
     if context is None:return dict(preview,method_selection=route)
+    study=study.model_copy(update=dict(max_evaluations=context['evaluation_cap']))
     request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
         tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
     return dict(status='ready',method=METHOD,request=request,method_selection=route,
@@ -1059,6 +1071,7 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
         return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED',detail['planning_status'],missing=detail['missing'])
     context,preview=mechanism_context(host,c,study,budget)
     if context is None:return preview
+    study=study.model_copy(update=dict(max_evaluations=context['evaluation_cap']))
     request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
         tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
     from tools.research_tasks import task_adapter
