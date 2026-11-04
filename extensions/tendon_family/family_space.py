@@ -349,6 +349,14 @@ def decision_summary(value, evidence, operations):
             'actuator velocity/length limits: bypassed by ideal tension'],
         controller_only=['holding_tip_speed_weight','terminal_tip_speed_weight'],
         parameter_view='parameter_capabilities(space, selected generation request) resolves conditional fields; full_specification holds authoritative domains')
+    if getattr(space,'passive_payout_domains_m',{}):
+        result['assumptions']=[a for a in result['assumptions'] if 'ideal tension' not in a]
+        result['execution_effects']=dict(mode='passive_fixed_payout_v1',active_control=False,
+            effective=['geometry/material/routing','fixed payout unilateral length limits','tendon capacity qualification'],
+            inactive=['pretension_n: no active initialization','length_servo_gain_n_m: no length servo',
+                'actuator displacement/velocity limits','controller weights'],
+            observed_state='Actual tension, length residual and taut/slack/transition classification require execution or equilibrium evidence.',
+            scope='Qualified hard static equilibrium and full finite-time soft-limit response are distinct models; neither substitutes for independent acceptance.')
     result['physical_default_rule']='Omitted physical_parameters inherit assembly prototype values; physical_domains default is a proposal value, not an applied override. Candidate capability view reports actual inherited defaults.'
     result['declared_domain']=dict(segment_count_bounds=frozen['segment_count_bounds'],
         tendon_count_bounds=frozen['tendon_count_bounds'],
@@ -356,6 +364,11 @@ def decision_summary(value, evidence, operations):
     result['executable_domain']=dict(segment_counts=frozen['executable_segment_counts'],
         tendon_count_bounds=frozen['executable_tendon_count_bounds'],
         scope='Registered generator envelope; backend/model/controller admission remains candidate-specific')
+    if getattr(space,'passive_payout_domains_m',{}):
+        counts=[i for i in range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)
+            if set(space.passive_payout_domains_m)=={'tendon_'+str(j) for j in range(i)}]
+        result['executable_domain'].update(payout_bound_tendon_counts=counts,
+            payout_rule='Exact frozen payout key set must match selected tendon count; other declared counts lack authorized payout bindings.')
     result['candidate_specific_conditions']=['Selected topology and segment indices',
         'Route/section/attachment/guide clearance and valid mesh',
         'Backend model dimensions, tendon order and supported controller/solver']
@@ -414,6 +427,7 @@ def parameter_capabilities(value, request):
     """Actual candidate paths, physical effectiveness and authoritative SI domains."""
     from tools.research.design import parameter_value
     space=parse_space(value);params=resolved_request(value,request);rows=[]
+    passive=bool(getattr(space,'passive_payout_domains_m',{}))
     def add(path,category,kind,unit,domain=None,choices=None,effective=True,reason=None,source=None,**detail):
         try:current=parameter_value(params,path)
         except (KeyError,IndexError,ValueError):current=None
@@ -470,9 +484,14 @@ def parameter_capabilities(value, request):
         reason={'length_servo_gain_n_m':'Ideal tension bypasses the length servo',
             'diameter_m':'Clearance/visual geometry only; native ideal tendon has no diameter-dependent inertia or friction',
             'pretension_n':'Initialization/control choice; a common full absolute-tension sequence overrides pretension'}.get(k)
+        if passive:
+            reason={'length_servo_gain_n_m':'No active length servo in fixed-payout execution',
+                'pretension_n':'No active control or pretension initialization; payout determines tension',
+                'diameter_m':'Clearance/visual geometry only; no tendon inertia or friction',
+                'force_limit_n':'Passive capacity qualification bound; not a structural force law or control input'}.get(k)
         add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,
-            effective=k!='length_servo_gain_n_m',reason=reason,source='tendon_domains.'+k,
-            input_set_changes=k=='force_limit_n')
+            effective=k not in ('length_servo_gain_n_m','pretension_n') if passive else k!='length_servo_gain_n_m',reason=reason,source='tendon_domains.'+k,
+            input_set_changes=k=='force_limit_n' and not passive)
     # Retain declaration templates for existing consumers; only concrete paths are analyzable.
     for k,d in space.routing_domains.items():
         add('spans.*.'+k,'routing','number','rad' if k.endswith('_rad') else 'm' if k=='radius_m' else 'normalized_station',d,
@@ -503,6 +522,9 @@ def parameter_capabilities(value, request):
                 key='anchor_s' if point['role']=='anchor' else 'guide_s'
                 add(f'route_overrides.{i}.{j}.attachment.s','routing','number','normalized_station',space.routing_domains[key],source='routing_domains.'+key)
     for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False,reason='Controller performance parameter; outside fixed-structure legal-input capability')
+    if passive:
+        for row in rows:
+            row['supported_methods']=['generate']+(['mechanism_structure_v1'] if row['continuous_perturbation'] else [])
     return rows
 
 

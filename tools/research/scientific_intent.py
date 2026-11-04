@@ -69,14 +69,14 @@ def scientific_actions(spec):
     if mechanism_interface(spec):
         actions.append(dict(scientific_goal='mechanism_research',domain='structure',tool='research_analysis',
             interface=spec['research_decisions']['analysis_interface'],available='analysis' in spec.get('capabilities',[]),
-            scope='inspect / differentiate / optimize / compare instantaneous mechanisms and explicit M1/M2 evidence. Main owns target, direction and adoption.'))
+            scope='inspect / differentiate / optimize / compare mechanisms, qualified passive equilibrium, registered finite-time response and explicit M1/M2 evidence. Main owns target, direction and adoption.'))
     if spec['research_decisions']['analysis_interface']=='scientific_question_v4':
         actions=[row for row in actions if row['scientific_goal']!='single_parameter_effect']
     for row in actions:
         if spec.get('canonical_task',{}).get('physical_problem') and row['scientific_goal']!='mechanism_research':
             row.update(available=False,scope='This frozen passive assembly has no active control; use mechanism_research. Independent passive Replay is available through research_plan only for a registered dynamic task.')
         elif spec.get('canonical_task',{}).get('physical_problem'):
-            row['scope']='Inspect, differentiate, optimize or compare frozen constrained geometry/equilibrium and load responses; Main owns structure adoption.'
+            row['scope']='Inspect, differentiate, optimize or compare frozen geometry/equilibrium and complete finite_time_task_response. The latter uses finite_time_task_violation over all loads/windows, qualification gates and any required paired intervention; Main owns structure adoption.'
         row.setdefault('domain','structure_control' if row['scientific_goal']=='structure_control_codesign' else
             'control' if row['scientific_goal']=='control_feasibility' else 'structure')
     return actions
@@ -251,8 +251,24 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         if passive:
             structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
                 'then':{'properties':{'operating_point':{'const':'frozen_task_initial_state'},
+                    'load_condition':{'const':'all_frozen_conditions'},
+                    'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'},
                     'target':{'type':'string','const':'finite_time_task_violation'}}},
-                'else':{'properties':{'operating_point':{'const':'re_equilibrated'}}}})
+                'else':{'properties':{'operating_point':{'const':'re_equilibrated'},'passive_ablation':{'type':'null'}}}})
+            task=(candidate or {}).get('configuration',{}).get('task') or spec.get('canonical_task',{})
+            goal=task.get('goal',{}).get('data',{})
+            from tools.research_tasks import passive_registered
+            props['effect_semantics']['enum']=['mechanism_effect','re_equilibrated_passive_response']+(
+                ['finite_time_task_response'] if passive_registered(task) else [])
+            structure['properties']['target']['description']='Static research: registered PhysicalMechanismTarget. Complete finite_time_task_response: exact string finite_time_task_violation, all frozen conditions, qualification gates and requested_budget; no single diagnostic substitutes for the full objective.'
+            if goal.get('version')!='passive_response_v2' or goal.get('allowed_ablation')!='disable_selected_passive_limits':
+                props['passive_ablation']={'type':'null'}
+            elif candidate:
+                names=list(candidate['configuration']['robot']['structure']['data'].get('fixed_payout_lengths_m',{}))
+                props['passive_ablation']['anyOf'][0]['items']['enum']=names
+            if task.get('evaluator',{}).get('parameters',{}).get('data',{}).get('mechanism'):
+                structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
+                    'then':{'required':['passive_ablation'],'properties':{'passive_ablation':{'type':'array','minItems':1}}}})
         if passive:
             structure['allOf'].append({'if':{'properties':{'operation':{'not':{'const':'compare'}}},'required':['operation']},
                 'then':{'properties':{'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'}}}})

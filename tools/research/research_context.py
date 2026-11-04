@@ -1849,14 +1849,33 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
         formal_candidate_created=bool(generated),method_detail=view['methods'].get(METHOD),
         remaining_evaluations=view['remaining_evaluations'],execution_block=execution_block)
     result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
-        parameter_domains=[{k:r[k] for k in ('parameter_id','current_value','minimum','maximum','unit')}
-            for r in parameters(s['spec'],current) if r['mechanism_differentiation']['supported']],
+        parameter_domain_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/structure_research/parameters'),
         suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
         formal_candidate_query=dict(reference=generated[-1]) if generated else None,
         historical_directions=[dict(candidate=raw['candidate'],relation='declared_historical_mathematics' if ref not in s.get('analysis_results',[]) else 'other_candidate_history',
             query=dict(reference=ref,pointer='/structure_research/structure_direction'))
             for ref,raw in list(directions.values())[::-1] if ref not in s.get('analysis_results',[]) or raw.get('candidate')!=candidate][:2])
+    if current['configuration']['task'].get('goal',{}).get('data',{}).get('version')=='passive_response_v2':
+        from tools.research_tasks import task_adapter
+        for ref in reversed(s.get('analysis_results',[])+s.get('physical_replays',[])):
+            raw=host.store.artifact(ref,paths=('candidate','raw_reference','structure_research.baseline'))
+            if raw.get('candidate')!=candidate:continue
+            diagnosis=(raw.get('structure_research',{}).get('baseline') or {}).get('qualification_diagnosis')
+            if diagnosis:
+                diagnosis=deepcopy(diagnosis);diagnosis['source']['reference']=ref
+                for failure in diagnosis['failed_qualifications']:failure['source']['reference']=ref
+            elif raw.get('raw_reference'):
+                diagnosis=task_adapter(current['configuration']).qualification_diagnosis(
+                    host.store.artifact(raw['raw_reference']),raw['raw_reference'])
+            if diagnosis:
+                result['qualification_diagnosis']={k:v for k,v in diagnosis.items() if k!='failed_qualifications'}
+                result['qualification_diagnosis']['failed_qualifications']=[{k:v for k,v in f.items() if k not in ('frozen_rule','observed')}
+                    for f in diagnosis['failed_qualifications'][:3]]
+                result['qualification_diagnosis']['failure_count']=len(diagnosis['failed_qualifications'])
+                break
     if not current['configuration']['task'].get('physical_problem'):
+        result['parameter_domains']=[{k:r[k] for k in ('parameter_id','current_value','minimum','maximum','unit')}
+            for r in parameters(s['spec'],current) if r['mechanism_differentiation']['supported']]
         from tools.research.scientific_intent import conic_entry
         from tools.research.task_constraints import selected_operating_point_guidance
         result['target_semantics']=dict(mechanism_effect='PhysicalMechanismTarget object: registered quantity, applicable reduction and explicit goal.',
@@ -2193,7 +2212,8 @@ def information_flow_brief(brief, delivered):
                 'formal_candidate_created','generation_plan_cited_evidence','generation_relations',
                 'formal_candidate_query','historical_directions','details_query','operation_admission',
                 'mechanism_categories','mechanism_purposes','effective_parameter_groups','parameter_domains','task_scope',
-                'target_semantics','conic_entry','operating_point_sources') if k in mechanism}
+                'target_semantics','conic_entry','operating_point_sources','parameter_domain_query',
+                'finite_time_response','qualification_diagnosis') if k in mechanism}
         control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
         task=result['study_goal'].get('task',{})
         if task.get('physical_problem'):

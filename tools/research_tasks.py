@@ -68,10 +68,80 @@ class ResearchTaskAdapter:
     def structure_task_view(self):
         conditions=self.condition_view()
         return dict(physical_capabilities=self.physical_capabilities(),conditions=conditions,
+            dynamic_constraints=self.dynamic_constraint_view(),
             response_semantics='finite_time_task_response' if passive_registered(self.task) else 'registered_active_task_and_saved_control_evidence',
             static_coverage='Static mechanisms cannot predict finite-time speed, drift, full Tracking or contact bounds.',
             dynamic_coverage='All frozen load cases and sample windows; per-step safety extrema where required by evaluator.',
             task_acceptance='unmeasured')
+
+    def dynamic_constraint_view(self):
+        """Discovery only: retain frozen evaluator meanings outside affine kernels."""
+        if not passive_registered(self.task):return []
+        rows=self.constraint_observations({})
+        for row in rows:
+            row.update(scope='complete_finite_time_task',
+                provenance=['/task/goal','/task/evaluator/parameters','/task/timing'],
+                mathematical_coverage='finite_time_task_response; static mechanisms are auxiliary diagnostics')
+        if self.task['goal']['data'].get('version')=='passive_response_v2':
+            from extensions.reference.passive_response import goal_definition,evaluation_definition
+            from types import SimpleNamespace
+            task=SimpleNamespace(goal=SimpleNamespace(data=self.task['goal']['data']),
+                evaluator=SimpleNamespace(parameters=SimpleNamespace(data=self.task['evaluator']['parameters']['data'])))
+            goal=goal_definition(task);evaluation=evaluation_definition(task)
+            for row in rows:
+                row['evaluation_definition']=next((b.model_dump(mode='json') for b in evaluation.bounds
+                    if row['constraint_id'].startswith('evaluator:'+b.name+'_')),None)
+            for i,rule in enumerate(goal.qualifications):
+                for case in goal.load_conditions:
+                    rows.append(dict(constraint_id='qualification:'+case+':'+rule.stage,condition_id=case,
+                        signal='stage_qualification',stage=rule.stage,time_window=list(rule.window_s),
+                        definition=rule.model_dump(mode='json'),scope='dynamic_qualification_gate',
+                        provenance=['/task/goal/data/qualifications/'+str(i)],
+                        mathematical_coverage='Recorded qualification facts; static equilibrium cannot certify this gate'))
+        return rows
+
+    def qualification_diagnosis(self, raw, reference, *, pointer=''):
+        """Read saved v2 facts; no integration, repaired validity or inferred cause."""
+        if not passive_registered(self.task) or self.task['goal']['data'].get('version')!='passive_response_v2':return None
+        from schemas.platform import TaskDefinition
+        from extensions.reference.passive_response import inspect_evidence
+        task=TaskDefinition.model_validate(self.task)
+        validity,reason=inspect_evidence(task,raw)
+        execution_validity=validity
+        task_success=None
+        if validity=='valid':
+            from extensions.reference.passive_evaluation_v2 import metrics
+            measured=metrics(task,raw)
+            validity,reason=measured['validity'],measured.get('reason')
+            task_success=measured['task_success']
+        failures=[]
+        arms=[('',raw)]
+        pair=raw.get('paired_ablation') or {}
+        if pair.get('ablation'):arms.append(('/paired_ablation/ablation',pair['ablation']))
+        for arm,execution in arms:
+            for i,episode in enumerate(execution.get('episodes',[])):
+                for stage,facts in episode.get('qualifications',{}).items():
+                    if facts.get('passed') is not False:continue
+                    rule=next((q for q in self.task['goal']['data']['qualifications'] if q['stage']==stage),None)
+                    failures.append(dict(load_condition=episode['load_condition'],stage=stage,
+                        failed_checks=[k for k,v in facts.get('checks',{}).items() if v is False],
+                        frozen_rule=rule,observed=facts,
+                        source=dict(reference=reference,pointer=pointer+arm+'/episodes/'+str(i)+'/qualifications/'+stage)))
+        category=('unloaded_initial_qualification' if any(f['stage']==self.task['goal']['data']['unloaded_stage'] for f in failures) else
+            'dynamic_stage_qualification' if failures else 'insufficient_mechanism_evidence' if execution_validity=='valid' and validity!='valid' else
+            'numerical_or_source_failure' if raw.get('numerical_failure') or validity!='valid' else
+            'valid_task_metric_failure' if task_success is False else 'valid_execution')
+        return dict(validity=validity,reason=reason,category=category,failed_qualifications=failures,
+            source=dict(reference=reference,pointer=pointer),new_physics_steps=0,
+            invalidated_conclusions=[] if validity=='valid' else
+                ['complete_task_signed_gap','ordinary_task_gradient','structural_descent','qualified_mechanism_certificate'],
+            diagnostic_options=[dict(effect_semantics='mechanism_effect',
+                targets=['constraint_length_residual','constraint_multiplier','constraint_kkt_residual','tangent_stiffness'],
+                prerequisites=['Frozen load and re_equilibrated point; actual static qualification is checked separately.',
+                    'Smooth sensitivities also require unchanged active set, numerical consistency and original parameter authorization.'],
+                status='conditional_not_yet_evaluated',cost_entry='mechanism_research.operation_admission'),
+                dict(effect_semantics='saved_stage_comparison',status='read_only',new_physics_steps=0)],
+            scope='Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.')
 
     def constraint_observations(self, components):
         """Join frozen task meanings to recorded evaluator values; never evaluate physics."""

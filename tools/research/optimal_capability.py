@@ -70,6 +70,14 @@ def family_analysis_parameters(spec,candidate):
         if (row['continuous_perturbation'] and row['study_authorized'] and 'analysis' in spec.get('capabilities',[])
                 and spec.get('mathematical_methods',{}).get(CONIC) and spec.get('mathematical_methods',{}).get(SENSITIVITY)):
             row['applicable_mathematical_methods'].append(SENSITIVITY)
+        if candidate['configuration']['task'].get('physical_problem'):
+            row['applicable_mathematical_methods']=[]
+            if row['continuous_perturbation'] and row['study_authorized'] and 'analysis' in spec.get('capabilities',[]) and spec.get('mathematical_methods',{}).get('mechanism_structure_v1'):
+                row['applicable_mathematical_methods'].append('mechanism_structure_v1')
+            if path.startswith('tendon_parameters.'):
+                row['execution_semantics'].update(explanation=row['analysis_reason'],
+                    effect_channels=['capacity_qualification'] if path.endswith('force_limit_n') else ['clearance_legality'] if path.endswith('diameter_m') else [],
+                    identification='Frozen passive payout; no active input or controller preparation.')
         if not row['study_authorized']:row['authorization_reason']='Not selected by frozen family_sensitivity_variables'
     return rows
 

@@ -370,13 +370,19 @@ def mathematical_method_view(host, reference, *, budget_snapshot=None):
                 operating_point='standardized_initial_pretension',protocol=protocol),
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+METHOD))
         if cfg['task'].get('physical_problem'):
+            from tools.research.structure_research import finite_time_discovery
+            capabilities=task_adapter(cfg).physical_capabilities()
             ready=authorized and item['formal_scope_authorized'] and not closed and not binding_error and (remaining is None or remaining>=1)
-            item.update(planning_status='ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
-                description='Shared geometry, qualified unilateral equilibrium, active sets and re-equilibrated structural response. No dynamic task acceptance.',
+            ready=ready and capabilities['status']=='supported'
+            item.update(planning_status='unsupported' if capabilities['status']=='unsupported' else 'insufficient_budget' if remaining is not None and remaining<1 else 'ready' if ready else 'blocked',execution_status='conditional_on_admission' if ready else 'blocked',
+                description='Shared geometry, qualified unilateral equilibrium, active sets, re-equilibrated response and registered complete finite-time task response. Independent acceptance remains separate.',
                 missing=[] if ready else ['original_scope_budget_or_candidate_admission'],
                 applicable=True,executable=ready,registered_acceptance=task_adapter(cfg).execution_requirements()['registered_acceptance'],
                 prerequisites=['Frozen passive assembly, load condition and material-point binding.'],
-                required_parameters=['V4 physical_problem, no_active_control, re_equilibrated, frozen load_condition, registered target and evaluation cap.'])
+                finite_time_response=finite_time_discovery(cfg),
+                required_parameters=['V4 operation, effect_semantics, matching target, frozen load selection and evaluation cap; registered paths for structural probes.'],
+                coverage=[dict(constraint_id=r['constraint_id'],status='diagnostic_or_finite_time_conditional',expressible=False)
+                    for r in task_adapter(cfg).dynamic_constraint_view()])
             item['applicability'].update(status='applicable',reasons=[],full_task_supported=False)
         if not authorized:
             item['planning_status']='unauthorized';item['execution_status']='blocked'
@@ -500,6 +506,13 @@ def mathematical_research_view(spec, candidate, reference, requirements, methods
         sources=[dict(reference=reference,pointer='/configuration'+p) for p in c['provenance']],
         semantics='Frozen TaskAdapter constraint; mathematical coverage and independent task acceptance are separate.')
         for c in constraints]
+    from tools.research_tasks import task_adapter
+    dynamic=task_adapter(candidate['configuration']).dynamic_constraint_view()
+    for row in dynamic:
+        metrics.append(dict(metric_id=row['constraint_id'],constraint={**row,
+            'signal':dict(name=row['signal']) if isinstance(row['signal'],str) else row['signal']},
+            sources=[dict(reference=reference,pointer='/configuration'+p) for p in row['provenance']],
+            semantics='Frozen dynamic evaluator or qualification gate; not an affine kernel constraint. Static mechanisms are auxiliary only.'))
     if T1 in methods:
         metrics.append(dict(metric_id='best_found_J',unit='1',method=T1,
             constraint_ids=[c['constraint_id'] for c in constraints],

@@ -42,7 +42,7 @@ def configuration_v2():
     return cfg
 
 
-def prepared_host_v2(*,failure=False):
+def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,mock_provider_budget=None):
     from tools.research import core
     from tools.research.state import state,save,update
     from tools.state_io import digest
@@ -52,7 +52,9 @@ def prepared_host_v2(*,failure=False):
     task['goal']['data']['protocol_source']=dict(artifact_id=digest(source))
     task_path=ROOT/'tasks'/('._'+name+'.json');study_path=ROOT/'configs/research'/('._'+name+'.json')
     cfg.update(study_id=name,evidence_destination='runs/'+name,task='../../tasks/'+task_path.name,mode='formal_research')
-    cfg['budgets']['physical_launches']=8;cfg['physical_replay_limit']=8
+    cfg['budgets']['physical_launches']=physical_budget;cfg['physical_replay_limit']=physical_budget
+    if mathematical_budget is not None:cfg['budgets']['mathematical_evaluations']=mathematical_budget
+    if mock_provider_budget is not None:cfg['budgets']['provider_requests']=mock_provider_budget
     task_path.write_text(json.dumps(dict(task=task,seed=1)));study_path.write_text(json.dumps(cfg))
     try:h=core.prepare(study_path,ROOT/'runs'/name)
     finally:task_path.unlink();study_path.unlink()

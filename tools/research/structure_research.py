@@ -47,6 +47,34 @@ def dynamic_protocol(configuration):
         seed=configuration.get('seed'),robot={k:v for k,v in configuration['robot'].items() if k!='structure'})
 
 
+def dynamic_cost(configuration, evaluations, paired=False):
+    """Same frozen episode/time-grid bound for discovery, compile and reservation."""
+    task=configuration['task'];arms=2 if paired else 1
+    episodes=len(task['goal']['data']['load_conditions'])
+    return dict(model_builds=arms*evaluations,episodes=arms*evaluations*episodes,
+        physics_steps=arms*evaluations*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
+
+
+def finite_time_discovery(configuration):
+    from tools.research_tasks import task_adapter
+    cap=task_adapter(configuration).physical_capabilities()
+    if not cap['evaluation']['finite_time_structure_response']:return dict(status='not_applicable')
+    task=configuration['task'];goal=task['goal']['data']
+    paired=bool(task['evaluator']['parameters']['data'].get('mechanism'))
+    tendons=list(configuration['robot']['structure']['data'].get('fixed_payout_lengths_m',{}))
+    legal=goal.get('allowed_ablation')=='disable_selected_passive_limits' and bool(tendons)
+    return dict(status='requires_explicit_intervention' if paired and legal else 'not_applicable' if paired else 'conditional_on_request_admission',
+        effect_semantics='finite_time_task_response',target='finite_time_task_violation',
+        operations=list(OPERATIONS),operating_point='frozen_task_initial_state',load_condition='all_frozen_conditions',
+        required_inputs=['operation','target','requested_budget','parameter_paths for differentiate/optimize',
+            'comparison_candidates for compare']+(['passive_ablation'] if paired else []),
+        paired_required=paired,legal_intervention_tendons=tendons if legal else [],
+        intervention_rule='Main selects exact passive limits; both baseline and ablation run every frozen episode. No legal intervention means no paired mechanism certification.',
+        per_evaluation_cost=dynamic_cost(configuration,1,paired),
+        cost_rule='Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.',
+        evidence_scope='Complete qualified finite-time numerical observation; static proxies cannot certify dynamic acceptance.')
+
+
 def observed_task_improvement(records, rows=(), bounds=None):
     """Reproject recorded full-task facts; derivative quality grants no eligibility."""
     from tools.research_tasks import constraint_gap
@@ -144,10 +172,7 @@ def prepare_context(spec, candidate, study, comparisons):
         minimum_evaluations=minimum,evaluations=study.max_evaluations if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
     if dynamic:
-        task=candidate['configuration']['task'];episodes=len(task['goal']['data']['load_conditions'])
-        arms=2 if study.passive_ablation else 1
-        result['dynamic_cost_bound']=dict(model_builds=arms*result['evaluations'],episodes=arms*result['evaluations']*episodes,
-            physics_steps=arms*result['evaluations']*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
+        result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
     return result
 
 
@@ -177,7 +202,8 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         evidenced_direction=bool(latest_direction),direction_proposed=bool(latest_direction),direction_query=latest_direction,
         formal_candidate_created=formal_candidate_created,
         details_query=dict(reference=reference,view='mathematical_capabilities',pointer='/structure_research'),
-        task_scope='Instantaneous mechanism; full task improvement unmeasured. Short responses use the existing M1 methods.')
+        finite_time_response=finite_time_discovery(candidate['configuration']),
+        task_scope='Fixed-state mechanisms, qualified re-equilibrated passive response and registered full finite-time response have distinct validity; full task improvement unmeasured until actual complete response. Independent task acceptance remains separate.')
 
 
 def matches_direction(spec, baseline, generated, direction):
@@ -274,6 +300,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 value=gap['signed_task_gap'],unit='1',reason=measured.get('reason'),
                 objective_status=gap['objective_status'],
                 task_gap=gap,task_acceptance='unmeasured')
+            diagnosis=task_adapter(cfg).qualification_diagnosis(raw,None,
+                pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
+            if diagnosis:observation['qualification_diagnosis']=diagnosis
             mechanics=dict(dynamic_execution=raw,task_constraints=gap['constraints'],
                 reference_semantics=dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
                     unloaded_tip_drift='same_episode_initial_sample',constraint_model='mujoco_unilateral_soft_limits',
@@ -491,6 +520,10 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 generation=selected['parameters']
                 # Uses the same generation contract as the evaluated model; no candidate is saved.
                 generation=plain(parse_build(dict(space=context['space'],request=generation)).request)
+                if passive:
+                    # Frozen defaults have no passive control effect; the public
+                    # passive generation Schema deliberately omits this field.
+                    generation.pop('control_weights',None)
                 direction=dict(version='structure_direction_v2',candidate=binding['candidate'],parameter_changes=changes,
                     baseline_metric=base['observation'],perturbed_metric=selected['observation'],
                     numerical_consistency=[r['consistency'] for r in responses],
@@ -563,7 +596,13 @@ def dynamic_summary(raw, reference):
             alternatives=direction['generation_handoff']['alternatives'],supporting_evidence=[reference],
             generation_query=dict(reference=reference,pointer='/structure_research/structure_direction/generation_handoff/generation'),
             direction_source=dict(reference=reference,pointer='/structure_research/structure_direction'))
+    diagnosis=(raw.get('baseline') or {}).get('qualification_diagnosis')
+    if diagnosis:
+        diagnosis=deepcopy(diagnosis)
+        diagnosis['source']['reference']=reference
+        for failure in diagnosis['failed_qualifications']:failure['source']['reference']=reference
     return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
+        qualification_diagnosis=diagnosis,
         baseline=compact(gaps[0]) if gaps else None,best_valid=compact(gaps[best]) if best is not None else None,
         hard_gates=gates,parameter_changes=direction['parameter_changes'] if direction else [],
         direction_status=raw.get('direction_status','not_requested'),derivative_status=raw.get('derivative_status','not_requested'),
