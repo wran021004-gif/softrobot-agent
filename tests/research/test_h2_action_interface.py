@@ -11,7 +11,7 @@ from tools.research.contracts import Plan,ResearchDecision,PLAN_RESEARCH_INTENTS
 from tools.research.object_choices import main_tool_schema,reference_choices,expand_references,bind_plan_selection
 from tools.research.provider import provider_schema
 from tools.research.state import state,update
-from tools.research.scientific_intent import parameter_catalog,compile_question
+from tools.research.scientific_intent import parameter_catalog,compile_question,question_schema
 from tools.research.structure_research import parameters
 from tests.research.test_passive_program_v2 import prepared_host_v2
 from tests.research.test_recent_round_tools import run_fixture
@@ -102,6 +102,8 @@ class H2ActionInterfaceTests(unittest.TestCase):
             self.assertIn('domain',page['facts'][0])
         self.assertEqual(rows['segments.0.sections.0.parameters.semi_z_m']['differentiation']['reason'],
             'ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED')
+        structure=question_schema(spec,raw)['$defs']['ScientificStructureV4']
+        self.assertIn('not authorization',structure['properties']['parameter_paths']['description'])
 
     def test_authorized_v4_compile_and_original_admission_without_worker(self):
         h,c=self.host();q=rationale(c);q['decision']['research_intent']='DIAGNOSE'

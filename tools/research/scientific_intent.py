@@ -224,7 +224,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
                 for branch in structure['properties']['parameter_group']['anyOf']:
                     if branch.get('type')=='string':branch['enum']=groups
             structure['properties']['parameter_paths']['items']['enum']=[r['parameter_id'] for r in registered if '*' not in r['parameter_id']]
-            structure['properties']['parameter_paths']['description']='Choose registered physical parameter IDs from this enum, or a parameter_group. Evidence JSON navigation pointers are not parameter IDs.'
+            structure['properties']['parameter_paths']['description']='This enum records parameter existence, not authorization for differentiation or optimization. Use structure_parameters to check study_authorized, differentiation, domain and execution_admission for each selected ID; the original compiler checks the requested method and operating point. Evidence JSON navigation pointers are not parameter IDs.'
         structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
         structure['description']='Choose operation, effect semantics, target, and parameters. Hypothesis and evaluation cap may reuse the completed diagnose decision. Only uniquely implied execution fields are compiled; distinct working points, sources and scientific methods remain Main choices.'
         from tools.research.structure_research import SCALAR_DIRECTION_TARGETS
