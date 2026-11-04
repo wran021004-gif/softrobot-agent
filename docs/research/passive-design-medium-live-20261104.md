@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04，Main 44 快照）
+# 被动自主科研与接口监督进展（2026-11-04，含 Main 82 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -95,3 +95,13 @@ Main 61 读取已有数值结果、62–63 仍发生格式拒绝，Main 64 最�
 Main 64 结算快照：Main 64 / Reporter 3，Provider 67，1080724 tokens；候选 3 / 独立 Replay 1；数学扣记 22 / 实际数学尝试 21；全部实际 model build 24 / episode 启动 24 / 完成 19 / 积分 10000 步。backend 原扣记 25 与真实 build 分列。无 pending、未封口调用、未知 Worker 或占用资源。
 
 Provider 先于 Main 57 按原机制从 64 增至 72，identity 为 `8218929f8a0bb31a58fda5729e7f885bdc917872ff6ba8ff8db9f8073e6b7097`。独立 Replay 形成新有效信息后，再按用户持续授权增加至 80，identity 为 `fdf1c0ec42c1d5a5bc7ca6b675ccaee7e8b50b079470d1b420125ceb5967f4d3`，仍保护其中 4 次收尾；所有历史费用保留。数学、分析及共享物理累计上限继续为 null，单 Worker 和单请求的明确资源合同不变。Main 仍自主选择后续科研问题；每至多四次 Main 检查实际信息增益，不为无变化的读取或错误循环自动续费。
+
+## Main 82 增补：截面半轴的真实优化、生成和独立验证
+
+Main 68–69 自选新问题并 diagnose，Main 70 将 hypothesis 错放 V4 根层后获准确的 `structure.hypothesis` 反馈，Main 71 重新合法提交。它自主选择 `segments.0.sections.0.parameters.semi_y_m` 局部优化，明确上限 12；Worker 实际完成 11 次评价、11 个 episode、5500 步积分，记录更低的完整冻结任务违反量。这是真实截面参数计算，进一步验证扩展授权的作用；仍不是严格梯度、下降证书或独立接受。
+
+Main 72–74 核对生成能力与建议，75 以唯一 changes 路径生成第四候选。按原 candidate_constructed 事件顺序核对真实科学配置，唯一物理变化是 semi_y_m，截面方向及其余物理条件保持父候选值。Main 76–79 完成新 diagnose、两候选完整时域匹配比较（2 次评价、1000 步），然后自主选择独立 Replay；这四次 Main 无格式拒绝。
+
+Main 80 再次写入非法 Plan 根层 selected_candidate，原验证拒绝且不启动 Worker；81 在下一次提交中纠正，完成第四候选独立 Replay。执行、资格、协议和无接触检查有效，独立指标约 `8.5373e-5 m`，较上一独立 Replay 的 `8.7520e-5 m` 下降约 2.45%；仍远高于冻结 `1e-9 m` 阈值，结果为 valid_failure。没有自动删字段、改协议、SELECT 或成功声明。Reporter 记录解读，Main 82 查询新机会与参数。
+
+本快照为 Main 82 / Reporter 5，Provider `87/96`、1402650 tokens；候选 4 / 独立 Replay 2；数学账本 36 / 实际数学评价尝试 34；全部真实 build 38 / episode 启动 38 / 完成 33 / 积分 17000 步，backend 原扣记 40。1889 个 artifact 哈希全部通过，无 pending、未封口调用、未消费响应、未知 Worker 或资源占用。Provider 在有效科研进展后依次 +8 至 88、96；当前 resolved identity 为 `afe79ca993c7664ab75f998774e5eb58b78df9023a4319633643b550a879f098`。科学实现沿用 `2053bc4`，其后仅追加非敏感报告；profile 和数学/共享物理 null 不变。继续执行同一 Store，并按原监督规则检查信息增益。
