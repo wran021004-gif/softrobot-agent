@@ -1,5 +1,6 @@
 """Offline H2 action/parameter projections; no real Provider, Worker or physics."""
 import asyncio
+import json
 from copy import deepcopy
 from types import SimpleNamespace
 import unittest
@@ -43,6 +44,34 @@ class H2ActionInterfaceTests(unittest.TestCase):
         # Expansion uses the SDK-side alias binding; the wire adapter omits it.
         return main_tool_schema(agent.plan_schema(actions,decision_required=True,
             family_version=spec.get('family_space',{}).get('version'),study=spec),reference_choices(h,include_all=True))
+
+    def test_contract_rejections_survive_reads_and_sdk_handoffs_without_repair(self):
+        h,c=self.host();plan=rationale(c);bad_plan=deepcopy(plan);bad_plan['selected_candidate']=c
+        bad_question=dict(version='scientific_question_v4',domain='structure',
+            structure=dict(operation='inspect',effect_semantics='finite_time_task_response',
+                target='finite_time_task_violation',load_condition='all_frozen_conditions'),
+            hypothesis='OFFLINE misplaced hypothesis must not be silently discarded.',requested_budget=1)
+        read=dict(subject='current_task',topic='task',detail_level='targeted')
+        wires=run_fixture(h,[('research_plan',bad_plan),('research_plan',plan),
+            ('research_analysis',bad_question),*[('evidence_read',read)]*4,None])
+        packet=json.loads(wires[-1]['messages'][-1]['content'].split('\n',1)[1])['research']
+        continuation=packet['tool_continuation'];rejections=continuation['input_contract_feedback']['rejections']
+        self.assertEqual({r['tool'] for r in rejections},{'research_plan','research_analysis'})
+        self.assertEqual(next(r for r in rejections if r['tool']=='research_plan')['field'],'selected_candidate')
+        issue=next(r for r in rejections if r['tool']=='research_analysis')
+        self.assertEqual({r['field'] for r in issue['issues']},{'hypothesis','requested_budget'})
+        self.assertTrue(all(r['tool']=='evidence_read' for r in continuation['recent']))
+        schema=next(t['function']['parameters'] for t in wires[-1]['tools'] if t['function']['name']=='research_analysis')
+        root_fields=schema['description'].split('. ',1)[0].removeprefix('Root fields only: ').split(', ')
+        self.assertEqual(set(root_fields),set(schema['properties']))
+        self.assertFalse(Draft202012Validator(schema).is_valid(bad_question))
+        feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+            if e['kind']=='model_original_tool_feedback']
+        original=next(v for v in feedback if v['tool_use']['name']=='research_analysis')['tool_use']['input']
+        self.assertEqual(original,bad_question)
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        self.assertTrue(any(e['kind']=='session_handoff' for e in h.store.events(h.run_id)))
 
     def test_intent_is_host_bound_for_every_action_without_changing_canonical_plan(self):
         schema=main_tool_schema(agent.plan_schema(list(PLAN_RESEARCH_INTENTS),decision_required=True),{})

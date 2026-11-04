@@ -299,6 +299,8 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
     elif 'ScientificControlEffort' in schema.get('$defs',{}):
         schema['$defs']['ScientificControlEffort']['required'].append('method')
     schema=prune_schema_definitions(schema)
+    if question_contract(spec) is ScientificQuestionV4:
+        schema['description']='Root fields only: '+', '.join(schema['properties'])+'. Put execution options inside the selected structure/control payload. The completed diagnose Plan already owns the hypothesis and candidate. '+schema['description']
     return compact_schema(schema) if question_contract(spec) is ScientificQuestionV4 else schema
 
 

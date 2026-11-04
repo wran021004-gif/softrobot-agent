@@ -976,10 +976,10 @@ def diagnostic_brief(value):
 
 def tool_continuation(host):
     """Reconstruct navigation intent from existing events, separately from science."""
-    recent=[];selection=None;plan_action=None;plan_selection=None
+    recent=[];selection=None;plan_action=None;plan_selection=None;contract_rejections=[]
     for event in host.store.events(host.run_id):
         if event['kind']=='authorized_continuation_activated':
-            selection=None;plan_action=None;plan_selection=None
+            selection=None;plan_action=None;plan_selection=None;contract_rejections=[]
         elif event['kind']=='research_tool_route':
             route=host.store.artifact(event['outputs'][0])
             selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],sequence=event['sequence'],
@@ -998,12 +998,26 @@ def tool_continuation(host):
             if use['name']=='evidence_read':
                 if len(json.dumps(use['input']).encode())<=700:entry['query']=use['input']
                 else:entry['original_input_query']=dict(reference=event['outputs'][0],view='full',pointer='/tool_use/input')
-            if result['status']=='error':
+            detail={}
+            if result['status']=='error' or use['name']=='research_analysis':
                 try:detail=json.loads(''.join(b.get('text','') for b in result['content']))
                 except ValueError:detail={}
+            if result['status']=='error':
                 entry.update({k:detail[k] for k in ('error_code','expected') if k in detail})
+            code=detail.get('error_code') or '';reason=detail.get('reason') or ''
+            if code.startswith('TOOL_SCHEMA_') or reason.startswith('INVALID_SCIENTIFIC_') and reason.endswith('_INPUT'):
+                # A completed tool call may return a rejected scientific input.
+                # Keep its validator facts beyond the four most recent reads;
+                # neither a later success nor rotation rewrites that request.
+                rejection=dict(tool=use['name'],source=event['outputs'][0],
+                    **{k:detail[k] for k in ('error_code','reason','field','expected','issues') if k in detail})
+                for key in ('version','action'):
+                    if key in use['input']:rejection[key]=use['input'][key]
+                contract_rejections.append(rejection);contract_rejections=contract_rejections[-3:]
             recent.append(entry);recent=recent[-4:]
     return dict(selection=selection,plan_action=plan_action,plan_selection=plan_selection,recent=recent,
+        input_contract_feedback=dict(rejections=contract_rejections,
+            scope='Historical validator rejections retained across reads and handoffs; current tool Schema is authoritative. No request is repaired or executed by this view; these are not scientific results.'),
         scope='Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.')
 
 
