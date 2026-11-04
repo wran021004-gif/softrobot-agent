@@ -69,6 +69,17 @@ class RecentRoundToolTests(unittest.TestCase):
             ('research_route',dict(tool='research_plan',action='diagnose')),None])
         names=lambda w:{t['function']['name'] for t in w['tools']}
         self.assertEqual(names(wires[0]),{'research_route'})
+        route=next(t['function']['parameters'] for t in wires[0]['tools'] if t['function']['name']=='research_route')
+        validator=Draft202012Validator(route)
+        self.assertTrue(validator.is_valid(dict(tool='evidence_read')))
+        self.assertTrue(validator.is_valid(dict(tool='evidence_read',action=None)))
+        self.assertFalse(validator.is_valid(dict(tool='evidence_read',action='diagnose')))
+        self.assertTrue(validator.is_valid(dict(tool='research_plan',action='diagnose')))
+        self.assertFalse(validator.is_valid(dict(tool='research_plan')))
+        self.assertFalse(validator.is_valid(dict(tool='research_plan',action='not_registered')))
+        if 'research_analysis' in route['properties']['tool']['enum']:
+            self.assertTrue(validator.is_valid(dict(tool='research_analysis')))
+            self.assertFalse(validator.is_valid(dict(tool='research_analysis',action='research_analysis')))
         for w in wires[1:4]:self.assertEqual(names(w),{'research_route','evidence_read'})
         self.assertEqual(names(wires[4]),{'research_route','research_plan'})
         schema=next(t['function']['parameters'] for t in wires[4]['tools'] if t['function']['name']=='research_plan')
