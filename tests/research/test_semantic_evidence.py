@@ -252,5 +252,45 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertIn('semantic_evidence_v1',json.dumps(wires[-1]))
         self.assertFalse(state(h)['candidates'])
 
+    def test_reporter_cold_task_returns_direct_read_without_report_or_science(self):
+        from tools.research import reporter
+        h=question_host();before=deepcopy(state(h));ledger=h.store.remaining()
+        events=h.store.events(h.run_id)
+        with patch.object(reporter,'assemble',side_effect=AssertionError('TASK_IS_NOT_A_RESULT_CARD')):
+            result=reporter.investigate(h,dict(question='Explain the frozen task.',subject='current_task'))
+        self.assertEqual(result['status'],'unsupported')
+        self.assertEqual(result['alternative_tool'],'evidence_read')
+        self.assertFalse(result['scientific_result_created'])
+        self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),ledger)
+        self.assertEqual(h.store.events(h.run_id),events)
+        pages=all_pages(h,result['alternative_query'])
+        snapshot=h.store.session(h.run_id)['snapshot']
+        facts={k:v for p in pages for k,v in p['facts'].items()}
+        self.assertEqual(facts['frozen_task'],snapshot['input']['task'])
+        self.assertFalse(reporter.entries(h))
+        schema=reporter.InvestigationRequest.model_json_schema()
+        self.assertNotIn('current_task',schema['properties']['subject']['anyOf'][0]['enum'])
+        wires=run_fixture(h,[('research_investigate',dict(question='Explain frozen task.',subject='current_task')),None])
+        feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+            if e['kind']=='model_original_tool_feedback'][-1]
+        self.assertEqual(feedback['result']['status'],'error')
+        self.assertIn('evidence_read(subject=current_task, topic=task)',json.dumps(wires[-1]))
+        self.assertFalse(reporter.entries(h));self.assertFalse(state(h)['candidates'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_reporter_focus_is_prose_and_explicit_reads_select_registered_topics(self):
+        from tools.research import reporter
+        h,c=self.host()
+        reporter.investigate(h,dict(question='Explain structure.',subject=c,
+            focus=['materials','tendon routes','stiffness']))
+        saved=reporter.entries(h)[-1][1]
+        self.assertEqual([q['topic'] for q in saved['request']['automatic_reads']],['structure','task'])
+        reporter.investigate(h,dict(question='Read registered parameter choices.',subject=c,
+            reads=[dict(subject=c,topic='structure_parameters')]))
+        saved=reporter.entries(h)[-1][1]
+        self.assertEqual(saved['request']['automatic_reads'],[])
+        self.assertEqual(saved['request']['reads'][0]['topic'],'structure_parameters')
+        self.assertTrue(all(row.get('status')!='unavailable' for row in saved['request']['selected_reads']))
+
 
 if __name__=='__main__':unittest.main()

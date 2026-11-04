@@ -24,8 +24,10 @@ from tools.research.state import state, protected
 class InvestigationRequest(Contract):
     question: str = Field(min_length=1)
     references: list[EvidenceRef] = Field(default_factory=list)
-    subject: Literal['current_candidate','current_task','registered_results','reports'] | EvidenceRef | None = None
-    focus: list[str] = Field(default_factory=list)
+    subject: Literal['current_candidate','registered_results','reports'] | EvidenceRef | None = Field(default=None,
+        description='Owned candidate or saved results/reports only. Read the frozen task directly with evidence_read(subject=current_task, topic=task).')
+    focus: list[str] = Field(default_factory=list,
+        description='Scientific questions for interpretation; does not select automatic topics. Use reads for registered topic/group/selection detail.')
     constraints: list[str] = Field(default_factory=lambda: ['Use existing evidence only'])
     reads: list[EvidenceIntentQuery | EvidenceQuery] = Field(default_factory=list,
         description='Optional scientific subject/topic/group/selection queries. Exact old EvidenceQuery remains for deliberate raw review. Neither grants formal reading credit.')
@@ -218,6 +220,12 @@ def _save(host, report, *, request=None, status='deferred', interpretation_for=N
 
 def investigate(host, request):
     """Typed synchronous tool: existing evidence only, no nested Provider send."""
+    # Accept the previously advertised entry only to return an executable
+    # alternative. A frozen input is not a scientific ResultCard.
+    if request.get('subject')=='current_task':
+        return dict(status='unsupported',reason='REPORTER_REQUIRES_CANDIDATE_OR_SAVED_RESULT',
+            alternative_query=dict(subject='current_task',topic='task'),
+            alternative_tool='evidence_read',scientific_result_created=False,formal_read_credit=False)
     q=InvestigationRequest.model_validate(request)
     from tools.research.evidence_intent import resolve_evidence_intent
     from tools.research.evidence_policy import registered_references
@@ -225,7 +233,7 @@ def investigate(host, request):
     if not q.references:
         subject=q.subject or 'current_candidate'
         if isinstance(subject,EvidenceRef):q.references.extend([subject])
-        elif subject in ('current_candidate','current_task'):
+        elif subject=='current_candidate':
             resolved=resolve_evidence_intent(host,dict(subject=subject,topic='structure'))
             if resolved['status']!='available':raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
             q.references.extend([EvidenceRef.model_validate(resolved['subject'])])
@@ -254,7 +262,7 @@ def investigate(host, request):
         # router. Deterministic topic discovery uses the same compiler as Main.
         for reference in q.references:
             ref=plain(reference)
-            topics=(('structure','structure_parameters','task','mechanism_capabilities','mathematical_methods')
+            topics=(('structure','task')
                 if ref in s.get('candidates',{}).values() else
                 ('mathematical_results',) if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])] else
                 ('physical_results',) if ref in [r for k in RESULT_KEYS if k not in ('analysis_results','mechanics_results') for r in s.get(k,[])] else ())
