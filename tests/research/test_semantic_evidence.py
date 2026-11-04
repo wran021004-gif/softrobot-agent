@@ -241,6 +241,32 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertTrue(all(not p['formal_read_credit'] and not p['scientific_result_created'] for p in pages))
         self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),used)
 
+    def test_saved_math_detail_entry_delivers_semantic_facts_on_actual_sdk(self):
+        from tools.research.research_context import agent_decision_brief
+        from tests.research.test_p63a_math_interface import t1_request,offline_dispatch
+        h,c=self.host();ref=offline_dispatch(h,t1_request(h,c),'semantic-detail-fixture')['reference']
+        query=agent_decision_brief(h)['mathematical_research']['latest_result']['detail_query']
+        self.assertEqual(query,dict(subject=ref,topic='mathematical_results'))
+        reads=deepcopy(state(h).get('evaluation_reads',[]))
+        pages=all_pages(h,query)
+        self.assertTrue(all(p['version']=='semantic_evidence_v1' for p in pages))
+        self.assertTrue(any(item['facts'] for p in pages for item in p['facts']))
+        for page in pages:
+            for source in page['sources']:core.read_evidence(h,source,record_read=False)
+        self.assertEqual(state(h).get('evaluation_reads',[]),reads)
+        wires=run_fixture(h,[('evidence_read',query),None])
+        advertised=packet(wires[0])['mathematical_research']['latest_result']['detail_query']
+        self.assertEqual(advertised['topic'],'mathematical_results')
+        self.assertNotIn('pointer',advertised)
+        feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id)
+            if e['kind']=='model_original_tool_feedback'][-1]
+        value=json.loads(feedback['result']['content'][0]['text'])
+        self.assertEqual(value['version'],'semantic_evidence_v1')
+        self.assertFalse(value['formal_read_credit'])
+        # Exact old derived-view reads remain available for deliberate review.
+        raw=core.read_evidence(h,dict(reference=ref,view='working_set',pointer='/mathematical_decision_view'),record_read=False)
+        self.assertTrue(raw);self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_frozen_task_is_queryable_before_any_candidate_exists(self):
         h=question_host();self.assertFalse(state(h)['candidates'])
         pages=all_pages(h,dict(subject='current_task',topic='task'))

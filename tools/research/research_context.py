@@ -1378,7 +1378,7 @@ def mathematical_discovery_observations(host, current, candidate):
                     ('task_duration_s','analysis_horizon_s','remaining_task_s','origin','period_s','interpretation')},
                 claim_kind=summary['evidence_summary']['claim_kind'],verification_status=summary['evidence_summary']['verification_status']),
             unresolved=summary['decision_relevance']['unresolved_questions'][:2],
-            detail_query=dict(reference=reference,view='working_set',pointer='/mathematical_decision_view'))
+            detail_query=dict(subject=reference,topic='mathematical_results'))
         search=raw.get('native_dynamics',{}).get('optimization',{})
         optimized=raw.get('native_dynamics',{}).get('optimized_schedule',{})
         if summary.get('structure_research'):
