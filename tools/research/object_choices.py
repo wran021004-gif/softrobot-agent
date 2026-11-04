@@ -57,7 +57,7 @@ def reference_schema(schema, choices, action):
             description='Choose the exact named object from saved_object_choices; do not enter hashes.')
     # Freeze the mapping with the advertised schema so no later insertion can rebind it.
     schema['x-research-reference-choices']=choices
-    if action in ('execute','initialize_control','control_search','select','confirm','replay'):
+    if action in ('execute','initialize_control','control_search','physical_replay','select','confirm','replay'):
         decision=schema['$defs']['ResearchDecision']
         decision['properties'].pop('selected_candidate',None)
         decision['required']=[k for k in decision.get('required',[]) if k!='selected_candidate']
@@ -115,6 +115,7 @@ def bind_plan_selection(host,payload):
     if action=='execute':candidate=value['candidate']
     elif action=='initialize_control':candidate=value['control_seed']['candidate']
     elif action=='control_search':candidate=value['control_search']['candidate']
+    elif action=='physical_replay':candidate=value['physical_replay'].get('candidate')
     elif action in ('select','confirm','replay'):
         selected=value['mechanics_source'] if action=='replay' else value['selected_execution']
         refs=selected if isinstance(selected,list) else [selected]

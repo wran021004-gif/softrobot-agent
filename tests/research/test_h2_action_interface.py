@@ -103,7 +103,7 @@ class H2ActionInterfaceTests(unittest.TestCase):
         host=SimpleNamespace(store=SimpleNamespace(artifact=lambda r,**kw:dict(candidate=ref)))
         for action,intent in PLAN_RESEARCH_INTENTS.items():
             q=dict(action=action,decision={},candidate=ref,control_seed=dict(candidate=ref),
-                control_search=dict(candidate=ref),selected_execution=ref,mechanics_source=ref)
+                control_search=dict(candidate=ref),physical_replay=dict(candidate=ref),selected_execution=ref,mechanics_source=ref)
             before=deepcopy(q);bound=bind_plan_selection(host,q)
             self.assertEqual(bound['decision']['research_intent'],intent)
             self.assertEqual(q,before)

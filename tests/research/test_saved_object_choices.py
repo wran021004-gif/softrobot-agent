@@ -90,6 +90,25 @@ class SavedChoiceTests(unittest.TestCase):
         expanded=bind_plan_selection(self.h,expand_references(value,schema));Plan.model_validate(expanded)
         self.assertEqual(expanded['candidate'],expanded['decision']['selected_candidate'])
 
+    def test_direct_physical_replay_binds_its_only_candidate_and_rejects_conflicts(self):
+        schema=reference_schema(plan_schema(['physical_replay'],decision_required=True,focused=True),
+            {'candidate_9':self.c},'physical_replay')
+        self.assertNotIn('selected_candidate',schema['$defs']['ResearchDecision']['properties'])
+        value=rationale('physical_replay');value['physical_replay']=dict(candidate='candidate_9')
+        Draft202012Validator(schema).validate(value)
+        original=deepcopy(value)
+        expanded=bind_plan_selection(self.h,expand_references(value,schema));Plan.model_validate(expanded)
+        self.assertEqual(expanded['decision']['selected_candidate'],self.c)
+        self.assertEqual(value,original)
+        conflicting=deepcopy(expanded);conflicting['decision']['selected_candidate']=ref('d')
+        with self.assertRaisesRegex(ValueError,'CONFLICTING_CANDIDATE_REFERENCES'):
+            bind_plan_selection(self.h,conflicting)
+        invalid=deepcopy(value);invalid['selected_candidate']='candidate_9'
+        self.assertFalse(Draft202012Validator(schema).is_valid(invalid))
+        bound_invalid=bind_plan_selection(self.h,{**expanded,'selected_candidate':self.c})
+        self.assertIn('selected_candidate',bound_invalid)
+        with self.assertRaises(ValueError):Plan.model_validate(bound_invalid)
+
     def test_joint_select_preserves_original_qualification_rejection(self):
         first,second=ref('e'),ref('f')
         self.records[first['artifact_id']]=dict(candidate=self.c);self.records[second['artifact_id']]=dict(candidate=ref('d'))

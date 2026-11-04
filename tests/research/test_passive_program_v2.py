@@ -136,6 +136,7 @@ class PassiveProgramTests(unittest.TestCase):
         from tools.research.reporter import _card
         from tools.research.evidence_views import acceptance_certificate
         h,c=prepared_host_v2();plan=replay_plan(c);plan['physical_replay']['passive_ablation']=['tendon_0']
+        plan['decision'].pop('selected_candidate')
         with patch('tools.research.physical_replay.guard'),patch('tools.research.reporter._wire',side_effect=ValueError('Mock Reporter transport disabled')):
             wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='physical_replay')),('research_plan',plan)],limit=2)
         self.assertEqual(len(state(h).get('physical_replays',[])),1)
@@ -147,6 +148,7 @@ class PassiveProgramTests(unittest.TestCase):
             receipt=h.store.artifact(arm['receipt_reference']);self.assertTrue(receipt['parent_boundary']['termination_confirmed'])
             self.assertEqual(receipt['raw_reference'],arm['raw_reference'])
         schema=next(t['function']['parameters'] for t in wires[1]['tools'] if t['function']['name']=='research_plan')
+        self.assertNotIn('selected_candidate',schema['$defs']['ResearchDecision']['properties'])
         self.assertIn('passive_ablation',schema['$defs']['PhysicalReplayRequest']['properties'])
         self.assertNotIn('state_vector',json.dumps(schema));self.assertNotIn('efc_J',json.dumps(wires))
         card=plain(_card(h,ref));self.assertTrue(any(f['name']=='passive_program' for f in card['recorded_context']))
