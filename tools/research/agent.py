@@ -1,5 +1,5 @@
 """Production Strands harness, accounted provider transport and persisted conversation."""
-from tools.research.budget import mathematics_fits
+from tools.research.budget import mathematics_fits,decision_budget
 import asyncio
 from copy import deepcopy
 import json, time
@@ -1480,7 +1480,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     await agent._session_manager.save_snapshot(agent,is_latest=True)
                     record(host,'supervisor_pause',dict(boundary='request_feedback',session_id=agent._session_manager.session_id,
                         sdk_message_identity=digest(agent.messages),budgets_preserved=True,next_request_sent=False,
-                        budget=decision_packet(host)['research']['budget']))
+                        budget=decision_budget(host),budget_source='tools.research.budget.decision_budget'))
                     break
                 record(host,'sdk_invocation_suspended_for_handoff',dict(session_id=agent._session_manager.session_id,
                     sdk_message_identity=digest(agent.messages),invocation_completed=False,
