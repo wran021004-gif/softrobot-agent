@@ -44,6 +44,17 @@ def initial_messages(study_id):
 
 def selected_evidence_facts(parsed, query, limit):
     """Keep bounded selected facts through handoff; full evidence stays in L2."""
+    if isinstance(parsed,dict) and parsed.get('version')=='semantic_evidence_v1':
+        # The continuation is executable: preserve its complete scope and exact
+        # content identity before optional older facts. Latest feedback already
+        # uses the existing preserve_once exact-delivery branch below.
+        facts={k:deepcopy(parsed[k]) for k in ('version','status','study_id','subject','topic','view_kind',
+            'content_identity','query','next_query','formal_read_credit','scientific_result_created') if k in parsed}
+        facts.update(scope='Saved semantic facts; no new scientific result or complete-read credit.',
+            recovery_query=deepcopy(parsed['query']))
+        for key in ('sources','facts','total'):
+            if key in parsed and len(json.dumps({**facts,key:parsed[key]}).encode())<=limit:facts[key]=deepcopy(parsed[key])
+        return facts
     if (query.get('view')=='mathematical_capabilities' and isinstance(parsed,dict)
             and all(k in parsed for k in ('method','next_submission','request_template_query'))):
         # A single method action has a small execution-facing projection. Keep
@@ -120,7 +131,7 @@ def feedback_delivery(host, tool_ids, *, compact=False, exact=False, db=None):
         size=len(json.dumps(result,separators=(',',':')).encode())
         query=value['tool_use']['input']
         default_view='summary' if spec.get('research_decisions',{}).get('context_limits') else 'full'
-        whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success'
+        whole_read=(compact and value['tool_use']['name']=='evidence_read' and result['status']=='success' and 'topic' not in query
             and query.get('view',default_view)=='full' and not query.get('pointer'))
         from tools.research.config import bounded_evidence_enabled,evidence_feedback_limit
         bounded=bounded_evidence_enabled(spec)

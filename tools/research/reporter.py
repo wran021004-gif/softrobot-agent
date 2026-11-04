@@ -4,6 +4,7 @@ F0 owns facts and evidence admission. Reports are retrieval artifacts, never
 registered evidence. Model interpretation runs at settled pre-decision boundaries.
 """
 from copy import deepcopy
+from typing import Literal
 import json
 import httpx
 from pydantic import Field
@@ -13,7 +14,7 @@ from schemas.research_reporting import (EvidenceLocation, EvidenceRelation,
     RecordedField, ReportedMetric, ReporterInterpretation, ScientificReport)
 from tools.platform_store import plain
 from tools.research.core import read_evidence
-from tools.research.contracts import EvidenceQuery, ExperienceQuery
+from tools.research.contracts import EvidenceQuery, EvidenceIntentQuery, ExperienceQuery
 from tools.research.evidence_views import (result_card,recorded_math_summary,recorded_control_diagnostics,
     recorded_static_summary,metric_semantics,quantitative_facts,_resources)
 from tools.research.evidence_policy import paired_evidence
@@ -22,11 +23,12 @@ from tools.research.state import state, protected
 
 class InvestigationRequest(Contract):
     question: str = Field(min_length=1)
-    references: list[EvidenceRef] = Field(min_length=1)
+    references: list[EvidenceRef] = Field(default_factory=list)
+    subject: Literal['current_candidate','current_task','registered_results','reports'] | EvidenceRef | None = None
     focus: list[str] = Field(default_factory=list)
     constraints: list[str] = Field(default_factory=lambda: ['Use existing evidence only'])
-    reads: list[EvidenceQuery] = Field(default_factory=list,
-        description='Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit')
+    reads: list[EvidenceIntentQuery | EvidenceQuery] = Field(default_factory=list,
+        description='Optional scientific subject/topic/group/selection queries. Exact old EvidenceQuery remains for deliberate raw review. Neither grants formal reading credit.')
     experience_queries: list[ExperienceQuery] = Field(default_factory=list,max_length=8,
         description='Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.')
 
@@ -217,6 +219,22 @@ def _save(host, report, *, request=None, status='deferred', interpretation_for=N
 def investigate(host, request):
     """Typed synchronous tool: existing evidence only, no nested Provider send."""
     q=InvestigationRequest.model_validate(request)
+    from tools.research.evidence_intent import resolve_evidence_intent
+    from tools.research.evidence_policy import registered_references
+    s=state(host)
+    if not q.references:
+        subject=q.subject or 'current_candidate'
+        if isinstance(subject,EvidenceRef):q.references.extend([subject])
+        elif subject in ('current_candidate','current_task'):
+            resolved=resolve_evidence_intent(host,dict(subject=subject,topic='structure'))
+            if resolved['status']!='available':raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
+            q.references.extend([EvidenceRef.model_validate(resolved['subject'])])
+        else:
+            refs=[r for k in RESULT_KEYS for r in s.get(k,[])] if subject=='registered_results' else [r for r,_ in entries(host)]
+            if not refs:raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
+            q.references.extend(EvidenceRef.model_validate(r) for r in refs)
+    allowed=[*s.get('candidates',{}).values(),*registered_references(host),*[r for r,_ in entries(host)]]
+    if any(plain(r) not in allowed for r in q.references):raise ValueError('INVESTIGATION_SUBJECT_NOT_REGISTERED_IN_STUDY')
     # A prior report is a retrieval wrapper. Investigate its original results,
     # never recursively send the old full report as another scientific result.
     previous_reports=[];references=[]
@@ -232,13 +250,15 @@ def investigate(host, request):
     report=assemble(host,q.references,question=q.question)
     automatic=[]
     if not q.reads:
-        # Cards already carry verified metrics/status/cost with raw pointers.
-        # Discover bounded child structure, not an entire trajectory/history.
-        for card in report.results:
-            q.reads.append(EvidenceQuery(reference=card.identity.result.reference,view='summary'))
-            for source in card.detail_sources[:3]:
-                query=EvidenceQuery(reference=source.reference,pointer=source.pointer,view='summary')
-                if query not in q.reads:q.reads.append(query)
+        # Focus is authored scientific prose for Reporter, never a second field
+        # router. Deterministic topic discovery uses the same compiler as Main.
+        for reference in q.references:
+            ref=plain(reference)
+            topics=(('structure','structure_parameters','task','mechanism_capabilities','mathematical_methods')
+                if ref in s.get('candidates',{}).values() else
+                ('mathematical_results',) if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])] else
+                ('physical_results',) if ref in [r for k in RESULT_KEYS if k not in ('analysis_results','mechanics_results') for r in s.get(k,[])] else ())
+            q.reads.extend(EvidenceIntentQuery(subject=reference,topic=topic) for topic in topics)
         automatic=[plain(query) for query in q.reads]
     # Investigation owns detailed cross-model reading; main Agent receives L1.
     for reference in q.references:
@@ -250,11 +270,21 @@ def investigate(host, request):
     selected_reads=[]
     for query in q.reads:
         try:
-            selected_reads.append(dict(query=plain(query),value=read_evidence(host,plain(query),record_read=False)))
+            if isinstance(query,EvidenceIntentQuery):
+                page=resolve_evidence_intent(host,plain(query))
+                selected_reads.append(dict(query=plain(query),value=page))
+                # Read bounded existing pages, without additional model calls.
+                # A retained continuation permits exact future recovery.
+                size=len(json.dumps(page).encode())
+                while page.get('next_query') and size<12000:
+                    next_query=page['next_query'];page=resolve_evidence_intent(host,next_query)
+                    selected_reads.append(dict(query=next_query,value=page));size+=len(json.dumps(page).encode())
+            else:selected_reads.append(dict(query=plain(query),value=read_evidence(host,plain(query),record_read=False)))
         except (ValueError,KeyError,IndexError) as exc:
             selected_reads.append(dict(query=plain(query),status='unavailable',reason=str(exc),
                 navigation=getattr(exc,'evidence_navigation',None),
-                suggested_query=dict(reference=plain(query.reference),view='summary',pointer='')))
+                suggested_query=plain(query) if isinstance(query,EvidenceIntentQuery) else
+                    dict(reference=plain(query.reference),view='summary',pointer='')))
     from tools.research.experience import retrieve
     request=plain(q)
     request['selected_reads']=selected_reads
@@ -433,7 +463,7 @@ def reporter_handoff_summary(host, reference, saved):
         limitations.extend(evidence['unsupported_inferences']);unresolved.extend(evidence['unresolved'])
     interpretations=report['interpretations'] if saved['interpretation_status']=='available' else []
     reads=(saved.get('request') or {}).get('reads',[])
-    pending=[c for c in corrections if not any(q['reference']==c['reference'] and
+    pending=[c for c in corrections if not any(q.get('reference')==c['reference'] and
         (not q.get('pointer') or q['pointer']==c['pointer']) and q.get('view','full')=='full' for q in reads)]
     if pending:interpretations=[]
     # The full revision remains readable; hypotheses retain their original kind.
@@ -465,7 +495,7 @@ def _compact_reads(reads, automatic):
     for row in reads:
         query=row['query']
         if row.get('status')=='unavailable':result.append(row);continue
-        if query in automatic:
+        if query in automatic and 'topic' not in query:
             result.append(dict(query=query,status='projected_in_result_facts'));continue
         value=row.get('value')
         if len(json.dumps(value,separators=(',',':')).encode())>12000:
@@ -486,7 +516,7 @@ def applicable_corrections(host, references):
         for i,row in enumerate(value.get(key,[])) if row.get('reference') in references]
 
 
-def _source_catalog(host, report, queries):
+def _source_catalog(host, report, queries, *, semantic_sources=()):
     """Request-local raw locations; never infer paths from summary field names."""
     catalog={};seen=set()
     def add(source):
@@ -516,10 +546,12 @@ def _source_catalog(host, report, queries):
             for pointer in pointers:add(EvidenceLocation(reference=card.identity.result.reference,pointer=pointer))
     for relation in report.relations:collect(relation.sources)
     for query in queries:
+        if 'topic' in query:continue
         # These pointers address a projection, not the immutable raw document.
         # Keep the exact view in selected_reads; cite its raw artifact root.
         pointer='' if query.get('view') in ('working_set','mathematical_capabilities','summary') else query.get('pointer','')
         add(EvidenceLocation(reference=query['reference'],pointer=pointer))
+    for location in semantic_sources:add(EvidenceLocation.model_validate(location))
     return catalog
 
 
@@ -534,7 +566,9 @@ def _wire(host, reference, saved):
         for query in q.get('reads',[]):
             reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
     report=ScientificReport.model_validate(saved['report'])
-    catalog=_source_catalog(host,report,[r['query'] for r in reads if r.get('status')!='unavailable'])
+    available=[r for r in reads if r.get('status')!='unavailable']
+    catalog=_source_catalog(host,report,[r['query'] for r in available],
+        semantic_sources=[loc for r in available if 'topic' in r['query'] for loc in (r.get('value') or {}).get('sources',[])])
     from tools.research.capability import signed_score_comparisons
     comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
         card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
@@ -631,7 +665,7 @@ def _finish(host, boundary, wire, response):
             for loc in [plain(card.identity.result),*map(plain,card.detail_sources)]}
         allowed.update(f.source.reference.artifact_id for card in report.results for f in card.recorded_context)
         for relation in report.relations:allowed.update(s.reference.artifact_id for s in relation.sources)
-        allowed.update(q['reference']['artifact_id'] for q in (saved.get('request') or {}).get('reads',[]))
+        allowed.update(q['reference']['artifact_id'] for q in (saved.get('request') or {}).get('reads',[]) if 'reference' in q)
         # The exact persisted request catalog already contains typed metric,
         # critical-sample and input sources. They are part of this request scope.
         allowed.update(loc['reference']['artifact_id'] for loc in payload.get('source_catalog',{}).values())

@@ -60,7 +60,9 @@ def resolve_evidence_intent(host, query):
         if q.group is not None or selected:raise ValueError('EVIDENCE_TOPIC_HAS_NO_GROUP_OR_SELECTION')
     if q.topic=='structure':
         candidate_required();no_selectors();data=resolved_candidate_facts(raw,subject)
-        data['fixed_payout_lengths_m']=raw.get('parameters',{}).get('payout_lengths_m',{})
+        data['fixed_payout_lengths_m']=raw['configuration']['robot']['structure']['data'].get('fixed_payout_lengths_m',{})
+        from tools.research_tasks import task_adapter
+        data['physical_capabilities']=task_adapter(raw['configuration']).physical_capabilities()
         source(subject,'/configuration');source(subject,'/parameters')
     elif q.topic=='structure_parameters':
         candidate_required();rows=parameter_catalog(s['spec'],raw)
@@ -132,7 +134,8 @@ def resolve_evidence_intent(host, query):
         # task/model/timing/coverage and multi-factor limitations.
         from tools.research.reporter import assemble
         report=plain(assemble(host,selected,question='Compare the two explicitly selected existing results.'))
-        data=dict(results=report['results'],relations=report['relations'],limitations=report['limitations'])
+        data=dict(results=report['results'],relations=report['relations'],
+            limitations='Only recorded comparison relations are supported; no new causal or acceptance conclusion.')
         for ref in selected:source(ref)
     elif q.topic=='reporter_explanations':
         no_group=q.group is None

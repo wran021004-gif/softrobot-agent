@@ -107,5 +107,62 @@ class SemanticEvidenceTests(unittest.TestCase):
         used=h.store.remaining()['used'];self.assertEqual(used['backend_solves'],0)
         self.assertEqual(state(h)['mathematical_evaluations'],0)
 
+    def test_m5_constraints_methods_and_sdk_discovery(self):
+        from tests.research.test_p63a_math_interface import fixture_host
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        from tools.research.config import ROOT
+        from tools.state_io import read
+        execution=read(ROOT/'configs/research/study_p4_m5_autonomy.json')['family_execution']
+        h=fixture_host(task='bf5_position_tool_axis_v1.json',family_execution=execution,control='control_bf5_tool_axis.json');c=generate(h)
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE])
+        task={k:v for p in all_pages(h,dict(subject=c,topic='task')) for k,v in p['facts'].items()}
+        self.assertIn('tool_axis',json.dumps(task))
+        self.assertEqual(task['frozen_task']['family'],'task.position_tool_axis')
+        methods=[r for p in all_pages(h,dict(subject=c,topic='mathematical_methods')) for r in p['facts']]
+        by_id={r['id']:r for r in methods}
+        self.assertEqual(by_id['task_capability']['planning_status'],'unsupported')
+        self.assertIn('mujoco_direct_control_v1',by_id)
+        wires=run_fixture(h,[('evidence_read',dict(subject=c,topic='task')),('evidence_read',dict(subject=c,topic='mathematical_methods')),None])
+        self.assertIn('tool_axis',json.dumps(wires[-1]))
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_reporter_semantic_sources_and_next_main_explanation(self):
+        import asyncio,httpx
+        from tools.research import reporter
+        from tools.research.state import save
+        from tests.research.test_s129_agent_reporting import reporter_response
+        h,c=self.host()
+        before=deepcopy(state(h).get('evaluation_reads',[]))
+        outcome=reporter.investigate(h,dict(question='Explain the registered structural and material mechanisms.',
+            subject=c,focus=['effective continuous parameters','registered mechanism prerequisites']))
+        saved=h.store.artifact(outcome['report_reference'])
+        self.assertTrue(saved['request']['selected_reads'])
+        self.assertTrue(all('topic' in q for q in saved['request']['reads']))
+        wire=reporter._wire(h,outcome['report_reference'],saved)
+        payload=json.loads(wire['messages'][-1]['content'])
+        for source in payload['source_catalog'].values():core.read_evidence(h,source,record_read=False)
+        self.assertTrue(any('/configuration' in loc['pointer'] for loc in payload['source_catalog'].values()))
+        self.assertTrue(any('facts' in (r.get('value') or {}) for r in payload['selected_reads']))
+        with patch('tools.research.provider.credential',return_value='offline'):
+            asyncio.run(reporter.complete_reports(h,httpx.MockTransport(reporter_response)))
+        current=reporter.current_reports(h)[-1]
+        self.assertEqual(current[1]['interpretation_status'],'available',current[1].get('error'))
+        wires=run_fixture(h,[None])
+        findings=packet(wires[0])['reporter_findings']
+        self.assertTrue(findings[-1]['interpretations'])
+        self.assertEqual(state(h).get('evaluation_reads',[]),before)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_semantic_compaction_keeps_cursor_and_no_formal_credit(self):
+        from tools.research.session_handoff import selected_evidence_facts
+        h,c=self.host();query=dict(subject=c,topic='structure_parameters')
+        value=core.read_tool_evidence(h,query)
+        compact=selected_evidence_facts(value,query,1700)
+        self.assertEqual(compact['next_query'],value['next_query'])
+        self.assertFalse(compact['formal_read_credit'])
+        self.assertFalse(compact['scientific_result_created'])
+        self.assertEqual(core.read_tool_evidence(h,compact['next_query'])['status'],'available')
+
 
 if __name__=='__main__':unittest.main()
