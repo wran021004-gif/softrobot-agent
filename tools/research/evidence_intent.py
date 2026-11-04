@@ -39,11 +39,19 @@ def resolve_evidence_intent(host, query):
     physics=[r for k in ('results','physical_replays','matched_state_results','rl_evaluations') for r in s.get(k,[])]
     from tools.research.reporter import entries
     reports=[r for r,_ in entries(host)] if q.topic=='reporter_explanations' or q.subject=='reports' else []
+    with host.store.connect(True) as db:
+        snapshot=dict(artifact_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(host.run_id,)).fetchone()[0],
+            media_type='application/json')
     subject=plain(q.subject)
-    if subject=='current_candidate' or subject=='current_task':
+    task_topics=('task','research_history','research_opportunities')
+    if subject=='current_task':
+        if q.topic not in task_topics:raise ValueError('CURRENT_TASK_REQUIRES_TASK_OR_HISTORY_TOPIC')
+        subject=snapshot
+    elif subject=='current_candidate':
         subject=decision_candidate(host,{},research_intent(host))
         if subject is None:return _choices('NO_CURRENT_CANDIDATE',candidates)
-    registered=[*candidates,*registered_references(host),*reports]
+    if subject==snapshot and q.topic not in task_topics:raise ValueError('FROZEN_TASK_SUBJECT_SCOPE_MISMATCH')
+    registered=[*candidates,*registered_references(host),*reports,snapshot]
     if isinstance(subject,dict) and subject not in registered:
         raise ValueError('EVIDENCE_SUBJECT_NOT_REGISTERED_IN_STUDY')
     # Even a registered object must pass the original protected/raw read boundary.
@@ -76,12 +84,13 @@ def resolve_evidence_intent(host, query):
             'physical_meaning','unit','current_value','effective','continuous','selectable','study_authorized')} for r in rows]
         source(subject,'/parameters');source(subject,'/configuration')
     elif q.topic=='task':
-        candidate_required();no_selectors()
+        if subject not in [*candidates,snapshot]:raise ValueError('FROZEN_TASK_OR_OWNED_CANDIDATE_REQUIRED')
+        no_selectors();configuration=raw['input'] if subject==snapshot else raw['configuration']
         from tools.research_tasks import task_adapter
-        adapter=task_adapter(raw['configuration'])
+        adapter=task_adapter(configuration)
         data=dict(description=adapter.describe(),constraints=adapter.constraint_observations({}),
-            frozen_task=raw['configuration']['task'])
-        source(subject,'/configuration/task')
+            frozen_task=configuration['task'])
+        source(subject,'/input/task' if subject==snapshot else '/configuration/task')
     elif q.topic in ('mathematical_methods','mechanism_capabilities'):
         candidate_required();method_view=mathematical_method_view(host,subject)
         if q.topic=='mathematical_methods':
@@ -122,8 +131,11 @@ def resolve_evidence_intent(host, query):
         refs=selected or refs;data=[]
         for ref in refs:
             source(ref);card=plain(result_card(host,ref))
-            data.append(dict(reference=ref,facts=mathematical_decision_view(card) if q.topic=='mathematical_results' else card))
-        authority=True
+            facts=mathematical_decision_view(card) if q.topic=='mathematical_results' else card
+            if q.detail_level=='summary' and q.topic=='physical_results':
+                facts={k:card[k] for k in ('identity','metrics','original_constraint_violations','evidence_summary') if k in card}
+            data.append(dict(reference=ref,facts=facts))
+        view='raw_scientific_projection';authority=True
     elif q.topic=='comparison':
         no_group=q.group is None
         if not no_group:raise ValueError('COMPARISON_TOPIC_HAS_NO_GROUP')
@@ -136,6 +148,7 @@ def resolve_evidence_intent(host, query):
         report=plain(assemble(host,selected,question='Compare the two explicitly selected existing results.'))
         data=dict(results=report['results'],relations=report['relations'],
             limitations='Only recorded comparison relations are supported; no new causal or acceptance conclusion.')
+        view='derived_research_comparison'
         for ref in selected:source(ref)
     elif q.topic=='reporter_explanations':
         no_group=q.group is None
@@ -150,8 +163,17 @@ def resolve_evidence_intent(host, query):
             saved=read_evidence(host,dict(reference=ref),record_read=False);report=saved['report']
             source(ref,'/report/interpretations')
             for card in report['results']:source(card['identity']['result']['reference'])
-            data.append(dict(report_reference=ref,status=saved.get('reporter_status'),interpretations=report['interpretations'],
+            data.append(dict(report_reference=ref,status=saved.get('interpretation_status'),interpretations=report['interpretations'],
                 original_results=[c['identity']['result']['reference'] for c in report['results']]))
+    elif q.topic in ('research_history','research_opportunities'):
+        no_selectors();anchor=s['family_space_reference']
+        pointer='/research_history_index' if q.topic=='research_history' else '/research_opportunities'
+        data=read_evidence(host,dict(reference=anchor,view='working_set',pointer=pointer),record_read=False)
+        source(anchor)
+        if q.topic=='research_history':
+            for row in data.values():
+                location=row.get('source') or {}
+                if location.get('reference'):source(location['reference'],location.get('pointer',''))
     else:raise ValueError('UNSUPPORTED_EVIDENCE_TOPIC')
     data=_scientific_details(data)
     bound=q.model_dump(mode='json',exclude={'continuation'});bound['subject']=subject
@@ -191,7 +213,8 @@ def evidence_intent_access():
     return dict(interface='semantic_evidence_v1',tool='evidence_read',
         queries=[dict(subject='current_candidate',topic=t) for t in
             ('structure','structure_parameters','mechanism_capabilities','mathematical_methods','mathematical_results','physical_results')]
-            +[dict(subject='current_task',topic='task'),dict(subject='reports',topic='reporter_explanations')],
+            +[dict(subject='current_task',topic=t) for t in ('task','research_history','research_opportunities')]
+            +[dict(subject='reports',topic='reporter_explanations')],
         guidance='Use registered choices and next_query verbatim. Exact EvidenceQuery remains available for deliberate raw review and formal acceptance; ordinary queries grant no complete-read credit.')
 
 
@@ -217,4 +240,6 @@ def semantic_query_handles(value):
         return dict(subject=ref,topic='structure_parameters')
     if ref and view in ('full','summary','range') and path.startswith('/report/interpretations'):
         return dict(subject=ref,topic='reporter_explanations')
+    if view=='working_set' and path in ('/research_history_index','/research_opportunities'):
+        return dict(subject='current_task',topic='research_history' if path=='/research_history_index' else 'research_opportunities')
     return {k:semantic_query_handles(v) for k,v in value.items()}

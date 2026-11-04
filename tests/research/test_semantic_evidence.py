@@ -24,6 +24,14 @@ def all_pages(h,q):
     return pages
 
 
+def capture_schemas(wires,label):
+    from tools.research.config import ROOT
+    directory=ROOT/'runs/semantic-evidence-wire-captures';directory.mkdir(exist_ok=True)
+    schemas={t['function']['name']:t['function']['parameters'] for t in wires[0]['tools']
+        if t['function']['name'] in ('evidence_read','research_investigate')}
+    (directory/(label+'.json')).write_text(json.dumps(dict(scope='Actual SDK Mock HTTP Schema; no real Provider.',schemas=schemas),indent=2),encoding='utf-8')
+
+
 class SemanticEvidenceTests(unittest.TestCase):
     def setUp(self):
         for name in ('tools.service_execution._run_contained','mujoco.mj_step',
@@ -78,6 +86,7 @@ class SemanticEvidenceTests(unittest.TestCase):
         q=dict(subject=c,topic='structure_parameters')
         nxt=core.read_tool_evidence(h,q)['next_query']
         wires=run_fixture(h,[('evidence_read',q),('evidence_read',nxt),('evidence_read',dict(subject=c,topic='mathematical_methods')),None])
+        capture_schemas(wires,'active')
         schema=next(t['function']['parameters'] for t in wires[0]['tools'] if t['function']['name']=='evidence_read')
         self.assertIn('EvidenceIntentQuery',schema['$defs'])
         for wire in wires:
@@ -103,7 +112,13 @@ class SemanticEvidenceTests(unittest.TestCase):
         params=[r for p in all_pages(h,dict(subject=c,topic='structure_parameters')) for r in p['facts']]
         self.assertTrue(any(r['selectable'] for r in params))
         self.assertEqual(state(h)['spec']['research_decisions']['analysis_interface'],'scientific_question_v4')
-        self.assertIn('structure',question_schema(state(h)['spec'],host=h)['properties'])
+        schema=question_schema(state(h)['spec'],h.store.artifact(c))
+        self.assertIn('structure',schema['properties'])
+        wires=run_fixture(h,[('research_route',dict(tool='evidence_read')),
+            ('evidence_read',dict(subject=c,topic='mechanism_capabilities')),None])
+        capture_schemas(wires[1:],'passive')
+        self.assertIn('finite_time_task_response',json.dumps(wires[-1]))
+        self.assertEqual(packet(wires[-1])['research_focus']['control']['status'],'not_applicable')
         used=h.store.remaining()['used'];self.assertEqual(used['backend_solves'],0)
         self.assertEqual(state(h)['mathematical_evaluations'],0)
 
@@ -163,6 +178,79 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertFalse(compact['formal_read_credit'])
         self.assertFalse(compact['scientific_result_created'])
         self.assertEqual(core.read_tool_evidence(h,compact['next_query'])['status'],'available')
+
+    def test_changed_projection_rejects_old_cursor_and_pins_old_candidate(self):
+        from tools.research.scientific_intent import parameter_catalog
+        h,c=self.host();q=dict(subject='current_candidate',topic='structure_parameters')
+        first=core.read_tool_evidence(h,q);nxt=first['next_query']
+        generate(h,lengths=(.17,.11))
+        self.assertEqual(core.read_tool_evidence(h,nxt)['subject'],c)
+        rows=parameter_catalog(state(h)['spec'],h.store.artifact(c));changed=deepcopy(rows)
+        changed[0]['current_value']='changed registered projection fixture'
+        with patch('tools.research.scientific_intent.parameter_catalog',return_value=changed):
+            with self.assertRaisesRegex(ValueError,'STALE_EVIDENCE_CONTINUATION'):core.read_tool_evidence(h,nxt)
+
+    def test_semantic_physical_read_never_grants_select_and_raw_guard_remains(self):
+        from tests.research.test_p63g_bounded_evidence import bounded_host,BoundedEvidenceTests
+        from tools.research.feedback import eligibility
+        from tools.research.state import save
+        h=bounded_host();c,ref=BoundedEvidenceTests().physical(h)
+        before=deepcopy(state(h).get('evaluation_reads',[]))
+        pages=all_pages(h,dict(subject=ref,topic='physical_results'))
+        self.assertTrue(all(not p['formal_read_credit'] for p in pages))
+        self.assertEqual(state(h).get('evaluation_reads',[]),before)
+        self.assertFalse(eligibility(h,ref,selection=True)['eligible'])
+        forbidden=save(h,dict(fixture='Unregistered raw object'),'unregistered_fixture')
+        with patch('tools.research.core.protected',return_value=True):
+            with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ'):
+                core.read_tool_evidence(h,dict(reference=forbidden,view='full'))
+        with self.assertRaisesRegex(ValueError,'EVIDENCE_SUBJECT_NOT_REGISTERED'):
+            core.read_tool_evidence(h,dict(subject=forbidden,topic='physical_results'))
+
+    def test_main_delegates_saved_result_without_pointer_on_actual_sdk(self):
+        import httpx
+        from tools.research import reporter
+        from tests.research.test_p63a_math_interface import t1_request,offline_dispatch
+        from tests.research.test_s129_agent_reporting import reporter_response
+        h,c=self.host();ref=offline_dispatch(h,t1_request(h,c),'semantic-synthetic-saved-math')['reference']
+        complete=reporter.complete_reports
+        async def mock_reports(host,transport,**kwargs):
+            return await complete(host,httpx.MockTransport(reporter_response),**kwargs)
+        with patch.object(reporter,'complete_reports',side_effect=mock_reports):
+            wires=run_fixture(h,[('research_investigate',dict(question='Explain the saved control result and its limitations.',
+                subject=ref,focus=['model scope','recorded constraints'])),None])
+        findings=packet(wires[-1])['reporter_findings']
+        self.assertEqual(findings[-1]['status'],'available')
+        self.assertTrue(findings[-1]['interpretations'])
+        self.assertFalse(findings[-1]['scientific_citation_eligible'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        reads=reporter.current_reports(h)[-1][1]['request']['reads']
+        self.assertTrue(any(q.get('topic')=='mathematical_results' for q in reads))
+        comparisons=core.read_tool_evidence(h,dict(subject='registered_results',topic='comparison',selection=[ref]))
+        self.assertEqual(comparisons['reason'],'SELECT_TWO_DISTINCT_REGISTERED_RESULTS')
+
+    def test_two_saved_results_reuse_original_comparison_scope(self):
+        from tests.research.test_p63a_math_interface import t1_request,offline_dispatch
+        h,c=self.host();other=generate(h,lengths=(.17,.11))
+        refs=[offline_dispatch(h,t1_request(h,ref),'semantic-pair-'+str(i))['reference'] for i,ref in enumerate((c,other))]
+        before=deepcopy(state(h));used=h.store.remaining()
+        pages=all_pages(h,dict(subject='registered_results',topic='comparison',selection=refs))
+        facts={k:v for p in pages for k,v in p['facts'].items()}
+        self.assertTrue(facts['relations'])
+        self.assertTrue(all(p['view_kind']=='derived_research_comparison' for p in pages))
+        self.assertTrue(all(not p['formal_read_credit'] and not p['scientific_result_created'] for p in pages))
+        self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),used)
+
+    def test_frozen_task_is_queryable_before_any_candidate_exists(self):
+        h=question_host();self.assertFalse(state(h)['candidates'])
+        pages=all_pages(h,dict(subject='current_task',topic='task'))
+        facts={k:v for p in pages for k,v in p['facts'].items()}
+        self.assertEqual(facts['frozen_task'],h.store.session(h.run_id)['snapshot']['input']['task'])
+        for page in pages:
+            for source in page['sources']:core.read_evidence(h,source,record_read=False)
+        wires=run_fixture(h,[('evidence_read',dict(subject='current_task',topic='task')),None])
+        self.assertIn('semantic_evidence_v1',json.dumps(wires[-1]))
+        self.assertFalse(state(h)['candidates'])
 
 
 if __name__=='__main__':unittest.main()

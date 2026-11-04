@@ -1,0 +1,2045 @@
+{
+  "scope": "Schema only: original actual Main wire and new actual SDK Mock HTTP wires. No private prompts or Store contents.",
+  "original": {
+    "evidence_read": {
+      "$defs": {
+        "EvidenceRef": {
+          "description": "Use the stable short reference in the research packet or an evidence response.",
+          "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "if": {},
+      "properties": {
+        "count": {
+          "default": 20,
+          "description": "Property count",
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        },
+        "fields": {
+          "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Fields",
+          "type": "array"
+        },
+        "pointer": {
+          "default": "",
+          "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "start": {
+          "default": 0,
+          "description": "Property start",
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "view": {
+          "default": "full",
+          "description": "acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit.",
+          "enum": [
+            "full",
+            "summary",
+            "fields",
+            "range",
+            "capabilities",
+            "mathematical_capabilities",
+            "working_set",
+            "acceptance_certificate"
+          ],
+          "title": "View",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference"
+      ],
+      "then": {
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "view": {
+                  "const": "fields"
+                }
+              },
+              "required": [
+                "view"
+              ]
+            },
+            "then": {
+              "properties": {
+                "fields": {
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "fields"
+              ]
+            }
+          }
+        ]
+      },
+      "title": "EvidenceQuery",
+      "type": "object"
+    },
+    "research_investigate": {
+      "$defs": {
+        "EvidenceQuery": {
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "view": {
+                    "const": "fields"
+                  }
+                },
+                "required": [
+                  "view"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "fields"
+                ]
+              }
+            }
+          ],
+          "properties": {
+            "count": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Count",
+              "type": "integer"
+            },
+            "fields": {
+              "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 32,
+              "title": "Fields",
+              "type": "array"
+            },
+            "pointer": {
+              "default": "",
+              "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+              "title": "Pointer",
+              "type": "string"
+            },
+            "reference": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "start": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Start",
+              "type": "integer"
+            },
+            "view": {
+              "default": "full",
+              "enum": [
+                "full",
+                "summary",
+                "fields",
+                "range",
+                "capabilities",
+                "mathematical_capabilities",
+                "working_set",
+                "acceptance_certificate"
+              ],
+              "title": "View",
+              "type": "string"
+            }
+          },
+          "required": [
+            "reference"
+          ],
+          "title": "EvidenceQuery",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "description": "Use the stable short reference in the research packet or an evidence response.",
+          "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+          "type": "string"
+        },
+        "ExperienceQuery": {
+          "additionalProperties": false,
+          "properties": {
+            "entry_id": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Entry Id"
+            },
+            "failure_type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Failure Type"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Key"
+            },
+            "kind": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Kind"
+            },
+            "knowledge_type": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "experience",
+                    "skill"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Logical type: procedure maps to skill; case/success_case maps to experience. Original frozen authorization still applies.",
+              "title": "Knowledge Type"
+            },
+            "limit": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+              "title": "Limit"
+            },
+            "operation": {
+              "default": "search",
+              "enum": [
+                "search",
+                "read"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "revision": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Revision"
+            },
+            "structure": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Structure"
+            },
+            "task": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Task"
+            },
+            "version": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Version"
+            }
+          },
+          "title": "ExperienceQuery",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "description": "Property constraints",
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "experience_queries": {
+          "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+          "items": {
+            "$ref": "#/$defs/ExperienceQuery"
+          },
+          "maxItems": 8,
+          "title": "Experience Queries",
+          "type": "array"
+        },
+        "focus": {
+          "description": "Property focus",
+          "items": {
+            "type": "string"
+          },
+          "title": "Focus",
+          "type": "array"
+        },
+        "question": {
+          "description": "Property question",
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "reads": {
+          "description": "Delegate detailed evidence reading here: exact fields/range/JSON Pointer reads, including working_set /diagnostic_relations; never formal reading credit",
+          "items": {
+            "$ref": "#/$defs/EvidenceQuery"
+          },
+          "title": "Reads",
+          "type": "array"
+        },
+        "references": {
+          "description": "Property references",
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "minItems": 1,
+          "title": "References",
+          "type": "array"
+        }
+      },
+      "required": [
+        "question",
+        "references"
+      ],
+      "title": "InvestigationRequest",
+      "type": "object"
+    }
+  },
+  "new": {
+    "active": {
+      "evidence_read": {
+        "$defs": {
+          "EvidenceContinuation": {
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "evidence_continuation_v1",
+                "default": "evidence_continuation_v1",
+                "title": "Version",
+                "type": "string"
+              },
+              "study_id": {
+                "title": "Study Id",
+                "type": "string"
+              },
+              "query_identity": {
+                "title": "Query Identity",
+                "type": "string"
+              },
+              "content_identity": {
+                "title": "Content Identity",
+                "type": "string"
+              },
+              "offset": {
+                "minimum": 1,
+                "title": "Offset",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "study_id",
+              "query_identity",
+              "content_identity",
+              "offset"
+            ],
+            "title": "EvidenceContinuation",
+            "type": "object"
+          },
+          "EvidenceIntentQuery": {
+            "additionalProperties": false,
+            "description": "Scientific discovery; registered choices, never arbitrary JSON paths.",
+            "properties": {
+              "subject": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "current_candidate",
+                      "current_task",
+                      "registered_results",
+                      "reports"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                ],
+                "title": "Subject"
+              },
+              "topic": {
+                "enum": [
+                  "structure",
+                  "structure_parameters",
+                  "task",
+                  "mechanism_capabilities",
+                  "mathematical_methods",
+                  "mathematical_results",
+                  "physical_results",
+                  "comparison",
+                  "reporter_explanations",
+                  "research_history",
+                  "research_opportunities"
+                ],
+                "title": "Topic",
+                "type": "string"
+              },
+              "group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact registered group returned by this topic; unknown groups return choices.",
+                "title": "Group"
+              },
+              "selection": {
+                "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "title": "Selection",
+                "type": "array"
+              },
+              "detail_level": {
+                "default": "summary",
+                "enum": [
+                  "summary",
+                  "targeted",
+                  "evidence_review"
+                ],
+                "title": "Detail Level",
+                "type": "string"
+              },
+              "continuation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceContinuation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "subject",
+              "topic"
+            ],
+            "title": "EvidenceIntentQuery",
+            "type": "object"
+          },
+          "EvidenceQuery": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ],
+            "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set"
+                ],
+                "title": "View",
+                "type": "string"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object"
+          },
+          "EvidenceRef": {
+            "type": "string",
+            "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+            "description": "Use the stable short reference in the research packet or an evidence response."
+          }
+        },
+        "description": "Ordinary discovery: subject and topic, then exact registered group/selection or next_query. Legacy reference/view/pointer fields are explicit evidence review only.",
+        "title": "EvidenceReadQuery",
+        "type": "object",
+        "properties": {
+          "subject": {
+            "anyOf": [
+              {
+                "enum": [
+                  "current_candidate",
+                  "current_task",
+                  "registered_results",
+                  "reports"
+                ],
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              }
+            ],
+            "title": "Subject",
+            "description": "Property subject"
+          },
+          "topic": {
+            "enum": [
+              "structure",
+              "structure_parameters",
+              "task",
+              "mechanism_capabilities",
+              "mathematical_methods",
+              "mathematical_results",
+              "physical_results",
+              "comparison",
+              "reporter_explanations",
+              "research_history",
+              "research_opportunities"
+            ],
+            "title": "Topic",
+            "type": "string",
+            "description": "Property topic"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact registered group returned by this topic; unknown groups return choices.",
+            "title": "Group"
+          },
+          "selection": {
+            "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "title": "Selection",
+            "type": "array"
+          },
+          "detail_level": {
+            "default": "summary",
+            "enum": [
+              "summary",
+              "targeted",
+              "evidence_review"
+            ],
+            "title": "Detail Level",
+            "type": "string",
+            "description": "Property detail_level"
+          },
+          "continuation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceContinuation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property continuation"
+          },
+          "reference": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "pointer": {
+            "default": "",
+            "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+            "title": "Pointer",
+            "type": "string"
+          },
+          "view": {
+            "default": "full",
+            "enum": [
+              "full",
+              "summary",
+              "fields",
+              "range",
+              "capabilities",
+              "mathematical_capabilities",
+              "working_set"
+            ],
+            "title": "View",
+            "type": "string",
+            "description": "Property view"
+          },
+          "fields": {
+            "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 32,
+            "title": "Fields",
+            "type": "array"
+          },
+          "start": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer",
+            "description": "Property start"
+          },
+          "count": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Count",
+            "type": "integer",
+            "description": "Property count"
+          }
+        },
+        "if": {},
+        "then": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceIntentQuery"
+            },
+            {
+              "$ref": "#/$defs/EvidenceQuery"
+            }
+          ]
+        },
+        "required": []
+      },
+      "research_investigate": {
+        "$defs": {
+          "EvidenceContinuation": {
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "evidence_continuation_v1",
+                "default": "evidence_continuation_v1",
+                "title": "Version",
+                "type": "string"
+              },
+              "study_id": {
+                "title": "Study Id",
+                "type": "string"
+              },
+              "query_identity": {
+                "title": "Query Identity",
+                "type": "string"
+              },
+              "content_identity": {
+                "title": "Content Identity",
+                "type": "string"
+              },
+              "offset": {
+                "minimum": 1,
+                "title": "Offset",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "study_id",
+              "query_identity",
+              "content_identity",
+              "offset"
+            ],
+            "title": "EvidenceContinuation",
+            "type": "object"
+          },
+          "EvidenceIntentQuery": {
+            "additionalProperties": false,
+            "description": "Scientific discovery; registered choices, never arbitrary JSON paths.",
+            "properties": {
+              "subject": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "current_candidate",
+                      "current_task",
+                      "registered_results",
+                      "reports"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                ],
+                "title": "Subject"
+              },
+              "topic": {
+                "enum": [
+                  "structure",
+                  "structure_parameters",
+                  "task",
+                  "mechanism_capabilities",
+                  "mathematical_methods",
+                  "mathematical_results",
+                  "physical_results",
+                  "comparison",
+                  "reporter_explanations",
+                  "research_history",
+                  "research_opportunities"
+                ],
+                "title": "Topic",
+                "type": "string"
+              },
+              "group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact registered group returned by this topic; unknown groups return choices.",
+                "title": "Group"
+              },
+              "selection": {
+                "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "title": "Selection",
+                "type": "array"
+              },
+              "detail_level": {
+                "default": "summary",
+                "enum": [
+                  "summary",
+                  "targeted",
+                  "evidence_review"
+                ],
+                "title": "Detail Level",
+                "type": "string"
+              },
+              "continuation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceContinuation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "subject",
+              "topic"
+            ],
+            "title": "EvidenceIntentQuery",
+            "type": "object"
+          },
+          "EvidenceQuery": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ],
+            "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set",
+                  "acceptance_certificate"
+                ],
+                "title": "View",
+                "type": "string"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object"
+          },
+          "EvidenceRef": {
+            "type": "string",
+            "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+            "description": "Use the stable short reference in the research packet or an evidence response."
+          },
+          "ExperienceQuery": {
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "default": "search",
+                "enum": [
+                  "search",
+                  "read"
+                ],
+                "title": "Operation",
+                "type": "string"
+              },
+              "key": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Key"
+              },
+              "entry_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Entry Id"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Revision"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Task"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Structure"
+              },
+              "failure_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Failure Type"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Kind"
+              },
+              "knowledge_type": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "experience",
+                      "skill"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Logical type: procedure maps to skill; case/success_case maps to experience. Original frozen authorization still applies.",
+                "title": "Knowledge Type"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                "title": "Limit"
+              }
+            },
+            "title": "ExperienceQuery",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "minLength": 1,
+            "title": "Question",
+            "type": "string",
+            "description": "Property question"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "References",
+            "type": "array",
+            "description": "Property references"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "enum": [
+                  "current_candidate",
+                  "current_task",
+                  "registered_results",
+                  "reports"
+                ],
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subject",
+            "description": "Property subject"
+          },
+          "focus": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Focus",
+            "type": "array",
+            "description": "Property focus"
+          },
+          "constraints": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Constraints",
+            "type": "array",
+            "description": "Property constraints"
+          },
+          "reads": {
+            "description": "Optional scientific subject/topic/group/selection queries. Exact old EvidenceQuery remains for deliberate raw review. Neither grants formal reading credit.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceIntentQuery"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceQuery"
+                }
+              ]
+            },
+            "title": "Reads",
+            "type": "array"
+          },
+          "experience_queries": {
+            "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+            "items": {
+              "$ref": "#/$defs/ExperienceQuery"
+            },
+            "maxItems": 8,
+            "title": "Experience Queries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "InvestigationRequest",
+        "type": "object"
+      }
+    },
+    "passive": {
+      "evidence_read": {
+        "$defs": {
+          "EvidenceContinuation": {
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "evidence_continuation_v1",
+                "default": "evidence_continuation_v1",
+                "title": "Version",
+                "type": "string"
+              },
+              "study_id": {
+                "title": "Study Id",
+                "type": "string"
+              },
+              "query_identity": {
+                "title": "Query Identity",
+                "type": "string"
+              },
+              "content_identity": {
+                "title": "Content Identity",
+                "type": "string"
+              },
+              "offset": {
+                "minimum": 1,
+                "title": "Offset",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "study_id",
+              "query_identity",
+              "content_identity",
+              "offset"
+            ],
+            "title": "EvidenceContinuation",
+            "type": "object"
+          },
+          "EvidenceIntentQuery": {
+            "additionalProperties": false,
+            "description": "Scientific discovery; registered choices, never arbitrary JSON paths.",
+            "properties": {
+              "subject": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "current_candidate",
+                      "current_task",
+                      "registered_results",
+                      "reports"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                ],
+                "title": "Subject"
+              },
+              "topic": {
+                "enum": [
+                  "structure",
+                  "structure_parameters",
+                  "task",
+                  "mechanism_capabilities",
+                  "mathematical_methods",
+                  "mathematical_results",
+                  "physical_results",
+                  "comparison",
+                  "reporter_explanations",
+                  "research_history",
+                  "research_opportunities"
+                ],
+                "title": "Topic",
+                "type": "string"
+              },
+              "group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact registered group returned by this topic; unknown groups return choices.",
+                "title": "Group"
+              },
+              "selection": {
+                "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "title": "Selection",
+                "type": "array"
+              },
+              "detail_level": {
+                "default": "summary",
+                "enum": [
+                  "summary",
+                  "targeted",
+                  "evidence_review"
+                ],
+                "title": "Detail Level",
+                "type": "string"
+              },
+              "continuation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceContinuation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "subject",
+              "topic"
+            ],
+            "title": "EvidenceIntentQuery",
+            "type": "object"
+          },
+          "EvidenceQuery": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ],
+            "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set",
+                  "acceptance_certificate"
+                ],
+                "title": "View",
+                "type": "string",
+                "description": "acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit."
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object"
+          },
+          "EvidenceRef": {
+            "type": "string",
+            "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+            "description": "Use the stable short reference in the research packet or an evidence response."
+          }
+        },
+        "description": "Ordinary discovery: subject and topic, then exact registered group/selection or next_query. Legacy reference/view/pointer fields are explicit evidence review only.",
+        "title": "EvidenceReadQuery",
+        "type": "object",
+        "properties": {
+          "subject": {
+            "anyOf": [
+              {
+                "enum": [
+                  "current_candidate",
+                  "current_task",
+                  "registered_results",
+                  "reports"
+                ],
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              }
+            ],
+            "title": "Subject",
+            "description": "Property subject"
+          },
+          "topic": {
+            "enum": [
+              "structure",
+              "structure_parameters",
+              "task",
+              "mechanism_capabilities",
+              "mathematical_methods",
+              "mathematical_results",
+              "physical_results",
+              "comparison",
+              "reporter_explanations",
+              "research_history",
+              "research_opportunities"
+            ],
+            "title": "Topic",
+            "type": "string",
+            "description": "Property topic"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact registered group returned by this topic; unknown groups return choices.",
+            "title": "Group"
+          },
+          "selection": {
+            "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "title": "Selection",
+            "type": "array"
+          },
+          "detail_level": {
+            "default": "summary",
+            "enum": [
+              "summary",
+              "targeted",
+              "evidence_review"
+            ],
+            "title": "Detail Level",
+            "type": "string",
+            "description": "Property detail_level"
+          },
+          "continuation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EvidenceContinuation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Property continuation"
+          },
+          "reference": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "pointer": {
+            "default": "",
+            "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+            "title": "Pointer",
+            "type": "string"
+          },
+          "view": {
+            "default": "full",
+            "enum": [
+              "full",
+              "summary",
+              "fields",
+              "range",
+              "capabilities",
+              "mathematical_capabilities",
+              "working_set",
+              "acceptance_certificate"
+            ],
+            "title": "View",
+            "type": "string",
+            "description": "acceptance_certificate reads the complete deterministic independent task-acceptance view for SELECT; large raw full reads return bounded navigation without full-read credit."
+          },
+          "fields": {
+            "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 32,
+            "title": "Fields",
+            "type": "array"
+          },
+          "start": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer",
+            "description": "Property start"
+          },
+          "count": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Count",
+            "type": "integer",
+            "description": "Property count"
+          }
+        },
+        "if": {},
+        "then": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceIntentQuery"
+            },
+            {
+              "$ref": "#/$defs/EvidenceQuery"
+            }
+          ]
+        },
+        "required": []
+      },
+      "research_investigate": {
+        "$defs": {
+          "EvidenceContinuation": {
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "evidence_continuation_v1",
+                "default": "evidence_continuation_v1",
+                "title": "Version",
+                "type": "string"
+              },
+              "study_id": {
+                "title": "Study Id",
+                "type": "string"
+              },
+              "query_identity": {
+                "title": "Query Identity",
+                "type": "string"
+              },
+              "content_identity": {
+                "title": "Content Identity",
+                "type": "string"
+              },
+              "offset": {
+                "minimum": 1,
+                "title": "Offset",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "study_id",
+              "query_identity",
+              "content_identity",
+              "offset"
+            ],
+            "title": "EvidenceContinuation",
+            "type": "object"
+          },
+          "EvidenceIntentQuery": {
+            "additionalProperties": false,
+            "description": "Scientific discovery; registered choices, never arbitrary JSON paths.",
+            "properties": {
+              "subject": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "current_candidate",
+                      "current_task",
+                      "registered_results",
+                      "reports"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                ],
+                "title": "Subject"
+              },
+              "topic": {
+                "enum": [
+                  "structure",
+                  "structure_parameters",
+                  "task",
+                  "mechanism_capabilities",
+                  "mathematical_methods",
+                  "mathematical_results",
+                  "physical_results",
+                  "comparison",
+                  "reporter_explanations",
+                  "research_history",
+                  "research_opportunities"
+                ],
+                "title": "Topic",
+                "type": "string"
+              },
+              "group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact registered group returned by this topic; unknown groups return choices.",
+                "title": "Group"
+              },
+              "selection": {
+                "description": "Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "title": "Selection",
+                "type": "array"
+              },
+              "detail_level": {
+                "default": "summary",
+                "enum": [
+                  "summary",
+                  "targeted",
+                  "evidence_review"
+                ],
+                "title": "Detail Level",
+                "type": "string"
+              },
+              "continuation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceContinuation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "subject",
+              "topic"
+            ],
+            "title": "EvidenceIntentQuery",
+            "type": "object"
+          },
+          "EvidenceQuery": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ],
+            "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "pointer": {
+                "default": "",
+                "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "view": {
+                "default": "full",
+                "enum": [
+                  "full",
+                  "summary",
+                  "fields",
+                  "range",
+                  "capabilities",
+                  "mathematical_capabilities",
+                  "working_set",
+                  "acceptance_certificate"
+                ],
+                "title": "View",
+                "type": "string"
+              },
+              "fields": {
+                "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "title": "Fields",
+                "type": "array"
+              },
+              "start": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Start",
+                "type": "integer"
+              },
+              "count": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Count",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "EvidenceQuery",
+            "type": "object"
+          },
+          "EvidenceRef": {
+            "type": "string",
+            "pattern": "^(candidate|evaluation|result|evidence)_[1-9][0-9]*$",
+            "description": "Use the stable short reference in the research packet or an evidence response."
+          },
+          "ExperienceQuery": {
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "default": "search",
+                "enum": [
+                  "search",
+                  "read"
+                ],
+                "title": "Operation",
+                "type": "string"
+              },
+              "key": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Key"
+              },
+              "entry_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Entry Id"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Revision"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Task"
+              },
+              "structure": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Structure"
+              },
+              "failure_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Failure Type"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Kind"
+              },
+              "knowledge_type": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "experience",
+                      "skill"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Logical type: procedure maps to skill; case/success_case maps to experience. Original frozen authorization still applies.",
+                "title": "Knowledge Type"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.",
+                "title": "Limit"
+              }
+            },
+            "title": "ExperienceQuery",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "minLength": 1,
+            "title": "Question",
+            "type": "string",
+            "description": "Property question"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "References",
+            "type": "array",
+            "description": "Property references"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "enum": [
+                  "current_candidate",
+                  "current_task",
+                  "registered_results",
+                  "reports"
+                ],
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subject",
+            "description": "Property subject"
+          },
+          "focus": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Focus",
+            "type": "array",
+            "description": "Property focus"
+          },
+          "constraints": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Constraints",
+            "type": "array",
+            "description": "Property constraints"
+          },
+          "reads": {
+            "description": "Optional scientific subject/topic/group/selection queries. Exact old EvidenceQuery remains for deliberate raw review. Neither grants formal reading credit.",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/EvidenceIntentQuery"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceQuery"
+                }
+              ]
+            },
+            "title": "Reads",
+            "type": "array"
+          },
+          "experience_queries": {
+            "description": "Optional curated procedural search/exact read. Guidance only; never scientific sources or formal reading credit.",
+            "items": {
+              "$ref": "#/$defs/ExperienceQuery"
+            },
+            "maxItems": 8,
+            "title": "Experience Queries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "InvestigationRequest",
+        "type": "object"
+      }
+    }
+  }
+}

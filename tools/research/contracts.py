@@ -1027,7 +1027,8 @@ class EvidenceIntentQuery(Contract):
     """Scientific discovery; registered choices, never arbitrary JSON paths."""
     subject: Literal['current_candidate','current_task','registered_results','reports'] | EvidenceRef
     topic: Literal['structure','structure_parameters','task','mechanism_capabilities',
-        'mathematical_methods','mathematical_results','physical_results','comparison','reporter_explanations']
+        'mathematical_methods','mathematical_results','physical_results','comparison','reporter_explanations',
+        'research_history','research_opportunities']
     group: str | None = Field(default=None, description='Exact registered group returned by this topic; unknown groups return choices.')
     selection: list[EvidenceRef | str] = Field(default_factory=list,
         description='Explicit registered object or method/primitive identifiers returned in choices; no implicit scientific selection.')

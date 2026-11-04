@@ -1,0 +1,73 @@
+test_original_mock_sdk_handoff_delivers_page_cursor (tests.research.test_p63g_bounded_evidence.NavigationPagingTests.test_original_mock_sdk_handoff_delivers_page_cursor) ... exception=<RequestBoundaryHandoff> | event loop cycle failed
+ok
+test_full_read_credit_survives_compact_feedback_handoff (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_full_read_credit_survives_compact_feedback_handoff) ... ERROR
+test_new_requests_refresh_query_schema_after_old_snapshot_verification (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_new_requests_refresh_query_schema_after_old_snapshot_verification) ... ERROR
+test_explicit_nonpass_continuation_restores_tools_without_send_or_reset (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_explicit_nonpass_continuation_restores_tools_without_send_or_reset) ... ERROR
+
+======================================================================
+ERROR: test_full_read_credit_survives_compact_feedback_handoff (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_full_read_credit_survives_compact_feedback_handoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tests\research\test_request_boundary_handoff.py", line 232, in test_full_read_credit_survives_compact_feedback_handoff
+    asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\agent.py", line 859, in converse
+    require_research_authorization(host)
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\state.py", line 112, in require_research_authorization
+    raise ValueError('FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER')
+ValueError: FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER
+
+======================================================================
+ERROR: test_new_requests_refresh_query_schema_after_old_snapshot_verification (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_new_requests_refresh_query_schema_after_old_snapshot_verification)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tests\research\test_request_boundary_handoff.py", line 363, in test_new_requests_refresh_query_schema_after_old_snapshot_verification
+    asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\agent.py", line 859, in converse
+    require_research_authorization(host)
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\state.py", line 112, in require_research_authorization
+    raise ValueError('FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER')
+ValueError: FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER
+
+======================================================================
+ERROR: test_explicit_nonpass_continuation_restores_tools_without_send_or_reset (tests.research.test_request_boundary_handoff.RequestBoundaryHandoffTests.test_explicit_nonpass_continuation_restores_tools_without_send_or_reset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tests\research\test_request_boundary_handoff.py", line 389, in test_explicit_nonpass_continuation_restores_tools_without_send_or_reset
+    asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\agent.py", line 859, in converse
+    require_research_authorization(host)
+  File "D:\softrobot-agent\.worktrees\semantic-evidence\tools\research\state.py", line 112, in require_research_authorization
+    raise ValueError('FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER')
+ValueError: FORMAL_STUDY_MATHEMATICS_APPROVAL_REQUIRED_BEFORE_PROVIDER
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.071s
+
+FAILED (errors=3)

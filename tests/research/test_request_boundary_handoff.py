@@ -137,6 +137,9 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         h=cold_host();pilot=deepcopy(state(h)['pilot'])
         pilot.update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback')
         update(h,freeze='explicit-offline-request-boundary-fixture',pilot=pilot)
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE])
         return h
 
     def responder(self,h,sent):
@@ -348,13 +351,14 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
     def test_new_requests_refresh_query_schema_after_old_snapshot_verification(self):
         from tools.research.agent import plan_schema,PLAN_TOOL_DESCRIPTION
         h=self.provision();sent=[]
-        current=EvidenceQuery.model_json_schema();old=deepcopy(current)
+        from tools.research.agent import evidence_query_schema
+        current=evidence_query_schema(state(h)['spec']);old=EvidenceQuery.model_json_schema()
         old['properties']['fields']['description']='Explicit synthetic older query description'
         def old_plan_schema(*args,**kwargs):
             schema=plan_schema(*args,**kwargs)
             schema['allOf']=[r for r in schema['allOf'] if 'research_intent' not in r.get('then',{}).get('properties',{}).get('decision',{}).get('properties',{})]
             return schema
-        with patch.object(EvidenceQuery,'model_json_schema',return_value=old),\
+        with patch('tools.research.agent.evidence_query_schema',return_value=old),\
                 patch('tools.research.agent.plan_schema',side_effect=old_plan_schema),\
                 patch('tools.research.agent.PLAN_TOOL_DESCRIPTION','Explicit synthetic older Plan description'),\
                 patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
