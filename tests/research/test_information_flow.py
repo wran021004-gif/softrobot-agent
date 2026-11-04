@@ -49,6 +49,30 @@ def packet(wire):
 
 
 class InformationFlowTests(unittest.TestCase):
+    def test_passive_intro_uses_physical_facts_and_scientific_choices(self):
+        structure=dict(candidate='synthetic_candidate',segments=[dict(length_m=.16)],tendons=[dict(id='tendon_0')])
+        parameters=[dict(parameter_group='segment',parameter_id='registered_choice',physical_meaning='Young modulus',unit='Pa',current_value=7.2e6)]
+        brief=dict(analysis_interface='scientific_question_v4')
+        delivered=dict(research_state=dict(task=dict(research_mode='passive_mechanism_and_dynamic_execution')),
+            current_control=dict(resolved_facts=structure,scientific_parameters=parameters,control_initialized=False,parameters_query=dict(pointer='/parameters')),budget={})
+        before=deepcopy(delivered)
+        result=information_flow_brief(brief,delivered)['research_focus']
+        self.assertEqual(result['structure'],structure)
+        self.assertEqual(result['research_parameters'],parameters)
+        self.assertEqual(result['control']['status'],'not_applicable')
+        self.assertNotIn('control_initialized',result['control'])
+        self.assertNotIn('parameters_query',result)
+        self.assertEqual(delivered,before)
+
+    def test_initial_mock_wire_contains_structure_without_raw_parameter_read(self):
+        h=flow_host()
+        wires=run_fixture(h,[('research_plan',generation(h)),None])
+        focus=packet(wires[-1])['research_focus']
+        self.assertTrue(focus['structure']['segments'])
+        self.assertTrue(focus['structure']['tendons'])
+        self.assertTrue(focus['research_parameters'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_direct_reads_preserve_generate_and_stable_prompt(self):
         h=flow_host();ref=state(h)['family_space_reference']
         update(h,pilot={**state(h)['pilot'],'tool_directory':[dict(tool='research_plan',actions=['generate'])]})

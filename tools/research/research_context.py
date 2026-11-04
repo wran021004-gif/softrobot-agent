@@ -603,6 +603,8 @@ def resolved_candidate_facts(candidate,reference):
         segments=[{k:c.get(k) for k in ('id','length_m','physics','sections','natural_curvature_rad_m','connection')}
             for c in robot['components'] if c['kind']=='flexible_segment'],
         tendon_order=[t['id'] for t in robot['tendons']],
+        tendons=[{k:t.get(k) for k in ('id','diameter_m','force_limit_n','pretension_n')}
+            for t in robot['tendons']],
         frame=cfg['robot'].get('frame'),mount=cfg['task']['environment']['data'].get('mount'),
         target_world_m=cfg['task']['goal']['data'].get('target_m'),
         coordinate_scope='Mount pose maps the robot base into world; world origin and mounted base are distinct.',
@@ -1649,6 +1651,10 @@ def agent_decision_brief(host):
             details_query=dict(reference=anchor,view='working_set',pointer='/candidate_index/'+str(ws['candidate_index'].index(row))),
             control_source_scope='Initialized schedules are not physical passes. Measured inputs, predictions and unmeasured plans retain their origin; historical evidence grants no current execution permission. No source is selected.')
         brief['current_candidate']=facts
+        facts['resolved_facts']=deepcopy(row['resolved_facts'])
+        from tools.research.scientific_intent import parameter_catalog
+        facts['scientific_parameters']=[{k:r[k] for k in ('parameter_group','parameter_id','physical_meaning','unit','current_value')}
+            for r in parameter_catalog(s['spec'],host.store.artifact(candidate)) if r['selectable']]
         from tools.research.task_constraints import mathematical_method_view, mathematical_catalog, mathematical_opportunity_summary
         view=mathematical_method_view(host,candidate,budget_snapshot=brief['budget'])
         brief['mathematical_capabilities']=mathematical_catalog(view)
@@ -2122,6 +2128,8 @@ def information_flow_brief(brief, delivered):
     focus=dict(candidate=current.get('current_candidate'),candidate_status=current.get('candidate_status'),
         task_accepted=current.get('task_accepted'),control=control,
         latest_result=current.get('latest_result'))
+    if control.get('resolved_facts'):focus['structure']=control.pop('resolved_facts')
+    if control.get('scientific_parameters'):focus['research_parameters']=control.pop('scientific_parameters')
     if intent:
         focus['formal_hypothesis']=dict(plan_reference=intent.get('plan_reference'),
             pointer='/original_plan',hypothesis_id=(hypothesis.get('decision') or {}).get('hypothesis_id'),
@@ -2216,11 +2224,11 @@ def information_flow_brief(brief, delivered):
                 'finite_time_response','qualification_diagnosis') if k in mechanism}
         control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
         task=result['study_goal'].get('task',{})
-        if task.get('physical_problem'):
+        if task.get('physical_problem') or task.get('research_mode') in ('passive_mechanism_and_dynamic_execution','static_mechanism_research'):
             task.pop('metrics',None);task.pop('reference',None)
             focus['control']=dict(status='not_applicable',executable_under_current_profile=False,
                 control_channels=[],reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_CHANNELS')
-            focus['parameters_query']=control.get('parameters_query')
+            focus['parameters_at']='research_focus.research_parameters'
         if findings and findings[-1]['status']=='unavailable':
             result['reporter_findings']=[{k:findings[-1][k] for k in ('status','report_reference','result_references','interpretation_query')}]
         science=result.get('scientific_results') or {}
