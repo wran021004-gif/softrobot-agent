@@ -231,7 +231,8 @@ def evaluation_capacity(host, requested=1, confirmation=False):
     s=state(host)
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     left=s['spec']['rl_limits']['evaluation_episodes']-used
-    fit=max(0,min(requested,left,host.store.remaining()['remaining']['backend_solves']))
+    remaining=host.store.remaining()['remaining']['backend_solves']
+    fit=max(0,min(requested,left) if remaining is None else min(requested,left,remaining))
     return dict(admitted=fit,remaining_episodes=left,confirmation_reserve=0,per_episode_s=None)
 
 
