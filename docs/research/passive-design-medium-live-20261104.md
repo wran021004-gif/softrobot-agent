@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04 Study，含 Main 153 增补）
+# 被动自主科研与接口监督进展（2026-11-04 Study，含 Main 169 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -145,3 +145,13 @@ Main 134 合法 diagnose；135 的 V4 根层 hypothesis / local_radius_fraction 
 监督边界发现具体通用延迟：最后一次原反馈已于 UTC 15:54:20.533 封口，监督暂停事件至 15:55:46.905 才保存，间隔约 86.37 秒，无计算或 Provider 在运行。原 agent.converse 为记录预算调用完整 decision_packet，重建了不需要的科研视图。原 decision_budget 在同一 Store 只需约 0.51 秒；其 public_operation_budget、provider_budget、science_budget、closeout 与原监督事件中对应内容完全一致。
 
 `d09fcca` 仅让此监督事件直接保存原 decision_budget，并以 budget_source 标明来源。Main 的完整科研包仍走原路径；该事件不再附带完整包额外组装的 training / method_remaining，原方法配额和训练状态仍由原来源保留并可查询。没有新预算器、Registry、上限或成本重算。新增原 SDK Mock 回归在旧实现中精确失败于结算重建，修复后与原预算监督回归共 2 项通过：原反馈已结算、不多发送请求、未消费响应为空、共享预算快照等于原预算函数。无真实 Provider。修复后的实际结算耗时仍待下一真实窗口验证。
+
+## Main 169 增补：结算修复实测及公共请求额度增补
+
+原同一 Store 的两次实际事件时间对照：修复前 Main 153，反馈封口至监督事件为 `86.372083 s`；修复后 Main 157 为 `0.481984 s`，budget_source 指向原 decision_budget。调用、Worker 和所有预算仍原样结算，Main 的科研包未改走简化路径。这是具体窗口的实际观测，不作为统一性能保证。
+
+Main 154 生成第十候选，157 更正一次 diagnose 根字段错误后合法提交；158 的路由 action 不适用在 159 更正，160 的 V4 根层 hypothesis 在 161 更正。161 实际完成 1 次评价、500 步，检查新生成候选的完整协议观测，不标作新优化收益或独立接受。163 的明确低上限被拒绝，164 显式更正并真实完成 10 次评价、5000 步，局部记录违反量约从 53040.6 降至 52112.6。Main 166 自主生成第十一候选，168 的 diagnose 根字段错误在 169 更正；两次新生成的真实物理变化仍仅为 semi_y_m。后两候选尚无独立 Replay，当前独立结果仍止于第九候选，全部 valid_failure，未 SELECT 或 Main STOP。
+
+Main 169 结算快照：Main 169 / Reporter 10、Provider 179、3375036 tokens；数学扣记 143 / 实际评价尝试 133；候选 11 / 独立 Replay 7；全部真实 build 142 / episode 启动 142 / 完成 137 / 积分 69000 步，backend 原扣记 152。3897 个 artifact 哈希通过，调用、Worker、响应和资源均结算。原 55 次 Study 逐文件清单、白名单、结果及授权库再次完全一致；独立 none Study 仍 28/40、数学 0 / Replay 0，原授权行与配置哈希相符，处于监督暂停而非 Main STOP。
+
+按用户持续授权，Provider 逐次增至 176、184、192（仍含 4 次收尾）；公共操作已用 209、余 47 时，原事务机制一次 +64，从 256 增至 320，保留原 8 次收尾。当前为 Provider `179/192`、公共操作 `213/320`；变更前状态、扣账、snapshot、授权增补与新 identity 全部保留，未重置任何消耗。公共请求增补避免成为数学研究的间接请求障碍，数学、分析和共享物理累计额度继续 null，单 Worker / 单问题合同及独立 Replay 子限额不变。当前 identity 为 `aeebf134bd19c70c1a608d4188be81d1d18ccfc355617754c09a5b540ada8e23`，接口修复仍为 d09fcca / bbeee70；继续原 Study 的有限监督窗口。
