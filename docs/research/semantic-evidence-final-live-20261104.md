@@ -1,116 +1,139 @@
-# 语义取证最终审查与原 Study 接续检查（2026-11-04）
+# 语义取证最终审查与真实 Main 验证（2026-11-04）
 
-本轮已完成最小接口修复、定向离线验证、原 Study 的正式版本接续和 SDK restore_only。
-真实发送被桌面自动审批拒绝，正在等待用户对具体 DeepSeek 目标与研究载荷的明确批准。
-本轮没有新增真实 Main/Reporter、数学 Worker 或物理积分，不能据此声称科研自主性通过。
+本轮在原 Study 上完成接口修复、正式接续与真实 Gateway 验证。
+`gpt-5.6-sol` 自主运行了真实有限时域数学检查，并依据结果提出新的刚度假设。
+后续求导未通过原参数授权，新假设的 diagnose 又未通过合同，故没有第二次数值计算、
+新结构或独立物理验收。已在安全结算边界监督暂停；不是 Main 自主 STOP。
 
-## 源码审查与最小修复
+## 接口审查与修复
 
 基线：`codex/semantic-evidence-20261104@7ffb98ff40149894fe626f62bff9d667b50b4942`。
-独立分支：`codex/semantic-evidence-final-live-20261104`。没有合并 main。
+交付分支：`codex/semantic-evidence-final-live-20261104`，不合并 main。
 
-Reporter 的 current_task 先被错误地解析为 structure；即使改为 task，冻结输入 snapshot
-也不属于 Reporter 的注册候选/保存结果合同，无法合法生成 ResultCard。因此采用明确不支持方案：
+Reporter 的 current_task 不能仅把 structure 改为 task：冻结输入 snapshot 不属于其候选/保存结果
+ResultCard 合同。修复从已实现 subject 选项中删除 current_task；旧直接入口明确返回 unsupported
+与 `evidence_read(subject=current_task, topic=task)`。实际 SDK 拒绝旧入口并提供合法入口说明。
+Main 直接读取仍绑定原 session snapshot 的 `/input/task`，冷启动无需候选，不生成报告或科学证据。
 
-- 从 InvestigationRequest.subject 的已实现对象选项中删除 current_task，并说明直接读取入口。
-- 旧入口直接调用返回 unsupported、原因、`evidence_read(subject=current_task, topic=task)`；不保存报告。
-- 实际 SDK 按更新后的 Schema 拒绝旧入口；合法替代入口留在 Schema 描述中。
-- Main 直接读取 current_task 继续由原 session snapshot 的 `/input/task` 提供来源，无需候选。
+focus 是给 Reporter 的科研问题文本，不负责选择字段。原默认五类主题会无条件展开参数、机制、
+方法目录；现默认仅 structure/task，详细主题通过既有 reads/topic/group/selection 显式选择。
+没有自由文本关键词映射，没有扩大 Reporter 推断权限。
 
-focus 保持给 Reporter 的科研问题文本，不作为确定性字段路由。
-原候选默认自动读取 structure、structure_parameters、task、mechanism_capabilities、mathematical_methods
-五类，且每类会继续读取最多约 12KB；这会无条件展开参数、机制和方法目录。
-本轮将默认值收敛为 structure/task；详细目录由现有 reads 的合法 topic/group/selection 显式选择。
-没有增加材料、腱路或刚度的自由文本映射，没有改变 Reporter 的推断权限。
+EvidenceReadQuery 保留 EvidenceIntentQuery | EvidenceQuery；evidence_query_schema 经原 provider_schema
+保留联合合同和条件结构，Runtime 复用同一确定性编译器。混合输入仍拒绝，精确原始读取、
+acceptance_certificate、正式 SELECT/STOP 保留，没有修改物理、评价器、阈值或参数授权。
 
-EvidenceReadQuery 仍为 EvidenceIntentQuery | EvidenceQuery。agent.evidence_query_schema
-通过原 provider_schema 保留联合条件与定义，core.read_tool_evidence 复用同一确定性编译器；
-混合原始/语义字段由合同拒绝，原精确 full/fields、正式 acceptance_certificate 和 SELECT/STOP 入口保留。
-没有修改这三处源码，也没有新增 Registry、Store、调度器、Agent 或任务适配器。
+运行中另证实一处必要修复：最新数学结果 detail_query 仍在每轮 L0 宣传旧 working_set
+`/mathematical_decision_view`。6277 字节派生视图被转为目录；请求33/36输入与反馈哈希完全相同。
+仅将该自动详情链接改为现有 `subject=结果, topic=mathematical_results`。
+历史反馈和精确 raw/derived review 不重写。真实请求37随后采用新入口，收到完整事实与真实来源，
+formal_read_credit=false；之后的证据读取全部使用语义查询。
 
-冻结 Provider 实际为 `https://api.deepseek.com` / `deepseek-flash`，thinking disabled，
-并非 ChatGPT Gateway。原 wire 未启用 strict；没有切换模型、推理、端点或上下文策略。
-DeepSeek 的 [工具文档](https://api-docs.deepseek.com/guides/tool_calls/) 将 strict Schema 校验
-另列为 beta 合同；本轮不把 Mock JSON Schema 成功等同于远端接受。远端接受情况仍未实测。
+生产源码仅改 reporter.py 与 research_context.py；没有新 Agent、Planner、Registry、Store、
+调度器、任务适配器或正式 SELECT/STOP 流程。
 
-## 定向测试
+## 验证与真实 Schema
 
-35 项不同测试通过，1 项旧测试因缺失历史夹具未能运行：
+36 项不同定向测试通过：语义/实际 SDK Mock 16 项、既有 Reporter 17 项、旧 Schema 恢复刷新1项、
+原完整证书 SELECT 与 STOP 索引2项。M1、被动v2、M5、真实来源、原始/派生视图区分和不授信保持。
+运行中详情链接新增回归修复前失败，修复后与 Reporter/SDK 恢复共3项定向回归通过。
+1项旧测试的4个 subcase 因缺少 `evidence/s129_math_capability/gvs_pair.json` 未完成，不报告为通过。
+两个旧离线 Reporter 夹具补齐原门禁所需测试 scope，其中一个补注册合成结果；生产授权未放宽。
+首次失败及补测日志均私有保留。所有离线测试不产生真实 Provider、Worker 或积分。
 
-- test_semantic_evidence：15 项，包括新增冷启动 Reporter 拒绝、直接任务读取与默认主题范围。
-- 原 SDK 旧 Schema 恢复后刷新新 Schema：1 项。
-- 原完整 acceptance_certificate 实际交付后 SELECT，以及完整 STOP 索引：2 项。
-- 既有 Reporter：17 项通过，覆盖真实来源、只读投影、SDK 交付、费用、反馈和恢复。
-- test_native_science_tool_reporter_boundary_and_unknown_send 的四个 subcase 均在读取仓库缺失的
-  `evidence/s129_math_capability/gvs_pair.json` 时失败；不把缺失夹具报告为通过，未补造科学证据。
+当前 Gateway `http://127.0.0.1:8787/v1` 的健康检查和账号目录确认精确模型 `gpt-5.6-sol`。
+Main reasoning=none，Reporter reasoning=medium。实际请求28–43均 HTTP200，接受带 EvidenceIntentQuery /
+EvidenceQuery 联合条件的工具 Schema；正式 diagnose 后 research_analysis 确实在实际 Main wire 中。
+这证明该非 strict Gateway 合同的实际接受，不保证模型每次输出符合合同；Host 仍执行独立验证。
+所有实现接续后均先 restore_only，再发送有限请求；旧历史、最后反馈与最新工具合同恢复正确。
 
-初次语义测试的被动夹具要求干净提交，另一个新增断言误以为旧对象能穿过更新后的 SDK Schema；
-提交后重跑全部 15 项通过。两个旧 Reporter SDK 夹具缺少原门禁要求的离线数学 scope，
-其中一个还没有注册其合成结果；仅在测试内用现有 approve/helper 和结果列表补齐，定向复测通过。
-所有测试用 HTTP Mock；保留首次失败与补测日志，没有修改生产授权门禁。
+## 原 Study、授权与实现身份
 
-## 原 Study、安全与版本接续
+原 Study：`passive-mechanism-autonomy-20261104`，未另建后继 Study。
+开始时540个 artifact、133个 Store/SDK文件及共享授权库与既有完整备份一致；复用原备份。
+原授权文本字节哈希核验通过，原批准允许累计48、每次最多+8及非科学接口版本接续。
 
-原 Study：`passive-mechanism-autonomy-20261104`，未创建后继 Study。
-只读核验原暂停事件 510、原正式授权事件 359、全部 540 个 artifact 哈希和
-133 个 Store/SDK 文件；与既有完整备份一致，没有新建第二套备份。
-26 次 Provider 均结算，无 pending/unknown Worker，无待消费响应、未结算回执或资源占用。
-原批准附件的字节哈希与保存的 directive 一致；scope 明确记录 Provider 端点、模型、
-累计上限 48、每次最多 +8，以及非科学接口修复的版本接续许可。
+开发工作树第一次写入前因 AUTHORITY_ANCHOR_MISMATCH 被原门禁拒绝；改为在原执行工作树
+检出已提交实现后，从原路径使用原共享授权库。没有复制授权索引或绕过 check_root。
+预算32→40、40→48均通过原 attached-authority 原子增补及 formal_study_authorization /
+live_handoff_admission / core.bind，旧费用没有重新扣除或清零。
 
-首次在开发工作树调用正式 bind 前的 save，被原 check_root 以 AUTHORITY_ANCHOR_MISMATCH 拒绝，
-发生在任何写入之前。原因是原授权索引归属于原执行工作树。随后将干净的原执行工作树
-检出已提交版本，从原路径使用原 Store/共享授权库；没有复制授权库或绕过 check_root。
+原 Store 的冻结 Provider 实际是 DeepSeek。用户明确指定应使用 Gateway 后，正式记录运行配置接续，
+没有把模型切换冒充单一模型的接口对照实验。更正前已结算的额外1次 DeepSeek请求保留：
+19310 tokens、一次历史回看和一次机制语义读取，无数学/物理计算；不能计作目标 Gateway 验证。
+此前桌面自动审批拒绝及后续用户明确外发批准也保留，拒绝本身没有产生 Provider 消耗。
 
-正式接续通过原 attached-authority 原子更新、formal_study_authorization、live_handoff_admission
-与 core.bind 完成：
-
-| 项目 | 之前 | 本轮接续后 |
-|---|---|---|
-| 执行 SHA | `8517772445741d7871a5b0c468249637e5688ce1` | `90e3e2a5ee96e1213eb5a2e73dc4208f58d8c46e` |
-| resolved identity | `2c7105e30478c5bcb6cad3b37492e5b178a7c3932f723bbaf7cf31c911e496cc` | `b1ae07b461059d4d074407394dadcf78b5cedaa2b5b3aa7452101d8835e0b2ae` |
-| 共享 Provider 总额 | 32 | 40 |
-| 已用 / 剩余 | 26 / 6 | 26 / 14 |
-| 保护收尾 | 4（总额内） | 4（总额内） |
+| 阶段 | 实现 / resolved identity |
+|---|---|
+| 原暂停 | `8517772445741d7871a5b0c468249637e5688ce1` / `2c7105e30478c5bcb6cad3b37492e5b178a7c3932f723bbaf7cf31c911e496cc` |
+| Reporter修复、总额40 | `90e3e2a5ee96e1213eb5a2e73dc4208f58d8c46e` / `b1ae07b461059d4d074407394dadcf78b5cedaa2b5b3aa7452101d8835e0b2ae` |
+| 用户更正为Gateway | 同一实现 / `32908efe1f98500ce72db41a0453f595b47dd12ade5e4b9fcee82e5454ea082b` |
+| 最后+8至48 | 同一实现 / `d9ef09d43645415a67c79980631c9cf145c06abaa3ec070453ae2372d6713fc3` |
+| 保存数学结果详情修复 | `a9873b995150afd499182f3817d1df1c72d297aa` / 同一 resolved identity |
 
 科学 profile 始终为 `9f95b160c2aa80a89ca40d324d75fc33e660fd51a86f3fe6a65235cdc376dcd3`。
-科学文件哈希、原评价器、任务、结构域、积分协议、候选、plans、数学/物理结果与累计费用保持。
-数学累计预算为 null，单 Worker 180 秒、共享物理 256 episode / 128000 步、独立 Replay 16 次不变。
-implementation_binding 保存旧/新实现关系；不把两个 SHA 冒充同一实现。
+原任务、FamilySpace、评价器、积分协议、科学文件、参数授权和 execution_instructions 均保持。
+数学累计配额仍 null，单 Worker180秒，共享物理256 episode /128000步、独立Replay16次不变。
+后续报告提交不更换原 Study 的执行 SHA。
+唯一数学结果产生于90e3e2a阶段；a9873b9接续后读取该原结果，没有重算或重标其来源SHA。
 
-原 SDK restore_only 已成功，恢复原历史并通过 reconcile/trusted-history 路径，
-最后已结算反馈没有重新消费或收费；恢复后仍无 unconsumed_response。
-新发送前刷新工具 Schema 的实际 SDK Mock 回归通过；尚无本轮真实新 wire 可供远端接受核查。
+## 自主科研实际过程
 
-## 真实运行与科研验收
+Gateway 段15次 Main、1次 Reporter。第一轮 Main 自主选择已注册 finite_time_task_response /
+finite_time_task_violation inspect，真实 Worker完成1次数学评价、1次模型构建、1个完整0.5秒episode、
+500步积分。它计算的是有限时域响应，不能声称已验证原H1全文中的所有静态/Jacobian机制。
 
-原 SDK 的最多 1 次新请求入口在进程启动前被自动审批拒绝两次。
-第二次提供原正式 scope 的端点/模型及原批准范围，自动审批仍认为这些工具读取记录不足以
-替代用户对具体外部目标和敏感研究上下文的直接批准。已提出精确批准问题；没有绕行发送。
-原 Store 已记录监督暂停，明确不是 Main 自主 STOP。
+记录的响应最大值为 `9.166032107660516e-05 m`，冻结上界 `1e-09 m`，规范化超限
+`91659.32107660515`。no-contact hard gate通过，结果为有效 task-metric failure；
+没有结构改进、没有请求导数，task_acceptance=unmeasured。
+Reporter给出3项有真实来源的解释，区分有效失败、未建立因果方向和独立验收仍未测。
+实际后续 Main wire 持续包含上述数值、限制和数学 Schema；反馈未丢失。
 
-| 观察 | 本轮结果 |
+原详情链接造成目录循环，修复并再次正式绑定后，Main采用语义结果读取，继而自主提交求导问题，
+后又提出H2：提高授权的杨氏模量是否降低位移超限且保持无接触，并给出可削弱该假设的观察。
+H2明确引用真实基线数值，不是监督者注入的科研路线。
+
+后续执行限制必须保留：
+
+- 请求38选择了一个未授权参数，原冻结授权门禁返回 ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED；
+  没有启动 Worker或增加数学/积分。不能将其记成求导失败或结构不可行。
+- 请求40的diagnose包含多余顶层selected_candidate，Host明确要求移到decision内。
+- 请求42删除该多余字段，但research_intent仍不符合DIAGNOSE常量；Host再次明确拒绝。
+- 请求43又读取已有数学结果，未完成H2正式登记，没有执行单参数求导。
+
+Gateway证据读取8次语义、5次原始；另有额外DeepSeek段1次语义读取。
+5次原始读取包含完整结果索引1次及4次目录反馈，其中数学决策视图有1次字节完全相同的重复。
+没有发生本轮原始/派生字段混用错误。修复后6次读取全为语义输入；仍有对相同已保存结果的重复读取，
+不能把这种模型行动停滞全部归为接口错误。原参数门禁与Plan拒绝符合当前实际Schema，不予绕过。
+
+| 层级 | 本轮证据与边界 |
 |---|---|
-| 真实 Provider 接受新 Schema | 未测，发送在进程启动前被拒绝 |
-| 新 Main 语义读取 / 原始读取 | 0 / 0（新 Main 请求为 0） |
-| 新的无效目录阅读或视图混用 | 无可观察的新请求；不能宣称问题已在真实模型上消失 |
-| 新自主假设、数学请求或数学结果 | 无；原已登记假设保留，不冒充本轮成果 |
-| 数学反馈进入后续决策 | 未测 |
-| 结构修改 / 独立物理结果 | 无 |
-| L1 / L2 / L3 / L4 | 本轮真实验证均未开展；离线接口通过不替代科研验收 |
+| L1 信息获取 | 真实语义读取任务机会、注册参数及已保存数学事实；旧详情入口缺口已修复并真实采用 |
+| L2 研究行动 | 自主执行真实数学检查；H2为后续自主提出的可检验假设，但其新diagnose未获准 |
+| L3 结果利用 | H2与杨氏模量选择明确基于实际结果；有决策意图证据，尚无完成的第二轮辨别计算或结构采纳 |
+| L4 结构与独立执行 | 未完成；未生成新结构、未独立Replay，不能声称数学指导结构设计已通过 |
 
-未进入数学执行的直接原因是桌面外发审批阻断；目前没有新模型行动可用于归因。
-不能把它归为 Main 不行动，也不能据此证明接口已完全满足真实科研需求。
+## 最终费用、安全与发布
 
-## 累计账本与交付
+| 范围 | Main | Reporter | Provider | tokens |
+|---|---:|---:|---:|---:|
+| 原历史26次 | 22 | 4 | 26 | 321492 |
+| 更正前额外DeepSeek | 1 | 0 | 1 | 19310 |
+| 本轮Gateway | 15 | 1 | 16 | 216952 |
+| 原Study累计 | 38 | 5 | 43 | 557754 |
 
-原 Study 累计 Main 22、Reporter 4、共享 Provider 26、tokens 321492；数学评价、Worker、
-rollout、模型构建、物理 episode、积分和独立 Replay 均为 0。
-Provider/工具实际累计 wall_s=143.3760000001639，public operations=41；数值计算时间为 0。
-Store 未保存可核实的货币账单，本轮不按当前价格反推历史实际货币费用。
-新增 bind/restore/监督事件不产生 Provider、数学或积分消耗，历史失败和费用均保留。
+数学评价1，模型构建1，episode/rollout1，积分500，独立物理Replay0，新结构0。
+数值时间 `2.177401200053282 s`，积分kernel时间 `0.6139879999682307 s`；
+共享账本 backend_solves=1、model_calls=43、tool_calls=60、wall_s=`346.38794880046044`。
+平台通用 worker_calls=0不代表数学子进程未启动；真实启动由原数学Worker回执、结果及实际积分记录证明。
+货币账单未记录，cost_usd为unknown，不按当前价格反推历史实付费用。
 
-源码提交：b0ce55a（Reporter 修复与新增测试）、6428496 / 90e3e2a（离线夹具合同补齐）。
-本报告的后续文档提交不代表再次更换原 Study 的执行 SHA。
-私有 Store、完整 wire、凭据、原批准全文、历史成功参数及本地恢复脚本均未随分支发布。
-没有启动正式 PHS-2D/P3、没有合并 main。后续真实发送须先满足尚待的明确外发批准。
+总额48、剩5，其中4为保护收尾；原legacy门禁 science_capable_main_requests=0、
+next_request_will_protect=true。未消费保护额度做探索、未超过授权48，也没有为耗尽配额继续发送。
+最后监督暂停明确 not_main_stop=true，SDK ready是可恢复状态，不代表仍有请求执行。
+最终897个artifact哈希通过；原540个artifact、510个事件和全部原调用/费用逐项保持。
+共享授权绑定正确，无pending/unknown Worker、未结算调用、unconsumed响应或资源占用。
+
+源码修复提交：b0ce55a；离线夹具补齐：6428496 /90e3e2a；运行中详情修复：a9873b9。
+仅发布非敏感源码、测试与本摘要。私有Store、完整wire、凭据、原批准全文、运行脚本和历史成功参数不公开。
+没有自动启动正式PHS-2D/P3，没有合并main。下一阶段是否开展应基于上述未完成项另作决定。
