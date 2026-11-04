@@ -387,6 +387,7 @@ class ReportingSessionTests(unittest.TestCase):
         from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
         approve(h,[REGISTERED_MATHEMATICS_SCOPE])  # Offline SDK fixture; no live approval.
         reference=save(h,dict(status='computed',operation='offline_fixture',solver_status='iteration_limit'),'synthetic_fixture')
+        update(h,analysis_results=[reference])  # Register the fabricated saved result in this fixture only.
         sent=[];main=[]
         def respond(request):
             wire=json.loads(request.content);sent.append(wire)
