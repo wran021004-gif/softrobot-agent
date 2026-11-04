@@ -383,6 +383,9 @@ class ReportingSessionTests(unittest.TestCase):
 
     def test_native_investigation_delivers_l1_before_next_model_in_same_invocation(self):
         h=cold_host();p=deepcopy(state(h)['pilot']);p['session_handoff_live_admitted']=True;update(h,pilot=p)
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE])  # Offline SDK fixture; no live approval.
         reference=save(h,dict(status='computed',operation='offline_fixture',solver_status='iteration_limit'),'synthetic_fixture')
         sent=[];main=[]
         def respond(request):
@@ -569,6 +572,9 @@ class ReportingSessionTests(unittest.TestCase):
 
     def test_production_loop_rotates_twice_and_advertises_native_investigation(self):
         h=cold_host();p=deepcopy(state(h)['pilot']);p['session_handoff_live_admitted']=True;update(h,pilot=p)
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE])  # Offline SDK fixture; no live approval.
         sent=[]
         def respond(request):
             wire=json.loads(request.content);sent.append(wire)
