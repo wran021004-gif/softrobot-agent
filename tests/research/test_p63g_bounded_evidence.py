@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 from tools.platform_host import Host
 from tools.platform_store import plain
@@ -24,6 +25,69 @@ from tests.research.test_information_flow import packet
 from tests.research.test_recent_round_tools import run_fixture
 
 POLICY=dict(version='bounded_scientific_evidence_v1')
+
+
+class NavigationPagingTests(unittest.TestCase):
+    def test_large_derived_catalog_pages_reach_every_registered_entry(self):
+        spec=dict(research_decisions=dict(role_policy=dict(version='research_roles_v2'),evidence_read_policy=POLICY))
+        data={str(i):dict(description='Synthetic catalog row. '*60) for i in range(42)}
+        query=dict(reference=dict(artifact_id='a'*64),view='mathematical_capabilities',pointer='/catalog')
+        seen=[];pages=0
+        with patch.object(core,'state',return_value=dict(spec=spec)),patch.object(core,'read_evidence',return_value=data):
+            while query:
+                value=core.read_tool_evidence(SimpleNamespace(),query,record_read=False)
+                self.assertLess(len(json.dumps(value).encode()),6000)
+                seen.extend(row['field'] for row in value['entries']);pages+=1
+                query=value.get('next_query')
+                if query:
+                    self.assertEqual(query['view'],'mathematical_capabilities')
+                    self.assertEqual(query['pointer'],'/catalog')
+                    self.assertGreater(query['start'],0)
+                self.assertLess(pages,43)
+        self.assertEqual(seen,list(data))
+
+    def test_handoff_keeps_next_page_query_without_read_credit(self):
+        from tools.research.session_handoff import selected_evidence_facts
+        query=dict(reference=dict(artifact_id='a'*64),view='mathematical_capabilities',pointer='/catalog',start=7,count=20)
+        value=dict(policy='main_evidence_navigation_v1',entries=[],remaining_entries=35,next_query=query)
+        facts=selected_evidence_facts(value,{},6000)
+        self.assertEqual(facts['next_query'],query)
+        self.assertIn('No full-read credit',facts['scope'])
+
+    def test_range_cursor_keeps_original_list_offset(self):
+        spec=dict(research_decisions=dict(role_policy=dict(version='research_roles_v2'),evidence_read_policy=POLICY))
+        data=dict(total=100,start=10,items=[dict(description='Synthetic. '*600) for _ in range(30)])
+        query=dict(reference=dict(artifact_id='a'*64),view='range',pointer='/rows',start=10,count=30)
+        with patch.object(core,'state',return_value=dict(spec=spec)),patch.object(core,'read_evidence',return_value=data):
+            value=core.read_tool_evidence(SimpleNamespace(),query,record_read=False)
+        self.assertEqual(value['entries'][0]['field'],'10')
+        self.assertEqual(value['next_query']['view'],'range')
+        self.assertEqual(value['next_query']['start'],10+len(value['entries']))
+        self.assertEqual(value['remaining_entries'],100-value['next_query']['start'])
+
+    def test_original_mock_sdk_handoff_delivers_page_cursor(self):
+        import asyncio,os,httpx
+        from tests.research.test_request_boundary_handoff import RequestBoundaryHandoffTests
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        h=RequestBoundaryHandoffTests().provision();spec=deepcopy(state(h)['spec'])
+        spec['research_decisions']['evidence_read_policy']=POLICY;update(h,spec=spec)
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE])
+        ref=save(h,dict(catalog={str(i):dict(description='Synthetic row. '*100) for i in range(42)}),'synthetic_navigation_fixture')
+        sent=[]
+        def response(request):
+            wire=json.loads(request.content);sent.append(wire)
+            message=dict(role='assistant',content='Synthetic navigation read.');finish='stop'
+            if len(sent)==1:
+                finish='tool_calls';message['tool_calls']=[dict(id='synthetic-page',type='function',function=dict(name='evidence_read',arguments=json.dumps(dict(reference=ref,view='full',pointer='/catalog'))))]
+            return httpx.Response(200,json=dict(id='synthetic-paging',object='chat.completion',created=1,model=wire['model'],choices=[dict(index=0,finish_reason=finish,message=message)],usage=dict(prompt_tokens=10,completion_tokens=3,total_tokens=13)))
+        with patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),patch('tools.research.core.guard'),patch('tools.research.agent.guard'),patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(response)):
+            asyncio.run(agent.converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+        self.assertEqual(len(sent),2)
+        text=json.dumps(packet(sent[1])['pending_feedback_delivery'])
+        self.assertIn('next_query',text);self.assertIn('/catalog',text)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+        self.assertFalse(state(h)['analysis_results'])
 
 
 def bounded_host():

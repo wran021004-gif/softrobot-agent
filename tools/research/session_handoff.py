@@ -62,6 +62,7 @@ def selected_evidence_facts(parsed, query, limit):
         # a partial navigation view, never a scientific or complete-read fact.
         facts=dict(policy=parsed['policy'],entries=[],remaining_entries=0,
             scope='Partial navigation only; exact queries address original or derived views. No full-read credit.')
+        if parsed.get('next_query'):facts['next_query']=deepcopy(parsed['next_query'])
         entries=parsed.get('entries',[])
         for entry in entries:
             projected={k:entry[k] for k in ('field','query','type','length','value','range_query') if k in entry}

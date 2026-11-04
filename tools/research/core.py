@@ -77,7 +77,8 @@ def read_tool_evidence(host,query,*,record_read=True):
     else:entries=[]
     if q.view=='range' and isinstance(value,dict) and isinstance(value.get('items'),list):
         entries=[(q.start+i,v) for i,v in enumerate(value['items'])]
-    for key,item in entries:
+    page_start=0 if q.view=='range' else q.start
+    for key,item in entries[page_start:page_start+q.count]:
         token=str(key).replace('~','~0').replace('/','~1')
         pointer=q.pointer+'/'+token
         query_item=dict(reference=plain(q.reference),view=view,pointer=pointer)
@@ -91,7 +92,12 @@ def read_tool_evidence(host,query,*,record_read=True):
         index['entries'].append(entry)
         if len(json.dumps(index,ensure_ascii=False,separators=(',',':')).encode('utf-8'))>4000:
             index['entries'].pop();break
-    index['remaining_entries']=len(entries)-len(index['entries'])
+    next_start=q.start+len(index['entries'])
+    total=value['total'] if q.view=='range' else len(entries)
+    index['remaining_entries']=max(0,total-next_start)
+    if index['remaining_entries'] and index['entries']:
+        index['next_query']=dict(reference=plain(q.reference),view=q.view if q.view=='range' else view,
+            pointer=q.pointer,start=next_start,count=q.count,**(dict(fields=q.fields) if q.fields else {}))
     if bounded:
         index.update(status='raw_result_not_delivered',full_result_delivered=False,
             notice='Raw data remains unchanged in Store. This response grants no whole-result or formal acceptance read credit. Use bounded fields/range/pointers for a specific question.',
