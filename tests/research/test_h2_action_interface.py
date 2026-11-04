@@ -196,6 +196,8 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertEqual(issue['expected_field'],'structure.requested_budget')
         self.assertEqual(set(denied['allowed_root_fields']),{'version','domain','structure'})
         self.assertEqual(bad,original)
+        malformed=deepcopy(bad);malformed['domain']=[]
+        self.assertEqual(compile_question(h,malformed,tool_use_id='invalid-domain')['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
         inherited=compile_question(h,q,tool_use_id='unchanged-plan-cap')
         self.assertEqual(inherited['requested_evaluations'],1)
         self.assertEqual(inherited['minimum_evaluations'],5)

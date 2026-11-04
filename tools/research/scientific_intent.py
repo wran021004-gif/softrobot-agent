@@ -504,7 +504,7 @@ def compile_question(host, payload, *, tool_use_id):
         try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
             schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
-            domain=payload.get('domain');body=schema['properties'].get(domain,{})
+            domain=payload.get('domain');body=schema['properties'].get(domain,{}) if isinstance(domain,str) else {}
             refs=[b['$ref'] for b in body.get('anyOf',[body]) if '$ref' in b]
             properties=schema['$defs'][refs[0].rsplit('/',1)[-1]]['properties'] if refs else body.get('properties',{})
             issues=[]
