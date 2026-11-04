@@ -409,7 +409,7 @@ def completed_question_plan(host):
 def expand_v4(spec, payload, candidate=None):
     """Fill only fields uniquely implied by explicit semantics/frozen physics."""
     full=deepcopy(payload);sources={}
-    domain=payload.get('domain');body=full.get(domain)
+    domain=payload.get('domain');body=full.get(domain) if isinstance(domain,str) else None
     if not isinstance(body,dict):return full,sources
     def bind(name,value,basis):
         if name not in body:
