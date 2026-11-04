@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04，含 Main 112 增补）
+# 被动自主科研与接口监督进展（2026-11-04，含 Main 131 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -125,3 +125,13 @@ Main 94 为 Main 94 / Reporter 5、Provider `99/104`、1634147 tokens；数学�
 Main 110（Provider 116）首次提交即合法完成第四次独立 Replay。实际原请求根层及 decision 均无 selected_candidate，只有 physical_replay.candidate；原绑定函数补齐 canonical decision，未删除任何输入字段。结果有效、完整、无接触，位移约 `6.7234e-5 m`，较上一独立结果下降约 19.3%，仍高于冻结 `1e-9 m` 阈值，故为 valid_failure。这个具体真实请求验证了唯一候选合同，不能据此宣称所有模型根字段错误已根治。Main 111 读取新机会与参数，112 自主选择下一次 diagnose；没有 SELECT 或 Main STOP。
 
 Main 112 结算快照：Main 112 / Reporter 7、Provider `119/128`、2037603 tokens；数学账本 78 / 实际评价尝试 73；候选 6 / 独立 Replay 4；全部真实 build 79 / episode 启动 79 / 完成 74 / 积分 37500 步，backend 原扣记 84。2596 个 artifact 哈希全部通过，无 pending、未封口调用、未消费响应、未知 Worker 或占用。当前 identity 为 `8235c572face8398f6aac209b1af4a9e9843b3efaeeba49bc10a2f7ea511b0b2`，科学及接口绑定提交 `27878ae`；Provider 按有效科研进展逐次 +8 至 112、120、128。原各 Study 历史成本、精确参数授权、profile、数学与共享物理累计 null 均保留；继续按四次 Main 监督窗口推进。
+
+## Main 131 增补：持续有效计算及三次单候选 Replay
+
+Main 113 的 diagnose 错放根字段，在 114 纠正；115 以明确额度 20 完成新的半轴加杨氏模量优化，实际 19 次评价、9500 步。Main 118 生成第七候选，120 一次合法提交第五次 Replay，原评价器返回 valid_failure，位移约 `5.5952e-5 m`。Main 123 的新 diagnose 一次合法通过；124 的明确上限 8 低于最低申请 11，拒绝且不执行。125 的额外 diagnose 错放根字段被拒绝；126 直接显式改为合法额度 11，真实完成 10 次评价、5000 步。Main 129 生成第八候选，131 一次合法提交第六次 Replay，位移约 `5.4959e-5 m`，仍为 valid_failure。两次新结构的实际物理变化均只有 semi_y_m。
+
+修复后的 Main 110、120、131 三次 Replay 均一次合法提交，只有 payload 候选位置，无额外根字段或重复 decision 候选。diagnose 的根字段错误仍有零星复发，全部保留；其现有聚焦 Schema 本身正确，未增加过滤、别名或自动改请求。当前未形成重复读取/相同拒绝循环；每个继续窗口均核对真实信息增益。Main 120 后只读复核原 Study 的文件、白名单、历史结果与授权库，仍与最初保全清单一致。
+
+Main 131 结算快照：Main 131 / Reporter 8、Provider `139/144`、2473300 tokens；数学扣记 109 / 实际评价尝试 102；候选 8 / 独立 Replay 6；全部实际 build 110 / episode 启动 110 / 完成 105 / 积分 53000 步，backend 原扣记 117。3030 个 artifact 哈希通过，调用、Worker、响应与占用均已结算。所有独立结果仍未达到冻结阈值，未 SELECT 或 Main STOP，不能从局部改进推断全局可行或不可行。
+
+有效进展后 Provider 以原机制逐次增至 136、144，并在本边界追加至 152，当前 `139/152`、含 4 次收尾；增补后 identity 为 `7016274282f6d22925ca4c02e720323de04c5e30d0daac8e59886255f2430c40`。profile、数学/共享物理累计 null、原单 Worker 和单问题有限合同及所有历史费用不变。继续同一 Store 的四次 Main 监督窗口，未创建另一 Study 或注入科研路线。
