@@ -503,8 +503,20 @@ def compile_question(host, payload, *, tool_use_id):
         expanded,field_sources=expand_v4(spec,payload,candidate)
         try:q=ScientificQuestionV4.model_validate(expanded)
         except ValidationError as exc:
-            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=[
-                dict(field='.'.join(map(str,e['loc'])),reason=e['msg']) for e in exc.errors()],scientific_execution_started=False)
+            schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
+            domain=payload.get('domain');body=schema['properties'].get(domain,{})
+            refs=[b['$ref'] for b in body.get('anyOf',[body]) if '$ref' in b]
+            properties=schema['$defs'][refs[0].rsplit('/',1)[-1]]['properties'] if refs else body.get('properties',{})
+            issues=[]
+            for error in exc.errors():
+                issue=dict(field='.'.join(map(str,error['loc'])),reason=error['msg'])
+                if error['type']=='extra_forbidden' and len(error['loc'])==1 and error['loc'][0] in properties:
+                    issue['expected_field']=domain+'.'+error['loc'][0]
+                issues.append(issue)
+            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=issues,
+                allowed_root_fields=list(schema['properties']),
+                correction_scope='Field locations from the active Schema only. Main must resubmit; the original input and any explicit cap are unchanged.',
+                scientific_execution_started=False)
         if q.domain=='structure':
             structure=payload['structure']
             if (q.structure.operation in ('differentiate','optimize') and
@@ -983,7 +995,9 @@ def mechanism_context(host,c,study,budget):
         return fail('insufficient_budget','MECHANISM_QUESTION_BUDGET_CANNOT_FIT',
             minimum_evaluations=exc.minimum_evaluations,requested_evaluations=budget,
             cost_dependencies=exc.cost_dependencies,dynamic_cost_bound=exc.dynamic_cost_bound,
-            remaining_evaluations=mathematical_remaining(spec,s['mathematical_evaluations']))
+            remaining_evaluations=mathematical_remaining(spec,s['mathematical_evaluations']),
+            evaluation_cap_field='structure.requested_budget' if question_contract(spec) is ScientificQuestionV4 else 'requested_budget',
+            next_choice='Main may reduce the question or explicitly choose a legal maximum at evaluation_cap_field. No field is moved and no explicit maximum is increased automatically.')
     except ValueError as exc:
         return None,mechanism_parameter_failure(spec,c,study.paths) or fail('unsupported',str(exc))[1]
     preview=dict(minimum_evaluations=context['minimum_evaluations'],required_evaluations=context['evaluations'],

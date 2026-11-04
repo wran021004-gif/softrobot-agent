@@ -1010,7 +1010,7 @@ def tool_continuation(host):
                 # Keep its validator facts beyond the four most recent reads;
                 # neither a later success nor rotation rewrites that request.
                 rejection=dict(tool=use['name'],source=event['outputs'][0],
-                    **{k:detail[k] for k in ('error_code','reason','field','expected','issues') if k in detail})
+                    **{k:detail[k] for k in ('error_code','reason','field','expected','issues','allowed_root_fields') if k in detail})
                 for key in ('version','action'):
                     if key in use['input']:rejection[key]=use['input'][key]
                 contract_rejections.append(rejection);contract_rejections=contract_rejections[-3:]

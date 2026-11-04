@@ -188,6 +188,25 @@ class H2ActionInterfaceTests(unittest.TestCase):
             target='finite_time_task_violation',load_condition='all_frozen_conditions'))
         return h,c,q
 
+    def test_misplaced_cap_reports_active_schema_field_without_dropping_it(self):
+        h,c,q=self.admitted_question(plan_cap=1);bad=deepcopy(q);bad['requested_budget']=5
+        original=deepcopy(bad);denied=compile_question(h,bad,tool_use_id='misplaced-cap')
+        self.assertEqual(denied['reason'],'INVALID_SCIENTIFIC_V4_INPUT')
+        issue=next(r for r in denied['issues'] if r['field']=='requested_budget')
+        self.assertEqual(issue['expected_field'],'structure.requested_budget')
+        self.assertEqual(set(denied['allowed_root_fields']),{'version','domain','structure'})
+        self.assertEqual(bad,original)
+        inherited=compile_question(h,q,tool_use_id='unchanged-plan-cap')
+        self.assertEqual(inherited['requested_evaluations'],1)
+        self.assertEqual(inherited['minimum_evaluations'],5)
+        self.assertEqual(inherited['evaluation_cap_field'],issue['expected_field'])
+        chosen=deepcopy(q);chosen['structure']['requested_budget']=5
+        admitted=compile_question(h,chosen,tool_use_id='main-explicitly-moved-cap')
+        self.assertEqual(admitted['status'],'ready',admitted)
+        self.assertEqual(admitted['required_evaluations'],5)
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_default_minimum_and_explicit_low_caps_have_exact_shared_costs(self):
         h,c,q=self.admitted_question()
         single=compile_question(h,q,tool_use_id='single-minimum')
