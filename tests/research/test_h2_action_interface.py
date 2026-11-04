@@ -94,6 +94,7 @@ class H2ActionInterfaceTests(unittest.TestCase):
             self.assertTrue(row['design_supported'])
             self.assertEqual(row['study_authorized'],authorized)
             self.assertEqual(row['differentiation']['supported'],authorized)
+            self.assertTrue(row['differentiation']['method_supported'])
             self.assertEqual(row['domain']['minimum'],source['minimum'])
             self.assertEqual(row['domain']['maximum'],source['maximum'])
             self.assertEqual(row['execution_admission'],'not_checked')
@@ -182,8 +183,29 @@ class H2ActionInterfaceTests(unittest.TestCase):
             self.assertEqual(denied['requested_evaluations'],cap)
             self.assertEqual(denied['dynamic_cost_bound']['physics_steps'],10000)
             self.assertFalse(denied['scientific_execution_started'])
+        q['structure'].pop('requested_budget');q['structure']['operation']='optimize'
+        minimum_search=compile_question(h,q,tool_use_id='dual-minimum-search')
+        self.assertEqual(minimum_search['effective_evaluation_cap'],11)
+        self.assertEqual(minimum_search['dynamic_cost_bound']['physics_steps'],11000)
+        q['structure']['requested_budget']=64
+        bounded_search=compile_question(h,q,tool_use_id='dual-maximum-legal-search')
+        self.assertEqual(bounded_search['dynamic_cost_bound'],dict(model_builds=128,episodes=128,physics_steps=64000))
         self.assertEqual(state(h)['mathematical_evaluations'],0)
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_static_question_reuses_minimum_cost_admission_without_dynamic_work(self):
+        h,c,q=self.admitted_question()
+        q['structure'].update(effect_semantics='re_equilibrated_passive_response',load_condition='unloaded',
+            target=dict(quantity='re_equilibrated_position_response',reduction='norm',goal='decrease'))
+        ready=compile_question(h,q,tool_use_id='static-minimum')
+        self.assertEqual(ready['status'],'ready',ready)
+        self.assertEqual(ready['effective_evaluation_cap'],5)
+        self.assertNotIn('dynamic_cost_bound',ready)
+        q['structure']['requested_budget']=4
+        denied=compile_question(h,q,tool_use_id='static-low-cap')
+        self.assertEqual(denied['status'],'insufficient_budget',denied)
+        self.assertEqual(denied['minimum_evaluations'],5)
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
 
     def test_independent_expanded_study_and_operation_schema_preserve_old_grant(self):
         old,old_c,q=self.admitted_question();frozen=deepcopy(state(old)['spec'])
