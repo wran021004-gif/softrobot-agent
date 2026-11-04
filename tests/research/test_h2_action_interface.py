@@ -149,9 +149,9 @@ class H2ActionInterfaceTests(unittest.TestCase):
         self.assertNotIn('research_intent',schema(second)['$defs']['ResearchDecision']['properties'])
         self.assertEqual(state(h)['mathematical_evaluations'],0)
 
-    def admitted_question(self,*,variables=None,plan_cap=0,physical_budget=128):
+    def admitted_question(self,*,variables=None,plan_cap=0,physical_budget=128,unmetered=False):
         h,c=prepared_host_v2(mathematical_budget=64,physical_budget=physical_budget,
-            mock_provider_budget=20,sensitivity_variables=variables)
+            mock_provider_budget=20,sensitivity_variables=variables,unmetered=unmetered)
         plan=rationale(c);plan['decision']['requested_budget']=plan_cap
         core.dispatch(h,bind_plan_selection(h,plan),'OFFLINE-cost-diagnose')
         q=dict(version='scientific_question_v4',domain='structure',structure=dict(operation='differentiate',
@@ -205,6 +205,36 @@ class H2ActionInterfaceTests(unittest.TestCase):
         denied=compile_question(h,q,tool_use_id='static-low-cap')
         self.assertEqual(denied['status'],'insufficient_budget',denied)
         self.assertEqual(denied['minimum_evaluations'],5)
+        self.assertEqual(state(h)['mathematical_evaluations'],0)
+
+    def test_unmetered_physics_keeps_numeric_receipts_replay_sublimit_and_sdk_null(self):
+        from schemas.platform import MeasuredCost
+        from tools.platform_store import zero
+        from tools.research.budget import backend_capacity,decision_budget
+        h,c,q=self.admitted_question(unmetered=True,physical_budget=16)
+        self.assertIsNone(state(h)['spec']['budgets']['mathematical_evaluations'])
+        self.assertIsNone(state(h)['spec']['budgets']['physical_launches'])
+        self.assertIsNone(backend_capacity(h))
+        # Accounting fixture only: no numerical work or scientific evidence.
+        cost={**zero(),'backend_solves':100000}
+        row,_=h.store.reserve(h.run_id,'offline-accounting-only','fixture',h.actor,cost)
+        h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=h.actor,
+            tool_id='test.accounting_fixture',execution_status='completed',charged=cost),
+            dict(fixture='Synthetic accounting test; no physics performed.'),actual_cost=cost)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],100000)
+        self.assertIsNone(h.store.remaining()['remaining']['backend_solves'])
+        budget=decision_budget(h)['science_budget']
+        self.assertIsNone(budget['remaining_physical'])
+        self.assertEqual(budget['remaining_full_replays'],16)
+        q['structure'].update(operation='optimize',parameter_paths=['segments.0.young_pa','payout_lengths_m.tendon_0'],
+            requested_budget=64,passive_ablation=['tendon_0'])
+        ready=compile_question(h,q,tool_use_id='unmetered-after-accounting')
+        self.assertEqual(ready['status'],'ready',ready)
+        self.assertEqual(ready['dynamic_cost_bound']['physics_steps'],64000)
+        with self.assertRaises(ValueError):MeasuredCost.model_validate({**cost,'backend_solves':None})
+        wires=run_fixture(h,[None])
+        self.assertTrue(wires)
+        self.assertIsNone(backend_capacity(h))
         self.assertEqual(state(h)['mathematical_evaluations'],0)
 
     def test_independent_expanded_study_and_operation_schema_preserve_old_grant(self):

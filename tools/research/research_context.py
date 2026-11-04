@@ -764,7 +764,7 @@ def action_feedback(host,current, *, analysis_metadata=None):
         candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
         for action in ('physical_replay','control_search'):
             reason=None;status='preflight_eligible'
-            if closed or action not in current['actions'] or action not in s['spec']['capabilities'] or capacity<1:
+            if closed or action not in current['actions'] or action not in s['spec']['capabilities'] or (capacity is not None and capacity<1):
                 status='unavailable';reason='Protected/stopped state, action availability or shared backend capacity'
             elif action=='control_search' and cfg['task']['family']!='task.reach':
                 status='not_applicable';reason='Current search requires reach-hold norm constraints'

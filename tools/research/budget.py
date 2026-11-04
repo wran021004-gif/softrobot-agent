@@ -45,7 +45,8 @@ def backend_capacity(host, db=None, *, evaluation_run=None):
     """Protect each newly admitted PPO stage's evaluation in the shared ledger."""
     s=host.store.session(host.run_id,db)['state']
     held=sum(bool(e.get('evaluation_reserved')) for name,e in s.get('rl_runs',{}).items() if name!=evaluation_run)
-    return max(0,host.store.remaining(db=db)['remaining']['backend_solves']-held)
+    remaining=host.store.remaining(db=db)['remaining']['backend_solves']
+    return None if remaining is None else max(0,remaining-held)
 
 
 def reserve_evaluation(host, current, db, *, training=False, evaluation_run=None):
@@ -125,10 +126,10 @@ def decision_budget(host):
             mathematical_quota_scope='No cumulative mathematical count quota; actual costs remain recorded.' if b['mathematical_evaluations'] is None else 'Frozen cumulative mathematical count quota.',
             remaining_mathematical=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0)),
             remaining_full_replays=max(0,(s['spec'].get('physical_replay_limit') if s['spec'].get('physical_replay_limit') is not None else b['physical_launches'])-s.get('physical_replay_launches',0)),
-            available_full_replays=capacity(host,b['physical_launches'],root_operation=True,route='fixed_tension')['admitted'],
+            available_full_replays=capacity(host,b['physical_launches'] if b['physical_launches'] is not None else s['spec']['physical_replay_limit'],root_operation=True,route='fixed_tension')['admitted'],
             full_replay_scope='remaining_full_replays is the method sublimit, not an additional shared pool. available_full_replays also applies shared launches, confirmation reserve and public-operation capacity; full request admission still applies.',
             plan_control_search=dict(callback_unit='full physical replay request; exact cached baselines can avoid a new launch',
-                declared_callback_maximum=b['physical_launches']+1,
+                declared_callback_maximum=None if b['physical_launches'] is None else b['physical_launches']+1,
                 scope='Frozen request cap, not remaining launches. Native analysis callbacks use native_control_limits and the mathematical allowance instead.'),
             native=dict(per_request_control_limits=s['spec'].get('native_control_limits'),
                 research_effort=('Mathematical search has no cumulative count quota. Main may deepen control optimization, change parameterization or choose another legal method; finite search failure is not structural infeasibility. Main chooses useful effort, not necessarily the maximum.' if b['mathematical_evaluations'] is None else None),
@@ -163,7 +164,7 @@ def science_fits(host):
             and set(spec['allowed_plan_actions'])<={'generate','stop'} and not s.get('candidates')) or
         ('analysis' in capabilities and mathematics_fits(spec,s.get('mathematical_evaluations',0))) or
         ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
-        ('physical_replay' in capabilities and backend>=1 and s.get('physical_replay_launches',0)<
+        ('physical_replay' in capabilities and (backend is None or backend>=1) and s.get('physical_replay_launches',0)<
             (spec.get('physical_replay_limit') if spec.get('physical_replay_limit') is not None else b['physical_launches'])) or
         ('rl' in capabilities and evaluations>0 and ((backend>=2 and
             s.get('admitted_training_stages',len(runs))<limits['training_stages']) or (backend>=1 and runs))) or
@@ -228,7 +229,10 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     # Fixed replay has one public Plan and no charged child tool calls. Inside
     # that admitted Plan, its current public call has already been paid.
     operation_slots=operations+int(not root_operation) if route in ('fixed_tension','passive_protocol') else (operations-int(root_operation))//3
-    fit = max(0, min(requested, slots-reserve, backend_capacity(host)-reserve, operation_slots))
+    shared=backend_capacity(host)
+    bounds=[requested,slots-reserve,operation_slots]
+    if shared is not None:bounds.append(shared-reserve)
+    fit = max(0, min(bounds))
     return dict(requested=requested, admitted=fit, internal_launches=fit,
         numerical_reservation_s=0., confirmation_launch_reserve=reserve,
         per_execution_s=allowance(s), remaining_numerical_s=None, remaining_activity_s=None)

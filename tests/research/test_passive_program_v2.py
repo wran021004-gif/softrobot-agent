@@ -42,7 +42,7 @@ def configuration_v2():
     return cfg
 
 
-def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,mock_provider_budget=None,sensitivity_variables=None):
+def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,mock_provider_budget=None,sensitivity_variables=None,unmetered=False):
     from tools.research import core
     from tools.research.state import state,save,update
     from tools.state_io import digest
@@ -56,6 +56,8 @@ def prepared_host_v2(*,failure=False,mathematical_budget=None,physical_budget=8,
     if mathematical_budget is not None:cfg['budgets']['mathematical_evaluations']=mathematical_budget
     if mock_provider_budget is not None:cfg['budgets']['provider_requests']=mock_provider_budget
     if sensitivity_variables is not None:cfg['family_sensitivity_variables']=dict(version='family_sensitivity_v2',variables=sensitivity_variables)
+    if unmetered:
+        cfg['budgets'].update(mathematical_evaluations=None,physical_launches=None)
     task_path.write_text(json.dumps(dict(task=task,seed=1)));study_path.write_text(json.dumps(cfg))
     try:h=core.prepare(study_path,ROOT/'runs'/name)
     finally:task_path.unlink();study_path.unlink()

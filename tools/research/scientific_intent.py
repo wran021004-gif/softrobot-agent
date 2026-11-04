@@ -992,7 +992,8 @@ def mechanism_context(host,c,study,budget):
     if not mathematics_fits(spec,s['mathematical_evaluations'],context['evaluations']):
         return fail('insufficient_budget','SHARED_MATHEMATICAL_BUDGET_CANNOT_FIT',**preview,
             remaining_evaluations=mathematical_remaining(spec,s['mathematical_evaluations']))
-    if context.get('dynamic_cost_bound',{}).get('episodes',0)>backend_capacity(host):
+    physical_remaining=backend_capacity(host)
+    if physical_remaining is not None and context.get('dynamic_cost_bound',{}).get('episodes',0)>physical_remaining:
         return fail('insufficient_budget','SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT',**preview,
             remaining_physical_episodes=backend_capacity(host))
     return context,preview

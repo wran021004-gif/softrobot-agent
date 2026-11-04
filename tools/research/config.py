@@ -437,15 +437,22 @@ def resolve(path, profile=None, *, backend_profile=None):
         raise ValueError('POSITIVE_NATIVE_CONTROL_COUNT_LIMITS_REQUIRED')
     if native_limits is not None:study['native_control_limits']=native_limits
     replay_limit=study.get('physical_replay_limit')
-    if replay_limit is not None and (type(replay_limit) is not int or not 0<=replay_limit<=b['physical_launches']):
+    if replay_limit is not None and (type(replay_limit) is not int or replay_limit<0 or
+            b['physical_launches'] is not None and replay_limit>b['physical_launches']):
         raise ValueError('PHYSICAL_REPLAY_LIMIT_MUST_SHARE_BACKEND_CEILING')
     count_keys = ('provider_requests', 'protected_provider_requests', 'public_operations',
         'protected_public_operations', 'physical_launches', 'local_solves', 'offline_nlp',
         'bdf_replays', 'mathematical_evaluations')
-    if any((b[k] is not None or k!='mathematical_evaluations') and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
+    if any((b[k] is not None or k not in ('mathematical_evaluations','physical_launches')) and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
         raise ValueError('FINITE_NONNEGATIVE_COUNT_REQUIRED')
     if b['mathematical_evaluations'] is None and (study['mode']!='formal_research' or 'analysis' not in study['capabilities']):
         raise ValueError('UNMETERED_MATHEMATICS_REQUIRES_FORMAL_ANALYSIS_SCOPE')
+    if b['physical_launches'] is None:
+        from tools.research_tasks import passive_registered
+        if (study['mode']!='formal_research' or 'analysis' not in study['capabilities'] or
+                b['mathematical_evaluations'] is not None or not passive_registered(task['task']) or
+                replay_limit is None or study['nmpc_limits']['executions'] or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
+            raise ValueError('UNMETERED_PHYSICS_REQUIRES_PASSIVE_ANALYSIS_AND_FINITE_INDEPENDENT_REPLAY_LIMIT')
     if study['mode']=='engineering_investigation':
         if (study['capabilities']!=['investigation']
                 or not set(study['allowed_plan_actions'])<= {'diagnose','stop'}
@@ -468,7 +475,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     if any(v is not None for v in time_values):
         raise ValueError('COUNT_MODE_REQUIRES_EXPLICIT_DISABLED_SCIENTIFIC_TIMING')
     repetitions=study['confirmation']['fresh_independent_repetitions']
-    if type(repetitions) is not int or repetitions<0 or (repetitions and repetitions>=b['physical_launches']):
+    if type(repetitions) is not int or repetitions<0 or (repetitions and b['physical_launches'] is not None and repetitions>=b['physical_launches']):
         raise ValueError('CONFIRMATIONS_REQUIRE_NONNEGATIVE_COUNT_AND_SHARED_DEVELOPMENT_PLUS_REPEAT_CAPACITY')
     stages=study['rl_limits']['training_stages'];rl='rl' in study['capabilities']
     if type(stages) is not int or not (1 if rl else 0)<=stages<=10:
@@ -563,6 +570,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     if b['mathematical_evaluations'] is None:
         study['budget_semantics'].update(mathematical_evaluations='usage_only_no_count_quota',
             engineering_worker_timeout_s=study['analysis_cap_s'])
+    if b['physical_launches'] is None:study['budget_semantics']['physical_launches']='usage_only_no_count_quota'
     if family_mode:
         initial=cfg['task']['initializer']['parameters']['data']
         if initial['unspecified']!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial[key].values()):

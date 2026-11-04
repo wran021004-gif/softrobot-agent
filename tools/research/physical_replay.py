@@ -521,7 +521,8 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
         from tools.research.budget import backend_capacity
-        if backend_capacity(host,db)<episodes:raise ValueError('BACKEND_CAPACITY_PROTECTS_RESERVED_RL_EVALUATIONS')
+        remaining=backend_capacity(host,db)
+        if remaining is not None and remaining<episodes:raise ValueError('BACKEND_CAPACITY_PROTECTS_RESERVED_RL_EVALUATIONS')
         current['physical_replay_launches']=current.get('physical_replay_launches',0)+episodes
         host.store.update_state(db,host.run_id,current)
     row,_=host.store.reserve(host.run_id,worker_key,digest(request),host.actor,

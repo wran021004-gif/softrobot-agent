@@ -556,7 +556,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
-        if episodes and episodes>backend_capacity(host,db):raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
+        if episodes:
+            remaining=backend_capacity(host,db)
+            if remaining is not None and episodes>remaining:raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
         if current.get('success_gate') or not mathematics_fits(current['spec'],current.get('mathematical_evaluations',0),count):
             raise ValueError('MATHEMATICAL_COUNT_OR_SUCCESS_GATE')
         current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+count
@@ -565,7 +567,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
     episodes=(sensitivity_context or {}).get('dynamic_cost_bound',{}).get('episodes',0)
     if episodes:
         from tools.research.budget import backend_capacity
-        if episodes>backend_capacity(host):raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
+        remaining=backend_capacity(host)
+        if remaining is not None and episodes>remaining:raise ValueError('SHARED_PHYSICAL_EPISODE_BUDGET_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,
         {**zero(),'wall_s':reserve,'tool_calls':int(origin=='engineering_preflight'),'backend_solves':episodes},kind='candidate_analysis',guard=charge)
     folder=host.store.root/'analyses'/row['execution_id']
