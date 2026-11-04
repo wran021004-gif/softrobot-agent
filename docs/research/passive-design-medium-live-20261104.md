@@ -1,4 +1,4 @@
-# 被动自主科研与接口监督进展（2026-11-04，含 Main 131 增补）
+# 被动自主科研与接口监督进展（2026-11-04 Study，含 Main 153 增补）
 
 用户已正式批准科研、持续监督、及时接口修复和按需追加 Provider；数学、分析及其共享物理计算均无累计上限。本记录是结算边界的进展快照，不是科研完成、Main STOP 或任务成功声明。原始 Store、完整 wire、凭据、批准全文和候选当前数值不公开。
 
@@ -135,3 +135,13 @@ Main 113 的 diagnose 错放根字段，在 114 纠正；115 以明确额度 20 
 Main 131 结算快照：Main 131 / Reporter 8、Provider `139/144`、2473300 tokens；数学扣记 109 / 实际评价尝试 102；候选 8 / 独立 Replay 6；全部实际 build 110 / episode 启动 110 / 完成 105 / 积分 53000 步，backend 原扣记 117。3030 个 artifact 哈希通过，调用、Worker、响应与占用均已结算。所有独立结果仍未达到冻结阈值，未 SELECT 或 Main STOP，不能从局部改进推断全局可行或不可行。
 
 有效进展后 Provider 以原机制逐次增至 136、144，并在本边界追加至 152，当前 `139/152`、含 4 次收尾；增补后 identity 为 `7016274282f6d22925ca4c02e720323de04c5e30d0daac8e59886255f2430c40`。profile、数学/共享物理累计 null、原单 Worker 和单问题有限合同及所有历史费用不变。继续同一 Store 的四次 Main 监督窗口，未创建另一 Study 或注入科研路线。
+
+## Main 153 增补（2026-11-05）：第九候选与监督结算延迟修复
+
+Main 134 合法 diagnose；135 的 V4 根层 hypothesis / local_radius_fraction 被原校验拒绝，136 更正后真实完成 10 次评价、5000 步。Main 139 生成第九候选，141 的 diagnose 根字段错误在 142 更正；144 自主转向并一次合法完成第七次独立 Replay，位移约 `5.3990e-5 m`，仍为 valid_failure。这是唯一候选修复后第四次一次合法提交的真实 Replay。Main 145 的等价重复在 Worker 前正确拒绝；其后离开重放，149 更正并完成新 diagnose。150 的明确单次上限不足被拒绝，151 显式更正后真实完成 10 次评价、5000 步；152 选择生成，153 读取相关参数，尚未生成第十候选。没有通过删除错误字段、放宽新颖性或阈值来继续研究。
+
+本边界为 Main 153 / Reporter 10，Provider `163/168`、3020286 tokens；数学扣记 131 / 实际评价尝试 122；候选 9 / 独立 Replay 7；全部实际 build 131 / episode 启动 131 / 完成 126 / 积分 63500 步，backend 原扣记 140。3541 个 artifact 哈希通过，调用、Worker、响应和占用均已结算。Provider 增补至 160、168 的各次旧状态、费用和授权均保留；identity 为 `1408470899f71c82709cce6bb662186a5f551a6b32d376c0f3f4d5e2d963d668`。科学 profile 与数学/共享物理累计 null 不变；未 SELECT 或 Main STOP。
+
+监督边界发现具体通用延迟：最后一次原反馈已于 UTC 15:54:20.533 封口，监督暂停事件至 15:55:46.905 才保存，间隔约 86.37 秒，无计算或 Provider 在运行。原 agent.converse 为记录预算调用完整 decision_packet，重建了不需要的科研视图。原 decision_budget 在同一 Store 只需约 0.51 秒；其 public_operation_budget、provider_budget、science_budget、closeout 与原监督事件中对应内容完全一致。
+
+`d09fcca` 仅让此监督事件直接保存原 decision_budget，并以 budget_source 标明来源。Main 的完整科研包仍走原路径；该事件不再附带完整包额外组装的 training / method_remaining，原方法配额和训练状态仍由原来源保留并可查询。没有新预算器、Registry、上限或成本重算。新增原 SDK Mock 回归在旧实现中精确失败于结算重建，修复后与原预算监督回归共 2 项通过：原反馈已结算、不多发送请求、未消费响应为空、共享预算快照等于原预算函数。无真实 Provider。修复后的实际结算耗时仍待下一真实窗口验证。
