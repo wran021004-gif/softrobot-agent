@@ -1,0 +1,122 @@
+"""Knowledge isolation and finite grants. All SDK replies are offline fixtures."""
+import asyncio
+from contextlib import contextmanager
+from copy import deepcopy
+import hashlib
+import json
+import unittest
+from unittest.mock import patch
+from uuid import uuid4
+
+from tools.research import core, agent, experience
+from tools.research.config import ROOT, resolve
+from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+from tools.research.evidence_policy import registered_references
+from tools.research.state import state, update
+from tests.research.test_cross_task_integration import fixture_directory
+from tests.research.test_research_authorization_preflight import approve
+from tests.research.test_recent_round_tools import run_fixture
+
+SPEC=ROOT/'configs/research/study_phs2d_knowledge_autonomy_20261105.json'
+
+
+@contextmanager
+def fixture():
+    spec=resolve(SPEC)
+    spec['study_id']='phs-knowledge-fixture-'+uuid4().hex[:8]
+    spec['configuration']['run_id']=spec['study_id']
+    with fixture_directory() as folder, patch('tools.research.config.resolve',return_value=spec):
+        h=core.prepare(directory=folder)
+        update(h,freeze='offline-fixture',pilot={**state(h)['pilot'],
+            'session_handoff_live_admitted':True,'session_handoff_boundary':'request_feedback'})
+        yield h
+
+
+class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_new_identity_preserves_science_and_freezes_only_six_procedures(self):
+        old=resolve(ROOT/'configs/research/study_phs2d_autonomous_original_prepared_20261105.json')
+        new=resolve(SPEC)
+        for key in ('canonical_task','family_space','analysis_protocol','budgets',
+                    'physical_replay_limit','physical_worker_watchdog_s','mathematical_worker_watchdog_s'):
+            self.assertEqual(new[key],old[key],key)
+        for key in ('backend','dynamics_model','discretization','controller'):
+            self.assertEqual(new['configuration']['policy'][key],old['configuration']['policy'][key],key)
+        self.assertEqual(new['provider_request_extension_policy'],dict(version='finite_provider_request_extension_v1',
+            maximum_additional_requests=104,maximum_requests_per_extension=8))
+        self.assertNotEqual(old['resolved_identity'],new['resolved_identity'])
+        rows=new['knowledge_manifest']['entries']
+        self.assertEqual(len(rows),6)
+        self.assertEqual({r['entry_id'] for r in rows},set(new['knowledge']['include_entry_ids']))
+        for row in rows:
+            self.assertEqual(row['kind'],'procedure')
+            self.assertEqual(row['revision'],'1')
+            self.assertEqual(row['compact_skill']['source_sha256'],hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest())
+        self.assertFalse(new['supplied_evidence'])
+        for key in ('history','mathematics','control_seeds'):
+            self.assertFalse(new['research_decisions'][key])
+
+    def test_all_index_entries_and_referenced_sources_remain_confined(self):
+        with fixture() as h:
+            allowed=set(state(h)['spec']['knowledge']['include_entry_ids'])
+            found=experience.retrieve(h,dict(operation='search'))
+            self.assertEqual({r['entry_id'] for r in found['results']},allowed)
+            self.assertTrue(all('content' not in r for r in found['results']))
+            for row in experience._index_rows():
+                if row['entry_id'] in allowed:continue
+                self.assertFalse(experience.retrieve(h,dict(entry_id=row['entry_id']))['results'])
+                with self.assertRaisesRegex(ValueError,'EXACT_EXPERIENCE_READ'):
+                    experience.retrieve(h,dict(operation='read',entry_id=row['entry_id'],revision=row['revision']))
+            for row in found['results']:
+                for reader in ('agent','reporter'):
+                    read=experience.retrieve(h,row['read_query'],reader=reader)
+                    self.assertFalse(read['scientific_evidence'])
+                    self.assertEqual(read['results'][0]['content_role'],'procedural_knowledge')
+                    for source in read['results'][0]['content']['evidence_sources']:
+                        if 'entry_id' in source:
+                            with self.assertRaisesRegex(ValueError,'EXACT_EXPERIENCE_READ'):
+                                experience.retrieve(h,dict(operation='read',**source),reader=reader)
+            self.assertEqual(registered_references(h),[])
+            self.assertFalse(state(h)['candidates'])
+            self.assertFalse(state(h)['results'])
+            self.assertFalse(state(h)['physical_replays'])
+
+    def test_read_rejects_content_drift_against_frozen_hash(self):
+        with fixture() as h:
+            query=dict(operation='read',entry_id='skill-parameter-model',revision='1')
+            with patch('pathlib.Path.read_bytes',return_value=b'{"changed":true}'):
+                with self.assertRaisesRegex(ValueError,'FROZEN_KNOWLEDGE_CONTENT_CHANGED'):
+                    experience.retrieve(h,query)
+            self.assertFalse(state(h)['retrievals'])
+
+    def test_gateway_sdk_wire_delivers_hint_then_on_demand_body(self):
+        with fixture() as h:
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE])
+            hint=experience.retrieval_hint(h)
+            self.assertIn('skill',hint)
+            self.assertNotIn('content',hint)
+            query=dict(operation='read',entry_id='skill-parameter-model',revision='1')
+            with patch('tools.research.agent.credential',return_value='offline-fixture'):
+                wires=run_fixture(h,[('experience_retrieve',query),None],limit=2)
+            names={t['function']['name'] for t in wires[0]['tools']}
+            self.assertIn('experience_retrieve',names)
+            self.assertEqual(wires[0]['model'],'gpt-5.6-sol')
+            self.assertEqual(wires[0]['reasoning_effort'],'medium')
+            self.assertTrue(experience.hint_progress(h))
+            self.assertTrue(experience.read_progress(h)['reads'][0]['body_delivered'])
+            self.assertNotIn('diagnostic_questions',json.dumps(wires[0]))
+            self.assertIn('diagnostic_questions',json.dumps(wires[1]))
+            self.assertEqual(registered_references(h),[])
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+            self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_new_study_rejects_live_entry_before_credentials_or_transport(self):
+        with fixture() as h:
+            with patch('tools.research.agent.credential') as credentials,patch('httpx.AsyncHTTPTransport') as transport:
+                with self.assertRaisesRegex(ValueError,'INDEPENDENT_FORMAL_STUDY_APPROVAL'):
+                    asyncio.run(agent.converse(h,max_new_provider_requests=1))
+            credentials.assert_not_called()
+            transport.assert_not_called()
+            self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+
+
+if __name__=='__main__':unittest.main()

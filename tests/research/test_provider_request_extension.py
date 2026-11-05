@@ -37,4 +37,28 @@ class ProviderExtensionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'SETTLED_NONSUCCESS'):extend_provider_requests(h,a)
         self.assertNotIn('provider_request_extensions',state(h))
 
+    def test_batch_cap_multiple_addenda_stale_identity_and_cumulative_cap(self):
+        h,a=self.fixture();spec=deepcopy(state(h)['spec'])
+        spec['provider_request_extension_policy'].update(maximum_additional_requests=16,maximum_requests_per_extension=8)
+        update(h,spec=spec)
+        before=h.store.remaining();old=deepcopy(state(h))
+        def approval(extra):
+            current=state(h)['spec'];value=deepcopy(a)
+            value['scope'].update(resolved_identity=current['resolved_identity'],
+                previous_request_limit=current['budgets']['provider_requests'],additional_requests=extra)
+            value['scope_identity']=digest(value['scope'])
+            return value
+        with self.assertRaisesRegex(ValueError,'BATCH_CAP_EXCEEDED'):extend_provider_requests(h,approval(9))
+        self.assertEqual(h.store.remaining(),before)
+        first=approval(8);extend_provider_requests(h,first)
+        stale=deepcopy(first);stale['source']='Different fixture approval with stale identity'
+        with self.assertRaisesRegex(ValueError,'EXACT_USER_APPROVED'):extend_provider_requests(h,stale)
+        extend_provider_requests(h,approval(8))
+        with self.assertRaisesRegex(ValueError,'CAP_EXCEEDED'):extend_provider_requests(h,approval(1))
+        self.assertEqual(h.store.remaining()['used'],before['used'])
+        self.assertEqual(h.store.remaining()['limit']['model_calls'],before['limit']['model_calls']+16)
+        for name in ('physical_launches','mathematical_evaluations','protected_provider_requests'):
+            self.assertEqual(state(h)['spec']['budgets'][name],old['spec']['budgets'][name])
+        self.assertEqual(len(state(h)['provider_request_extensions']),2)
+
 if __name__=='__main__':unittest.main()

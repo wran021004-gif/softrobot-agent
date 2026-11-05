@@ -475,11 +475,16 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('FINITE_MATHEMATICAL_WORKER_WATCHDOG_REQUIRED')
         study['mathematical_worker_watchdog_s']=mathematical_watchdog
     if provider_extension is not None:
-        if (set(provider_extension)!={'version','maximum_additional_requests'} or
+        if (not {'version','maximum_additional_requests'}<=set(provider_extension) or
+                set(provider_extension)-{'version','maximum_additional_requests','maximum_requests_per_extension'} or
                 provider_extension['version']!='finite_provider_request_extension_v1' or
                 type(provider_extension['maximum_additional_requests']) is not int or
                 not 0<provider_extension['maximum_additional_requests']<=256):
             raise ValueError('FINITE_EXPLICIT_PROVIDER_EXTENSION_POLICY_REQUIRED')
+        if 'maximum_requests_per_extension' in provider_extension:
+            per_extension=provider_extension['maximum_requests_per_extension']
+            if type(per_extension) is not int or not 0<per_extension<=provider_extension['maximum_additional_requests']:
+                raise ValueError('FINITE_EXPLICIT_PROVIDER_EXTENSION_POLICY_REQUIRED')
         study['provider_request_extension_policy']=deepcopy(provider_extension)
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
     analysis_timeout=study['analysis_cap_s']

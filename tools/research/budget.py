@@ -30,6 +30,8 @@ def extend_provider_requests(host, approval):
                 policy.get('version')!='finite_provider_request_extension_v1'):
             raise ValueError('EXACT_USER_APPROVED_FINITE_PROVIDER_EXTENSION_REQUIRED')
         used=sum(host.store.artifact(ref,db=db)['additional_requests'] for ref in current.get('provider_request_extensions',[]))
+        if extra>policy.get('maximum_requests_per_extension',policy['maximum_additional_requests']):
+            raise ValueError('FROZEN_PROVIDER_EXTENSION_BATCH_CAP_EXCEEDED')
         if used+extra>policy['maximum_additional_requests']:
             raise ValueError('FROZEN_PROVIDER_EXTENSION_CAP_EXCEEDED')
         if (current.get('pending') or pending(host) or current.get('selected') or current.get('success_gate') or

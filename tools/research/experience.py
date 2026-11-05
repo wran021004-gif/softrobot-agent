@@ -113,7 +113,8 @@ def retrieval_hint(host):
     if s['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
         phase=decision_phase(host)
         rows=[r for r in entries(host) if r.get('compact_skill') and phase and
-            phase['phase'] in r.get('applicable_triggers',[]) and name in [r['task'],*r.get('applicable_tasks',[])]]
+            phase['phase'] in r.get('applicable_triggers',[]) and
+            (r['task']=='soft_robot_research' or name in [r['task'],*r.get('applicable_tasks',[])])]
         if not rows:return None
         # One relevant principle, delivered directly. Experience stays on demand.
         row=sorted(rows,key=lambda r:(r['task']!=name,r['entry_id']))[0]
@@ -260,6 +261,9 @@ def retrieve(host,query,*,reader='agent'):
         content=None;body_hash=None
         if q.operation=='read':
             body=source.read_bytes()
+            frozen_hash=entry.get('compact_skill',{}).get('source_sha256')
+            if frozen_hash and hashlib.sha256(body).hexdigest()!=frozen_hash:
+                raise ValueError('FROZEN_KNOWLEDGE_CONTENT_CHANGED: '+canonical)
             content=json.loads(body) if source.suffix=='.json' else body.decode('utf8')
             # Existing receipt identity only; never an admission/comparison gate.
             body_hash=hashlib.sha256(body).hexdigest()
