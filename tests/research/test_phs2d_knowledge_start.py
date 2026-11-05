@@ -33,6 +33,42 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_discovery_reuses_v2_generation_without_changing_parameter_facts(self):
+        from tools.research import optimal_capability as opt
+        from tools.research.design import generate_candidate
+        with fixture() as h:
+            generated=generate_candidate(h,dict(version='serial_family_generation_v2',
+                family_space_identity=state(h)['spec']['family_space_identity'],
+                segment_count=9,tendon_count=4,spans=[dict(first_segment=0,last_segment=3,count=4)],
+                payout_lengths_m={'tendon_'+str(i):0.4 for i in range(4)}),
+                dict(origin='offline discovery regression; no scientific evaluation'))
+            self.assertEqual(generated['status'],'generated',generated)
+            ref=generated['candidate'];candidate=h.store.artifact(ref);spec=state(h)['spec']
+            before=h.store.remaining();original=opt._family_parameter_data
+            with patch.object(opt,'_family_parameter_data',wraps=original) as builds:
+                result=opt.candidate_methods(h,ref)
+            self.assertGreater(len(result['variables']),10)
+            self.assertEqual(builds.call_count,1)
+            for row in result['variables']:
+                _,parameter=opt.family_parameters(spec,candidate,row['variable'])
+                self.assertEqual(row['parameter'],parameter)
+                self.assertEqual(row['current_value'],parameter['current_value'])
+            changed=deepcopy(candidate)
+            segment=next(p for p in changed['configuration']['robot']['structure']['data']['components'] if p['kind']=='flexible_segment')
+            segment['length_m']+=0.001
+            with self.assertRaisesRegex(ValueError,'GENERATED_CONFIGURATION'):
+                opt.family_parameters(spec,changed,result['variables'][0]['variable'])
+            legacy=deepcopy(spec)
+            legacy['family_sensitivity_variables']=dict(version='family_sensitivity_v1',
+                variables=['segments.0.length_m','spans.0.radius_m'])
+            legacy_params,legacy_domain=opt.family_parameters(legacy,candidate,'segments.0.length_m')
+            self.assertEqual(legacy_domain['current_value'],0.16)
+            self.assertEqual(legacy_params['segments']['0']['length_m'],0.16)
+            _,radius=opt.family_parameters(legacy,candidate,'spans.0.radius_m')
+            self.assertEqual(radius['path'],'spans.0.radius_m')
+            self.assertEqual(h.store.remaining(),before)
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+
     def test_citation_error_feedback_resolves_advertised_alias_without_masking_gate(self):
         from tools.research.state import save
         from tools.research.agent import error_feedback

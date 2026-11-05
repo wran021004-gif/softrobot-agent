@@ -84,9 +84,15 @@ def family_analysis_parameters(spec,candidate):
 
 def family_parameters(spec, candidate, path, *, continuous=True):
     """Resolve one authorized actual path and verify the existing generated model."""
+    if not family_variable_authorized(spec,path):raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
+    params,domains=_family_parameter_data(spec,candidate,path)
+    return _family_parameter_value(spec,params,domains,path,continuous=continuous)
+
+
+def _family_parameter_data(spec,candidate,path):
+    """Candidate-wide data; v1 retains its path-dependent normalization."""
     from extensions.tendon_family.family_space import parse_build, resolved_request
     from extensions.tendon_family.generated_serial import generate_family
-    if not family_variable_authorized(spec,path):raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
     if candidate.get('generation_version') not in ('serial_family_generation_v1','serial_family_generation_v2'):
         raise ValueError('CURRENT_GENERATED_FAMILY_CANDIDATE_REQUIRED')
     build=parse_build(dict(space=spec['family_space'],request=candidate['parameters']))
@@ -106,14 +112,19 @@ def family_parameters(spec, candidate, path, *, continuous=True):
                 if choice.get(key) is None:choice[key]=old_domains[f'segments.{i}.{key}']['default']
         params=plain(parse_build(dict(space=spec['family_space'],request=params)).request)
     domains={r['parameter_id']:r for r in family_analysis_parameters(spec,candidate) if '*' not in r['parameter_id']}
-    if path not in domains:raise ValueError('PARAMETER_NOT_IN_CURRENT_CANDIDATE_TOPOLOGY')
-    domain=domains[path]
-    if not domain['effective_in_current_execution']:raise ValueError('PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING: '+domain['analysis_reason'])
-    if continuous and not domain['continuous_perturbation']:raise ValueError('PARAMETER_NOT_CONTINUOUS_STRUCTURAL_DIRECTION: '+domain['analysis_reason'])
     robot,mesh,_=generate_family(build);cfg=candidate['configuration']
     if (robot!=cfg['robot']['structure']['data'] or mesh!=cfg['policy']['discretization']['data']
             or cfg['policy']['candidate_builder']['parameters']['data']!=plain(build)):
         raise ValueError('GENERATED_CONFIGURATION_DOES_NOT_MATCH_FROZEN_REQUEST')
+    return params,domains
+
+
+def _family_parameter_value(spec,params,domains,path,*,continuous=True):
+    if not family_variable_authorized(spec,path):raise ValueError('AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED')
+    if path not in domains:raise ValueError('PARAMETER_NOT_IN_CURRENT_CANDIDATE_TOPOLOGY')
+    domain=domains[path]
+    if not domain['effective_in_current_execution']:raise ValueError('PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING: '+domain['analysis_reason'])
+    if continuous and not domain['continuous_perturbation']:raise ValueError('PARAMETER_NOT_CONTINUOUS_STRUCTURAL_DIRECTION: '+domain['analysis_reason'])
     return params,dict(path=path,units=domain['unit'],bounds=[domain.get('minimum'),domain.get('maximum')],
         current_value=domain['current_value'],category=domain['category'],data_type=domain['data_type'],choices=domain['choices'],
         continuous_perturbation=domain['continuous_perturbation'],physical_component=domain['physical_component'],
@@ -209,6 +220,17 @@ def candidate_methods(host, reference, *, analysis_metadata=None):
             'candidate','requested_operation.operating_point'))) for ref in s.get('analysis_results',[])]
     eligible=[(ref,raw) for ref,raw in analysis_metadata if raw.get('status')=='computed'
         and raw.get('implementation')==s['freeze'] and raw.get('model') and raw.get('protocol')==spec['analysis_protocol']]
+    # One discovery call has one frozen candidate per identity. Rebuild/verify
+    # its common v2 data once, not once for every continuous parameter. Execution
+    # still uses family_parameters and revalidates independently. Legacy v1's
+    # path-dependent sparse normalization deliberately remains unchanged.
+    parameter_data={}
+    def discovery_parameters(c,path):
+        if spec.get('family_sensitivity_variables',{}).get('version')!='family_sensitivity_v2':
+            return family_parameters(spec,c,path)
+        key=c['identity']
+        if key not in parameter_data:parameter_data[key]=_family_parameter_data(spec,c,path)
+        return _family_parameter_value(spec,*parameter_data[key],path)
     rows=[]
     for variable in variables:
         row=dict(variable=variable,status='missing_models',ready_stencils=[],incomplete_stencils=[],rejections=[])
@@ -216,12 +238,12 @@ def candidate_methods(host, reference, *, analysis_metadata=None):
         for ref,raw in eligible:
             try:
                 c=verify_candidate(host,raw['candidate'])
-                p=family_parameters(spec,c,variable)[0] if spec.get('start_mode')=='family_space' else c['parameters']
+                p=discovery_parameters(c,variable)[0] if spec.get('start_mode')=='family_space' else c['parameters']
                 models.append((ref,raw,parameter_value(p,variable)))
             except (ValueError,KeyError):continue
         try:
             if spec.get('start_mode')=='family_space':
-                parameters,parameter=family_parameters(spec,candidate,variable)
+                parameters,parameter=discovery_parameters(candidate,variable)
             else:
                 parameters=candidate['parameters'];parameter=dict(path=variable,
                     units='m' if variable.endswith('length_m') else 'Pa',bounds=spec['allowed_parameters'][variable])

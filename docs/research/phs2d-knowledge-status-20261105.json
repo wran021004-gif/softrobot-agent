@@ -1,11 +1,11 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T13:44:12.085730+08:00",
+  "checked_at": "2026-11-05T13:56:33.244108+08:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
-  "resolved_identity": "3d022f81a28dd10e6e525a75772f3441171cd0f476b8fba371ea1756575d7283",
+  "resolved_identity": "9bebbb956ad3a5192fa5720af8e3b2e6231aab24745a903b1afe627892840d84",
   "profile_identity": "8305214c035551f8f05f3d23b6cd34d4cfe81605da6375e53ae143a395af1717",
   "knowledge_manifest_identity": "9cbaac4f2a5c419c5480bdc007b69c44392caca2c970bf2c7b3c1c8e6a848e75",
-  "status": "SUPERVISED_LIVE_RESEARCH_RUNNING",
+  "status": "SUPERVISED_LIVE_RESEARCH_AT_SETTLED_WINDOW",
   "scientific_stop": false,
   "blockers": [],
   "knowledge_retrieval_isolation": "passed_offline_sdk_mock_only",
@@ -15,7 +15,7 @@
   "L3": "Autonomous legal topology revision after mathematical failure and independent static re-evaluation; physical improvement not established.",
   "L4": "not_observed",
   "budgets": {
-    "provider_requests": 32,
+    "provider_requests": 40,
     "protected_provider_requests": 4,
     "mathematical_evaluations": 20,
     "physical_launches": 80,
@@ -27,27 +27,28 @@
     "maximum_requests_per_extension": 8,
     "version": "finite_provider_request_extension_v1"
   },
-  "applied_provider_extensions": 1,
-  "formal_approval_events": 2,
+  "applied_provider_extensions": 2,
+  "formal_approval_events": 3,
   "scientific_cost": {
-    "provider_requests": 22,
+    "provider_requests": 28,
     "reporter_requests": 1,
-    "prompt_tokens": 817739,
-    "completion_tokens": 11358,
-    "total_tokens": 829097,
-    "mathematical_evaluations": 2,
+    "prompt_tokens": 1131867,
+    "completion_tokens": 14345,
+    "total_tokens": 1146212,
+    "mathematical_evaluations": 3,
     "backend_episodes": 0,
     "physics_steps": 0,
-    "native_model_builds": 2
+    "native_model_builds": 3,
+    "scientific_worker_wall_s": 5.572448799968697
   },
-  "candidates": 3,
+  "candidates": 4,
   "physical_replays": 0,
   "source_cost_ledger": {
-    "tool_calls": 21,
-    "model_calls": 22,
+    "tool_calls": 27,
+    "model_calls": 28,
     "backend_solves": 0,
     "worker_calls": 0,
-    "wall_s": 422.0856944997795
+    "wall_s": 547.1684487997554
   },
   "tests": {
     "distinct_tests": 15,
@@ -98,16 +99,16 @@
   "authorization_scope_identity": "9b7b09ce994c99472647691a556bed7d89ae923c63ea64bd79bd61feaf7fea65",
   "provider_requests_by_purpose": {
     "gateway_quota_probe": 1,
-    "conversation": 20,
+    "conversation": 26,
     "reporter": 1
   },
   "actual_provider_usage": {
     "known_subtotal": {
-      "prompt_tokens": 817739,
-      "completion_tokens": 11358,
-      "total_tokens": 829097
+      "prompt_tokens": 1131867,
+      "completion_tokens": 14345,
+      "total_tokens": 1146212
     },
-    "responses_with_usage": 22,
+    "responses_with_usage": 28,
     "responses_missing_usage": 0,
     "money": "not_measured"
   },
@@ -139,11 +140,84 @@
     "scientific_exhaustion": false
   },
   "latest_extension": {
-    "previous_limit": 24,
-    "current_limit": 32,
+    "previous_limit": 32,
+    "current_limit": 40,
     "additional_requests": 8,
     "scientific_limits_unchanged": true,
     "costs_preserved": true,
     "authorization": "Actual user explicitly authorized necessary budget; identity derived and grant registered before send"
+  },
+  "actual_provider_usage_by_role": {
+    "gateway_quota_probe": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 27,
+      "completion_tokens": 5,
+      "total_tokens": 32,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        225
+      ]
+    },
+    "conversation": {
+      "requests": 26,
+      "usage_missing": 0,
+      "prompt_tokens": 1128118,
+      "completion_tokens": 13866,
+      "total_tokens": 1141984,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        119682,
+        152921,
+        176039,
+        181850,
+        197753,
+        204516,
+        195371,
+        201860,
+        217364,
+        223830,
+        236575,
+        252757,
+        314348,
+        278748,
+        308811,
+        312220,
+        319522,
+        296712,
+        329002,
+        352768,
+        337165,
+        374385,
+        370104,
+        365995,
+        388506,
+        375911
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 3722,
+      "completion_tokens": 474,
+      "total_tokens": 4196,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        15123
+      ]
+    }
+  },
+  "discovery_performance_repair": {
+    "serialized_packet_unchanged": true,
+    "before_wall_s": 36.35746349999681,
+    "after_wall_s": 13.89880029996857,
+    "v2_candidate_data_builds_per_discovery": 1,
+    "regression_passed": true
   }
 }
