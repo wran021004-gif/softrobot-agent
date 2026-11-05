@@ -75,8 +75,25 @@ unchanged Worker watchdogs. Provider extensions remain limited to at most eight
 per exact addendum, with a total policy ceiling of 128; that policy does not grant
 an increment in advance.
 
-Status: prepared, environment ready, pending independent current-identity user
-approval. No real successor Provider request, mathematical research, loading,
-independent Replay or SELECT has occurred yet. SDK/Mock tests prove delivery and
-readability, not real Main adoption. Once approved, the same formal Study can run
-in supervised windows without a separate Provider rehearsal.
+Status: explicitly approved and genuinely running in the same formal Study.
+The existing request-feedback live admission was registered separately; no Provider
+was sent before both admission and current-identity authorization passed.
+
+At the first settled eight-request boundary: seven Main requests and one Reporter
+request, one legal design, one real unloaded qualification check, zero loading
+episodes/integration steps/backend episode charges, no independent Replay or SELECT.
+The check reported initial-forward failure and partial failed-call contact facts;
+no qualified unloaded point exists yet. Main proactively read the detailed expert
+case, and its body delivery is confirmed by saved Provider requests. Main then
+chose the low-cost check, explicitly distinguishing numerical, unilateral-branch
+and geometric explanations and declining premature differentiation/full dynamics.
+That is observable method use consistent with the experience; it proves neither
+causal benefit nor a feasible mechanism. One invalid Plan field was rejected
+without a scientific launch, then Main corrected it.
+
+The user also authorized timely public-interface repairs and conditional Provider
+increments. Existing settled transactions, batches of at most eight, the 128-total
+policy ceiling, exact identity rebinding and actual cost preservation still apply.
+Scientific failures alone are not interface defects. Source and sanitized reports
+were explicitly authorized for push to the existing origin branch; private Stores,
+full wires and credentials remain local.
