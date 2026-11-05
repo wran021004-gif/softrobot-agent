@@ -37,6 +37,14 @@ class OriginalProtocolTests(unittest.TestCase):
         self.assertEqual(dynamic_cost(full,5)['physics_steps'],1760000)
         self.assertEqual(dynamic_cost(continuous,1)['physics_steps'],640000)
 
+    def test_select_denominator_checks_actual_conditions(self):
+        from tools.research_tasks import complete_phs_conditions
+        full=read('tasks/phs2d_original_ten_v1_2.json')['task']
+        self.assertTrue(complete_phs_conditions(full))
+        self.assertFalse(complete_phs_conditions(read('tasks/phs2d_original_representative_v1_2.json')['task']))
+        full['physical_problem']['loads'][-1]['force_world_n'][0]=-.09
+        self.assertFalse(complete_phs_conditions(full))
+
     def build(self):
         s=read('configs/research/family_space_phs2d_route_research_v2.json')
         r=dict(version='serial_family_generation_v2',family_space_identity=digest(s),segment_count=9,tendon_count=4)
@@ -96,6 +104,16 @@ class OriginalProtocolTests(unittest.TestCase):
         self.assertFalse(response['implicit_sensitivity']['gradient_trustworthy'])
         self.assertIsNone(response['samples'][0]['derivative'])
         self.assertFalse(response['consistency']['passed'])
+
+    def test_main_summary_retains_derivative_and_branch_qualification(self):
+        from tools.research.structure_research import summary
+        response=dict(parameter_path='guide_hole_positions_m.guide_1.tendon_0_hole.1',
+            derivatives=[None,None],derivative_status='active_set_switch',branch_status='active_set_switch',
+            direction_status='directional_comparison',consistency=dict(passed=False))
+        result=summary(dict(structure_research=dict(operation='differentiate',target={},
+            parameter_sensitivities=[response],cost={},unsupported_conclusions=[])),dict(artifact_id='a'*64))
+        self.assertEqual(result['parameter_sensitivities'][0]['derivative_status'],'active_set_switch')
+        self.assertEqual(result['parameter_sensitivities'][0]['branch_status'],'active_set_switch')
 
     def test_real_solid_plate_rejects_oblique_cable_penetration(self):
         from extensions.tendon_family.passive import PassiveModel

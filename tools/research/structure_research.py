@@ -656,7 +656,7 @@ def summary(value, reference):
         return item if array is None or array.ndim==0 else dict(shape=list(array.shape),
             minimum=float(np.min(array)),maximum=float(np.max(array)),norm=float(np.linalg.norm(array)))
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
-    sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','strict_derivative') if k in row}
+    sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','derivative_status','branch_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]
     for compact_sensitivity,row in zip(sensitivity,raw.get('parameter_sensitivities',[])):
         if row.get('implicit_sensitivity'):
