@@ -33,6 +33,33 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_rejected_payout_delivers_exact_frozen_domain_without_repair(self):
+        from tools.research.design import generate_candidate
+        from extensions.tendon_family.family_space import Domain
+        with fixture() as h:
+            before=deepcopy(state(h));ledger=h.store.remaining()
+            request=dict(version='serial_family_generation_v2',
+                family_space_identity=before['spec']['family_space_identity'],segment_count=9,tendon_count=4,
+                spans=[dict(first_segment=0,last_segment=8,count=4,phase_rad=0)],
+                payout_lengths_m={'tendon_'+str(i):1.3465 for i in range(4)})
+            original=deepcopy(request)
+            result=generate_candidate(h,request,dict(origin='offline rejection fixture'))
+            self.assertEqual(result['status'],'invalid')
+            self.assertEqual(result['reason'],'OUTSIDE_FAMILY_DOMAIN: payout_lengths_m.tendon_0')
+            diagnostic=result['diagnostic']
+            self.assertEqual(diagnostic['field'],'payout_lengths_m.tendon_0')
+            self.assertEqual(diagnostic['requested_value'],1.3465)
+            domain=Domain.model_validate(before['spec']['family_space']['passive_payout_domains_m']['tendon_0'])
+            self.assertEqual(diagnostic['minimum'],domain.minimum)
+            self.assertEqual(diagnostic['maximum'],domain.maximum)
+            self.assertFalse(diagnostic['automatic_repair'])
+            for boundary in (domain.minimum,domain.maximum):self.assertEqual(domain.check(boundary,'fixture'),boundary)
+            self.assertEqual(request,original)
+            self.assertEqual(state(h)['spec'],before['spec'])
+            self.assertEqual(state(h)['candidates'],before['candidates'])
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+            self.assertEqual(h.store.remaining(),ledger)
+
     def test_accounted_quota_probe_does_not_become_sdk_history(self):
         import httpx
         from types import SimpleNamespace

@@ -18,7 +18,11 @@ class Domain(Contract):
 
     def check(self, value, name):
         if not self.minimum <= value <= self.maximum:
-            raise ValueError('OUTSIDE_FAMILY_DOMAIN: '+name)
+            error=ValueError('OUTSIDE_FAMILY_DOMAIN: '+name)
+            error.diagnostic=dict(status='outside_frozen_domain',field=name,
+                requested_value=value,minimum=self.minimum,maximum=self.maximum,
+                source='frozen_family_domain',automatic_repair=False)
+            raise error
         return value
 
 
@@ -284,7 +288,7 @@ def validate_request(space, request):
         if set(payouts)!={'tendon_'+str(i) for i in range(request.tendon_count)}:raise ValueError('PAYOUT_DOMAINS_MUST_MATCH_SELECTED_TOPOLOGY')
         for key,domain in payouts.items():
             if domain.minimum<=0:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
-            domain.check(selected.get(key,domain.default),key)
+            domain.check(selected.get(key,domain.default),'payout_lengths_m.'+key)
         if set(selected)-set(payouts):raise ValueError('UNKNOWN_PAYOUT_TENDON')
     if space.conditional_rules == 'base_only_consecutive_spans_v1' and any(
             span.first_segment != 0 for span in request.spans):
