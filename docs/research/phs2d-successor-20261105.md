@@ -97,3 +97,29 @@ policy ceiling, exact identity rebinding and actual cost preservation still appl
 Scientific failures alone are not interface defects. Source and sanitized reports
 were explicitly authorized for push to the existing origin branch; private Stores,
 full wires and credentials remain local.
+
+## Live checkpoint after 44 shared requests
+
+The same formal Study has two candidates and seven mathematical attempts. No
+qualified unloaded point, loading integration, independent Replay or SELECT exists.
+The one full-task attempt failed its hard-initialization forward and retained its
+ten-episode reservation charge; 70 physical episodes remain. New native
+position-only geometry now succeeds before the failing full forward, supplying
+initial contact and tendon-length/payout facts as separate observations. Main
+requested that geometry-first question and used the updated optional check.
+
+Three small live feedback repairs are committed: shared hard-initialization
+dependency/model binding; actual Knowledge receipt/summary aliases; and initial
+position facts in existing unloaded inspect. Physics, solver settings, scientific
+profile, original qualifiers and old records remain unchanged. Tests were limited
+to existing-record projections, the affected SDK/gate checks and one position-only
+engineering call. No Provider rehearsal or broad physical regression was run.
+
+The latest user instruction authorized conditional small Provider increments.
+One existing exact addendum raises the limit from 64 to 72, in an eight-request
+batch, based on the new discriminating geometry evidence. All 44 prior requests
+and costs remain. Physics stays at 80 total episodes and mathematical count has
+no cumulative quota. The policy ceiling remains 128; this does not pre-grant all
+remaining increments. See `phs2d-successor-live-status-20261105.json` for measured
+counters, token usage and the distinction between experience delivery, reading
+and observable method use. No causal benefit or research success is claimed.
