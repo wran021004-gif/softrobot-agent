@@ -2,7 +2,15 @@
 
 Study `phs2d-knowledge-autonomy-20261105` 已真实启动，初始 resolved identity 为 `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
 
-## 最新接续：临时官方 API，定时切回 Gateway
+## 最新授权：数学评价与分析累计次数不限
+
+用户新明确要求“数学评价、数学分析等不设置上限”。已在第 16 次数学评价后的安全结算边界，通过原 `tools/research/budget.py` 中的精确授权 addendum 将本 Study 的累计 `mathematical_evaluations` 从 20 改为 `null`，复用现有 unlimited admission 语义。新 resolved identity、正式研究授权、committed bind 和 SDK restore-only 均已完成；原 16 次实际评价及其成本完整保留，profile v3、原任务、会话和验收不变。此后已实际执行第 17 次数学评价，证明原位接续没有重置计数。
+
+两项定向离线回归通过（3.338 s），验证精确授权、幂等、旧计数/成本/profile 保留、超过旧累计次数仍可准入；过期身份、非明确 unlimited 目标、未消费响应与未封口 Worker 均被原子拒绝。没有取消 Main 已明确选择的单次计算努力或改动原注册方法。
+
+最新已结算窗口累计 **15 个合法候选、17 次数学评价**（12 次静力检查、5 次完整十工况 finite-time 尝试），尚无合格工作点、加载积分、独立 Replay 或 SELECT。Provider **101/112**，仍按已批准的每次最多 +8、总上限 128 的政策监督增补。数学次数不再是累计停止条件。用户授权的持续监督心跳 `phs-2d` 已启用，定时接口切回由独立心跳 `phs-2d-gateway` 督办；未改变或无需行动时保持安静。
+
+## 临时官方 API，定时切回 Gateway（先前接续记录）
 
 用户明确要求“先用官方API（第三种）方式续上，等一个半小时之后继续使用gateway方式”。已在同一 Store 应用精确身份的 transport addendum、正式授权与 committed bind，保留 `gpt-5.6-sol`、Main `medium`、Reporter `none`、原科学 profile v3、Python/线程环境、SDK 会话和全部费用。切回时间为 **2026-11-05 18:22:53 Asia/Shanghai（10:22:53 UTC）**，当前聊天心跳 `phs-2d-gateway` 已保存该指令；在已结算边界使用同一正式机制恢复原 Gateway。该时间不表示已经证明 Gateway 额度恢复。
 
