@@ -1,7 +1,7 @@
 """Explicit unmetered addenda over real Store fixtures; no numerical launches."""
 from copy import deepcopy
 import unittest
-from tools.research.budget import authorize_unmetered_mathematics,mathematical_remaining,mathematics_fits
+from tools.research.budget import authorize_unmetered_mathematics,mathematical_remaining,mathematics_fits,decision_budget
 from tools.research.state import state,update,require_research_authorization,guard,save
 from tools.research.analysis import admission
 from tools.state_io import digest
@@ -10,6 +10,26 @@ from tests.research.test_phs2d_knowledge_start import fixture
 
 
 class MathematicalQuotaAuthorizationTests(unittest.TestCase):
+    def test_passive_mechanism_cost_view_keeps_recorded_counts_and_missing_costs_distinct(self):
+        with fixture() as h:
+            ref=save(h,dict(fixture='Synthetic cost projection only; no physics or scientific evidence',
+                requested_operation=dict(model_source='mujoco'),status='computed',
+                structure_research=dict(constraint_state=dict(qualified=False),cost=dict(rollouts=0,physics_steps=0,model_builds=1))))
+            update(h,analysis_results=[ref]);before=h.store.remaining()
+            view=decision_budget(h)['science_budget']['native']
+            self.assertEqual(view['attempts_without_cost_record'],0)
+            self.assertEqual(view['latest_cost_query'],dict(reference=ref,view='full',pointer='/structure_research/cost'))
+            self.assertTrue(view['cost_record_complete'])
+            partial=save(h,dict(fixture='Synthetic failed forward cost fixture',requested_operation=dict(model_source='mujoco'),
+                status='execution_incomplete',native_diagnostic=dict(cost=dict(physics_steps=0))))
+            missing=save(h,dict(fixture='Synthetic missing cost fixture',requested_operation=dict(model_source='mujoco'),status='execution_incomplete'))
+            update(h,analysis_results=[ref,partial,missing])
+            view=decision_budget(h)['science_budget']['native']
+            self.assertEqual(view['attempts_without_cost_record'],1)
+            self.assertFalse(view['cost_record_complete'])
+            self.assertEqual(view['recorded_physics_steps'],0)
+            self.assertEqual(h.store.remaining(),before)
+
     def approval(self,h):
         spec=state(h)['spec'];scope=dict(study_id=h.run_id,resolved_identity=spec['resolved_identity'],
             previous_limit=spec['budgets']['mathematical_evaluations'],new_limit=None)

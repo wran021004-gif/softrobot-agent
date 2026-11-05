@@ -205,14 +205,14 @@ def decision_budget(host):
     public_total=remaining['tool_calls'];public_reserve=b.get('protected_public_operations',0)
     native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r,paths=(
         'requested_operation.model_source','status','native_dynamics.cost','nonlinear_response.cost',
-        'native_progress.cost','native_diagnostic.cost'))).get('requested_operation',{}).get('model_source')=='mujoco']
+        'native_progress.cost','native_diagnostic.cost','structure_research.cost'))).get('requested_operation',{}).get('model_source')=='mujoco']
     native_costs=[]
     for r,v in native:
-        for key in ('native_dynamics','nonlinear_response','native_progress','native_diagnostic'):
+        for key in ('native_dynamics','nonlinear_response','structure_research','native_progress','native_diagnostic'):
             cost=(v.get(key) or {}).get('cost')
             if cost:
                 native_costs.append((r,cost,'/'+key+'/cost',
-                    key in ('native_dynamics','nonlinear_response') and v.get('status') in ('computed','not_comparable')))
+                    key in ('native_dynamics','nonlinear_response','structure_research') and v.get('status') in ('computed','not_comparable')))
                 break
     return dict(public_operation_budget=dict(remaining_total=public_total,reserved_for_closeout=public_reserve,
             available_for_exploration=max(0,public_total-public_reserve),
