@@ -51,14 +51,15 @@ class C0BridgeTests(unittest.TestCase):
     def test_request_snapshot_is_detached_and_not_persistent(self):
         from tools.platform_store import Store
         with TemporaryDirectory() as tmp:
-            s=Store(tmp);calls=[]
+            s=Store(tmp);s.create_context_archive();calls=[]
             def build():calls.append(1);return dict(value=[])
             with s.read_snapshot():
                 s.snapshot_value('a',build)['value'].append(1)
                 self.assertEqual(s.snapshot_value('a',build),dict(value=[]))
             s.snapshot_value('a',build)
             self.assertEqual(len(calls),2)
-            self.assertFalse(s.db.exists())
+            with s.connect(True) as db:
+                self.assertEqual(db.execute('SELECT COUNT(*) FROM artifacts').fetchone()[0],0)
 
     def test_v4_menu_and_old_compiler_alias(self):
         from tools.research.scientific_intent import scientific_actions,action_entry

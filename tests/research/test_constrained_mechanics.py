@@ -241,7 +241,10 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         from tools.research.contracts import MechanismStudy
         wrong=MechanismStudy(operation='inspect',target=dict(quantity='tip_jacobian'),point_semantics='frozen_task_initial_state',max_evaluations=1)
         with self.assertRaisesRegex(ValueError,'FROZEN_PASSIVE'):
-            prepare_context({},dict(configuration=dict(task=dict(physical_problem=problem))),wrong,[])
+            prepare_context({},dict(configuration=dict(
+                task=dict(family='task.passive_response',evaluator=dict(extension_id='evaluate.passive_response'),physical_problem=problem),
+                policy=dict(controller=dict(extension_id='controller.no_active_control')),
+                robot=dict(structure=dict(data=design)))),wrong,[])
         folder=OUT/('boundary-'+uuid4().hex[:8]);folder.mkdir()
         native=PassiveModel(boundary,problem,folder/'model.xml')
         record=mechanics(native,'unloaded',.5,direction_world=(0.,1.,0.))
