@@ -1,6 +1,18 @@
 # PHS-2D Knowledge 自主研究：真实启动与持续监督
 
-Study `phs2d-knowledge-autonomy-20261105` 已真实启动，沿用 resolved identity `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
+Study `phs2d-knowledge-autonomy-20261105` 已真实启动，初始 resolved identity 为 `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
+
+## 最新状态：Gateway 额度阻断，目标尚未达成
+
+第 76 次共享 Provider 请求返回 HTTP429 `subscription_sharing_usage_limit_exceeded`、`retryable=false`。已停止后续发送，没有后台重试或自动更换 Provider。当前原 SDK restore-only 已再次通过，不发送模型或科学请求；无 pending/unknown、无未消费响应、无 SELECT、无被接受的科学 STOP。当前仍保留原 Gateway `gpt-5.6-sol / medium`。
+
+本 Study 共有 **10 个合法候选、12 次数学评价**（7 次无载静力检查、5 次完整十工况 finite-time 尝试）。工作点均未合格或初始化失败，实际加载 episode=0、积分步=0、独立 Replay=0，无完整通过证书。Main 自主改变紧凑几何后解除了最初全零状态的 floor 交叉，但后续平衡仍未通过 KKT、稳定性或容量资格。后续两个 payout 变体保留为失败证据，第十个候选尚未评价；不从这些局部失败推断全族不可行。
+
+累计 8 个合法 +8 增补，Provider **76/88**，其中 Main conversation=68、Reporter=7、授权 quota probe=1；数学 **12/20**，episode 预留 **50/80**，公共操作 **67/160**，原 4 次保护收尾额度不变。Gateway 账户阻断不能由增加 Study 额度解决，因此当前 12 次剩余 Provider 未继续发送。原有限 policy 总上限仍为 128，没有扩张数学或物理冻结限额。
+
+74 个响应有 usage，已知 subtotal 为 prompt=3,964,677、completion=34,840、total=3,999,517 tokens；第 48 次 504 与第 76 次 429 均扣请求数且原记录保留、usage 未返回，不能当成零 tokens。货币费用未知。已知科研 Native 模型 12 个，已结算数学数值耗时（含原准备费用）累计 25.8568415 s，Worker 边界耗时累计 25.8568415 s；原 ledger wall_s=1524.1358415 是其原定义的已记账耗时，不是整个监督聊天经过时间。工程复现和两个小玩具回归积分步另记，不授予 Study 物理信用。
+
+当前 resolved identity `d467380ffa990fe05ecf46d5a324690f74d5f36c29ab0405f2425274ff362043`，profile v3 `e952d4bb2a456ef3ab6a9ce54b691a6f6efff6292be7aadf59a6dd919f74e80b`。原 prepared Study 四文件哈希最终再次全部核对未变，原 Store 的失败、费用和所有授权增补均保留。运行阻断与 Main 科学 STOP 严格区分；额度恢复后可原位继续。
 
 ## 额度恢复与批准
 
