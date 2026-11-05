@@ -33,6 +33,35 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_failed_static_forward_retains_pre_call_state_and_partial_costs(self):
+        from types import SimpleNamespace
+        import mujoco
+        import numpy as np
+        from extensions.tendon_family.passive_equilibrium import StaticProblem
+        model=mujoco.MjModel.from_xml_string('<mujoco><worldbody><body><joint type="hinge"/><geom size="0.1"/></body></worldbody></mujoco>')
+        native=SimpleNamespace(model=model,physics=dict(identity='offline-toy-model'),
+            cost=dict(model_builds=1,material_point_jacobian_calls=0,tendon_jacobian_extractions=0))
+        problem=StaticProblem(native)
+        def fail(model,data):
+            data.qpos[:]=999
+            raise mujoco.FatalError('FactorizeHessian: rank-deficient sparse Hessian')
+        with patch.object(mujoco,'mj_forward',new=fail),self.assertRaises(mujoco.FatalError) as error:
+            problem.at(np.array([0.125]))
+        value=error.exception
+        self.assertEqual(value.mujoco_diagnostic['qpos'],[0.125])
+        self.assertEqual(value.mujoco_diagnostic['error_location'],'passive_hard_equilibrium_forward')
+        self.assertEqual(value.mujoco_diagnostic['failed_call_internal_steps'],'unknown')
+        self.assertEqual(value.native_diagnostic['cost']['native_forward_calls'],0)
+        self.assertEqual(value.native_diagnostic['cost']['native_forward_attempts'],1)
+        self.assertEqual(value.native_diagnostic['cost']['physics_steps'],0)
+        self.assertIsNone(problem.last)
+        clean=StaticProblem(native);actual=clean.at(np.array([0.125]))
+        expected=mujoco.MjData(model);expected.qpos[:]=0.125;mujoco.mj_forward(model,expected)
+        for field in ('qpos','qvel','qfrc_bias','qfrc_passive','ten_length'):
+            np.testing.assert_array_equal(getattr(actual,field),getattr(expected,field))
+        clean.at(np.array([0.125]))
+        self.assertEqual(clean.cost['native_forward_calls'],1)
+
     def test_discovery_reuses_v2_generation_without_changing_parameter_facts(self):
         from tools.research import optimal_capability as opt
         from tools.research.design import generate_candidate

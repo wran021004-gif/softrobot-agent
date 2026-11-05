@@ -8,8 +8,10 @@ from .passive import material_point
 
 class StaticProblem:
     def __init__(self,native,s=.5,force=0.):
+        from .backends import MujocoFailureSnapshot
         self.native=native;self.m=native.model;self.s=s;self.force=np.asarray(force if np.ndim(force) else [force,0.,0.],dtype=float)
         self.d=mujoco.MjData(self.m);self.last=None
+        self.failure=MujocoFailureSnapshot(self.m,native.physics['identity'])
         self.cost=dict(native_forward_calls=0,objective_calls=0,gradient_calls=0,constraint_calls=0,
             constraint_jacobian_calls=0,hessian_columns=0,optimizer_iterations=0,QP_calls=0,equilibrium_solves=0,KKT_solves=0,multiplier_fits=0)
 
@@ -17,7 +19,16 @@ class StaticProblem:
         q=np.asarray(q)
         if self.last is None or not np.array_equal(q,self.last):
             self.d.qpos[:]=q;self.d.qvel[:]=0.;self.d.qfrc_applied[:]=0.;self.d.qacc_warmstart[:]=0.
-            mujoco.mj_forward(self.m,self.d);self.last=q.copy();self.cost['native_forward_calls']+=1
+            try:self.failure.call(self.d,mujoco.mj_forward,'passive_hard_equilibrium_forward')
+            except Exception as exc:
+                exc.native_diagnostic=dict(kind='passive_static_forward_failure',
+                    cost=dict(self.cost,model_builds=self.native.cost['model_builds'],
+                        material_point_jacobian_calls=self.native.cost['material_point_jacobian_calls'],
+                        tendon_jacobian_extractions=self.native.cost['tendon_jacobian_extractions'],
+                        native_forward_attempts=self.cost['native_forward_calls']+1,physics_steps=0,rollouts=0),
+                    scope='Partial static counters before failed forward; no dynamics or qualified equilibrium. Failed native call internal progress unknown.')
+                raise
+            self.last=q.copy();self.cost['native_forward_calls']+=1
         return self.d
 
     def objective(self,q):
