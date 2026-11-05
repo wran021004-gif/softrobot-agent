@@ -299,6 +299,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     replan_period=study.pop('nmpc_replan_period_s',None)
     physical_watchdog=study.pop('physical_worker_watchdog_s',None)
     mathematical_watchdog=study.pop('mathematical_worker_watchdog_s',None)
+    provider_extension=study.pop('provider_request_extension_policy',None)
     family_mode=study.get('start_mode')=='family_space'
     if fixed_structure is not None and not family_mode:raise ValueError('FIXED_STRUCTURE_REQUIRES_FAMILY_STUDY')
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
@@ -473,6 +474,13 @@ def resolve(path, profile=None, *, backend_profile=None):
         if type(mathematical_watchdog) not in (int,float) or not 0<mathematical_watchdog<=14400:
             raise ValueError('FINITE_MATHEMATICAL_WORKER_WATCHDOG_REQUIRED')
         study['mathematical_worker_watchdog_s']=mathematical_watchdog
+    if provider_extension is not None:
+        if (set(provider_extension)!={'version','maximum_additional_requests'} or
+                provider_extension['version']!='finite_provider_request_extension_v1' or
+                type(provider_extension['maximum_additional_requests']) is not int or
+                not 0<provider_extension['maximum_additional_requests']<=256):
+            raise ValueError('FINITE_EXPLICIT_PROVIDER_EXTENSION_POLICY_REQUIRED')
+        study['provider_request_extension_policy']=deepcopy(provider_extension)
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
     analysis_timeout=study['analysis_cap_s']
     if b['mathematical_evaluations'] is None:

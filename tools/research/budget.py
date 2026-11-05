@@ -3,6 +3,67 @@ from tools.platform_store import plain
 from contextlib import contextmanager
 
 
+def extend_provider_requests(host, approval):
+    """Local user addendum to the original Store; never a Main tool or a send.
+
+    Preserves every receipt and scientific limit. Rebinding and the existing
+    identity-bound research authorization are still required before continuation.
+    """
+    from copy import deepcopy
+    from tools.state_io import digest
+    from tools.platform_store import ROOT,encode
+    from tools.research.provider import pending
+    identity=digest(approval)
+    with host.store.transaction() as db:
+        session=host.store.session(host.run_id,db);current=session['state'];spec=current['spec']
+        for ref in current.get('provider_request_extensions',[]):
+            if host.store.artifact(ref,db=db)['approval_identity']==identity:
+                return dict(already_applied=True,reference=ref)
+        policy=spec.get('provider_request_extension_policy',{})
+        scope=approval.get('scope',{});extra=scope.get('additional_requests')
+        limit=spec['budgets']['provider_requests']
+        if (approval.get('version')!='provider_request_extension_approval_v1' or approval.get('approved') is not True or
+                not approval.get('source') or approval.get('scope_identity')!=digest(scope) or
+                set(scope)!={'study_id','resolved_identity','previous_request_limit','additional_requests'} or
+                scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity'] or
+                scope['previous_request_limit']!=limit or type(extra) is not int or extra<=0 or
+                policy.get('version')!='finite_provider_request_extension_v1'):
+            raise ValueError('EXACT_USER_APPROVED_FINITE_PROVIDER_EXTENSION_REQUIRED')
+        used=sum(host.store.artifact(ref,db=db)['additional_requests'] for ref in current.get('provider_request_extensions',[]))
+        if used+extra>policy['maximum_additional_requests']:
+            raise ValueError('FROZEN_PROVIDER_EXTENSION_CAP_EXCEEDED')
+        if (current.get('pending') or pending(host) or current.get('selected') or current.get('success_gate') or
+                current['research_status']=='stopped' or
+                db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
+            raise ValueError('SETTLED_NONSUCCESS_BOUNDARY_REQUIRED_FOR_PROVIDER_EXTENSION')
+        cfg=host.store.config(db);snapshot=deepcopy(session['snapshot'])
+        if cfg['budget']['model_calls']!=limit or snapshot['input']['policy']['budget']['model_calls']!=limit:
+            raise ValueError('ORIGINAL_PROVIDER_LIMIT_BINDING_MISMATCH')
+        addendum=plain(host.store.put(db,dict(version='provider_request_extension_v1',approval=approval,
+            approval_identity=identity,additional_requests=extra,previous_state=plain(host.store.put(db,current)),
+            scientific_limits_unchanged=True,all_costs_and_failures_retained=True)))
+        updated=deepcopy(spec);updated.pop('resolved_identity')
+        updated['budgets']['provider_requests']=limit+extra
+        updated['configuration']['policy']['budget']['model_calls']=limit+extra
+        updated.setdefault('authorization_addenda',[]).append(addendum)
+        updated['resolved_identity']=digest(updated)
+        snapshot['input']['policy']['budget']['model_calls']=limit+extra
+        snapshot_ref=host.store.put(db,snapshot)
+        previous_hash=digest(cfg);cfg['budget']['model_calls']=limit+extra
+        db.execute('ATTACH DATABASE ? AS authority',(str(ROOT/'runs/.platform_authorities.sqlite'),))
+        changed=db.execute('UPDATE authority.grants SET config_hash=? WHERE grant_id=? AND root=? AND config_hash=?',
+            (digest(cfg),cfg['grant_id'],str(host.store.root),previous_hash))
+        if changed.rowcount!=1:raise ValueError('EXISTING_STORE_AUTHORITY_REQUIRED')
+        db.execute("UPDATE meta SET value=? WHERE key='config'",(encode(cfg),))
+        db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(snapshot_ref.artifact_id,host.run_id))
+        current.update(spec=updated,validation_extension_pending_binding=True)
+        current.setdefault('provider_request_extensions',[]).append(addendum)
+        host.store.update_state(db,host.run_id,current)
+        host.store.event(db,host.run_id,'provider_request_extension','authorized',outputs=[addendum,snapshot_ref])
+    return dict(already_applied=False,reference=addendum,request_limit=limit+extra,
+        requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
+
+
 def mathematical_remaining(spec, used=0):
     """None is an authorized absence of a count quota; usage is still recorded."""
     limit=spec['budgets']['mathematical_evaluations']
