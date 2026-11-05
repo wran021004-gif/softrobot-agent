@@ -30,7 +30,7 @@ class ProviderV2Tests(unittest.TestCase):
         h=v2_host();sdk=SimpleNamespace(messages=[],
             _session_manager=SimpleNamespace(session_id=state(h)['pilot']['framework_session_id']))
         before=h.store.remaining()
-        for purpose in ('provider_validation','reporter','gateway_quota_probe'):
+        for purpose in ('provider_validation','reporter'):
             record(h,'r3_request',dict(purpose=purpose))
             self.assertEqual(trusted_history(h,sdk),'empty')
         self.assertEqual(h.store.remaining(),before)

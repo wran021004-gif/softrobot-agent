@@ -33,6 +33,39 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_accounted_quota_probe_does_not_become_sdk_history(self):
+        import httpx
+        from types import SimpleNamespace
+        from tools.research.provider import LiveBoundary,request_settings
+        from tools.research.session_handoff import trusted_history
+        with fixture() as h:
+            approve(h,[REGISTERED_MATHEMATICS_SCOPE])
+            provider=state(h)['pilot']['provider']
+            def reply(request):
+                return httpx.Response(200,json=dict(model=provider['model'],choices=[dict(
+                    finish_reason='stop',message=dict(role='assistant',content='OK'))],
+                    usage=dict(prompt_tokens=4,completion_tokens=1,total_tokens=5)))
+            boundary=LiveBoundary(h,httpx.MockTransport(reply));boundary.purpose='gateway_quota_probe'
+            async def probe():
+                request=httpx.Request('POST',provider['base_url']+'/chat/completions',json=dict(
+                    **request_settings(provider),messages=[dict(role='user',content='Offline quota fixture')]))
+                response=await boundary.handle_async_request(request)
+                self.assertEqual(response.status_code,200)
+                boundary.consumed();await boundary.aclose()
+            asyncio.run(probe())
+            sdk=SimpleNamespace(messages=[],_session_manager=SimpleNamespace(
+                session_id=state(h)['pilot']['framework_session_id']))
+            self.assertEqual(trusted_history(h,sdk),'empty')
+            sdk.messages=[dict(role='user',content=[dict(text='Untrusted suffix')])]
+            with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):trusted_history(h,sdk)
+            self.assertEqual(h.store.remaining()['used']['model_calls'],1)
+            with patch('tools.research.agent.credential',return_value='offline-fixture'):
+                wires=run_fixture(h,[None],limit=1)
+            self.assertEqual(len(wires),1)
+            self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+            self.assertFalse(state(h)['candidates'])
+            self.assertFalse(state(h)['physical_replays'])
+
     def test_new_identity_preserves_science_and_freezes_only_six_procedures(self):
         old=resolve(ROOT/'configs/research/study_phs2d_autonomous_original_prepared_20261105.json')
         new=resolve(SPEC)
