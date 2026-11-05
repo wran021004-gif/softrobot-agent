@@ -482,7 +482,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 raw_body=store.put(db,body,media='application/octet-stream')
                 reception=dict(body=plain(raw_body),http_status=response.status_code,elapsed_s=time.monotonic()-started,
                     purpose=purpose,pid=os.getpid(),usage=None,finish_reasons=None,money=None,
-                    reasoning_tokens=None,usage_source='provider response; missing fields unknown')
+                    reasoning_tokens=None,usage_source='provider response; missing fields unknown',
+                    **(dict(protocol='openai_responses_v1',upstream_body=plain(raw_body),body_is_derived_chat_view=False) if responses else {}))
                 ref=store.put(db,reception)
                 state=store.session(run,db)['state']
                 if 200<=response.status_code<300:

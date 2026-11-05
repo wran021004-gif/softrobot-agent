@@ -8,7 +8,7 @@ from unittest.mock import patch
 import httpx
 from tools.research.config import ROOT
 from tools.research.state import state, update, save, guard
-from tools.research.provider import transition_transport
+from tools.research.provider import transition_transport,LiveBoundary,IncompleteModelOutput,received
 from tools.research.core import bind
 from tools.research.agent import converse
 from tools.platform_store import zero
@@ -126,6 +126,27 @@ class ProviderTransportTests(unittest.TestCase):
         self.assertTrue(receptions[-1]['body_is_derived_chat_view'])
         upstream=json.loads(h.store.artifact(receptions[-1]['upstream_body'],raw=True))
         self.assertEqual(upstream['status'],'completed')
+
+    def test_incomplete_responses_replay_has_one_charge_and_no_tool_admission(self):
+        h,a=self.fixture();transition_transport(h,a);sent=[]
+        def reply(request):
+            sent.append(json.loads(request.content))
+            return httpx.Response(200,json=dict(id='resp_incomplete',model='gpt-5.6-sol',status='incomplete',
+                incomplete_details=dict(reason='max_output_tokens'),output=[dict(type='function_call',call_id='partial',name='research_plan',arguments='{')]))
+        boundary=LiveBoundary(h,httpx.MockTransport(reply))
+        request=httpx.Request('POST','https://api.openai.com/v1/chat/completions',json=dict(
+            model='gpt-5.6-sol',stream=False,store=False,reasoning_effort='medium',messages=[dict(role='user',content='Offline fixture')],
+            tools=[dict(type='function',function=dict(name='research_plan',parameters=dict(type='object',properties={})))]))
+        before=h.store.remaining()
+        for _ in range(2):
+            with self.assertRaises(IncompleteModelOutput):asyncio.run(boundary.handle_async_request(request))
+        self.assertEqual(len(sent),1)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],before['used']['model_calls']+1)
+        self.assertFalse(state(h)['plans']);self.assertFalse(state(h)['candidates'])
+        reception=received(h,boundary.last_request)
+        self.assertIsNone(reception['usage'])
+        self.assertEqual(json.loads(h.store.artifact(reception['upstream_body'],raw=True))['status'],'incomplete')
+        self.assertEqual(reception['finish_reasons'],['length'])
 
 
 if __name__=='__main__':unittest.main()
