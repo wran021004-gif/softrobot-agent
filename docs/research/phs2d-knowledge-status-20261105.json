@@ -1,6 +1,6 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T11:30:34.859285+08:00",
+  "checked_at": "2026-11-05T11:38:04.343325+08:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
   "resolved_identity": "31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7",
   "profile_identity": "69db05e7b850caed1dc2a8727a496d115dee6fc1891401f67ae866f09cb380ea",
@@ -8,7 +8,6 @@
   "status": "SUPERVISOR_PAUSED_BEFORE_FIRST_SEND",
   "scientific_stop": false,
   "blockers": [
-    "INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE",
     "NONRETRYABLE_SHARING_LIMIT_RECOVERY_NOT_CONFIRMED"
   ],
   "knowledge_retrieval_isolation": "passed_offline_sdk_mock_only",
@@ -31,7 +30,7 @@
     "version": "finite_provider_request_extension_v1"
   },
   "applied_provider_extensions": 0,
-  "formal_approval_events": 0,
+  "formal_approval_events": 1,
   "scientific_cost": {
     "provider_requests": 0,
     "reporter_requests": 0,
@@ -69,7 +68,7 @@
     "models_http_status": 200,
     "exact_model_present": true,
     "quota_recovery_proved": false,
-    "usage_ui": "read timed out",
+    "usage_ui": "Existing official usage tab redirects to auth/login?next=/settings/usage; current browser cannot establish Gateway account quota recovery.",
     "inference_requests": 0
   },
   "old_prepared_store": {
@@ -96,6 +95,8 @@
   "authorization_request": "docs/research/phs2d-knowledge-authorization-request-20261105.json",
   "initial_launch_after_gates": {
     "command": "python -m tools.research run --run-id phs2d-knowledge-autonomy-20261105 --no-session-handoff --max-new-provider-requests 4 --pause-after-completed-invocations 1",
-    "scope": "Use original research interpreter with frozen thread variables after exact grant and independent quota recovery; no send performed. Automatic handoff admission flags have not been forged."
-  }
+    "scope": "Exact user grant is recorded. Use original research interpreter and frozen thread variables only after independent quota recovery; no send performed. Automatic handoff admission flags remain unchanged."
+  },
+  "authorization_status": "EXPLICIT_USER_APPROVAL_RECORDED_AND_CURRENT_IDENTITY_GATES_PASSED",
+  "authorization_scope_identity": "9b7b09ce994c99472647691a556bed7d89ae923c63ea64bd79bd61feaf7fea65"
 }
