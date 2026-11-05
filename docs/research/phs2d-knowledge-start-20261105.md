@@ -1,5 +1,7 @@
 # PHS-2D Knowledge 正式研究准入（2026-11-05）
 
+后续进展：用户明确授权一次 Gateway 实测并在 HTTP200 后选择继续原 Gateway；Study 已真实启动。以下为此前准入与阻断记录，当前进展见 [真实研究报告](phs2d-knowledge-live-20261105.md) 和 [状态 JSON](phs2d-knowledge-status-20261105.json)。
+
 新的 Knowledge-enabled Study 已准备并隔离冻结；**真实自主研究尚未启动**。用户回复“批准”后，原 Store 已登记精确身份和注册数学的正式授权，原授权门禁通过。此前不可重试共享额度 429 的独立恢复依据仍未取得。没有真实推理探测、换模型、后台重试或自主科学 STOP。
 
 ## 身份与保全

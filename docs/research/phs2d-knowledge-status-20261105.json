@@ -1,21 +1,19 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T11:38:04.343325+08:00",
+  "checked_at": "2026-11-05T13:11:41.663803+08:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
   "resolved_identity": "31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7",
   "profile_identity": "69db05e7b850caed1dc2a8727a496d115dee6fc1891401f67ae866f09cb380ea",
   "knowledge_manifest_identity": "9cbaac4f2a5c419c5480bdc007b69c44392caca2c970bf2c7b3c1c8e6a848e75",
-  "status": "SUPERVISOR_PAUSED_BEFORE_FIRST_SEND",
+  "status": "SUPERVISED_LIVE_RESEARCH_AT_SETTLED_WINDOW",
   "scientific_stop": false,
-  "blockers": [
-    "NONRETRYABLE_SHARING_LIMIT_RECOVERY_NOT_CONFIRMED"
-  ],
+  "blockers": [],
   "knowledge_retrieval_isolation": "passed_offline_sdk_mock_only",
-  "knowledge_adoption": "not_measured",
-  "L1": "not_measured_live",
-  "L2": "not_measured_live",
-  "L3": "not_measured_live",
-  "L4": "not_measured_live",
+  "knowledge_adoption": "one compact Skill summary delivered; zero full reads; Main explicitly declined to claim adoption",
+  "L1": "observed: autonomous falsifiable hypothesis and legal candidate generation",
+  "L2": "Registered kernel inspection executed; operating point explicitly unqualified; Main interpretation and subsequent decision under review",
+  "L3": "not_yet_observed",
+  "L4": "not_observed",
   "budgets": {
     "provider_requests": 24,
     "protected_provider_requests": 4,
@@ -32,25 +30,25 @@
   "applied_provider_extensions": 0,
   "formal_approval_events": 1,
   "scientific_cost": {
-    "provider_requests": 0,
-    "reporter_requests": 0,
-    "prompt_tokens": 0,
-    "completion_tokens": 0,
-    "total_tokens": 0,
-    "mathematical_evaluations": 0,
+    "provider_requests": 9,
+    "reporter_requests": 1,
+    "prompt_tokens": 235622,
+    "completion_tokens": 3195,
+    "total_tokens": 238817,
+    "mathematical_evaluations": 1,
     "backend_episodes": 0,
     "physics_steps": 0,
-    "native_model_builds": 0,
-    "scientific_worker_wall_s": 0
+    "native_model_builds": 1,
+    "scientific_worker_wall_s": 1.5714473000261933
   },
-  "candidates": 0,
+  "candidates": 1,
   "physical_replays": 0,
   "source_cost_ledger": {
-    "tool_calls": 0,
-    "model_calls": 0,
+    "tool_calls": 7,
+    "model_calls": 9,
     "backend_solves": 0,
     "worker_calls": 0,
-    "wall_s": 0.0
+    "wall_s": 142.8994473000057
   },
   "tests": {
     "distinct_tests": 15,
@@ -95,8 +93,33 @@
   "authorization_request": "docs/research/phs2d-knowledge-authorization-request-20261105.json",
   "initial_launch_after_gates": {
     "command": "python -m tools.research run --run-id phs2d-knowledge-autonomy-20261105 --no-session-handoff --max-new-provider-requests 4 --pause-after-completed-invocations 1",
-    "scope": "Exact user grant is recorded. Use original research interpreter and frozen thread variables only after independent quota recovery; no send performed. Automatic handoff admission flags remain unchanged."
+    "scope": "Launched on the original Gateway following explicit user-authorized probe and explicit provider continuation selection; no Store reset, no official API substitution."
   },
   "authorization_status": "EXPLICIT_USER_APPROVAL_RECORDED_AND_CURRENT_IDENTITY_GATES_PASSED",
-  "authorization_scope_identity": "9b7b09ce994c99472647691a556bed7d89ae923c63ea64bd79bd61feaf7fea65"
+  "authorization_scope_identity": "9b7b09ce994c99472647691a556bed7d89ae923c63ea64bd79bd61feaf7fea65",
+  "provider_requests_by_purpose": {
+    "gateway_quota_probe": 1,
+    "conversation": 7,
+    "reporter": 1
+  },
+  "actual_provider_usage": {
+    "known_subtotal": {
+      "prompt_tokens": 235622,
+      "completion_tokens": 3195,
+      "total_tokens": 238817
+    },
+    "responses_with_usage": 9,
+    "responses_missing_usage": 0,
+    "money": "not_measured"
+  },
+  "gateway_user_authorized_inference_check": {
+    "http_status": 200,
+    "answer": "OK",
+    "model": "gpt-5.6-sol",
+    "tokens": 32,
+    "charged_requests": 1,
+    "remaining_account_quota": "not_returned",
+    "subsequent_user_selection": "continue original Gateway gpt-5.6-sol / medium",
+    "no_retry": true
+  }
 }
