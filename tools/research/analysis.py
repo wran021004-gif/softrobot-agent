@@ -328,7 +328,7 @@ def admission(host,requested=1,engineering=False):
     s=state(host)
     remaining=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0))
     count=requested if remaining is None else max(0,min(requested,remaining))
-    return dict(admitted=count,requested=requested,reservation_s=0.,timeout_s=s['spec'].get('analysis_cap_s'),remaining_numerical_s=None)
+    return dict(admitted=count,requested=requested,reservation_s=0.,timeout_s=s['spec'].get('mathematical_worker_watchdog_s',s['spec'].get('analysis_cap_s')),remaining_numerical_s=None)
 
 
 def dispatch(host,query,key,*,guard,origin='model'):
