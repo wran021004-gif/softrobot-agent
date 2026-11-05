@@ -208,7 +208,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
         from .passive_equilibrium import solve
         native.protocol['static_solver'].update(goal.unloaded_static_solver)
         unloaded=native.load(problem.baseline_load)
-        equilibrium=solve(native,unloaded.material_s,unloaded.force_world_n)
+        equilibrium=solve(native,unloaded.material_s,unloaded.force_world_n,multistart=goal.unloaded_multistart)
         raw['unloaded_equilibrium']=equilibrium
         raw['cost_initialization']=equilibrium['numerical_cost']
         if equilibrium['status']!='qualified_local_minimum':
@@ -314,6 +314,11 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 balance=static.qfrc_passive+static.qfrc_applied-static.qfrc_bias+static.qfrc_constraint
                 value.update(**mechanism,static_balance_inf_nm=float(np.max(abs(balance))),force_map_error_nm=map_error,
                     taut=[label=='taut' for label in mechanism['constraint_classification']])
+                if original:
+                    value.update(qacc_rad_s2=data.qacc.tolist(),qacc_warmstart=data.qacc_warmstart.tolist(),
+                        applied_force_nm=data.qfrc_applied.tolist(),passive_force_nm=data.qfrc_passive.tolist(),
+                        bias_force_nm=data.qfrc_bias.tolist(),constraint_force_nm=data.qfrc_constraint.tolist(),
+                        static_balance_nm=balance.tolist())
             return value
         try:
             start_tick=0

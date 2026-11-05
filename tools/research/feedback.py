@@ -735,6 +735,8 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
             reasons.append('selection requires a passing development evaluation')
         if not v['passed']:
             reasons.append('result did not pass complete original task evaluation')
+        if r.get('acceptance',{}).get('selection_eligible') is False:
+            reasons.append('SCREENING_EVIDENCE_CANNOT_ESTABLISH_FULL_PHS_SELECT')
         c=verify_candidate(host,r['candidate'])
         if v['controller_route']=='nmpc' and (r.get('profile_identity')!=s['profile']['identity'] or r['scientific_configuration']!=c['scientific_configuration']):
             reasons.append('selected scientific configuration mismatch')

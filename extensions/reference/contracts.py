@@ -107,6 +107,7 @@ class PassiveResponseGoalV2(Contract):
     version: Literal['passive_response_v2'] = 'passive_response_v2'
     execution_protocol: Literal['continuous_v1','phs2d_original_v1'] = 'continuous_v1'
     unloaded_static_solver: dict[str, FiniteFloat] = Field(default_factory=dict)
+    unloaded_multistart: bool = False
     load_conditions: list[str] = Field(min_length=1,max_length=32)
     programs: dict[str,list[PassiveStageV2]]
     protocol_source: EvidenceRef
@@ -136,6 +137,7 @@ class PassiveResponseGoalV2(Contract):
         value=handler(self)
         if self.execution_protocol=='continuous_v1':value.pop('execution_protocol',None)
         if not self.unloaded_static_solver:value.pop('unloaded_static_solver',None)
+        if not self.unloaded_multistart:value.pop('unloaded_multistart',None)
         return value
 
     @model_validator(mode='after')
@@ -145,12 +147,14 @@ class PassiveResponseGoalV2(Contract):
                     self.force_sampling!='interval_start' or self.static_balance_reference!='copied_integration_zero_velocity' or
                     self.allowed_ablation!='none' or not self.unloaded_static_solver):
                 raise ValueError('EXPLICIT_ORIGINAL_PHS_INITIALIZATION_AND_PHASE_REQUIRED')
-            from extensions.tendon_family.passive import SOLVER
-            if (set(self.unloaded_static_solver)-set(SOLVER) or
+            keys={'max_iterations','ftol','length_tolerance_m','stationarity_tolerance_nm',
+                'complementarity_tolerance_nm','active_tolerance_m','rank_relative_tolerance',
+                'hessian_step_rad','minimum_reduced_eigenvalue'}
+            if (set(self.unloaded_static_solver)!=keys or
                     any(v<=0 for v in self.unloaded_static_solver.values()) or
                     self.unloaded_static_solver.get('max_iterations',0)!=int(self.unloaded_static_solver.get('max_iterations',0))):
                 raise ValueError('VALID_FROZEN_UNLOADED_STATIC_SOLVER_REQUIRED')
-        elif self.initial_source=='fresh_unloaded_hard_equilibrium' or self.unloaded_static_solver or self.reset!='same_complete_initial_state_each_episode':
+        elif self.initial_source=='fresh_unloaded_hard_equilibrium' or self.unloaded_static_solver or self.unloaded_multistart or self.reset!='same_complete_initial_state_each_episode':
             raise ValueError('VERSIONED_HARD_EQUILIBRIUM_PROTOCOL_REQUIRED')
         if len(set(self.load_conditions))!=len(self.load_conditions) or set(self.programs)!=set(self.load_conditions):
             raise ValueError('EXACT_ORDERED_EPISODE_PROGRAMS_REQUIRED')

@@ -59,7 +59,9 @@ def task_definition(task, reg):
             floor=next(o for o in task.environment.data['environment']['objects'] if o['name']==assembly.floor_id)
             stages=list(goal.programs.values())
             if (floor['position_m'][2]!=0 or any(len(s)!=2 or s[0].end_s!=4 or s[-1].end_s!=8 for s in stages) or
-                    timing.sample_period_s!=.01 or timing.timestep_s not in (.000125,.0000625)):
+                    timing.sample_period_s!=.01 or timing.timestep_s not in (.000125,.0000625) or
+                    problem.gravity!=(0.,0.,-9.81) or problem.mount_position!=(0.,0.,.5) or
+                    not np.allclose(problem.monitor_s,np.arange(21)/20,rtol=0,atol=1e-12)):
                 raise ValueError('ORIGINAL_PHS_GROUND_AND_TIME_GRID_REQUIRED')
         return goal,bounds,problem
     if goal.hold_window_s[1]!=timing.duration_s:

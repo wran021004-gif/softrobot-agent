@@ -117,6 +117,23 @@ def differentiate(parameter, baseline, evaluate, *, goal, allow_ineligible=False
         direction_status='locally_consistent' if selected else 'unresolved',strict_derivative=False,descent_certificate=False)
 
 
+def withhold_gradient(response,reason):
+    """Keep measured comparisons while withholding an inadmissible gradient."""
+    response['diagnostic_secants']=dict(derivatives=response.get('derivatives'),
+        normalized_derivatives=response.get('normalized_derivatives'),scope='Finite comparisons only; not a gradient')
+    response.update(derivatives=[None]*len(response.get('derivatives',[])),
+        normalized_derivatives=[None]*len(response.get('normalized_derivatives',[])),
+        derivative_status=reason,direction_status='directional_comparison',
+        suggested_delta=None,selected_record_index=None,strict_derivative=False)
+    for sample in response.get('samples',[]):
+        sample['derivative']=None;sample['normalized_derivative']=None
+    if 'implicit_sensitivity' in response:
+        response['implicit_sensitivity']=dict(status='directional_comparison',reason=reason,
+            gradient_trustworthy=False,strict_derivative=False)
+    response['consistency'].update(passed=False,reason=reason)
+    return response
+
+
 def re_equilibrated(parameter,baseline,records,models,response,study):
     """Reuse legal two-scale rebuilt models; add qualified implicit state checks."""
     from extensions.tendon_family.passive_inverse import task_design_sensitivity

@@ -68,11 +68,37 @@ class ResearchTaskAdapter:
     def structure_task_view(self):
         conditions=self.condition_view()
         return dict(physical_capabilities=self.physical_capabilities(),conditions=conditions,
+            research_cost_levels=self.research_cost_levels(),
             dynamic_constraints=self.dynamic_constraint_view(),
             response_semantics='finite_time_task_response' if passive_registered(self.task) else 'registered_active_task_and_saved_control_evidence',
             static_coverage='Static mechanisms cannot predict finite-time speed, drift, full Tracking or contact bounds.',
             dynamic_coverage='All frozen load cases and sample windows; per-step safety extrema where required by evaluator.',
             task_acceptance='unmeasured')
+
+    def research_cost_levels(self):
+        """Read-only method costs. Screening never inherits full-task eligibility."""
+        goal=self.task.get('goal',{}).get('data',{})
+        if goal.get('execution_protocol')!='phs2d_original_v1':return None
+        from tools.research.structure_research import dynamic_cost
+        full=dynamic_cost(self.configuration,1)
+        dt=self.task['timing']['timestep_s'];program=next(iter(goal['programs'].values()))
+        rep_steps=round((program[0]['end_s']+2*(program[-1]['end_s']-program[0]['end_s']))/dt)
+        return dict(version='phs2d_research_cost_levels_v1',
+            low=dict(method='mechanism_structure_v1',effect='re_equilibrated_passive_response',
+                model_builds=1,equilibrium_solves=2,physics_steps=0,
+                optimizer_iteration_cap_per_solve=goal['unloaded_static_solver']['max_iterations'],
+                outputs=['actual_length_jacobian','taut_slack_sets','constraint_nullspace','qualified_local_compliance'],select_eligible=False),
+            medium=dict(method='physical_replay',frozen_task='phs2d-original-representative-v1-r2',
+                load_conditions=['s5_positive','s5_negative'],model_builds=1,physics_steps=rep_steps,
+                prerequisite='Separately frozen screening configuration through the existing Worker; never change the formal task in place',select_eligible=False),
+            high=dict(method='physical_replay',per_complete_evaluation=full,
+                prerequisite='All ten cases, fresh qualified baseline, original bounds and independent evaluator; research evaluations confer no acceptance',
+                independent_replay_additional_cost=full,select_eligible='Only the owned complete independent Replay certificate'),
+            confirmation=dict(halfstep_physics_steps=2*full['physics_steps'],
+                initial_perturbation_physics_steps=full['physics_steps'],
+                prerequisite='Separate frozen confirmation task/initialization identity and budget; perturbation initializer not yet admitted',
+                geometry='score-grid is the original qualification; every-step geometry requires separate measured costs'),
+            accounting='Exact integration bounds; model/solver/forward/geometry attempts measured by the original Worker, failures included. Wall time estimates are not upper bounds.')
 
     def dynamic_constraint_view(self):
         """Discovery only: retain frozen evaluator meanings outside affine kernels."""
@@ -900,6 +926,11 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         status = 'accepted' if accepted else 'valid_failure'
     result=dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=[t['id'] for t in cfg['robot']['structure']['data']['tendons']] if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
     result['constraint_observations']=adapter.constraint_observations(components)
+    if task.get('goal',{}).get('data',{}).get('execution_protocol')=='phs2d_original_v1':
+        loads=task['physical_problem']['loads'];baseline=task['physical_problem']['baseline_load']
+        complete={(l['material_s'],tuple(l['force_world_n'])) for l in loads if l['name']!=baseline}=={
+            (s,(f,0.,0.)) for s in (.3,.4,.5,.6,.7) for f in (.1,-.1)}
+        result.update(selection_eligible=complete,qualification_scope='complete_phs_ten_case' if complete else 'screening_only')
     return result
 
 

@@ -190,16 +190,25 @@ class FamilySpaceV2(FamilySpace):
     serial_assembly: SerialAssemblyRule
     passive_payout_domains_m: dict[str,Domain] = Field(default_factory=dict)
     terminal_payload_anchor: bool = False
+    guide_hole_coordinate_domains_m: dict[int,Domain] = Field(default_factory=dict)
+    route_coordinate_domains_m: dict[Literal['fixed_base','payload'],dict[int,Domain]] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def historical_space(self,handler):
         value=handler(self)
         if not self.passive_payout_domains_m:value.pop('passive_payout_domains_m',None)
         if not self.terminal_payload_anchor:value.pop('terminal_payload_anchor',None)
+        for key in ('guide_hole_coordinate_domains_m','route_coordinate_domains_m'):
+            if not getattr(self,key):value.pop(key,None)
         return value
 
     @model_validator(mode='after')
     def serial(self):
+        coordinates=[self.guide_hole_coordinate_domains_m,*self.route_coordinate_domains_m.values()]
+        if any(set(d)-{1,2} for d in coordinates):
+            raise ValueError('ONLY_LOCAL_YZ_CONTINUOUS_ROUTING_COORDINATES_SUPPORTED')
+        if any(coordinates) and not self.terminal_payload_anchor:
+            raise ValueError('PHYSICAL_ROUTING_COORDINATES_REQUIRE_OPT_IN_SPACE')
         if not self.executable_segment_counts or self.executable_segment_counts != sorted(set(self.executable_segment_counts)) or any(
                 not self.segment_count_bounds[0] <= i <= self.segment_count_bounds[1] for i in self.executable_segment_counts):
             raise ValueError('EXECUTABLE_SEGMENT_COUNTS_MUST_BE_DECLARED')
@@ -293,6 +302,15 @@ def validate_request(space, request):
             if key not in domains:
                 raise ValueError('UNDECLARED_FAMILY_PARAMETER: '+key)
             domains[key].check(value, key)
+    if isinstance(space,FamilySpaceV2):
+        for guide,holes in getattr(request,'guide_hole_positions_m',{}).items():
+            for hole,pos in holes.items():
+                for axis,domain in space.guide_hole_coordinate_domains_m.items():
+                    domain.check(pos[axis],f'guide_hole_positions_m.{guide}.{hole}.{axis}')
+        for index,route in request.route_overrides.items():
+            for j,point in enumerate(route):
+                for axis,domain in space.route_coordinate_domains_m.get(point.attachment.part,{}).items():
+                    domain.check(point.attachment.position_m[axis],f'route_overrides.{index}.{j}.attachment.position_m.{axis}')
 
 
 def decision_summary(value, evidence, operations):
@@ -423,6 +441,15 @@ def resolved_request(value, request):
     for k,d in space.tendon_domains.items():params['tendon_parameters'].setdefault(k,d.default)
     for k,d in space.control_domains.items():params['control_weights'].setdefault(k,d.default)
     for k,d in getattr(space,'passive_payout_domains_m',{}).items():params.setdefault('payout_lengths_m',{}).setdefault(k,d.default)
+    if isinstance(space,FamilySpaceV2) and space.guide_hole_coordinate_domains_m:
+        # Materialize the current real holes, not independent invented sites.
+        # This preserves a selected parent's exact physical routing when edited.
+        from .generated_serial import generate_family
+        design,_,_=generate_family(parse_build(dict(space=value,request=params)))
+        for part in design['components']:
+            if part['kind']=='guide' and part.get('guide_holes'):
+                holes=params.setdefault('guide_hole_positions_m',{}).setdefault(part['id'],{})
+                for hole,pos in part['guide_holes'].items():holes.setdefault(hole,pos)
     return plain((GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(params))
 
 
@@ -431,7 +458,7 @@ def parameter_capabilities(value, request):
     from tools.research.design import parameter_value
     space=parse_space(value);params=resolved_request(value,request);rows=[]
     passive=bool(getattr(space,'passive_payout_domains_m',{}))
-    def add(path,category,kind,unit,domain=None,choices=None,effective=True,reason=None,source=None,**detail):
+    def add(path,category,kind,unit,domain=None,choices=None,effective=True,reason=None,source=None,physical_binding=None,**detail):
         try:current=parameter_value(params,path)
         except (KeyError,IndexError,ValueError):current=None
         continuous=bool(kind=='number' and domain and domain.minimum<domain.maximum and effective and not reason)
@@ -452,6 +479,7 @@ def parameter_capabilities(value, request):
             rows[-1]['physical_component']={'kind':'tendons','ids':['tendon_'+str(i) for i in range(params['tendon_count'])]}
         elif category=='routing' and 'affected_tendon_indices' in detail:
             rows[-1]['physical_component']={'kind':'tendon_paths','ids':['tendon_'+str(i) for i in detail['affected_tendon_indices']]}
+        if physical_binding is not None:rows[-1]['physical_component']=physical_binding
 
     add('segment_count','topology','integer','count',choices=space.executable_segment_counts)
     add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
@@ -502,7 +530,9 @@ def parameter_capabilities(value, request):
     offset=0
     for i,span in enumerate(params['spans']):
         affected=[j for j in range(offset,offset+span['count']) if str(j) not in params['route_overrides']]
-        hole_affected=[j for j in range(offset,offset+span['count']) if any(p.get('hole') for p in params['route_overrides'].get(str(j),[]))]
+        hole_affected=[j for j in range(offset,offset+span['count']) if any(p.get('hole') and
+            p['hole'] not in params.get('guide_hole_positions_m',{}).get(p['attachment']['part'],{})
+            for p in params['route_overrides'].get(str(j),[]))]
         def route(path,key,effective=True,**detail):
             influenced=sorted(set(affected+hole_affected)) if key in ('radius_m','phase_rad','angular_offset_rad') and not path.startswith('anchor_') else affected
             if path.startswith('angular_offsets_rad.'):
@@ -524,6 +554,20 @@ def parameter_capabilities(value, request):
             if a['part'].startswith('segment_'):
                 key='anchor_s' if point['role']=='anchor' else 'guide_s'
                 add(f'route_overrides.{i}.{j}.attachment.s','routing','number','normalized_station',space.routing_domains[key],source='routing_domains.'+key)
+            if isinstance(space,FamilySpaceV2) and not point.get('hole'):
+                for axis,domain in space.route_coordinate_domains_m.get(a['part'],{}).items():
+                    add(f'route_overrides.{i}.{j}.attachment.position_m.{axis}','routing','number','m',domain,
+                        source=f'route_coordinate_domains_m.{a["part"]}.{axis}',
+                        physical_binding=dict(kind='physical_route_attachment',part=a['part'],tendon='tendon_'+str(i),role=point['role'],axis='yz'[axis-1]),
+                        perturbation='Move one attachment in its fixed body-local YZ plane; preserve topology, mass and inertia')
+    if isinstance(space,FamilySpaceV2):
+        for guide,holes in params.get('guide_hole_positions_m',{}).items():
+            for hole in holes:
+                for axis,domain in space.guide_hole_coordinate_domains_m.items():
+                    add(f'guide_hole_positions_m.{guide}.{hole}.{axis}','routing','number','m',domain,
+                        source=f'guide_hole_coordinate_domains_m.{axis}',
+                        physical_binding=dict(kind='physical_guide_hole',part=guide,hole=hole,axis='yz'[axis-1]),
+                        perturbation='Move the real plate-hole center in its body-local YZ plane; preserve hole radius, plate mass and inertia')
     for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False,reason='Controller performance parameter; outside fixed-structure legal-input capability')
     if passive:
         for row in rows:

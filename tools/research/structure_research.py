@@ -340,6 +340,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
             from extensions.tendon_family.compiler import resolve
             native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'])
+            if cfg['task']['goal']['data'].get('execution_protocol')=='phs2d_original_v1':
+                native.protocol['static_solver'].update(cfg['task']['goal']['data']['unloaded_static_solver'])
             seed=None
             if records and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
@@ -446,8 +448,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 def probe(value):
                     values=list(base_values);values[i]=value
                     return evaluate(values)
-                response=differentiate(row,base,probe,goal=study.target.goal,allow_ineligible=dynamic)
-                if evidence['method_selection']['method']=='passive_kkt_implicit':
+                response=differentiate(row,base,probe,goal=study.target.goal,allow_ineligible=dynamic or passive)
+                if evidence['method_selection']['method']=='passive_kkt_implicit' and response['consistency']['passed']:
                     from extensions.math_analysis.differentiation_router import re_equilibrated
                     response['implicit_sensitivity']=re_equilibrated(row,base,records,models,response,study)
                 if dynamic:
@@ -464,11 +466,11 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     changed=any(r['mechanics']['equilibrium']['equilibrium'][key]!=branch[key]
                         for r in records[first:] for key in ('active','positive'))
                     qualified=all(r['mechanics']['constraint_state']['qualified'] for r in [base,*records[first:]])
-                    smooth=base['mechanics']['constraint_state']['status']=='smooth_fixed_active_set'
+                    smooth=all(r['mechanics']['constraint_state']['status']=='smooth_fixed_active_set' for r in [base,*records[first:]])
                     response['branch_status']='active_set_switch' if changed else 'unqualified' if not qualified else 'nonsmooth_or_degenerate' if not smooth else 'same_active_set'
                     if changed or not qualified or not smooth:
-                        response.update(direction_status='directional_comparison',suggested_delta=None,selected_record_index=None)
-                        response['consistency'].update(passed=False,reason=response['branch_status'])
+                        from extensions.math_analysis.differentiation_router import withhold_gradient
+                        withhold_gradient(response,response['branch_status'])
                 response.update(parameter_path=row['parameter_id'],parameter_unit=row['unit'],
                     model_effect_observed=any(r['compiled_physical_changes'] for r in records[first:]))
                 if not response['model_effect_observed']:
