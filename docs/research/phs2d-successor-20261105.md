@@ -4,6 +4,29 @@ Branch: `codex/phs2d-initialization-successor-20261105`, based on the requested
 `bf67b178c1438d2706a2e628b1c5131c334e1771`. The stopped parent and its Store,
 failures and charges remain untouched. No merge into main.
 
+Final state: the same formal successor is sealed by the original count-budget
+closure (`model_stop=false`), without accepted voluntary STOP, SELECT or task
+success. One generated geometry progressed to full forward and both original
+optimizer starts, but no candidate qualified. The fourth candidate remains
+unmeasured. Initial interface consistency and actual Knowledge delivery were
+verified; research success was not established.
+
+| Final registered quantity | Value |
+| --- | --- |
+| Shared Provider requests | 104: Gateway 95, official API 9 |
+| Known token usage | 4,020,393; two failed requests have unknown usage |
+| Saved candidates / mathematical evaluations | 4 / 9 |
+| Registered numerical time charged to mathematical analyses | 15.0855 s |
+| Native model builds / full forward calls / optimizer iterations | 9 / 4,526 / 810 |
+| Charged backend episode allowances / actual integrated episodes | 10 / 0 |
+| Qualified unloaded points / physics steps / independent Replays | 0 / 0 / 0 |
+
+Monetary cost is unknown. Engineering diagnostics/tests are separate from these
+formal-Study counters. See `phs2d-successor-live-status-20261105.json` for the final
+aggregate ledger and `closure` classification. Gateway quota restriction was
+handled through the user's authorized third official API, with the same model,
+reasoning, SDK session and scientific profile.
+
 ## Diagnostic conclusion
 
 Only two saved failed designs were examined. The contact sample failed its first
@@ -63,9 +86,9 @@ These engineering checks are not current-Study scientific evidence.
 
 ## Independent formal successor
 
-`phs2d-mechanism-successor-20261105` is prepared with the original ten conditions,
+`phs2d-mechanism-successor-20261105` was prepared with the original ten conditions,
 nine-segment/four-tendon domain, physical model, qualification and Replay/SELECT
-rules. The model remains Gateway `gpt-5.6-sol`, Main `medium`, Reporter `none`.
+rules. It initially used Gateway `gpt-5.6-sol`, Main `medium`, Reporter `none`.
 The new Store starts independently; it does not reset parent costs.
 
 The concrete approval request is `phs2d-successor-authorization-20261105.json`:
