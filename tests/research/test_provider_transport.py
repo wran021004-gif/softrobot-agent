@@ -23,10 +23,10 @@ class ProviderTransportTests(unittest.TestCase):
         p=deepcopy(spec['runtime']['provider']);path=h.store.root/'gateway-key-fixture.json'
         path.write_text(json.dumps(dict(base_url=p['base_url'],api_key='gateway-fixture')))
         spec['runtime'].update(provider=p,credentials_reference=str(path))
-        spec['configuration']['policy']['model']=deepcopy(p)
+        spec['configuration']['policy']['model']={**deepcopy(p),'thinking':None}
         spec['research_decisions']['role_policy']=dict(version='research_roles_v3',main=dict(reasoning='medium'),reporter=dict(reasoning='none'))
         spec['research_decisions']['tool_schema_policy']=dict(version='on_demand_tools_v3')
-        update(h,spec=spec,pilot={**s['pilot'],'provider':deepcopy(p)})
+        update(h,spec=spec,pilot={**s['pilot'],'provider':{**deepcopy(p),'thinking':None}})
         target={**deepcopy(p),'adapter':'openai_api','base_url':'https://api.openai.com/v1','proxy_url':'http://127.0.0.1:7890'}
         path=h.store.root/'official-key-fixture.json'
         path.write_text(json.dumps(dict(base_url=target['base_url'],api_key='official-fixture')))
@@ -58,7 +58,9 @@ class ProviderTransportTests(unittest.TestCase):
             if key!='provider':self.assertEqual(s['pilot'][key],old['pilot'][key])
         back=self.approval(h,old['pilot']['provider'],old['spec']['runtime']['credentials_reference'])
         transition_transport(h,back)
-        self.assertEqual(state(h)['spec']['runtime'],old['spec']['runtime'])
+        self.assertEqual(state(h)['spec']['runtime']['provider'],old['pilot']['provider'])
+        for key in old['spec']['runtime']:
+            if key!='provider':self.assertEqual(state(h)['spec']['runtime'][key],old['spec']['runtime'][key])
         self.assertEqual(state(h)['spec']['budgets'],old['spec']['budgets'])
         self.assertEqual(h.store.remaining(),ledger)
         self.assertEqual(len(state(h)['provider_transport_transitions']),2)

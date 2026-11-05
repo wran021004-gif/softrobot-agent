@@ -182,6 +182,7 @@ def transition_transport(host, approval):
     A committed bind and identity-bound research grant remain mandatory.
     """
     from tools.platform_tasks import compile_input
+    from schemas.platform import ModelConfig
     identity=digest(approval)
     with host.store.transaction() as db:
         current=host.store.session(host.run_id,db)['state'];spec=current['spec']
@@ -195,16 +196,19 @@ def transition_transport(host, approval):
                 or scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity']
                 or scope['previous_provider_identity']!=digest(old)):
             raise ValueError('EXACT_USER_APPROVED_PROVIDER_TRANSPORT_REQUIRED')
-        target=scope['provider'];transport_keys={'adapter','adapter_version','base_url','proxy_url','model_capabilities'}
+        target=plain(ModelConfig.model_validate(scope['provider']))
+        normalized=plain(ModelConfig.model_validate(old))
+        transport_keys={'adapter','adapter_version','base_url','proxy_url','model_capabilities'}
         endpoints={'openai_api':'https://api.openai.com/v1','chatgpt_gateway':'http://127.0.0.1:8787/v1'}
         if ({old['adapter'],target.get('adapter')}!=set(endpoints)
                 or any(p['base_url'].rstrip('/')!=endpoints[p['adapter']] for p in (old,target))
-                or {k:v for k,v in old.items() if k not in transport_keys}!=
+                or {k:v for k,v in normalized.items() if k not in transport_keys}!=
                    {k:v for k,v in target.items() if k not in transport_keys}
                 or not isinstance(scope['credentials_reference'],str) or not scope['credentials_reference']):
             raise ValueError('TRANSPORT_ONLY_SAME_MODEL_AND_RESEARCH_SETTINGS_REQUIRED')
         validate_provider(target)
-        if old!=current['pilot']['provider'] or old!=spec['configuration']['policy']['model']:
+        if (normalized!=plain(ModelConfig.model_validate(current['pilot']['provider']))
+                or normalized!=plain(ModelConfig.model_validate(spec['configuration']['policy']['model']))):
             raise ValueError('ORIGINAL_PROVIDER_BINDING_MISMATCH')
         if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
                 or any(v.get('active_reservation') or v.get('status',{}).get('worker_alive',True)
