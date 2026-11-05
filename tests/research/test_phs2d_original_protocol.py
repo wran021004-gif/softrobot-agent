@@ -97,4 +97,18 @@ class OriginalProtocolTests(unittest.TestCase):
         self.assertIsNone(response['samples'][0]['derivative'])
         self.assertFalse(response['consistency']['passed'])
 
+    def test_real_solid_plate_rejects_oblique_cable_penetration(self):
+        from extensions.tendon_family.passive import PassiveModel
+        from extensions.tendon_family.route_validation import validate_routes
+        s,r=self.build()
+        # Legal hole center, but the approach crosses the solid plate outside
+        # its cylindrical clearance. This is a test fixture, not a study result.
+        r['guide_hole_positions_m']['guide_1']['tendon_0_hole'][1]=-.01
+        design,_,physics=generate_family(parse_build(dict(space=s,request=r)))
+        problem=read('tasks/phs2d_original_ten_v1_2.json')['task']['physical_problem']
+        native=PassiveModel(physics,problem);native.design_components=design['components']
+        result=validate_routes(native,[[0.]*native.model.nv])
+        self.assertEqual(result['status'],'illegal')
+        self.assertTrue(any(x['reason']=='cable_solid_intersection' for x in result['issues']))
+
 if __name__=='__main__':unittest.main()
