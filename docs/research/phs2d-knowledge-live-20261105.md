@@ -2,6 +2,16 @@
 
 Study `phs2d-knowledge-autonomy-20261105` 已真实启动，初始 resolved identity 为 `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
 
+## 最新监督窗口：第 109 次请求已结算，未接受 STOP
+
+window27 新增一次不同活跃集合的静力检查，累计仍无合格工作点。window28 读取当前结果索引后，Main 提交停止提案，但未提供结构化 `supporting_evidence`；原门禁返回 `INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: local_diagnostic`，没有接受 STOP、没有执行科学计算，也没有改变计数。该字段遗漏不是放宽证据门禁的理由。Study 仍为 `ready`，无 pending/unknown 或未消费响应，后续科研决定仍由 Main 作出。
+
+当前累计 **15 个合法候选记录、18 次数学评价**（13 次静力检查、5 次完整十工况尝试），Provider **109/120**。数学累计不限；实际加载 episode、科学积分、独立 Replay、SELECT 均为 0。没有因本窗口重复索引读取或被拒 STOP 增补额度。
+
+只读审计发现共享预算视图漏读本任务真实的 `structure_research.cost`，曾将 17/18 个结果显示为缺少成本。生产修复 `15614b1` 仅把已有成本路径纳入原投影，现正确区分有记录的 16 个结果与缺少完整成本的 2 个历史失败；不伪造缺失次数。定向离线回归通过（1.989 s），原 bind 与 SDK restore-only 通过、无新增请求、profile 和旧账目不变。
+
+精简状态报告也区分了数学 Worker 数值成本 **42.2783897 s** 与包括候选构造等工作在内的总 `numerical_s` **54.7247798 s**；后者此前误用了“数学数值成本”标签。当前报告改为直接汇总原 `analysis_costs`，历史记录不改写。
+
 ## 最新授权：数学评价与分析累计次数不限
 
 用户新明确要求“数学评价、数学分析等不设置上限”。已在第 16 次数学评价后的安全结算边界，通过原 `tools/research/budget.py` 中的精确授权 addendum 将本 Study 的累计 `mathematical_evaluations` 从 20 改为 `null`，复用现有 unlimited admission 语义。新 resolved identity、正式研究授权、committed bind 和 SDK restore-only 均已完成；原 16 次实际评价及其成本完整保留，profile v3、原任务、会话和验收不变。此后已实际执行第 17 次数学评价，证明原位接续没有重置计数。

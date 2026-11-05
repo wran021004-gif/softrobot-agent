@@ -1,6 +1,6 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T09:43:56.689867+00:00",
+  "checked_at": "2026-11-05T09:53:22.537395+00:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
   "resolved_identity": "f994e8c47531c590777429ac9108b30348a741731c6650644d8f5f0ee4cfcba1",
   "profile_identity": "e952d4bb2a456ef3ab6a9ce54b691a6f6efff6292be7aadf59a6dd919f74e80b",
@@ -37,11 +37,11 @@
   "applied_provider_extensions": 12,
   "formal_approval_events": 15,
   "scientific_cost": {
-    "provider_requests": 105,
+    "provider_requests": 109,
     "reporter_requests": 7,
-    "prompt_tokens": 6328457,
-    "completion_tokens": 46517,
-    "total_tokens": 6374974,
+    "prompt_tokens": 6705235,
+    "completion_tokens": 48456,
+    "total_tokens": 6753691,
     "mathematical_evaluations": 18,
     "backend_episodes": 50,
     "physics_steps": 0,
@@ -51,18 +51,19 @@
     "loaded_episodes_started": 0,
     "loaded_episodes_completed": 0,
     "static_failure_internal_cost_records_complete": false,
-    "charged_mathematical_numerical_s": 54.724779800046235,
+    "charged_mathematical_numerical_s": 42.27838969998993,
     "subsequent_cost_records_complete": true,
-    "baseline_first_12_costs_from_verified_pause_audit": true
+    "baseline_first_12_costs_from_verified_pause_audit": true,
+    "total_numerical_s_including_construction": 54.724779800046235
   },
   "candidates": 15,
   "physical_replays": 0,
   "source_cost_ledger": {
-    "tool_calls": 96,
-    "model_calls": 105,
+    "tool_calls": 100,
+    "model_calls": 109,
     "backend_solves": 50,
     "worker_calls": 0,
-    "wall_s": 1845.5123897002777
+    "wall_s": 1888.1373897002777
   },
   "tests": {
     "distinct_tests": 15,
@@ -284,7 +285,7 @@
     "regression_passed": true
   },
   "profile_version": 3,
-  "implementation_freeze": "6a11a0b121ba860af54714271508c8e32604a072",
+  "implementation_freeze": "15614b1cf6c7f3bed5d48f0a7a8af567506b2d30",
   "latest_interface_repair": {
     "kind": "generation_vs_mathematics_authorization_catalog",
     "scientific_scope_unchanged": true,
@@ -308,8 +309,8 @@
   },
   "remaining_resources": {
     "backend_solves": 30,
-    "model_calls": 15,
-    "tool_calls": 64,
+    "model_calls": 11,
+    "tool_calls": 60,
     "wall_s": null,
     "worker_calls": 0
   },
@@ -384,20 +385,20 @@
       "total_tokens": 3999517
     },
     "openai_api": {
-      "requests": 29,
+      "requests": 33,
       "settled_usage_missing": 1,
-      "responses_with_usage": 28,
-      "prompt_tokens": 2363780,
-      "completion_tokens": 11677,
-      "total_tokens": 2375457
+      "responses_with_usage": 32,
+      "prompt_tokens": 2740558,
+      "completion_tokens": 13616,
+      "total_tokens": 2754174
     }
   },
   "provider_purpose_counts": {
     "gateway_quota_probe": 1,
-    "conversation": 97,
+    "conversation": 101,
     "reporter": 7
   },
-  "responses_with_usage": 102,
+  "responses_with_usage": 106,
   "settled_responses_with_unknown_usage": 3,
   "outstanding_provider_requests": 0,
   "temporary_transport": {
@@ -447,5 +448,40 @@
     "timer_automation_id": "phs-2d-gateway",
     "execution_boundary": "settled",
     "bounded_shared_requests_per_window": 4
+  },
+  "last_stop_attempt": {
+    "request_number": 109,
+    "accepted": false,
+    "error": "INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: local_diagnostic",
+    "supporting_evidence_missing": true,
+    "science_started": false,
+    "counts_unchanged": true,
+    "scientific_stop": false
+  },
+  "passive_mechanism_cost_projection_repair": {
+    "source_commit": "15614b1",
+    "original_costs_preserved": true,
+    "profile_unchanged": true,
+    "targeted_regression_passed": true,
+    "test_wall_s": 1.989,
+    "current_native_budget_view": {
+      "per_request_control_limits": null,
+      "research_effort": "Mathematical search has no cumulative count quota. Main may deepen control optimization, change parameterization or choose another legal method; finite search failure is not structural infeasibility. Main chooses useful effort, not necessarily the maximum.",
+      "accounting_scope": "Current Study registered analysis_results only; imported historical results and proposed actions are excluded.",
+      "recorded_rollouts": 0,
+      "recorded_physics_steps": 0,
+      "latest_cost_query": {
+        "reference": {
+          "artifact_id": "c771232dfaa61df82a2c39e821478cc77e734323af7c5e389a76c5bf9f9e5ebd",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/structure_research/cost"
+      },
+      "attempts_without_cost_record": 2,
+      "cost_record_complete": false,
+      "integration_scope": "Recorded physics_steps already includes prefix reconstruction and suffix rollouts. Callback counts describe these rollouts, not additional integrations. Independent full replay is separate; zero independent physical evaluations does not imply zero native integration.",
+      "allowance_scope": "Recorded totals are known subtotals; incomplete records leave actual total unknown. Native analysis shares remaining_mathematical; per-request limits are not a separate cumulative allowance. Missing costs are unknown, not zero."
+    }
   }
 }
