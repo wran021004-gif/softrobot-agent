@@ -32,7 +32,10 @@
 | force phase | interval-start 力；逐步前向刷新，10 ms snapshot 重映射外力 | interval-start 力，逐步 post-step 还按更新几何重新映射外力 | 存在真实原生状态/约束求值相位差异 |
 | static balance | 拷贝原积分状态，qvel=0，再映射力并 forward | 使用 copied_integration_zero_velocity | 语义一致；cold 版本作为另一显式选项存在 |
 | 积分器/求解 | implicitfast、100 iterations、1e-10 tolerance、冻结 tendon solref/solimp | 使用相同实际选项 | 相同，实际原始记录保存 |
+| 地面位置 | 原实际 XML 为 z=0 m | 新 bridge 从通用 task scaffold 继承 z=-0.02 m；碰撞掩码相同 | 否；本次参考无接触不能证明全域等价 |
 | Windows 编译栈 | 被动历史模型专用 32 MiB 编译线程 | 通用 loader 使用 8 MiB 编译线程 | 工程实现不同；本次实际已编译 144 维模型，无原生崩溃 |
+
+实际 XML 核对还发现一个本次准备的来源差异：历史候选 configuration 的通用 task scaffold 地面为 -0.02 m，而历史 PHS runner 明确覆盖为 0 m。新 bridge 继承了前者。原生 XML SHA 分别为旧新鲜执行 75de64d1… 与统一名义 26de8786…，未宣称同一模型身份。该差异已记入本报告，必须在未来继任合同中明确修正到原 PHS 地面或作为单独科学版本批准，不能静默改动本次已运行 task/Store。原地面与新地面都不构成本次参考载荷的已观测接触，仍不能据此宣称全域等价。
 
 这些区别通过新 task_id/task_version、不可变 protocol_source 和独立 Study 身份公开冻结。旧任务、旧评价结果及旧账本均不变。配对数字接近也只证明本次有限结构/工况下的一致程度，不能证明两种协议在整个 FamilySpace 上等价。
 
