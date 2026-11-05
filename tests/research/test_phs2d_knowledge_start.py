@@ -49,6 +49,9 @@ class PhsKnowledgeStartTests(unittest.TestCase):
             catalog=resolve_evidence_intent(h,query)
             self.assertIn('segment',catalog['parameter_groups'])
             self.assertIn('segments.0.length_m',catalog['parameter_choices'])
+            overview=resolve_evidence_intent(h,dict(subject=ref,topic='structure_parameters',group='geometry',detail_level='targeted'))
+            self.assertGreater(len(overview['facts']),1)
+            self.assertNotIn('execution_semantics',overview['facts'][0])
             selected=resolve_evidence_intent(h,{**query,'selection':['segments.0.length_m']})
             row=selected['facts'][0]
             self.assertTrue(row['generation_available'])

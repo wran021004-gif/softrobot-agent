@@ -83,6 +83,12 @@ def resolve_evidence_intent(host, query):
         data=rows if q.detail_level!='summary' else [{k:r[k] for k in ('parameter_group','parameter_id',
             'physical_meaning','unit','current_value','domain','design_supported','generation_available','differentiation','authorization_reason',
             'execution_admission','effective','continuous','selectable','study_authorized')} for r in rows]
+        if not selected and q.detail_level!='evidence_review':
+            # Browsing needs values/domains and distinct generation/math grants,
+            # not repeated compiler prose that leaves just one row per page.
+            data=[{k:r[k] for k in ('parameter_group','parameter_id','physical_meaning','unit','current_value',
+                'domain','design_supported','generation_available','study_authorized','selectable',
+                'authorization_reason','effective','continuous')} for r in rows]
         source(subject,'/parameters');source(subject,'/configuration')
     elif q.topic=='task':
         if subject not in [*candidates,snapshot]:raise ValueError('FROZEN_TASK_OR_OWNED_CANDIDATE_REQUIRED')
@@ -198,7 +204,7 @@ def resolve_evidence_intent(host, query):
             generation_available='Generation is separately conditional on the frozen FamilySpace and original Plan admission. It does not require a mathematical differentiation grant.',
             study_authorized='Mathematical direction authorization only; false does not freeze the parameter for legal generation.',
             selectable='Mathematical method selection only; not a general design-generation prohibition.',
-            navigation='Choose a listed parameter group; selection accepts its exact parameter IDs. No parameter or scientific action is recommended.')
+            navigation='Browse compact rows using next_query; select exact parameter IDs with detail_level=targeted for full execution and differentiation detail. No parameter or scientific action is recommended.')
     if q.detail_level=='evidence_review':
         envelope['review_queries']=[dict(**location,view='full') for location in sources]
     items=list(data.items()) if isinstance(data,dict) else data
