@@ -1,8 +1,8 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T10:00:54.085594+00:00",
+  "checked_at": "2026-11-05T10:24:01.321367+00:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
-  "resolved_identity": "f994e8c47531c590777429ac9108b30348a741731c6650644d8f5f0ee4cfcba1",
+  "resolved_identity": "0b43157960a16068820d0680b2360bcdfce95c5f91426daffb73a650ca6907ec",
   "profile_identity": "e952d4bb2a456ef3ab6a9ce54b691a6f6efff6292be7aadf59a6dd919f74e80b",
   "knowledge_manifest_identity": "9cbaac4f2a5c419c5480bdc007b69c44392caca2c970bf2c7b3c1c8e6a848e75",
   "status": "SCIENTIFIC_STOP",
@@ -35,7 +35,7 @@
     "version": "finite_provider_request_extension_v1"
   },
   "applied_provider_extensions": 12,
-  "formal_approval_events": 15,
+  "formal_approval_events": 16,
   "scientific_cost": {
     "provider_requests": 111,
     "reporter_requests": 7,
@@ -285,7 +285,7 @@
     "regression_passed": true
   },
   "profile_version": 3,
-  "implementation_freeze": "15614b1cf6c7f3bed5d48f0a7a8af567506b2d30",
+  "implementation_freeze": "bf67b178c1438d2706a2e628b1c5131c334e1771",
   "latest_interface_repair": {
     "kind": "generation_vs_mathematics_authorization_catalog",
     "scientific_scope_unchanged": true,
@@ -365,12 +365,12 @@
   },
   "initial_authorization_scope_identity": "9b7b09ce994c99472647691a556bed7d89ae923c63ea64bd79bd61feaf7fea65",
   "current_authorization_reference": {
-    "artifact_id": "3e708867e6ccc550f6d2eca4a86537ff8b583c0ea3c0bddcc4a0ba41d73d872d",
+    "artifact_id": "d82eeb2e95a9d807b9260c76be1b4f1c9d1cc45b45de2e122272e00d99edc34d",
     "media_type": "application/json"
   },
   "current_provider": {
-    "adapter": "openai_api",
-    "base_url": "https://api.openai.com/v1",
+    "adapter": "chatgpt_gateway",
+    "base_url": "http://127.0.0.1:8787/v1",
     "model": "gpt-5.6-sol",
     "main_reasoning": "medium",
     "reporter_reasoning": "none"
@@ -410,10 +410,24 @@
       {
         "artifact_id": "b494355ac66795565a7efa39f3329555a8b889772caba8739663c87400059945",
         "media_type": "application/json"
+      },
+      {
+        "artifact_id": "7b43367aabfaf741354aecd051f6bf750450cc0a68ac4f174803ea65ed81b832",
+        "media_type": "application/json"
       }
     ],
     "original_sdk_session_preserved": true,
-    "original_scientific_profile_preserved": true
+    "original_scientific_profile_preserved": true,
+    "status": "completed_returned_to_gateway",
+    "actual_return_at_utc": "2026-11-05T10:23:22.614401+00:00",
+    "return_addendum": {
+      "artifact_id": "7b43367aabfaf741354aecd051f6bf750450cc0a68ac4f174803ea65ed81b832",
+      "media_type": "application/json"
+    },
+    "timer_automation_status": "deleted_after_completion",
+    "new_provider_requests": 0,
+    "prior_stop_preserved": true,
+    "quota_recovery_proved": false
   },
   "official_transport_repair": {
     "original_chat_request_number": 77,
@@ -447,9 +461,10 @@
     "automation_id": "phs-2d",
     "status": "deleted_after_accepted_main_stop",
     "timer_automation_id": "phs-2d-gateway",
-    "timer_status": "ACTIVE_configuration_return_only",
+    "timer_status": "deleted_after_configuration_return",
     "execution_boundary": "settled",
-    "new_requests_after_stop": false
+    "new_requests_after_stop": false,
+    "bounded_shared_requests_per_window": 4
   },
   "last_stop_attempt": {
     "request_number": 109,
@@ -501,5 +516,15 @@
     "mathematical_budget_exhausted": false,
     "goal_feasible_solution_achieved": false,
     "supervisor_forced_stop": false
+  },
+  "configuration_only_return_verification": {
+    "original_stop_unchanged": true,
+    "all_ledger_charges_unchanged": true,
+    "profile_unchanged": true,
+    "mathematical_quota_unmetered": true,
+    "mathematical_evaluations_unchanged": 18,
+    "identity_bound_authorization_valid": true,
+    "provider_requests_sent": 0,
+    "account_quota_tested": false
   }
 }
