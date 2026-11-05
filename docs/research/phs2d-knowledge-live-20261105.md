@@ -76,3 +76,11 @@ Provider 上限 64，累计 52 次；数学 8/20，episode 预留已扣 30/80，
 使用同一冻结 XML 和已保存 pre-call state 的最小工程复现，完整 forward 复现原 FatalError；位置/速度两阶段检查可返回，确认全零几何有 228 个 floor 接触和 912 约束行。只用于工程归因，不给科研接受性信用，不改变地面、约束、物理或求解器。该复现 1 个模型、1 个失败 forward、2 个组件调用、0 积分/优化，约 0.051 s；此前一次直接 Windows XML 编译退出 1，完成模型数未知，随后改用仓库已有编译线程 loader。这些工程费用另存原 Store，不能与 Main 的成功证据混淆。
 
 发现原 `analysis.recover` 会把 Worker 已保存的部分 `internal_calculations` 再覆盖为 unknown。最小修复改为仅在没有计数时提供 unknown fallback；保留失败状态、原预留扣账及未知内部进度。真实离线 Store 回归验证“已知部分计数保留”和“缺失计数仍 unknown”两分支（1 项，2.799 s），不重新执行 Worker。旧第 50 次结果和收据不改写，原 `/native_diagnostic/cost` 仍可精确读取；监督者仅链接纠正其呈现归因。科学 profile 保持 v3。
+
+## 第 56 次请求：区分设计生成与数学方向权限
+
+Main 读取三个参数页后将未获数学方向授权的参数理解为设计中不可修改，并提交了“等待初始化/结构变量授权”的诊断意图；没有接受 STOP。实际冻结 FamilySpace 与原生成合同仍允许这些字段的合法生成，数学方向授权则另有范围。公共目录虽然有 design_supported，却同时用 study_authorized/selectable 表示数学资格，且正常分页不提供全部参数组目录，造成设计可变性呈现歧义。
+
+最小修复补充 generation_available 的条件含义，明确 study_authorized/selectable 仅指数学方向；每页列出现有全部参数组，指定组可看到精确参数 ID，沿用原 selection 过滤和原 provenance。没有指定参数方向、科学动作或最终结构，没有扩张域或数学授权。定向合法生成/原数学拒绝回归通过（2.973 s）。语义证据模块 16 项已验证：首次 15 项通过、1 项被未提交工作树 bind 门正确拦截；提交源码后仅重跑此项通过（45.433 s），失败日志保留，没有绕过门禁。绑定后 profile 仍为 v3。
+
+第六批 +8 原子增补后 Provider 上限 72，当前 identity `2ccd50ed9a479c194540114298bab7ddb2c895017dbdd128b42a5432a2d35c26`。Main 收到的是通用权限/导航纠正与新预算事实，无科学行动指令。原数学 20、episode 80、公共操作 160 和收尾 4 次不变，仍从原 Store 接续。
