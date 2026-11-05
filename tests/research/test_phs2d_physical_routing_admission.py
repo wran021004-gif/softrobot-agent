@@ -36,5 +36,16 @@ class PhysicalRoutingAdmissionTests(unittest.TestCase):
  def test_hole_outside_plate_rejected(self):
   with self.assertRaises(ValueError):
    self.build(lambda r:r['guide_hole_positions_m']['guide_1'].update(tendon_0_hole=[0.,1.,1.]))
+ def payload_request(self,r,offset):
+  r['guide_hole_positions_m']={}
+  def point(part,pos,role):return dict(attachment=dict(part=part,s=0.,position_m=pos),role=role)
+  r['route_overrides']={0:[point('fixed_base',[0.,.018,0.],'start'),point('payload',offset,'anchor')]}
+ def test_payload_anchor_inside_real_envelope(self):
+  design,mesh,physics=self.build(lambda r:self.payload_request(r,[0.,.007,.006]))
+  self.assertEqual(design['tendons'][0]['points'][-1]['attachment']['part'],'payload')
+  self.assertFalse(design['actuators'])
+ def test_payload_anchor_outside_real_envelope_rejected(self):
+  with self.assertRaisesRegex(ValueError,'INSIDE_REAL_ENVELOPE'):
+   self.build(lambda r:self.payload_request(r,[0.,.02,.006]))
 if __name__=='__main__':unittest.main()
 
