@@ -174,6 +174,62 @@ def pending(host):
     with host.store.connect(True) as db:
         return [dict(r) for r in db.execute("SELECT * FROM calls WHERE run_id=? AND caller=? AND status IN ('running','unknown')",(host.run_id,CALLER))]
 
+def transition_transport(host, approval):
+    """Explicit local Gateway/API addendum; never a Main tool or a new send.
+
+    Only transport and its credential reference may change. The original SDK
+    session, scientific profile, limits, costs and immutable receipts survive.
+    A committed bind and identity-bound research grant remain mandatory.
+    """
+    from tools.platform_tasks import compile_input
+    identity=digest(approval)
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state'];spec=current['spec']
+        for ref in current.get('provider_transport_transitions',[]):
+            if host.store.artifact(ref,db=db)['approval_identity']==identity:
+                return dict(already_applied=True,reference=ref)
+        scope=approval.get('scope',{});old=spec['runtime']['provider']
+        if (approval.get('version')!='provider_transport_approval_v1' or approval.get('approved') is not True
+                or not approval.get('source') or approval.get('scope_identity')!=digest(scope)
+                or set(scope)!={'study_id','resolved_identity','previous_provider_identity','provider','credentials_reference'}
+                or scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity']
+                or scope['previous_provider_identity']!=digest(old)):
+            raise ValueError('EXACT_USER_APPROVED_PROVIDER_TRANSPORT_REQUIRED')
+        target=scope['provider'];transport_keys={'adapter','adapter_version','base_url','proxy_url','model_capabilities'}
+        endpoints={'openai_api':'https://api.openai.com/v1','chatgpt_gateway':'http://127.0.0.1:8787/v1'}
+        if ({old['adapter'],target.get('adapter')}!=set(endpoints)
+                or any(p['base_url'].rstrip('/')!=endpoints[p['adapter']] for p in (old,target))
+                or {k:v for k,v in old.items() if k not in transport_keys}!=
+                   {k:v for k,v in target.items() if k not in transport_keys}
+                or not isinstance(scope['credentials_reference'],str) or not scope['credentials_reference']):
+            raise ValueError('TRANSPORT_ONLY_SAME_MODEL_AND_RESEARCH_SETTINGS_REQUIRED')
+        validate_provider(target)
+        if old!=current['pilot']['provider'] or old!=spec['configuration']['policy']['model']:
+            raise ValueError('ORIGINAL_PROVIDER_BINDING_MISMATCH')
+        if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
+                or any(v.get('active_reservation') or v.get('status',{}).get('worker_alive',True)
+                       for v in current.get('rl_runs',{}).values())
+                or db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
+            raise ValueError('SETTLED_PROVIDER_AND_SCIENCE_BOUNDARY_REQUIRED')
+        cfg=deepcopy(host.store.session(host.run_id,db)['snapshot']['input'])
+        cfg['policy']['model']=deepcopy(target);compile_input(cfg,host.reg)
+        ref=plain(host.store.put(db,dict(version='provider_transport_transition_v1',approval=approval,
+            approval_identity=identity,previous_state=plain(host.store.put(db,current)),
+            scientific_limits_unchanged=True,all_costs_and_failures_retained=True)))
+        updated=deepcopy(spec);updated.pop('resolved_identity')
+        updated['runtime'].update(provider=deepcopy(target),credentials_reference=scope['credentials_reference'])
+        updated['configuration']['policy']['model']=deepcopy(target)
+        updated.setdefault('authorization_addenda',[]).append(ref)
+        updated['resolved_identity']=digest(updated)
+        current['pilot']['provider']=deepcopy(target)
+        current.update(spec=updated,validation_extension_pending_binding=True)
+        current.setdefault('provider_transport_transitions',[]).append(ref)
+        host.store.update_state(db,host.run_id,current)
+        host.store.event(db,host.run_id,'provider_transport_transition','authorized',outputs=[ref])
+    return dict(already_applied=False,reference=ref,resolved_identity=updated['resolved_identity'],
+        requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
+
+
 def received(host,request_id):
     return next((host.store.artifact(e['outputs'][0]) for e in reversed(host.store.events(host.run_id))
         if e['kind']=='r3_response' and e['request_id']==request_id),None)
