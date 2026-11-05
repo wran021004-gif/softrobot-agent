@@ -1,0 +1,101 @@
+{
+  "version": "phs2d_knowledge_start_status_v1",
+  "checked_at": "2026-11-05T11:30:34.859285+08:00",
+  "study_id": "phs2d-knowledge-autonomy-20261105",
+  "resolved_identity": "31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7",
+  "profile_identity": "69db05e7b850caed1dc2a8727a496d115dee6fc1891401f67ae866f09cb380ea",
+  "knowledge_manifest_identity": "9cbaac4f2a5c419c5480bdc007b69c44392caca2c970bf2c7b3c1c8e6a848e75",
+  "status": "SUPERVISOR_PAUSED_BEFORE_FIRST_SEND",
+  "scientific_stop": false,
+  "blockers": [
+    "INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE",
+    "NONRETRYABLE_SHARING_LIMIT_RECOVERY_NOT_CONFIRMED"
+  ],
+  "knowledge_retrieval_isolation": "passed_offline_sdk_mock_only",
+  "knowledge_adoption": "not_measured",
+  "L1": "not_measured_live",
+  "L2": "not_measured_live",
+  "L3": "not_measured_live",
+  "L4": "not_measured_live",
+  "budgets": {
+    "provider_requests": 24,
+    "protected_provider_requests": 4,
+    "mathematical_evaluations": 20,
+    "physical_launches": 80,
+    "public_operations": 160,
+    "protected_public_operations": 8
+  },
+  "proposed_provider_extensions": {
+    "maximum_additional_requests": 104,
+    "maximum_requests_per_extension": 8,
+    "version": "finite_provider_request_extension_v1"
+  },
+  "applied_provider_extensions": 0,
+  "formal_approval_events": 0,
+  "scientific_cost": {
+    "provider_requests": 0,
+    "reporter_requests": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "mathematical_evaluations": 0,
+    "backend_episodes": 0,
+    "physics_steps": 0,
+    "native_model_builds": 0,
+    "scientific_worker_wall_s": 0
+  },
+  "candidates": 0,
+  "physical_replays": 0,
+  "source_cost_ledger": {
+    "tool_calls": 0,
+    "model_calls": 0,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 0.0
+  },
+  "tests": {
+    "distinct_tests": 15,
+    "passed": 15,
+    "failed": 0,
+    "elapsed_s": 56.666,
+    "provider_transport": "httpx.MockTransport only",
+    "scientific_result": false,
+    "earlier_failures_retained_in_private_logs": true
+  },
+  "gateway_non_inference_checks": {
+    "health_http_status": 200,
+    "connected": true,
+    "plan_usage": true,
+    "models_http_status": 200,
+    "exact_model_present": true,
+    "quota_recovery_proved": false,
+    "usage_ui": "read timed out",
+    "inference_requests": 0
+  },
+  "old_prepared_store": {
+    "files": 4,
+    "all_bytes_unchanged": true,
+    "manifest_identity": "c774ac760a9bb882ea2a4b69f4e02d068a9fba4c2928b6c5b24637e44093df3c"
+  },
+  "historical_tests": "Prior 71 distinct directed tests checked from existing records; not rerun",
+  "historical_full_ten": {
+    "acceptance": "accepted",
+    "fresh_certificate_complete": true,
+    "current_study_credit": false,
+    "physics_steps": 352000,
+    "loading_episodes": 10,
+    "shared_unloaded_preparations": 1,
+    "model_builds": 1,
+    "worker_wall_s": 887.847
+  },
+  "environment": {
+    "status": "ready",
+    "thread_variables": "MKL_NUM_THREADS=OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=1",
+    "new_dependencies_installed": false
+  },
+  "authorization_request": "docs/research/phs2d-knowledge-authorization-request-20261105.json",
+  "initial_launch_after_gates": {
+    "command": "python -m tools.research run --run-id phs2d-knowledge-autonomy-20261105 --no-session-handoff --max-new-provider-requests 4 --pause-after-completed-invocations 1",
+    "scope": "Use original research interpreter with frozen thread variables after exact grant and independent quota recovery; no send performed. Automatic handoff admission flags have not been forged."
+  }
+}
