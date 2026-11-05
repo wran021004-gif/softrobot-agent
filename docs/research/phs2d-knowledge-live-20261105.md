@@ -2,7 +2,17 @@
 
 Study `phs2d-knowledge-autonomy-20261105` 已真实启动，初始 resolved identity 为 `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
 
-## 最新监督窗口：第 109 次请求已结算，未接受 STOP
+## 最新状态：Main 正式停止，无可行解、无 SELECT
+
+第 **111** 次共享 Provider 请求中，Main 改正引用字段，提交了全部 **18** 个当前 Study 结果引用；原门禁接受了 `empirical_search` 范围的无选择 STOP。第 109、110 次被拒提案与费用完整保留，没有放宽或绕过证据门禁。原状态现为 `stopped`，最终 disposition 为 `4810ad750142ee3477cf73cbe1d671546ec85d63739a09b295a3c45fc2b4d1b8`，`selected=null`。无 pending/unknown、无未消费响应。
+
+最终 **15 个合法候选记录、14 个不同物理设计、18 次数学评价**（13 次静力检查、5 次完整十工况尝试）。实际加载 episode=0、科学积分步=0、独立 Replay=0；不存在合格工作点或完整任务通过证书。Main 根据已观察到的反复资格失败和分支切换，判断进一步当前局部调整的信息价值较低而停止；这是有范围的研究决策，不证明整个设计族不可行，也不表示用户“找到可行解”的目标已达成。
+
+STOP 并非预算耗尽触发：Provider **111/120**，原预授权政策最高 128；数学评价累计仍为 **不限**，episode 预留 **50/80**，公共操作 **102/160**。所有失败、授权增补和成本保留。108 个响应有 usage，已知 subtotal prompt=6,897,039、completion=50,911、total=6,947,950 tokens；3 次错误未返回 usage，不能视为零。货币费用未知。数学 Worker 累计 42.2783897 s，包括候选构造等工作的总 numerical_s=54.7247798 s。
+
+持续科研监督心跳 `phs-2d` 已在正式 STOP 后删除。**18:22:53 Asia/Shanghai 后切回 Gateway 的独立定时任务仍有效**，但它只恢复配置、保留封存状态和数学不限授权，不重启研究、不再发送 Provider 请求。当前完整状态见 [状态 JSON](phs2d-knowledge-status-20261105.json)。
+
+## 此前监督窗口：第 109 次请求已结算，未接受 STOP
 
 window27 新增一次不同活跃集合的静力检查，累计仍无合格工作点。window28 读取当前结果索引后，Main 提交停止提案，但未提供结构化 `supporting_evidence`；原门禁返回 `INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: local_diagnostic`，没有接受 STOP、没有执行科学计算，也没有改变计数。该字段遗漏不是放宽证据门禁的理由。Study 仍为 `ready`，无 pending/unknown 或未消费响应，后续科研决定仍由 Main 作出。
 

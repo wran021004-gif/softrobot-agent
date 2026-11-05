@@ -1,12 +1,12 @@
 {
   "version": "phs2d_knowledge_start_status_v1",
-  "checked_at": "2026-11-05T09:53:22.537395+00:00",
+  "checked_at": "2026-11-05T10:00:54.085594+00:00",
   "study_id": "phs2d-knowledge-autonomy-20261105",
   "resolved_identity": "f994e8c47531c590777429ac9108b30348a741731c6650644d8f5f0ee4cfcba1",
   "profile_identity": "e952d4bb2a456ef3ab6a9ce54b691a6f6efff6292be7aadf59a6dd919f74e80b",
   "knowledge_manifest_identity": "9cbaac4f2a5c419c5480bdc007b69c44392caca2c970bf2c7b3c1c8e6a848e75",
-  "status": "RUNNING_OFFICIAL_API",
-  "scientific_stop": false,
+  "status": "SCIENTIFIC_STOP",
+  "scientific_stop": true,
   "blockers": [],
   "knowledge_retrieval_isolation": "passed_offline_sdk_mock_only",
   "knowledge_adoption": "one compact Skill summary delivered; zero full reads; Main explicitly declined to claim adoption",
@@ -37,11 +37,11 @@
   "applied_provider_extensions": 12,
   "formal_approval_events": 15,
   "scientific_cost": {
-    "provider_requests": 109,
+    "provider_requests": 111,
     "reporter_requests": 7,
-    "prompt_tokens": 6705235,
-    "completion_tokens": 48456,
-    "total_tokens": 6753691,
+    "prompt_tokens": 6897039,
+    "completion_tokens": 50911,
+    "total_tokens": 6947950,
     "mathematical_evaluations": 18,
     "backend_episodes": 50,
     "physics_steps": 0,
@@ -59,11 +59,11 @@
   "candidates": 15,
   "physical_replays": 0,
   "source_cost_ledger": {
-    "tool_calls": 100,
-    "model_calls": 109,
+    "tool_calls": 102,
+    "model_calls": 111,
     "backend_solves": 50,
     "worker_calls": 0,
-    "wall_s": 1888.1373897002777
+    "wall_s": 1919.9963897003327
   },
   "tests": {
     "distinct_tests": 15,
@@ -309,8 +309,8 @@
   },
   "remaining_resources": {
     "backend_solves": 30,
-    "model_calls": 11,
-    "tool_calls": 60,
+    "model_calls": 9,
+    "tool_calls": 58,
     "wall_s": null,
     "worker_calls": 0
   },
@@ -385,20 +385,20 @@
       "total_tokens": 3999517
     },
     "openai_api": {
-      "requests": 33,
+      "requests": 35,
       "settled_usage_missing": 1,
-      "responses_with_usage": 32,
-      "prompt_tokens": 2740558,
-      "completion_tokens": 13616,
-      "total_tokens": 2754174
+      "responses_with_usage": 34,
+      "prompt_tokens": 2932362,
+      "completion_tokens": 16071,
+      "total_tokens": 2948433
     }
   },
   "provider_purpose_counts": {
     "gateway_quota_probe": 1,
-    "conversation": 101,
+    "conversation": 103,
     "reporter": 7
   },
-  "responses_with_usage": 106,
+  "responses_with_usage": 108,
   "settled_responses_with_unknown_usage": 3,
   "outstanding_provider_requests": 0,
   "temporary_transport": {
@@ -445,9 +445,11 @@
   },
   "supervision": {
     "automation_id": "phs-2d",
+    "status": "deleted_after_accepted_main_stop",
     "timer_automation_id": "phs-2d-gateway",
+    "timer_status": "ACTIVE_configuration_return_only",
     "execution_boundary": "settled",
-    "bounded_shared_requests_per_window": 4
+    "new_requests_after_stop": false
   },
   "last_stop_attempt": {
     "request_number": 109,
@@ -483,5 +485,21 @@
       "integration_scope": "Recorded physics_steps already includes prefix reconstruction and suffix rollouts. Callback counts describe these rollouts, not additional integrations. Independent full replay is separate; zero independent physical evaluations does not imply zero native integration.",
       "allowance_scope": "Recorded totals are known subtotals; incomplete records leave actual total unknown. Native analysis shares remaining_mathematical; per-request limits are not a separate cumulative allowance. Missing costs are unknown, not zero."
     }
+  },
+  "final_disposition": {
+    "artifact_id": "4810ad750142ee3477cf73cbe1d671546ec85d63739a09b295a3c45fc2b4d1b8",
+    "media_type": "application/json"
+  },
+  "distinct_physical_designs": 14,
+  "accepted_main_stop": {
+    "request_number": 111,
+    "selected": null,
+    "claimed_inference": "empirical_search",
+    "supporting_evidence_count": 18,
+    "global_infeasibility_established": false,
+    "provider_budget_exhausted": false,
+    "mathematical_budget_exhausted": false,
+    "goal_feasible_solution_achieved": false,
+    "supervisor_forced_stop": false
   }
 }
