@@ -33,6 +33,25 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_citation_error_feedback_resolves_advertised_alias_without_masking_gate(self):
+        from tools.research.state import save
+        from tools.research.agent import error_feedback
+        with fixture() as h:
+            ref=save(h,dict(fixture='Offline source only; no scientific computation'))
+            update(h,analysis_results=[ref])
+            before=deepcopy(state(h));ledger=h.store.remaining()
+            use=dict(name='research_plan',toolUseId='offline-citation-failure',input=dict(
+                action='stop',supporting_evidence=['result_1'],decision=dict(claimed_inference='local_diagnostic')))
+            original=deepcopy(use)
+            value=error_feedback(h,use,ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH'),before)
+            self.assertEqual(value['error_code'],'EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+            self.assertEqual(value['citation_errors'][0]['reference'],ref)
+            self.assertFalse(value['worker_started'])
+            self.assertEqual(use,original)
+            self.assertEqual(h.store.remaining(),ledger)
+            self.assertEqual(state(h)['research_status'],'ready')
+            self.assertIsNone(state(h)['selected'])
+
     def test_rejected_payout_delivers_exact_frozen_domain_without_repair(self):
         from tools.research.design import generate_candidate
         from extensions.tendon_family.family_space import Domain

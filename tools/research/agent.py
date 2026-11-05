@@ -738,9 +738,12 @@ def error_feedback(host, use, exc, before):
     citation={}
     if code=='UNREGISTERED_RESEARCH_EVIDENCE' or code.startswith(('INFERENCE_NOT_SUPPORTED','EVIDENCE_TASK_IDENTITY','EVIDENCE_DESIGN_IDENTITY','EVIDENCE_MODEL_SCOPE')):
         from tools.research.evidence_policy import registered_references,citation_inventory,citation_role
+        from tools.research.object_choices import reference_choices
         from schemas.platform import EvidenceRef
         known=registered_references(host)
-        cited=[plain(EvidenceRef.model_validate(r)) for r in use['input'].get('supporting_evidence',[])]
+        choices=reference_choices(host,include_all=True)
+        cited=[plain(EvidenceRef.model_validate(choices.get(r,r) if isinstance(r,str) else r))
+            for r in use['input'].get('supporting_evidence',[])]
         refs=[r for r in cited if r not in known or code!='UNREGISTERED_RESEARCH_EVIDENCE']
         anchor=next(iter(known),s.get('family_space_reference'))
         inference=(use['input'].get('decision') or {}).get('claimed_inference','empirical_search')
