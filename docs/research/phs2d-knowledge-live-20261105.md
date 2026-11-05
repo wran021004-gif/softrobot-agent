@@ -1,4 +1,4 @@
-# PHS-2D Knowledge 自主研究：真实启动与前两窗口
+# PHS-2D Knowledge 自主研究：真实启动与持续监督
 
 Study `phs2d-knowledge-autonomy-20261105` 已真实启动，沿用 resolved identity `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
 
@@ -46,3 +46,13 @@ Study `phs2d-knowledge-autonomy-20261105` 已真实启动，沿用 resolved iden
 截至前两窗口：Provider 9/24，其中 quota probe=1、Main=7、Reporter=1；公共操作 7/160，数学 1/20，共享 backend episode 0/80。9 条响应均有 usage，累计 prompt=235,622、completion=3,195、total=238,817 tokens。货币费用未测量；所有失败、检查和原始费用均保留。原保护收尾 4 次仍保留，没有增补、无计数重置。
 
 L1 已观察到自主合法结构生成及假设；L2 已发生真实机制分析，但工作点不合格，对科学判断能力的评价还需后续行为。L3 数学指导的新结构修改尚未观察到，L4 完整十工况通过尚未建立。当前没有 SELECT，也没有 Main STOP。监督者没有向 Main 提供历史获胜结构、参数方向或指定下一项科学动作。
+
+## 后续窗口、接口修复与首批增补
+
+Main 两次提交超出冻结 payout 范围的生成请求，均原样拒绝，没有产生候选或扣数学成本。真实接口缺少精确 domain 诊断，已补充字段名、原请求值及冻结上下界；没有改变范围或自动修复设计。定向边界回归通过，提交后原 bind 迁移。因 source-hash 保守规则，profile 进入 v2；旧结果保留原 profile，不迁移接受性。
+
+Main 随后自主生成第二个合法短跨距候选并执行自己的无载静力 active-set 检查：LICQ=true、active=1、boundary=1、positive=0、slack=3；optimizer_success=false、qualified=false。primal violation=0.0006085993 m，stationarity=0.4689319942 N·m，最小约化刚度=0.1834846881 N·m/rad，张力=0。因未收敛且不严格互补，不能作为可信局部梯度或任务可行证据。第二次成本：1 个模型、1 次平衡、144 Hessian 列、1314 native forwards、0 积分步。两次检查 profile 不同，不能从数值下降声称受控因果改善。
+
+第 20 次共享调用尝试 STOP，Main 明确承认仍有未测合法机会，仅因临近收尾预算选择结束。原科学门拒绝 EVIDENCE_DESIGN_IDENTITY_MISMATCH：为单一设计引用了另一个设计结果。反馈格式器又把短别名错误当成 EvidenceRef，使原始拒绝原因被掩盖；现已仅在错误呈现处解析公开别名，保留原门与拒绝，测试通过。没有接受 STOP，也没有 SELECT。最新 Knowledge 定向模块 9 项通过（55.426 s，Mock Provider），不代表科学验收。
+
+用户明确授权持续监督、必要时增补、修复接口并继续直到找到可行解。首批 +8 已经原 Store 原子事务完成，Provider 24→32；新 resolved identity 为 `3d022f81a28dd10e6e525a75772f3441171cd0f476b8fba371ea1756575d7283`。授权记录区分用户原话与监督者推导的精确身份。原数学 20、episode 80、公共操作 160、收尾保留 4 次不变，20 次历史调用和全部失败保留。当前恢复原 Gateway/SDK 后续窗口；以状态 JSON 与原账本为最新值。
