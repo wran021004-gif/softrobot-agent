@@ -347,6 +347,9 @@ def retrieve(host,query,*,reader='agent'):
 
 
 def disposition_bindings(host,dispositions):
+    if not dispositions:return []
+    from tools.research.object_choices import reference_choices
+    aliases={ref['artifact_id']:name for name,ref in reference_choices(host,include_all=True).items()}
     reads={}
     for ref in state(host)['retrievals']:
         receipt=host.store.artifact(ref)
@@ -356,11 +359,13 @@ def disposition_bindings(host,dispositions):
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
             content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding
+        if ref['artifact_id'] in aliases:reads[aliases[ref['artifact_id']]]=binding
     if state(host)['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
         for delivery in hint_progress(host):
             for key in delivery.get('summary_keys',[]):
                 reads[key]=dict(summary_delivery=delivery['request'],entry_key=key,
                     source_kind='expert_process_summary' if key.startswith('process:') else 'skill_summary',full_read=False)
+                if key.startswith('process:'):reads['summary:'+key.removeprefix('process:')]=reads[key]
     if set(dispositions)-set(reads):raise ValueError('DISPOSITION_REQUIRES_EXACT_ACTUAL_READ; SEARCH_OR_STARTUP_TEXT_IS_INSUFFICIENT')
     return [dict(**reads[key],disposition=value) for key,value in dispositions.items()]
 

@@ -35,6 +35,14 @@ class PhsSuccessorTests(unittest.TestCase):
             progress=experience.hint_progress(h)
             self.assertEqual(sum(r['evidence_role']=='confirmed_expert_process_delivery_only' for r in progress),1)
             self.assertTrue(experience.read_progress(h)['reads'][0]['body_delivered'])
+            from tools.research.object_choices import main_projection
+            receipt=experience.read_progress(h)['reads'][0]['read_receipt']
+            binding=experience.disposition_bindings(h,{main_projection(h,receipt):'context_only'})[0]
+            self.assertEqual(binding['read_receipt'],receipt)
+            summary=experience.disposition_bindings(h,{'summary:phs2d-research-process@1':'context_only'})[0]
+            self.assertFalse(summary['full_read'])
+            with self.assertRaisesRegex(ValueError,'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ'):
+                experience.disposition_bindings(h,{main_projection(h,state(h)['family_space_reference']):'adopted'})
             body=experience.retrieve(h,query)['results'][0]['content']
             self.assertEqual(len(body['trace']),7)
             for key in ('sources','final_result','parameters','payout_lengths_m','label'):
