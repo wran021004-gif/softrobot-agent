@@ -19,7 +19,7 @@ class GatewayProviderLossTests(unittest.TestCase):
     def test_projected_gateway_long_path_loss_preserves_original_sdk_and_charge(self):
         with fixture() as h:
             approve(h,[REGISTERED_MATHEMATICS_SCOPE])
-            s=state(h);pilot=deepcopy(s['pilot']);pilot['framework_session_id']='gateway-loss-'+('x'*65)
+            s=state(h);pilot=deepcopy(s['pilot']);pilot['framework_session_id']='gateway-loss-'+('x'*97)
             update(h,pilot=pilot,core_hashes=core_hashes())
             ref=s['public_prior_manifest']
             use=dict(toolUseId='gateway-fixture-read',name='evidence_read',input=dict(reference=ref,view='summary'))
