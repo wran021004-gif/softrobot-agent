@@ -85,16 +85,28 @@ class ProviderTransportTests(unittest.TestCase):
         seen=[]
         def reply(request):
             wire=json.loads(request.content);seen.append((str(request.url),wire))
-            self.assertEqual(wire['model'],'gpt-5.6-sol');self.assertEqual(wire['reasoning_effort'],'medium')
+            self.assertEqual(wire['model'],'gpt-5.6-sol')
             if len(seen)==1:
+                self.assertEqual(wire['reasoning_effort'],'medium')
                 message=dict(role='assistant',content=None,tool_calls=[dict(id='transport-route',type='function',function=dict(name='research_route',arguments='{"tool":"evidence_read"}'))])
                 reason='tool_calls'
             else:
-                self.assertEqual(str(request.url),'https://api.openai.com/v1/chat/completions')
+                self.assertEqual(str(request.url),'https://api.openai.com/v1/responses')
                 self.assertEqual(request.headers['authorization'],'Bearer official-fixture')
-                self.assertFalse(any('provider_output' in m for m in wire['messages']))
-                self.assertTrue(any(m.get('tool_call_id')=='transport-route' for m in wire['messages']))
-                self.assertFalse(wire['store']);message=dict(role='assistant',content='Synthetic feedback consumed.');reason='stop'
+                self.assertEqual(wire['reasoning'],dict(effort='medium'))
+                self.assertFalse(any('provider_output' in m for m in wire['input']))
+                self.assertTrue(any(m.get('type')=='function_call_output' and m.get('call_id')=='transport-route' for m in wire['input']))
+                self.assertFalse(wire['store'])
+                self.assertTrue(all(t['strict'] is False for t in wire['tools']))
+                if len(seen)==2:
+                    output=[dict(type='reasoning',id='rs_fixture',summary=[],encrypted_content='opaque-fixture'),
+                        dict(type='function_call',id='fc_fixture',call_id='official-route',name='research_route',arguments='{"tool":"evidence_read"}')]
+                else:
+                    self.assertIn(dict(type='reasoning',id='rs_fixture',summary=[],encrypted_content='opaque-fixture'),wire['input'])
+                    self.assertTrue(any(m.get('type')=='function_call_output' and m.get('call_id')=='official-route' for m in wire['input']))
+                    output=[dict(type='message',role='assistant',content=[dict(type='output_text',text='Synthetic feedback consumed.')])]
+                return httpx.Response(200,json=dict(id='resp-fixture-'+str(len(seen)),model=wire['model'],status='completed',output=output,
+                    usage=dict(input_tokens=10,output_tokens=4,total_tokens=14,output_tokens_details=dict(reasoning_tokens=2))))
             return httpx.Response(200,json=dict(id='fixture-'+str(len(seen)),object='chat.completion',created=1,model=wire['model'],
                 usage=dict(prompt_tokens=10,completion_tokens=4,total_tokens=14),choices=[dict(index=0,finish_reason=reason,message=message)]))
         with patch.dict(os.environ,state(h)['spec']['runtime']['threads']),patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(reply)):
@@ -104,10 +116,16 @@ class ProviderTransportTests(unittest.TestCase):
             asyncio.run(converse(h,session_handoff=False,restore_only=True))
             self.assertEqual(h.store.remaining()['used'],ledger['used'])
             self.assertEqual(state(h)['pilot']['framework_session_id'],session)
-            asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=1,pause_after_completed_invocations=1))
-        self.assertEqual(len(seen),2)
-        self.assertEqual(h.store.remaining()['used']['model_calls'],2)
+            asyncio.run(converse(h,session_handoff=False,max_new_provider_requests=2,pause_after_completed_invocations=1))
+        self.assertEqual(len(seen),3)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],3)
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        receptions=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='r3_response' and e['status']=='metadata_saved']
+        self.assertEqual(receptions[-1]['usage']['total_tokens'],14)
+        self.assertEqual(receptions[-1]['reasoning_tokens'],2)
+        self.assertTrue(receptions[-1]['body_is_derived_chat_view'])
+        upstream=json.loads(h.store.artifact(receptions[-1]['upstream_body'],raw=True))
+        self.assertEqual(upstream['status'],'completed')
 
 
 if __name__=='__main__':unittest.main()

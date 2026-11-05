@@ -436,8 +436,14 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             return httpx.Response(reception['http_status'],content=store.artifact(reception['body'],raw=True),request=request)
         if pending(host):
             raise ValueError('R3_UNCONFIRMED_ATTEMPT_BLOCKS_SEND')
+        upstream=request;responses=expected['adapter']=='openai_api' and expected.get('reasoning')=='medium' and bool(wire.get('tools'))
+        if responses:
+            from tools.research.openai_responses import request_wire
+            upstream=httpx.Request('POST',expected['base_url'].rstrip('/')+'/responses',
+                headers={k:v for k,v in request.headers.items() if k.lower() not in ('content-length','content-type')},
+                json=request_wire(host,wire),extensions=request.extensions)
         from tools.research.provider_context import capacity_estimate
-        capacity=capacity_estimate(request.content,expected)
+        capacity=capacity_estimate(upstream.content,expected)
         def guard(db):
             if self.max_model_calls is not None and store.remaining(db=db)['used']['model_calls']>=self.max_model_calls:
                 raise SupervisorReviewPause('SUPERVISOR_PROVIDER_REQUEST_LIMIT')
@@ -447,6 +453,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             self.request_phase=provider_allowance(host,db)['request_phase']
         with store.transaction() as db:
             raw_request=store.put(db,wire)
+            upstream_ref=store.put(db,json.loads(upstream.content)) if responses else None
         key='r3-request-'+uuid4().hex
         try:
             row,_=store.reserve(run,key,digest(wire),CALLER,{**zero(),'model_calls':1,'wall_s':0.},
@@ -463,11 +470,12 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 input_bytes=len(request.content),
                 context_capacity=capacity,
                 **(dict(request_phase=self.request_phase) if self.request_phase is not None else {}),
-                endpoint=str(request.url),timeout_s=request.extensions.get('timeout'),client_retries=0,transport_retries=0))
+                endpoint=str(upstream.url),timeout_s=request.extensions.get('timeout'),client_retries=0,transport_retries=0,
+                **(dict(protocol='openai_responses_v1',upstream_request=plain(upstream_ref),sdk_endpoint=str(request.url),upstream_input_bytes=len(upstream.content)) if responses else {})))
             store.event(db,run,'r3_request','sent',request=key,execution=row['execution_id'],outputs=[metadata])
         started=time.monotonic()
         try:
-            response=await self.inner.handle_async_request(request)
+            response=await self.inner.handle_async_request(upstream)
             body=await response.aread()
             # The first commit contains original bytes, even if metadata decoding fails.
             with store.transaction() as db:
@@ -481,6 +489,14 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                     state['pilot']['unconsumed_response']=key
                 store.update_state(db,run,state)
                 store.event(db,run,'r3_response','received',request=key,execution=row['execution_id'],outputs=[ref])
+            if responses and 200<=response.status_code<300:
+                from tools.research.openai_responses import chat_view
+                original_body=raw_body
+                body=chat_view(body)
+                with store.transaction() as db:
+                    converted=store.put(db,body,media='application/octet-stream')
+                    reception.update(body=plain(converted),upstream_body=plain(original_body),
+                        protocol='openai_responses_v1',body_is_derived_chat_view=True)
             try:
                 parsed=json.loads(body)
                 usage=parsed.get('usage')
