@@ -60,6 +60,24 @@ def dynamic_cost(configuration, evaluations, paired=False):
         physics_steps=arms*evaluations*round(duration/task['timing']['timestep_s']))
 
 
+def initial_geometry(native, initial=None):
+    """Position-only facts at the first start; no equilibrium or integration."""
+    import mujoco
+    data=mujoco.MjData(native.model)
+    data.qpos[:]=np.zeros(native.model.nv) if initial is None else initial
+    native.cost['native_position_attempts']=native.cost.get('native_position_attempts',0)+1
+    try:mujoco.mj_fwdPosition(native.model,data)
+    except Exception as exc:return dict(status='numerically_unresolved',reason=str(exc),scope='Initial geometry unavailable; no qualification inferred.')
+    native.cost['native_position_calls']=native.cost.get('native_position_calls',0)+1
+    contacts=[dict(geom1=native.model.geom(int(c.geom1)).name,geom2=native.model.geom(int(c.geom2)).name,
+        distance_m=float(c.dist)) for c in data.contact]
+    return dict(status='computed',source='native position pipeline at first declared start',
+        contact_count=int(data.ncon),minimum_contact_distance_m=min((c['distance_m'] for c in contacts),default=None),
+        contact_examples=contacts[:3],tendon_length_m=data.ten_length.tolist(),payout_m=native.payout.tolist(),
+        length_residual_m=(data.ten_length-native.payout).tolist(),
+        scope='Initial geometry only; contact and length excess are observations, not proof of their causal role in factorization failure, equilibrium, stability or task acceptance.')
+
+
 def finite_time_discovery(configuration):
     from tools.research_tasks import task_adapter
     cap=task_adapter(configuration).physical_capabilities()
@@ -222,6 +240,7 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         unloaded_qualification=(dict(operation='inspect',target=dict(quantity='constraint_active_set',reduction='identity',goal='increase'),
             load_condition=problem['baseline_load'],operating_point='re_equilibrated',effect_semantics='mechanism_effect',
             cost='One mathematical evaluation; frozen initialization only, zero loading episodes or integration steps.',
+            output_facts='Includes position-only initial contact pairs and tendon-length versus payout facts even when the subsequent full forward fails; initial geometry is separate from equilibrium qualification.',
             strategy='Frozen unloaded_static_solver and unloaded_multistart, native task scene and original qualification. Optional diagnostic; Main chooses.') if problem else None),
         task_scope='Fixed-state mechanisms, qualified re-equilibrated passive response and registered full finite-time response have distinct validity; full task improvement unmeasured until actual complete response. Independent task acceptance remains separate.')
 
@@ -362,9 +381,11 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
             qualification_only=(study.operation=='inspect' and study.target.quantity=='constraint_active_set'
                 and study.load_condition==native.problem.baseline_load)
+            geometry=initial_geometry(native,seed[0] if seed else None) if qualification_only else None
             mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed,
                 study.target.direction_world if study.target.quantity=='directional_material_response' else None,
                 unloaded_multistart=goal.get('unloaded_multistart',False),qualification_only=qualification_only)
+            if geometry is not None:mechanics['qualification_diagnosis']['initial_geometry']=geometry
             from tools.research_tasks import task_adapter
             if mechanics['equilibrium'] is not None:
                 mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)

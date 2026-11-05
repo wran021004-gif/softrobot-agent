@@ -328,6 +328,7 @@ def main_tool_schema(schema, choices):
     if 'ResearchDecision' in schema.get('$defs',{}) and 'action' in schema.get('properties',{}):
         remove_fields(schema,('research_intent',))
         schema['$defs']['ResearchDecision']['description']='Main chooses hypothesis, candidate and scientific variables. The host derives research_intent from the explicit Plan action before original validation.'
+        schema['description']=schema.get('description','')+' Candidate selection belongs only in decision.selected_candidate when advertised there. Never add a top-level selected_candidate field.'
     if 'EvidenceRef' in schema.get('$defs',{}):
         schema['$defs']['EvidenceRef']=dict(type='string',pattern=r'^(candidate|evaluation|result|evidence)_[1-9][0-9]*$',
             description='Use the stable short reference in the research packet or an evidence response.')
