@@ -76,6 +76,8 @@ def finite_time_discovery(configuration):
         paired_required=paired,legal_intervention_tendons=tendons if legal else [],
         intervention_rule='Main selects exact passive limits; both baseline and ablation run every frozen episode. No legal intervention means no paired mechanism certification.',
         per_evaluation_cost=dynamic_cost(configuration,1,paired),
+        initialization_dependency=('Before any integration, original PHS independently repeats the same solve(), native scene, unloaded_static_solver and unloaded_multistart used by unloaded qualification inspect. Changing to finite_time_task_response cannot bypass that initial forward failure. A precheck is optional, and a static pass grants no dynamic acceptance.'
+            if goal.get('execution_protocol')=='phs2d_original_v1' else 'Independent execution uses the frozen task initializer.'),
         evaluation_cap='Optional explicit maximum; omitted question/diagnose cap uses the legal minimum. An explicit low cap is rejected without execution.',
         cost_rule='Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.',
         evidence_scope='Complete qualified finite-time numerical observation; static proxies cannot certify dynamic acceptance.')

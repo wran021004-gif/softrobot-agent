@@ -747,7 +747,7 @@ def result_card(host, reference):
         study=value.get('owning_study') or value.get('study'),
         task_identity=evidence['task_identity'], candidate=value.get('candidate',value.get('design_candidate',binding.get('candidate'))),
         control_source=value.get('control_schedule_reference',value.get('source_reference',value.get('source'))),
-        operation=value.get('operation'), model_identity=evidence['model_identity'],
+        operation=value.get('operation'), model_identity=evidence['model_identity'] or value.get('numerical_failure',{}).get('model_identity'),
         design_identity=evidence['design_identity'],
         evaluation_profile_identity=value.get('profile_identity'),evaluation_identity=value.get('execution_id'))
     summary=compact_evidence(value,reference,facts_only=True)['summary']

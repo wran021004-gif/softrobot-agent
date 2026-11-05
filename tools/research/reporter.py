@@ -134,6 +134,9 @@ def _comparison(host, left, right):
         for key,factor in (('robot','structure'),('policy','control')):
             if ca.get(key)!=cb.get(key):factors.append(factor)
         sources += [EvidenceLocation(reference=c,pointer='/configuration') for c in (a.candidate,b.candidate)]
+        if a.candidate==b.candidate and ca['task'].get('physical_problem'):
+            reasons=[r for r in reasons if not r.startswith(('Unknown design_identity;','Unknown control_source;'))]
+            reasons.append('Exact same immutable passive candidate binds the structure, fixed payout, task and execution settings; no active control source exists. This does not establish a qualified working point or comparable complete outcomes.')
     if left.mathematics and right.mathematics:
         # B already owns the controlled mathematical comparison. Physical outcome
         # pairing cannot negate that narrower recorded comparison.
