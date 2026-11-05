@@ -66,6 +66,49 @@ def extend_provider_requests(host, approval):
         requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
 
 
+def authorize_unmetered_mathematics(host, approval):
+    """Apply an explicit user quota change without resetting any computation.
+
+    Uses the existing None quota semantics. Physics, Provider limits, individual
+    requests, method grants and watchdogs remain independently owned.
+    """
+    from copy import deepcopy
+    from tools.state_io import digest
+    from tools.research.provider import pending
+    identity=digest(approval)
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state'];spec=current['spec']
+        for ref in current.get('mathematical_quota_authorizations',[]):
+            if host.store.artifact(ref,db=db)['approval_identity']==identity:
+                return dict(already_applied=True,reference=ref)
+        scope=approval.get('scope',{});old=spec['budgets']['mathematical_evaluations']
+        if (approval.get('version')!='unmetered_mathematics_approval_v1' or approval.get('approved') is not True
+                or not approval.get('source') or approval.get('scope_identity')!=digest(scope)
+                or set(scope)!={'study_id','resolved_identity','previous_limit','new_limit'}
+                or scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity']
+                or scope['previous_limit']!=old or type(old) is not int or scope['new_limit'] is not None
+                or spec['mode']!='formal_research' or 'analysis' not in spec.get('capabilities',[])):
+            raise ValueError('EXACT_EXPLICIT_UNMETERED_MATHEMATICS_AUTHORIZATION_REQUIRED')
+        if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
+                or current.get('selected') or current.get('success_gate') or current['research_status']=='stopped'
+                or any(v.get('active_reservation') or v.get('status',{}).get('worker_alive',True) for v in current.get('rl_runs',{}).values())
+                or db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
+            raise ValueError('SETTLED_NONSUCCESS_BOUNDARY_REQUIRED_FOR_MATHEMATICAL_QUOTA')
+        ref=plain(host.store.put(db,dict(version='unmetered_mathematics_addendum_v1',approval=approval,
+            approval_identity=identity,previous_state=plain(host.store.put(db,current)),
+            all_costs_and_failures_retained=True,other_limits_unchanged=True)))
+        updated=deepcopy(spec);updated.pop('resolved_identity')
+        updated['budgets']['mathematical_evaluations']=None
+        updated.setdefault('authorization_addenda',[]).append(ref)
+        updated['resolved_identity']=digest(updated)
+        current.update(spec=updated,validation_extension_pending_binding=True)
+        current.setdefault('mathematical_quota_authorizations',[]).append(ref)
+        host.store.update_state(db,host.run_id,current)
+        host.store.event(db,host.run_id,'mathematical_quota_authorization','authorized',outputs=[ref])
+    return dict(already_applied=False,reference=ref,resolved_identity=updated['resolved_identity'],
+        requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
+
+
 def mathematical_remaining(spec, used=0):
     """None is an authorized absence of a count quota; usage is still recorded."""
     limit=spec['budgets']['mathematical_evaluations']
