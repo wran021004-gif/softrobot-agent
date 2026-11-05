@@ -88,6 +88,22 @@ class PhsKnowledgeStartTests(unittest.TestCase):
                     experience.retrieve(h,query)
             self.assertFalse(state(h)['retrievals'])
 
+    def test_knowledge_receipts_cannot_support_select_or_stop(self):
+        from tools.research.contracts import Plan
+        from tools.research.evidence_policy import admit_decision
+        from tests.research.test_cross_task_integration import plan
+        with fixture() as h:
+            receipt=experience.retrieve(h,dict(operation='read',entry_id='skill-witness-replay',revision='1'))['reference']
+            for action in ('select','stop'):
+                with self.subTest(action=action):
+                    payload=dict(supporting_evidence=[receipt])
+                    if action=='select':payload['selected_execution']=receipt
+                    value=Plan.model_validate(plan(action,**payload))
+                    with self.assertRaisesRegex(ValueError,'UNREGISTERED_RESEARCH_EVIDENCE'):
+                        admit_decision(h,value)
+            self.assertIsNone(state(h)['selected'])
+            self.assertEqual(state(h)['research_status'],'ready')
+
     def test_gateway_sdk_wire_delivers_hint_then_on_demand_body(self):
         with fixture() as h:
             approve(h,[REGISTERED_MATHEMATICS_SCOPE])

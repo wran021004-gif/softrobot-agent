@@ -74,6 +74,8 @@ class KnowledgeTests(unittest.TestCase):
     def test_reporter_records_reads_without_scientific_registration(self):
         from tools.research import reporter
         ref=save(self.h,dict(fixture='Existing evidence, no scientific claim'))
+        # Investigation now requires an owned subject; keep the fixture explicit.
+        update(self.h,candidates={'offline-subject':ref})
         request=dict(question='Diagnose saved evidence using procedural guidance',references=[ref],
             experience_queries=[dict(operation='read',entry_id='research-contact-causality',revision='1')])
         with patch.object(reporter,'assemble',return_value=SimpleNamespace(results=[])),patch.object(reporter,'applicable_corrections',return_value=[]),patch.object(reporter,'_save',return_value=ref) as saved:
@@ -81,7 +83,7 @@ class KnowledgeTests(unittest.TestCase):
         receipt=self.h.store.artifact(saved.call_args.kwargs['request']['experience_receipts'][0])
         self.assertEqual(receipt['reader'],'reporter')
         self.assertFalse(receipt['scientific_evidence'])
-        self.assertEqual(registered_references(self.h),[])
+        self.assertEqual(registered_references(self.h),[ref])
 
     def test_reporter_wire_keeps_guidance_outside_scientific_sources(self):
         from tools.research import reporter
