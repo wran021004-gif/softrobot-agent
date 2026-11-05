@@ -123,3 +123,11 @@ no cumulative quota. The policy ceiling remains 128; this does not pre-grant all
 remaining increments. See `phs2d-successor-live-status-20261105.json` for measured
 counters, token usage and the distinction between experience delivery, reading
 and observable method use. No causal benefit or research success is claimed.
+
+### Settled request 62: transient transport recovery
+
+The same formal Study reached 62 shared Provider requests. A Gateway HTTP 502 (`network_error`, remote generation outcome unknown) was archived and charged; it produced no scientific tool execution. This was not evidence of quota exhaustion. A subsequent restore exposed a real SDK gap: the first failed request following a committed handoff left the exact deterministic invocation prompt in the snapshot, which the initial-context verifier rejected.
+
+The minimal repair accepts only a settled 429/502/503/504 first conversation failure after the committed handoff, with exact stored request/history correspondence, the original verified preparation, no local tool/model output, and unchanged deterministic prompt. Resume uses that saved prompt without appending a duplicate. The failure and unknown monetary usage stay recorded. One real-SDK/Mock regression passed (26.674 s), including altered-prompt rejection, zero-send restore, exact prompt preservation, and retained charges. Earlier attempts to use the legacy S125 fixture were blocked by its absent local readiness/MATLAB dependency; the directed regression uses the existing PHS fixture instead. No scientific computation or live Provider call was used for this regression.
+
+A second conditional +8 addendum, under the user's standing instruction, raised the finite Provider limit to 80 (six protected). Main independently proposed a new gross-geometry structural contrast from registered initial-geometry facts. Its malformed edit requests were rejected before generation; no design or value was chosen by the operator. All frozen physics and acceptance remain unchanged. The user's later conditional permission to use the existing third official API on Gateway quota restriction is recorded locally; the profile and credential were checked without sending inference or exporting credentials.

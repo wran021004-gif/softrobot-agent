@@ -1474,7 +1474,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 # request's hash and prevent exact response replay.
                 resume=bool(rejected_initial or state(host)['pilot'].get('unconsumed_response') or (agent.messages
                     and agent.messages[-1]['role']=='user'
-                    and any('toolResult' in b for b in agent.messages[-1]['content'])))
+                    and (any('toolResult' in b for b in agent.messages[-1]['content'])
+                         or agent.messages[-1]['content']==[dict(text=INVOCATION_PROMPT)])))
                 rejected_initial=False
                 result=await agent.invoke_async(None if resume else INVOCATION_PROMPT)
             except Exception as exc:

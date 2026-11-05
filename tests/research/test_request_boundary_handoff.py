@@ -14,6 +14,45 @@ from tests.research.test_s125_contract import cold_host
 
 
 class RequestBoundaryHandoffTests(unittest.TestCase):
+    def test_failed_first_send_after_handoff_keeps_charge_and_exact_prompt(self):
+        from tools.research.provider import pending
+        from tests.research.test_phs2d_knowledge_start import fixture
+        from tests.research.test_research_authorization_preflight import approve
+        from tools.research.contracts import REGISTERED_MATHEMATICS_SCOPE
+        context=fixture();h=context.__enter__();self.addCleanup(context.__exit__,None,None,None)
+        approve(h,[REGISTERED_MATHEMATICS_SCOPE]);sent=[];normal=self.responder(h,sent)
+        def respond(request):
+            if len(sent)==1:
+                sent.append(json.loads(request.content))
+                return httpx.Response(502,json=dict(error=dict(code='network_error',message='Offline unknown remote outcome')))
+            response=normal(request);body=response.json()
+            body['choices'][0]['message'].pop('reasoning_content',None)
+            return httpx.Response(200,json=body)
+        with patch('tools.research.agent.credential',return_value='offline'),\
+                patch('tools.research.provider.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
+            with self.assertRaises(Exception) as failure:
+                asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,max_new_provider_requests=2))
+            self.assertEqual(len(sent),2,str(failure.exception))
+            self.assertIsNotNone(state(h)['pilot'].get('handoff'))
+            ledger=h.store.remaining();self.assertEqual(ledger['used']['model_calls'],2)
+            root=h.store.root/'framework_sessions/session'/state(h)['pilot']['framework_session_id']
+            path=next(root.rglob('snapshot_latest.json'));original=path.read_bytes()
+            snapshot=json.loads(original);snapshot['data']['messages'][-1]['content'][0]['text']='Untrusted replacement'
+            path.write_text(json.dumps(snapshot),encoding='utf8')
+            with self.assertRaisesRegex(ValueError,'SDK_INITIAL_CONTEXT_MISMATCH'):
+                asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            path.write_bytes(original)
+            asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            self.assertEqual(h.store.remaining(),ledger);self.assertEqual(len(sent),2)
+            asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+        self.assertEqual(len(sent),3)
+        self.assertEqual(sent[1]['messages'][:-1],sent[2]['messages'][:-1])
+        self.assertEqual(h.store.remaining()['used']['model_calls'],3)
+        self.assertEqual(pending(h),[])
+        self.assertTrue(any(e['kind']=='sdk_failed_initial_invocation_verified' for e in h.store.events(h.run_id)))
+
     def test_initial_parameter_rejection_restores_without_reset_or_duplicate_prompt(self):
         from tools.research.provider import pending, provider_outcome
         from tools.research.session_handoff import INVOCATION_PROMPT
