@@ -21,6 +21,7 @@ def state_ok(value, raw):
 
 def inspect(task,raw,*,intervention=False):
     goal=PassiveResponseGoalV2.model_validate(task.goal.data)
+    original=goal.execution_protocol=='phs2d_original_v1'
     source=raw.get('physical_binding',{})
     if (raw.get('kind')!='passive_dynamic_execution_v2' or source.get('task_identity')!=digest(task.model_dump(mode='json'))
             or raw.get('active_actuators')!=0 or not source.get('design_identity') or not source.get('model_identity')):
@@ -47,11 +48,28 @@ def inspect(task,raw,*,intervention=False):
                     or not np.allclose([r['time_s'] for r in rows],np.arange(count+1)*period,rtol=0,atol=1e-10)):
                 return 'incomplete','COMPLETE_DYNAMIC_GRID_REQUIRED'
             initial=e['integration_initial']
-            if not state_ok(initial,raw) or e['state_resets']!=1:return 'invalid','COMPLETE_INITIAL_STATE_MISMATCH'
+            if not state_ok(initial,raw) or e['state_resets']!=(2 if original else 1):return 'invalid','COMPLETE_INITIAL_STATE_MISMATCH'
             if first_state is None:first_state=initial
             elif initial!=first_state:return 'invalid','EPISODES_DID_NOT_RESET_SAME_COMPLETE_STATE'
             if raw['initial_state_source']=='saved_integration_state':
                 if not goal.allow_saved_state or not raw.get('initial_state_result'):return 'invalid','SAVED_STATE_SOURCE_REQUIRED'
+            elif original:
+                eq=raw['unloaded_equilibrium']
+                if (eq['status']!='qualified_local_minimum' or not eq['equilibrium']['kkt_pass'] or
+                        not eq['equilibrium']['second_order_sufficient'] or not eq['equilibrium']['capacity'] or
+                        any(eq['solver_settings'].get(k)!=v for k,v in goal.unloaded_static_solver.items()) or
+                        initial['qpos_rad']!=eq['equilibrium']['qpos'] or any(initial['qvel_rad_s']) or initial['time_s']!=0):
+                    return 'invalid','QUALIFIED_FRESH_UNLOADED_EQUILIBRIUM_REQUIRED'
+                loading=e['loading_initial'];boundary=e['phase_boundaries'][0]['integration_state']
+                if (not state_ok(loading,raw) or loading['qpos_rad']!=boundary['qpos_rad'] or
+                        any(loading['qvel_rad_s']) or loading['time_s']!=0 or
+                        any(loading['state_vector'][1+2*n:])):
+                    return 'invalid','QPOS_ONLY_COLD_LOADING_RESET_REQUIRED'
+                prefix=[r for r in rows if r['time_s']<=stages[0].end_s]
+                first_prefix=[r for r in episodes[0]['samples'] if r['time_s']<=stages[0].end_s]
+                if prefix!=first_prefix:return 'invalid','SHARED_UNLOADED_BASELINE_MISMATCH'
+                expected_steps=steps if e is episodes[0] else steps-round(stages[0].end_s/dt)
+                if e['executed_physics_steps']!=expected_steps:return 'invalid','SHARED_BASELINE_COST_MISMATCH'
             else:
                 named=task.initializer.parameters.data
                 expected={key:[named[key].get(j,0.) for j in raw['coordinate_order']] for key in ('qpos_rad','qvel_rad_s')}
@@ -64,7 +82,8 @@ def inspect(task,raw,*,intervention=False):
                     return 'invalid','PHASE_STATE_OR_CLOCK_MISMATCH'
                 row=next(r for r in rows if abs(r['time_s']-stage.end_s)<1e-10)
                 value=boundary['integration_state']
-                if value['qpos_rad']!=row['qpos_rad'] or value['qvel_rad_s']!=row['qvel_rad_s'] or abs(value['time_s']-e['engine_origin_s']-stage.end_s)>1e-8:
+                engine_time=stage.end_s-(stages[0].end_s if original and stage is not stages[0] else 0)
+                if value['qpos_rad']!=row['qpos_rad'] or value['qvel_rad_s']!=row['qvel_rad_s'] or abs(value['time_s']-e['engine_origin_s']-engine_time)>1e-8:
                     return 'invalid','PHASE_BOUNDARY_MEASUREMENT_MISMATCH'
             if e['qualified_state']!=e['phase_boundaries'][0]['integration_state']:return 'invalid','QUALIFIED_STATE_BINDING_MISMATCH'
             if disabled and e.get('intervention_at_s')!=stages[0].end_s:return 'invalid','INTERVENTION_BEFORE_COMMON_QUALIFICATION'
@@ -77,7 +96,8 @@ def inspect(task,raw,*,intervention=False):
                 t=r['time_s'];held=t if goal.force_sampling=='interval_end' or t==0 else max(0.,t-dt)
                 force=force_at(goal,case,held)[0];phase=force_at(goal,case,t)[1]
                 if r['phase']!=phase or not np.allclose(r['force_world_n'],force,rtol=0,atol=1e-12):return 'invalid','FROZEN_FORCE_PROTOCOL_MISMATCH'
-                if abs(r['engine_time_s']-e['engine_origin_s']-t)>1e-8:return 'invalid','ENGINE_CLOCK_MISMATCH'
+                engine_time=t-(stages[0].end_s if original and t>stages[0].end_s else 0)
+                if abs(r['engine_time_s']-e['engine_origin_s']-engine_time)>1e-8:return 'invalid','ENGINE_CLOCK_MISMATCH'
                 if not np.allclose(np.asarray(r['tendon_length_m'])-raw['payout_lengths_m'],r['length_residual_m'],rtol=0,atol=1e-12):
                     return 'invalid','MEASURED_LENGTH_RESIDUAL_MISMATCH'
                 if any(w['number'] for w in r['warnings']):return 'invalid','MUJOCO_WARNING'
@@ -112,9 +132,11 @@ def inspect(task,raw,*,intervention=False):
                 if route['status']!='legal_at_checked_poses':return 'invalid','ILLEGAL_TENDON_ROUTE_AT_CHECKED_POSES'
             if goal.recording=='full_physics_csv':
                 traces=[v for v in raw['trace_files'] if v['load_condition']==case]
-                if len(traces)!=1 or traces[0]['physics_steps']!=steps or traces[0]['bytes']<=0 or len(traces[0]['sha256'])!=64:
+                trace_steps=e['executed_physics_steps'] if original else steps
+                if len(traces)!=1 or traces[0]['physics_steps']!=trace_steps or traces[0]['bytes']<=0 or len(traces[0]['sha256'])!=64:
                     return 'incomplete','FULL_PHYSICS_TRACE_MISSING'
-        if raw['physics_steps']!=steps*len(episodes):return 'incomplete','PHYSICS_COST_COVERAGE_MISMATCH'
+        expected_cost=sum(e['executed_physics_steps'] for e in episodes) if original else steps*len(episodes)
+        if raw['physics_steps']!=expected_cost:return 'incomplete','PHYSICS_COST_COVERAGE_MISMATCH'
     except (KeyError,TypeError,ValueError,StopIteration,IndexError):return 'incomplete','REQUIRED_V2_MEASUREMENTS_MISSING'
     return 'valid',None
 

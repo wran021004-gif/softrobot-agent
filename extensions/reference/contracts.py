@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import Field, FiniteFloat, model_validator
+from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef, Signal, Payload, EvaluationResult, BackendResult, WorkerOutput, MemoryEntry, WorkOrder
 from schemas.design_spec import DesignSpec
@@ -105,6 +105,8 @@ class PassiveQualificationV2(Contract):
 class PassiveResponseGoalV2(Contract):
     """Finite frozen programs; the Agent chooses owned objects, never engine state."""
     version: Literal['passive_response_v2'] = 'passive_response_v2'
+    execution_protocol: Literal['continuous_v1','phs2d_original_v1'] = 'continuous_v1'
+    unloaded_static_solver: dict[str, FiniteFloat] = Field(default_factory=dict)
     load_conditions: list[str] = Field(min_length=1,max_length=32)
     programs: dict[str,list[PassiveStageV2]]
     protocol_source: EvidenceRef
@@ -113,8 +115,8 @@ class PassiveResponseGoalV2(Contract):
     frame: Literal['world'] = 'world'
     force_sampling: Literal['interval_start','interval_end']
     static_balance_reference: Literal['cold_zero_velocity','copied_integration_zero_velocity']
-    reset: Literal['same_complete_initial_state_each_episode'] = 'same_complete_initial_state_each_episode'
-    initial_source: Literal['frozen_named_state','qualified_unloaded']
+    reset: Literal['same_complete_initial_state_each_episode','qpos_only_shared_unloaded'] = 'same_complete_initial_state_each_episode'
+    initial_source: Literal['frozen_named_state','qualified_unloaded','fresh_unloaded_hard_equilibrium']
     allow_saved_state: bool = False
     unloaded_stage: str
     qualifications: list[PassiveQualificationV2] = Field(min_length=1,max_length=32)
@@ -129,8 +131,27 @@ class PassiveResponseGoalV2(Contract):
     recording: Literal['score_and_qualification','full_physics_csv'] = 'score_and_qualification'
     route_check: Literal['not_required','score_grid','every_physics_step'] = 'not_required'
 
+    @model_serializer(mode='wrap')
+    def historical_serialization(self,handler):
+        value=handler(self)
+        if self.execution_protocol=='continuous_v1':value.pop('execution_protocol',None)
+        if not self.unloaded_static_solver:value.pop('unloaded_static_solver',None)
+        return value
+
     @model_validator(mode='after')
     def programs_match(self):
+        if self.execution_protocol=='phs2d_original_v1':
+            if (self.initial_source!='fresh_unloaded_hard_equilibrium' or self.reset!='qpos_only_shared_unloaded' or self.allow_saved_state or
+                    self.force_sampling!='interval_start' or self.static_balance_reference!='copied_integration_zero_velocity' or
+                    self.allowed_ablation!='none' or not self.unloaded_static_solver):
+                raise ValueError('EXPLICIT_ORIGINAL_PHS_INITIALIZATION_AND_PHASE_REQUIRED')
+            from extensions.tendon_family.passive import SOLVER
+            if (set(self.unloaded_static_solver)-set(SOLVER) or
+                    any(v<=0 for v in self.unloaded_static_solver.values()) or
+                    self.unloaded_static_solver.get('max_iterations',0)!=int(self.unloaded_static_solver.get('max_iterations',0))):
+                raise ValueError('VALID_FROZEN_UNLOADED_STATIC_SOLVER_REQUIRED')
+        elif self.initial_source=='fresh_unloaded_hard_equilibrium' or self.unloaded_static_solver or self.reset!='same_complete_initial_state_each_episode':
+            raise ValueError('VERSIONED_HARD_EQUILIBRIUM_PROTOCOL_REQUIRED')
         if len(set(self.load_conditions))!=len(self.load_conditions) or set(self.programs)!=set(self.load_conditions):
             raise ValueError('EXACT_ORDERED_EPISODE_PROGRAMS_REQUIRED')
         for stages in self.programs.values():

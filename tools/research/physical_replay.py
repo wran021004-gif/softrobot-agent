@@ -538,7 +538,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     try:
         with io_path(folder/'worker.log').open('w',encoding='utf8') as log:
             done=_run_contained([s['spec']['runtime']['research_python'],'-m','tools.research.execution_worker',
-                str(folder/'request.json')],log,None)
+                str(folder/'request.json')],log,s['spec'].get('physical_worker_watchdog_s'))
         boundary=dict(termination_confirmed=True,returncode=done.returncode)
     except subprocess.TimeoutExpired as exc:
         boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)

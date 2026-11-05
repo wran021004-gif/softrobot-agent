@@ -53,8 +53,11 @@ def dynamic_cost(configuration, evaluations, paired=False):
     """Same frozen episode/time-grid bound for discovery, compile and reservation."""
     task=configuration['task'];arms=2 if paired else 1
     episodes=len(task['goal']['data']['load_conditions'])
+    duration=episodes*task['timing']['duration_s']
+    if task['goal']['data'].get('execution_protocol')=='phs2d_original_v1':
+        duration-=(episodes-1)*next(iter(task['goal']['data']['programs'].values()))[0]['end_s']
     return dict(model_builds=arms*evaluations,episodes=arms*evaluations*episodes,
-        physics_steps=arms*evaluations*episodes*round(task['timing']['duration_s']/task['timing']['timestep_s']))
+        physics_steps=arms*evaluations*round(duration/task['timing']['timestep_s']))
 
 
 def finite_time_discovery(configuration):

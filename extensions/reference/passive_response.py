@@ -55,6 +55,12 @@ def task_definition(task, reg):
             raise ValueError('EXPLICIT_PASSIVE_V2_CONTRACT_AND_EVALUATOR_VERSION_REQUIRED')
         from .passive_program import validate_program
         validate_program(task,goal,bounds,problem)
+        if goal.execution_protocol=='phs2d_original_v1':
+            floor=next(o for o in task.environment.data['environment']['objects'] if o['name']==assembly.floor_id)
+            stages=list(goal.programs.values())
+            if (floor['position_m'][2]!=0 or any(len(s)!=2 or s[0].end_s!=4 or s[-1].end_s!=8 for s in stages) or
+                    timing.sample_period_s!=.01 or timing.timestep_s not in (.000125,.0000625)):
+                raise ValueError('ORIGINAL_PHS_GROUND_AND_TIME_GRID_REQUIRED')
         return goal,bounds,problem
     if goal.hold_window_s[1]!=timing.duration_s:
         raise ValueError('PASSIVE_HOLD_MUST_COVER_TASK_ENDPOINT')

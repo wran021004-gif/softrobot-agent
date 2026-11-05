@@ -463,6 +463,9 @@ def resolve(path, profile=None, *, backend_profile=None):
     for total, reserved in (('provider_requests', 'protected_provider_requests'), ('public_operations', 'protected_public_operations')):
         if b[reserved] > b[total]:
             raise ValueError('PROTECTION_IS_PART_OF_TOTAL: ' + reserved)
+    watchdog=study.get('physical_worker_watchdog_s')
+    if watchdog is not None and (type(watchdog) not in (int,float) or not 0<watchdog<=14400):
+        raise ValueError('FINITE_PHYSICAL_WORKER_WATCHDOG_REQUIRED')
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
     analysis_timeout=study['analysis_cap_s']
     if b['mathematical_evaluations'] is None:

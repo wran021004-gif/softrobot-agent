@@ -2,6 +2,7 @@
 import time
 import csv
 import hashlib
+from copy import deepcopy
 from pathlib import Path
 import numpy as np
 import mujoco
@@ -134,6 +135,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
     from tools.platform_registry import registry
     goal,bounds,problem=task_definition(inp.task,registry())
     v2=goal.version=='passive_response_v2'
+    original=v2 and goal.execution_protocol=='phs2d_original_v1'
     if (disabled_limits or initial_state is not None) and not v2:raise ValueError('PASSIVE_V2_STATE_OR_INTERVENTION_REQUIRED')
     if initial_state is not None and not goal.allow_saved_state:raise ValueError('SAVED_PASSIVE_STATE_NOT_ALLOWED_BY_FROZEN_TASK')
     p=physics_for(inp);scene=assemble_physical(inp,p)
@@ -193,13 +195,33 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
             tendon_jacobian_extractions=native.cost['tendon_jacobian_extractions'],
             route_checked_poses=sum(e.get('route_geometry',{}).get('checked_poses',0) for e in raw['episodes']),
             route_segment_body_checks=sum(e.get('route_geometry',{}).get('segment_body_checks',0) for e in raw['episodes']))
+        if original:
+            for key in ('route_checked_poses','route_segment_body_checks'):
+                field='checked_poses' if key=='route_checked_poses' else 'segment_body_checks'
+                raw['cost'][key]-=sum(e.get('shared_baseline_route_cost',{}).get(field,0) for e in raw['episodes'])
+            raw['cost'].update({k:raw['cost'].get(k,0)+v for k,v in raw.get('cost_initialization',{}).items()})
         raw['timings_s']['total']=time.perf_counter()-started
         if folder:atomic_json(folder/'passive_progress.json',raw)
     if v2:checkpoint()
+    shared=None
+    if original:
+        from .passive_equilibrium import solve
+        native.protocol['static_solver'].update(goal.unloaded_static_solver)
+        unloaded=native.load(problem.baseline_load)
+        equilibrium=solve(native,unloaded.material_s,unloaded.force_world_n)
+        raw['unloaded_equilibrium']=equilibrium
+        raw['cost_initialization']=equilibrium['numerical_cost']
+        if equilibrium['status']!='qualified_local_minimum':
+            raw.update(status='invalid',reason='UNLOADED_HARD_EQUILIBRIUM_NOT_QUALIFIED')
+            checkpoint()
+            return backend_result(inp,raw)
+        raw['initial_state']=dict(qpos_rad=equilibrium['equilibrium']['qpos'],qvel_rad_s=[0.]*model.nv)
+        checkpoint()
     for case in goal.load_conditions:
         if v2:model.tendon_limited[:]=base_limited
         data=mujoco.MjData(model);mujoco.mj_resetData(model,data)
         data.qpos[:]=scene['qpos_rad'];data.qvel[:]=scene['qvel_rad_s']
+        if original:data.qpos[:]=raw['initial_state']['qpos_rad'];data.qvel[:]=0.
         if initial_state is not None:restore_state(model,data,initial_state,binding);state_restores+=1
         load=native.load(case)
         episode=dict(load_condition=case,initial_state=raw['initial_state'],complete=False,samples=[],
@@ -225,7 +247,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
         def refresh(t):
             nonlocal map_error
             force,phase=load_at(goal,load,t)
-            failure.call(data,mujoco.mj_forward,'passive_state_geometry')
+            if not original:failure.call(data,mujoco.mj_forward,'passive_state_geometry')
             _,J=native.apply_force(data,load.material_s,force)
             if v2:map_error=float(np.max(abs(data.qfrc_applied-J.T@np.asarray(force))))
             failure.call(data,mujoco.mj_forward,'passive_loaded_constraints')
@@ -286,18 +308,35 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 if goal.static_balance_reference=='copied_integration_zero_velocity':mujoco.mj_copyData(static,model,data)
                 else:static.qpos[:]=data.qpos
                 static.qvel[:]=0.
-                failure.call(static,mujoco.mj_forward,'passive_static_geometry')
+                if not original:failure.call(static,mujoco.mj_forward,'passive_static_geometry')
                 native.apply_force(static,load.material_s,force)
-                failure.call(static,mujoco.mj_forward,'passive_static_balance');static_forwards+=2
+                failure.call(static,mujoco.mj_forward,'passive_static_balance');static_forwards+=1 if original else 2
                 balance=static.qfrc_passive+static.qfrc_applied-static.qfrc_bias+static.qfrc_constraint
                 value.update(**mechanism,static_balance_inf_nm=float(np.max(abs(balance))),force_map_error_nm=map_error,
                     taut=[label=='taut' for label in mechanism['constraint_classification']])
             return value
         try:
-            force,phase=refresh(0.);safety();first=sample(0.,force,phase);episode['samples'].append(first)
-            if v2 and any(q.sampling=='every_physics_step' and q.window_s[0]==0 for q in goal.qualifications):episode['qualification_samples'].append(first)
+            start_tick=0
+            if original and shared is not None:
+                # One freshly integrated baseline belongs to this execution. Logical
+                # episode prefixes reference it; they are never charged as new steps.
+                episode.update(deepcopy(shared))
+                episode['load_condition']=case;episode['complete']=False
+                episode['shared_unloaded_reference']=raw['episodes'][0]['load_condition']
+                episode['shared_baseline_route_cost']=deepcopy(shared['route_geometry'])
+                episode['executed_physics_steps']=0
+                start_tick=round(goal.programs[case][0].end_s/dt)
+                data.qpos[:]=episode['qualified_state']['qpos_rad'];data.qvel[:]=0.
+                episode['loading_initial']=saved_state(data)
+                episode['state_resets']=2
+                failure.call(data,mujoco.mj_forward,'passive_loading_initial_geometry')
+                refresh(start_tick*dt)
+            else:
+                if original:failure.call(data,mujoco.mj_forward,'passive_original_initial_geometry')
+                force,phase=refresh(0.);safety();first=sample(0.,force,phase);episode['samples'].append(first)
+                if v2 and any(q.sampling=='every_physics_step' and q.window_s[0]==0 for q in goal.qualifications):episode['qualification_samples'].append(first)
             checkpoint()
-            for tick in range(steps):
+            for tick in range(start_tick,steps):
                 if v2 and disabled and tick==round(goal.programs[case][0].end_s/dt):
                     if not episode.get('qualified_state'):raise ValueError('QUALIFIED_COMMON_INITIAL_STATE_REQUIRED_BEFORE_ABLATION')
                     model.tendon_limited[disabled]=False
@@ -305,10 +344,19 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                     episode['intervention_at_s']=tick*dt
                 # v1 is unchanged. v2 explicitly freezes interval-start/end force semantics.
                 applied_time=(tick+1)*dt if v2 and goal.force_sampling=='interval_end' else tick*dt
-                force,phase=refresh(applied_time)
+                if original:
+                    force,phase=load_at(goal,load,applied_time)
+                    _,J=native.apply_force(data,load.material_s,force)
+                    map_error=float(np.max(abs(data.qfrc_applied-J.T@np.asarray(force))))
+                else:force,phase=refresh(applied_time)
                 failure.call(data,mujoco.mj_step,'passive_time_integration')
                 episode['physics_steps']+=1
-                force,phase=refresh(applied_time if v2 else (tick+1)*dt)
+                if original:
+                    failure.call(data,mujoco.mj_forward,'passive_original_post_step_geometry')
+                    if (tick+1)%stride==0:
+                        native.apply_force(data,load.material_s,force)
+                        failure.call(data,mujoco.mj_forward,'passive_original_snapshot_constraints')
+                else:force,phase=refresh(applied_time if v2 else (tick+1)*dt)
                 now=(tick+1)*dt
                 if v2:phase=load_at(goal,load,now)[1]
                 safety(now);episode['checked_physics_steps']+=1
@@ -336,7 +384,15 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                             if not qualified['passed']:raise ValueError('UNLOADED_DYNAMIC_QUALIFICATION_FAILED')
                             episode['qualified_state']=boundary_state
                     checkpoint()
+                    if original and abs(now-goal.programs[case][0].end_s)<1e-10:
+                        shared=deepcopy({k:v for k,v in episode.items() if k not in ('load_condition','loading_initial')})
+                        raw['shared_unloaded_identity']=digest(shared)
+                        data=mujoco.MjData(model);data.qpos[:]=boundary_state['qpos_rad']
+                        episode['loading_initial']=saved_state(data);episode['state_resets']=2
+                        failure.call(data,mujoco.mj_forward,'passive_loading_initial_geometry')
+                        refresh(now)
             episode['complete']=True
+            if original:episode['executed_physics_steps']=steps-start_tick
         except Exception as exc:
             raw['reason']=str(exc)
             if v2:raw['status']='invalid'
@@ -347,7 +403,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 trace.close()
                 with path.open('rb') as stream:identity=hashlib.file_digest(stream,'sha256').hexdigest()
                 raw['trace_files'].append(dict(path=path.name,sha256=identity,bytes=path.stat().st_size,
-                    physics_steps=episode['physics_steps'],load_condition=case,format='full_physics_csv_v2'))
+                    physics_steps=episode.get('executed_physics_steps',episode['physics_steps']),load_condition=case,format='full_physics_csv_v2'))
         checkpoint()
     if len(raw['episodes'])==len(goal.load_conditions) and all(e['complete'] for e in raw['episodes']):raw['status']='completed'
     checkpoint()
