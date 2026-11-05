@@ -549,7 +549,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
                 # Resume its exact saved prompt; keep its charge and failure.
                 return 'rejected_initial_request'
     if agent.messages or any(e['kind']=='r3_request' and
-            host.store.artifact(e['outputs'][0]).get('purpose') not in ('reporter','provider_validation')
+            host.store.artifact(e['outputs'][0]).get('purpose') not in ('reporter','provider_validation','gateway_quota_probe')
             for e in events):
         raise ValueError('SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR')
     return 'empty'
