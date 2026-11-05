@@ -297,6 +297,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     native_limits=study.pop('native_control_limits',None)
     first_strategy=study.pop('initial_structure_strategy',None)
     replan_period=study.pop('nmpc_replan_period_s',None)
+    physical_watchdog=study.pop('physical_worker_watchdog_s',None)
     family_mode=study.get('start_mode')=='family_space'
     if fixed_structure is not None and not family_mode:raise ValueError('FIXED_STRUCTURE_REQUIRES_FAMILY_STUDY')
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
@@ -463,9 +464,10 @@ def resolve(path, profile=None, *, backend_profile=None):
     for total, reserved in (('provider_requests', 'protected_provider_requests'), ('public_operations', 'protected_public_operations')):
         if b[reserved] > b[total]:
             raise ValueError('PROTECTION_IS_PART_OF_TOTAL: ' + reserved)
-    watchdog=study.get('physical_worker_watchdog_s')
+    watchdog=physical_watchdog
     if watchdog is not None and (type(watchdog) not in (int,float) or not 0<watchdog<=14400):
         raise ValueError('FINITE_PHYSICAL_WORKER_WATCHDOG_REQUIRED')
+    if watchdog is not None:study['physical_worker_watchdog_s']=watchdog
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
     analysis_timeout=study['analysis_cap_s']
     if b['mathematical_evaluations'] is None:
