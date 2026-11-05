@@ -2,7 +2,7 @@
 from typing import Literal
 from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
-from .contracts import Discretization, RoutePoint, Section, Segment, Rigid, Attachment
+from .contracts import Discretization, RoutePoint, Section, Segment, Rigid, Attachment, Vec3
 
 
 class Domain(Contract):
@@ -189,11 +189,13 @@ class FamilySpaceV2(FamilySpace):
     version: Literal['serial_family_space_v2'] = 'serial_family_space_v2'
     serial_assembly: SerialAssemblyRule
     passive_payout_domains_m: dict[str,Domain] = Field(default_factory=dict)
+    terminal_payload_anchor: bool = False
 
     @model_serializer(mode='wrap')
     def historical_space(self,handler):
         value=handler(self)
         if not self.passive_payout_domains_m:value.pop('passive_payout_domains_m',None)
+        if not self.terminal_payload_anchor:value.pop('terminal_payload_anchor',None)
         return value
 
     @model_validator(mode='after')
@@ -232,11 +234,12 @@ class GenerationRequestV2(GenerationRequest):
     controller_recipe: dict = Field(default_factory=dict)
     controller_solver: dict = Field(default_factory=dict)
     payout_lengths_m: dict[str,FiniteFloat] = Field(default_factory=dict)
+    guide_hole_positions_m: dict[str,dict[str,Vec3]] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def legacy_generation(self,handler):
         result=handler(self)
-        for key in ('controller_recipe','controller_solver','payout_lengths_m'):
+        for key in ('controller_recipe','controller_solver','payout_lengths_m','guide_hole_positions_m'):
             if not getattr(self,key):result.pop(key,None)
         return result
 

@@ -1,0 +1,169 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_phs2d_admission_20261105_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "dd046307fe1cd49240877bdf5cd5baeacee351f2",
+  "mode": "engineering_numerical",
+  "control": "control_passive_v1.json",
+  "study_id": "phs2d-reference-ten-20261105",
+  "evidence_destination": "runs/phs2d-reference-ten-20261105",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "diagnose",
+    "physical_replay",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 16,
+    "protected_public_operations": 2,
+    "physical_launches": 10,
+    "mathematical_evaluations": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "evaluation_episodes": 0,
+    "actions_per_trial": null,
+    "training_actions": null
+  },
+  "reserve_rl_evaluation": false,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    },
+    "analysis_interface": "scientific_question_v4",
+    "architecture": "english_decision_v1",
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "role_policy": {
+      "version": "research_roles_v2",
+      "main": {
+        "thinking": "disabled",
+        "reasoning_effort": "none"
+      },
+      "reporter": {
+        "thinking": "enabled",
+        "reasoning_effort": "low"
+      }
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    },
+    "evidence_read_policy": {
+      "version": "bounded_scientific_evidence_v1"
+    }
+  },
+  "authorization": "User request 2026-11-05 explicitly authorizes isolated bounded real MuJoCo engineering validation; Provider requests 0. Reference structures only in private REFERENCE_REPRODUCTION_ONLY Stores. No autonomous Provider Study.",
+  "execution_instructions": "Engineering execution only. No Provider or Main. Preserve every failure; no SELECT or claim of original-protocol equivalence.",
+  "task": "../../tasks/phs2d_admission_continuous_v1.json",
+  "supplied_evidence": [],
+  "require_task_guidance": false,
+  "runtime": "runtime_phs2d_engineering_20261105.json",
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_passive_mujoco",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.25,
+      4.0,
+      8.0
+    ],
+    "samples_s": [
+      0.0,
+      4.0,
+      8.0
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1,
+      10,
+      100
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "scoring_window_s": 0.25,
+  "mathematical_methods": {
+    "mechanism_structure_v1": "Stage III-A/B authorized existing bounded passive mechanism research; no dynamic acceptance inferred."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.young_pa",
+      "payout_lengths_m.*"
+    ]
+  },
+  "physical_replay_limit": 10
+}

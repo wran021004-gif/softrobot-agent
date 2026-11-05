@@ -310,6 +310,10 @@ def generate_family(value):
                 if i>0:
                     guide=guides_by_segment[i]
                     hole=name+'_hole';guide['guide_holes'][hole]=yz(radius,angle+span.guide_angle_offset_rad)
+                    if serial and guide['id'] in r.guide_hole_positions_m:
+                        if not space.terminal_payload_anchor:raise ValueError('INVERSE_GUIDE_OVERRIDE_REQUIRES_OPT_IN_SPACE')
+                        position=r.guide_hole_positions_m[guide['id']].get(hole)
+                        if position is not None:guide['guide_holes'][hole]=list(position)
                     route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==i else 'guide',hole))
                 for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
             route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
@@ -333,6 +337,12 @@ def generate_family(value):
                     envelope=max(np.linalg.norm(properties(st['section'])['outer_yz_m'],axis=1).max() for st in segments[i]['sections'])
                     if distance<envelope+tendon_values['diameter_m']/2:raise ValueError('SECTION_ROUTE_CLEARANCE')
                     order.append(i+a['s'])
+                elif (serial and space.terminal_payload_anchor and part=='payload' and p['role']=='anchor'
+                        and span.last_segment==len(segments)-1):
+                    payload=next(c for c in components if c['id']=='payload')
+                    if p.get('hole') or a['s'] or any(abs(x)>h for x,h in zip(a['position_m'],payload['envelope_halfsize_m'])):
+                        raise ValueError('PAYLOAD_ANCHOR_MUST_BE_INSIDE_REAL_ENVELOPE')
+                    order.append(float(len(segments)+1))
                 elif part in guides_by_id:
                     i=next(k for k,g in guides_by_segment.items() if g['id']==part)
                     if not max(1,span.first_segment)<=i<=span.last_segment:
@@ -344,7 +354,9 @@ def generate_family(value):
                     if a['s'] or a['position_m'][0]!=0:raise ValueError('BASE_SECTION_PLANE_REQUIRED')
                     bounds['radius_m'].check(np.linalg.norm(a['position_m'][1:]),'base_radius_m');order.append(0.)
                 else:raise ValueError('ROUTE_ATTACHMENT_OUTSIDE_FAMILY')
-            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
+            terminal=route[-1]['attachment']['part']
+            terminal_ok=terminal==segments[span.last_segment]['id'] or (serial and space.terminal_payload_anchor and terminal=='payload' and span.last_segment==len(segments)-1)
+            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or not terminal_ok:
                 raise ValueError('ORDERED_SELECTED_SPAN_REQUIRED')
             for point_index,p in enumerate(route):
                 a=p['attachment']
@@ -370,6 +382,8 @@ def generate_family(value):
                 transmission=[dict(tendon=name,ratio=1.)]))
     used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
     for guide in guides:guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
+    if serial and any(key not in guides_by_id or set(holes)-set(guides_by_id[key]['guide_holes']) for key,holes in r.guide_hole_positions_m.items()):
+        raise ValueError('GUIDE_OVERRIDE_MUST_BIND_USED_REAL_HOLE')
     design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
     if getattr(space,'passive_payout_domains_m',{}):
         design['actuators']=[]
