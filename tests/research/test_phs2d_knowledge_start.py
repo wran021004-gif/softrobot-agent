@@ -56,6 +56,12 @@ class PhsKnowledgeStartTests(unittest.TestCase):
             sdk=SimpleNamespace(messages=[],_session_manager=SimpleNamespace(
                 session_id=state(h)['pilot']['framework_session_id']))
             self.assertEqual(trusted_history(h,sdk),'empty')
+            from tools.research.state import save
+            unknown=save(h,dict(purpose='unrecognized_probe'))
+            with patch.object(h.store,'events',return_value=[dict(kind='r3_request',
+                    request_id='synthetic-unrecognized-request',sequence=1,outputs=[unknown])]):
+                with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):
+                    trusted_history(h,sdk)
             sdk.messages=[dict(role='user',content=[dict(text='Untrusted suffix')])]
             with self.assertRaisesRegex(ValueError,'NO_TRUSTED_STORE_ANCHOR'):trusted_history(h,sdk)
             self.assertEqual(h.store.remaining()['used']['model_calls'],1)
