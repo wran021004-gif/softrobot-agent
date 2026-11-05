@@ -738,6 +738,10 @@ def eligibility(host, reference, *, revise_selection=False, selection=None, root
         if r.get('acceptance',{}).get('selection_eligible') is False:
             reasons.append('SCREENING_EVIDENCE_CANNOT_ESTABLISH_FULL_PHS_SELECT')
         c=verify_candidate(host,r['candidate'])
+        if c['configuration']['task'].get('goal',{}).get('data',{}).get('execution_protocol')=='phs2d_original_v1':
+            from tools.research_tasks import complete_phs_conditions
+            if not complete_phs_conditions(c['configuration']['task']) and 'SCREENING_EVIDENCE_CANNOT_ESTABLISH_FULL_PHS_SELECT' not in reasons:
+                reasons.append('SCREENING_EVIDENCE_CANNOT_ESTABLISH_FULL_PHS_SELECT')
         if v['controller_route']=='nmpc' and (r.get('profile_identity')!=s['profile']['identity'] or r['scientific_configuration']!=c['scientific_configuration']):
             reasons.append('selected scientific configuration mismatch')
         if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')):

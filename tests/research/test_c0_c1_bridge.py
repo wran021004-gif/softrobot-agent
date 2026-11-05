@@ -58,7 +58,8 @@ class C0BridgeTests(unittest.TestCase):
                 self.assertEqual(s.snapshot_value('a',build),dict(value=[]))
             s.snapshot_value('a',build)
             self.assertEqual(len(calls),2)
-            with s.connect(True) as db:
+            from contextlib import closing
+            with closing(s.connect(True)) as db:
                 self.assertEqual(db.execute('SELECT COUNT(*) FROM artifacts').fetchone()[0],0)
 
     def test_v4_menu_and_old_compiler_alias(self):

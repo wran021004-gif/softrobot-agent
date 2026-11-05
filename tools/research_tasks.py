@@ -20,6 +20,14 @@ def passive_protocol(task):
     return 'offline_passive_response_v2' if task.get('goal',{}).get('data',{}).get('version')=='passive_response_v2' else 'offline_passive_response_v1'
 
 
+def complete_phs_conditions(task):
+    """Actual frozen denominator, independent of a stored summary or task name."""
+    problem=task['physical_problem']
+    loads=[l for l in problem['loads'] if l['name']!=problem['baseline_load']]
+    return len(loads)==10 and {(l['material_s'],tuple(l['force_world_n'])) for l in loads}=={
+        (s,(f,0.,0.)) for s in (.3,.4,.5,.6,.7) for f in (.1,-.1)}
+
+
 @dataclass(frozen=True)
 class ResearchTaskAdapter:
     configuration: dict
@@ -927,9 +935,7 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     result=dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=[t['id'] for t in cfg['robot']['structure']['data']['tendons']] if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
     result['constraint_observations']=adapter.constraint_observations(components)
     if task.get('goal',{}).get('data',{}).get('execution_protocol')=='phs2d_original_v1':
-        loads=task['physical_problem']['loads'];baseline=task['physical_problem']['baseline_load']
-        complete={(l['material_s'],tuple(l['force_world_n'])) for l in loads if l['name']!=baseline}=={
-            (s,(f,0.,0.)) for s in (.3,.4,.5,.6,.7) for f in (.1,-.1)}
+        complete=complete_phs_conditions(task)
         result.update(selection_eligible=complete,qualification_scope='complete_phs_ten_case' if complete else 'screening_only')
     return result
 
