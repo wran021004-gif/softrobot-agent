@@ -55,6 +55,10 @@ def _permitted(entry, policy, *, legacy=False):
         or (entry['kind']=='case' and entry['status']==PATTERN_STATUS and
             entry.get('introduced_in')=='knowledge_organization_v1' and not entry.get('benchmark_sensitive')
             and entry.get('disclosure')=='abstract_decision_pattern_only')
+        or (entry['entry_id']=='phs2d-research-process' and entry['revision']=='1' and entry['kind']=='case'
+            and entry['entry_id'] in (policy.get('include_entry_ids') or [])
+            and entry['status']==PATTERN_STATUS and entry.get('introduced_in')=='phs2d_process_v1'
+            and entry.get('disclosure')=='answer_isolated_expert_process' and not entry.get('benchmark_sensitive'))
         or (entry['kind'] in ('case','success_case') and entry.get('benchmark_sensitive')
             and policy.get('allow_benchmark_answers',False) and entry['status']=='reference_backed_scoped'))
 
@@ -71,6 +75,10 @@ def freeze_knowledge(policy):
     rows=deepcopy([entry for entry in _index_rows() if _permitted(entry,policy)])
     if policy.get('delivery')=='compact_skill_v1':
         for row in rows:
+            if row.get('introduced_in')=='phs2d_process_v1':
+                value=json.loads((ROOT/row['path']).read_bytes())
+                row['compact_process']=dict(steps=value['startup_process'],lessons=value['general_lessons'],
+                    ownership=value['decision_ownership'])
             if knowledge_type(row)!='skill' or row.get('introduced_in')!='knowledge_organization_v1':continue
             body=(ROOT/row['path']).read_bytes();value=json.loads(body)
             row['compact_skill']=dict(principle=value['principle'][:280],
@@ -112,6 +120,21 @@ def retrieval_hint(host):
     name=family.removeprefix('task.')
     if s['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
         phase=decision_phase(host)
+        process=next((r for r in entries(host) if r.get('compact_process') and
+            name in [r['task'],*r.get('applicable_tasks',[])]),None)
+        if process and phase:
+            delivered=hint_progress(host);key='process:'+process['entry_id']+'@'+process['revision']
+            first=not any(key in r.get('summary_keys',[]) for r in delivered)
+            relevant=phase['phase'] in ('initialization_failure_review','voluntary_stop')
+            if first or relevant and not any(r['notice_id']==phase['notice_id'] for r in delivered):
+                compact=process['compact_process']
+                return dict(boundary='first_process' if first else phase['notice_id'],
+                    expert_process=dict(key=key,ownership=compact['ownership'],
+                        steps=compact['steps'] if first else [compact['steps'][0],compact['steps'][2]],
+                        lessons=compact['lessons'] if first else [compact['lessons'][3],compact['lessons'][6]],
+                        read_query=dict(operation='read',entry_id=process['entry_id'],revision=process['revision'])),
+                    decision_reason=phase['reason'],
+                    scope='Historical process, context only; no winning design, current scientific evidence or prescribed research direction. Delivery does not prove adoption.')
         rows=[r for r in entries(host) if r.get('compact_skill') and phase and
             phase['phase'] in r.get('applicable_triggers',[]) and
             (r['task']=='soft_robot_research' or name in [r['task'],*r.get('applicable_tasks',[])])]
@@ -178,6 +201,11 @@ def decision_phase(host):
     if not s.get('plans'):
         return dict(phase='first_scientific_plan',notice_id='first_plan',
             reason='Check model/input semantics and how condition-specific experiments can distinguish competing explanations before selecting the first research plan.')
+    from tools.research.research_context import initialization_review
+    review=initialization_review(host)
+    if review and review['repeated_block'] and review['failed_attempts'] in (2,4,8,16,32,64):
+        return dict(phase='initialization_failure_review',notice_id='initialization:'+str(review['failed_attempts']),
+            reason='Repeated unloaded qualification failures span the observed candidates. Compare competing geometry, unilateral-branch and numerical explanations; a low-value local route does not exhaust other legal mathematical methods. Main chooses whether to switch.')
     from tools.research.evidence_views import native_search_summary
     failed=[]
     for ref in results:
@@ -213,14 +241,14 @@ def hint_progress(host):
                 if not isinstance(content,str) or not content.startswith('CURRENT_RESEARCH_PACKET\n'):continue
                 research=json.loads(content.split('\n',1)[1]).get('research',{})
                 hint=(research.get('knowledge') or {}).get('access') or research.get('experience_guidance') or {}
-                if hint.get('skill'):
-                    notice_id=hint['boundary'];skill=hint['skill']
+                if hint.get('skill') or hint.get('expert_process'):
+                    notice_id=hint['boundary'];skill=hint.get('skill') or hint['expert_process']
                     if notice_id in seen:continue
                     seen.add(notice_id)
                     rows.append(dict(notice_id=notice_id,request=event['outputs'][0],wire=meta['request'],
                         summary_keys=[skill['key']],summary=skill,
                         **(dict(experience_hint=hint['experience']) if hint.get('experience') else {}),
-                        evidence_role='confirmed_skill_summary_delivery_only'))
+                        evidence_role='confirmed_expert_process_delivery_only' if hint.get('expert_process') else 'confirmed_skill_summary_delivery_only'))
                     continue
                 notice=hint.get('decision_notice')
                 if not notice or notice['notice_id'] in seen:continue
@@ -332,7 +360,7 @@ def disposition_bindings(host,dispositions):
         for delivery in hint_progress(host):
             for key in delivery.get('summary_keys',[]):
                 reads[key]=dict(summary_delivery=delivery['request'],entry_key=key,
-                    source_kind='skill_summary',full_read=False)
+                    source_kind='expert_process_summary' if key.startswith('process:') else 'skill_summary',full_read=False)
     if set(dispositions)-set(reads):raise ValueError('DISPOSITION_REQUIRES_EXACT_ACTUAL_READ; SEARCH_OR_STARTUP_TEXT_IS_INSUFFICIENT')
     return [dict(**reads[key],disposition=value) for key,value in dispositions.items()]
 

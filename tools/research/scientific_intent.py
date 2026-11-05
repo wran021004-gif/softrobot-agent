@@ -267,7 +267,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             from tools.research_tasks import passive_registered
             props['effect_semantics']['enum']=['mechanism_effect','re_equilibrated_passive_response']+(
                 ['finite_time_task_response'] if passive_registered(task) else [])
-            structure['properties']['target']['description']='Static research: registered PhysicalMechanismTarget. Complete finite_time_task_response: exact string finite_time_task_violation, all frozen conditions, qualification gates and requested_budget; no single diagnostic substitutes for the full objective.'
+            structure['properties']['target']['description']='Static research: registered PhysicalMechanismTarget. Optional low-cost unloaded qualification: operation inspect, quantity constraint_active_set, frozen baseline load, re_equilibrated point; frozen initialization only, zero loading episodes. Complete finite_time_task_response: exact string finite_time_task_violation, all frozen conditions, qualification gates and requested_budget; no single diagnostic substitutes for the full objective.'
             if goal.get('version')!='passive_response_v2' or goal.get('allowed_ablation')!='disable_selected_passive_limits':
                 props['passive_ablation']={'type':'null'}
             elif candidate:

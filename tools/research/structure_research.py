@@ -217,6 +217,10 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         formal_candidate_created=formal_candidate_created,
         details_query=dict(reference=reference,view='mathematical_capabilities',pointer='/structure_research'),
         finite_time_response=finite_time_discovery(candidate['configuration']),
+        unloaded_qualification=(dict(operation='inspect',target=dict(quantity='constraint_active_set',reduction='identity',goal='increase'),
+            load_condition=problem['baseline_load'],operating_point='re_equilibrated',effect_semantics='mechanism_effect',
+            cost='One mathematical evaluation; frozen initialization only, zero loading episodes or integration steps.',
+            strategy='Frozen unloaded_static_solver and unloaded_multistart, native task scene and original qualification. Optional diagnostic; Main chooses.') if problem else None),
         task_scope='Fixed-state mechanisms, qualified re-equilibrated passive response and registered full finite-time response have distinct validity; full task improvement unmeasured until actual complete response. Independent task acceptance remains separate.')
 
 
@@ -339,17 +343,30 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             from extensions.tendon_family.passive import PassiveModel
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
             from extensions.tendon_family.compiler import resolve
-            native=PassiveModel(resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data']),cfg['task']['physical_problem'])
-            if cfg['task']['goal']['data'].get('execution_protocol')=='phs2d_original_v1':
-                native.protocol['static_solver'].update(cfg['task']['goal']['data']['unloaded_static_solver'])
+            goal=cfg['task']['goal']['data'];original=goal.get('execution_protocol')=='phs2d_original_v1'
+            scene=None
+            if original:
+                from schemas.platform import SessionInput
+                from extensions.tendon_family.scene import assemble_physical
+                from extensions.tendon_family.backends import physics_for
+                inp=SessionInput.model_validate(cfg);physics=physics_for(inp);scene=assemble_physical(inp,physics)
+                scene['control']=dict(tension_execution_mode='passive_fixed_payout_v1',
+                    solreflimit=goal['solreflimit'],solimplimit=goal['solimplimit'])
+            else:physics=resolve(cfg['robot']['structure']['data'],cfg['policy']['discretization']['data'])
+            native=PassiveModel(physics,cfg['task']['physical_problem'],scene=scene)
+            if original:native.protocol['static_solver'].update(goal['unloaded_static_solver'])
             seed=None
-            if records and native.physics['dofs']==models[0].physics['dofs']:
+            if not original and records and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
+            qualification_only=(study.operation=='inspect' and study.target.quantity=='constraint_active_set'
+                and study.load_condition==native.problem.baseline_load)
             mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed,
-                study.target.direction_world if study.target.quantity=='directional_material_response' else None)
+                study.target.direction_world if study.target.quantity=='directional_material_response' else None,
+                unloaded_multistart=goal.get('unloaded_multistart',False),qualification_only=qualification_only)
             from tools.research_tasks import task_adapter
-            mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
-            data=dict(equilibrium=mechanics['equilibrium']['equilibrium'])
+            if mechanics['equilibrium'] is not None:
+                mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
+            data=dict(equilibrium=mechanics['equilibrium']['equilibrium'] if mechanics['equilibrium'] else None)
         else:native=NativeModel(cfg)
         models.append(native)
         if passive:pass
@@ -366,7 +383,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         if not passive:
             u=point['u'] if query.native.tensions_n is None else query.native.tensions_n
             mechanics=native.mechanics(data,u,material_s=study.target.material_s) if study.target.quantity=='material_point_jacobian' else native.mechanics(data,u)
-        observation=observe(mechanics,study.target)
+        observation=(dict(status='computed',value=None,unit='1',qualification_diagnosis=mechanics['qualification_diagnosis'],
+            reason='Initialization diagnosis completed; no qualified working point.') if passive and mechanics['equilibrium'] is None else observe(mechanics,study.target))
         record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
             configuration=cfg,observation=observation,mechanics=mechanics,state=data if passive else native.checkpoint(data),
             physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None)
@@ -411,7 +429,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         if dynamic and base['observation']['status']!='computed':raise ValueError('INCOMPLETE_OR_INVALID_DYNAMIC_TASK: '+str(base['observation']['reason']))
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
             constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
-            task_observations=base['mechanics']['task_observations'],registered_acceptance=task_adapter(configuration).execution_requirements()['registered_acceptance'])
+            task_observations=base['mechanics']['task_observations'],
+            qualification_diagnosis=base['mechanics'].get('qualification_diagnosis'),
+            registered_acceptance=task_adapter(configuration).execution_requirements()['registered_acceptance'])
         if study.operation=='compare':
             if study.comparison_load_conditions:
                 from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
@@ -421,7 +441,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 for condition in study.comparison_load_conditions:
                     mechanics=constrained_mechanics(models[0],condition,study.target.material_s,
                         direction_world=study.target.direction_world if study.target.quantity=='directional_material_response' else None,
-                        baseline_result=base['mechanics']['baseline_equilibrium'])
+                        baseline_result=base['mechanics']['baseline_equilibrium'],
+                        unloaded_multistart=configuration['task']['goal']['data'].get('unloaded_multistart',False))
                     observation=observe(mechanics,study.target)
                     if observation['status']!='computed':raise ValueError(observation['reason'])
                     cases.append(dict(load_condition=condition,observation=observation,
@@ -677,6 +698,7 @@ def summary(value, reference):
             row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
+        qualification_diagnosis=raw.get('qualification_diagnosis'),
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         task_observations=task_observations,
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),

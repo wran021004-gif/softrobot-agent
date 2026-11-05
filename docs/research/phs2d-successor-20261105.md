@@ -1,0 +1,82 @@
+# PHS-2D initialization repair and successor
+
+Branch: `codex/phs2d-initialization-successor-20261105`, based on the requested
+`bf67b178c1438d2706a2e628b1c5131c334e1771`. The stopped parent and its Store,
+failures and charges remain untouched. No merge into main.
+
+## Diagnostic conclusion
+
+Only two saved failed designs were examined. The contact sample failed its first
+forward under both single-start and original dual-start execution; the original
+abort behavior never reached the second start. The failed-call diagnostic observed
+228 contacts; that partially mutated state is not a valid completed forward.
+
+The other sample had a saved formal dual-start result, which was reused. Its first
+start terminated after five iterations with a 0.154 m primal violation. The second
+hit 400 iterations, with stationarity 1.7495922075 N m and primal violation
+2.49571134e-6 m; KKT, capacity and sufficient stiffness checks failed. Neither
+start qualified. Positive stiffness at the first unqualified point does not prove
+stability. The legacy scene's dual-start calculation also failed.
+
+Three differences were confirmed: omitted multistart, a legacy static floor at
+-100 m instead of the frozen native task scene, and warm-started structural probes
+instead of the formal baseline starts. No sampled false negative was established;
+the causal role in the parent's failure remains unproved. The repaired mathematical
+path reproduced both saved formal trials exactly on the physical qualification
+fields and state. See `phs2d-initialization-diagnostic-20261105.json`.
+
+## Local changes and checks
+
+- `passive_equilibrium.mechanics` accepts backward-compatible
+  `unloaded_multistart=False` and an optional qualification-only inspection.
+  `solve` keeps its acceptance and abort rules, adding per-start initial
+  contact/length facts, cost and partial progress on exceptions.
+- `structure_research.calculate` uses the original PHS scene, static solver and
+  declared starts. Existing `inspect` with `constraint_active_set` on the frozen
+  baseline exposes unloaded qualification. No new action, solver or Worker
+  reservation state machine was added. Complete dynamics independently requalify.
+- The existing result summary and Reporter projections carry initial-forward,
+  unilateral length, numerical termination, KKT, capacity and conditional
+  stability facts. Failed-point gradients do not establish a mechanism conclusion.
+- Cross-candidate initialization review lists requested methods, unresolved
+  explanations and optional research directions with costs/prerequisites. The
+  existing STOP opportunity review asks why alternatives are declined, without
+  requiring an experiment or forbidding justified STOP.
+- `phs2d-research-process@1` is a real `case`, admitted only by its explicit
+  whitelist. It contains seven English decisions: unloaded qualification;
+  numerical versus physical failure; finite deformation; constraint geometry;
+  actual guide holes; material relaxation/settling; complete independent checks.
+  The first request receives six linked process summaries and seven transferable
+  lessons. Detailed reading is optional. Repeated failures and STOP receive
+  bounded reminders. Attribution remains Codex/operator organization, not proven
+  autonomous discovery. No winning parameters, labels or reconstruction references
+  were added to the case; benchmark-answer access remains disabled.
+
+Four directed tests passed in 23.973 s, including a real SDK/Mock Provider wire,
+on-demand detailed reading, cross-candidate reminders and the original Knowledge
+SELECT/STOP isolation. The accounting regression reused the saved real kernel
+output: one mathematical charge, retained kernel cost, zero backend episode
+reservations and unmeasured task acceptance. The real kernel checks themselves
+used two models, zero integration steps and no Provider. Including initial
+diagnosis, this task built five static models, with no loaded episodes or search.
+These engineering checks are not current-Study scientific evidence.
+
+## Independent formal successor
+
+`phs2d-mechanism-successor-20261105` is prepared with the original ten conditions,
+nine-segment/four-tendon domain, physical model, qualification and Replay/SELECT
+rules. The model remains Gateway `gpt-5.6-sol`, Main `medium`, Reporter `none`.
+The new Store starts independently; it does not reset parent costs.
+
+The concrete approval request is `phs2d-successor-authorization-20261105.json`:
+64 shared Provider requests (6 protected), 80 backend episodes, 320 public
+operations (10 protected), no cumulative mathematical count quota, and finite
+unchanged Worker watchdogs. Provider extensions remain limited to at most eight
+per exact addendum, with a total policy ceiling of 128; that policy does not grant
+an increment in advance.
+
+Status: prepared, environment ready, pending independent current-identity user
+approval. No real successor Provider request, mathematical research, loading,
+independent Replay or SELECT has occurred yet. SDK/Mock tests prove delivery and
+readability, not real Main adoption. Once approved, the same formal Study can run
+in supervised windows without a separate Provider rehearsal.

@@ -94,15 +94,26 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
     for start in starts:
         # SI objective is scaled uniformly for SLSQP stopping; physical KKT unscaled.
         cons=[] if native.unrestricted else [dict(type='ineq',fun=lambda q:-1000*problem.constraint(q),jac=lambda q:-1000*problem.jacobian(q))]
-        result=minimize(lambda q:1000*problem.objective(q),start,jac=lambda q:1000*problem.gradient(q),
-            method='SLSQP',constraints=cons,options=dict(ftol=opts['ftol'],maxiter=opts['max_iterations']))
-        problem.cost['optimizer_iterations']+=int(result.nit)
-        checked=problem.qualify(result.x)
+        before=dict(problem.cost)
+        try:
+            gap=problem.constraint(start).tolist();contacts=int(problem.at(start).ncon)
+            result=minimize(lambda q:1000*problem.objective(q),start,jac=lambda q:1000*problem.gradient(q),
+                method='SLSQP',constraints=cons,options=dict(ftol=opts['ftol'],maxiter=opts['max_iterations']))
+            problem.cost['optimizer_iterations']+=int(result.nit)
+            checked=problem.qualify(result.x)
+        except Exception as exc:
+            # Preserve the formal abort behavior and expose what was actually tried.
+            exc.equilibrium_progress=dict(trials=trials,starts_requested=len(starts),starts_attempted=len(trials)+1,
+                initial_forward_completed=problem.cost['native_forward_calls']>0,
+                numerical_cost=dict(problem.cost))
+            raise
         # Preserve PHS qualification: independent physical KKT/second-order
         # checks, not SLSQP's line-search flag, establish numerical eligibility.
         # A failed solver termination remains explicit alongside those checks.
         checked['solver_termination']='converged' if result.success else 'nonconverged_numerically_qualified' if checked['status']=='qualified_local_minimum' else 'nonconverged_unqualified'
-        checked.update(optimizer_success=bool(result.success),optimizer_message=result.message,iterations=int(result.nit),initial=start.tolist())
+        checked.update(optimizer_success=bool(result.success),optimizer_message=result.message,iterations=int(result.nit),initial=start.tolist(),
+            initial_contacts=contacts,initial_length_residual_m=gap,
+            numerical_cost={k:v-before[k] for k,v in problem.cost.items()})
         trials.append(checked)
     good=[x for x in trials if x['status']=='qualified_local_minimum']
     best=min(good or trials,key=lambda x:(x['primal_violation_m'],x['stationarity_inf_nm']))
@@ -110,6 +121,47 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
         multistart_same_branch=bool(max(np.linalg.norm(np.array(x['qpos'])-best['qpos']) for x in trials)<1e-4) if multistart else None,
         numerical_cost=problem.cost,solver_settings=dict(opts),task_acceptance='unmeasured',regularization='none',
         assumptions='native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium')
+
+
+def qualification_diagnosis(result=None, *, failure=None, multistart=False):
+    """Physical eligibility facts, never a structural infeasibility conclusion."""
+    progress=getattr(failure,'equilibrium_progress',{}) if failure is not None else {}
+    trials=(result or progress).get('trials',[]);eq=(result or {}).get('equilibrium')
+    qualified=bool(eq and eq['status']=='qualified_local_minimum')
+    snapshot=getattr(failure,'mujoco_diagnostic',{}) if failure is not None else {}
+    collision=snapshot.get('partial_failed_call_observations',{})
+    rows=[{k:t.get(k) for k in ('status','solver_termination','optimizer_success','optimizer_message','iterations',
+        'initial_contacts','initial_length_residual_m','native_contacts','length_residual_m','stationarity_inf_nm',
+        'primal_violation_m','complementarity_nm','kkt_pass','capacity','second_order_sufficient','numerical_cost')} for t in trials]
+    initial_failure=failure is not None and not progress.get('initial_forward_completed',False)
+    if failure is not None:
+        rows.append(dict(status='initial_forward_failure' if initial_failure else 'numerically_unresolved',
+            solver_termination='aborted',optimizer_message=str(failure)))
+    status=('qualified' if qualified else 'initial_forward_failure' if initial_failure else
+        'numerically_unresolved' if failure is not None or any(not t['optimizer_success'] for t in trials) else 'unqualified')
+    layers=[]
+    if failure is not None:layers.append('initial_forward_failure' if initial_failure else 'numerical_solver_failure')
+    if any(t.get('initial_contacts',0) or t.get('native_contacts',0) for t in trials):layers.append('contact')
+    if collision.get('ncon',0):layers.append('contact_observed_after_failed_forward')
+    if any(not t['optimizer_success'] for t in trials):layers.append('equilibrium_nonconvergence')
+    if any(t['primal_violation_m']>(result or {}).get('solver_settings',{}).get('length_tolerance_m',0.) for t in trials):layers.append('unilateral_length_violation')
+    if eq and not eq['kkt_pass']:layers.append('KKT_not_qualified')
+    if eq and not eq['capacity']:layers.append('tension_capacity')
+    if eq and not eq['second_order_sufficient']:layers.append('reduced_stiffness_not_positive')
+    return dict(status=status,qualified=qualified,starts_requested=progress.get('starts_requested',2 if multistart else 1),
+        starts_attempted=progress.get('starts_attempted',len(trials)),trials=rows,
+        starts_skipped_after_abort=progress.get('starts_requested',0)-progress.get('starts_attempted',0),
+        failure_layers=layers,initial_forward_completed=not initial_failure,
+        failed_forward_geometry=({k:collision[k] for k in ('ncon','nefc','valid_complete_state','interpretation') if k in collision} if collision else None),
+        termination_error=str(failure) if failure is not None else None,
+        best_working_point=({k:eq[k] for k in ('kkt_pass','capacity','second_order_sufficient','native_contacts',
+            'stationarity_inf_nm','primal_violation_m','complementarity_nm')} if eq else None),
+        stability_qualified=bool(qualified and eq['second_order_sufficient']),
+        valid_followup=['local unilateral mechanism','finite-deformation comparison','independent complete dynamics'] if qualified else
+            ['legal initialization comparison','constraint geometry and payout','taut/slack branch diagnosis'],
+        unresolved_explanations=[] if qualified else ['constraint geometry','unilateral branch changes','solver failure to find a qualified point'],
+        task_acceptance='unmeasured',
+        scope='Frozen hard-equilibrium eligibility only. Unqualified-point stiffness/gradients do not prove stability or structural infeasibility; dynamic qualification and task acceptance remain independent.')
 
 
 def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1.,0.,0.)):
@@ -142,10 +194,20 @@ def tangent(native,equilibrium,s,force,locations,increment=.1,direction_world=(1
         caveat='finite increments are local extrapolations; slack activation and multiplier sign changes require nonlinear equilibrium solve')
 
 
-def mechanics(native,condition,material_s,initial=None,direction_world=None,*,baseline_result=None):
+def mechanics(native,condition,material_s,initial=None,direction_world=None,*,baseline_result=None,unloaded_multistart=False,qualification_only=False):
     """Registered observations at a real hard equilibrium; no task acceptance."""
     load=native.load(condition);unloaded=native.load(native.problem.baseline_load)
-    baseline=baseline_result if baseline_result is not None else solve(native,unloaded.material_s,unloaded.force_world_n,initial[0] if initial else None)
+    try:
+        baseline=baseline_result if baseline_result is not None else solve(native,unloaded.material_s,unloaded.force_world_n,
+            initial[0] if initial else None,multistart=unloaded_multistart)
+    except Exception as exc:
+        if not qualification_only or not hasattr(exc,'equilibrium_progress'):raise
+        for k,v in exc.equilibrium_progress['numerical_cost'].items():native.cost[k]=native.cost.get(k,0)+v
+        native.cost['native_forward_attempts']=native.cost['native_forward_calls']+1
+        return dict(physical_problem='passive_unilateral_equilibrium',equilibrium=None,baseline_equilibrium=None,
+            constraint_state=dict(status='unqualified',qualified=False),task_observations=[],
+            point_binding=dict(material_s=material_s,load=unloaded.model_dump(mode='json'),frame='world'),
+            qualification_diagnosis=qualification_diagnosis(failure=exc,multistart=unloaded_multistart))
     loaded=baseline if condition==native.problem.baseline_load else solve(native,load.material_s,load.force_world_n,initial[1] if initial else baseline['equilibrium']['qpos'])
     cost={k:(baseline['numerical_cost'][k] if baseline_result is None else 0)+(loaded['numerical_cost'][k] if loaded is not baseline else 0) for k in baseline['numerical_cost']}
     p=StaticProblem(native,load.material_s,load.force_world_n);eq=loaded['equilibrium'];q=np.array(eq['qpos'])
@@ -176,6 +238,7 @@ def mechanics(native,condition,material_s,initial=None,direction_world=None,*,ba
         directional_response=response,
         re_equilibrated_position_response=(point-basepoint).tolist() if qualified else None,
         equilibrium=loaded,baseline_equilibrium=baseline,
+        qualification_diagnosis=qualification_diagnosis(baseline,multistart=unloaded_multistart),
         tip_jacobian_m_rad=Jtip.tolist(),tendon_jacobian_m_rad=J.tolist(),
         constraint_state=dict(status='smooth_fixed_active_set' if smooth else 'nonsmooth_or_degenerate' if qualified else 'unqualified',
             qualified=qualified,LICQ=eq['LICQ'],strict_complementarity=eq['strict_complementarity'],

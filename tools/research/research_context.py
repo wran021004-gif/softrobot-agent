@@ -1433,6 +1433,50 @@ def mathematical_discovery_observations(host, current, candidate):
     return observations,latest
 
 
+def initialization_review(host):
+    """Cross-candidate qualification blockers from recorded facts, no new runs."""
+    def collect():
+        s=state(host)
+        if not s['spec'].get('canonical_task',{}).get('physical_problem'):return None
+        failures=[];designs=set();methods=set();layers=set();latest_qualified=False
+        for ref in s.get('analysis_results',[]):
+            a=host.store.artifact(ref);m=a.get('structure_research') or {};records=m.get('records',[])
+            request=(a.get('requested_operation') or {}).get('mechanism_study') or {}
+            target=(request.get('target') or {}).get('quantity')
+            if target:methods.add((request.get('operation','inspect'),target,request.get('effect_semantics','mechanism_effect')))
+            diagnosis=m.get('qualification_diagnosis')
+            if not diagnosis and records:
+                mech=records[0]['mechanics'];eq=mech.get('baseline_equilibrium')
+                if not eq:eq=mech.get('dynamic_execution',{}).get('unloaded_equilibrium')
+                if eq:
+                    from extensions.tendon_family.passive_equilibrium import qualification_diagnosis
+                    diagnosis=qualification_diagnosis(eq,multistart=len(eq.get('trials',[]))>1)
+            if not diagnosis and a.get('native_diagnostic',{}).get('kind')=='passive_static_forward_failure':
+                diagnosis=dict(qualified=False,status='initial_forward_failure',failure_layers=['initial_forward_failure'])
+            if not diagnosis:continue
+            latest_qualified=diagnosis.get('qualified',False)
+            if latest_qualified:continue
+            failures.append(ref);layers.update(diagnosis.get('failure_layers',[]))
+            if a.get('candidate'):
+                c=host.store.artifact(a['candidate']);designs.add(c.get('physical_design_identity',a['candidate']['artifact_id']))
+        if not failures:return None
+        targets={row[1] for row in methods}
+        directions=[dict(direction=title,requested=bool(targets.intersection(names)),cost=cost,prerequisite=pre) for title,names,cost,pre in (
+            ('frozen unloaded initialization and legal starts',{'constraint_active_set'},'low-cost static','Frozen solver and initialization; no loading integration.'),
+            ('unilateral lengths, payout and taut/slack branches',{'constraint_length_residual','constraint_slack_set','constraint_boundary_set','constraint_tension_margin'},'low-cost static','Unqualified points describe diagnostics only.'),
+            ('actual guide-hole and routing geometry',{'tendon_jacobian','all_tendon_output_row_residual'},'static geometry','Inspect real installed assembly; no finite-response conclusion.'),
+            ('local mechanism and structural sensitivity',{'tangent_compliance','directional_material_response','constrained_motion_subspace'},'bounded mathematical probes','Qualified working point; gradients require branch regularity and consistency.'),
+            ('finite deformation and loaded response',{'re_equilibrated_position_response','finite_time_task_violation'},'static comparison or complete physical task','Qualified point for local response; full dynamics use independent frozen qualification.'))]
+        return dict(failed_attempts=len(failures),distinct_failed_designs=len(designs),repeated_block=len(failures)>=2 and not latest_qualified,
+            failure_layers=sorted(layers),attempted_methods=[dict(operation=o,target=t,effect_semantics=e) for o,t,e in sorted(methods)],
+            research_directions=directions,unresolved=['geometric difficulty','unilateral branch changes','solver did not find a qualified point'],
+            stop_questions=['Does the evidence reject only the current parameterization or solver route?',
+                'Which physically different legal directions remain, and why decline them?',
+                'Could a low-cost diagnostic resolve the main uncertainty?'],
+            scope='Requested methods are coverage facts, not proof of successful computation or exhausted design space. Main chooses experiments or a justified STOP; remaining budget does not compel continuation.')
+    return host.store.snapshot_value(('initialization_review',host.run_id),collect)
+
+
 def research_opportunity_review(host, *, details=False):
     """On-demand facts and existing admission leads; never choose an experiment."""
     from tools.research.evidence_views import native_search_summary
@@ -1497,6 +1541,7 @@ def research_opportunity_review(host, *, details=False):
     space=spec.get('family_space') or {};scope=spec.get('topology_scope') or {}
     current=context(host);brief=decision_brief(current)
     review=dict(version='research_opportunity_review_v1',study_status=s['research_status'],
+        initialization_review=initialization_review(host),
         independently_accepted_structures=complete,full_independent_acceptance=bool(complete),
         coverage=dict(distinct_physical_structures=len(structures),structures=list(structures.values()),
             segment_counts=scope.get('segment_counts',space.get('executable_segment_counts')),
@@ -1517,6 +1562,7 @@ def research_opportunity_review(host, *, details=False):
     searches=[r for r in results if r['control_search']];last=searches[-1] if searches else None
     last_search=last['control_search'] if last else {}
     return dict(version=review['version'],study_status=s['research_status'],full_independent_acceptance=bool(complete),
+        initialization_review=review['initialization_review'],
         coverage=dict(physical_structures=len(structures),topologies=[{k:v[k] for k in ('segment_count','tendon_count')} for v in structures.values()],
             allowed_segments=review['coverage']['segment_counts'],allowed_tendons=review['coverage']['tendon_counts'] or review['coverage']['tendon_count_bounds'],
             continuous_domain_coverage='Not exhausted or quantified.'),
@@ -1871,6 +1917,7 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
         latest_direction=dict(reference=latest,pointer='/structure_research/structure_direction') if latest else None,
         formal_candidate_created=bool(generated),method_detail=view['methods'].get(METHOD),
         remaining_evaluations=view['remaining_evaluations'],execution_block=execution_block)
+    result['initialization_review']=initialization_review(host)
     result.update(direction_candidate=candidate if latest else None,generation_plan_cited_evidence=bool(cited),
         parameter_domain_query=dict(reference=candidate,view='mathematical_capabilities',pointer='/structure_research/parameters'),
         suggestion_adopted=bool(adopted),generation_relations=relations[-2:],
@@ -1881,8 +1928,12 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
     if current['configuration']['task'].get('goal',{}).get('data',{}).get('version')=='passive_response_v2':
         from tools.research_tasks import task_adapter
         for ref in reversed(s.get('analysis_results',[])+s.get('physical_replays',[])):
-            raw=host.store.artifact(ref,paths=('candidate','raw_reference','structure_research.baseline'))
+            raw=host.store.artifact(ref,paths=('candidate','raw_reference','structure_research.baseline','structure_research.qualification_diagnosis'))
             if raw.get('candidate')!=candidate:continue
+            static=raw.get('structure_research',{}).get('qualification_diagnosis')
+            if static:
+                result['qualification_diagnosis']=static
+                break
             diagnosis=(raw.get('structure_research',{}).get('baseline') or {}).get('qualification_diagnosis')
             if diagnosis:
                 diagnosis=deepcopy(diagnosis);diagnosis['source']['reference']=ref
@@ -2238,7 +2289,7 @@ def information_flow_brief(brief, delivered):
                 'formal_candidate_query','historical_directions','details_query','operation_admission',
                 'mechanism_categories','mechanism_purposes','effective_parameter_groups','parameter_domains','task_scope',
                 'target_semantics','conic_entry','operating_point_sources','parameter_domain_query',
-                'finite_time_response','qualification_diagnosis') if k in mechanism}
+                'finite_time_response','qualification_diagnosis','unloaded_qualification','initialization_review') if k in mechanism}
         control['control_sources']=[r for r in control.get('control_sources',[]) if r.get('full_control_sequence')]
         task=result['study_goal'].get('task',{})
         if task.get('physical_problem') or task.get('research_mode') in ('passive_mechanism_and_dynamic_execution','static_mechanism_research'):
