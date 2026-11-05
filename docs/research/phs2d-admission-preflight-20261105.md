@@ -32,3 +32,7 @@ To resolve the state-semantics comparison with fresh evidence, an independent hi
 ## Full-dimensional registered mathematics
 
 One additional isolated REFERENCE_REPRODUCTION_ONLY engineering Store is authorized for one registered `mechanism_structure_v1` evaluation of the actual 144-coordinate reference assembly, loaded at s=0.5 with +0.1 N. It uses the existing Worker, hard-unilateral equilibrium kernel and projected Tip row diagnostic. Its cap is one mathematical evaluation, zero physical episodes and zero integrations. Numerical qualification is measured, never assumed. This supplements the four-coordinate light diagnostic without exporting the reference parameters to Main.
+
+## Conditional smaller numerical check
+
+Only after the first complete unified ten-case run is independently accepted, the separately frozen reference-halfstep Store may execute s=0.5 ±0.1 N again at 0.0625 ms. Its exact cap is two episodes / 256000 attempted steps / one model / zero Provider. It has a distinct task/protocol/Study identity. This is a limited fresh representative timestep check, not the requested full ten-case and initial-perturbation/per-step-geometry robustness certificate. The primary and legacy finite allowance plus this conditional check is at most 1781500 attempted steps; planned total is at most 1633500 before accounting the original ordinary early stop. No unknown attempt is retried. Remaining full convergence and perturbation work is itemized separately.
