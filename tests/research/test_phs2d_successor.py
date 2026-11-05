@@ -15,6 +15,24 @@ from tests.research.test_research_authorization_preflight import approve
 
 
 class PhsSuccessorTests(unittest.TestCase):
+    def test_protected_closeout_reads_only_frozen_opportunity_view(self):
+        from tools.research.core import read_evidence
+        from tools.research.evidence_intent import resolve_evidence_intent
+        with fixture() as h:
+            anchor=state(h)['family_space_reference'];before=h.store.remaining()['used']
+            with patch('tools.research.core.protected',return_value=True):
+                review=resolve_evidence_intent(h,dict(subject='current_task',topic='research_opportunities',detail_level='evidence_review'))
+                self.assertEqual(review['facts']['version'],'research_opportunity_review_v1')
+                detail=read_evidence(h,dict(reference=anchor,view='working_set',pointer='/research_opportunities/decision_rule'),record_read=False)
+                self.assertIn('Main chooses',detail)
+                with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ_REQUIRES'):
+                    resolve_evidence_intent(h,dict(subject='current_task',topic='task'))
+                wrong=save(h,dict(scope='Offline non-anchor fixture'))
+                with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ_REQUIRES'):
+                    read_evidence(h,dict(reference=wrong,view='working_set',pointer='/research_opportunities'),record_read=False)
+            self.assertEqual(h.store.remaining()['used'],before)
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+
     def test_sdk_delivers_process_once_and_reads_case_without_science_credit(self):
         new=resolve(ROOT/'configs/research/study_phs2d_mechanism_successor_20261105.json')
         with fixture() as h:

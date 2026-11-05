@@ -55,7 +55,10 @@ def resolve_evidence_intent(host, query):
     if isinstance(subject,dict) and subject not in registered:
         raise ValueError('EVIDENCE_SUBJECT_NOT_REGISTERED_IN_STUDY')
     # Even a registered object must pass the original protected/raw read boundary.
-    raw=read_evidence(host,dict(reference=subject),record_read=False) if isinstance(subject,dict) else None
+    # Opportunity discovery reads the frozen family working set below. It does
+    # not need the entire session snapshot, which is forbidden during closeout.
+    opportunity_snapshot=q.topic=='research_opportunities' and subject==snapshot
+    raw=read_evidence(host,dict(reference=subject),record_read=False) if isinstance(subject,dict) and not opportunity_snapshot else None
     selected=[plain(r) for r in q.selection]
     sources=[];view='derived_research_view';authority=False
     def source(ref,pointer=''):
