@@ -81,7 +81,7 @@ def resolve_evidence_intent(host, query):
         if any(k not in ids for k in selected):return _choices('REGISTERED_PARAMETER_SELECTION_REQUIRED',ids)
         if selected:rows=[r for r in rows if r['parameter_id'] in selected]
         data=rows if q.detail_level!='summary' else [{k:r[k] for k in ('parameter_group','parameter_id',
-            'physical_meaning','unit','current_value','domain','design_supported','differentiation','authorization_reason',
+            'physical_meaning','unit','current_value','domain','design_supported','generation_available','differentiation','authorization_reason',
             'execution_admission','effective','continuous','selectable','study_authorized')} for r in rows]
         source(subject,'/parameters');source(subject,'/configuration')
     elif q.topic=='task':
@@ -191,6 +191,14 @@ def resolve_evidence_intent(host, query):
         topic=q.topic,view_kind=view,authoritative_scientific_evidence=authority,
         formal_read_credit=False,content_identity=content_identity,sources=sources,
         query=bound,scientific_result_created=False)
+    if q.topic=='structure_parameters':
+        envelope['parameter_groups']=groups
+        if q.group is not None and not selected:envelope['parameter_choices']=ids
+        envelope['authorization_scope']=dict(
+            generation_available='Generation is separately conditional on the frozen FamilySpace and original Plan admission. It does not require a mathematical differentiation grant.',
+            study_authorized='Mathematical direction authorization only; false does not freeze the parameter for legal generation.',
+            selectable='Mathematical method selection only; not a general design-generation prohibition.',
+            navigation='Choose a listed parameter group; selection accepts its exact parameter IDs. No parameter or scientific action is recommended.')
     if q.detail_level=='evidence_review':
         envelope['review_queries']=[dict(**location,view='full') for location in sources]
     items=list(data.items()) if isinstance(data,dict) else data

@@ -112,6 +112,7 @@ def parameter_catalog(spec, candidate, group=None, method=None):
             physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
             domain={k:deepcopy(row[k]) for k in ('data_type','minimum','maximum','choices') if k in row},
             design_supported='generate' in row['supported_methods'],
+            generation_available='generate' in row['supported_methods'] and 'generate' in spec.get('allowed_plan_actions',[]),
             differentiation=deepcopy(row.get('mechanism_differentiation')),
             authorization_reason=row.get('authorization_reason'),execution_admission='not_checked',
             effective=row['effective_in_current_execution'],continuous=row['continuous_perturbation'],

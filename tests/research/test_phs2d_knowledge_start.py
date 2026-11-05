@@ -33,6 +33,35 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_generation_catalog_does_not_conflate_math_direction_authorization(self):
+        from tools.research.design import generate_candidate
+        from tools.research.evidence_intent import resolve_evidence_intent
+        from tools.research.optimal_capability import family_parameters
+        with fixture() as h:
+            spec=deepcopy(state(h)['spec'])
+            result=generate_candidate(h,dict(version='serial_family_generation_v2',
+                family_space_identity=spec['family_space_identity'],segment_count=9,tendon_count=4,
+                segments={'0':dict(length_m=0.159)},spans=[dict(first_segment=0,last_segment=3,count=4)],
+                payout_lengths_m={'tendon_'+str(i):0.4 for i in range(4)}),dict(origin='Offline catalog/legality fixture only'))
+            self.assertEqual(result['status'],'generated',result)
+            ref=result['candidate'];candidate=h.store.artifact(ref)
+            query=dict(subject=ref,topic='structure_parameters',group='segment')
+            catalog=resolve_evidence_intent(h,query)
+            self.assertIn('segment',catalog['parameter_groups'])
+            self.assertIn('segments.0.length_m',catalog['parameter_choices'])
+            selected=resolve_evidence_intent(h,{**query,'selection':['segments.0.length_m']})
+            row=selected['facts'][0]
+            self.assertTrue(row['generation_available'])
+            self.assertFalse(row['study_authorized'])
+            self.assertFalse(row['selectable'])
+            self.assertEqual(row['current_value'],0.159)
+            self.assertIn('Mathematical',selected['authorization_scope']['study_authorized'])
+            with self.assertRaisesRegex(ValueError,'AUTHORIZED_FAMILY_CONTINUOUS_PARAMETER_REQUIRED'):
+                family_parameters(spec,candidate,'segments.0.length_m')
+            self.assertEqual(state(h)['spec'],spec)
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
+            self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
     def test_analysis_recovery_preserves_partial_worker_costs_and_unknown_fallback(self):
         from tools.platform_store import zero
         from tools.state_io import atomic_json,digest
