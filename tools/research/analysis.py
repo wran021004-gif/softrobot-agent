@@ -682,7 +682,7 @@ def recover(host):
             for kind in ('model_build','capability','dual_face')}
         value['attempt_boundary_semantics']='Durable pre-call boundaries; interruption between checkpoint and call cannot establish that the solver entered. Reserved evaluations never reset.'
     if value['status'] not in ('computed','unavailable','not_applicable','not_comparable'):
-        value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
+        value.setdefault('internal_calculations',dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged'))
     if value.get('operation') in ('mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1') and value['status']=='computed':
         from tools.research.physical_replay import binding as schedule_binding
         schedule=value['native_dynamics']['optimized_schedule']

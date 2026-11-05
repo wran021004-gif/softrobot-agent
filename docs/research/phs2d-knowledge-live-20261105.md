@@ -68,3 +68,11 @@ Main 随后自主生成第二个合法短跨距候选并执行自己的无载静
 当前 6 个合法候选、7 次数学评价。第五次静力检查仍不合格且容量超限。Main 随后自主选择对第四、第六个候选分别执行原完整十工况 finite-time 检查；两次均在无载静力初始求解时触发 `FatalError: FactorizeHessian: rank-deficient sparse Hessian`，未开始加载 episode，未积分。它们各扣 1 次数学评价及 10 个 episode 的原预留额度，全部费用保留；20 个是已扣预留预算，不能说实际完成了 20 个 episode。没有独立 Replay 或证书。Provider 经过第三、第四个原子 +8 增补，当前上限 56，累计使用 44；数学 7/20，episode 预算已扣 20/80，公共操作 41/160。
 
 原静力前向调用未使用已有 MuJoCo 失败快照，导致上述错误缺少失败前状态、准确位置和静力中间费用。最小修复仅在 `StaticProblem.at` 复用原 `MujocoFailureSnapshot`，保留原异常，并通过既有 Worker 的 `native_diagnostic` 路径结算部分计数；失败调用内部进度仍标为 unknown。没有更换求解器、regularization、初始条件、物理或验收。2 项定向测试通过（0.387 s），包含失败前状态不被异常后状态污染、部分费用、正常原生前向数组完全一致与原 Worker 快照持久化。因科学源文件 hash 变化，原 bind 保守生成 profile v3；旧失败和旧 profile 候选保留，Main 须自行选择并在当前 profile 合法构建后继续，不转移旧接受性。旧 prepared Study 四文件哈希再次全部核对未变。
+
+## 第 52 次请求：Gateway 接续、初态接触与部分费用保留
+
+Provider 上限 64，累计 52 次；数学 8/20，episode 预留已扣 30/80，仍没有加载 episode 或积分。第 48 次返回已知 retryable HTTP504，没有科学动作，原收费保留；原 SDK restore-only 校验通过后恢复同一 Gateway，第 49 次正常成功。第 50 次由 Main 自主对其当前 profile 重构候选执行完整十工况检查，同样初始化失败。新快照明确为全零 q、静力第一次 forward，优化迭代 0；异常后的碰撞诊断记载 228 个地面接触。
+
+使用同一冻结 XML 和已保存 pre-call state 的最小工程复现，完整 forward 复现原 FatalError；位置/速度两阶段检查可返回，确认全零几何有 228 个 floor 接触和 912 约束行。只用于工程归因，不给科研接受性信用，不改变地面、约束、物理或求解器。该复现 1 个模型、1 个失败 forward、2 个组件调用、0 积分/优化，约 0.051 s；此前一次直接 Windows XML 编译退出 1，完成模型数未知，随后改用仓库已有编译线程 loader。这些工程费用另存原 Store，不能与 Main 的成功证据混淆。
+
+发现原 `analysis.recover` 会把 Worker 已保存的部分 `internal_calculations` 再覆盖为 unknown。最小修复改为仅在没有计数时提供 unknown fallback；保留失败状态、原预留扣账及未知内部进度。真实离线 Store 回归验证“已知部分计数保留”和“缺失计数仍 unknown”两分支（1 项，2.799 s），不重新执行 Worker。旧第 50 次结果和收据不改写，原 `/native_diagnostic/cost` 仍可精确读取；监督者仅链接纠正其呈现归因。科学 profile 保持 v3。

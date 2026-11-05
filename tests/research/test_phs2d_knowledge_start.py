@@ -33,6 +33,35 @@ def fixture():
 
 
 class PhsKnowledgeStartTests(unittest.TestCase):
+    def test_analysis_recovery_preserves_partial_worker_costs_and_unknown_fallback(self):
+        from tools.platform_store import zero
+        from tools.state_io import atomic_json,digest
+        from tools.research import analysis
+        for recorded in (True,False):
+            with self.subTest(recorded=recorded),fixture() as h:
+                query=dict(operation='mechanism_structure_v1',candidate=state(h)['family_space_reference'])
+                key='offline-partial-cost-recovery';h.store.reserve(h.run_id,key,digest(query),h.actor,zero())
+                folder=h.store.root/'offline-analysis-recovery';folder.mkdir()
+                costs=[dict(purpose='failed_native_analysis',physics_steps=0,native_forward_calls=0,native_forward_attempts=1)]
+                value=dict(status='execution_incomplete',reason='Synthetic engine failure fixture; no science')
+                if recorded:value['internal_calculations']=costs
+                atomic_json(folder/'result.json',value)
+                atomic_json(folder/'boundary.json',dict(termination_confirmed=True,elapsed_s=0.4,returncode=1))
+                (folder/'worker.log').write_text('Offline fixture only',encoding='utf-8')
+                update(h,pending=dict(folder=str(folder),worker_request_id=key,request=query,
+                    origin='offline-fixture',implementation='offline-fixture',reserved_s=0.),mathematical_evaluations=1)
+                before=h.store.remaining()
+                result=analysis.recover(h);raw=h.store.artifact(result['reference'])
+                if recorded:
+                    self.assertEqual(raw['internal_calculations'],costs)
+                    self.assertEqual(state(h)['analysis_costs'][-1]['internal_calculations'],costs)
+                else:self.assertEqual(raw['internal_calculations']['status'],'partial_or_unavailable')
+                self.assertEqual(raw['status'],'execution_incomplete')
+                self.assertEqual(state(h)['mathematical_evaluations'],1)
+                before['used']['wall_s']+=0.4  # Original settlement records the fixture's elapsed time.
+                self.assertEqual(h.store.remaining(),before)
+                self.assertIsNone(state(h)['pending'])
+
     def test_failed_static_forward_retains_pre_call_state_and_partial_costs(self):
         from types import SimpleNamespace
         import mujoco
