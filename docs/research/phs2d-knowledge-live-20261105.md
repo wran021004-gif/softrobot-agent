@@ -2,7 +2,21 @@
 
 Study `phs2d-knowledge-autonomy-20261105` 已真实启动，初始 resolved identity 为 `31c22b6af32975d2d30c87e1c56943faf0fb47d6273d74d5496a790237b5dab7`、原 Gateway `gpt-5.6-sol / medium`、原完整十工况和原 Store。这里记录前两个已结算窗口，不代表最终科研结论；后续累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和私有原账本为准。
 
-## 最新状态：Gateway 额度阻断，目标尚未达成
+## 最新接续：临时官方 API，定时切回 Gateway
+
+用户明确要求“先用官方API（第三种）方式续上，等一个半小时之后继续使用gateway方式”。已在同一 Store 应用精确身份的 transport addendum、正式授权与 committed bind，保留 `gpt-5.6-sol`、Main `medium`、Reporter `none`、原科学 profile v3、Python/线程环境、SDK 会话和全部费用。切回时间为 **2026-11-05 18:22:53 Asia/Shanghai（10:22:53 UTC）**，当前聊天心跳 `phs-2d-gateway` 已保存该指令；在已结算边界使用同一正式机制恢复原 Gateway。该时间不表示已经证明 Gateway 额度恢复。
+
+官方账户 `GET /v1/models` HTTP200 确认存在精确模型，未发送额外推理探针。第 77 次共享请求真实返回 HTTP400：此模型的 Chat Completions 不支持 `medium` 与 function tools 的组合，明确要求 Responses 或 `none`。保留原错误及费用，未降低 reasoning。最小接口修复将官方 `medium` 工具请求转换为 stateless Responses；同一原计费边界保存原始上游请求、原始上游响应和明确标记的 SDK Chat 投影视图，按工具调用身份保留加密 reasoning 项。SDK 仍负责唯一的科研会话与工具执行。参考 [官方模型文档](https://developers.openai.com/api/docs/models/gpt-5.6-sol) 和 [Responses 迁移文档](https://developers.openai.com/api/docs/guides/migrate-to-responses)；真实 HTTP 反馈优先于宽泛的模型能力列表。
+
+后续两个已结算窗口共 **8 次真实官方 API 研究请求全部 HTTP200**。累计 **11 个合法候选、14 次数学评价**（9 次静力检查、5 次完整十工况 finite-time 尝试），仍无合格工作点、实际加载积分、独立 Replay 或 SELECT。Main 自行评价第十个候选，继而生成并评价新的路由变体；新的静力结果仍未满足收敛、容量或稳定性资格，不证明全族不可行。监督者没有提供结构数值或替 Main 选择方向。
+
+原账本 Provider **85/96**（9 次合法 +8 增补）、数学 **14/20**、episode 预留 **50/80**、公共操作 **75/160**。8 次官方成功响应已知 prompt=617,878、completion=3,209、total=621,087 tokens；第 77 次错误 usage 未返回，原 Gateway 的两次缺失 usage 也仍未知。所有 Provider 货币费用仍未知。原冻结科学资源未扩张。
+
+定向离线验证共 4 项，覆盖精确授权、原子往返、非法模型/设置与未结算边界拒绝、真实 SDK 跨接口接续、原工具反馈、上游原始证据、加密 reasoning 再交接，以及 incomplete 响应只扣一次且不得提交工具。最新 3 项完整运行 31.757 s，新增 incomplete 回归 2.331 s；没有声称全仓测试通过。最初旧通用夹具因 `matlab.engine` 缺失失败的记录保留，随后改用本任务现有 PHS 离线夹具；没有安装或伪造 MATLAB。
+
+当前累计状态以 [状态 JSON](phs2d-knowledge-status-20261105.json) 和原账本为准。下文为此前阶段的历史记录。
+
+## 上次暂停：第 76 次 Gateway 额度阻断
 
 第 76 次共享 Provider 请求返回 HTTP429 `subscription_sharing_usage_limit_exceeded`、`retryable=false`。已停止后续发送，没有后台重试或自动更换 Provider。当前原 SDK restore-only 已再次通过，不发送模型或科学请求；无 pending/unknown、无未消费响应、无 SELECT、无被接受的科学 STOP。当前仍保留原 Gateway `gpt-5.6-sol / medium`。
 
