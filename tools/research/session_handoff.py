@@ -589,21 +589,27 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
             committed=[e for e in events if e['kind']=='session_handoff' and e['status']=='committed'
                 and e['outputs'][0]==preparation]
             unsent=bool(committed and not any(e['kind']=='r3_request' and e['sequence']>committed[-1]['sequence'] for e in events))
-            failed_send=None
+            failed_send=None;failed_sends=[]
             if committed:
                 from tools.research.provider import received,model_messages,pending
                 after=[e for e in events if e['sequence']>committed[-1]['sequence']]
                 sends=[e for e in after if e['kind']=='r3_request']
-                if len(sends)==1 and not pending(host) and not s.get('pending') and not s['pilot'].get('unconsumed_response'):
-                    send=sends[0];row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])
-                    meta=host.store.artifact(send['outputs'][0]);wire=host.store.artifact(meta['request'])
-                    if (row and row['receipt'] and json.loads(row['receipt'])['execution_status']=='failed'
-                            and reception and reception['http_status'] in (429,502,503,504)
-                            and meta.get('purpose')=='conversation'
-                            and not any(e['kind'] in ('model_original_turn','model_original_tool_request','model_original_tool_feedback') for e in after)
-                            and wire['messages'][-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
-                            and model_messages(host,normalized,wire['messages'][0]['content'])==wire['messages'][:-1]):
-                        failed_send=send['request_id']
+                if (sends and not pending(host) and not s.get('pending') and not s['pilot'].get('unconsumed_response')
+                        and not any(e['kind'] in ('model_original_turn','model_original_tool_request','model_original_tool_feedback') for e in after)):
+                    # Repeated settled failures can share this initial snapshot.
+                    # Verify every send against the exact saved prompt; an earlier
+                    # successful, unknown or different send cannot be skipped.
+                    for send in sends:
+                        row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])
+                        meta=host.store.artifact(send['outputs'][0]);wire=host.store.artifact(meta['request'])
+                        if not (row and row['receipt'] and json.loads(row['receipt'])['execution_status']=='failed'
+                                and reception and reception['http_status'] in (429,502,503,504)
+                                and meta.get('purpose')=='conversation'
+                                and wire['messages'][-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
+                                and model_messages(host,normalized,wire['messages'][0]['content'])==wire['messages'][:-1]):
+                            break
+                    else:
+                        failed_sends=[send['request_id'] for send in sends];failed_send=failed_sends[-1]
             if (normalized[:len(initial_messages)]!=initial_messages or not suffix
                     or any(m!=dict(role='user',content=[dict(text=INVOCATION_PROMPT)]) for m in suffix)
                     or not (unsent or failed_send) or verification.get('preparation')!=preparation or not verification.get('independently_restored')):
@@ -611,7 +617,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
             from tools.research.provider import record
             record(host,'sdk_failed_initial_invocation_verified' if failed_send else 'sdk_unsent_invocation_verified',dict(preparation=preparation,session_id=session_id,
                 sdk_message_identity=digest(agent.messages),messages=agent.messages,snapshot_files=files,
-                next_request_sent=False,invocation_completed=False,failed_request_id=failed_send,
+                next_request_sent=False,invocation_completed=False,failed_request_id=failed_send,failed_request_ids=failed_sends,
                 failed_request_cost_retained=bool(failed_send),remote_generation_outcome='unknown' if failed_send else 'not_sent'))
             return 'initial_unsent_invocation'
         if (verification.get('preparation')!=preparation or not verification.get('independently_restored')

@@ -14,7 +14,7 @@ from tests.research.test_s125_contract import cold_host
 
 
 class RequestBoundaryHandoffTests(unittest.TestCase):
-    def test_failed_first_send_after_handoff_keeps_charge_and_exact_prompt(self):
+    def test_repeated_failed_first_sends_after_handoff_keep_charges_and_exact_prompt(self):
         from tools.research.provider import pending
         from tests.research.test_phs2d_knowledge_start import fixture
         from tests.research.test_research_authorization_preflight import approve
@@ -22,7 +22,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         context=fixture();h=context.__enter__();self.addCleanup(context.__exit__,None,None,None)
         approve(h,[REGISTERED_MATHEMATICS_SCOPE]);sent=[];normal=self.responder(h,sent)
         def respond(request):
-            if len(sent)==1:
+            if len(sent) in (1,2):
                 sent.append(json.loads(request.content))
                 return httpx.Response(502,json=dict(error=dict(code='network_error',message='Offline unknown remote outcome')))
             response=normal(request);body=response.json()
@@ -46,12 +46,29 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             path.write_bytes(original)
             asyncio.run(converse(h,session_handoff=True,restore_only=True))
             self.assertEqual(h.store.remaining(),ledger);self.assertEqual(len(sent),2)
+            with self.assertRaises(Exception):
+                asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
+            self.assertEqual(len(sent),3)
+            ledger=h.store.remaining();self.assertEqual(ledger['used']['model_calls'],3)
+            failed=[e for e in h.store.events(h.run_id) if e['kind']=='r3_request'][1:]
+            lookup=h.store.lookup
+            for bad_receipt in (None,json.dumps(dict(execution_status='completed'))):
+                def altered(run_id,key,db=None):
+                    row=lookup(run_id,key,db)
+                    return {**row,'receipt':bad_receipt} if key==failed[0]['request_id'] else row
+                with patch.object(h.store,'lookup',side_effect=altered):
+                    with self.assertRaisesRegex(ValueError,'SDK_INITIAL_CONTEXT_MISMATCH'):
+                        asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            asyncio.run(converse(h,session_handoff=True,restore_only=True))
+            self.assertEqual(h.store.remaining(),ledger);self.assertEqual(len(sent),3)
             asyncio.run(converse(h,session_handoff=True,max_new_provider_requests=1))
-        self.assertEqual(len(sent),3)
+        self.assertEqual(len(sent),4)
         self.assertEqual(sent[1]['messages'][:-1],sent[2]['messages'][:-1])
-        self.assertEqual(h.store.remaining()['used']['model_calls'],3)
+        self.assertEqual(sent[2]['messages'][:-1],sent[3]['messages'][:-1])
+        self.assertEqual(h.store.remaining()['used']['model_calls'],4)
         self.assertEqual(pending(h),[])
-        self.assertTrue(any(e['kind']=='sdk_failed_initial_invocation_verified' for e in h.store.events(h.run_id)))
+        verified=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='sdk_failed_initial_invocation_verified']
+        self.assertEqual(verified[-1]['failed_request_ids'],[e['request_id'] for e in failed])
 
     def test_initial_parameter_rejection_restores_without_reset_or_duplicate_prompt(self):
         from tools.research.provider import pending, provider_outcome
