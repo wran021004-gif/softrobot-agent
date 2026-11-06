@@ -57,3 +57,7 @@
 第三个 Gateway 账号使用 `http://127.0.0.1:8789/v1` 和 `~/.softrobot-agent/chatgpt-api-account3.json`。
 `npm run account3 -- login` 显示官方授权网址供复制到无痕浏览器，`npm run account3 -- start` 启动独立实例。
 后续明确指定“Gateway 第三个账号”；前两个连接不切换。详见 [第三个账号说明](gateway_account3.md)。
+
+2026-11-06 用户批准后，第二、第三账号各自目录均返回 8 个型号，gpt-5.6-luna / none 短文本推理均通过。
+首轮共两次 empty_response 保留，移入已有完成事件修复后各复验一次成功；总四次尝试。
+具体工具调用能力未在这两个新账号测试。见 [真实验证报告](gateway_accounts23_validation_20261106.md)。

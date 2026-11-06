@@ -69,5 +69,9 @@ account_status=connected、plan_usage=true。原账号 Key 访问 8788、新账�
 本次真实推理请求为 0，没有读取新账号模型目录，也没有创建 Study。
 connected / plan usage 表示身份与授权通过，不替代具体模型的实际调用能力验证。
 
+后续用户已明确批准 Account2/3 的真实推理验证。Account2 的 gpt-5.6-luna / none 已返回 HTTP 200 和 OK。
+为加载原 8787 已有的响应修复，只重启 Account2/3；Account2 当前 PID=166208，8788 与原凭据路径不变。
+首轮失败、修复及受控复验见 [2026-11-06 两账号验证](gateway_accounts23_validation_20261106.md)。
+
 官方依据：[OpenAI Docs：Accounts and sessions](https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions)
 要求不同注册的账号信息、client ID 和凭据分开保存；不以 email 作为唯一账号身份。

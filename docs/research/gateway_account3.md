@@ -35,10 +35,17 @@ npm run account3 -- status
 
 `npm run account3 -- setup` 仅初始化独立本地存储，无须登录、不访问上游。
 服务器启动也不发送推理；具体模型和工具能力在明确选择该账号后另行验证。
-本次不创建 Study、不发送模型请求、不增加自动账号轮换或 Provider 回退。
+配置阶段不创建 Study、不发送模型请求、不增加自动账号轮换或 Provider 回退。
 
 本地验证：9 项 Windows DPAPI、共享账号入口、原 CLI、运行锁和 Mock OAuth 回归通过。
 原 Account1/2 状态与原连接凭据共 9 个文件在 Account3 setup 和登录等待阶段内容未变，
-8787 / 8788 仍由原进程监听。Account3 本地凭据已生成；浏览器授权、服务启动结果须另行核实。
+8787 / 8788 当时仍由原进程监听。此处为配置阶段检查，后续真实验证见下文。
+
+用户已通过手动网址在无痕窗口完成 Account3 授权，SDK 返回 connected / sharing=true。
+8789 已后台启动，本地 health=200，六组不同账号 Key 交叉访问均为 401。
+随后用户明确批准 Account2/3 真实推理；两者 gpt-5.6-luna / none 均已返回 HTTP 200 和 OK。
+期间移入原 8787 已使用的响应事件修复，仅重启 Account2/3，当前 Account3 PID=94940、Account2 PID=166208；
+原 8787 PID=56416 未变。无需重复启动服务。
+首轮失败与修复后复验均保留，完整计数及范围见 [两账号真实验证](gateway_accounts23_validation_20261106.md)。
 
 官方依据：[OpenAI Docs：Registration and sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in)。
