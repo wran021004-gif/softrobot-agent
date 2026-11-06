@@ -51,3 +51,43 @@ test('Responses completion, interruption and upstream errors are distinct',async
   await assert.rejects(run([{type:'response.incomplete'}]),{code:'response_incomplete'});
   await assert.rejects(run([{type:'response.failed',response:{error:{code:'subscription_sharing_usage_limit_exceeded'}}}]),{code:'subscription_sharing_usage_limit_exceeded'});
 });
+
+const runEvents=events=>streamResponse('synthetic-token',{model:'account-model',input:[{role:'user',content:'Act.'}]},
+  new AbortController().signal,()=>({responses:{create:async()=>
+    (async function*(){yield* events;})()}}));
+
+test('completed item events survive an omitted terminal output, preserving exact calls and reasoning',async()=>{
+  const reasoning={type:'reasoning',id:'reasoning-fixture',encrypted_content:'opaque-fixture',summary:[]};
+  const result=await runEvents([
+    {type:'response.output_item.done',output_index:1,item:call},
+    {type:'response.output_item.done',output_index:0,item:reasoning},
+    {type:'response.completed',response:{status:'completed',output:[],usage:{input_tokens:8,output_tokens:3,total_tokens:11}}},
+  ]);
+  assert.deepEqual(result.provider_output,[reasoning,call]);
+  assert.equal(result.tool_calls[0].id,call.call_id);assert.equal(result.tool_calls[0].function.arguments,call.arguments);
+  assert.equal(result.usage.total_tokens,11);
+  assert.deepEqual(result.gateway_completion,{output_source:'completed_item_events',terminal_output_items:0,completed_item_events:2});
+  const text={type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:'Exact completed text.'}]};
+  assert.equal((await runEvents([{type:'response.output_item.done',output_index:0,item:text},
+    {type:'response.completed',response:{status:'completed'}}])).text,'Exact completed text.');
+});
+
+test('terminal output remains authoritative and empty/delta-only output is never fabricated',async()=>{
+  const final={type:'message',role:'assistant',content:[{type:'output_text',text:'Terminal answer.'}]};
+  const result=await runEvents([{type:'response.output_item.done',output_index:0,item:call},
+    {type:'response.completed',response:{status:'completed',output:[final]}}]);
+  assert.equal(result.text,'Terminal answer.');assert.deepEqual(result.tool_calls,[]);
+  assert.equal(result.gateway_completion.output_source,'terminal_output');
+  const empty=await runEvents([{type:'response.output_text.delta',delta:'unconfirmed'},
+    {type:'response.completed',response:{status:'completed',output:[]}}]);
+  assert.equal(empty.text,'');assert.deepEqual(empty.tool_calls,[]);assert.equal(empty.usage,undefined);
+});
+
+test('completed items alone cannot turn interruption, incompleteness or failure into success',async()=>{
+  const done={type:'response.output_item.done',output_index:0,item:call};
+  await assert.rejects(runEvents([done]),{code:'stream_interrupted'});
+  await assert.rejects(runEvents([done,{type:'response.incomplete'}]),{code:'response_incomplete'});
+  await assert.rejects(runEvents([done,{type:'response.failed',response:{error:{code:'subscription_sharing_usage_limit_exceeded'}}}]),{code:'subscription_sharing_usage_limit_exceeded'});
+  await assert.rejects(runEvents([{type:'response.output_item.done',output_index:0,item:{...call,status:'incomplete'}},
+    {type:'response.completed',response:{status:'completed',output:[]}}]),{code:'invalid_stream'});
+});
