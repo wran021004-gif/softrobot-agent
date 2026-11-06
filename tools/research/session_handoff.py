@@ -184,6 +184,35 @@ def selected_evidence_facts(parsed, query, limit):
     return facts
 
 
+def settled_semantic_reads(host):
+    """Retain bounded saved retrieval pages across clean SDK sessions; no read credit."""
+    pages={}
+    events=[e for e in host.store.events(host.run_id) if e['kind']=='model_original_tool_feedback'][-64:]
+    for event in reversed(events):
+        reference=event['outputs'][0]
+        value=host.store.artifact(reference,paths=('tool_use','result.status'))
+        use=value['tool_use']
+        if use['name']!='evidence_read' or 'topic' not in use['input'] or value['result']['status']!='success':continue
+        result=host.store.artifact(reference,paths=('result.content',))['result']
+        parsed=json.loads(''.join(b.get('text','') for b in result['content']))
+        if parsed.get('version')!='semantic_evidence_v1' or parsed.get('status')!='available':continue
+        query=deepcopy(parsed['query'])
+        cursor=use['input'].get('continuation')
+        if cursor:query['continuation']=deepcopy(cursor)
+        key=digest(dict(query=query,content_identity=parsed['content_identity']))
+        if key in pages:
+            pages[key]['settled_repetitions']+=1
+            continue
+        if len(pages)>=6:continue
+        facts=selected_evidence_facts(parsed,query,6000)
+        facts['recovery_query']=query
+        pages[key]=dict(sequence=event['sequence'],settled_repetitions=1,
+            feedback_reference=reference,facts=facts,
+            original_result_query=dict(reference=reference,view='full',pointer='/result'))
+    return dict(version='settled_semantic_reads_v1',pages=list(reversed(list(pages.values()))),
+        scope='Recent successful Store retrieval pages, not proof of Main understanding or complete-read credit. Exact repeats add no new data; saved facts or next_query remain available. Main chooses whether further retrieval or a scientific action is useful.')
+
+
 def feedback_delivery(host, tool_ids, *, compact=False, exact=False, db=None):
     """Project the verified last tool round, without synthesizing SDK messages."""
     from tools.research.research_context import compact_evidence

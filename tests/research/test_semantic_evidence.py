@@ -179,6 +179,73 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertFalse(compact['scientific_result_created'])
         self.assertEqual(core.read_tool_evidence(h,compact['next_query'])['status'],'available')
 
+    def test_settled_semantic_pages_survive_fresh_host_with_exact_cursors_and_repeat_counts(self):
+        from tools.platform_host import Host
+        from tools.research.provider import record
+        from tools.research.session_handoff import settled_semantic_reads
+        h,c=self.host();q=dict(subject=c,topic='structure_parameters',detail_level='targeted')
+        first=core.read_tool_evidence(h,q);self.assertTrue(first.get('next_query'))
+        def feedback(query,page,status='success'):
+            return record(h,'model_original_tool_feedback',dict(tool_use=dict(name='evidence_read',input=query),
+                result=dict(status=status,content=[dict(text=json.dumps(page))])))
+        feedback(q,first);feedback(q,first)
+        second=core.read_tool_evidence(h,first['next_query']);feedback(first['next_query'],second)
+        feedback(q,first,status='error')
+        before=deepcopy(state(h));usage=h.store.remaining();events=h.store.events(h.run_id)
+        pages=settled_semantic_reads(Host(h.store.root,h.run_id))['pages']
+        self.assertEqual(len(pages),2)
+        self.assertEqual(pages[0]['settled_repetitions'],2)
+        self.assertEqual(pages[0]['facts']['facts'],first['facts'])
+        self.assertEqual(pages[0]['facts']['next_query'],first['next_query'])
+        self.assertEqual(pages[1]['facts']['recovery_query'],first['next_query'])
+        self.assertEqual(core.read_tool_evidence(h,pages[1]['facts']['recovery_query'])['facts'],second['facts'])
+        self.assertTrue(all(not p['facts']['formal_read_credit'] for p in pages))
+        self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),usage)
+        self.assertEqual(h.store.events(h.run_id),events)
+
+    def test_large_retained_page_keeps_exact_recovery_without_restarting_pagination(self):
+        from tools.research.provider import record
+        from tools.research.session_handoff import settled_semantic_reads
+        h,c=self.host();q=dict(subject=c,topic='structure_parameters')
+        first=core.read_tool_evidence(h,q);nxt=first['next_query']
+        page=core.read_tool_evidence(h,nxt)
+        page['facts']=[dict(offline_fixture_only='x'*12000)]
+        record(h,'model_original_tool_feedback',dict(tool_use=dict(name='evidence_read',input=nxt),
+            result=dict(status='success',content=[dict(text=json.dumps(page))])))
+        kept=settled_semantic_reads(h)['pages'][0]['facts']
+        self.assertNotIn('facts',kept)
+        self.assertEqual(kept['recovery_query'],nxt)
+        self.assertEqual(kept.get('next_query'),page.get('next_query'))
+
+    def test_settled_semantic_reads_reach_actual_later_main_wire(self):
+        h,c=self.host()
+        spec=deepcopy(state(h)['spec'])
+        spec['research_decisions'].update(tool_schema_policy=dict(version='research_information_flow_v1'),
+            language_policy=dict(version='english_sources_v1',authored_language='en'))
+        update(h,spec=spec)
+        wires=run_fixture(h,[('evidence_read',dict(subject=c,topic='structure_parameters',group='lengths')),
+            ('evidence_read',dict(subject=c,topic='structure_parameters',group='materials')),None])
+        retained=packet(wires[-1])['evidence_access']['settled_retrievals']
+        self.assertEqual(len(retained['pages']),2)
+        self.assertEqual({p['facts']['query']['group'] for p in retained['pages']},{'lengths','materials'})
+        self.assertTrue(all(p['facts'].get('facts') for p in retained['pages']))
+        self.assertTrue(all(not p['facts']['formal_read_credit'] for p in retained['pages']))
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+
+    def test_settled_semantic_retention_is_bounded_to_latest_six_distinct_pages(self):
+        from tools.research.provider import record
+        from tools.research.session_handoff import settled_semantic_reads
+        h,c=self.host()
+        rows=[row for page in all_pages(h,dict(subject=c,topic='structure_parameters')) for row in page['facts']]
+        ids=[row['parameter_id'] for row in rows[:8]];self.assertEqual(len(ids),8)
+        for name in ids:
+            q=dict(subject=c,topic='structure_parameters',selection=[name],detail_level='targeted')
+            page=core.read_tool_evidence(h,q)
+            record(h,'model_original_tool_feedback',dict(tool_use=dict(name='evidence_read',input=q),
+                result=dict(status='success',content=[dict(text=json.dumps(page))])))
+        kept=settled_semantic_reads(h)['pages']
+        self.assertEqual([p['facts']['query']['selection'][0] for p in kept],ids[-6:])
+
     def test_changed_projection_rejects_old_cursor_and_pins_old_candidate(self):
         from tools.research.scientific_intent import parameter_catalog
         h,c=self.host();q=dict(subject='current_candidate',topic='structure_parameters')

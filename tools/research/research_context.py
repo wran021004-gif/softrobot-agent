@@ -1949,6 +1949,8 @@ def agent_decision_brief(host):
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
     from tools.research.config import information_flow_v1
     if information_flow_v1(s['spec']):
+        from tools.research.session_handoff import settled_semantic_reads
+        brief['settled_retrievals']=settled_semantic_reads(host)
         brief['focus_hypothesis']=deepcopy(brief.get('prepared_scientific_intent') or intent.get('latest_decision'))
         brief['flow_facts']=[]
         from tools.research.object_choices import main_projection
@@ -2317,6 +2319,8 @@ def information_flow_brief(brief, delivered):
     capabilities=[dict(category=name,actions=[r for r in action_rows if r['action'] in names])
         for name,names in groups.items()]
     access=value.get('evidence_access',{})
+    if brief.get('settled_retrievals',{}).get('pages'):
+        access['settled_retrievals']=deepcopy(brief['settled_retrievals'])
     access.pop('knowledge',None)
     if access.get('working_set'):access['working_set'].pop('scope',None)
     if access.get('stop_index'):access['stop_index'].pop('rule',None)
