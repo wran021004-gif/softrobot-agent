@@ -45,3 +45,11 @@
 官方依据：[API Key 设置](https://developers.openai.com/api/docs/quickstart)、
 [Chat Completions 参数](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、
 [GPT-5.6 Luna 模型契约](https://developers.openai.com/api/docs/models/gpt-5.6-luna)。
+
+## 新增 Gateway 第二个账号
+
+原三类 Provider 及已有凭据继续保留。新增连接使用同一个 `chatgpt_gateway` 适配，
+独立地址 `http://127.0.0.1:8788/v1` 和凭据 `~/.softrobot-agent/chatgpt-api-account2.json`。
+账号由 `npm run account2 -- login` 登录，`npm run account2 -- start` 通过 7890 代理启动。
+后续明确指定“Gateway 第二个账号”；账号目录和模型权限单独验证，既有 Study 的冻结连接不变。
+详见 [第二个账号说明](gateway_account2.md)。

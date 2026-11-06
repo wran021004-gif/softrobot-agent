@@ -58,6 +58,23 @@ This does not change OAuth, consent, account, region selection or billing.
 Starting the server performs no upstream request. Do not repeat a known
 non-retryable admission error merely because proxy startup succeeded.
 
+## Second account without changing the first
+
+From this V2 directory, use `npm run account2 -- login` and select the second
+account in the official browser flow. After login, run `npm run account2 -- start`.
+The account2 launcher reuses the existing CLI and pinned DevKit, sets its own
+state directory and port, and routes through the existing 7890 proxy.
+It does not select a profile or stop the server in the first account's directory.
+
+Account2 uses `%LOCALAPPDATA%/LocalResearchChatGPTGateway-Account2`, port 8788,
+and `~/.softrobot-agent/chatgpt-api-account2.json`. Its local secret is generated
+by the original DPAPI code, not copied from account1. `setup` initializes local
+storage without signing in; `status` reads the account2 session when its server
+is stopped. Successful login exports the separate local credential file without
+printing its secret; conflicting existing files are preserved.
+No inference, model selection, automatic account switching or request fallback
+is added. See [Chinese setup instructions](../docs/research/gateway_account2.md).
+
 `node scripts/diagnose-state.mjs --audit-p4` reads protected state offline and
 emits consistency booleans only. It does not create a client, refresh tokens,
 verify JWT signatures remotely, write credentials or reveal private IDs.
