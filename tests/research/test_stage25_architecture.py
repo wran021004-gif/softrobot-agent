@@ -31,6 +31,36 @@ def target_for(quantity):
 
 
 class Stage25ArchitectureTests(unittest.TestCase):
+    def test_load_summary_keeps_baseline_and_each_case_constraints_distinct(self):
+        # Fabricated retrieval fixture: neither baseline slack nor its eligibility
+        # may be attributed to every compared load.
+        from tools.research.structure_research import summary
+        states=[dict(qualified=True,active_count=0,minimum_slack_margin_m=.00998,
+                     native_soft_length_residual_m=[-.00998,-.01]),
+                dict(qualified=False,active_count=1,minimum_slack_margin_m=.00797,
+                     native_soft_length_residual_m=[.0001,-.00797])]
+        names=['s3_positive','s7_positive']
+        raw=dict(operation='compare',target=dict(quantity='constraint_multiplier',reduction='maximum'),
+            baseline=dict(value=0.,unit='N'),constraint_state=states[0],
+            point_binding=dict(load=dict(name=names[0])),cost={},unsupported_conclusions=[],
+            load_comparison=dict(aggregate=dict(operation='maximum',value=2.,unit='N'),cases=[
+                dict(load_condition=name,observation=dict(status='computed',value=value,unit='N'),
+                    mechanics=dict(constraint_state=state))
+                for name,value,state in zip(names,[0.,2.],states)]))
+        before=deepcopy(raw);ref=dict(artifact_id='1'*64,media_type='application/json')
+        view=summary(dict(structure_research=raw),ref)
+        self.assertEqual(view['constraint_state_load_condition'],'s3_positive')
+        self.assertEqual(view['constraint_state']['minimum_slack_margin_m'],.00998)
+        cases=view['load_comparison']['cases']
+        self.assertEqual([c['load_condition'] for c in cases],names)
+        self.assertEqual([c['constraint_state']['minimum_slack_margin_m'] for c in cases],[.00998,.00797])
+        self.assertEqual([c['qualified'] for c in cases],[True,False])
+        self.assertEqual(cases[1]['constraint_state']['native_soft_length_excess_m'],.0001)
+        self.assertEqual(cases[1]['source'],dict(reference=ref,pointer='/structure_research/load_comparison/cases/1'))
+        self.assertEqual(view['load_comparison']['aggregate'],raw['load_comparison']['aggregate'])
+        self.assertIn('baseline load only',view['load_comparison']['scope'])
+        self.assertEqual(raw,before)
+
     def test_registry_schema_compiler_and_physical_admission(self):
         h,c=prepared_host();candidate=h.store.artifact(c)
         with patch.object(core,'guard'):core.dispatch(h,diagnosis(c,'mechanism_research'),'stage25-diagnose')

@@ -708,10 +708,13 @@ def summary(value, reference):
         if row.get('implicit_sensitivity'):
             compact_sensitivity['implicit_sensitivity']={k:row['implicit_sensitivity'][k] for k in
                 ('status','baseline_included','relative_error','gradient_trustworthy','strict_derivative','reason') if k in row['implicit_sensitivity']}
-    constraint_state=raw.get('constraint_state')
-    if constraint_state and 'native_soft_length_residual_m' in constraint_state:
-        constraint_state={k:v for k,v in constraint_state.items() if k!='native_soft_length_residual_m'}
-        constraint_state['native_soft_length_excess_m']=max(0.,max(raw['constraint_state']['native_soft_length_residual_m']))
+    def constraint_summary(state):
+        if not state:return state
+        compact={k:v for k,v in state.items() if k!='native_soft_length_residual_m'}
+        if 'native_soft_length_residual_m' in state:
+            compact['native_soft_length_excess_m']=max(0.,max(state['native_soft_length_residual_m']))
+        return compact
+    constraint_state=constraint_summary(raw.get('constraint_state'))
     task_observations=deepcopy(raw.get('task_observations',[])[:4])
     diagnosis=raw.get('qualification_diagnosis')
     if diagnosis:
@@ -729,6 +732,7 @@ def summary(value, reference):
             row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
+        constraint_state_load_condition=((raw.get('point_binding') or {}).get('load') or {}).get('name'),
         qualification_diagnosis=diagnosis,
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         task_observations=task_observations,
@@ -736,9 +740,13 @@ def summary(value, reference):
         structure_direction=compact,generation_handoff=handoff,
         comparison=comparison,parameter_sensitivities=sensitivity,local_search=raw.get('local_search'),
         load_comparison=({**{k:v for k,v in raw['load_comparison'].items() if k!='cases'},
+            'scope':'Top-level constraint_state describes the baseline load only. Each case owns its constraint state; aggregate applies only to the requested target.',
             'cases':[dict(load_condition=c['load_condition'],status=c['observation']['status'],
                 value=observation_summary(c['observation']['value']),unit=c['observation']['unit'],
-                qualified=c['mechanics']['constraint_state']['qualified']) for c in raw['load_comparison']['cases']]} if raw.get('load_comparison') else None),
+                qualified=c['mechanics']['constraint_state']['qualified'],
+                constraint_state=constraint_summary(c['mechanics']['constraint_state']),
+                source=dict(reference=reference,pointer=f'/structure_research/load_comparison/cases/{i}'))
+                for i,c in enumerate(raw['load_comparison']['cases'])]} if raw.get('load_comparison') else None),
         source=dict(reference=reference,pointer='/structure_research'),
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
         effect_semantics=raw.get('effect_semantics'),reference_semantics=raw.get('reference_semantics'),
