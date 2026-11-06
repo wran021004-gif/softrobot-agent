@@ -388,6 +388,11 @@ def completed_question_plan(host):
     import json
     s=state(host);references=list(s.get('plans',[]))
     intent = research_intent(host)['latest_decision'] or {}
+    # Construction records a new object; it does not change the explicitly
+    # bound research question. Only another diagnose can choose its subject.
+    while intent.get('action') in ('generate','propose') and intent.get('execution_status')=='completed':
+        references=references[:references.index(intent['plan_reference'])]
+        intent=research_intent(host,plan_references=references)['latest_decision'] or {}
     # Preparation of the identical object preserves Main's scientific choice.
     # Any other action or condition change ends this carry.
     while (s['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4'
@@ -513,9 +518,11 @@ def compile_question(host, payload, *, tool_use_id):
                 issue=dict(field='.'.join(map(str,error['loc'])),reason=error['msg'])
                 if error['type']=='extra_forbidden' and len(error['loc'])==1 and error['loc'][0] in properties:
                     issue['expected_field']=domain+'.'+error['loc'][0]
+                if error.get('ctx',{}).get('expected'):issue['allowed_values']=error['ctx']['expected']
                 issues.append(issue)
-            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=issues,
+            return dict(status='needs_choice',reason='INVALID_SCIENTIFIC_V4_INPUT',issues=issues[:4],
                 allowed_root_fields=list(schema['properties']),
+                additional_mathematical_evaluations=0,additional_physical_episodes=0,
                 correction_scope='Field locations from the active Schema only. Main must resubmit; the original input and any explicit cap are unchanged.',
                 scientific_execution_started=False)
         if q.domain=='structure':
@@ -537,8 +544,9 @@ def compile_question(host, payload, *, tool_use_id):
             point_error=all(list(e.absolute_path)==['structure','operating_point'] for e in errors)
             return dict(status='not_applicable' if point_error else 'needs_choice',
                 reason='SCIENTIFIC_WORKING_POINT_NOT_APPLICABLE' if point_error else 'INVALID_SCIENTIFIC_V4_INPUT',issues=[
-                dict(field='.'.join(map(str,e.absolute_path)),reason=e.message) for e in errors],
-                scientific_execution_started=False)
+                dict(field='.'.join(map(str,e.absolute_path)),reason=e.message[:240],
+                    **(dict(allowed_values=e.validator_value) if e.validator in ('enum','const') else {})) for e in errors[:4]],
+                scientific_execution_started=False,additional_mathematical_evaluations=0,additional_physical_episodes=0)
         result=(compile_mechanism(host,expanded['structure'],tool_use_id=tool_use_id,v4=True) if q.domain=='structure' else
             compile_v1(host,expanded['control'],tool_use_id=tool_use_id,contract=ScientificControlV4,source_question=payload))
         if result['status']!='ready':return result
@@ -548,6 +556,7 @@ def compile_question(host, payload, *, tool_use_id):
             tool_use_id=tool_use_id,plan_reference=intent['plan_reference'],raw_main_input=deepcopy(payload),
             provider_schema=schema,compiled_question=expanded,deterministic_field_sources=field_sources,
             full_request=result['request'],method_alignment=result['method_alignment'],scientific_execution_started=False),'scientific_intent_compilation')
+        result['plan_reference']=intent['plan_reference']
         return result
     if mechanism_interface(spec):return compile_mechanism(host,payload,tool_use_id=tool_use_id)
     return compile_v1(host,payload,tool_use_id=tool_use_id,contract=question_contract(spec))

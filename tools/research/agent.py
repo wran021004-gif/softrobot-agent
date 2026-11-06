@@ -48,6 +48,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             'is justified, and remaining uncertainty. Absence of a passing candidate alone is insufficient; unused '
             'budget alone does not require continuation. User stop, budget limits, engineering blocks '
             'and evidence-based scientific closure remain valid. Use existing Plan fields; no experiment is prescribed.')
+        schema['properties']['supporting_evidence']['description']='Cite every result in research_workflow.evaluations / all_fresh_results, including failures across candidates. Use advertised short references. Multi-candidate empirical_search describes finite exploration; a stronger candidate-specific claim retains all original identity and evidence checks.'
     conditions=(study or {}).get('task_conditions')
     if conditions:
         for branch in schema['properties']['selected_execution']['anyOf']:
@@ -497,7 +498,8 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
     selection=selection or selected_analysis(host,None)
     if not selection:raise ValueError('SELECTED_AUTHORIZED_ANALYSIS_METHOD_REQUIRED')
     method,detail=selection
-    intent=research_intent(host)['latest_decision']
+    from tools.research.scientific_intent import completed_question_plan
+    intent=completed_question_plan(host)
     candidate=intent['agent_hypothesis']['decision']['selected_candidate']
     bound_candidate=verify_candidate(host,candidate)
     schema=selected_analysis_schema(method,detail,bound=True)
@@ -548,7 +550,8 @@ def bind_selected_analysis_request(host, payload, *, tool_use_id, selection=None
 def selected_analysis(host, brief):
     """Expose only the method in the last settled diagnose decision."""
     from tools.research.research_context import research_intent
-    intent=research_intent(host)['latest_decision'] or {}
+    from tools.research.scientific_intent import completed_question_plan
+    intent=completed_question_plan(host) or {}
     decision=(intent.get('agent_hypothesis') or {}).get('decision') or {}
     method=decision.get('selected_method');candidate=intent.get('candidate')
     if (intent.get('action')!='diagnose' or intent.get('execution_status')!='completed' or not method or not candidate
@@ -991,7 +994,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                             schema=selected_analysis_schema(method,detail)
                             validate_selected_analysis_payload(payload,schema,detail)
                     from tools.research.analysis import dispatch as analysis_dispatch
-                    value=compilation if compilation is not None and compilation['status']!='ready' else analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard)
+                    value=compilation if compilation is not None and compilation['status']!='ready' else analysis_dispatch(host,payload,'native-'+use['toolUseId'],guard=guard,
+                        plan_reference=compilation.get('plan_reference') if compilation else None)
                     if compilation is not None and compilation.get('method_alignment'):
                         alignment=deepcopy(compilation['method_alignment'])
                         result=value.get('result',value)
@@ -1374,7 +1378,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     if len(action)==1:
                         plan.tool_spec={**plan.tool_spec,'inputSchema':{'json':reference_schema(schema,choices,action[0])}}
                         from tools.research.research_context import ordered_candidates
-                        wanted=[*ordered_candidates(host,s)[-3:],
+                        wanted=[*ordered_candidates(host,s),*s.get('plans',[]),*s.get('analysis_results',[]),*s.get('mechanics_results',[]),
                             *[r['candidate'] for r in boundary.research_packet.get('saved_replay_choices',{}).get('options',[])],
                             *s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
                         boundary.research_packet['saved_object_choices']=[dict(choice=k,reference=v,

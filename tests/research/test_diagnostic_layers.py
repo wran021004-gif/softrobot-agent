@@ -47,7 +47,8 @@ class DiagnosticLayerTests(unittest.TestCase):
     def test_real_first_forward_failure_keeps_position_geometry_and_cost(self):
         out=self.failed;layers=analysis.diagnostic_layers(out);raw=out['structure_research']
         geometry=layers['geometry'];process=layers['numerical_solve']['facts']
-        self.assertEqual(geometry['status'],'passed')
+        self.assertEqual(geometry['status'],'not_evaluated')
+        self.assertEqual(geometry['computation_status'],'completed')
         self.assertEqual(geometry['facts']['contact_count'],228)
         self.assertEqual(len(geometry['facts']['tendon_length_m']),4)
         self.assertIn('position_world_m',geometry['facts']['contact_examples'][0])
@@ -110,7 +111,7 @@ class DiagnosticLayerTests(unittest.TestCase):
             active_model_progress=[dict(stage='model_preparation'),dict(stage='derivative_check',
                 row=dict(construction=dict(static_equilibrium=False),model=dict(y0=[0.,0.,0.],operating_point=dict(name='halfway_waypoint'))))])
         layers=analysis.diagnostic_layers(result)
-        self.assertEqual(layers['geometry']['status'],'passed')
+        self.assertEqual(layers['geometry']['computation_status'],'completed')
         self.assertEqual(layers['numerical_solve']['status'],'unqualified')
         self.assertIsNone(layers['numerical_solve']['facts']['derivative_check'])
         self.assertEqual(layers['dynamic_validation']['status'],'not_evaluated')
@@ -152,9 +153,9 @@ class DiagnosticLayerTests(unittest.TestCase):
         result['dynamic_execution_progress']=[dict(status='completed',episodes=[dict(load_condition='fixture_case',complete=True)],cost=dict(physics_steps=2))]
         layers=analysis.diagnostic_layers(result)
         self.assertEqual(layers['static_qualification']['status'],'not_evaluated')
-        self.assertEqual(layers['dynamic_validation']['status'],'passed')
+        self.assertEqual(layers['dynamic_validation']['status'],'not_evaluated')
         self.assertIn('independent Replay',layers['dynamic_validation']['missing_checks'])
-        self.assertEqual(analysis.diagnostic_overview(layers)['highest_passed_layer'],'dynamic_validation')
+        self.assertIn('dynamic_validation',analysis.diagnostic_overview(layers)['observed_layers'])
 
     def test_main_reporter_and_tool_use_one_projection_without_mutation(self):
         from tools.research.evidence_views import quantitative_facts
@@ -188,8 +189,31 @@ class DiagnosticLayerTests(unittest.TestCase):
         value=dict(status='computed',raw=dict(records=[{},row]))
         layers=analysis.diagnostic_layers(value)
         self.assertEqual(layers['numerical_solve']['status'],'unqualified')
-        self.assertEqual(layers['static_qualification']['status'],'unqualified')
+        self.assertEqual(layers['static_qualification']['status'],'not_applicable')
         self.assertEqual(value['status'],'computed')  # Preserve original computation semantics.
+
+    def test_second_initial_forward_failure_is_not_hidden_by_first_start_success(self):
+        from tests.research.test_constrained_mechanics import physical_fixture
+        from extensions.tendon_family.passive import PassiveModel
+        from extensions.tendon_family.passive_equilibrium import solve,StaticProblem,qualification_diagnosis
+        import mujoco
+        *_,physics,problem=physical_fixture();native=PassiveModel(physics,problem)
+        second=.001*np.sin(np.arange(native.model.nv));first_done=[]
+        original_qualify=StaticProblem.qualify;original_forward=mujoco.mj_forward
+        def qualify(instance,q):
+            out=original_qualify(instance,q);first_done.append(True);return out
+        def forward(model,data):
+            if first_done and np.array_equal(data.qpos,second):raise mujoco.FatalError('Injected second-start initial forward failure')
+            return original_forward(model,data)
+        with patch.object(StaticProblem,'qualify',new=qualify),patch.object(mujoco,'mj_forward',new=forward),self.assertRaises(mujoco.FatalError) as error:
+            solve(native,multistart=True)
+        progress=error.exception.equilibrium_progress
+        self.assertTrue(progress['trials'][0]['initial_forward_completed'])
+        self.assertGreater(progress['numerical_cost']['native_forward_calls'],0)
+        self.assertFalse(progress['failed_trial']['initial_forward_completed'])
+        diagnosis=qualification_diagnosis(failure=error.exception,multistart=True)
+        self.assertEqual(diagnosis['status'],'initial_forward_failure')
+        self.assertEqual(diagnosis['starts_attempted'],2)
 
 
 if __name__=='__main__':unittest.main()

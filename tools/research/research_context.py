@@ -370,7 +370,8 @@ def context(host, *, evidence_references=None):
     # One authoritative STOP index, including results absent from observation previews.
     current['all_fresh_results']=[r for key in ('results','mechanics_results','physical_replays',
         'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])]
-    analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','operation','source_kind')))
+    analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','operation','source_kind','status','plan_reference',
+        'boundary','diagnostic_layers','charged_analysis_evaluations','reserved_dynamic_cost_bound','actual_resource_consumption')))
         for r in s.get('analysis_results',[])]
     current['decision_feedback']=dict(
         recent_searches=[dict(reference=r,**compact_evidence(host.store.artifact(r),r)['summary'])
@@ -621,6 +622,95 @@ def recorded_changes(before,after,path=''):
     return [dict(pointer=path,before=before,after=after)]
 
 
+def candidate_workflow(host,current,candidates,evaluations):
+    """Read-only joins of registered candidates, original Plans and exact results."""
+    from tools.research.scientific_intent import completed_question_plan
+    from tools.research.analysis import diagnostic_overview
+    s=state(host);plans=[];outcomes={};generated_by={}
+    for reference in s.get('plans',[]):
+        saved=host.store.artifact(reference);plan=saved['original_plan']
+        call=host.store.lookup(host.run_id,saved['request_id'])
+        receipt=json.loads(call['receipt']) if call and call['receipt'] else None
+        output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
+        result=output.get('result',output)
+        item=dict(reference=reference,action=plan['action'],candidate=plan_candidate(plan),
+            submission_status=receipt['execution_status'] if receipt else 'registered',
+            result=result.get('reference'),hypothesis_query=dict(reference=reference,pointer='/original_plan'))
+        plans.append(item)
+        if result.get('reference'):outcomes[result['reference']['artifact_id']]=reference
+        if plan['action'] in ('generate','propose') and result.get('candidate'):
+            generated_by[result['candidate']['artifact_id']]=reference
+    index=[]
+    mathematical=[*s.get('analysis_results',[]),*s.get('mechanics_results',[])]
+    for reference,value in evaluations:
+        layers=value.get('diagnostic_layers')
+        item=dict(reference=reference,candidate=value.get('candidate') or value.get('design_candidate'),
+            plan=value.get('plan_reference') or outcomes.get(reference['artifact_id']),
+            method=value.get('operation'),status=value.get('status'),
+            kind='mathematics' if reference in mathematical else 'independent_execution',
+            worker_started=(value.get('boundary') or {}).get('worker_started'),
+            complete_dynamic_execution=(value.get('profile') or {}).get('complete'),
+            original_acceptance=(value.get('acceptance') or {}).get('accepted'),
+            actual_resource_consumption=value.get('actual_resource_consumption'),
+            reserved_episodes=value.get('physical_launches'))
+        if layers:item['diagnostics']=diagnostic_overview(layers)
+        index.append(item)
+    rows=[]
+    for candidate in candidates:
+        c=host.store.artifact(candidate,paths=('profile_identity','configuration.task','provenance'))
+        results=[r for r in index if r['candidate']==candidate];math=[r for r in results if r['kind']=='mathematics']
+        physics=[r for r in results if r['kind']=='independent_execution']
+        rows.append(dict(candidate=candidate,generated=True,generated_by=generated_by.get(candidate['artifact_id']),
+            generation_source=c.get('provenance'),
+            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'] and
+                (not c['configuration']['task'].get('physical_problem') or passive_registered(c['configuration']['task'])),
+            plans=[p['reference'] for p in plans if p['candidate']==candidate],
+            mathematical_evaluations=len(math),latest_mathematics=math[-1]['reference'] if math else None,
+            latest_mathematical_status=math[-1]['status'] if math else 'not_evaluated',
+            complete_dynamic_execution=any(r['complete_dynamic_execution'] is True for r in physics),
+            independent_acceptance=any(r['complete_dynamic_execution'] is True and r['original_acceptance'] is True for r in physics),
+            unevaluated=not results,details_query=dict(reference=candidate,pointer='/configuration')))
+    active=completed_question_plan(host)
+    rejected=[host.store.artifact(e['outputs'][0]) for e in host.store.events(host.run_id)
+        if e['kind']=='research_decision_rejected']
+    pending=s.get('pending') or {}
+    return dict(candidates=rows,plans=plans,evaluations=index,
+        rejected_requests=[dict(request_id=r['request_id'],action=r['plan']['action'],reason=r['reason']) for r in rejected[-3:]],
+        pending_evaluation=(dict(plan=pending.get('plan_reference'),candidate=pending.get('request',{}).get('candidate'),
+            stage='reserved_or_running',worker_started=None) if pending.get('kind')=='candidate_analysis' else None),
+        active_plan=(dict(reference=active['plan_reference'],candidate=active['candidate'],
+            hypothesis=active['agent_hypothesis']) if active else None),
+        unknown_plan_links=[r['reference'] for r in index if r['plan'] is None],
+        scope='Exact Store/receipt joins only. Registration is not execution or scientific progress. New construction never rebinds an existing diagnose; Main must explicitly diagnose a different candidate.')
+
+
+def execution_preview(host,candidate,evaluations):
+    """Frozen execution dependencies and existing ledger facts; no new admission."""
+    from tools.research_tasks import task_adapter
+    from tools.research.budget import backend_capacity
+    cfg=host.store.artifact(candidate)['configuration'];task=cfg['task'];adapter=task_adapter(cfg)
+    passive=bool(task.get('physical_problem'));goal=task['goal']['data']
+    related=[(r,v) for r,v in evaluations if (v.get('candidate') or v.get('design_candidate'))==candidate]
+    qualifications=[(r,v) for r,v in related if (v.get('diagnostic_layers') or {}).get('static_qualification')]
+    latest=qualifications[-1] if qualifications else None
+    hard=passive and goal.get('execution_protocol')=='phs2d_original_v1'
+    failed=bool(latest and latest[1]['diagnostic_layers']['static_qualification']['status']!='passed')
+    episodes=len(goal['load_conditions']) if passive else 1
+    return dict(candidate=candidate,mode=task['physical_problem']['mode'] if passive else 'active_ideal_tension',
+        requirements={k:v for k,v in adapter.execution_requirements().items() if k in
+            ('registered_acceptance','execution_admission','known_blockers','protocol_id','physical_inputs')},
+        initializer=('Every full execution repeats the frozen unloaded hard-equilibrium solve and both original starts before loading. A previous initialization failure cannot be bypassed by selecting full ten-case dynamics.' if hard else
+            'Frozen passive task initializer and loading protocol.' if passive else adapter.lifecycle()['initialization']),
+        control_sources=[e['source'] for e in state(host).get('control_initializations',[]) if e['candidate']==candidate] if not passive else [],
+        latest_qualification=(dict(reference=latest[0],**latest[1]['diagnostic_layers']['static_qualification']) if latest else None),
+        repeat_initialization_failure=hard and failed,
+        evidence_since_qualification=[r for r,v in related[related.index(latest)+1:]] if latest else [],
+        cost=dict(reserved_episodes=episodes,remaining_physical_episodes=backend_capacity(host),
+            recorded_executions=[dict(reference=r,reserved_episodes=v.get('physical_launches'),
+                actual=v.get('actual_resource_consumption')) for r,v in related if v.get('physical_launches') is not None]),
+        scope='Information only; original admission and budget rules remain unchanged. No Worker or mathematical precheck is launched. Main chooses whether a possible repeated initialization failure is worth attempting.')
+
+
 def working_set(host,current, *, citation_references=None, analysis_metadata=None):
     """Recomputable bounded Store projection; science and next-method choice stay separate."""
     from tools.research.candidate_portfolio import ranking_key
@@ -629,7 +719,9 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
     references=current['all_fresh_results'];coverage=read_coverage(host)
     metadata={r['artifact_id']:v for r,v in (analysis_metadata or [])}
     owners=[(ref,metadata[ref['artifact_id']] if ref['artifact_id'] in metadata and metadata[ref['artifact_id']].get('candidate')
-        else host.store.artifact(ref,paths=('candidate','design_candidate'))) for ref in references]
+        else host.store.artifact(ref,paths=('candidate','design_candidate','status','operation','plan_reference','boundary',
+            'diagnostic_layers','profile.complete','acceptance.accepted','physical_launches','actual_resource_consumption'))) for ref in references]
+    workflow=candidate_workflow(host,current,candidates,owners)
     shown=candidates[-3:];best=current.get('best_valid') or {};important=best.get('executable_candidate',best.get('candidate'))
     if important in candidates and important not in shown:shown=[*shown[-2:],important]
     selected=decision_candidate(host,current,research_intent(host))
@@ -726,8 +818,9 @@ def working_set(host,current, *, citation_references=None, analysis_metadata=Non
         citation_totals=dict(citation_eligibility_counts=dict(registered_count=len(known),
             scientific_result_count=sum(citation_role(host,r,current=s,known=known) in
                 ('scientific_result','independent_evaluation') for r in known)))
-    return dict(version='evidence_working_set_v2',candidate_index=index,candidate_count=len(candidates),
-        candidate_index_query='All candidate references remain in source_references; previews retain the latest three',
+    return dict(version='evidence_working_set_v2',candidate_index=index,candidate_count=len(candidates),research_workflow=workflow,
+        execution_preview=execution_preview(host,selected,owners) if selected else None,
+        candidate_index_query='All candidates are in research_workflow.candidates; detailed previews retain the latest three and active Plan candidate.',
         control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage,read_coverage_count=len(coverage),
         source_state_identity=digest(s),
         read_counts={k:sum(r['successfully_provided'] and r['classification']==k for r in coverage) for k in ('exact_repeat','covered_subnode','changed_content','new_query')},
@@ -921,6 +1014,8 @@ def decision_brief(current):
         candidate_count=ws['candidate_count'],candidate_index=deepcopy(ws['candidate_index']),
         control_result_links=links,control_comparisons=ws['control_comparisons'],
         method_scope=ws['method_scope'],scientific_scope=ws['scientific_scope'])
+    brief['research_workflow']=ws['research_workflow']
+    brief['execution_preview']=ws['execution_preview']
     brief['evidence_working_set']['read_state']=dict(completed_reads=len(ws['read_coverage']),
         read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
             classification=r['classification'],content_identity=r['delivery_identity'],
@@ -1055,7 +1150,9 @@ def plan_candidate(plan):
 
 def decision_candidate(host,current,intent):
     """Display the recorded decision candidate, then feedback/latest construction."""
-    return (next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
+    from tools.research.scientific_intent import completed_question_plan
+    active=completed_question_plan(host)
+    return ((active or {}).get('candidate') or next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
         or (current.get('latest_scientific_feedback') or {}).get('candidate')
         or next(iter(reversed(ordered_candidates(host,state(host)))),None))
 
@@ -1541,6 +1638,9 @@ def research_opportunity_review(host, *, details=False):
     space=spec.get('family_space') or {};scope=spec.get('topology_scope') or {}
     current=context(host);brief=decision_brief(current)
     review=dict(version='research_opportunity_review_v1',study_status=s['research_status'],
+        research_workflow=current['evidence_working_set']['research_workflow'],
+        all_fresh_results=current['all_fresh_results'],
+        execution_preview=current['evidence_working_set']['execution_preview'],
         initialization_review=initialization_review(host),
         independently_accepted_structures=complete,full_independent_acceptance=bool(complete),
         coverage=dict(distinct_physical_structures=len(structures),structures=list(structures.values()),
@@ -1562,6 +1662,8 @@ def research_opportunity_review(host, *, details=False):
     searches=[r for r in results if r['control_search']];last=searches[-1] if searches else None
     last_search=last['control_search'] if last else {}
     return dict(version=review['version'],study_status=s['research_status'],full_independent_acceptance=bool(complete),
+        research_workflow=review['research_workflow'],all_fresh_results=review['all_fresh_results'],
+        execution_preview=review['execution_preview'],
         initialization_review=review['initialization_review'],
         coverage=dict(physical_structures=len(structures),topologies=[{k:v[k] for k in ('segment_count','tendon_count')} for v in structures.values()],
             allowed_segments=review['coverage']['segment_counts'],allowed_tendons=review['coverage']['tendon_counts'] or review['coverage']['tendon_count_bounds'],
@@ -2259,6 +2361,7 @@ def information_flow_brief(brief, delivered):
     trace=brief.get('milestone_trace',value.get('history_trace'))
     if trace and trace['total']==0:trace=dict(total=0,action_total=trace.get('action_total',0),recall=dict(trace='actions'))
     result=dict(version='research_information_flow_v1',
+        research_workflow=brief.get('research_workflow'),execution_preview=brief.get('execution_preview'),
         scientific_results=value.get('scientific_results'),
         study_goal={k:current[k] for k in ('task_identity','task','task_conditions') if k in current},
         research_focus=focus,current_research_state=value.get('current_research_state'),

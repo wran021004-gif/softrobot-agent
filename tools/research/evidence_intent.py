@@ -91,7 +91,7 @@ def resolve_evidence_intent(host, query):
             # not repeated compiler prose that leaves just one row per page.
             data=[{k:r[k] for k in ('parameter_group','parameter_id','physical_meaning','unit','current_value',
                 'domain','design_supported','generation_available','study_authorized','selectable',
-                'authorization_reason','effective','continuous')} for r in rows]
+                'applicable_methods')} for r in rows]
         source(subject,'/parameters');source(subject,'/configuration')
     elif q.topic=='task':
         if subject not in [*candidates,snapshot]:raise ValueError('FROZEN_TASK_OR_OWNED_CANDIDATE_REQUIRED')
@@ -216,7 +216,8 @@ def resolve_evidence_intent(host, query):
     # registered detail remains exact even if large (SDK can offload it).
     page=[];end=start
     for item in items[start:]:
-        if page and (len(page)>=6 or len(json.dumps(page+[item],ensure_ascii=False).encode())>2600):break
+        byte_limit=6000 if q.topic=='structure_parameters' and not selected else 2600
+        if page and (len(page)>=6 or len(json.dumps(page+[item],ensure_ascii=False).encode())>byte_limit):break
         page.append(item);end+=1
     envelope['facts']=dict(page) if isinstance(data,dict) else page
     envelope['total']=len(items)

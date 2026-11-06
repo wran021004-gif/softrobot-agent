@@ -31,7 +31,7 @@ def _reference_choices(host, *, include_all=False):
     evaluations=[r for key in ('results','physical_replays','rl_evaluations') for r in s.get(key,[])]
     analyses=s.get('analysis_results',[])
     from tools.research.evidence_policy import registered_references
-    refs=[] if include_all else [*readable_results(s),*registered_references(host)]
+    refs=[] if include_all else [*candidates,*s.get('plans',[]),*readable_results(s),*registered_references(host)]
     # Row identities are local selectors, not portable scientific identities.
     # Each advertised schema retains the exact alias-to-reference binding below.
     with host.store.connect(True) as db:
@@ -40,6 +40,7 @@ def _reference_choices(host, *, include_all=False):
         for ref in refs:
             if ref in choices.values():continue
             if ref in analyses:name='result_'+str(analyses.index(ref)+1)
+            elif ref in s.get('plans',[]):name='plan_'+str(s['plans'].index(ref)+1)
             else:
                 row=db.execute('SELECT rowid FROM artifacts WHERE id=?',(ref['artifact_id'],)).fetchone()
                 if row is None:continue
@@ -78,7 +79,9 @@ def expand_references(payload, schema, *, strict=True):
         if '$ref' in node:
             name=node['$ref'].rsplit('/',1)[-1]
             if name=='EvidenceRef':
-                if isinstance(value,str) and (strict or value in choices):return deepcopy(choices[value])
+                if isinstance(value,str) and (strict or value in choices):
+                    if value not in choices:raise ValueError('UNKNOWN_SAVED_OBJECT_CHOICE: '+value)
+                    return deepcopy(choices[value])
                 return value
             return expand(value,definitions[name])
         if isinstance(value,dict):
@@ -330,7 +333,7 @@ def main_tool_schema(schema, choices):
         schema['$defs']['ResearchDecision']['description']='Main chooses hypothesis, candidate and scientific variables. The host derives research_intent from the explicit Plan action before original validation.'
         schema['description']=schema.get('description','')+' Candidate selection belongs only in decision.selected_candidate when advertised there. Never add a top-level selected_candidate field.'
     if 'EvidenceRef' in schema.get('$defs',{}):
-        schema['$defs']['EvidenceRef']=dict(type='string',pattern=r'^(candidate|evaluation|result|evidence)_[1-9][0-9]*$',
+        schema['$defs']['EvidenceRef']=dict(type='string',pattern=r'^(candidate|plan|evaluation|result|evidence)_[1-9][0-9]*$',
             description='Use the stable short reference in the research packet or an evidence response.')
         schema['x-research-reference-choices']=choices
     if any('family_space_identity' in node.get('properties',{}) for node in schema.get('$defs',{}).values()):

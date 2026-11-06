@@ -116,7 +116,7 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
                 numerical_cost={k:v-before[k] for k,v in problem.cost.items()})
             exc.equilibrium_progress=dict(trials=trials,starts_requested=len(starts),starts_attempted=len(trials)+1,
                 failed_trial=trial,
-                initial_forward_completed=problem.cost['native_forward_calls']>0,
+                initial_forward_completed=trial['initial_forward_completed'],
                 numerical_cost=dict(problem.cost))
             raise
         # Preserve PHS qualification: independent physical KKT/second-order

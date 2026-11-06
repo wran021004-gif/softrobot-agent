@@ -1,0 +1,54 @@
+{
+  "credentials_reference": "~/.softrobot-agent/openai-api.json",
+  "provider": {
+    "adapter": "openai_api",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.openai.com/v1",
+    "context_bytes": 1048576,
+    "context_guard": {
+      "context_limit_tokens": 1050000,
+      "framing_headroom_tokens": 8192
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": null,
+    "max_turns": 40,
+    "model": "gpt-5.6-sol",
+    "model_capabilities": {
+      "catalog_source": "Official API GET /v1/models HTTP200 confirmed exact gpt-5.6-sol on 2026-11-05; official model documentation supports medium and function calls: https://developers.openai.com/api/docs/models/gpt-5.6-sol. Original 1MiB request ceiling retained.",
+      "max_request_bytes": 1048576,
+      "model": "gpt-5.6-sol",
+      "reasoning": [
+        "none",
+        "medium"
+      ],
+      "tools": true,
+      "verification": "account_verified"
+    },
+    "output_context_reserve_tokens": 32768,
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 0,
+      "max_total": 0
+    },
+    "proxy_url": "http://127.0.0.1:7890",
+    "reasoning": "medium",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": null,
+    "timeout_s": 600.0
+  },
+  "research_python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
+  "rl_diagnostic_hard_cap_s": null,
+  "rl_evaluation_hard_cap_s": null,
+  "rl_python": "D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe",
+  "threads": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  }
+}

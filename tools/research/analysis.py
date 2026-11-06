@@ -332,8 +332,12 @@ def admission(host,requested=1,engineering=False):
     return dict(admitted=count,requested=requested,reservation_s=0.,timeout_s=s['spec'].get('mathematical_worker_watchdog_s',s['spec'].get('analysis_cap_s')),remaining_numerical_s=None)
 
 
-def dispatch(host,query,key,*,guard,origin='model'):
+def dispatch(host,query,key,*,guard,origin='model',plan_reference=None):
     q=AnalysisRequest.model_validate(query)
+    if plan_reference:
+        from tools.research.research_context import plan_candidate
+        if plan_candidate(host.store.artifact(plan_reference)['original_plan'])!=plain(q.candidate):
+            raise ValueError('ANALYSIS_PLAN_CANDIDATE_MISMATCH')
     request_id=key+'-analysis'
     identity=digest(plain(q))
     old=host.store.lookup(host.run_id,request_id)
@@ -582,6 +586,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time(),analysis_evaluations=count)
+    if plan_reference:pending['plan_reference']=plain(plan_reference)
     if episodes:pending['dynamic_cost_bound']=sensitivity_context['dynamic_cost_bound']
     if preparation_s:pending['preparation_numerical_s']=preparation_s
     if method_fit:pending['method_admission']=method_fit
@@ -666,6 +671,7 @@ def recover(host):
             value=scoped_result(value,TaskAnalysisRequirement.model_validate(request['task_analysis']),
                 request['analysis_applicability'],AnalysisRequest.model_validate(request['query']))
     value.setdefault('operation',p['request']['operation'])
+    if p.get('plan_reference'):value['plan_reference']=p['plan_reference']
     value.update(candidate=p['request']['candidate'],requested_operation=p['request'],operation_key=p['worker_request_id'],
         owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed+p.get('preparation_numerical_s',0.),
         charged_analysis_evaluations=p.get('analysis_evaluations',1),boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
@@ -760,7 +766,7 @@ def diagnostic_layers(value):
     unknown; neither optimizer termination nor another layer supplies them.
     """
     def layer(status='not_evaluated',facts=None,missing=(),failures=(),scope=''):
-        return dict(status=status,facts=facts or {},missing_checks=list(missing),
+        return dict(status=status,computation_status='not_evaluated',facts=facts or {},missing_checks=list(missing),
             failure_reasons=list(failures),scope=scope)
     def fields(row,names):return {k:row[k] for k in names if k in row}
     structure=value.get('structure_research') or {}
@@ -784,10 +790,10 @@ def diagnostic_layers(value):
         dynamic_validation=layer(missing=['complete dynamics','independent Replay','original task acceptance'],
             scope='Independent execution and original evaluator remain authoritative; local mathematics grants no task acceptance.'))
     if geometry:
-        layers['geometry']=layer('passed' if geometry.get('status')=='computed' else 'unqualified',
+        layers['geometry']=layer('not_evaluated',
             fields(geometry,('source','contact_count','minimum_contact_distance_m','contact_examples',
                 'tendon_length_m','payout_m','length_residual_m','geometric_active','geometric_slack')),
-            missing=[] if geometry.get('status')=='computed' else ['position geometry'],
+            missing=['geometry qualification'] if geometry.get('status')=='computed' else ['position geometry'],
             failures=[geometry['reason']] if geometry.get('reason') else [],scope=geometry.get('scope','Position-only facts.'))
     if diagnosis:
         trials=diagnosis.get('trials',[])
@@ -852,9 +858,10 @@ def diagnostic_layers(value):
                 scope='Existing active construction, derivatives or native mechanics; no passive multistart requirement.')
             static=point.get('equilibrium',construction.get('static_equilibrium'))
             requested=point.get('name') in ('target_equilibrium','fixed_input_equilibrium') or value.get('operation')=='equilibrium'
-            qualified=bool(model) and not failed and (not requested or static is not False)
-            layers['static_qualification']=layer('unqualified' if failed else 'passed' if requested and qualified else
-                'not_evaluated' if requested else 'not_applicable',
+            available=point.get('available',row.get('available'))
+            qualified=bool(model) and not failed and available is not False and (available is True or static is True)
+            layers['static_qualification']=layer('not_applicable' if not requested else 'unqualified' if failed or available is False else
+                'passed' if qualified else 'not_evaluated',
                 dict(equilibrium_available=qualified if requested else static,
                     derivative_check=derivative,linearization_available=bool(model),
                     **fields(construction,('position_residual_m','static_residual_inf','tension_bounds_n')),
@@ -890,11 +897,11 @@ def diagnostic_layers(value):
             started_conditions=[e['load_condition'] for e in r.get('episodes',[])],cost=r.get('cost'),
             complete=r.get('status')=='completed',reason=r.get('reason')) for r in executions]
         complete=all(r['complete'] for r in runs)
-        layers['dynamic_validation']=layer('passed' if complete else 'unqualified',dict(executions=runs),
+        layers['dynamic_validation']=layer('not_evaluated' if complete else 'unqualified',dict(executions=runs),
             missing=['independent Replay','original task acceptance']+([] if complete else ['complete loading integration']),
             failures=[r['reason'] for r in runs if r['reason']],scope=layers['dynamic_validation']['scope'])
     elif native.get('input_response') or native.get('structure_baseline') or (native.get('cost') or {}).get('physics_steps',0)>0:
-        layers['dynamic_validation']=layer('passed' if value.get('status')=='computed' else 'unqualified',
+        layers['dynamic_validation']=layer('not_evaluated' if value.get('status')=='computed' else 'unqualified',
             dict(source_pointer='/native_dynamics',cost=native.get('cost'),operation=value.get('operation')),
             missing=['independent Replay','original task acceptance'],
             scope='Recorded native integration in this operation only; a short response or finite search is not full-task validation.')
@@ -903,8 +910,8 @@ def diagnostic_layers(value):
     if acceptance:
         complete=(value.get('profile') or {}).get('complete')
         independent=value.get('route') in ('passive_protocol','fixed_tension') if value.get('route') else None
-        layers['dynamic_validation']=layer('passed' if complete and acceptance.get('accepted') is True else
-            'unqualified' if complete is not None else 'not_evaluated',
+        layers['dynamic_validation']=layer('passed' if complete and independent and acceptance.get('accepted') is True else
+            'unqualified' if acceptance.get('accepted') is False or complete is False else 'not_evaluated',
             dict(execution_complete=complete,acceptance=fields(acceptance,('status','accepted','protocol_id')),
                 independent_replay=independent),
             missing=([] if complete else ['complete valid execution'])+([] if independent else ['independent Replay']),
@@ -914,6 +921,20 @@ def diagnostic_layers(value):
     if value.get('status')=='not_applicable' and not (diagnosis or records or value.get('raw')):
         layers['numerical_solve']=layer('not_applicable',failures=(value.get('analysis_applicability') or {}).get('reasons',[]),
             scope='Requested method is not applicable; no physical infeasibility inference.')
+    layers['geometry']['computation_status']=('completed' if geometry.get('status')=='computed' or
+        not geometry and layers['geometry']['facts'] else 'partial' if geometry else 'not_evaluated')
+    numerical=layers['numerical_solve']
+    if numerical['facts']:
+        numerical['computation_status']='partial' if diagnosis.get('termination_error') or value.get('status') in ('execution_incomplete','incomplete') else 'completed'
+    static_layer=layers['static_qualification']
+    if static_layer['status'] in ('passed','unqualified'):static_layer['computation_status']='completed'
+    dynamic_layer=layers['dynamic_validation']
+    if executions:dynamic_layer['computation_status']='completed' if all(r['complete'] for r in runs) else 'partial'
+    elif acceptance:dynamic_layer['computation_status']='completed' if complete else 'partial'
+    elif dynamic_layer['facts'].get('source_pointer')=='/native_dynamics':dynamic_layer['computation_status']='completed' if value.get('status')=='computed' else 'partial'
+    # Kinematics and native-state observations have no aggregate geometry
+    # certificate. Preserve their facts without manufacturing qualification.
+    if layers['geometry']['status']=='passed':layers['geometry']['status']='not_evaluated'
     return layers
 
 
@@ -922,7 +943,9 @@ def diagnostic_overview(layers):
     names=list(layers)
     numbers={**layers['geometry']['facts'],**layers['static_qualification']['facts']}
     return dict(layer_status={k:v['status'] for k,v in layers.items()},
-        highest_passed_layer=next((k for k in reversed(names) if layers[k]['status']=='passed'),None),
+        computation_status={k:v.get('computation_status','not_evaluated') for k,v in layers.items()},
+        observed_layers=[k for k in names if layers[k].get('computation_status','not_evaluated')!='not_evaluated'],
+        qualified_layers=[k for k in names if layers[k]['status']=='passed'],
         primary_failure_layer=next((k for k in names if layers[k]['status']=='unqualified'),None),
         key_facts={k:numbers[k] for k in ('contact_count','stationarity_inf_nm','primal_violation_m','complementarity_nm') if k in numbers},
         unresolved_checks={k:v['missing_checks'] for k,v in layers.items() if v['missing_checks']},
