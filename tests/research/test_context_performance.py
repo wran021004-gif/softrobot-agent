@@ -12,6 +12,38 @@ from tests.research.test_cross_task_integration import fixture_directory
 
 
 class ContextPerformanceTests(unittest.TestCase):
+    def test_report_status_and_latest_selection_preserve_revision_order_without_raw_history(self):
+        from tools.research.reporter import current_reports,entries
+        with fixture_directory() as folder:
+            store=Store(folder)
+            a=store.put_context_checkpoint(dict(interpretation_for=None,interpretation_status='deferred',request=dict(trace=list(range(2000)))))
+            b=store.put_context_checkpoint(dict(interpretation_for=None,interpretation_status='deferred',request=dict(trace=['fixture'])))
+            rb=store.put_context_checkpoint(dict(interpretation_for=b,interpretation_status='available',request=dict(trace=['B original'])))
+            ra=store.put_context_checkpoint(dict(interpretation_for=a,interpretation_status='unavailable',request=dict(trace=['A original'])))
+            references=[a,b,rb,ra]
+            events=[dict(kind='research_report',outputs=[r]) for r in references]
+            host=SimpleNamespace(store=store,run_id='offline-report-history')
+            expected=[(ra,store.artifact(ra)),(rb,store.artifact(rb))]
+            with patch.object(store,'events',return_value=events),store.read_snapshot():
+                self.assertEqual(entries(host),[(r,store.artifact(r)) for r in references])
+                self.assertEqual(current_reports(host),expected)
+                with patch.object(store,'artifact',wraps=store.artifact) as reads:
+                    statuses=current_reports(host,status_only=True)
+                    self.assertEqual(statuses,[(r,{k:v[k] for k in ('interpretation_for','interpretation_status')}) for r,v in expected])
+                    outer=[c for c in reads.call_args_list if c.kwargs.get('db') is None]
+                    self.assertTrue(all(c.kwargs.get('paths')==('interpretation_for','interpretation_status') for c in outer))
+                with patch.object(store,'artifact',wraps=store.artifact) as reads:
+                    latest=current_reports(host,limit=1)
+                    self.assertEqual(latest,expected[-1:])
+                    full=[c.args[0] for c in reads.call_args_list if not c.kwargs]
+                    self.assertEqual(full,[rb])
+                latest[0][1]['request']['trace'].append('mutation')
+                self.assertEqual(current_reports(host,limit=1),expected[-1:])
+                with closing(store.connect()) as db:
+                    db.execute('UPDATE artifacts SET body=? WHERE id=?',(b'{}',a['artifact_id']));db.commit()
+                with self.assertRaisesRegex(ValueError,'EVIDENCE_MISSING_OR_CHANGED'):
+                    current_reports(host,status_only=True)
+
     def test_first_exact_subnode_reads_avoid_full_root_and_keep_copy_isolation(self):
         from tools.research.core import read_evidence
         with fixture_directory() as folder:

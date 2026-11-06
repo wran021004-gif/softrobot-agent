@@ -442,7 +442,7 @@ async def request_feedback_boundary(host,agent):
     if (not messages or messages[-1]['role']!='user'
             or not any('toolResult' in b for b in messages[-1]['content'])):
         raise ValueError('PAIRED_TOOL_FEEDBACK_REQUEST_BOUNDARY_REQUIRED')
-    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host,status_only=True)):
         raise ValueError('REPORTER_DELIVERY_REQUIRED_BEFORE_REQUEST_HANDOFF')
     events=host.store.events(host.run_id)
     main=[e for e in events if e['kind']=='r3_request'

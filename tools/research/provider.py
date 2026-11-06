@@ -277,7 +277,7 @@ def abandon_unrecoverable_reporter_attempt(host,request_id,*,authorization):
     if (not attempts or host.store.artifact(attempts[-1]['outputs'][0])['base_report']!=base['artifact_id']
             or saved_base['interpretation_for'] or saved_base['report']['interpretations']):
         raise ValueError('ORIGINAL_DETERMINISTIC_REPORT_REQUIRED')
-    current=next(((r,v) for r,v in current_reports(host) if (v['interpretation_for'] or r)==base),None)
+    current=next(((r,v) for r,v in current_reports(host,status_only=True) if (v['interpretation_for'] or r)==base),None)
     if not current or current[1]['interpretation_status'] not in ('deferred','unavailable'):
         raise ValueError('UNAVAILABLE_REPORTER_INTERPRETATION_REQUIRED')
     before=state(host)

@@ -53,10 +53,11 @@ RESULT_KEYS=('results','physical_replays','mechanics_results','analysis_results'
     'matched_state_results','rl_evaluations','control_search_results')
 
 
-def entries(host):
+def entries(host, *, status_only=False):
     references={e['outputs'][0]['artifact_id']:plain(e['outputs'][0])
         for e in host.store.events(host.run_id) if e['kind']=='research_report'}
-    return [(ref,host.store.artifact(ref)) for ref in references.values()]
+    return [(ref,host.store.artifact(ref,paths=('interpretation_for','interpretation_status'))
+        if status_only else host.store.artifact(ref)) for ref in references.values()]
 
 
 def _card(host, reference):
@@ -244,7 +245,7 @@ def investigate(host, request):
             if resolved['status']!='available':raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
             q.references.extend([EvidenceRef.model_validate(resolved['subject'])])
         else:
-            refs=[r for k in RESULT_KEYS for r in s.get(k,[])] if subject=='registered_results' else [r for r,_ in entries(host)]
+            refs=[r for k in RESULT_KEYS for r in s.get(k,[])] if subject=='registered_results' else [r for r,_ in entries(host,status_only=True)]
             if not refs:raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
             q.references.extend(EvidenceRef.model_validate(r) for r in refs)
     # An owned Plan records the requested construction/analysis, not its outcome.
@@ -252,7 +253,7 @@ def investigate(host, request):
     supporting_plans=[ref for ref in q.references if plain(ref) in s.get('plans',[])]
     q=q.model_copy(update=dict(references=[ref for ref in q.references if ref not in supporting_plans]))
     if not q.references:raise ValueError('INVESTIGATION_REQUIRES_CANDIDATE_OR_SAVED_RESULT: read owned Plans with evidence_read')
-    allowed=[*s.get('candidates',{}).values(),*registered_references(host),*[r for r,_ in entries(host)]]
+    allowed=[*s.get('candidates',{}).values(),*registered_references(host),*[r for r,_ in entries(host,status_only=True)]]
     if any(plain(r) not in allowed for r in q.references):raise ValueError('INVESTIGATION_SUBJECT_NOT_REGISTERED_IN_STUDY')
     # A prior report is a retrieval wrapper. Investigate its original results,
     # never recursively send the old full report as another scientific result.
@@ -418,13 +419,17 @@ def interpretation_priority(report, previous, *, decision_v3=False):
     return 'routine_or_repeated_result'
 
 
-def current_reports(host):
+def current_reports(host, *, status_only=False, limit=None):
     """Latest saved revision for each base report, in original result order."""
     current={}
-    for ref,saved in entries(host):
+    for ref,saved in entries(host,status_only=True):
         base=saved['interpretation_for'] or ref
         current[base['artifact_id']]=(ref,saved)
-    return list(current.values())
+    rows=list(current.values())
+    if limit is not None:rows=rows[-limit:] if limit else []
+    # Status gates and latest-report selection do not need historical raw reads.
+    # Complete default views and selected report requests remain unchanged.
+    return rows if status_only else [(ref,host.store.artifact(ref)) for ref,_ in rows]
 
 
 def reporter_handoff_summary(host, reference, saved):
@@ -757,15 +762,17 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
         raise ValueError('REPORTER_REQUIRES_SETTLED_MAIN_REQUEST')
     if any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True) for e in s.get('rl_runs',{}).values()):return
     attempted={host.store.artifact(e['outputs'][0])['base_report'] for e in host.store.events(host.run_id) if e['kind']=='reporter_attempt'}
-    reports=entries(host)
+    reports=entries(host,status_only=True)
     finished={saved['interpretation_for']['artifact_id'] for _,saved in reports if saved['interpretation_for']}
-    for ref,saved in reports:
-        if saved['interpretation_status']!='deferred' or ref['artifact_id'] in finished:continue
+    for index,(ref,meta) in enumerate(reports):
+        if meta['interpretation_status']!='deferred' or ref['artifact_id'] in finished:continue
+        saved=host.store.artifact(ref)
         if ref['artifact_id'] in attempted:
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_INTERRUPTED_NO_AUTOMATIC_RETRY')
             continue
-        previous=[v['report'] for r,v in reports[:reports.index((ref,saved))] if not v['interpretation_for']]
+        previous=[host.store.artifact(r,paths=('report',))['report']
+            for r,v in reports[:index] if not v['interpretation_for']]
         from tools.research.evidence_policy import english_native
         priority=interpretation_priority(saved['report'],previous,decision_v3=english_native(s['spec']))
         record(host,'reporter_priority',dict(base_report=ref,reason=priority,

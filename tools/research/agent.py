@@ -830,7 +830,7 @@ async def deliver_science_before_decision(host,agent,transport,*,max_model_calls
     from tools.research.session_handoff import unmatched
     if pending(host) or state(host)['pilot'].get('unconsumed_response'):
         raise ValueError('SCIENCE_DELIVERY_REQUIRES_CONSUMED_PROVIDER_RESPONSE')
-    if not any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):return
+    if not any(v['interpretation_status']=='deferred' for _,v in current_reports(host,status_only=True)):return
     if state(host).get('pending') or unmatched(agent.messages):
         raise ValueError('SCIENCE_DELIVERY_REQUIRES_PAIRED_SETTLED_TOOLS')
     with host.store.connect(True) as db:
@@ -853,7 +853,7 @@ async def deliver_science_before_decision(host,agent,transport,*,max_model_calls
         sdk_message_identity=digest(agent.messages),paired=True,receipts_settled=True))
     await complete_reports(host,transport,max_model_calls=max_model_calls)
     if pending(host) or state(host)['pilot'].get('unconsumed_response') or any(
-            v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+            v['interpretation_status']=='deferred' for _,v in current_reports(host,status_only=True)):
         raise ValueError('SCIENCE_DELIVERY_INCOMPLETE_BLOCKS_DECISION')
 
 
@@ -862,7 +862,7 @@ async def pause_completed_invocation(host,agent,completed):
     from tools.research.session_handoff import safe_boundary, trusted_history
     from tools.research.reporter import current_reports
     await wait_training(host)
-    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host,status_only=True)):
         raise ValueError('REPORTER_DELIVERY_REQUIRED_BEFORE_SUPERVISOR_PAUSE')
     await agent._session_manager.save_snapshot(agent,is_latest=True)
     with host.store.connect(True) as db:

@@ -1892,7 +1892,7 @@ def agent_decision_brief(host):
                 brief['scientific_control_methods']=control_method_choices(mathematical_method_view(host,diagnosis['candidate']))
     from tools.research.config import bounded_evidence_enabled
     brief['bounded_evidence']=bounded_evidence_enabled(s['spec'])
-    selected=current_reports(host)[-2:]
+    selected=current_reports(host,limit=2)
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     for report in brief['latest_reports']:
         for finding in report.get('findings',[]):

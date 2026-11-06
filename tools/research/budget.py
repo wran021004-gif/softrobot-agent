@@ -209,7 +209,7 @@ def decision_budget(host):
     from tools.research.reporter import current_reports
     reporter_used=sum(e['kind']=='r3_request' and host.store.artifact(e['outputs'][0]).get('purpose')=='reporter'
         for e in host.store.events(host.run_id))
-    reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host))
+    reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host,status_only=True))
     public_total=remaining['tool_calls'];public_reserve=b.get('protected_public_operations',0)
     native=[(r,v) for r in s.get('analysis_results',[]) if (v:=host.store.artifact(r,paths=(
         'requested_operation.model_source','status','native_dynamics.cost','nonlinear_response.cost',
