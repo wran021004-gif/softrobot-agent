@@ -304,6 +304,35 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertFalse(reporter.entries(h));self.assertFalse(state(h)['candidates'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
 
+    def test_reporter_owned_plan_is_provenance_not_a_scientific_result(self):
+        from tools.research import reporter
+        from tools.platform_store import plain
+        from tools.research.state import save,update
+        h,c=self.host();before=deepcopy(state(h).get('evaluation_reads',[]))
+        plan=save(h,dict(request_id='offline-lineage-plan',original_plan=dict(action='generate',hypothesis='Offline lineage fixture only')))
+        update(h,plans=[*state(h).get('plans',[]),plan])
+        query=dict(reference=plan,view='full',pointer='/original_plan')
+        expected=plain(reporter.EvidenceQuery.model_validate(query))
+        outcome=reporter.investigate(h,dict(question='Verify owned construction lineage.',references=[c,plan],reads=[query]))
+        saved=h.store.artifact(outcome['report_reference'])
+        self.assertEqual(len(saved['report']['results']),1)
+        self.assertEqual(saved['report']['results'][0]['identity']['result']['reference'],c)
+        self.assertEqual(saved['request']['supporting_plan_references'],[plan])
+        self.assertEqual(saved['request']['reads'].count(expected),1)
+        raw=next(r for r in saved['request']['selected_reads'] if r['query']==expected)
+        self.assertEqual(raw['value']['action'],'generate')
+        self.assertEqual(state(h).get('evaluation_reads',[]),before)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        with self.assertRaisesRegex(ValueError,'INVESTIGATION_REQUIRES_CANDIDATE_OR_SAVED_RESULT'):
+            reporter.investigate(h,dict(question='Plan intent alone is not an outcome.',references=[plan]))
+        foreign=save(h,dict(original_plan=dict(action='generate',hypothesis='Unregistered foreign fixture')))
+        with self.assertRaisesRegex(ValueError,'INVESTIGATION_SUBJECT_NOT_REGISTERED_IN_STUDY'):
+            reporter.investigate(h,dict(question='Do not admit unowned Plans.',references=[c,foreign]))
+        outcome=reporter.investigate(h,dict(question='Preserve automatic candidate topics with provenance.',references=[c,plan]))
+        saved=h.store.artifact(outcome['report_reference'])
+        self.assertEqual([q['topic'] for q in saved['request']['automatic_reads']],['structure','task'])
+        self.assertIn(expected,saved['request']['reads'])
+
     def test_reporter_focus_is_prose_and_explicit_reads_select_registered_topics(self):
         from tools.research import reporter
         h,c=self.host()

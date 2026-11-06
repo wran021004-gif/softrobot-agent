@@ -247,6 +247,11 @@ def investigate(host, request):
             refs=[r for k in RESULT_KEYS for r in s.get(k,[])] if subject=='registered_results' else [r for r,_ in entries(host)]
             if not refs:raise ValueError('INVESTIGATION_REQUIRES_REGISTERED_SUBJECT')
             q.references.extend(EvidenceRef.model_validate(r) for r in refs)
+    # An owned Plan records the requested construction/analysis, not its outcome.
+    # Keep it in the same investigation as a raw provenance read, not a ResultCard.
+    supporting_plans=[ref for ref in q.references if plain(ref) in s.get('plans',[])]
+    q=q.model_copy(update=dict(references=[ref for ref in q.references if ref not in supporting_plans]))
+    if not q.references:raise ValueError('INVESTIGATION_REQUIRES_CANDIDATE_OR_SAVED_RESULT: read owned Plans with evidence_read')
     allowed=[*s.get('candidates',{}).values(),*registered_references(host),*[r for r,_ in entries(host)]]
     if any(plain(r) not in allowed for r in q.references):raise ValueError('INVESTIGATION_SUBJECT_NOT_REGISTERED_IN_STUDY')
     # A prior report is a retrieval wrapper. Investigate its original results,
@@ -274,6 +279,9 @@ def investigate(host, request):
                 ('physical_results',) if ref in [r for k in RESULT_KEYS if k not in ('analysis_results','mechanics_results') for r in s.get(k,[])] else ())
             q.reads.extend(EvidenceIntentQuery(subject=reference,topic=topic) for topic in topics)
         automatic=[plain(query) for query in q.reads]
+    for reference in supporting_plans:
+        query=EvidenceQuery(reference=reference,view='full',pointer='/original_plan')
+        if query not in q.reads:q.reads.append(query)
     # Investigation owns detailed cross-model reading; main Agent receives L1.
     for reference in q.references:
         raw=host.store.artifact(reference,paths=('candidate',))
@@ -304,6 +312,7 @@ def investigate(host, request):
     request['selected_reads']=selected_reads
     request['automatic_reads']=automatic
     request['previous_report_references']=previous_reports
+    if supporting_plans:request['supporting_plan_references']=[plain(ref) for ref in supporting_plans]
     request['experience_receipts']=[retrieve(host,plain(query),reader='reporter')['reference'] for query in q.experience_queries]
     # Distinct explicit invocations may ask the identical question again.
     # Native receipt recovery reuses the saved report instead of calling here.
