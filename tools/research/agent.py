@@ -1298,7 +1298,11 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     native[0].tool_spec['description']=QUESTION_PLAN_DESCRIPTION
                     from tools.research.scientific_intent import explicit_actions
                     if explicit_actions(s['spec']):
-                        native[0].tool_spec['description']='Record hypothesis and owned candidate in diagnose; optionally choose next_research_action to load its scientific interface. Selection executes nothing. Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.'
+                        native[0].tool_spec['description']=(
+                            'Submit the selected Plan action. Use decision.selected_candidate for candidate selection; never add top-level selected_candidate. '
+                            'For generate, include the required generation payload; prose alone is insufficient. '
+                            'For diagnose, record hypothesis and optionally next_research_action; selection executes nothing. '
+                            'Main chooses variables, effort and subsequent actions. Original Plan and independent acceptance gates apply.')
             if english_native(s['spec']):
                 tool=next((t for t in native if t.tool_name=='research_analysis'),None)
                 from tools.research.scientific_intent import enabled as question_enabled, completed_question_plan, selected_question_schema
