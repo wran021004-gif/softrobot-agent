@@ -70,11 +70,13 @@ def initial_geometry(native, initial=None):
     except Exception as exc:return dict(status='numerically_unresolved',reason=str(exc),scope='Initial geometry unavailable; no qualification inferred.')
     native.cost['native_position_calls']=native.cost.get('native_position_calls',0)+1
     contacts=[dict(geom1=native.model.geom(int(c.geom1)).name,geom2=native.model.geom(int(c.geom2)).name,
-        distance_m=float(c.dist)) for c in data.contact]
+        distance_m=float(c.dist),position_world_m=c.pos.tolist()) for c in data.contact]
     return dict(status='computed',source='native position pipeline at first declared start',
         contact_count=int(data.ncon),minimum_contact_distance_m=min((c['distance_m'] for c in contacts),default=None),
         contact_examples=contacts[:3],tendon_length_m=data.ten_length.tolist(),payout_m=native.payout.tolist(),
         length_residual_m=(data.ten_length-native.payout).tolist(),
+        geometric_active=((data.ten_length-native.payout)>=-native.protocol['static_solver']['active_tolerance_m']).tolist(),
+        geometric_slack=((data.ten_length-native.payout)<-native.protocol['static_solver']['active_tolerance_m']).tolist(),
         scope='Initial geometry only; contact and length excess are observations, not proof of their causal role in factorization failure, equilibrium, stability or task acceptance.')
 
 

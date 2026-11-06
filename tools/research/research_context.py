@@ -2592,6 +2592,10 @@ def mathematical_decision_view(card):
         capability=compact,owning_study=card['identity']['study'],
         unresolved={**(summary.get('decision_relevance') or {}),
             'evidence_limits':card['evidence_summary']['unresolved']})
+    if summary.get('diagnostic_overview'):
+        result['diagnostic_overview']={k:v for k,v in summary['diagnostic_overview'].items()
+            if k not in ('unresolved_checks','interpretation') and v!={}}
+        result['diagnostic_query']=dict(reference=card['identity']['result']['reference'],pointer=summary['diagnostic_pointer'])
     if summary.get('native_analysis'):
         result['cost_scope']='Costs belong to owning_study, unknown if unrecorded. Native physics_steps includes prefix reconstruction and rollouts; callbacks are not additional rollouts. Independent physical replay is separate.'
     if summary.get('structure_research'):

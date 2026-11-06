@@ -11,7 +11,7 @@ from schemas.research_reporting import (
     ResultIdentity,
 )
 from tools.platform_store import plain
-from tools.research.analysis import decision_result
+from tools.research.analysis import decision_result, diagnostic_layers, diagnostic_overview
 from tools.research.core import read_evidence
 from tools.research.evidence_policy import summarize_evidence
 from tools.research.research_context import compact_evidence, physical_diagnostic
@@ -433,6 +433,8 @@ def quantitative_facts(value, reference):
         mathematical_conclusion=claim.get('conclusion'),verification_status=claim.get('verification_status'),
         task_acceptance=acceptance.get('status',value.get('task_acceptance')),
         source=dict(reference=reference,pointer=''))
+    facts['diagnostic_layers']=diagnostic_layers(value)
+    facts['diagnostic_overview']=diagnostic_overview(facts['diagnostic_layers'])
     if claim:
         model=value.get('model') or {};binding=claim.get('binding') or {}
         facts['model_context']=dict(basis=binding.get('basis'),model_scope=trajectory.get('model_scope'),

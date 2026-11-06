@@ -102,7 +102,7 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
             proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
     if q.capability_method and checkpoint:checkpoint('optimal_model_attempt',dict(kind='model_build',stage='attempt'))
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
-        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context if q.operation=='design_sensitivity' else None,
+        operating_points=[q.operating_point],exact_point=exact_point,checkpoint=checkpoint,**({'design_context':design_context if q.operation=='design_sensitivity' else None,
             'check_instantaneous_braking':q.operation=='instantaneous_braking_v1'} if sorosim else {})))
     rows=envelope['records'][1:]
     if q.capability_method and checkpoint:checkpoint('optimal_model_returned',dict(kind='model_build',stage='returned'))
@@ -321,6 +321,7 @@ def scoped_result(result, requirements, applicability, query):
         computation_status=result['status'], verification_status=verification, supported_interpretation=interpretation,
         unsupported_conclusions=['task acceptance', 'continuous-time holding-window compliance' if trajectory else 'whole holding-window compliance', 'global nonlinear feasibility or infeasibility',
             'hardware performance', 'robustness', 'repeatability', 'equilibrium validity at a non-equilibrium point']))
+    result['diagnostic_layers']=diagnostic_layers(result)
     return result
 
 
@@ -655,6 +656,9 @@ def recover(host):
             value['dynamic_execution_progress']=[read(path) for path in sorted(folder.glob('dynamic_*/passive_progress.json'))]
         value['dynamic_progress_scope']='Original partial snapshots; not a completed task observation or independent Replay. Reserved attempts remain charged.'
     if (folder/'worker_runtime.json').exists():value['worker_runtime']=read(folder/'worker_runtime.json')
+    if value.get('status')!='computed':
+        progress=sorted(folder.glob('numerical_active_*.json'))
+        if progress:value['active_model_progress']=[read(path) for path in progress]
     # New failed workers still carry scope; old receipts are never reinterpreted.
     if 'scoped_claim' not in value and (folder/'request.json').exists():
         request=read(folder/'request.json')
@@ -700,6 +704,7 @@ def recover(host):
                 status='partial_callback_observations',accounting='Recorded native operations before failure; no successful search or acceptance inferred')]
             value['physics_steps_lower_bound']=max(value.get('physics_steps_lower_bound',0),observed_cost['physics_steps'])
 
+    value['diagnostic_layers']=diagnostic_layers(value)
     ref=save(host,value,'candidate_analysis_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:
@@ -748,12 +753,188 @@ def scientific_status(value):
             else 'No task success, structural infeasibility, or performance ranking follows from this result.'))
 
 
+def diagnostic_layers(value):
+    """Project recorded facts, independently by information layer; never run physics.
+
+    A passed layer covers only its declared scope. Missing observations stay
+    unknown; neither optimizer termination nor another layer supplies them.
+    """
+    def layer(status='not_evaluated',facts=None,missing=(),failures=(),scope=''):
+        return dict(status=status,facts=facts or {},missing_checks=list(missing),
+            failure_reasons=list(failures),scope=scope)
+    def fields(row,names):return {k:row[k] for k in names if k in row}
+    structure=value.get('structure_research') or {}
+    records=structure.get('records',[])
+    mechanics=records[0].get('mechanics',{}) if records else (value.get('native_dynamics') or {}).get('mechanics',{})
+    diagnosis=structure.get('qualification_diagnosis') or mechanics.get('qualification_diagnosis') or {}
+    diagnosis_pointer=('/structure_research/qualification_diagnosis' if structure.get('qualification_diagnosis') else
+        '/structure_research/records/0/mechanics/qualification_diagnosis')
+    static_pointer=diagnosis_pointer+'/best_working_point'
+    equilibrium=mechanics.get('equilibrium') or (mechanics.get('dynamic_execution') or {}).get('unloaded_equilibrium')
+    if not diagnosis and equilibrium:
+        from extensions.tendon_family.passive_equilibrium import qualification_diagnosis
+        diagnosis=qualification_diagnosis(equilibrium,multistart=len(equilibrium.get('trials',[]))>1)
+        diagnosis_pointer='/structure_research/records/0/mechanics/'+('equilibrium' if mechanics.get('equilibrium') else 'dynamic_execution/unloaded_equilibrium')
+        static_pointer=diagnosis_pointer+'/equilibrium'
+    geometry=diagnosis.get('initial_geometry') or value.get('initial_geometry') or {}
+    cost=structure.get('cost') or (value.get('native_dynamics') or value.get('native_diagnostic') or {}).get('cost')
+    layers=dict(geometry=layer(missing=['independent geometry observations'],scope='Recorded model/position facts only.'),
+        numerical_solve=layer(missing=['recorded numerical process'],scope='Computation progress, not physical eligibility.'),
+        static_qualification=layer(missing=['applicable working-point qualification'],scope='Local working point only; no structural infeasibility claim.'),
+        dynamic_validation=layer(missing=['complete dynamics','independent Replay','original task acceptance'],
+            scope='Independent execution and original evaluator remain authoritative; local mathematics grants no task acceptance.'))
+    if geometry:
+        layers['geometry']=layer('passed' if geometry.get('status')=='computed' else 'unqualified',
+            fields(geometry,('source','contact_count','minimum_contact_distance_m','contact_examples',
+                'tendon_length_m','payout_m','length_residual_m','geometric_active','geometric_slack')),
+            missing=[] if geometry.get('status')=='computed' else ['position geometry'],
+            failures=[geometry['reason']] if geometry.get('reason') else [],scope=geometry.get('scope','Position-only facts.'))
+    if diagnosis:
+        trials=diagnosis.get('trials',[])
+        process=[fields(t,('status','stage','initial_forward_completed','optimizer_entered','optimizer_success','optimizer_status',
+            'optimizer_message','solver_termination','iterations','initial_contacts','failure_stage','termination_error','numerical_cost'))
+            for t in trials]
+        aborted=bool(diagnosis.get('termination_error'))
+        nonconverged=any(t.get('optimizer_success') is False for t in trials)
+        layers['numerical_solve']=layer('unqualified' if aborted or nonconverged else 'passed' if trials else 'not_evaluated',
+            dict(**fields(diagnosis,('initial_forward_completed','starts_requested','starts_attempted','starts_skipped_after_abort','failure_stage')),
+                trials=process,cost=cost,source_pointer=diagnosis_pointer),
+            missing=['remaining starts after abort'] if diagnosis.get('starts_skipped_after_abort') else [],
+            failures=[diagnosis['termination_error']] if aborted else ['optimizer_nonconvergence'] if nonconverged else [],
+            scope='Frozen passive solver process; nonconvergence is not structural infeasibility. Initial vectors remain in raw trials.')
+        best=diagnosis.get('best_working_point') or {}
+        checks=best.get('qualification_checks') or {}
+        layers['static_qualification']=layer('passed' if diagnosis.get('qualified') else 'unqualified' if best else 'not_evaluated',
+            dict(**best,qualified=diagnosis.get('qualified'),stability_qualified=diagnosis.get('stability_qualified'),
+                source_pointer=static_pointer),
+            missing=[] if best else ['length constraints','nonnegative dual tension','stationarity','complementarity',
+                'tension capacity','KKT','regularity','second-order qualification'],
+            failures=[k for k,v in checks.items() if v is False],scope=diagnosis.get('scope','Frozen passive equilibrium qualification.'))
+    elif not (structure.get('physical_problem') or mechanics.get('dynamic_execution') or (value.get('binding') or {}).get('physical_problem')):
+        # Active GVS/SoRoSim and native fixed-state mechanics retain their own
+        # eligibility rules. In particular, a valid non-equilibrium linearization
+        # needs no passive KKT and says nothing about static stability.
+        envelope=value.get('raw') or {}
+        progress=value.get('active_model_progress') or []
+        row=next(iter(envelope.get('records',[])[1:]),{})
+        row_pointer='/raw/records/1'
+        if not row:
+            row=next((p['row'] for p in reversed(progress) if p.get('row')), {})
+            if row:row_pointer='/active_model_progress/'+str(next(i for i in reversed(range(len(progress))) if progress[i].get('row')))+'/row'
+        raw=row.get('raw_facts') or value.get('raw_facts') or {}
+        model=value.get('model') or row.get('model') or {}
+        construction=value.get('construction') or row.get('construction') or {}
+        point=model.get('operating_point') or row.get('point') or value.get('operating_point') or {}
+        derivative=row.get('derivative_check') or raw.get('derivative_check')
+        if mechanics.get('coordinates') or mechanics.get('validity'):
+            layers['geometry']=layer('passed',fields(mechanics,('validity','coordinates','tendon_lengths_m','input_bounds_n')),
+                scope='Recorded native geometry and legal input bounds at the declared state; no equilibrium claim.')
+        elif model:
+            layers['geometry']=layer('passed',dict(output_position_m=model.get('y0'),
+                input_limits_n=(model.get('binding') or {}).get('tension_limits_n')),
+                missing=['native contact/joint observations'],scope='Prepared active-model kinematics only; contact legality not inferred.')
+        elif construction.get('achieved_world_point_m') is not None:
+            layers['geometry']=layer('passed',fields(construction,('achieved_world_point_m','requested_world_point_m','tension_bounds_n')),
+                missing=['native contact/joint observations'],scope='Recorded active construction kinematics; no equilibrium or contact qualification inferred.')
+        elif 'contact_count' in (value.get('native_diagnostic') or {}):
+            layers['geometry']=layer('passed',fields(value['native_diagnostic'],('contact_count','constraint_count','contacts','time_s')),
+                scope='Recorded native geometry before state-support rejection; contact observations do not establish an admissible working point.')
+        if row or mechanics or construction:
+            failure=raw.get('failure_code') or row.get('reason')
+            failed=bool(failure or row.get('available') is False or construction.get('success') is False or (derivative or {}).get('passed') is False)
+            layers['numerical_solve']=layer('unqualified' if failed else 'passed',
+                dict(construction=fields(construction,('method','solver','success','status','message','iterations',
+                    'function_evaluations','position_residual_m','static_residual_inf')),derivative_check=derivative,cost=cost,
+                    source_pointer=row_pointer if row else '/native_dynamics/mechanics'),
+                failures=[failure] if failure else ['recorded solver or derivative check failed'] if failed else [],
+                scope='Existing active construction, derivatives or native mechanics; no passive multistart requirement.')
+            static=point.get('equilibrium',construction.get('static_equilibrium'))
+            requested=point.get('name') in ('target_equilibrium','fixed_input_equilibrium') or value.get('operation')=='equilibrium'
+            qualified=bool(model) and not failed and (not requested or static is not False)
+            layers['static_qualification']=layer('unqualified' if failed else 'passed' if requested and qualified else
+                'not_evaluated' if requested else 'not_applicable',
+                dict(equilibrium_available=qualified if requested else static,
+                    derivative_check=derivative,linearization_available=bool(model),
+                    **fields(construction,('position_residual_m','static_residual_inf','tension_bounds_n')),
+                    **fields(raw,('equilibrium','linearization_scope','conservative_tangent'))),
+                missing=['dynamic stability'] if requested else [],failures=[failure] if failure else [],
+                scope='Existing active operating-point/derivative eligibility. Fixed-state mechanics and non-equilibrium linearizations do not assert a static minimum.')
+        if progress:
+            layers['numerical_solve']['facts']['process']=[fields(p,('stage','operation','model_prepared')) for p in progress]
+            if value.get('status') not in ('computed','not_applicable'):
+                layers['numerical_solve']['status']='unqualified'
+                layers['numerical_solve']['failure_reasons']=[value.get('reason','Active calculation incomplete')]
+                if layers['static_qualification']['status']=='passed' and progress[-1]['stage']!='model_returned':
+                    layers['static_qualification']['status']='not_evaluated'
+                    layers['static_qualification']['missing_checks'].append(progress[-1]['stage'])
+    failure=value.get('numerical_failure') or diagnosis.get('numerical_failure') or {}
+    if failure or value.get('native_diagnostic'):
+        facts=layers['numerical_solve']['facts']
+        facts.update(fields(failure,('error_location','forward_evaluations','confirmed_completed_steps','attempted_steps')))
+        if not diagnosis:
+            layers['numerical_solve']=layer('unqualified',{**facts,'cost':cost},
+                missing=['unrecorded worker progress'],failures=[value.get('reason') or failure.get('error_location')],
+                scope='Only recorded failure observations; unobserved solver entry and counts remain unknown.')
+    # Dynamic observations can exist through another legal path. Never gate this
+    # projection on L1/L2/L3, and never equate local affine replay with physics.
+    executions=[r['mechanics']['dynamic_execution'] for r in records if r.get('mechanics',{}).get('dynamic_execution')]
+    executions+=value.get('dynamic_execution_progress',[]) if not executions else []
+    if value.get('kind') in ('passive_dynamic_execution_v1','passive_dynamic_execution_v2'):executions=[value]
+    acceptance=value.get('acceptance') or {}
+    native=value.get('native_dynamics') or {}
+    if executions:
+        runs=[dict(status=r.get('status'),execution_started=True,loading_started=bool(r.get('episodes')),
+            completed_conditions=[e['load_condition'] for e in r.get('episodes',[]) if e.get('complete')],
+            started_conditions=[e['load_condition'] for e in r.get('episodes',[])],cost=r.get('cost'),
+            complete=r.get('status')=='completed',reason=r.get('reason')) for r in executions]
+        complete=all(r['complete'] for r in runs)
+        layers['dynamic_validation']=layer('passed' if complete else 'unqualified',dict(executions=runs),
+            missing=['independent Replay','original task acceptance']+([] if complete else ['complete loading integration']),
+            failures=[r['reason'] for r in runs if r['reason']],scope=layers['dynamic_validation']['scope'])
+    elif native.get('input_response') or native.get('structure_baseline') or (native.get('cost') or {}).get('physics_steps',0)>0:
+        layers['dynamic_validation']=layer('passed' if value.get('status')=='computed' else 'unqualified',
+            dict(source_pointer='/native_dynamics',cost=native.get('cost'),operation=value.get('operation')),
+            missing=['independent Replay','original task acceptance'],
+            scope='Recorded native integration in this operation only; a short response or finite search is not full-task validation.')
+    elif (value.get('trajectory') or {}).get('replay'):
+        layers['dynamic_validation']['facts']['local_affine_replay'] = fields(value['trajectory']['replay'],('passed','numerically_valid'))
+    if acceptance:
+        complete=(value.get('profile') or {}).get('complete')
+        independent=value.get('route') in ('passive_protocol','fixed_tension') if value.get('route') else None
+        layers['dynamic_validation']=layer('passed' if complete and acceptance.get('accepted') is True else
+            'unqualified' if complete is not None else 'not_evaluated',
+            dict(execution_complete=complete,acceptance=fields(acceptance,('status','accepted','protocol_id')),
+                independent_replay=independent),
+            missing=([] if complete else ['complete valid execution'])+([] if independent else ['independent Replay']),
+            scope=layers['dynamic_validation']['scope'])
+    if not executions and not native and not acceptance and diagnosis and not diagnosis.get('qualified'):
+        layers['dynamic_validation']['failure_reasons']=['qualified passive working point not obtained; loading not executed in this operation']
+    if value.get('status')=='not_applicable' and not (diagnosis or records or value.get('raw')):
+        layers['numerical_solve']=layer('not_applicable',failures=(value.get('analysis_applicability') or {}).get('reasons',[]),
+            scope='Requested method is not applicable; no physical infeasibility inference.')
+    return layers
+
+
+def diagnostic_overview(layers):
+    """Small summary of independent layer statuses; no new scientific ranking."""
+    names=list(layers)
+    numbers={**layers['geometry']['facts'],**layers['static_qualification']['facts']}
+    return dict(layer_status={k:v['status'] for k,v in layers.items()},
+        highest_passed_layer=next((k for k in reversed(names) if layers[k]['status']=='passed'),None),
+        primary_failure_layer=next((k for k in names if layers[k]['status']=='unqualified'),None),
+        key_facts={k:numbers[k] for k in ('contact_count','stationarity_inf_nm','primal_violation_m','complementarity_nm') if k in numbers},
+        unresolved_checks={k:v['missing_checks'] for k,v in layers.items() if v['missing_checks']},
+        interpretation='Layers are independent information scopes, not sequential Workers. Unqualified results do not establish structural infeasibility.')
+
+
 def compact_result(value, reference):
     """Compatible public tool response, with exact pointers into raw evidence."""
     summary=dict(reference=reference,**{k:value.get(k) for k in (
         'status','candidate','operation','proxy_values','origin','owning_study','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
     summary['scientific_computation']=scientific_status(value)
+    summary['diagnostic_layers']=diagnostic_layers(value)
+    summary['diagnostic_overview']=diagnostic_overview(summary['diagnostic_layers'])
     summary['scientific_computation']['evidence_reference']=reference
     summary['stored_result_keys']=list(value)
     if value.get('status') not in ('computed','not_comparable'):
@@ -872,6 +1053,9 @@ def decision_result(value, reference):
         decision_relevance=dict(supported_facts=[fact],unresolved_questions=[unresolved],potential_discriminating_checks=[check],
             unsupported_inferences=['Global/physical feasibility, structural necessity or surrounding-region exclusion.']),
         failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
+    result['diagnostic_layers']=diagnostic_layers(value)
+    result['diagnostic_overview']=diagnostic_overview(result['diagnostic_layers'])
+    result['diagnostic_pointer']='/diagnostic_layers' if 'diagnostic_layers' in value else ''
     from tools.research.evidence_policy import summarize_evidence
     evidence=summarize_evidence(value,reference)
     # Scope/operating-point payloads repeat the original claim and model config.

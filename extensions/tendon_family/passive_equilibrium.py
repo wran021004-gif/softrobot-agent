@@ -74,6 +74,10 @@ class StaticProblem:
         positions=[self.native.point(self.at(q),b)[0].tolist() for b in self.native.points]
         kkt=station<=opts['stationarity_tolerance_nm'] and primal<=opts['length_tolerance_m'] and comp<=opts['complementarity_tolerance_nm']
         stable=bool(not len(eig) or eig[0]>opts['minimum_reduced_eigenvalue'])
+        checks=dict(length_constraints=primal<=opts['length_tolerance_m'],dual_nonnegative=bool(np.all(tension>=0)),
+            stationarity=station<=opts['stationarity_tolerance_nm'],complementarity=comp<=opts['complementarity_tolerance_nm'],
+            tension_capacity=bool(capacity),KKT=bool(kkt),LICQ=rank==int(sum(active)),
+            strict_complementarity=bool(np.all(positive[active])),second_order_sufficient=stable,contact_free=self.at(q).ncon==0)
         return dict(qpos=q.tolist(),tensions_n=tension.tolist(),length_residual_m=g.tolist(),stationarity_vector_nm=residual.tolist(),
             stationarity_inf_nm=station,primal_violation_m=primal,complementarity_nm=comp,dual_violation_n=0.,
             active=active.tolist(),positive=positive.tolist(),positive_rank=int(np.linalg.matrix_rank(J[positive],tol=max(1e-12,opts['rank_relative_tolerance']*np.linalg.norm(J[positive],ord=2)))) if positive.any() else 0,
@@ -81,7 +85,7 @@ class StaticProblem:
             LICQ=rank==int(sum(active)),strict_complementarity=bool(np.all(positive[active])),
             reduced_eigenvalues=eig.tolist(),reduced_condition=float(eig[-1]/eig[0]) if len(eig) and eig[0]>0 else None,
             hessian_asymmetry=asym,H=H.tolist(),Jlength=J.tolist(),positions=positions,objective=self.objective(q),
-            native_contacts=int(self.at(q).ncon),capacity=capacity,kkt_pass=bool(kkt),second_order_sufficient=stable,
+            native_contacts=int(self.at(q).ncon),capacity=capacity,kkt_pass=bool(kkt),second_order_sufficient=stable,qualification_checks=checks,
             status='qualified_local_minimum' if kkt and stable and capacity and self.at(q).ncon==0 else 'unqualified',
             stability_scope='finite-difference sufficient positivity on nullspace of positive multipliers; no global or hardware certificate')
 
@@ -95,15 +99,23 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
         # SI objective is scaled uniformly for SLSQP stopping; physical KKT unscaled.
         cons=[] if native.unrestricted else [dict(type='ineq',fun=lambda q:-1000*problem.constraint(q),jac=lambda q:-1000*problem.jacobian(q))]
         before=dict(problem.cost)
+        trial=dict(initial=start.tolist(),initial_forward_completed=False,optimizer_entered=False,stage='initial_forward')
         try:
             gap=problem.constraint(start).tolist();contacts=int(problem.at(start).ncon)
+            trial.update(initial_forward_completed=True,initial_contacts=contacts,initial_length_residual_m=gap,
+                optimizer_entered=True,stage='optimizer')
             result=minimize(lambda q:1000*problem.objective(q),start,jac=lambda q:1000*problem.gradient(q),
                 method='SLSQP',constraints=cons,options=dict(ftol=opts['ftol'],maxiter=opts['max_iterations']))
             problem.cost['optimizer_iterations']+=int(result.nit)
+            trial.update(optimizer_success=bool(result.success),optimizer_status=int(result.status),
+                optimizer_message=str(result.message),iterations=int(result.nit),qpos=result.x.tolist(),stage='qualification')
             checked=problem.qualify(result.x)
         except Exception as exc:
             # Preserve the formal abort behavior and expose what was actually tried.
+            trial.update(status='aborted',failure_stage=trial['stage'],reason=str(exc),
+                numerical_cost={k:v-before[k] for k,v in problem.cost.items()})
             exc.equilibrium_progress=dict(trials=trials,starts_requested=len(starts),starts_attempted=len(trials)+1,
+                failed_trial=trial,
                 initial_forward_completed=problem.cost['native_forward_calls']>0,
                 numerical_cost=dict(problem.cost))
             raise
@@ -111,8 +123,7 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
         # checks, not SLSQP's line-search flag, establish numerical eligibility.
         # A failed solver termination remains explicit alongside those checks.
         checked['solver_termination']='converged' if result.success else 'nonconverged_numerically_qualified' if checked['status']=='qualified_local_minimum' else 'nonconverged_unqualified'
-        checked.update(optimizer_success=bool(result.success),optimizer_message=result.message,iterations=int(result.nit),initial=start.tolist(),
-            initial_contacts=contacts,initial_length_residual_m=gap,
+        checked.update(trial,stage='completed',status=checked['status'],
             numerical_cost={k:v-before[k] for k,v in problem.cost.items()})
         trials.append(checked)
     good=[x for x in trials if x['status']=='qualified_local_minimum']
@@ -130,13 +141,16 @@ def qualification_diagnosis(result=None, *, failure=None, multistart=False):
     qualified=bool(eq and eq['status']=='qualified_local_minimum')
     snapshot=getattr(failure,'mujoco_diagnostic',{}) if failure is not None else {}
     collision=snapshot.get('partial_failed_call_observations',{})
-    rows=[{k:t.get(k) for k in ('status','solver_termination','optimizer_success','optimizer_message','iterations',
+    rows=[{k:t[k] for k in ('status','solver_termination','initial','initial_forward_completed','optimizer_entered','stage',
+        'optimizer_status','optimizer_success','optimizer_message','iterations',
         'initial_contacts','initial_length_residual_m','native_contacts','length_residual_m','stationarity_inf_nm',
-        'primal_violation_m','complementarity_nm','kkt_pass','capacity','second_order_sufficient','numerical_cost')} for t in trials]
+        'primal_violation_m','dual_violation_n','complementarity_nm','kkt_pass','capacity','LICQ','strict_complementarity',
+        'second_order_sufficient','qualification_checks','numerical_cost') if k in t} for t in trials]
     initial_failure=failure is not None and not progress.get('initial_forward_completed',False)
     if failure is not None:
-        rows.append(dict(status='initial_forward_failure' if initial_failure else 'numerically_unresolved',
-            solver_termination='aborted',optimizer_message=str(failure)))
+        rows.append({**progress.get('failed_trial',{}),
+            'status':'initial_forward_failure' if initial_failure else 'numerically_unresolved',
+            'solver_termination':'aborted','termination_error':str(failure)})
     status=('qualified' if qualified else 'initial_forward_failure' if initial_failure else
         'numerically_unresolved' if failure is not None or any(not t['optimizer_success'] for t in trials) else 'unqualified')
     layers=[]
@@ -152,10 +166,12 @@ def qualification_diagnosis(result=None, *, failure=None, multistart=False):
         starts_attempted=progress.get('starts_attempted',len(trials)),trials=rows,
         starts_skipped_after_abort=progress.get('starts_requested',0)-progress.get('starts_attempted',0),
         failure_layers=layers,initial_forward_completed=not initial_failure,
+        failure_stage=progress.get('failed_trial',{}).get('failure_stage'),
+        numerical_failure=snapshot or None,
         failed_forward_geometry=({k:collision[k] for k in ('ncon','nefc','valid_complete_state','interpretation') if k in collision} if collision else None),
         termination_error=str(failure) if failure is not None else None,
-        best_working_point=({k:eq[k] for k in ('kkt_pass','capacity','second_order_sufficient','native_contacts',
-            'stationarity_inf_nm','primal_violation_m','complementarity_nm')} if eq else None),
+        best_working_point=({k:eq[k] for k in ('kkt_pass','capacity','second_order_sufficient','native_contacts','LICQ','strict_complementarity',
+            'stationarity_inf_nm','primal_violation_m','dual_violation_n','complementarity_nm','qualification_checks') if k in eq} if eq else None),
         stability_qualified=bool(qualified and eq['second_order_sufficient']),
         valid_followup=['local unilateral mechanism','finite-deformation comparison','independent complete dynamics'] if qualified else
             ['legal initialization comparison','constraint geometry and payout','taut/slack branch diagnosis'],

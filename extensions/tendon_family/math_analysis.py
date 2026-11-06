@@ -231,7 +231,7 @@ def _validate_task_protocol(inp,p):
         raise ValueError('ANALYSIS_PROTOCOL_CONTROL_PERIOD_MISMATCH')
 
 
-def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None,operating_points=None,exact_point=None):
+def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None,operating_points=None,exact_point=None,checkpoint=None):
     from .model_applicability import assess_model_uses
     _validate_task_protocol(inp,p)
     binding={**binding,'analysis_protocol_identity':digest(plain(p))}
@@ -240,16 +240,22 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
         raise ValueError('CONFIGURATION_ONLY_BOUNDARY_VIOLATION')
     n=len(binding['coordinate_order']); limits=[row['force_limit_n'] for row in inp.robot.structure.data['tendons']]
     seed=dict(x=[0.]*(2*n),u=[row['pretension_n'] for row in inp.robot.structure.data['tendons']])
-    graph=make_graph_from_input(inp,seed); points=[exact_point] if exact_point is not None else _candidate_points(inp,graph,p,operating_points); records=[]
+    if checkpoint:checkpoint('active_0_preparation',dict(stage='model_preparation'))
+    graph=make_graph_from_input(inp,seed)
+    if checkpoint:checkpoint('active_1_construction',dict(stage='operating_point_construction',model_prepared=True))
+    points=[exact_point] if exact_point is not None else _candidate_points(inp,graph,p,operating_points); records=[]
     for point in points:
         if not point['available']:
             records.append(point); continue
+        if checkpoint:checkpoint('active_2_linearization_'+point['name'],dict(stage='linearization',row=point))
         case=dict(effective=plain(inp),binding={**binding,'target_m':inp.task.goal.data.get('target_m'),
             'tension_limits_n':limits,'configuration_only_identity':digest(boundary)})
         model=linear_model(case,point,p,binding['configuration'],graph)
-        records.append(dict(point=model.operating_point,model=plain(model),
-            derivative_check=derivative_check(model,graph,p) if point['name']=='halfway_waypoint' else None,
-            construction=point['construction']))
+        row=dict(point=model.operating_point,model=plain(model),construction=point['construction'])
+        if checkpoint and point['name']=='halfway_waypoint':checkpoint('active_3_derivatives_'+point['name'],dict(stage='derivative_check',row=row))
+        row['derivative_check']=derivative_check(model,graph,p) if point['name']=='halfway_waypoint' else None
+        records.append(row)
+        if checkpoint:checkpoint('active_4_returned_'+point['name'],dict(stage='model_returned',row=row))
     model_binding=Binding(extension_id='model.gvs',version='1.0.0',parameters=Payload(
         contract='family.gvs_model',data=dict(basis=inp.policy.controller.parameters.data['recipe']['basis'])))
     applicability=assess_model_uses(inp.robot,inp.task,model_binding,

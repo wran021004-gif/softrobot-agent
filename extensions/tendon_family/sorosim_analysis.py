@@ -51,6 +51,7 @@ def linear_model(inp,binding,p,point,raw,spec,scales):
 def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None,operating_points=None,
                                       exact_point=None,session=None,checkpoint=None,design_context=None,check_instantaneous_braking=False):
     from .model_applicability import assess_model_uses
+    if checkpoint:checkpoint('active_0_preparation',dict(stage='model_preparation'))
     spec,numerical,scales=prepare(inp,p)
     boundary=_configuration_boundary(inp,binding,'model.sorosim_gvs')
     names=operating_points or ['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint']
@@ -59,6 +60,7 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
     with (SorosimSession() if session is None else nullcontext(session)) as engine:
         if engine.model_identity is None:engine.construct(spec)
         if engine.model_identity!=spec['identity']:raise ValueError('ANALYSIS_CANDIDATE_SESSION_MISMATCH')
+        if checkpoint:checkpoint('active_1_construction',dict(stage='operating_point_construction',model_prepared=True))
         for name in names:
             point=dict(name=name,phase='configuration_'+name,remaining_task_s=p.duration_s,actual_time_s=None,
                 construction=dict(method='existing candidate initializer/control preparation',provenance=numerical['provenance']))
@@ -81,8 +83,11 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
             if check_instantaneous_braking:payload['check_instantaneous_braking']=True
             if design_context:
                 payload.update(design_context)
+            if checkpoint:checkpoint('active_2_analysis_'+name,dict(stage='active_analysis',operation=operation))
             raw=engine.evaluate('analysis',payload)
             if checkpoint:checkpoint(name,dict(request=payload,result=raw))
+            if checkpoint:checkpoint('active_3_returned_'+name,dict(stage='analysis_returned',
+                row=dict(name=name,raw_facts=raw,construction=raw['construction'],derivative_check=raw.get('derivative_check'))))
             construction={**point.get('construction',{}),**raw['construction']}
             diagnostic=dict(stage='S4-A',operation=operation,candidate=binding.get('candidate'),
                 model_identity=spec['identity'],operating_point=dict(name=name,x=raw['x'],u=raw['u']),
@@ -97,6 +102,7 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
             model=linear_model(inp,binding,p,point,raw,spec,scales)
             records.append(dict(point=model.operating_point,model=plain(model),construction=construction,
                 derivative_check=raw['derivative_check'],raw_facts=raw,diagnostic=diagnostic,research_interpretations=[]))
+            if checkpoint:checkpoint('active_4_returned_'+name,dict(stage='model_returned',row=records[-1]))
         environment=dict(environment=engine.environment,dependency=engine.dependency,timings=engine.timings)
     model_binding=Binding(extension_id='model.sorosim_gvs',version='1.0.0',parameters=Payload(
         contract='family.sorosim_model',data=dict(basis=inp.policy.controller.parameters.data['recipe']['basis'])))
