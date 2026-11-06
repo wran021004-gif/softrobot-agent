@@ -12,6 +12,57 @@ from tests.research.test_cross_task_integration import fixture_directory
 
 
 class ContextPerformanceTests(unittest.TestCase):
+    def test_first_exact_subnode_reads_avoid_full_root_and_keep_copy_isolation(self):
+        from tools.research.core import read_evidence
+        with fixture_directory() as folder:
+            store=Store(folder)
+            value={'rows':[{'x':False,'none':None},{'x':2}],
+                '0':{'a/b':{'~':[1,2]}},'trace':list(range(2000))}
+            ref=store.put_context_checkpoint(value)
+            host=SimpleNamespace(store=store,run_id='offline-exact-read')
+            queries=[(dict(pointer='/rows/0',view='fields',fields=['x','none']),value['rows'][0]),
+                (dict(pointer='/0/a~1b/~0'),[1,2]),
+                (dict(pointer='/rows/0/none'),None),
+                (dict(pointer='/rows',view='range',start=1,count=1),dict(total=2,start=1,items=[{'x':2}]))]
+            with patch('tools.research.core.state',return_value={'spec':{}}),\
+                    patch('tools.research.core.protected',return_value=False),store.read_snapshot():
+                for query,expected in queries:
+                    with self.subTest(query=query),patch.object(store,'artifact',wraps=store.artifact) as reads:
+                        actual=read_evidence(host,dict(reference=ref,**query),record_read=False)
+                        self.assertEqual(actual,expected)
+                        outer=[c for c in reads.call_args_list if c.kwargs.get('db') is None]
+                        self.assertEqual([c.kwargs for c in outer],[{'pointers':(query['pointer'],)}])
+                actual['items'][0]['x']=-1
+                self.assertEqual(read_evidence(host,dict(reference=ref,**queries[-1][0]),record_read=False),queries[-1][1])
+                self.assertEqual(store.artifact(ref),value)
+                with closing(store.connect()) as db:
+                    db.execute('UPDATE artifacts SET body=? WHERE id=?',(b'{}',ref['artifact_id']));db.commit()
+                with self.assertRaisesRegex(ValueError,'EVIDENCE_MISSING_OR_CHANGED'):
+                    read_evidence(host,dict(reference=ref,pointer='/rows/0/none'),record_read=False)
+
+    def test_exact_projection_preserves_original_error_navigation_and_index_semantics(self):
+        from tools.research.core import read_evidence
+        with fixture_directory() as folder:
+            store=Store(folder);ref=store.put_context_checkpoint(dict(rows=[dict(x=1),None],acceptance=dict(task_passed=False)))
+            original=store.artifact
+            def unprojected(reference,**kwargs):
+                return {} if kwargs.get('pointers') is not None else original(reference,**kwargs)
+            def outcome(query,legacy):
+                host=SimpleNamespace(store=store,run_id='offline-navigation')
+                with patch.object(store,'artifact',side_effect=unprojected if legacy else original):
+                    try:return ('value',read_evidence(host,dict(reference=ref,**query),record_read=False))
+                    except (KeyError,IndexError,ValueError) as exc:
+                        return (type(exc).__name__,str(exc),getattr(exc,'evidence_navigation',None))
+            queries=[dict(pointer='/rows/00/x'),dict(pointer='/rows/2'),dict(pointer='/rows/no-index'),
+                dict(pointer='/rows/0/missing'),dict(pointer='/rows/0',view='fields',fields=['x','missing']),
+                dict(pointer='/rows/1',view='fields',fields=['x']),dict(pointer='/rows/0',view='range'),
+                dict(pointer='/rows',view='range',start=3),dict(pointer='/task_passed'),dict(pointer='rows')]
+            with patch('tools.research.core.state',return_value={'spec':{}}),\
+                    patch('tools.research.state.state',return_value={'spec':{}}),\
+                    patch('tools.research.core.protected',return_value=False),store.read_snapshot():
+                for query in queries:
+                    with self.subTest(query=query):self.assertEqual(outcome(query,False),outcome(query,True))
+
     def test_cached_evidence_field_rechecks_integrity_without_copying_unused_root(self):
         from tools.research.core import read_evidence
         with fixture_directory() as folder:

@@ -11,8 +11,8 @@ REF=dict(artifact_id='a'*64,media_type='application/json')
 
 class EvidenceTests(unittest.TestCase):
     def read(self,value,**query):
-        host=Mock();host.store.artifact.return_value=value
-        with patch('tools.research.core.state',return_value={}),patch('tools.research.core.protected',return_value=False):
+        host=Mock();host._evidence_query_cache={};host.store.artifact.return_value=value
+        with patch('tools.research.core.state',return_value={}),patch('tools.research.state.state',return_value={}),patch('tools.research.core.protected',return_value=False):
             return read_evidence(host,dict(reference=REF,**query))
 
     def test_s8_false_display_and_result_paths_are_rejected(self):
@@ -47,7 +47,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertIsNone(self.read(raw,**view['summary']['small_query']))
 
     def test_protected_read_rejected_before_traversal(self):
-        host=Mock();host.store.artifact.return_value={}
+        host=Mock();host._evidence_query_cache={};host.store.artifact.return_value={}
         with patch('tools.research.core.state',return_value={}),patch('tools.research.core.protected',return_value=True),patch('tools.research.core.readable_results',return_value=[]):
             with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ'):
                 read_evidence(host,dict(reference=REF,pointer='/missing'))

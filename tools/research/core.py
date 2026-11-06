@@ -129,9 +129,17 @@ def read_evidence(host, query, *, record_read=True):
     cache=getattr(host,'_evidence_query_cache',{})
     cache_key=digest(plain(q)) if cacheable else None
     derived=q.view in ('working_set','mathematical_capabilities','acceptance_certificate')
+    subnode_selected=False
     if q.reference.media_type=='application/json' and (derived or cacheable and cache_key in cache):
         # Keep content-addressed integrity checks, without copying an unused root.
         value=host.store.artifact(q.reference,paths=())
+    elif q.reference.media_type=='application/json' and cacheable and q.pointer.startswith('/'):
+        # First-time exact reads also need only their selected node. Keep the
+        # original traversal for misses and legacy array-index spellings.
+        try:selected=host.store.artifact(q.reference,pointers=(q.pointer,))
+        except KeyError:selected={}
+        subnode_selected=q.pointer in selected
+        value=selected[q.pointer] if subnode_selected else host.store.artifact(q.reference)
     else:
         value = host.store.artifact(q.reference,raw=True) if q.reference.media_type in ('application/gzip','application/octet-stream') else host.store.artifact(q.reference)
     if isinstance(value,bytes):
@@ -206,6 +214,11 @@ def read_evidence(host, query, *, record_read=True):
         value=mathematical_method_view(host,plain(q.reference))
     root_value=value
     def navigation(exc,node,path):
+        nonlocal root_value
+        if subnode_selected:
+            # Error recovery still describes the complete original document,
+            # including ancestor paths and acceptance/derived-view navigation.
+            root_value=host.store.artifact(q.reference)
         from tools.research.evidence_views import data_access
         view=q.view if q.view in ('working_set','mathematical_capabilities') else 'summary'
         details=dict(reference=plain(q.reference),view=q.view,failed_pointer=q.pointer,
@@ -285,7 +298,7 @@ def read_evidence(host, query, *, record_read=True):
     if q.pointer and not q.pointer.startswith('/'):
         raise ValueError('INVALID_EVIDENCE_POINTER: use an absolute JSON pointer or empty root')
     parent=''
-    for part in q.pointer[1:].split('/') if q.pointer else []:
+    for part in q.pointer[1:].split('/') if q.pointer and not subnode_selected else []:
         part = part.replace('~1', '/').replace('~0', '~')
         if isinstance(value,list) and (not part.isdecimal() or int(part)>=len(value)):
             raise navigation(IndexError('List index must be in [0, '+str(len(value))+')'),value,parent)
