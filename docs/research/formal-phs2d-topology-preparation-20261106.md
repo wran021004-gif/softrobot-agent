@@ -118,3 +118,14 @@ gateway `gpt-5.6-sol / medium` request-feedback handoff：原始请求/收据、
 具体孔距、截面与路由必须通过真实几何检查；默认长链初始接触/forward 失败待 Main 研究。
 本次没有证明任何拓扑的完整动态通过、硬件性能、全局可行性或不可行性。
 下一步仅在用户批准最终申请后，记录授权和正式 Handoff 准入，直接启动原十工况自主研究。
+
+## 最终准备记录
+
+- Study：`phs2d-topology-successor-20261106`。
+- Resolved identity：`560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111`。
+- FamilySpace identity：`eb4b0e785e32347af9d6894f82276ada654630474b160e47ac8dd4fd24b1f664`。
+- Implementation freeze：`f76a85282368458f01884579842876d317cc2134`。后续交付提交只保存报告与准备证据。
+- 重新绑定的历史 C4 在新 Store 的短引用为 `candidate_5`；参数、结构和任务与旧准备候选相等，尚无 Plan 或评价。短引用变化不表示新增科学候选或新的设计发现。
+- 共 29 个不同的定向测试通过。六组代表工程检查本次记录耗时 6.751 s，各组耗时见 validation JSON。
+- 新 Store 的 Provider、数学、物理、公开操作使用量均为零；无 pending、未结算 receipt 或未消费 response。
+- 环境与 Handoff 技术证据 ready，正式执行门禁仍阻断，等待当前身份、范围、预算和 handoff 的最终明确授权。
