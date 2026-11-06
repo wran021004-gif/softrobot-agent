@@ -123,7 +123,17 @@ def read_evidence(host, query, *, record_read=True):
     """Use the existing evidence boundary; internal reads may omit read markers."""
     q = EvidenceQuery.model_validate(query)
     s = state(host)
-    value = host.store.artifact(q.reference,raw=True) if q.reference.media_type in ('application/gzip','application/octet-stream') else host.store.artifact(q.reference)
+    # Whole JSON reads already have Store's request-local cache and copy isolation.
+    # Caching that root a second time retains and copies large trajectories twice.
+    cacheable=q.view in ('full','fields','range') and not (q.view=='full' and not q.pointer)
+    cache=getattr(host,'_evidence_query_cache',{})
+    cache_key=digest(plain(q)) if cacheable else None
+    derived=q.view in ('working_set','mathematical_capabilities','acceptance_certificate')
+    if q.reference.media_type=='application/json' and (derived or cacheable and cache_key in cache):
+        # Keep content-addressed integrity checks, without copying an unused root.
+        value=host.store.artifact(q.reference,paths=())
+    else:
+        value = host.store.artifact(q.reference,raw=True) if q.reference.media_type in ('application/gzip','application/octet-stream') else host.store.artifact(q.reference)
     if isinstance(value,bytes):
         try:
             if value.startswith(b'\x1f\x8b'):
@@ -140,11 +150,8 @@ def read_evidence(host, query, *, record_read=True):
         return _record_evidence_read(host,q,s,acceptance_certificate(host,plain(q.reference)),record_read)
     # Reuse only exact static projections of the verified Store content. Dynamic
     # views and summaries (whose navigation can change) are recomputed normally.
-    cacheable=q.view in ('full','fields','range')
-    cache=getattr(host,'_evidence_query_cache',{})
-    # Store.artifact already verified the content-addressed reference above.
-    cache_key=digest(plain(q)) if cacheable else None
-    if cache_key in cache:
+    # The source was verified above even when the selected subnode is cached.
+    if cacheable and cache_key in cache:
         return _record_evidence_read(host,q,s,deepcopy(cache[cache_key]),record_read)
     if q.view=='working_set':
         from tools.research.evidence_policy import registered_references

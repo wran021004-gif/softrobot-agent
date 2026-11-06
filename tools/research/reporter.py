@@ -62,7 +62,10 @@ def entries(host):
 def _card(host, reference):
     """Adapt RL episode fields locally; F0 and mathematical methods stay frozen."""
     card=result_card(host,reference)
-    value=read_evidence(host,dict(reference=reference),record_read=False)
+    value=host.store.artifact(reference,paths=('profile.passive_program','mathematical_facts',
+        'independent_evaluation_executed'))
+    if 'mathematical_facts' in value or 'independent_evaluation_executed' in value:
+        value=read_evidence(host,dict(reference=reference),record_read=False)
     if value.get('profile',{}).get('passive_program'):
         card=card.model_copy(update=dict(recorded_context=[*card.recorded_context,RecordedField(name='passive_program',
             value=value['profile']['passive_program'],source=EvidenceLocation(reference=reference,pointer='/profile/passive_program'))]))
@@ -142,7 +145,7 @@ def _comparison(host, left, right):
         # pairing cannot negate that narrower recorded comparison.
         comparable=None
         for current,baseline in ((a,b),(b,a)):
-            comparison=host.store.artifact(current.result.reference).get('trajectory',{}).get('structural_comparison',{})
+            comparison=host.store.artifact(current.result.reference,paths=('trajectory.structural_comparison',)).get('trajectory',{}).get('structural_comparison',{})
             if comparison.get('baseline_result')==plain(baseline.result.reference):
                 comparable=comparison.get('status')=='computed_estimate'
                 sources.append(EvidenceLocation(reference=current.result.reference,pointer='/trajectory/structural_comparison'))
@@ -160,8 +163,8 @@ def _comparison(host, left, right):
         left=a,right=b,comparable=comparable,reasons=reasons,
         changed_factors=list(dict.fromkeys(factors)),sources=sources)
     changes=[]
-    current_raw=host.store.artifact(a.result.reference)
-    baseline_raw=host.store.artifact(b.result.reference)
+    current_raw=host.store.artifact(a.result.reference,paths=('task_analysis.constraints','acceptance'))
+    baseline_raw=host.store.artifact(b.result.reference,paths=('task_analysis.constraints','acceptance'))
     baseline={m.name:m for m in right.metrics}
     for m in left.metrics:
         old=baseline.get(m.name)
@@ -250,7 +253,7 @@ def investigate(host, request):
     # never recursively send the old full report as another scientific result.
     previous_reports=[];references=[]
     for ref in q.references:
-        raw=host.store.artifact(ref)
+        raw=host.store.artifact(ref,paths=('report.version','report.results'))
         if raw.get('report',{}).get('version')=='scientific_report_v1':
             previous_reports.append(plain(ref))
             references.extend(EvidenceRef.model_validate(c['identity']['result']['reference']) for c in raw['report']['results'])
@@ -273,7 +276,7 @@ def investigate(host, request):
         automatic=[plain(query) for query in q.reads]
     # Investigation owns detailed cross-model reading; main Agent receives L1.
     for reference in q.references:
-        raw=host.store.artifact(reference)
+        raw=host.store.artifact(reference,paths=('candidate',))
         if not raw.get('candidate'):continue
         query=EvidenceQuery(reference=reference,view='working_set',pointer='/diagnostic_relations')
         if query not in q.reads:q.reads.append(query)

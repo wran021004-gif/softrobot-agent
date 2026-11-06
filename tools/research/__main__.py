@@ -65,7 +65,7 @@ def main():
     elif args.command=='recover':
         print(json.dumps(recover(h)))
         return
-    elif args.command in ('run','live'):
+    elif args.command=='run':
         from tools.research.agent import converse,IncompleteModelOutput
         try:asyncio.run(converse(h,session_handoff=args.session_handoff,
             pause_after_completed_invocations=args.pause_after_completed_invocations,

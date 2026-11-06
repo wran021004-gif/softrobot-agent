@@ -134,7 +134,7 @@ def diagnostic_relations(host, reference):
     from tools.research.research_context import measured_samples, recorded_changes
     from tools.research_tasks import task_adapter
     from tools.state_io import digest
-    s=state(host);selected=host.store.artifact(reference)
+    s=state(host);selected=host.store.artifact(reference,paths=('candidate',))
     candidate=selected.get('candidate',reference if reference in s['candidates'].values() else None)
     if candidate is None:return dict(status='candidate_selection_required',relations=[])
     c=host.store.artifact(candidate);cfg=c['configuration']
@@ -735,7 +735,8 @@ def result_card(host, reference):
     Copies isolate nested dicts from the underlying saved artifacts.
     """
     reference=deepcopy(plain(reference))
-    value=deepcopy(read_evidence(host, dict(reference=reference), record_read=False))
+    # The evidence boundary already returns an isolated Store copy.
+    value=read_evidence(host, dict(reference=reference), record_read=False)
     if not isinstance(value,dict):
         raise ValueError('RESULT_CARD_REQUIRES_RESULT_OBJECT')
     control=value.get('control_schedule_reference',value.get('source_reference'))

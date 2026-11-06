@@ -34,7 +34,9 @@ def offline_host(values, **fields):
         evaluation_reads=[],guidance_reads=[],rl_evidence_reads=[])
     current.update(fields)
     store=Mock()
-    store.artifact.side_effect=lambda r:values[plain(r)['artifact_id']]
+    # These semantic fixtures may return extra fields; actual projection and
+    # integrity behavior is covered against Store in test_context_performance.
+    store.artifact.side_effect=lambda r,**kwargs:deepcopy(values[plain(r)['artifact_id']])
     store.session.side_effect=lambda run:dict(state=current)
     store.transaction.side_effect=AssertionError('NO_PERSISTENCE_OR_SCIENCE')
     store.reserve.side_effect=AssertionError('NO_EXECUTION_GRANT')

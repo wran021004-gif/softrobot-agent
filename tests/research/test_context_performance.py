@@ -12,6 +12,42 @@ from tests.research.test_cross_task_integration import fixture_directory
 
 
 class ContextPerformanceTests(unittest.TestCase):
+    def test_cached_evidence_field_rechecks_integrity_without_copying_unused_root(self):
+        from tools.research.core import read_evidence
+        with fixture_directory() as folder:
+            store=Store(folder);ref=store.put_context_checkpoint(dict(status='computed',trace=list(range(2000))))
+            host=SimpleNamespace(store=store,run_id='offline-evidence-cache')
+            query=dict(reference=ref,view='fields',fields=['status'])
+            with patch('tools.research.core.state',return_value={'spec':{}}),\
+                    patch('tools.research.core.protected',return_value=False),store.read_snapshot():
+                self.assertEqual(read_evidence(host,query,record_read=False),{'status':'computed'})
+                with patch.object(store,'artifact',wraps=store.artifact) as reads:
+                    self.assertEqual(read_evidence(host,query,record_read=False),{'status':'computed'})
+                    outer=[c for c in reads.call_args_list if c.kwargs.get('db') is None]
+                    self.assertEqual(len(outer),1)
+                    self.assertEqual(outer[0].kwargs,{'paths':()})
+                with closing(store.connect()) as db:
+                    db.execute('UPDATE artifacts SET body=? WHERE id=?',(b'{}',ref['artifact_id']));db.commit()
+                with self.assertRaisesRegex(ValueError,'EVIDENCE_MISSING_OR_CHANGED'):
+                    read_evidence(host,query,record_read=False)
+
+    def test_full_evidence_has_one_cache_owner_and_derived_view_keeps_verification(self):
+        from tools.research.core import read_evidence
+        with fixture_directory() as folder:
+            store=Store(folder);ref=store.put_context_checkpoint(dict(status='computed',trace=list(range(2000))))
+            host=SimpleNamespace(store=store,run_id='offline-evidence-view')
+            with patch('tools.research.core.state',return_value={'spec':{}}),\
+                    patch('tools.research.core.protected',return_value=False),store.read_snapshot():
+                result=read_evidence(host,dict(reference=ref),record_read=False);result['trace'][0]=-1
+                self.assertEqual(read_evidence(host,dict(reference=ref),record_read=False)['trace'][0],0)
+                self.assertFalse(getattr(host,'_evidence_query_cache',{}))
+                with patch('tools.research.task_constraints.mathematical_method_view',return_value={'methods':['offline']}),\
+                        patch.object(store,'artifact',wraps=store.artifact) as reads:
+                    self.assertEqual(read_evidence(host,dict(reference=ref,view='mathematical_capabilities',pointer='/methods'),record_read=False),['offline'])
+                    outer=[c for c in reads.call_args_list if c.kwargs.get('db') is None]
+                    self.assertEqual(len(outer),1)
+                    self.assertEqual(outer[0].kwargs,{'paths':()})
+
     def test_mechanism_scope_summary_matches_full_evidence_without_trace_read(self):
         from tools.research.evidence_policy import summarize_evidence,summarize_saved_evidence
         with fixture_directory() as folder:
