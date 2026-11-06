@@ -73,3 +73,9 @@ SDK 响应均为离线 fixture，不是正式科研证据。
 监督发现并保留了一处解释纠正：s3～s7 是 material_s=0.3～0.7 的加载位置，
 十工况施力幅值均为 0.1 N，并非力大小递增。该事实已通过原 operator_request 入口记录，
 恢复后随原任务来源提供给 Main；不改原历史解释或科学数据。
+
+修复已绑定到 `07631cb05bf313f7317795b3dd94a387d45ced85`。
+原 resolved identity `560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111`、
+科学 profile、pilot/Handoff 和完整账本逐项比较均保持不变；授权与 guard 通过。
+纯 Store I/O 指纹更新保留了七个相关依赖的精确记录，未标为物理模型变化。
+原恢复入口已验证第 17 次已结算的失败初始请求，window006 继续同一 Study。
