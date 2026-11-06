@@ -165,6 +165,20 @@ class DiagnosticLayerTests(unittest.TestCase):
         self.assertEqual(quantitative_facts(value,REF)['diagnostic_layers'],expected)
         self.assertEqual(analysis.compact_result(value,REF)['candidate'],REF)
         self.assertEqual(value,before)
+        compact=analysis.compact_result(self.failed,REF)['structure_research']['qualification_diagnosis']
+        self.assertNotIn('numerical_failure',compact)
+        self.assertNotIn('initial',compact['trials'][0])
+        self.assertIn('numerical_failure_pointer',compact)
+
+    def test_returned_active_equilibrium_before_model_failure_is_not_inapplicable(self):
+        # Explicit interrupted-model fixture; a returned construction is retained,
+        # but no converted model or completed qualification can be assumed.
+        value=dict(status='execution_incomplete',reason='Injected model conversion failure',active_model_progress=[
+            dict(stage='analysis_returned',row=dict(name='target_equilibrium',construction=dict(success=True,
+                static_equilibrium=True,static_residual_inf=1e-12),raw_facts=dict(equilibrium=True)))])
+        layer=analysis.diagnostic_layers(value)['static_qualification']
+        self.assertEqual(layer['status'],'not_evaluated')
+        self.assertEqual(layer['facts']['static_residual_inf'],1e-12)
 
 
 if __name__=='__main__':unittest.main()

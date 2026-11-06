@@ -713,6 +713,12 @@ def summary(value, reference):
         constraint_state={k:v for k,v in constraint_state.items() if k!='native_soft_length_residual_m'}
         constraint_state['native_soft_length_excess_m']=max(0.,max(raw['constraint_state']['native_soft_length_residual_m']))
     task_observations=deepcopy(raw.get('task_observations',[])[:4])
+    diagnosis=raw.get('qualification_diagnosis')
+    if diagnosis:
+        diagnosis={k:v for k,v in diagnosis.items() if k!='numerical_failure'}
+        diagnosis['trials']=[{k:v for k,v in row.items() if k!='initial'} for row in diagnosis.get('trials',[])]
+        if raw['qualification_diagnosis'].get('numerical_failure'):
+            diagnosis['numerical_failure_pointer']='/structure_research/qualification_diagnosis/numerical_failure'
     if raw.get('physical_problem'):
         definitions={o['name']:o for o in raw['records'][0]['configuration']['task']['physical_problem'].get('observations',[])}
         for row in task_observations:
@@ -723,7 +729,7 @@ def summary(value, reference):
             row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
     return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
-        qualification_diagnosis=raw.get('qualification_diagnosis'),
+        qualification_diagnosis=diagnosis,
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         task_observations=task_observations,
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),

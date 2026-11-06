@@ -824,7 +824,7 @@ def diagnostic_layers(value):
         raw=row.get('raw_facts') or value.get('raw_facts') or {}
         model=value.get('model') or row.get('model') or {}
         construction=value.get('construction') or row.get('construction') or {}
-        point=model.get('operating_point') or row.get('point') or value.get('operating_point') or {}
+        point=model.get('operating_point') or row.get('point') or value.get('operating_point') or dict(name=row.get('name'))
         derivative=row.get('derivative_check') or raw.get('derivative_check')
         if mechanics.get('coordinates') or mechanics.get('validity'):
             layers['geometry']=layer('passed',fields(mechanics,('validity','coordinates','tendon_lengths_m','input_bounds_n')),

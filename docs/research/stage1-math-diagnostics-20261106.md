@@ -20,6 +20,7 @@ not switched, reset or cleaned.
 | `tools/research/structure_research.py`: `initial_geometry` | Reuse position pipeline; retain contact world positions and geometric active/slack observations. No full forward retry. |
 | `extensions/tendon_family/passive_equilibrium.py`: `StaticProblem.qualify`, `solve`, `qualification_diagnosis` | Expose separate checks using unchanged thresholds. Record actual start, initial forward, optimizer entry/return/status, and interrupted current trial, retaining earlier completed trials. |
 | `extensions/tendon_family/math_analysis.py`, `sorosim_analysis.py`: `calculate_candidate_configuration` | Publish process milestones through the existing checkpoint callback. Active construction, derivatives, inputs and qualification remain owned by their existing kernels. |
+| `tests/research/test_constrained_mechanics.py`: shared Worker fixture | Replace a hidden legacy tip-row question with registered output-row coverage and the identical explicit world X/Y projection. No production registry change. |
 
 No new Worker, Agent, state machine, physics kernel, registry, hash identity or
 scientific evidence type was introduced. Existing candidate references remain on
@@ -81,7 +82,7 @@ Full engineering outputs are in local ignored
 
 ## Validation
 
-Eight focused new tests cover real A/B failures, interrupted second-start
+Nine focused new tests cover real A/B failures, interrupted second-start
 qualification, saved real active SoRoSim compatibility, partial active derivative
 progress, native geometry rejection, independent dynamic-layer projection, and
 identical Main/Reporter/tool facts without mutation. Synthetic process/dynamic
@@ -94,6 +95,22 @@ errors there come from its old `offline_host` Mock not supporting the existing
 `artifact(..., paths=...)` API. Both incompatible lines exist at `0528cda9`. This
 unrelated fixture is not repaired in Stage I; final runs name the intended test
 classes explicitly.
+
+The first committed run completed 39 intended tests in 72.645 s with one failure:
+the shared passive SDK fixture requested `constraint_tip_row_residual`, already
+hidden from Main at the supplied baseline. Its first request was rejected before
+execution (`INVALID_SCIENTIFIC_V4_INPUT`), yielding six rather than seven charged
+evaluations. The fixture now requests the existing registered
+`constraint_output_row_residual` with explicit identical world X/Y rows; original
+numerical checks and seven-evaluation assertion are retained.
+
+An independent exact baseline comparison completed in 10.154 s: real GVS,
+saved real SoRoSim initial and target-equilibrium results, and the real PHS
+two-start failure all preserve every original result field after removing only
+new diagnostic fields. The passive comparison includes original qualification
+and numerical counters and compares serialized JSON consistently (tuples become
+lists). Local comparison script and result:
+`runs/stage1_diagnostics/compare_baseline.py` and `baseline_comparison.json`.
 
 Final targeted counts, timings, exact baseline comparisons and publication
 identity are appended after verification. No Provider, formal Study, full ten-case

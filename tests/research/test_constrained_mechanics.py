@@ -154,11 +154,13 @@ class ConstrainedMechanicsTests(unittest.TestCase):
             expected_observation='Qualified equilibria and measured constrained compliance under the frozen lateral load.',
             weakening_observation='Unqualified equilibrium or no useful decoupling.',fixed_conditions='Same assembly, payout and frozen load bindings.',
             interpretation='Local numerical mechanism evidence; independent dynamic acceptance remains unmeasured.')
+        coverage=passive_question(quantity='constraint_output_row_residual')
+        coverage['structure']['target']['projection_world']=[[1.,0.,0.],[0.,1.,0.]]
         with patch('tools.research.reporter._wire',side_effect=ValueError('OFFLINE_REPORTER_UNAVAILABLE')),\
                 patch('tools.research.reporter.interpretation_priority',return_value='stage2_new_mechanism_result'):
             wires=run_fixture(h,[('research_route',dict(tool='research_plan',action='diagnose')),
                 ('research_plan',diagnose),
-                ('research_analysis',passive_question(quantity='constraint_tip_row_residual')),
+                ('research_analysis',coverage),
                 ('research_analysis',passive_question()),
                 ('research_analysis',passive_question('differentiate','re_equilibrated_position_response',5)),None])
         s=state(h);self.assertEqual(s['spec'],spec);self.assertEqual(s['mathematical_evaluations'],7)
