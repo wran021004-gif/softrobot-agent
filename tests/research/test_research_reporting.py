@@ -217,6 +217,22 @@ class ReportingTests(unittest.TestCase):
         read_evidence(case.host,dict(reference=case.result))
         self.assertTrue(feedback.eligibility(case.host,case.result)['eligible'])
 
+    def test_reporter_handoff_keeps_exact_candidate_identity_and_alias(self):
+        from tools.research.reporter import reporter_handoff_summary
+        reference=self.put(self.math_result('inconclusive'))
+        host,current=offline_host(self.values,analysis_results=[reference],candidates={'offline_candidate':self.candidate})
+        report=ScientificReport(mode='result_summary',results=[result_card(host,reference)])
+        saved=dict(report=plain(report),request=None,interpretation_status='deferred',error=None)
+        before=deepcopy((self.values,current))
+        with patch('tools.research.object_choices.reference_choices',return_value={'offline_candidate':self.candidate}):
+            handoff=reporter_handoff_summary(host,reference,saved)
+        finding=handoff['findings'][0]
+        self.assertEqual(finding['candidate'],self.candidate)
+        self.assertEqual(finding['candidate_aliases'],['offline_candidate'])
+        self.assertEqual(finding['result_reference'],reference)
+        self.assertEqual((self.values,current),before)
+        self.assertFalse(host.store.transaction.called or host.store.reserve.called)
+
     def test_report_modes_future_math_and_comparison_scope_are_typed(self):
         reference=self.put(self.math_result());host,_=offline_host(self.values)
         card=result_card(host,reference)

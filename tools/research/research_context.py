@@ -2287,6 +2287,8 @@ def information_flow_brief(brief, delivered):
             summary_query=report.get('summary_query'),
             reading_guidance='Use compact facts and interpretation_query for ordinary investigation; full reads remain available for formal requirements.',
             interpretations=report.get('interpretations',[]),
+            result_bindings=[{k:f[k] for k in ('result_reference','candidate','candidate_aliases','recorded_data_access') if k in f}
+                for f in report.get('findings',[])],
             unresolved=report.get('unresolved',[])[:3]))
     # Values are owned by verified_facts; explanations carry references only.
     facts=deepcopy(brief.get('flow_facts') or value.get('verified_facts',[]))

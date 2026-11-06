@@ -333,6 +333,33 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertEqual([q['topic'] for q in saved['request']['automatic_reads']],['structure','task'])
         self.assertIn(expected,saved['request']['reads'])
 
+    def test_unqualified_dynamic_record_navigation_reads_exact_saved_samples(self):
+        from tools.research.evidence_views import data_access
+        from tools.research.state import save
+        h,c=self.host()
+        samples=[dict(time_s=t,tip_m=[t,0.,0.],static_balance_inf_nm=.02,
+            material_positions_m=[[t,0.,0.]],actual_tension_n=[.3],ncon=0,
+            raw_large_array=[0.]*100) for t in (0.,8.)]
+        raw=dict(status='execution_incomplete',candidate=c,structure_research=dict(records=[
+            dict(mechanics=dict(dynamic_execution=dict(status='completed',episodes=[
+                dict(load_condition='offline_case',samples=samples,qualifications=dict(loaded=dict(passed=False))),
+                dict(load_condition='offline_empty',samples=[],qualifications={})])))]))
+        ref=save(h,raw);before=deepcopy(state(h));usage=h.store.remaining();events=h.store.events(h.run_id)
+        access=data_access(h,ref,raw);run=access['recorded_executions'][0]
+        episode=run['episodes'][0]
+        self.assertFalse(core.read_evidence(h,episode['qualifications_query'],record_read=False)['loaded']['passed'])
+        for name,index in (('first',0),('last',1)):
+            query=episode['sample_queries'][name]
+            observed=core.read_evidence(h,query,record_read=False)
+            self.assertEqual(observed,{k:samples[index][k] for k in query['fields']})
+            self.assertNotIn('raw_large_array',observed)
+            self.assertLess(len(json.dumps(observed)),4096)
+        self.assertEqual(core.read_evidence(h,episode['sample_range_query'],record_read=False)['items'],samples[:1])
+        self.assertNotIn('sample_queries',run['episodes'][1])
+        self.assertEqual(data_access(h,ref,dict(status='not_applicable'))['queries'],[])
+        self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),usage)
+        self.assertEqual(h.store.events(h.run_id),events)
+
     def test_reporter_focus_is_prose_and_explicit_reads_select_registered_topics(self):
         from tools.research import reporter
         h,c=self.host()

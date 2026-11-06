@@ -451,6 +451,15 @@ def reporter_handoff_summary(host, reference, saved):
             result_reference=card['identity']['result']['reference'],
             metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source','time_s','window_s')}
                 for m in metrics],main_violations=card['main_violations'])
+        candidate=card['identity'].get('candidate')
+        if candidate:
+            from tools.research.object_choices import reference_choices
+            fact['candidate']=candidate
+            fact['candidate_aliases']=[name for name,ref in reference_choices(host,include_all=True).items() if ref==candidate]
+        if (raw.get('structure_research') or {}).get('records'):
+            from tools.research.evidence_views import data_access
+            access=data_access(host,card['identity']['result']['reference'],raw)
+            if access.get('recorded_executions'):fact['recorded_data_access']=access
         fact['quantitative_facts']=quantitative_facts(raw,card['identity']['result']['reference'])
         fact['critical_observations']=card.get('critical_observations',[])
         for metric in fact['metrics']:metric['semantics']=metric_semantics(raw,metric['name'])

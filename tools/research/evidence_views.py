@@ -355,6 +355,30 @@ def data_access(host,reference,value):
     elif isinstance(value,dict):
         access['queries']=[dict(reference=reference,view='full',pointer='/'+_token(k)) for k in
             ('trajectory','mathematical_facts','task_requirements','acceptance') if k in value]
+        # An invalid objective can still own complete recorded trajectories.
+        # Advertise exact raw reads, never substitute observations for acceptance.
+        executions=[]
+        fields=('time_s','force_world_n','material_positions_m','tip_m','material_velocities_m_s',
+            'tip_velocity_m_s','static_balance_inf_nm','actual_tension_n','tendon_length_m',
+            'length_residual_m','ncon')
+        for i,record in enumerate((value.get('structure_research') or {}).get('records',[])):
+            raw=(record.get('mechanics') or {}).get('dynamic_execution')
+            if not raw:continue
+            pointer=f'/structure_research/records/{i}/mechanics/dynamic_execution'
+            episodes=[]
+            for j,episode in enumerate(raw.get('episodes',[])):
+                path=pointer+f'/episodes/{j}';samples=episode.get('samples',[])
+                row=dict(load_condition=episode.get('load_condition'),sample_count=len(samples),
+                    qualifications_query=dict(reference=reference,view='full',pointer=path+'/qualifications'))
+                if samples:
+                    row['sample_queries']={name:dict(reference=reference,view='fields',pointer=path+f'/samples/{index}',
+                        fields=[key for key in fields if key in samples[index]]) for name,index in (('first',0),('last',len(samples)-1))}
+                    row['sample_range_query']=dict(reference=reference,view='range',pointer=path+'/samples',start=0,count=1)
+                episodes.append(row)
+            executions.append(dict(source=dict(reference=reference,pointer=pointer),status=raw.get('status'),episodes=episodes))
+        if executions:
+            access['recorded_executions']=executions
+            access['observation_scope']='Saved samples only, including unqualified executions. First/last samples do not replace frozen scoring/reference windows or establish task acceptance.'
         from tools.research.state import state
         if reference in state(host).get('results',[]) and value.get('execution_id'):
             from extensions.tendon_family.control_evidence import ControlEvidence

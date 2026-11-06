@@ -64,6 +64,21 @@ class InformationFlowTests(unittest.TestCase):
         self.assertNotIn('parameters_query',result)
         self.assertEqual(delivered,before)
 
+    def test_reporter_navigation_and_candidate_binding_reach_main_without_raw_samples(self):
+        query=dict(reference={'artifact_id':'a'*64,'media_type':'application/json'},view='fields',pointer='/saved/0',fields=['tip_m'])
+        binding=dict(result_reference=query['reference'],candidate={'artifact_id':'b'*64,'media_type':'application/json'},
+            candidate_aliases=['offline_candidate'],recorded_data_access=dict(queries=[query]))
+        brief=dict(analysis_interface='scientific_question_v4',latest_reports=[dict(report_reference=query['reference'],
+            reporter_status='available',result_references=[query['reference']],findings=[{**binding,'metrics':['not duplicated']}])])
+        delivered=dict(research_state=dict(task=dict(research_mode='passive_mechanism_and_dynamic_execution')),
+            current_control={},budget={})
+        before=deepcopy((brief,delivered))
+        report=information_flow_brief(brief,delivered)['reporter_findings'][0]
+        self.assertEqual(report['result_bindings'],[binding])
+        self.assertNotIn('metrics',report['result_bindings'][0])
+        self.assertFalse(report['scientific_citation_eligible'])
+        self.assertEqual((brief,delivered),before)
+
     def test_initial_mock_wire_contains_structure_without_raw_parameter_read(self):
         h=flow_host()
         wires=run_fixture(h,[('research_plan',generation(h)),None])
