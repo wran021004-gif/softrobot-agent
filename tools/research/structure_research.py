@@ -701,6 +701,14 @@ def summary(value, reference):
         if array is not None and array.ndim and not array.size:return dict(shape=list(array.shape),minimum=None,maximum=None,norm=0.)
         return item if array is None or array.ndim==0 else dict(shape=list(array.shape),
             minimum=float(np.min(array)),maximum=float(np.max(array)),norm=float(np.linalg.norm(array)))
+    if compact is not None and direction.get('baseline_metric') and direction.get('perturbed_metric'):
+        compact['metric_comparison']=dict(
+            baseline=observation_summary(direction['baseline_metric'].get('value')),
+            proposed=observation_summary(direction['perturbed_metric'].get('value')),
+            unit=direction['perturbed_metric'].get('unit'),
+            scope='Metrics correspond to the proposed parameter_changes. Numerical consistency may describe different stencil coordinates; its observed_change is not the proposed-step gain.',
+            baseline_source=dict(reference=reference,pointer='/structure_research/structure_direction/baseline_metric'),
+            proposed_source=dict(reference=reference,pointer='/structure_research/structure_direction/perturbed_metric'))
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
     sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','derivative_status','branch_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]

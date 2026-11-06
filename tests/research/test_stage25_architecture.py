@@ -31,6 +31,27 @@ def target_for(quantity):
 
 
 class Stage25ArchitectureTests(unittest.TestCase):
+    def test_direction_summary_keeps_proposed_metrics_distinct_from_stencil_change(self):
+        # Fabricated two-scale fixture: the proposed half-step is different from
+        # the full-step observation used to check numerical consistency.
+        from tools.research.structure_research import summary
+        raw=dict(operation='differentiate',target=dict(quantity='re_equilibrated_position_response'),
+            baseline=dict(value=.003,unit='m'),cost={},unsupported_conclusions=[],
+            structure_direction=dict(parameter_changes=[dict(parameter_path='segments.2.young_pa',
+                baseline=7e6,suggested_value=6.935e6)],
+                baseline_metric=dict(value=.003,unit='m'),perturbed_metric=dict(value=.0030015,unit='m')),
+            method_selection=dict(numerical_consistency=[dict(observed_change=.000003)]))
+        before=deepcopy(raw);ref=dict(artifact_id='2'*64,media_type='application/json')
+        view=summary(dict(structure_research=raw),ref)
+        metrics=view['structure_direction']['metric_comparison']
+        self.assertEqual((metrics['baseline'],metrics['proposed'],metrics['unit']),(.003,.0030015,'m'))
+        self.assertAlmostEqual(metrics['proposed']-metrics['baseline'],.0000015)
+        self.assertEqual(view['method_selection']['numerical_consistency'][0]['observed_change'],.000003)
+        self.assertEqual(view['structure_direction']['parameter_changes'],raw['structure_direction']['parameter_changes'])
+        self.assertEqual(metrics['proposed_source'],dict(reference=ref,pointer='/structure_research/structure_direction/perturbed_metric'))
+        self.assertIn('not the proposed-step gain',metrics['scope'])
+        self.assertEqual(raw,before)
+
     def test_load_summary_keeps_baseline_and_each_case_constraints_distinct(self):
         # Fabricated retrieval fixture: neither baseline slack nor its eligibility
         # may be attributed to every compared load.
