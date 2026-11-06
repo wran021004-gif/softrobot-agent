@@ -16,6 +16,9 @@
 cd D:\softrobot-agent\.worktrees\research-harness-v2\local-chatgpt-gateway
 ```
 
+2026-11-06 已完成新账号授权并在后台启动 8788，无需重复执行启动命令。
+以下命令用于日后的手动登录与启动。
+
 首次登录：
 
 ```powershell
@@ -54,8 +57,17 @@ npm run account2 -- status
 2026-11-06 本地核查：原 8787 进程 PID 为 56416，实际源码来自
 `D:\softrobot-agent\.worktrees\p6-3b6-gateway-repair-retest\local-chatgpt-gateway`，
 不是本次编辑的 V2 工作树。没有切换该进程；原 OAuth、host、本地 API Key 和两份既有连接凭据，
-共 5 个文件在新增 setup 前后内容不变。Account2 本地凭据已生成；浏览器授权结果另行核实，
-不以 setup 成功替代登录、plan usage 或真实模型权限验证。
+共 5 个文件在新增 setup、登录和启动后内容不变。
+
+用户在浏览器完成新账号授权后，原 SDK 返回 connected / sharing=true。
+Account2 已后台启动，PID 为 623620，8788 的带认证 `/health` 返回 HTTP 200、
+account_status=connected、plan_usage=true。原账号 Key 访问 8788、新账号 Key 访问 8787 均返回 401，
+确认两个本地认证入口独立。原 8787 仍由 PID 56416 监听。
+当次进程记录和检查结果保存在 ignored 的 `runs/gateway-account2-20261106/`，不提交凭据。
+这些 PID 仅表示当次启动记录；后台实例的生命周期与后续手动终端启动分开管理。
+
+本次真实推理请求为 0，没有读取新账号模型目录，也没有创建 Study。
+connected / plan usage 表示身份与授权通过，不替代具体模型的实际调用能力验证。
 
 官方依据：[OpenAI Docs：Accounts and sessions](https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions)
 要求不同注册的账号信息、client ID 和凭据分开保存；不以 email 作为唯一账号身份。
