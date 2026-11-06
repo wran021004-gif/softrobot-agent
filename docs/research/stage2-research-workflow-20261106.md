@@ -96,4 +96,8 @@ STOP Schema 提醒通过短引用引用全部新结果，跨候选有限搜索�
 
 配置使用现有 `PENDING_EXPLICIT_APPROVAL:` 门禁。新 Study 的身份与预算必须获得用户独立明确授权；当前只准备和绑定，不启动正式研究或 Provider 预演。准备后的准确候选引用、实现冻结及授权申请见 `evidence/stage2_workflow_preparation_20261106/preparation.json` 和 `authorization_request.json`。
 
+零发送准备已完成：实现冻结为 `80f6f4ab7f856e876caafaf7b98b8077b480d637`，本地 Store 为此 worktree 的 `runs/research/phs2d-workflow-successor-20261106`。原 C4 经已有生成器重新构造为当前 `candidate_7`，结构、任务及 backend/discretization/dynamics_model 与原对象一致；当前 Plan、评价和授权均为空，候选明确未评价。Provider、数学评价及物理 episode 均为零。直接检查原授权门禁得到 `INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE`。父 Study 请求仍为 104，账本未改变。该检查仅调用本地授权函数，不调用 Provider 或 Worker。
+
+该准备记录之后的提交仅包含交付文档和准备元数据，未改变冻结实现。`prepared_workflow.json` 是无底层身份字符串的实际 Main 投影示例。
+
 阶段二测试通过后停止工程扩建，等待审查及新 Study 授权。
