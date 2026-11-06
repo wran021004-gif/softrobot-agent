@@ -3,7 +3,9 @@
 本次审查针对已启动的 `phs2d-topology-successor-20261106`，不重新准备 Study，
 不更改其冻结 Knowledge、FamilySpace、任务、物理模型或资格标准。
 原始身份 `560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111`，
-实现冻结 `f76a85282368458f01884579842876d317cc2134`。
+审查开始时实现冻结 `f76a85282368458f01884579842876d317cc2134`。
+最小清理后通过原 bind 接口绑定到 `5aa275ce0f6d59b3f1979746b65abab8c1b24f2a`，
+未改变科学 profile 或 resolved identity，见 [resume.json](../../evidence/phs2d_openness_audit_20261106/resume.json)。
 正式授权和 Handoff 已通过现有接口记录。已用 Provider 10/64（余 54），Main 自主发起
 `research_investigate`，要求解释十工况加载资格失败及有信息价值的下一步变量。
 
