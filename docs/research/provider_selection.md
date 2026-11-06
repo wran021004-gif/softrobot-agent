@@ -53,3 +53,7 @@
 账号由 `npm run account2 -- login` 登录，`npm run account2 -- start` 通过 7890 代理启动。
 后续明确指定“Gateway 第二个账号”；账号目录和模型权限单独验证，既有 Study 的冻结连接不变。
 详见 [第二个账号说明](gateway_account2.md)。
+
+第三个 Gateway 账号使用 `http://127.0.0.1:8789/v1` 和 `~/.softrobot-agent/chatgpt-api-account3.json`。
+`npm run account3 -- login` 显示官方授权网址供复制到无痕浏览器，`npm run account3 -- start` 启动独立实例。
+后续明确指定“Gateway 第三个账号”；前两个连接不切换。详见 [第三个账号说明](gateway_account3.md)。

@@ -9,7 +9,7 @@ import test from 'node:test';
 
 const exec = promisify(execFile);
 const cli = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
-const launcher = fileURLToPath(new URL('../scripts/account2.mjs', import.meta.url));
+const launcher = fileURLToPath(new URL('../scripts/account.mjs', import.meta.url));
 
 test('account2 isolates state and key despite inherited old settings; preserves credential files',
   { skip: process.platform !== 'win32', timeout: 60_000 }, async t => {
@@ -18,7 +18,7 @@ test('account2 isolates state and key despite inherited old settings; preserves 
     const oldDirectory = join(root, 'old-state');
     const env = { ...process.env, USERPROFILE: root, LOCALAPPDATA: root,
       SIWC_STATE_DIR: oldDirectory, SIWC_PORT: '8787' };
-    const run = (path, args) => exec(process.execPath, [path, ...args], { env, windowsHide: true, timeout: 20_000 });
+    const run = (path, args) => exec(process.execPath, [path, ...(path === launcher ? ['2'] : []), ...args], { env, windowsHide: true, timeout: 20_000 });
     await run(cli, ['status']);
     const oldEnvelope = await readFile(join(oldDirectory, 'local-api-key.json'));
     const oldKey = (await run(cli, ['key'])).stdout;
@@ -40,6 +40,12 @@ test('account2 isolates state and key despite inherited old settings; preserves 
     assert.equal(second.api_key, newKey);
     assert.equal(await readFile(originalFile, 'utf8'), original);
     assert.deepEqual(await readFile(join(oldDirectory, 'local-api-key.json')), oldEnvelope);
+    await exec(process.execPath, [launcher, '3', 'setup'], { env, windowsHide: true, timeout: 20_000 });
+    const third = JSON.parse(await readFile(join(credentials, 'chatgpt-api-account3.json'), 'utf8'));
+    assert.equal(third.base_url, 'http://127.0.0.1:8789');
+    assert.notEqual(third.api_key, second.api_key);
+    assert.notEqual(third.api_key, oldKey);
+    assert.equal(await readFile(secondFile, 'utf8'), secondText);
     await run(launcher, ['setup']);
     assert.equal(await readFile(secondFile, 'utf8'), secondText);
 

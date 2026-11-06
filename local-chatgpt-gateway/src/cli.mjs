@@ -16,7 +16,7 @@ const value = flag => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1
 
 async function main() {
   const allowed = {
-    login: ['--new', '--consent', '--profile', '--label'], logout: [], status: [], profiles: [],
+    login: ['--new', '--consent', '--profile', '--label', '--manual'], logout: [], status: [], profiles: [],
     select: [], key: [], serve: [], smoke: ['--model'],
   };
   if (!Object.hasOwn(allowed, command)) throw new ChatGPTError('invalid_command', 'Use login, logout, status, profiles, select, key, serve or smoke.');
@@ -49,6 +49,7 @@ async function main() {
     const client = createChatGPT({
       appName: 'Local Research ChatGPT Gateway', appId: 'local-research-chatgpt-gateway',
       inference: streamResponse, redirectPort: 0, storageDir: directory, credentialEncryption: encryption, sendHostId: true,
+      ...(args.includes('--manual') ? { openBrowser: url => console.log(`Authorization URL (copy into a private browser window):\n${url}`) } : {}),
     });
     const apiKey = await loadLocalKey(directory, encryption);
     if (command === 'login') {

@@ -75,6 +75,15 @@ printing its secret; conflicting existing files are preserved.
 No inference, model selection, automatic account switching or request fallback
 is added. See [Chinese setup instructions](../docs/research/gateway_account2.md).
 
+Account3 uses the same launcher through `npm run account3 -- setup|login|status|start`,
+with port 8789, `%LOCALAPPDATA%/LocalResearchChatGPTGateway-Account3` and
+`~/.softrobot-agent/chatgpt-api-account3.json`. Its login displays the SDK-generated
+authorization URL instead of opening the default browser. Copy it into a private
+window on this computer while the original loopback listener remains running.
+The base CLI also supports `login --manual`; it changes only `openBrowser`,
+retaining SDK state, nonce, PKCE, callback and token validation.
+See [Account3 instructions](../docs/research/gateway_account3.md).
+
 `node scripts/diagnose-state.mjs --audit-p4` reads protected state offline and
 emits consistency booleans only. It does not create a client, refresh tokens,
 verify JWT signatures remotely, write credentials or reveal private IDs.
