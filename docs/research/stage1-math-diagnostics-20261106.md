@@ -17,7 +17,7 @@ not switched, reset or cleaned.
 | `tools/research/analysis.py`: `diagnostic_layers`, `diagnostic_overview`, `scoped_result`, `recover`, `compact_result`, `decision_result` | One read-only four-layer projection over existing results, persisted on new mathematical results and shared by existing views. Recover published active checkpoints on failed workers. |
 | `tools/research/evidence_views.py`: `quantitative_facts` | Reporter uses the same projection. |
 | `tools/research/research_context.py`: `mathematical_decision_view` | Main receives independent layer statuses, principal obstruction, up to four recorded quantitative facts, and a detail query. |
-| `tools/research/structure_research.py`: `initial_geometry` | Reuse position pipeline; retain contact world positions and geometric active/slack observations. No full forward retry. |
+| `tools/research/structure_research.py`: `initial_geometry`, `summary` | Reuse position pipeline; retain contact world positions and geometric active/slack observations. No full forward retry. Keep full failure snapshots and initial vectors in raw evidence, with explicit pointers from summaries. |
 | `extensions/tendon_family/passive_equilibrium.py`: `StaticProblem.qualify`, `solve`, `qualification_diagnosis` | Expose separate checks using unchanged thresholds. Record actual start, initial forward, optimizer entry/return/status, and interrupted current trial, retaining earlier completed trials. |
 | `extensions/tendon_family/math_analysis.py`, `sorosim_analysis.py`: `calculate_candidate_configuration` | Publish process milestones through the existing checkpoint callback. Active construction, derivatives, inputs and qualification remain owned by their existing kernels. |
 | `tests/research/test_constrained_mechanics.py`: shared Worker fixture | Replace a hidden legacy tip-row question with registered output-row coverage and the identical explicit world X/Y projection. No production registry change. |
@@ -117,9 +117,36 @@ and numerical counters and compares serialized JSON consistently (tuples become
 lists). Local comparison script and result:
 `runs/stage1_diagnostics/compare_baseline.py` and `baseline_comparison.json`.
 
-Final targeted counts, timings, exact baseline comparisons and publication
-identity are appended after verification. No Provider, formal Study, full ten-case
-physical experiment, or MATLAB session is launched.
+Final verification at implementation commit `6d894c2d3`: **41 tests passed in
+101.533 s**, using the existing Windows Python at
+`D:/softrobot-agent/.mainline5-env/Scripts/python.exe`, MuJoCo 3.13.0, and
+`PYTHONPATH=.;tests/research`.
+
+| Directed test class / scope | Tests |
+| --- | ---: |
+| `test_diagnostic_layers.DiagnosticLayerTests` | 10 |
+| `test_constrained_mechanics.ConstrainedMechanicsTests` | 5 |
+| `test_mujoco_analysis.NativeAnalysisTests` | 5 |
+| `test_sorosim_analysis.AnalysisTests` | 5 |
+| `test_task_analysis_contract.TaskAnalysisTests` | 11 |
+| `test_task_analysis_contract.KKTQualification` | 3 |
+| Existing PHS partial-cost recovery and failed-forward snapshot methods | 2 |
+
+The shared active and passive workers, candidate binding, Main feedback, original
+qualified passive mechanics, GVS execution, saved real SoRoSim results, derivative
+and sensitivity checks, and exact once-only failure charging all pass. No
+provider inference, live formal Study, full ten-case physical experiment, or
+MATLAB session was launched. SDK test replies use Mock HTTP.
+
+Final local log: `runs/stage1_diagnostics/focused_tests_verified.txt`. Earlier
+failed checks and original costs were retained, not erased. The final source
+diff was checked for whitespace errors and contains no configuration, task,
+acceptance, solver, Store, Plan, candidate-identity, Worker-management or budget
+implementation changes. The original root worktree remains on
+`feat/gvs-dynamics` with no tracked modifications.
+
+Stage I development stops here. The branch is prepared for review without
+merging into `main`; Stage II is not started.
 
 ## Remaining scientific questions
 
