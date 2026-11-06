@@ -709,6 +709,13 @@ def summary(value, reference):
             scope='Metrics correspond to the proposed parameter_changes. Numerical consistency may describe different stencil coordinates; its observed_change is not the proposed-step gain.',
             baseline_source=dict(reference=reference,pointer='/structure_research/structure_direction/baseline_metric'),
             proposed_source=dict(reference=reference,pointer='/structure_research/structure_direction/perturbed_metric'))
+    baseline_summary=observation_summary(baseline)
+    tendon_order=(raw.get('baseline',{}).get('metadata') or {}).get('tendon_order')
+    if (raw['target'].get('quantity')=='constraint_multiplier' and raw['target'].get('reduction')=='identity'
+            and tendon_order and isinstance(baseline_summary,dict) and baseline_summary.get('shape')==[len(tendon_order)]):
+        baseline_summary.update(tendon_values=[dict(tendon=name,value=value) for name,value in zip(tendon_order,baseline)],
+            values_source=dict(reference=reference,pointer='/structure_research/baseline/value'),
+            channel_order_source=dict(reference=reference,pointer='/structure_research/baseline/metadata/tendon_order'))
     comparison=({k:observation_summary(v) for k,v in raw['comparison'].items() if k!='baseline'} if raw.get('comparison') else None)
     sensitivity=[{k:row[k] for k in ('parameter_path','derivatives','derivative_unit','consistency','direction_status','derivative_status','branch_status','strict_derivative') if k in row}
         for row in raw.get('parameter_sensitivities',[])]
@@ -738,7 +745,7 @@ def summary(value, reference):
                     metric['quantity']=='material_displacement' and metric.get('material_s',.5)==raw['target'].get('material_s',.5)):
                 row.pop('value',None);row['value_at']='structure_research.baseline'
             row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
-    return dict(operation=raw['operation'],target=raw['target'],baseline=observation_summary(baseline),baseline_unit=raw.get('baseline',{}).get('unit'),
+    return dict(operation=raw['operation'],target=raw['target'],baseline=baseline_summary,baseline_unit=raw.get('baseline',{}).get('unit'),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         constraint_state_load_condition=((raw.get('point_binding') or {}).get('load') or {}).get('name'),
         qualification_diagnosis=diagnosis,

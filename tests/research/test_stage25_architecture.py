@@ -31,6 +31,24 @@ def target_for(quantity):
 
 
 class Stage25ArchitectureTests(unittest.TestCase):
+    def test_multiplier_summary_retains_named_vector_order_without_expanding_scalar_targets(self):
+        from tools.research.structure_research import summary
+        # Fabricated channel order deliberately differs from lexical order.
+        raw=dict(operation='inspect',target=dict(quantity='constraint_multiplier',reduction='identity'),
+            baseline=dict(value=[0.,.012,0.],unit='N',metadata=dict(tendon_order=['c','a','b'])),
+            cost={},unsupported_conclusions=[])
+        before=deepcopy(raw);ref=dict(artifact_id='3'*64,media_type='application/json')
+        view=summary(dict(structure_research=raw),ref);baseline=view['baseline']
+        self.assertEqual(baseline['tendon_values'],[dict(tendon='c',value=0.),dict(tendon='a',value=.012),dict(tendon='b',value=0.)])
+        self.assertEqual((baseline['shape'],baseline['maximum']),([3],.012))
+        self.assertEqual(baseline['values_source'],dict(reference=ref,pointer='/structure_research/baseline/value'))
+        self.assertEqual(baseline['channel_order_source'],dict(reference=ref,pointer='/structure_research/baseline/metadata/tendon_order'))
+        self.assertEqual(raw,before)
+        scalar=deepcopy(raw);scalar['target']['reduction']='maximum';scalar['baseline']['value']=.012
+        self.assertEqual(summary(dict(structure_research=scalar),ref)['baseline'],.012)
+        unnamed=deepcopy(raw);unnamed['baseline'].pop('metadata')
+        self.assertNotIn('tendon_values',summary(dict(structure_research=unnamed),ref)['baseline'])
+
     def test_direction_summary_keeps_proposed_metrics_distinct_from_stencil_change(self):
         # Fabricated two-scale fixture: the proposed half-step is different from
         # the full-step observation used to check numerical consistency.
