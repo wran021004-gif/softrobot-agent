@@ -50,3 +50,19 @@ API `/v1/models`、`/v1/responses` 返回预期的 401；认证发现端点返�
 
 现有独立参数拒绝测试的默认 fixture 需要不可用的 MATLAB engine，本次未因此修改环境或放宽正式准入。
 首次回归执行发现新增测试 mock 的参数签名遗漏，已修正测试适配；未修改真实 Store。
+
+## 绑定与真实继续执行
+
+修复提交 `20112b3a8436dc57c7f79bd677956bb191cfb29d` 已推送并经原 bind 迁移。
+resolved identity 仍为 `560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111`。
+逐项核对 spec、科学 profile、pilot 和账本保持不变；科学依赖变化为空，profile 仍为版本 1。
+guard、正式授权和原 SDK 快照 restore-only 均通过，恢复验证没有消耗 Provider 请求。
+
+window008 沿原 converse/Handoff 启动，最多新增 4 次共享 Provider 请求，仍受累计 64 和保护 6 约束。
+北京时间 16:44，累计第 19 次请求返回 HTTP 200，Main 完成四个 evidence_read 查询：
+candidate_5 的 material_geometry、routing、geometry、assembly。
+这是实际推理和工具反馈恢复证据；截至此记录没有新增候选、数学结果或独立物理验收。
+这四项查询不能算四次科学改进。原有 3 次数学结果、原十工况和全部失败保持原样。
+原加载位置解释纠正仍通过已保存 operator_request 进入同一恢复路径。
+
+定时监督保持取消；此处续跑是本聊天中的有限正式执行窗口，没有重新创建自动化。
