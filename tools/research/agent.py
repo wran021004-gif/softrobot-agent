@@ -1186,7 +1186,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
             source=(host.store.artifact(host.store.artifact(preparation)['source_state']) if preparation else {})
             if source.get('pending_authorized_continuation')!=continuation:
                 with host.store.read_snapshot():
-                    current=decision_packet(host)['research']
+                    current=decision_packet(host,research_only=True)['research']
                 native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['actions'],
                     decision_required=True,family_version=state(host)['spec'].get('family_space',{}).get('version'),
                     diagnose_candidate_required=state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='bound_scientific_variables_v2',study=state(host)['spec'])}}
@@ -1272,7 +1272,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 from tools.research.config import bounded_evidence_enabled
                 if tool and name=='evidence_read' and bounded_evidence_enabled(s['spec']):
                     tool.tool_spec['description']='Read scientific facts using subject/topic, registered choices and next_query. Ordinary discovery grants no formal credit. Exact reference/view/pointer review remains available; formal SELECT requires complete acceptance_certificate delivery and original admission. STOP retains its complete fresh result-reference index.'
-            current=decision_packet(host)
+            current=decision_packet(host,research_only=True)
             from tools.research.experience import knowledge_enabled
             if not knowledge_enabled(s['spec']):agent.tool_registry.registry.pop('experience_retrieve',None)
             from tools.research.evidence_policy import english_native
@@ -1543,7 +1543,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         await boundary.aclose()
 
 
-def decision_packet(host):
+def decision_packet(host, *, research_only=False):
     from tools.research.core import packet
     from tools.research.research_context import ordered_candidates
     if state(host)['spec'].get('research_decisions'):
@@ -1552,6 +1552,13 @@ def decision_packet(host):
         from tools.research_tasks import task_adapter
         s=state(host);spec=s['spec']
         research=agent_decision_brief(host)
+        family_space=(decision_summary(spec['family_space'],s['family_space_reference'],
+            dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities']))
+            if spec.get('start_mode')=='family_space' else None)
+        # The Provider path consumes only these owners. Keep the richer export
+        # contract for existing audit callers without constructing it each turn.
+        if research_only:
+            return dict(research=research,study_id=host.run_id,family_space=family_space)
         controller=controller_capabilities(host)
         controller.pop('parameter_schema')
         if controller.get('status')!='not_applicable':
@@ -1568,8 +1575,7 @@ def decision_packet(host):
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
             controller_capabilities=controller,
             candidates=candidates,candidate_profile_bindings=bindings,
-            family_space=decision_summary(spec['family_space'],s['family_space_reference'],
-                dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])) if spec.get('start_mode')=='family_space' else None,
+            family_space=family_space,
             source_relative_design=dict(reference_parameters=spec['reference_parameters'],allowed_parameters=spec['allowed_parameters'],
                 length_constraint=spec.get('length_constraint')) if spec.get('start_mode')!='family_space' else None,
             analysis_protocol=spec['analysis_protocol'],

@@ -25,7 +25,18 @@ Main 自主选择先研究历史 C4 设计线索（当前 `candidate_5`），并
 
 首个数学结果：`370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f`。
 此结果与候选、H1 Plan 的精确关联保存在原 Store，不继承任何父结果。
-H2 动态 Worker 当前仍在运行；在完整结果、原始验收和独立 Replay 完成前，不作任务通过判断。
+H2 动态 Worker 已完成十工况计算，共 352000 个实际积分步，耗时 952.9 秒。
+结果为 `execution_incomplete`：全部加载阶段均未通过原 tip/monitor speed、tail drift、static balance 资格，
+不能生成有效任务表现分数，也未取得独立 Replay 验收。计算完成不代表科学资格通过。
+全部工况无接触、无数值 warning；qvel、长度超限检查通过，但不能抵消其他失败。
+tail drift 为 0.655～2.973 mm，原阈值为 0.5 mm；保持阈值不变。
+动态结果：`104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc`。
+
+首个结算边界已用 Provider 8/64（Main 6、Reporter 2），数学评价 2，数学动态 episode 10，
+独立物理 Replay 0，公开操作 9。无 pending、无未结算 receipt，预算与所有失败保留。
+原始 Plan、解释和账本的派生快照见
+[window001.json](../../evidence/phs2d_topology_live_20261106/window001.json)。
+研究已恢复同一 Store，继续由 Main 自主判断；尚未 SELECT 或 STOP。
 
 原始 Store 为
 `D:/softrobot-agent/.worktrees/stage2-research-workflow-20261106/runs/research/phs2d-topology-successor-20261106`。

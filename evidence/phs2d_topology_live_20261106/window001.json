@@ -1,0 +1,1337 @@
+{
+  "scope": "Derived supervisory snapshot; original Store owns all evidence and accounting",
+  "study_id": "phs2d-topology-successor-20261106",
+  "resolved_identity": "560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111",
+  "implementation_freeze": "f76a85282368458f01884579842876d317cc2134",
+  "ledger": {
+    "limit": {
+      "backend_solves": null,
+      "model_calls": 64,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 9,
+      "model_calls": 8,
+      "backend_solves": 10,
+      "worker_calls": 0,
+      "wall_s": 1079.475095800124
+    },
+    "remaining": {
+      "backend_solves": null,
+      "model_calls": 56,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "mathematical_evaluations": 2,
+  "independent_physical_replays": 0,
+  "pending": null,
+  "unsealed_calls": 0,
+  "unconsumed_response": null,
+  "candidate_count": 1,
+  "plans": [
+    {
+      "reference": {
+        "artifact_id": "ac9b16b9158a4962a90df1256239b2219caf910764edd8896ba5699c99acc31c",
+        "media_type": "application/json"
+      },
+      "plan": {
+        "action": "diagnose",
+        "candidate": null,
+        "cross_replay": null,
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H1_unloaded_qualification",
+          "requested_budget": 1,
+          "research_intent": "DIAGNOSE",
+          "selected_candidate": {
+            "artifact_id": "219ab002e80339142dac1fa286212ce8850b95c54f5b9d7fcaf03b3340c23551",
+            "media_type": "application/json"
+          },
+          "selected_method": "mechanism_research",
+          "selected_variables": [
+            "constraint_active_set",
+            "tendon_length_minus_payout",
+            "initial_contact_pairs"
+          ],
+          "version": "research_decision_v1"
+        },
+        "diagnostic": null,
+        "expected_observation": "The registered unloaded qualification completes both original starts, reports no prohibited initial contact, and returns finite tendon-length-versus-payout and active-set facts suitable for deciding whether finite-time evaluation or routing redesign is justified.",
+        "experience_disposition": {},
+        "fixed_conditions": "Keep candidate_5 geometry, routing, materials, four independent payouts, frozen native scene, unloaded_static_solver, unloaded_multistart, task assumptions, and passive unilateral equilibrium semantics unchanged; do not treat pretension_n as active initialization.",
+        "hypothesis": "The compiled nine-segment, four-tendon candidate can attain the frozen unloaded hard equilibrium without prohibited initial contact, and its fixed payouts create a diagnostically useful taut/slack pattern before any loaded dynamics.",
+        "interpretation": "A pass would justify considering a complete finite-time response evaluation. A failure would be local evidence about candidate_5 and its initialization, not evidence that its topology or FamilySpace is infeasible.",
+        "matched_state": null,
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_research_action": "mechanism_research",
+        "next_step": "diagnose",
+        "nmpc_prediction_diagnostic": null,
+        "parameters": null,
+        "physical_replay": null,
+        "refinement": null,
+        "revise_selection": false,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "Stop this diagnostic after one registered unloaded qualification evaluation; do not launch loaded episodes in this step.",
+        "supporting_evidence": [],
+        "weakening_observation": "Either original start fails hard equilibrium, prohibited initial contact is present, or tendon-length-versus-payout facts show an unusable all-slack or overconstrained pattern."
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "b1ae53e5369d07ea4b49694134ec0af09ab8607582c38a84a315d41c3da7a2db",
+        "media_type": "application/json"
+      },
+      "plan": {
+        "action": "diagnose",
+        "candidate": null,
+        "cross_replay": null,
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H2_complete_finite_time_response",
+          "requested_budget": 1,
+          "research_intent": "DIAGNOSE",
+          "selected_candidate": {
+            "artifact_id": "219ab002e80339142dac1fa286212ce8850b95c54f5b9d7fcaf03b3340c23551",
+            "media_type": "application/json"
+          },
+          "selected_method": "mechanism_research",
+          "selected_variables": [
+            "finite_time_task_violation",
+            "all_frozen_conditions",
+            "complete_dynamics"
+          ],
+          "version": "research_decision_v1"
+        },
+        "diagnostic": null,
+        "expected_observation": "One complete finite-time evaluation executes all ten frozen episodes from the repeated original initialization and reports finite trajectories plus constraint-level task violations; success would show every original acceptance requirement passing, while failure would localize the first dynamic or task bottleneck by load case and metric.",
+        "experience_disposition": {},
+        "fixed_conditions": "Keep candidate_5, its nine-segment/four-tendon topology, all geometry and routing, four payouts of 0.472 m, no active control, the frozen native scene, original two-start initialization, ten load cases, 8 s duration, timestep and sampling protocol, physical assumptions, and original evaluator unchanged. Do not interpret pretension_n as active initialization.",
+        "hypothesis": "Candidate_5's contact-free, statically qualified best unloaded equilibrium can survive complete passive finite-time execution across all ten frozen load cases and may satisfy the original displacement, ratio, plane, capacity, KKT, stability, and contact requirements despite the unloaded active-set degeneracy.",
+        "interpretation": "The prior static result justifies paying for one complete dynamic evaluation because it passed contact-free KKT, second-order, stability, and capacity checks at its best start, but it does not predict dynamic acceptance. A passing complete mathematical response would still require independent Replay for acceptance. A failure would be local to candidate_5 and would guide subsequent structural or routing changes, not establish FamilySpace infeasibility.",
+        "matched_state": null,
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_research_action": "mechanism_research",
+        "next_step": "diagnose",
+        "nmpc_prediction_diagnostic": null,
+        "parameters": null,
+        "physical_replay": null,
+        "refinement": null,
+        "revise_selection": false,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "Stop this experiment after one complete registered finite-time evaluation of candidate_5; do not optimize or alter the structure in this step.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "Repeated initialization fails, any episode terminates numerically, prohibited contact occurs, tendon capacity or equilibrium requirements fail, or one or more original displacement, ratio, plane, stability, or KKT constraints are violated."
+      }
+    }
+  ],
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "219ab002e80339142dac1fa286212ce8850b95c54f5b9d7fcaf03b3340c23551",
+        "media_type": "application/json"
+      },
+      "plan_reference": {
+        "artifact_id": "ac9b16b9158a4962a90df1256239b2219caf910764edd8896ba5699c99acc31c",
+        "media_type": "application/json"
+      },
+      "status": "computed",
+      "operation": "mechanism_structure_v1",
+      "boundary": {
+        "elapsed_s": 2.2670190999051556,
+        "returncode": 0,
+        "termination_confirmed": true,
+        "timed_out": false,
+        "worker_started": true
+      },
+      "diagnostic_layers": {
+        "dynamic_validation": {
+          "computation_status": "not_evaluated",
+          "facts": {},
+          "failure_reasons": [],
+          "missing_checks": [
+            "complete dynamics",
+            "independent Replay",
+            "original task acceptance"
+          ],
+          "scope": "Independent execution and original evaluator remain authoritative; local mathematics grants no task acceptance.",
+          "status": "not_evaluated"
+        },
+        "geometry": {
+          "computation_status": "completed",
+          "facts": {
+            "contact_count": 0,
+            "contact_examples": [],
+            "geometric_active": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "geometric_slack": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "length_residual_m": [
+              1.1102230246251565e-16,
+              5.551115123125783e-17,
+              1.1102230246251565e-16,
+              1.1102230246251565e-16
+            ],
+            "minimum_contact_distance_m": null,
+            "payout_m": [
+              0.472,
+              0.472,
+              0.472,
+              0.472
+            ],
+            "source": "native position pipeline at first declared start",
+            "tendon_length_m": [
+              0.4720000000000001,
+              0.47200000000000003,
+              0.4720000000000001,
+              0.4720000000000001
+            ]
+          },
+          "failure_reasons": [],
+          "missing_checks": [
+            "geometry qualification"
+          ],
+          "scope": "Initial geometry only; contact and length excess are observations, not proof of their causal role in factorization failure, equilibrium, stability or task acceptance.",
+          "status": "not_evaluated"
+        },
+        "numerical_solve": {
+          "computation_status": "completed",
+          "facts": {
+            "cost": {
+              "KKT_solves": 0,
+              "QP_calls": 0,
+              "constraint_calls": 748,
+              "constraint_jacobian_calls": 790,
+              "equilibrium_solves": 1,
+              "evaluation_attempts": 1,
+              "gradient_calls": 790,
+              "hessian_columns": 288,
+              "kernel_wall_s": 0.8214625000255182,
+              "material_point_jacobian_calls": 1582,
+              "model_builds": 1,
+              "multiplier_fits": 2,
+              "native_forward_calls": 1322,
+              "native_position_attempts": 1,
+              "native_position_calls": 1,
+              "objective_calls": 744,
+              "optimizer_iterations": 216,
+              "physics_steps": 0,
+              "rollouts": 0,
+              "tendon_jacobian_extractions": 790
+            },
+            "failure_stage": null,
+            "initial_forward_completed": true,
+            "source_pointer": "/structure_research/qualification_diagnosis",
+            "starts_attempted": 2,
+            "starts_requested": 2,
+            "starts_skipped_after_abort": 0,
+            "trials": [
+              {
+                "initial_contacts": 0,
+                "initial_forward_completed": true,
+                "iterations": 5,
+                "numerical_cost": {
+                  "KKT_solves": 0,
+                  "QP_calls": 0,
+                  "constraint_calls": 4,
+                  "constraint_jacobian_calls": 290,
+                  "equilibrium_solves": 0,
+                  "gradient_calls": 290,
+                  "hessian_columns": 144,
+                  "multiplier_fits": 1,
+                  "native_forward_calls": 290,
+                  "objective_calls": 2,
+                  "optimizer_iterations": 5
+                },
+                "optimizer_entered": true,
+                "optimizer_message": "Optimization terminated successfully",
+                "optimizer_status": 0,
+                "optimizer_success": true,
+                "solver_termination": "converged",
+                "stage": "completed",
+                "status": "qualified_local_minimum"
+              },
+              {
+                "initial_contacts": 0,
+                "initial_forward_completed": true,
+                "iterations": 211,
+                "numerical_cost": {
+                  "KKT_solves": 0,
+                  "QP_calls": 0,
+                  "constraint_calls": 744,
+                  "constraint_jacobian_calls": 500,
+                  "equilibrium_solves": 0,
+                  "gradient_calls": 500,
+                  "hessian_columns": 144,
+                  "multiplier_fits": 1,
+                  "native_forward_calls": 1030,
+                  "objective_calls": 742,
+                  "optimizer_iterations": 211
+                },
+                "optimizer_entered": true,
+                "optimizer_message": "Optimization terminated successfully",
+                "optimizer_status": 0,
+                "optimizer_success": true,
+                "solver_termination": "converged",
+                "stage": "completed",
+                "status": "unqualified"
+              }
+            ]
+          },
+          "failure_reasons": [],
+          "missing_checks": [],
+          "scope": "Frozen passive solver process; nonconvergence is not structural infeasibility. Initial vectors remain in raw trials.",
+          "status": "passed"
+        },
+        "static_qualification": {
+          "computation_status": "completed",
+          "facts": {
+            "LICQ": false,
+            "capacity": true,
+            "complementarity_nm": 1.2101430968411633e-18,
+            "dual_violation_n": 0.0,
+            "kkt_pass": true,
+            "native_contacts": 0,
+            "primal_violation_m": 1.1102230246251565e-16,
+            "qualification_checks": {
+              "KKT": true,
+              "LICQ": false,
+              "complementarity": true,
+              "contact_free": true,
+              "dual_nonnegative": true,
+              "length_constraints": true,
+              "second_order_sufficient": true,
+              "stationarity": true,
+              "strict_complementarity": false,
+              "tension_capacity": true
+            },
+            "qualified": true,
+            "second_order_sufficient": true,
+            "source_pointer": "/structure_research/qualification_diagnosis/best_working_point",
+            "stability_qualified": true,
+            "stationarity_inf_nm": 6.754579534584693e-17,
+            "strict_complementarity": false
+          },
+          "failure_reasons": [
+            "LICQ",
+            "strict_complementarity"
+          ],
+          "missing_checks": [],
+          "scope": "Frozen hard-equilibrium eligibility only. Unqualified-point stiffness/gradients do not prove stability or structural infeasibility; dynamic qualification and task acceptance remain independent.",
+          "status": "passed"
+        }
+      },
+      "structure_research": {
+        "cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "constraint_calls": 748,
+          "constraint_jacobian_calls": 790,
+          "equilibrium_solves": 1,
+          "evaluation_attempts": 1,
+          "gradient_calls": 790,
+          "hessian_columns": 288,
+          "kernel_wall_s": 0.8214625000255182,
+          "material_point_jacobian_calls": 1582,
+          "model_builds": 1,
+          "multiplier_fits": 2,
+          "native_forward_calls": 1322,
+          "native_position_attempts": 1,
+          "native_position_calls": 1,
+          "objective_calls": 744,
+          "optimizer_iterations": 216,
+          "physics_steps": 0,
+          "rollouts": 0,
+          "tendon_jacobian_extractions": 790
+        }
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "219ab002e80339142dac1fa286212ce8850b95c54f5b9d7fcaf03b3340c23551",
+        "media_type": "application/json"
+      },
+      "plan_reference": {
+        "artifact_id": "b1ae53e5369d07ea4b49694134ec0af09ab8607582c38a84a315d41c3da7a2db",
+        "media_type": "application/json"
+      },
+      "status": "execution_incomplete",
+      "reason": "INCOMPLETE_OR_INVALID_DYNAMIC_TASK: DYNAMIC_STAGE_NOT_QUALIFIED:loaded",
+      "operation": "mechanism_structure_v1",
+      "boundary": {
+        "elapsed_s": 952.8950767000206,
+        "returncode": 0,
+        "termination_confirmed": true,
+        "timed_out": false,
+        "worker_started": true
+      },
+      "diagnostic_layers": {
+        "dynamic_validation": {
+          "computation_status": "completed",
+          "facts": {
+            "executions": [
+              {
+                "complete": true,
+                "completed_conditions": [
+                  "s3_positive",
+                  "s3_negative",
+                  "s4_positive",
+                  "s4_negative",
+                  "s5_positive",
+                  "s5_negative",
+                  "s6_positive",
+                  "s6_negative",
+                  "s7_positive",
+                  "s7_negative"
+                ],
+                "cost": {
+                  "KKT_solves": 0,
+                  "QP_calls": 0,
+                  "attempted_steps": 352000,
+                  "constraint_calls": 748,
+                  "constraint_jacobian_calls": 790,
+                  "constraint_observations": 352001,
+                  "episodes_completed": 10,
+                  "episodes_started": 10,
+                  "equilibrium_solves": 1,
+                  "gradient_calls": 790,
+                  "hessian_columns": 288,
+                  "integration_state_restores": 0,
+                  "integration_state_saves": 31,
+                  "material_point_jacobian_calls": 459212,
+                  "model_builds": 1,
+                  "multiplier_fits": 2,
+                  "native_forward_calls": 362143,
+                  "objective_calls": 744,
+                  "optimizer_iterations": 216,
+                  "physics_steps": 352000,
+                  "route_checked_poses": 4401,
+                  "route_segment_body_checks": 28201608,
+                  "static_balance_forwards": 4401,
+                  "tendon_jacobian_extractions": 352791
+                },
+                "execution_started": true,
+                "loading_started": true,
+                "reason": null,
+                "started_conditions": [
+                  "s3_positive",
+                  "s3_negative",
+                  "s4_positive",
+                  "s4_negative",
+                  "s5_positive",
+                  "s5_negative",
+                  "s6_positive",
+                  "s6_negative",
+                  "s7_positive",
+                  "s7_negative"
+                ],
+                "status": "completed"
+              }
+            ]
+          },
+          "failure_reasons": [],
+          "missing_checks": [
+            "independent Replay",
+            "original task acceptance"
+          ],
+          "scope": "Independent execution and original evaluator remain authoritative; local mathematics grants no task acceptance.",
+          "status": "not_evaluated"
+        },
+        "geometry": {
+          "computation_status": "not_evaluated",
+          "facts": {},
+          "failure_reasons": [],
+          "missing_checks": [
+            "independent geometry observations"
+          ],
+          "scope": "Recorded model/position facts only.",
+          "status": "not_evaluated"
+        },
+        "numerical_solve": {
+          "computation_status": "partial",
+          "facts": {
+            "cost": {
+              "KKT_solves": 0,
+              "QP_calls": 0,
+              "attempted_steps": 352000,
+              "constraint_calls": 748,
+              "constraint_jacobian_calls": 790,
+              "constraint_observations": 352001,
+              "episodes_completed": 10,
+              "episodes_started": 10,
+              "equilibrium_solves": 1,
+              "evaluation_attempts": 1,
+              "gradient_calls": 790,
+              "hessian_columns": 288,
+              "integration_state_restores": 0,
+              "integration_state_saves": 31,
+              "kernel_wall_s": 934.3861780000152,
+              "material_point_jacobian_calls": 459212,
+              "model_builds": 1,
+              "multiplier_fits": 2,
+              "native_forward_calls": 362143,
+              "objective_calls": 744,
+              "optimizer_iterations": 216,
+              "physics_steps": 352000,
+              "route_checked_poses": 4401,
+              "route_segment_body_checks": 28201608,
+              "static_balance_forwards": 4401,
+              "tendon_jacobian_extractions": 352791
+            },
+            "failure_stage": null,
+            "initial_forward_completed": true,
+            "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/unloaded_equilibrium",
+            "starts_attempted": 2,
+            "starts_requested": 2,
+            "starts_skipped_after_abort": 0,
+            "trials": [
+              {
+                "initial_contacts": 0,
+                "initial_forward_completed": true,
+                "iterations": 5,
+                "numerical_cost": {
+                  "KKT_solves": 0,
+                  "QP_calls": 0,
+                  "constraint_calls": 4,
+                  "constraint_jacobian_calls": 290,
+                  "equilibrium_solves": 0,
+                  "gradient_calls": 290,
+                  "hessian_columns": 144,
+                  "multiplier_fits": 1,
+                  "native_forward_calls": 290,
+                  "objective_calls": 2,
+                  "optimizer_iterations": 5
+                },
+                "optimizer_entered": true,
+                "optimizer_message": "Optimization terminated successfully",
+                "optimizer_status": 0,
+                "optimizer_success": true,
+                "solver_termination": "converged",
+                "stage": "completed",
+                "status": "qualified_local_minimum"
+              },
+              {
+                "initial_contacts": 0,
+                "initial_forward_completed": true,
+                "iterations": 211,
+                "numerical_cost": {
+                  "KKT_solves": 0,
+                  "QP_calls": 0,
+                  "constraint_calls": 744,
+                  "constraint_jacobian_calls": 500,
+                  "equilibrium_solves": 0,
+                  "gradient_calls": 500,
+                  "hessian_columns": 144,
+                  "multiplier_fits": 1,
+                  "native_forward_calls": 1030,
+                  "objective_calls": 742,
+                  "optimizer_iterations": 211
+                },
+                "optimizer_entered": true,
+                "optimizer_message": "Optimization terminated successfully",
+                "optimizer_status": 0,
+                "optimizer_success": true,
+                "solver_termination": "converged",
+                "stage": "completed",
+                "status": "unqualified"
+              }
+            ]
+          },
+          "failure_reasons": [],
+          "missing_checks": [],
+          "scope": "Frozen passive solver process; nonconvergence is not structural infeasibility. Initial vectors remain in raw trials.",
+          "status": "passed"
+        },
+        "static_qualification": {
+          "computation_status": "completed",
+          "facts": {
+            "LICQ": false,
+            "capacity": true,
+            "complementarity_nm": 1.2101430968411633e-18,
+            "dual_violation_n": 0.0,
+            "kkt_pass": true,
+            "native_contacts": 0,
+            "primal_violation_m": 1.1102230246251565e-16,
+            "qualification_checks": {
+              "KKT": true,
+              "LICQ": false,
+              "complementarity": true,
+              "contact_free": true,
+              "dual_nonnegative": true,
+              "length_constraints": true,
+              "second_order_sufficient": true,
+              "stationarity": true,
+              "strict_complementarity": false,
+              "tension_capacity": true
+            },
+            "qualified": true,
+            "second_order_sufficient": true,
+            "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/unloaded_equilibrium/equilibrium",
+            "stability_qualified": true,
+            "stationarity_inf_nm": 6.754579534584693e-17,
+            "strict_complementarity": false
+          },
+          "failure_reasons": [
+            "LICQ",
+            "strict_complementarity"
+          ],
+          "missing_checks": [],
+          "scope": "Frozen hard-equilibrium eligibility only. Unqualified-point stiffness/gradients do not prove stability or structural infeasibility; dynamic qualification and task acceptance remain independent.",
+          "status": "passed"
+        }
+      },
+      "structure_research": {
+        "cost": {
+          "KKT_solves": 0,
+          "QP_calls": 0,
+          "attempted_steps": 352000,
+          "constraint_calls": 748,
+          "constraint_jacobian_calls": 790,
+          "constraint_observations": 352001,
+          "episodes_completed": 10,
+          "episodes_started": 10,
+          "equilibrium_solves": 1,
+          "evaluation_attempts": 1,
+          "gradient_calls": 790,
+          "hessian_columns": 288,
+          "integration_state_restores": 0,
+          "integration_state_saves": 31,
+          "kernel_wall_s": 934.3861780000152,
+          "material_point_jacobian_calls": 459212,
+          "model_builds": 1,
+          "multiplier_fits": 2,
+          "native_forward_calls": 362143,
+          "objective_calls": 744,
+          "optimizer_iterations": 216,
+          "physics_steps": 352000,
+          "route_checked_poses": 4401,
+          "route_segment_body_checks": 28201608,
+          "static_balance_forwards": 4401,
+          "tendon_jacobian_extractions": 352791
+        },
+        "baseline": {
+          "qualification_diagnosis": {
+            "category": "dynamic_stage_qualification",
+            "diagnostic_options": [
+              {
+                "cost_entry": "mechanism_research.operation_admission",
+                "effect_semantics": "mechanism_effect",
+                "prerequisites": [
+                  "Frozen load and re_equilibrated point; actual static qualification is checked separately.",
+                  "Smooth sensitivities also require unchanged active set, numerical consistency and original parameter authorization."
+                ],
+                "status": "conditional_not_yet_evaluated",
+                "targets": [
+                  "constraint_length_residual",
+                  "constraint_multiplier",
+                  "constraint_kkt_residual",
+                  "tangent_stiffness"
+                ]
+              },
+              {
+                "effect_semantics": "saved_stage_comparison",
+                "new_physics_steps": 0,
+                "status": "read_only"
+              }
+            ],
+            "failed_qualifications": [
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s3_positive",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0006547483134925402,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s3_negative",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0006825770055927395,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s4_positive",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0012162768050137354,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s4_negative",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.001225959354604655,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s5_positive",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0018267856461995204,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s5_negative",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.001827397985900199,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s6_positive",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.002426771289492691,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s6_negative",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.002425604172950257,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s7_positive",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0029734150575641952,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              },
+              {
+                "failed_checks": [
+                  "tip_speed",
+                  "monitor_speed",
+                  "tail_drift",
+                  "static_balance"
+                ],
+                "frozen_rule": {
+                  "length_excess_max_m": 5e-05,
+                  "monitor_speed_max_m_s": 0.001,
+                  "qvel_max_rad_s": 0.01,
+                  "sampling": "score_grid",
+                  "stage": "loaded",
+                  "static_balance_max_nm": 1e-05,
+                  "tail_drift_max_m": 0.0005,
+                  "tip_speed_max_m_s": 0.001,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "load_condition": "s7_negative",
+                "observed": {
+                  "checks": {
+                    "length_excess": true,
+                    "monitor_speed": false,
+                    "no_contacts": true,
+                    "no_warnings": true,
+                    "qvel": true,
+                    "static_balance": false,
+                    "tail_drift": false,
+                    "tip_speed": false
+                  },
+                  "drift_m": 0.0029680391186528553,
+                  "passed": false,
+                  "sampling": "score_grid",
+                  "scope": "Measured finite unloaded/stage window; no general stability proof",
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "source": {
+                  "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9/qualifications/loaded",
+                  "reference": null
+                },
+                "stage": "loaded"
+              }
+            ],
+            "invalidated_conclusions": [
+              "complete_task_signed_gap",
+              "ordinary_task_gradient",
+              "structural_descent",
+              "qualified_mechanism_certificate"
+            ],
+            "new_physics_steps": 0,
+            "reason": "DYNAMIC_STAGE_NOT_QUALIFIED:loaded",
+            "scope": "Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.",
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution",
+              "reference": null
+            },
+            "validity": "invalid"
+          }
+        }
+      }
+    }
+  ],
+  "reports": [
+    {
+      "reference": {
+        "artifact_id": "7b5fbf160d5ebaa1255ba51ab551877299cef1731b568bb02e2987dcf08fb5b3",
+        "media_type": "application/json"
+      },
+      "status": "available",
+      "interpretations": [
+        {
+          "kind": "new_information",
+          "sources": [
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "A contact-free, statically qualified local equilibrium was found for the frozen passive model at time 0 s with four tendon payouts of 0.472 m and no active control. The best point had stationarity residual 6.754579534584693e-17 N·m, primal violation 1.1102230246251565e-16 m, complementarity residual 1.2101430968411633e-18 N·m, zero dual violation, no native contacts, and maximum constraint tension 0.010899999999997682 N within declared capacity. The second-order sufficient condition passed and minimum reduced stiffness was 0.6755055066830709 N·m/rad. However, the tiny positive length excess/primal violation remains a strict numerical violation and must not be omitted."
+        },
+        {
+          "kind": "weakened_explanation",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "Simple numerical nonconvergence or local static instability is weakened as an explanation for failure at the best working point: both starts completed and converged, one produced a qualified local minimum, KKT and second-order checks passed, and the point was contact-free. Nevertheless, degeneracy remains: LICQ and strict complementarity both failed, with four active constraints and only two positive multipliers. The other converged trial was unqualified because tension capacity failed, so convergence alone does not establish qualification. These observations neither prove structural infeasibility nor identify a causal failure mechanism."
+        },
+        {
+          "kind": "unresolved_question",
+          "sources": [
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/task_analysis",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "370f38273907995678e0e20bc5853de4a1b28f9df23ef8d22a14f027aaf6c52f",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "Task feasibility and performance remain unresolved. The evidence is an instantaneous static diagnostic with a 0 s analysis horizon, whereas the task duration is 8.0 s; complete dynamics, independent replay, geometry qualification, and original task acceptance were not evaluated. No structure direction or parameter sensitivity was produced, and task improvement is unmeasured. Therefore this result cannot establish whole-window compliance, dynamic stability, robustness, repeatability, global nonlinear feasibility or infeasibility, hardware performance, or task success. Discriminating evidence would require an applicable task-constraint evaluation covering the complete dynamics and independent original evaluator."
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "80043d1abaaa4f0d74340293ca392d1c24ff0fab007fbf93fca3968b97089cee",
+        "media_type": "application/json"
+      },
+      "status": "available",
+      "interpretations": [
+        {
+          "kind": "new_information",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The unloaded operating point is a qualified local static equilibrium in the declared contact-free, fixed-payout model: stationarity is 6.754579534584693e-17 N·m, primal violation is 1.1102230246251565e-16 m, dual violation is 0 N, and complementarity is 1.2101430968411633e-18 N·m. KKT, tension-capacity, contact-free, and second-order-sufficiency checks passed, although LICQ and strict complementarity failed. Thus local static eligibility is supported, but robustness and whole-task stability are not established."
+        },
+        {
+          "kind": "weakened_explanation",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "A simple solver-nonconvergence explanation is weakened: both starts completed and reported optimizer convergence, with one qualified local minimum. All ten ± load episodes also completed without contacts or warnings. However, every loaded episode failed tip-speed, monitor-speed, tail-drift, and static-balance checks over 7.75–8.0 s. Tail drift ranged from 0.0006547483134925402 m to 0.0029734150575641952 m, exceeding the 0.0005 m limit in every condition; length excess and qvel checks passed. These repeated failures support a finite-time loaded-stage qualification problem, but they do not identify its mechanical cause because the design/load differences are multifactor and no diagnostic relation isolates causality."
+        },
+        {
+          "kind": "further_investigation",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/task_analysis",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "104be05d958388bbfbbf26709ea77d6d16cc04218685442e08d2971e2061e0cc",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The overall conclusion remains inconclusive: task acceptance is unmeasured, geometry was not independently evaluated, and independent Replay is missing. Consequently, the evidence supplies neither a verified task witness nor an infeasibility certificate, and it cannot establish task success, structural infeasibility, continuous-time compliance, robustness, repeatability, or hardware performance. Independent geometry observations, an independent Replay, and the original task-acceptance result are required to discriminate between model-specific loaded-stage motion and an independently reproducible task failure."
+        }
+      ]
+    }
+  ],
+  "status": "ready",
+  "selected": null,
+  "next_main_scientific_choice": "Not yet made; first request of next supervised window will consume saved evidence."
+}
