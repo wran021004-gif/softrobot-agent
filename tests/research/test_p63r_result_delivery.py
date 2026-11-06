@@ -38,6 +38,46 @@ def fixture(h,c,J,status='computed'):
     return ref,analysis,source
 
 
+class StandaloneDeliveryMaterializationTests(unittest.TestCase):
+    """Synthetic ordering/integrity cases, with no numerical model or Provider."""
+    def delivery(self, order, *, corrupt=None):
+        from types import SimpleNamespace
+        full_reads=[]
+        def metadata(host, ref):
+            if ref==corrupt:raise ValueError('ARTIFACT_INTEGRITY_ERROR')
+            return {'native_dynamics':{'present':True}} if ref.startswith('native') else {}
+        def full(ref):
+            full_reads.append(ref)
+            return {'fixture':ref}
+        def native(host,ref):
+            return dict(reference=ref,valid_complete=True,J=-int(ref[-1]),comparison_scope={'fixture_group':1})
+        host=SimpleNamespace(store=SimpleNamespace(artifact=full))
+        refs=[{'artifact_id':ref,'media_type':'application/json'} for ref in order]
+        # Real API references are mappings; the fixture readers retain that contract.
+        with patch('tools.research.state.state',return_value={'analysis_results':refs}), \
+             patch('tools.research.feedback.native_result_metadata',side_effect=lambda h,r:metadata(h,r['artifact_id'])), \
+             patch('tools.research.feedback.native_mathematical_fact',side_effect=lambda h,r:native(h,r['artifact_id'])), \
+             patch('tools.research.analysis.decision_result',side_effect=lambda v,r:{'fixture':v['fixture'],'reference':r}):
+            host.store.artifact=lambda ref:full(ref['artifact_id'])
+            return scientific_result_delivery(host),full_reads
+
+    def test_last_standalone_view_preserves_native_best_without_reading_overwritten_bodies(self):
+        result,reads=self.delivery(['old','native1','middle','native2','latest'])
+        self.assertEqual(reads,['latest'])
+        self.assertEqual(result['latest_evaluation']['fixture'],'latest')
+        self.assertEqual(result['study_best_mathematical'][0]['fact']['reference'],'native2')
+
+    def test_native_latest_does_not_materialize_earlier_standalone(self):
+        result,reads=self.delivery(['old','native2','middle','native1'])
+        self.assertEqual(reads,[])
+        self.assertEqual(result['latest_evaluation']['reference'],'native1')
+        self.assertEqual(result['study_best_mathematical'][0]['fact']['reference'],'native2')
+
+    def test_overwritten_standalone_metadata_still_enforces_integrity(self):
+        with self.assertRaisesRegex(ValueError,'ARTIFACT_INTEGRITY_ERROR'):
+            self.delivery(['old','latest'],corrupt='old')
+
+
 class ScientificResultDeliveryTests(unittest.TestCase):
     def setUp(self):
         self.h=g3_host();self.c=generate(self.h)

@@ -264,19 +264,22 @@ def scientific_result_delivery(host):
                     status=status,J=score,reason=value.get('reason'),search_reference=search['reference'],
                     source_query=dict(reference=search['reference'],view='full',
                         pointer='/result/comparison_summary/'+str(i)+'/conditions/'+condition.replace('~','~0').replace('/','~1')))
-    latest_evaluation=None
+    latest_evaluation=None;latest_standalone=None
     # Search owns its batch summary; standalone Native results share its fact card.
     for ref in s.get('analysis_results',[]):
         if ref['artifact_id'] in covered:continue
         value=native_result_metadata(host,ref)
         if not value.get('native_dynamics'):
-            from tools.research.analysis import decision_result
-            value=host.store.artifact(ref)
-            latest_evaluation=decision_result(value,ref);continue
-        fact=native_mathematical_fact(host,ref);latest_evaluation=fact
+            latest_standalone=ref;continue
+        fact=native_mathematical_fact(host,ref);latest_evaluation=fact;latest_standalone=None
         if fact['valid_complete'] and isinstance(fact['J'],(float,int)) and math.isfinite(fact['J']):
             key=digest(fact['comparison_scope'])
             if key not in groups or fact['J']<groups[key]['fact']['J']:groups[key]=dict(fact=fact,search=None)
+    if latest_standalone is not None:
+        # Earlier standalone views are overwritten, not ranked or delivered.
+        # Keep their verified metadata reads; materialize only the final view.
+        from tools.research.analysis import decision_result
+        latest_evaluation=decision_result(host.store.artifact(latest_standalone),latest_standalone)
     latest=searches[-1] if searches else None
     best=[]
     for row in groups.values():
