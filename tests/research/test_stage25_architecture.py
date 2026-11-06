@@ -31,6 +31,30 @@ def target_for(quantity):
 
 
 class Stage25ArchitectureTests(unittest.TestCase):
+    def test_failed_probe_summary_does_not_transfer_baseline_qualification(self):
+        from tools.research.structure_research import summary
+        # Fabricated qualified baseline and failed shorter-payout probe.
+        raw=dict(operation='differentiate',target=dict(quantity='re_equilibrated_position_response'),
+            baseline=dict(value=.003,unit='m'),cost={},unsupported_conclusions=[],
+            qualification_diagnosis=dict(qualified=True,status='qualified'),
+            failure=dict(reason='QUALIFIED_REGULAR_EQUILIBRIUM_REQUIRED',attempted_evaluations=2),records=[
+                dict(parameter_values={'payout_lengths_m.tendon_3':.4834},observation=dict(status='computed'),
+                    mechanics=dict(qualification_diagnosis=dict(qualified=True),constraint_state=dict(qualified=True))),
+                dict(parameter_values={'payout_lengths_m.tendon_3':.4814},
+                    observation=dict(status='not_applicable',reason='QUALIFIED_REGULAR_EQUILIBRIUM_REQUIRED'),
+                    mechanics=dict(qualification_diagnosis=dict(qualified=False,status='numerically_unresolved',failure_layers=['KKT_not_qualified']),
+                        constraint_state=dict(qualified=False,maximum_constraint_tension_n=23.,native_soft_length_residual_m=[.0001,-.001])))])
+        before=deepcopy(raw);ref=dict(artifact_id='4'*64,media_type='application/json')
+        view=summary(dict(structure_research=raw),ref);failed=view['failed_observations']
+        self.assertTrue(view['qualification_diagnosis']['qualified'])
+        self.assertEqual(len(failed),1);self.assertEqual(failed[0]['record_index'],1)
+        self.assertEqual(failed[0]['parameter_values'],{'payout_lengths_m.tendon_3':.4814})
+        self.assertFalse(failed[0]['qualification_diagnosis']['qualified'])
+        self.assertEqual(failed[0]['constraint_state']['maximum_constraint_tension_n'],23.)
+        self.assertEqual(failed[0]['constraint_state']['native_soft_length_excess_m'],.0001)
+        self.assertEqual(failed[0]['source'],dict(reference=ref,pointer='/structure_research/records/1'))
+        self.assertEqual(view['failure'],raw['failure']);self.assertEqual(raw,before)
+
     def test_multiplier_summary_retains_named_vector_order_without_expanding_scalar_targets(self):
         from tools.research.structure_research import summary
         # Fabricated channel order deliberately differs from lexical order.

@@ -730,6 +730,17 @@ def summary(value, reference):
             compact['native_soft_length_excess_m']=max(0.,max(state['native_soft_length_residual_m']))
         return compact
     constraint_state=constraint_summary(raw.get('constraint_state'))
+    failed_observations=[]
+    for i,record in enumerate(raw.get('records',[])):
+        observation=record.get('observation') or {};mechanics=record.get('mechanics') or {}
+        qualification=mechanics.get('qualification_diagnosis') or {};constraints=mechanics.get('constraint_state') or {}
+        if (observation.get('status') not in (None,'computed','available')
+                or qualification.get('qualified') is False or constraints.get('qualified') is False):
+            failed_observations.append(dict(record_index=i,parameter_values=record.get('parameter_values'),
+                observation={k:observation[k] for k in ('status','reason') if k in observation},
+                qualification_diagnosis={k:qualification[k] for k in ('status','qualified','stability_qualified','failure_layers') if k in qualification},
+                constraint_state=constraint_summary(constraints),
+                source=dict(reference=reference,pointer=f'/structure_research/records/{i}')))
     task_observations=deepcopy(raw.get('task_observations',[])[:4])
     diagnosis=raw.get('qualification_diagnosis')
     if diagnosis:
@@ -749,6 +760,8 @@ def summary(value, reference):
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         constraint_state_load_condition=((raw.get('point_binding') or {}).get('load') or {}).get('name'),
         qualification_diagnosis=diagnosis,
+        qualification_scope='Top-level qualification describes the baseline equilibrium, not every perturbed observation. Failed observations retain their own recorded coordinates and qualification; failure alone does not demonstrate an interface or method-routing defect.',
+        failure=raw.get('failure'),failed_observations=failed_observations,
         registered_acceptance=raw.get('registered_acceptance','unmeasured'),
         task_observations=task_observations,
         direction_status=raw.get('direction_status',raw.get('sensitivity',{}).get('direction_status','not_requested')),
