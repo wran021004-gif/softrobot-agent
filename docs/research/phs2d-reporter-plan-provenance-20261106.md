@@ -23,4 +23,8 @@ window010 在 30/64 正常有限窗口边界结束，没有 pending、未消费�
 新增测试最初的冻结模型赋值和 fixture 适配问题在离线回归中发现并修正；未修改正式 Store。
 3 项定向测试通过（新增谱系边界测试、既有显式/自动查询测试和完整 Reporter→Main 交付测试）。
 保留原工具 schema，避免当前 Handoff 的已承诺工具身份因无关描述变化而改变。
-绑定和继续执行状态在完成后追加。
+修复绑定为 `3f1deef771cfd545b31c5bdb0b9e341204966787`。
+原 resolved identity `560ac79e6f82f9367359fa941ea47cb29e3a35125b916f2eff15a319f8fe5111` 保持不变；
+spec、科学 profile、pilot 和完整账本逐项比较不变，科学依赖变化为空，profile 版本仍为 1。
+guard、正式授权和原 SDK restore-only 通过，没有为验证接口发送收费请求。
+window011 从原 30/64 账本继续，最多新增 4 次共享 Provider 请求，保护 6 和全局 64 保留。
