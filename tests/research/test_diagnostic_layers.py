@@ -180,5 +180,16 @@ class DiagnosticLayerTests(unittest.TestCase):
         self.assertEqual(layer['status'],'not_evaluated')
         self.assertEqual(layer['facts']['static_residual_inf'],1e-12)
 
+    def test_gvs_derivative_subcheck_failure_is_not_lost_without_aggregate_flag(self):
+        # GVS-shaped derivative fixture only: the real GVS contract reports three
+        # independent checks and has no aggregate passed field.
+        row=dict(point=dict(name='halfway_waypoint'),model=dict(y0=[0.,0.,0.]),
+            derivative_check=dict(dynamics=dict(passed=False),output=dict(passed=True),tip_velocity=dict(passed=True)))
+        value=dict(status='computed',raw=dict(records=[{},row]))
+        layers=analysis.diagnostic_layers(value)
+        self.assertEqual(layers['numerical_solve']['status'],'unqualified')
+        self.assertEqual(layers['static_qualification']['status'],'unqualified')
+        self.assertEqual(value['status'],'computed')  # Preserve original computation semantics.
+
 
 if __name__=='__main__':unittest.main()

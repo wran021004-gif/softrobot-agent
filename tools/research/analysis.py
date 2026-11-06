@@ -841,7 +841,9 @@ def diagnostic_layers(value):
                 scope='Recorded native geometry before state-support rejection; contact observations do not establish an admissible working point.')
         if row or mechanics or construction:
             failure=raw.get('failure_code') or row.get('reason')
-            failed=bool(failure or row.get('available') is False or construction.get('success') is False or (derivative or {}).get('passed') is False)
+            derivative_failed=bool(derivative and (derivative.get('passed') is False or
+                any(check.get('passed') is False for check in derivative.values() if isinstance(check,dict))))
+            failed=bool(failure or row.get('available') is False or construction.get('success') is False or derivative_failed)
             layers['numerical_solve']=layer('unqualified' if failed else 'passed',
                 dict(construction=fields(construction,('method','solver','success','status','message','iterations',
                     'function_evaluations','position_residual_m','static_residual_inf')),derivative_check=derivative,cost=cost,

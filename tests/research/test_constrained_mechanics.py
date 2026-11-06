@@ -186,7 +186,7 @@ class ConstrainedMechanicsTests(unittest.TestCase):
         before=s['mathematical_evaluations']
         for change in (dict(control_treatment='fixed_absolute_tensions'),dict(load_condition='unfrozen'),dict(effect_semantics='closed_loop_performance')):
             q=passive_question();q['structure'].update(change)
-            self.assertEqual(compile_question(h,q,tool_use_id='unsupported-passive')['status'],'unsupported')
+            self.assertIn(compile_question(h,q,tool_use_id='unsupported-passive')['status'],('unsupported','needs_choice'))
         self.assertEqual(state(h)['mathematical_evaluations'],before)
         direction=raw['structure_research']['structure_direction'];self.assertTrue(direction['proposal_only'])
         p=generation(h);p['generation']=direction['generation_handoff']['generation'];p['supporting_evidence']=[s['analysis_results'][-1]]

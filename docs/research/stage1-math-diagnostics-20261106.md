@@ -82,7 +82,7 @@ Full engineering outputs are in local ignored
 
 ## Validation
 
-Nine focused new tests cover real A/B failures, interrupted second-start
+Ten focused new tests cover real A/B failures, interrupted second-start
 qualification, saved real active SoRoSim compatibility, partial active derivative
 progress, native geometry rejection, independent dynamic-layer projection, and
 identical Main/Reporter/tool facts without mutation. Synthetic process/dynamic
@@ -103,6 +103,11 @@ execution (`INVALID_SCIENTIFIC_V4_INPUT`), yielding six rather than seven charge
 evaluations. The fixture now requests the existing registered
 `constraint_output_row_residual` with explicit identical world X/Y rows; original
 numerical checks and seven-evaluation assertion are retained.
+Its old rejection assertion was also updated to accept the existing
+`needs_choice` response for invalid advertised input, alongside `unsupported`.
+Both are pre-execution rejection; the original unchanged-budget assertion remains.
+The unified view reads both GVS per-derivative check flags and SoRoSim aggregate
+flags, without changing either kernel's calculation or qualification.
 
 An independent exact baseline comparison completed in 10.154 s: real GVS,
 saved real SoRoSim initial and target-equilibrium results, and the real PHS
