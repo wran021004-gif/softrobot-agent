@@ -92,7 +92,12 @@ def summarize_saved_evidence(host,reference):
     """Project Native summaries without materializing their recorded rollouts."""
     from tools.research.feedback import native_result_metadata
     value=native_result_metadata(host,reference)
-    if not value.get('native_dynamics'):value=host.store.artifact(reference)
+    if (value.get('operation')=='mechanism_structure_v1'
+            and (value.get('scoped_claim') or {}).get('numerical_result_pointer')=='/structure_research'):
+        # This scope projection checks the actual numerical root's existence;
+        # neither sampled trajectories nor per-probe configurations are used.
+        value.update(host.store.artifact(reference,paths=('structure_research.operation',)))
+    elif not value.get('native_dynamics'):value=host.store.artifact(reference)
     return summarize_evidence(value,reference)
 
 

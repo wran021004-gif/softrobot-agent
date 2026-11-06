@@ -209,6 +209,8 @@ def decision_phase(host):
     from tools.research.evidence_views import native_search_summary
     failed=[]
     for ref in results:
+        if not host.store.artifact(ref,paths=('native_dynamics.optimization',)).get('native_dynamics',{}).get('optimization'):
+            continue
         a=host.store.artifact(ref);search=native_search_summary(a,ref)
         if search and not search['model_predicates_passed']:failed.append(a)
     if len(failed)>=2:

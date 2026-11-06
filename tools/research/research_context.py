@@ -1569,14 +1569,18 @@ def initialization_review(host):
         if not s['spec'].get('canonical_task',{}).get('physical_problem'):return None
         failures=[];designs=set();methods=set();layers=set();latest_qualified=False
         for ref in s.get('analysis_results',[]):
-            a=host.store.artifact(ref);m=a.get('structure_research') or {};records=m.get('records',[])
+            a=host.store.artifact(ref,paths=('candidate','requested_operation.mechanism_study',
+                'structure_research.qualification_diagnosis','native_diagnostic.kind'))
+            m=a.get('structure_research') or {}
             request=(a.get('requested_operation') or {}).get('mechanism_study') or {}
             target=(request.get('target') or {}).get('quantity')
             if target:methods.add((request.get('operation','inspect'),target,request.get('effect_semantics','mechanism_effect')))
             diagnosis=m.get('qualification_diagnosis')
-            if not diagnosis and records:
-                mech=records[0]['mechanics'];eq=mech.get('baseline_equilibrium')
-                if not eq:eq=mech.get('dynamic_execution',{}).get('unloaded_equilibrium')
+            if not diagnosis:
+                paths=('/structure_research/records/0/mechanics/baseline_equilibrium',
+                    '/structure_research/records/0/mechanics/dynamic_execution/unloaded_equilibrium')
+                legacy=host.store.artifact(ref,pointers=paths)
+                eq=legacy.get(paths[0]) or legacy.get(paths[1])
                 if eq:
                     from extensions.tendon_family.passive_equilibrium import qualification_diagnosis
                     diagnosis=qualification_diagnosis(eq,multistart=len(eq.get('trials',[]))>1)
@@ -1894,7 +1898,8 @@ def agent_decision_brief(host):
         for finding in report.get('findings',[]):
             if finding.get('mathematics'):
                 ref=finding['result']['reference']
-                scope=summarize_evidence(host.store.artifact(ref),ref)
+                from tools.research.evidence_policy import summarize_saved_evidence
+                scope=summarize_saved_evidence(host,ref)
                 finding['mathematics']['unresolved']={**(finding['mathematics'].get('unresolved') or {}),
                     'evidence_limits':scope['unresolved']}
     from tools.research.evidence_views import result_card

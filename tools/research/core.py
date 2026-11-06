@@ -403,7 +403,18 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
 from tools.research.design import configuration_for, construct, verify_candidate, full_science
 
 
-def bind(host, reason=None, specification=None):
+def material_dependency_change(before,after,*,store_io_only=False):
+    """An explicit reviewed Store I/O repair can retain the scientific profile."""
+    if before==after:return False
+    if not store_io_only:return True
+    if before is None or set(before.get('sources',{}))!=set(after.get('sources',{})):return True
+    left=deepcopy(before);right=deepcopy(after)
+    for value in (left,right):
+        value['sources'].pop('tools/platform_store.py',None)
+    return left!=right
+
+
+def bind(host, reason=None, specification=None, *, store_io_only=False):
     from tools.platform_tasks import compile_input
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise ValueError('COMMIT_BEFORE_BIND_OR_MIGRATION')
@@ -422,8 +433,10 @@ def bind(host, reason=None, specification=None):
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     profile=deepcopy(s['profile'])
     science_prefixes=('backend.','candidate.','controller.','evaluate.','initialize.','model.','solver.','task.')
-    changed_dependencies=[name for name,value in snapshot['dependencies'].items()
+    dependency_updates=[name for name,value in snapshot['dependencies'].items()
         if name.startswith(science_prefixes) and old['dependencies'].get(name)!=value]
+    changed_dependencies=[name for name in dependency_updates
+        if material_dependency_change(old['dependencies'].get(name),snapshot['dependencies'][name],store_io_only=store_io_only)]
     selected_environment=s['spec'].get('numerical_environment',{})
     changed=science_hashes()!=profile['science_hashes'] or bool(changed_dependencies) or profile.get('execution_environment',{})!=selected_environment
     if 'freeze' in s and not reason:
@@ -448,6 +461,8 @@ def bind(host, reason=None, specification=None):
             current.setdefault('core_repairs',[]).append(dict(reason=reason,previous_commit=s.get('freeze'),commit=commit,
                 evaluation_version=profile['version'],material_behavior_change=changed,
                 changed_scientific_dependencies=changed_dependencies,
+                changed_store_io_dependencies=[name for name in dependency_updates if name not in changed_dependencies],
+                reviewed_store_io_only=store_io_only,
                 old_results_and_costs_retained=True,improvement_requires_new_comparable_reference=changed))
         host.store.update_state(db,host.run_id,current)
         host.store.event(db,host.run_id,'implementation_binding','committed',outputs=[ref])

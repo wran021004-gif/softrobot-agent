@@ -219,18 +219,40 @@ class Store:
                     return self.artifact(ref, raw=raw, db=conn, paths=paths,pointers=pointers)
             return self.snapshot_value(('artifact',ref.artifact_id,raw,tuple(paths) if paths is not None else None,
                 tuple(pointers) if pointers is not None else None),read)
-        row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
-        if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
-            raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)
+        def verified_body():
+            row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
+            if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
+                raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)
+            return row['body']
+        projected=paths is not None or pointers is not None
+        if projected:
+            if raw or ref.media_type!='application/json' or paths is not None and pointers is not None:
+                verified_body()
+                raise ValueError('JSON_POINTER_PROJECTION_REQUIRED' if pointers is not None else 'JSON_PATH_PROJECTION_REQUIRED')
+            def document():
+                # SQLite JSONB is a request-local parse of the verified original,
+                # never a second persisted artifact or a replacement identity.
+                return db.execute('SELECT jsonb(?)',(verified_body(),)).fetchone()[0]
+            body=(self.snapshot_value(('artifact_jsonb',ref.artifact_id,ref.media_type),document)
+                if db.execute('PRAGMA query_only').fetchone()[0] else document())
+        else:
+            body=verified_body()
+        def extract(queries):
+            # Bind the binary document once. Types distinguish absent fields from
+            # explicit JSON null without reparsing the full document per miss.
+            args=[body,*queries];parameters=['?'+str(i+2) for i in range(len(queries))]
+            values='json_extract(?1,'+','.join([*parameters,parameters[0]])+')'
+            types='json_array('+','.join('json_type(?1,'+p+')' for p in parameters)+')'
+            row=db.execute('SELECT '+values+','+types,args).fetchone()
+            return json.loads(row[0])[:-1],json.loads(row[1])
         if pointers is not None:
-            if raw or paths is not None or row['media']!='application/json':raise ValueError('JSON_POINTER_PROJECTION_REQUIRED')
             queries=[]
             for pointer in pointers:
                 if pointer and not pointer.startswith('/'):raise ValueError('JSON_POINTER_REQUIRED')
                 path='$'
                 for token in pointer[1:].split('/') if pointer else []:
                     token=token.replace('~1','/').replace('~0','~')
-                    kind=(db.execute('SELECT json_type(?,?)',(row['body'],path)).fetchone()[0]
+                    kind=(db.execute('SELECT json_type(?,?)',(body,path)).fetchone()[0]
                         if token.isdecimal() else None)
                     if kind=='array':
                         if not token.isdecimal() or str(int(token))!=token:raise KeyError(pointer)
@@ -238,25 +260,19 @@ class Store:
                     else:path+='.'+json.dumps(token,ensure_ascii=False)
                 queries.append(path)
             if not queries:return {}
-            args=[row['body'],*queries,queries[0]]
-            values=json.loads(db.execute('SELECT json_extract('+','.join('?' for _ in args)+')',args).fetchone()[0])
-            return {pointer:value for pointer,path,value in zip(pointers,queries,values)
-                if value is not None or db.execute('SELECT json_type(?,?)',(row['body'],path)).fetchone()[0] is not None}
+            values,types=extract(queries)
+            return {pointer:value for pointer,value,kind in zip(pointers,values,types) if kind is not None}
         if paths is not None:
-            if raw or row['media']!='application/json':raise ValueError('JSON_PATH_PROJECTION_REQUIRED')
             result={}
             if not paths:return result
-            # A multi-path extract parses once and retains JSON boolean types.
-            selected=[*paths,paths[0]]
-            args=[row['body'],*['$.'+path for path in selected]]
-            values=json.loads(db.execute('SELECT json_extract('+','.join('?' for _ in args)+')',args).fetchone()[0])
-            for path,value in zip(paths,values):
-                if value is None and db.execute('SELECT json_type(?,?)',(row['body'],'$.'+path)).fetchone()[0] is None:continue
+            values,types=extract(['$.'+path for path in paths])
+            for path,value,kind in zip(paths,values,types):
+                if kind is None:continue
                 target=result;keys=path.split('.')
                 for key in keys[:-1]:target=target.setdefault(key,{})
                 target[keys[-1]]=value
             return result
-        return row['body'] if raw else json.loads(row['body'])
+        return body if raw else json.loads(body)
 
     def session(self, run_id, db=None):
         if db is None:

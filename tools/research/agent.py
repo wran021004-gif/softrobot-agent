@@ -1262,6 +1262,19 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         if s['spec'].get('research_decisions'):
             await deliver_science_before_decision(host,agent,boundary.inner,max_model_calls=max_model_calls)
             check_provider_pause()
+        # Recent-round rotation is already due at a settled paired-feedback
+        # boundary. Do it before constructing a packet that will never be sent.
+        paired=bool(agent.messages and agent.messages[-1]['role']=='user'
+            and any('toolResult' in b for b in agent.messages[-1]['content']))
+        if (session_handoff and recent_policy and paired
+                and state(host)['pilot'].get('session_handoff_boundary')=='request_feedback'):
+            from tools.research.session_handoff import rotation_ready,request_feedback_boundary
+            if rotation_ready(host,agent.messages):
+                review=(pause_exploration_remaining is not None and not protected(host)
+                    and decision_budget(host)['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
+                await request_feedback_boundary(host,agent)
+                if review:raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
+                raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
         with host.store.read_snapshot():
             if on_demand:
                 for tool in native:agent.tool_registry.registry[tool.tool_name]=tool
