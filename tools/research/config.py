@@ -300,6 +300,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     physical_watchdog=study.pop('physical_worker_watchdog_s',None)
     mathematical_watchdog=study.pop('mathematical_worker_watchdog_s',None)
     provider_extension=study.pop('provider_request_extension_policy',None)
+    request_only=study.pop('request_budget_only',False)
     family_mode=study.get('start_mode')=='family_space'
     if fixed_structure is not None and not family_mode:raise ValueError('FIXED_STRUCTURE_REQUIRES_FAMILY_STUDY')
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
@@ -446,7 +447,18 @@ def resolve(path, profile=None, *, backend_profile=None):
     count_keys = ('provider_requests', 'protected_provider_requests', 'public_operations',
         'protected_public_operations', 'physical_launches', 'local_solves', 'offline_nlp',
         'bdf_replays', 'mathematical_evaluations')
-    if any((b[k] is not None or k not in ('mathematical_evaluations','physical_launches')) and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
+    if type(request_only) is not bool:raise ValueError('BOOLEAN_REQUEST_BUDGET_ONLY_REQUIRED')
+    if request_only:
+        from tools.research_tasks import passive_registered
+        if (study['mode']!='formal_research' or not passive_registered(task['task'])
+                or 'analysis' not in study['capabilities'] or replay_limit is not None
+                or any(b[k] is not None for k in ('mathematical_evaluations','physical_launches','public_operations'))
+                or b['protected_public_operations']!=0 or study['nmpc_limits']['executions']
+                or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
+            raise ValueError('REQUEST_ONLY_REQUIRES_PASSIVE_FORMAL_SCOPE_AND_USAGE_ONLY_COUNTS')
+        study['request_budget_only']=True
+    nullable=('mathematical_evaluations','physical_launches','public_operations') if request_only else ('mathematical_evaluations','physical_launches')
+    if any((b[k] is not None or k not in nullable) and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
         raise ValueError('FINITE_NONNEGATIVE_COUNT_REQUIRED')
     if b['mathematical_evaluations'] is None and (study['mode']!='formal_research' or 'analysis' not in study['capabilities']):
         raise ValueError('UNMETERED_MATHEMATICS_REQUIRES_FORMAL_ANALYSIS_SCOPE')
@@ -454,7 +466,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         from tools.research_tasks import passive_registered
         if (study['mode']!='formal_research' or 'analysis' not in study['capabilities'] or
                 b['mathematical_evaluations'] is not None or not passive_registered(task['task']) or
-                replay_limit is None or study['nmpc_limits']['executions'] or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
+                (replay_limit is None and not request_only) or study['nmpc_limits']['executions'] or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
             raise ValueError('UNMETERED_PHYSICS_REQUIRES_PASSIVE_ANALYSIS_AND_FINITE_INDEPENDENT_REPLAY_LIMIT')
     if study['mode']=='engineering_investigation':
         if (study['capabilities']!=['investigation']
@@ -464,7 +476,7 @@ def resolve(path, profile=None, *, backend_profile=None):
                 or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
             raise ValueError('READ_ONLY_INVESTIGATION_REQUIRES_ZERO_SCIENCE_AND_DIAGNOSTIC_ACTIONS')
     for total, reserved in (('provider_requests', 'protected_provider_requests'), ('public_operations', 'protected_public_operations')):
-        if b[reserved] > b[total]:
+        if b[total] is not None and b[reserved] > b[total]:
             raise ValueError('PROTECTION_IS_PART_OF_TOTAL: ' + reserved)
     watchdog=physical_watchdog
     if watchdog is not None and (type(watchdog) not in (int,float) or not 0<watchdog<=14400):
@@ -478,18 +490,21 @@ def resolve(path, profile=None, *, backend_profile=None):
         if (not {'version','maximum_additional_requests'}<=set(provider_extension) or
                 set(provider_extension)-{'version','maximum_additional_requests','maximum_requests_per_extension'} or
                 provider_extension['version']!='finite_provider_request_extension_v1' or
-                type(provider_extension['maximum_additional_requests']) is not int or
-                not 0<provider_extension['maximum_additional_requests']<=256):
+                not (request_only and provider_extension['maximum_additional_requests'] is None) and
+                (type(provider_extension['maximum_additional_requests']) is not int or
+                not 0<provider_extension['maximum_additional_requests']<=256)):
             raise ValueError('FINITE_EXPLICIT_PROVIDER_EXTENSION_POLICY_REQUIRED')
         if 'maximum_requests_per_extension' in provider_extension:
             per_extension=provider_extension['maximum_requests_per_extension']
-            if type(per_extension) is not int or not 0<per_extension<=provider_extension['maximum_additional_requests']:
+            if (type(per_extension) is not int or per_extension<=0 or
+                    provider_extension['maximum_additional_requests'] is not None and per_extension>provider_extension['maximum_additional_requests']):
                 raise ValueError('FINITE_EXPLICIT_PROVIDER_EXTENSION_POLICY_REQUIRED')
         study['provider_request_extension_policy']=deepcopy(provider_extension)
     time_values = [b[k] for k in ('activity_s', 'numerical_s', 'local_solve_s', 'delivery_reserve_s')]
     analysis_timeout=study['analysis_cap_s']
     if b['mathematical_evaluations'] is None:
-        if not isinstance(analysis_timeout,(int,float)) or not 0<analysis_timeout<=3600:
+        watchdog=mathematical_watchdog if request_only else analysis_timeout
+        if not isinstance(watchdog,(int,float)) or not 0<watchdog<=(14400 if request_only else 3600):
             raise ValueError('FINITE_ENGINEERING_ANALYSIS_WATCHDOG_REQUIRED')
     else:time_values.append(analysis_timeout)
     time_values += [study[k] for k in ('nmpc_execution_cap_s', 'standalone_watchdog_s')]
@@ -592,8 +607,10 @@ def resolve(path, profile=None, *, backend_profile=None):
             protection='requests and operations reserved within totals for evaluation, evidence and closeout'))
     if b['mathematical_evaluations'] is None:
         study['budget_semantics'].update(mathematical_evaluations='usage_only_no_count_quota',
-            engineering_worker_timeout_s=study['analysis_cap_s'])
+            engineering_worker_timeout_s=mathematical_watchdog if request_only else study['analysis_cap_s'])
     if b['physical_launches'] is None:study['budget_semantics']['physical_launches']='usage_only_no_count_quota'
+    if request_only:study['budget_semantics'].update(public_operations='usage_only_no_count_quota',
+        protection='Provider request reserve only; scientific acceptance and per-request method limits remain enforced')
     if family_mode:
         initial=cfg['task']['initializer']['parameters']['data']
         if initial['unspecified']!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial[key].values()):

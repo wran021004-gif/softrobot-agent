@@ -88,7 +88,7 @@ class Host:
         rows = self.reg.catalog(inp['policy'].get('tool_bindings') or inp['policy']['allowed_tools'])
         remaining = self.store.remaining(self.run_id)['remaining']
         for row in rows:
-            if row['kind'] == 'tool' and remaining['tool_calls'] <= 0:
+            if row['kind'] == 'tool' and remaining['tool_calls'] is not None and remaining['tool_calls'] <= 0:
                 row['executable'] = False
                 row['reasons'].append('TOOL_BUDGET_EXHAUSTED')
         return rows

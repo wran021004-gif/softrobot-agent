@@ -195,7 +195,7 @@ class RobotDescription(Contract):
 
 
 class Budget(Contract):
-    tool_calls: int = Field(ge=0)
+    tool_calls: int | None = Field(ge=0)
     model_calls: int = Field(ge=0)
     backend_solves: int | None = Field(ge=0)
     worker_calls: int = Field(ge=0)
@@ -204,6 +204,7 @@ class Budget(Contract):
 
 class MeasuredCost(Budget):
     """Receipts and events measure numeric cost; only limits may be disabled."""
+    tool_calls: int = Field(ge=0)
     backend_solves: int = Field(ge=0)
     wall_s: FiniteFloat = Field(ge=0)
 

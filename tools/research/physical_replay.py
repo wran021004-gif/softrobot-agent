@@ -456,16 +456,23 @@ def resolve_passive_state(store,study_id,candidate,configuration,options):
     return episode['qualified_state']
 
 
-def dispatch(host,arguments,key,*,role='development',selected=None):
+def dispatch(host,arguments,key,*,role='development',selected=None,plan_reference=None):
     confirmation=role=='confirmation'
     guard(host,not confirmation)
     s=state(host)
     if s['spec'].get('research_decisions') and 'physical_replay' not in s['spec']['capabilities']:
         raise ValueError('PHYSICAL_REPLAY_CAPABILITY_REQUIRED')
-    replay_limit=s['spec'].get('physical_replay_limit')
-    if s.get('physical_replay_launches',0)>=(s['spec']['budgets']['physical_launches'] if replay_limit is None else replay_limit):
+    from tools.research.budget import replay_remaining
+    replay_left=replay_remaining(s['spec'],s.get('physical_replay_launches',0))
+    if replay_left is not None and replay_left<1:
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     candidate=plain(arguments.candidate)
+    if plan_reference:
+        plan=host.store.artifact(plan_reference)['original_plan']
+        if (plain(plan_reference) not in s.get('plans',[]) or plan['action']!='physical_replay'
+                or plan['physical_replay']!=plain(arguments)
+                or host.store.artifact(plan_reference)['request_id']!=key):
+            raise ValueError('PHYSICAL_REPLAY_PLAN_CANDIDATE_MISMATCH')
     cfg=verify_candidate(host,candidate)['configuration']
     from tools.research_tasks import passive_registered
     passive=passive_registered(cfg['task'])
@@ -512,6 +519,7 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
         source_reference=source_ref,configuration=cfg,route=route,episode_count=episodes,
         **(dict(passive_source=source) if passive else dict(trajectory=source['trajectory'])),
         role=role,selected_execution=plain(selected),operation_key=key)
+    if plan_reference:request['plan_reference']=plain(plan_reference)
     worker_key=request['request_id']
     old=host.store.lookup(host.run_id,worker_key)
     if old:
@@ -532,16 +540,17 @@ def dispatch(host,arguments,key,*,role='development',selected=None):
     atomic_json(folder/'request.json',request)
     update(host,pending=dict(kind='physical_replay',worker_request_id=worker_key,folder=str(folder),
         implementation=s['freeze'],candidate=candidate,source_reference=source_ref,
-        role=role,selected_execution=plain(selected),operation_key=key,route=route,episode_count=episodes))
+        role=role,selected_execution=plain(selected),operation_key=key,route=route,episode_count=episodes,
+        **(dict(plan_reference=plain(plan_reference)) if plan_reference else {})))
     from tools.service_execution import _run_contained
     started=time.perf_counter()
     try:
         with io_path(folder/'worker.log').open('w',encoding='utf8') as log:
             done=_run_contained([s['spec']['runtime']['research_python'],'-m','tools.research.execution_worker',
                 str(folder/'request.json')],log,s['spec'].get('physical_worker_watchdog_s'))
-        boundary=dict(termination_confirmed=True,returncode=done.returncode)
+        boundary=dict(termination_confirmed=True,returncode=done.returncode,worker_started=True)
     except subprocess.TimeoutExpired as exc:
-        boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)
+        boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True,worker_started=True)
     boundary['elapsed_s']=time.perf_counter()-started
     atomic_json(folder/'boundary.json',boundary)
     return recover(host)
@@ -751,6 +760,7 @@ def recover(host):
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
         physical_launches=p.get('episode_count',1),actual_resource_consumption=raw.get('cost'),
         backend_reference=backend_reference,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
+    if p.get('plan_reference'):final['plan_reference']=p['plan_reference']
     if raw.get('kind')=='passive_dynamic_execution_v2':
         final['physical_cost_status']=dict(observation_scope=raw.get('cost_observation_scope',raw.get('cost',{}).get('observation_scope','observed_native_counts')),
             unobserved_work_possible=raw.get('unobserved_work_possible',raw.get('cost',{}).get('unobserved_work_possible',False)))

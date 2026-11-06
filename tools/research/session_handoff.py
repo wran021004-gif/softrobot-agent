@@ -9,6 +9,91 @@ from tools.research.state import state
 
 INVOCATION_PROMPT='Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.'
 
+
+def assess_live_admission(host,source_root,source_study):
+    """Reuse hash-verified live same-transport handoff evidence, read-only."""
+    from tools.platform_host import Host
+    from tools.research.provider import received
+    parent=Host(Path(source_root),source_study,actor='handoff-evidence-readonly')
+    events=parent.store.events(source_study);provider=state(host)['spec']['runtime']['provider']
+    if parent.store.root==host.store.root:raise ValueError('INDEPENDENT_HISTORICAL_HANDOFF_EVIDENCE_REQUIRED')
+    def request(event):
+        meta=parent.store.artifact(event['outputs'][0]);wire=parent.store.artifact(meta['request'])
+        reception=received(parent,event['request_id']);row=parent.store.lookup(source_study,event['request_id'])
+        if (meta.get('purpose')!='conversation' or meta.get('endpoint')!=provider['base_url'].rstrip('/')+'/chat/completions'
+                or wire.get('model')!=provider['model'] or wire.get('reasoning_effort')!=provider['reasoning']
+                or not row or not row['receipt'] or row['request_hash']!=digest(wire)
+                or json.loads(row['receipt']).get('execution_status')!='completed'
+                or not reception or reception.get('http_status')!=200):return None
+        body=json.loads(parent.store.artifact(reception['body'],raw=True))
+        if not body.get('choices') or body['choices'][0].get('finish_reason') not in ('tool_calls','stop'):return None
+        return wire,body
+    for i,event in enumerate(events):
+        if event['kind']!='session_handoff' or len(event['outputs'])!=2:continue
+        prep=parent.store.artifact(event['outputs'][0]);restored=parent.store.artifact(event['outputs'][1])
+        boundary=parent.store.artifact(prep['boundary']) if prep.get('boundary') else {}
+        if (prep.get('boundary_kind')!='request_feedback' or restored.get('independently_restored') is not True
+                or restored.get('preparation')!=event['outputs'][0] or not restored.get('snapshot_files')
+                or boundary.get('session_id')!=prep.get('previous_session') or not boundary.get('messages')
+                or digest(boundary['messages'])!=prep.get('boundary_identity') or unmatched(boundary['messages'])):continue
+        previous=next((e for e in reversed(events[:i]) if e['kind']=='r3_request'),None)
+        old=request(previous) if previous else None
+        if not old or not old[1]['choices'][0]['message'].get('tool_calls'):continue
+        last_assistant=next((m for m in reversed(boundary['messages']) if m['role']=='assistant'),{})
+        ids=[b['toolUse']['toolUseId'] for b in last_assistant.get('content',[]) if 'toolUse' in b]
+        if ids!=[t['id'] for t in old[1]['choices'][0]['message']['tool_calls']]:continue
+        delivery=prep.get('pending_feedback_delivery')
+        if not delivery or not delivery.get('items'):continue
+        for send in events[i+1:]:
+            if send['kind']!='r3_request':continue
+            live=request(send)
+            if not live:continue
+            tail=live[0]['messages'][-1].get('content')
+            if not isinstance(tail,str) or not tail.startswith('CURRENT_RESEARCH_PACKET\n'):continue
+            packet=json.loads(tail.split('\n',1)[1])
+            from tools.research.object_choices import main_context_enabled
+            expected=main_feedback_projection(parent,delivery) if main_context_enabled(state(parent)['spec']) else delivery
+            if packet_feedback(packet.get('research',{}))!=expected:continue
+            return dict(status='ready',source_root=str(parent.store.root),source_study=source_study,
+                provider_identity=digest(provider),handoff_outputs=event['outputs'],
+                old_request_id=previous['request_id'],continued_request_id=send['request_id'],
+                old_request=previous['outputs'][0],continued_request=send['outputs'][0],
+                independent_sdk_restore=True,exact_feedback_delivered=True,
+                scope='Technical same-model/transport request-feedback evidence only; no inherited scientific result or authorization.')
+    raise ValueError('SAME_PROVIDER_LIVE_HANDOFF_RESTORE_AND_EXACT_FEEDBACK_EVIDENCE_REQUIRED')
+
+
+def admit_formal_study(host,authorization_reference):
+    """Identity-bound formal authorization is the only production admission input."""
+    current=state(host);approval=host.store.artifact(authorization_reference);scope=approval.get('scope',{})
+    if not isinstance(scope,dict):raise ValueError('EXACT_FORMAL_STUDY_HANDOFF_AUTHORIZATION_REQUIRED')
+    handoff=scope.get('session_handoff',{})
+    if (not any(e['kind']=='formal_study_authorization' and plain(authorization_reference) in e['outputs']
+                for e in host.store.events(host.run_id)) or not approval.get('user_approval')
+            or approval.get('scope_identity')!=digest(scope) or scope.get('study_id')!=host.run_id
+            or scope.get('resolved_identity')!=current['spec']['resolved_identity']
+            or scope.get('implementation_freeze')!=current.get('freeze')
+            or 'request-feedback session handoff' not in scope.get('execution_scopes',[])
+            or handoff.get('boundary')!='request_feedback' or not handoff.get('evidence')):
+        raise ValueError('EXACT_FORMAL_STUDY_HANDOFF_AUTHORIZATION_REQUIRED')
+    evidence=host.store.artifact(handoff['evidence'])
+    actual=assess_live_admission(host,evidence['source_root'],evidence['source_study'])
+    if actual!=evidence:raise ValueError('CURRENT_PROVIDER_HANDOFF_EVIDENCE_MISMATCH')
+    from tools.research.state import require_research_authorization
+    require_research_authorization(host)
+    with host.store.transaction() as db:
+        latest=host.store.session(host.run_id,db)['state']
+        if (latest!=current or current.get('pending') or current['pilot'].get('unconsumed_response')
+                or current.get('validation_extension_pending_binding')
+                or db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
+            raise ValueError('SETTLED_COMMITTED_HANDOFF_ADMISSION_BOUNDARY_REQUIRED')
+        ref=host.store.put(db,dict(authorization=plain(authorization_reference),evidence=handoff['evidence'],
+            resolved_identity=current['spec']['resolved_identity'],implementation=current['freeze'],boundary='request_feedback'))
+        latest['pilot'].update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback')
+        host.store.update_state(db,host.run_id,latest)
+        host.store.event(db,host.run_id,'session_handoff_admission','authorized',outputs=[ref])
+    return dict(reference=plain(ref),provider_requests_sent=0)
+
 def session_storage_path(path):
     """Use Windows extended-length paths for durable SDK snapshot temp files."""
     return str(io_path(os.path.abspath(str(path))))

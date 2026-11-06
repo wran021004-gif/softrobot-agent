@@ -30,11 +30,13 @@ def extend_provider_requests(host, approval):
                 policy.get('version')!='finite_provider_request_extension_v1'):
             raise ValueError('EXACT_USER_APPROVED_FINITE_PROVIDER_EXTENSION_REQUIRED')
         used=sum(host.store.artifact(ref,db=db)['additional_requests'] for ref in current.get('provider_request_extensions',[]))
-        if extra>policy.get('maximum_requests_per_extension',policy['maximum_additional_requests']):
+        batch=policy.get('maximum_requests_per_extension',policy['maximum_additional_requests'])
+        if batch is not None and extra>batch:
             raise ValueError('FROZEN_PROVIDER_EXTENSION_BATCH_CAP_EXCEEDED')
-        if used+extra>policy['maximum_additional_requests']:
+        if policy['maximum_additional_requests'] is not None and used+extra>policy['maximum_additional_requests']:
             raise ValueError('FROZEN_PROVIDER_EXTENSION_CAP_EXCEEDED')
-        if (current.get('pending') or pending(host) or current.get('selected') or current.get('success_gate') or
+        if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
+                or current.get('selected') or current.get('success_gate') or
                 current['research_status']=='stopped' or
                 db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
             raise ValueError('SETTLED_NONSUCCESS_BOUNDARY_REQUIRED_FOR_PROVIDER_EXTENSION')
@@ -120,6 +122,12 @@ def mathematics_fits(spec, used=0, requested=1):
     return remaining is None or remaining>=requested
 
 
+def replay_remaining(spec,used=0):
+    limit=spec.get('physical_replay_limit')
+    if limit is None:limit=spec['budgets']['physical_launches']
+    return None if limit is None else max(0,limit-used)
+
+
 def provider_allowance(host, db=None):
     """One count boundary; frozen legacy Studies retain the pre-debit margin.
 
@@ -186,7 +194,7 @@ def protected(host):
     b = s['spec']['budgets']
     return bool(s.get('success_gate') or s.get('count_closeout') or
         provider_allowance(host)['protected_current_request'] or
-        remaining['tool_calls'] <= b.get('protected_public_operations', 0) or
+        (remaining['tool_calls'] is not None and remaining['tool_calls'] <= b.get('protected_public_operations', 0)) or
         (s['spec'].get('budget_semantics',{}).get('mode')=='count'
             and s['spec'].get('mode')!='engineering_investigation' and not science_fits(host)))
 
@@ -215,7 +223,7 @@ def decision_budget(host):
                     key in ('native_dynamics','nonlinear_response','structure_research') and v.get('status') in ('computed','not_comparable')))
                 break
     return dict(public_operation_budget=dict(remaining_total=public_total,reserved_for_closeout=public_reserve,
-            available_for_exploration=max(0,public_total-public_reserve),
+            available_for_exploration=None if public_total is None else max(0,public_total-public_reserve),
             scope='Shared ledger includes public requests and charged child operations; a scientific action may cost multiple operations.'),
         provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
         reporter_requests_used=reporter_used,pending_reporter_requests_upper_bound=reporter_pending,
@@ -231,8 +239,9 @@ def decision_budget(host):
             charged_mathematical_evaluations=s.get('mathematical_evaluations',0),
             mathematical_quota_scope='No cumulative mathematical count quota; actual costs remain recorded.' if b['mathematical_evaluations'] is None else 'Frozen cumulative mathematical count quota.',
             remaining_mathematical=mathematical_remaining(s['spec'],s.get('mathematical_evaluations',0)),
-            remaining_full_replays=max(0,(s['spec'].get('physical_replay_limit') if s['spec'].get('physical_replay_limit') is not None else b['physical_launches'])-s.get('physical_replay_launches',0)),
-            available_full_replays=capacity(host,b['physical_launches'] if b['physical_launches'] is not None else s['spec']['physical_replay_limit'],root_operation=True,route='fixed_tension')['admitted'],
+            remaining_full_replays=replay_remaining(s['spec'],s.get('physical_replay_launches',0)),
+            available_full_replays=(None if replay_remaining(s['spec']) is None else
+                capacity(host,replay_remaining(s['spec']),root_operation=True,route='fixed_tension')['admitted']),
             full_replay_scope='remaining_full_replays is the method sublimit, not an additional shared pool. available_full_replays also applies shared launches, confirmation reserve and public-operation capacity; full request admission still applies.',
             plan_control_search=dict(callback_unit='full physical replay request; exact cached baselines can avoid a new launch',
                 declared_callback_maximum=None if b['physical_launches'] is None else b['physical_launches']+1,
@@ -270,8 +279,8 @@ def science_fits(host):
             and set(spec['allowed_plan_actions'])<={'generate','stop'} and not s.get('candidates')) or
         ('analysis' in capabilities and mathematics_fits(spec,s.get('mathematical_evaluations',0))) or
         ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
-        ('physical_replay' in capabilities and (backend is None or backend>=1) and s.get('physical_replay_launches',0)<
-            (spec.get('physical_replay_limit') if spec.get('physical_replay_limit') is not None else b['physical_launches'])) or
+        ('physical_replay' in capabilities and (backend is None or backend>=1) and
+            (replay_remaining(spec,s.get('physical_replay_launches',0)) is None or replay_remaining(spec,s.get('physical_replay_launches',0))>=1)) or
         ('rl' in capabilities and evaluations>0 and ((backend>=2 and
             s.get('admitted_training_stages',len(runs))<limits['training_stages']) or (backend>=1 and runs))) or
         (s.get('local_solves',0)<b['local_solves'] and any(host.store.artifact(r).get('status')=='evaluated' for r in s.get('results',[]))) or
@@ -329,14 +338,15 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     reserve = 0 if confirmation else repetition_reserve(s)
     slots = s['spec']['nmpc_limits']['executions'] - s.get('nmpc_launches', 0)
     if route in ('fixed_tension','passive_protocol'):
-        limit=s['spec'].get('physical_replay_limit')
-        slots=(s['spec']['budgets']['physical_launches'] if limit is None else limit)-s.get('physical_replay_launches',0)
-    operations = max(0, remaining['tool_calls'] - (0 if confirmation else s['spec']['budgets'].get('protected_public_operations', 0)))
+        slots=replay_remaining(s['spec'],s.get('physical_replay_launches',0))
+    operations = None if remaining['tool_calls'] is None else max(0, remaining['tool_calls'] - (0 if confirmation else s['spec']['budgets'].get('protected_public_operations', 0)))
     # Fixed replay has one public Plan and no charged child tool calls. Inside
     # that admitted Plan, its current public call has already been paid.
-    operation_slots=operations+int(not root_operation) if route in ('fixed_tension','passive_protocol') else (operations-int(root_operation))//3
+    operation_slots=None if operations is None else operations+int(not root_operation) if route in ('fixed_tension','passive_protocol') else (operations-int(root_operation))//3
     shared=backend_capacity(host)
-    bounds=[requested,slots-reserve,operation_slots]
+    bounds=[requested]
+    if slots is not None:bounds.append(slots-reserve)
+    if operation_slots is not None:bounds.append(operation_slots)
     if shared is not None:bounds.append(shared-reserve)
     fit = max(0, min(bounds))
     return dict(requested=requested, admitted=fit, internal_launches=fit,

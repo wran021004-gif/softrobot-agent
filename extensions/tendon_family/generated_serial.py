@@ -238,7 +238,7 @@ class GeometryFailure(ValueError):
 
 def generate_family(value):
     """Expand polar spans; v1 preserves its assembly, v2 expands named prototypes."""
-    from .family_space import parse_build, Span, validate_request, FamilyBuildV2
+    from .family_space import parse_build, Span, validate_request, FamilyBuildV2,payout_domains
     from .sections import properties
     build=parse_build(value);space=build.space;r=build.request
     validate_request(space,r)
@@ -385,9 +385,10 @@ def generate_family(value):
     if serial and any(key not in guides_by_id or set(holes)-set(guides_by_id[key]['guide_holes']) for key,holes in r.guide_hole_positions_m.items()):
         raise ValueError('GUIDE_OVERRIDE_MUST_BIND_USED_REAL_HOLE')
     design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
-    if getattr(space,'passive_payout_domains_m',{}):
+    payouts=payout_domains(space,r.tendon_count)
+    if payouts:
         design['actuators']=[]
-        design['fixed_payout_lengths_m']={k:r.payout_lengths_m.get(k,d.default) for k,d in space.passive_payout_domains_m.items()}
+        design['fixed_payout_lengths_m']={k:r.payout_lengths_m.get(k,d.default) for k,d in payouts.items()}
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
     result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)

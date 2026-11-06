@@ -766,7 +766,7 @@ def _dispatch(host, value, request_id, origin='model'):
                  'refine':plan.refinement,'nmpc_prediction_diagnostic':plan.nmpc_prediction_diagnostic}[plan.action],request_id)
         elif plan.action=='physical_replay':
             from tools.research.physical_replay import dispatch as physical_dispatch
-            result=physical_dispatch(host,plan.physical_replay,request_id)
+            result=physical_dispatch(host,plan.physical_replay,request_id,plan_reference=ref)
         elif plan.action=='matched_state':
             from tools.research.matched_state import dispatch as matched_dispatch
             result=matched_dispatch(host,plan.matched_state,request_id)

@@ -368,8 +368,8 @@ def context(host, *, evidence_references=None):
         time_constraint='0 <= window_start <= knots[0] < knots[-1] <= window_end <= task duration',
         multi_start='additional_starts=[{candidate,source,adaptation_from?}]; same task, tendon order and time grid required')
     # One authoritative STOP index, including results absent from observation previews.
-    current['all_fresh_results']=[r for key in ('results','mechanics_results','physical_replays',
-        'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])]
+    current['all_fresh_results']=event_ordered_results(host,[r for key in ('results','mechanics_results','physical_replays',
+        'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])])
     analysis_metadata=[(r,host.store.artifact(r,paths=('candidate','operation','source_kind','status','plan_reference',
         'boundary','diagnostic_layers','charged_analysis_evaluations','reserved_dynamic_cost_bound','actual_resource_consumption')))
         for r in s.get('analysis_results',[])]
@@ -622,11 +622,42 @@ def recorded_changes(before,after,path=''):
     return [dict(pointer=path,before=before,after=after)]
 
 
+def event_ordered_results(host,references):
+    """First durable output sequence owns result chronology, never category order."""
+    sequence={}
+    for i,event in enumerate(host.store.events(host.run_id)):
+        for ref in event.get('outputs',[]):sequence.setdefault(ref['artifact_id'],i)
+    return sorted(references,key=lambda r:sequence.get(r['artifact_id'],-1))
+
+
+def pending_evaluation(host,pending):
+    """Report reservation and durable Worker facts without inferring liveness."""
+    if pending.get('kind') not in ('candidate_analysis','physical_replay'):return None
+    from pathlib import Path
+    from tools.state_io import read,io_path
+    folder=io_path(Path(pending['folder'])) if pending.get('folder') else None
+    records={name:read(folder/(name+'.json')) for name in ('worker_lifecycle','boundary')
+        if folder and (folder/(name+'.json')).exists()}
+    boundary=records.get('boundary',{});lifecycle=records.get('worker_lifecycle',{})
+    row=host.store.lookup(host.run_id,pending['worker_request_id']) if pending.get('worker_request_id') else None
+    return dict(kind=pending['kind'],plan=pending.get('plan_reference'),
+        candidate=pending.get('candidate') or pending.get('request',{}).get('candidate'),
+        source=pending.get('source_reference'),route=pending.get('route'),
+        episode_count=pending.get('episode_count'),request_id=pending.get('worker_request_id'),
+        reserved_resources=json.loads(row['reserved']) if row else None,
+        exclusive_resources=json.loads(row['resources']) if row else None,
+        stage='awaiting_settlement',worker_started=boundary.get('worker_started',True if lifecycle else None),
+        termination_confirmed=boundary.get('termination_confirmed'),worker_records=records,
+        worker_alive=None,receipt_status=row['status'] if row else None)
+
+
 def candidate_workflow(host,current,candidates,evaluations):
     """Read-only joins of registered candidates, original Plans and exact results."""
     from tools.research.scientific_intent import completed_question_plan
     from tools.research.analysis import diagnostic_overview
     s=state(host);plans=[];outcomes={};generated_by={}
+    values={r['artifact_id']:v for r,v in evaluations}
+    evaluations=[(r,values[r['artifact_id']]) for r in event_ordered_results(host,[r for r,v in evaluations])]
     for reference in s.get('plans',[]):
         saved=host.store.artifact(reference);plan=saved['original_plan']
         call=host.store.lookup(host.run_id,saved['request_id'])
@@ -676,8 +707,7 @@ def candidate_workflow(host,current,candidates,evaluations):
     pending=s.get('pending') or {}
     return dict(candidates=rows,plans=plans,evaluations=index,
         rejected_requests=[dict(request_id=r['request_id'],action=r['plan']['action'],reason=r['reason']) for r in rejected[-3:]],
-        pending_evaluation=(dict(plan=pending.get('plan_reference'),candidate=pending.get('request',{}).get('candidate'),
-            stage='reserved_or_running',worker_started=None) if pending.get('kind')=='candidate_analysis' else None),
+        pending_evaluation=pending_evaluation(host,pending),
         active_plan=(dict(reference=active['plan_reference'],candidate=active['candidate'],
             hypothesis=active['agent_hypothesis']) if active else None),
         unknown_plan_links=[r['reference'] for r in index if r['plan'] is None],
@@ -690,7 +720,9 @@ def execution_preview(host,candidate,evaluations):
     from tools.research.budget import backend_capacity
     cfg=host.store.artifact(candidate)['configuration'];task=cfg['task'];adapter=task_adapter(cfg)
     passive=bool(task.get('physical_problem'));goal=task['goal']['data']
-    related=[(r,v) for r,v in evaluations if (v.get('candidate') or v.get('design_candidate'))==candidate]
+    values={r['artifact_id']:v for r,v in evaluations}
+    related=[(r,values[r['artifact_id']]) for r in event_ordered_results(host,[r for r,v in evaluations])
+        if (values[r['artifact_id']].get('candidate') or values[r['artifact_id']].get('design_candidate'))==candidate]
     qualifications=[(r,v) for r,v in related if (v.get('diagnostic_layers') or {}).get('static_qualification')]
     latest=qualifications[-1] if qualifications else None
     hard=passive and goal.get('execution_protocol')=='phs2d_original_v1'

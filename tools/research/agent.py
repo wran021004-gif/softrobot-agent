@@ -39,6 +39,7 @@ QUESTION_PLAN_DESCRIPTION=('Record a scientific hypothesis and an owned candidat
 def plan_schema(actions, *, decision_required=False,family_version=None,diagnose_candidate_required=False,focused=False,study=None):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS, PLAN_RESEARCH_INTENTS
+    family_version=family_version or (study or {}).get('family_space',{}).get('version')
     schema=Plan.model_json_schema()
     if 'stop' in actions:
         schema['properties']['interpretation']['description']=schema['properties']['interpretation'].get('description','')+(
@@ -104,6 +105,11 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
                 count.pop('default')
             lower,upper=space['executable_tendon_count_bounds']
             schema['$defs'][generation]['properties']['tendon_count'].update(minimum=lower,maximum=upper)
+            if space.get('passive_payout_domain_m') and generation=='GenerationRequestV2':
+                domain=space['passive_payout_domain_m']
+                schema['$defs'][generation]['properties']['payout_lengths_m'].update(
+                    additionalProperties=dict(type='number',minimum=domain['minimum'],maximum=domain['maximum']),
+                    description='Independent SI payout for each actual tendon_i, i < tendon_count. Omitted values inherit '+str(domain['default'])+' m.')
             if space['conditional_rules']=='base_only_consecutive_spans_v1':
                 schema['$defs']['Span']['properties']['first_segment'].update(const=0,
                     description='Frozen FamilySpace requires a fixed-base start. last_segment chooses the anchor segment; other span variables remain selectable.')
@@ -1241,7 +1247,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     inputSchema={'json':parameters})
             return
         remaining=host.store.remaining()['remaining']
-        if remaining['model_calls']<1 or remaining['tool_calls']<2:
+        if remaining['model_calls']<1 or (remaining['tool_calls'] is not None and remaining['tool_calls']<2):
             engineering_closeout(host,'No remaining provider/public-operation capacity for model closeout')
             event.cancel='Engineering count-budget closure; no fabricated model STOP'
             return
