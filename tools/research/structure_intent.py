@@ -75,6 +75,11 @@ def compile_search(host, value, request_id):
             issue(field,'Outside frozen topology; no automatic replacement',choices=grant[field])
         topology[field]=choices
     native=q.evaluation_model=='native_mujoco'
+    passive=q.evaluation_model.startswith('passive_')
+    if passive and (q.research_goal!='passive_structure_research' or q.control_treatment!='no_active_control'
+            or q.control_search_effort is not None or q.initial_tension_n is not None
+            or q.proxy_objective not in ('task_violation','equilibrium_qualification')):
+        issue('evaluation_model','Passive research requires no_active_control and an explicit passive objective; no control search.')
     starts={}
     prior_ref=(value.get('decision') or {}).get('selected_candidate')
     prior=host.store.artifact(prior_ref)['parameters'] if prior_ref else {}
@@ -92,7 +97,7 @@ def compile_search(host, value, request_id):
     if native and (q.research_goal!='structure_control_codesign' or q.control_treatment!='reoptimized' or q.proxy_objective is not None):
         issue('control_treatment','Native task codesign requires reoptimized control and no proxy objective')
     proxy_treatment='proxy_optimized' if q.proxy_objective=='task_violation' else 'not_optimized'
-    if not native and (q.control_treatment!=proxy_treatment or q.research_goal!='structural_capability_screening' or q.proxy_objective is None
+    if not (native or passive) and (q.control_treatment!=proxy_treatment or q.research_goal!='structural_capability_screening' or q.proxy_objective is None
             or q.control_search_effort is not None or q.initial_tension_n is not None):
         issue('evaluation_model','Mathematical proxy requires explicit proxy_objective and structural_capability_screening; task_violation uses proxy_optimized, static/held-input proxies use not_optimized; no Native control effort')
     if native and q.control_search_effort is None:issue('control_search_effort','Choose temporal resolution, exploration scale and a shared finite callback cap')
@@ -113,9 +118,10 @@ def compile_search(host, value, request_id):
         bounds=q.bounds,
         objective='task_violation' if native else q.proxy_objective,
         operating_point='standardized_initial_pretension' if native or q.proxy_objective!='target_equilibrium_residual' else 'target_equilibrium',
-        **plain(q.structure_search_effort),evaluation_mode='mujoco_control' if native else 'mathematical_proxy',
+        **plain(q.structure_search_effort),evaluation_mode=q.evaluation_model if passive else 'mujoco_control' if native else 'mathematical_proxy',
         **starts,
         evidence_used=value.get('supporting_evidence',[]))
+    if q.diagnostic_load_conditions:query['diagnostic_load_conditions']=q.diagnostic_load_conditions
     decision=deepcopy(value.get('decision') or {})
     if decision.get('selected_candidate'):query['previous_candidate_ref']=decision['selected_candidate']
     if native:

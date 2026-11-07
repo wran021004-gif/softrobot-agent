@@ -124,6 +124,13 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         for branch in properties['initial_span_strategy']['anyOf']:
             if branch.get('type')=='string':branch['enum']=applicable_spans
         properties['design_variable_groups']['items']['enum']=[g for g in grant['variable_groups'] if g!='control']
+        modes=grant.get('evaluation_modes',[])
+        if modes and all(m.startswith('passive_') for m in modes):
+            properties['research_goal']={'type':'string','const':'passive_structure_research'}
+            properties['evaluation_model']={'type':'string','enum':modes}
+            properties['control_treatment']={'type':'string','const':'no_active_control'}
+            properties['proxy_objective']={'type':'string','enum':['task_violation','equilibrium_qualification']}
+            for field in ('control_search_effort','initial_tension_n'):properties.pop(field,None)
         for name in ('segment_counts','tendon_counts'):
             for branch in properties[name]['anyOf']:
                 if branch.get('type')=='array':branch['items']['enum']=grant[name]

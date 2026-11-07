@@ -372,7 +372,7 @@ def resolve(path, profile=None, *, backend_profile=None):
                 not all(type(grant[k]) is int and grant[k]>=1 for k in ('max_proposals','max_evaluations'))):
             raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
         if grant and 'evaluation_modes' in grant and (not grant['evaluation_modes'] or
-                not set(grant['evaluation_modes'])<={'mathematical_proxy','mujoco_control'}):
+                not set(grant['evaluation_modes'])<={'mathematical_proxy','mujoco_control','passive_equilibrium','passive_task_response'}):
             raise ValueError('EXPLICIT_FAMILY_SEARCH_EVALUATION_MODES_REQUIRED')
         study.update(additions,fidelity_policy=policy)
     if 'extends' in study:
@@ -551,7 +551,10 @@ def resolve(path, profile=None, *, backend_profile=None):
     if passive:
         if study['confirmation']['fresh_independent_repetitions'] or conditions is not None:
             raise ValueError('PASSIVE_V1_REQUIRES_ZERO_EXTRA_CONFIRMATIONS_AND_ONE_MULTILOAD_TASK')
-        if set(study['allowed_plan_actions'])-{'generate','propose','diagnose','physical_replay','select','stop'}:
+        passive_search=bool(study.get('family_search') and
+            set(study['family_search'].get('evaluation_modes',[]))<= {'passive_equilibrium','passive_task_response'} and
+            study['family_search'].get('evaluation_modes') and 'search' in study['capabilities'])
+        if set(study['allowed_plan_actions'])-({'generate','propose','diagnose','physical_replay','select','stop'}|({'search'} if passive_search else set())):
             raise ValueError('PASSIVE_V1_DISALLOWS_ACTIVE_EXECUTION_ACTIONS')
         controller=dict(extension_id='controller.no_active_control',version='1.0.0',parameters=dict(contract='platform.empty',version='1.0.0',data={}))
     else:

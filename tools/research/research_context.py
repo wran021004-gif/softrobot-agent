@@ -727,7 +727,8 @@ def execution_preview(host,candidate,evaluations):
     latest=qualifications[-1] if qualifications else None
     hard=passive and goal.get('execution_protocol')=='phs2d_original_v1'
     failed=bool(latest and latest[1]['diagnostic_layers']['static_qualification']['status']!='passed')
-    episodes=len(goal['load_conditions']) if passive else 1
+    from tools.research_tasks import passive_registered
+    episodes=(len(goal['load_conditions']) if passive_registered(task) else None) if passive else 1
     return dict(candidate=candidate,mode=task['physical_problem']['mode'] if passive else 'active_ideal_tension',
         requirements={k:v for k,v in adapter.execution_requirements().items() if k in
             ('registered_acceptance','execution_admission','known_blockers','protocol_id','physical_inputs')},

@@ -89,15 +89,15 @@ class FamilyMixedSearch(Contract):
     version: Literal['family_mixed_search_v1']
     family_space_identity: str = Field(min_length=1)
     method: Literal['bounded_mixed_coordinate_v1'] = 'bounded_mixed_coordinate_v1'
-    variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
+    variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control','payout']] = Field(min_length=1)
     segment_counts: list[int] = Field(min_length=1)
     tendon_counts: list[int] = Field(min_length=1)
     span_strategies: list[Literal['whole_chain','distributed_consecutive','distal',
         'base_to_distributed_anchors']] = Field(default_factory=lambda:['whole_chain'])
-    section_types: list[Literal['circle','tube','rectangle','ellipse']] = Field(default_factory=list)
+    section_types: list[Literal['circle','tube','rectangle','ellipse','polygon']] = Field(default_factory=list)
     bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     screening_fidelity: str = Field(min_length=1)
-    objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue','task_violation'] = Field(
+    objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue','task_violation','equilibrium_qualification'] = Field(
         description='Default proxy task_violation retains single-task CONIC semantics and charges model builds/internal solves. Explicit mujoco_control instead reoptimizes each frozen condition with Native T1; max_evaluations counts condition analysis entries, control_settings caps callbacks per entry. Shared score is the worst best-found J, no global optimum or physical acceptance.')
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium']
     max_proposals: int = Field(ge=1, strict=True)
@@ -107,7 +107,9 @@ class FamilyMixedSearch(Contract):
     step: FiniteFloat = Field(default=.25, gt=0, le=.5)
     minimum_step: FiniteFloat = Field(default=.03125, gt=0, le=.5)
     stop_score: FiniteFloat | None = None
-    evaluation_mode: Literal['mathematical_proxy','mujoco_control'] = 'mathematical_proxy'
+    evaluation_mode: Literal['mathematical_proxy','mujoco_control','passive_equilibrium','passive_task_response'] = 'mathematical_proxy'
+    diagnostic_load_conditions: list[str] = Field(default_factory=list,
+        description='Passive equilibrium only: optional frozen load subset. Diagnostic coverage cannot establish complete task performance. Omit for every load.')
     control_settings: 'LocalControlSearchSettings | None' = None
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0)
     initial_segment_count: StrictInt | None = None
@@ -119,6 +121,7 @@ class FamilyMixedSearch(Contract):
         value=handler(self)
         for key in ('initial_segment_count','initial_tendon_count','initial_span_strategy'):
             if getattr(self,key) is None:value.pop(key,None)
+        if not self.diagnostic_load_conditions:value.pop('diagnostic_load_conditions',None)
         if self.evaluation_mode=='mathematical_proxy':
             for key in ('evaluation_mode','control_settings','initial_tension_n'):value.pop(key,None)
         return value
@@ -128,6 +131,17 @@ class FamilyMixedSearch(Contract):
         for key,choices in (('initial_segment_count',self.segment_counts),('initial_tendon_count',self.tendon_counts),('initial_span_strategy',self.span_strategies)):
             if getattr(self,key) is not None and getattr(self,key) not in choices:raise ValueError('INITIAL_SEARCH_POINT_OUTSIDE_SELECTED_RANGE: '+key)
         native=self.evaluation_mode=='mujoco_control'
+        passive=self.evaluation_mode in ('passive_equilibrium','passive_task_response')
+        if passive and (self.objective not in ('task_violation','equilibrium_qualification') or
+                self.operating_point!='standardized_initial_pretension'):
+            raise ValueError('PASSIVE_SEARCH_REQUIRES_FROZEN_INITIALIZATION_AND_PASSIVE_OBJECTIVE')
+        if self.objective=='equilibrium_qualification' and self.evaluation_mode!='passive_equilibrium':
+            raise ValueError('EQUILIBRIUM_OBJECTIVE_REQUIRES_PASSIVE_EQUILIBRIUM')
+        if self.diagnostic_load_conditions and (self.evaluation_mode!='passive_equilibrium' or
+                len(set(self.diagnostic_load_conditions))!=len(self.diagnostic_load_conditions)):
+            raise ValueError('DIAGNOSTIC_LOAD_SUBSET_REQUIRES_DISTINCT_PASSIVE_EQUILIBRIUM_LOADS')
+        if not passive and 'payout' in self.variable_groups:
+            raise ValueError('PASSIVE_PARAMETER_GROUP_REQUIRES_PASSIVE_PROBLEM')
         if native:
             settings=self.control_settings
             if (self.objective!='task_violation' or self.operating_point!='standardized_initial_pretension'
@@ -420,14 +434,15 @@ class ScientificGeneration(Contract):
 
 class ScientificStructureSearch(Contract):
     version: Literal['scientific_structure_search_v1'] = 'scientific_structure_search_v1'
-    research_goal: Literal['structure_control_codesign','structural_capability_screening']
-    design_variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing']] = Field(min_length=1,description='Real structure groups only. Control reoptimization is specified separately by control_treatment.')
-    evaluation_model: Literal['native_mujoco','mathematical_proxy']
-    control_treatment: Literal['reoptimized','not_optimized','proxy_optimized'] = Field(description='reoptimized: fresh Native control optimization. not_optimized: static/held-input proxy. proxy_optimized: the registered CONIC task_violation optimizes affine-model controls, not Native dynamics.')
+    research_goal: Literal['structure_control_codesign','structural_capability_screening','passive_structure_research']
+    design_variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','payout']] = Field(min_length=1,description='Real structure groups only. Mesh convergence is a separate generation/comparison study, not physical task improvement.')
+    evaluation_model: Literal['native_mujoco','mathematical_proxy','passive_equilibrium','passive_task_response']
+    control_treatment: Literal['reoptimized','not_optimized','proxy_optimized','no_active_control'] = Field(description='Passive models require no_active_control; payout determines tension. Existing active semantics are unchanged.')
     structure_search_effort: StructureSearchEffort
     control_search_effort: ScientificControlEffort | None = None
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0,description='Native common absolute initial tension. Omit only to use the unique frozen tendon pretension default; if unavailable an explicit choice is required.')
-    proxy_objective: Literal['task_violation','target_equilibrium_residual','held_position_min_eigenvalue'] | None = Field(default=None,description='Required for mathematical_proxy; never substituted for Native task capability.')
+    proxy_objective: Literal['task_violation','target_equilibrium_residual','held_position_min_eigenvalue','equilibrium_qualification'] | None = Field(default=None,description='Static passive qualification is a diagnostic, never a dynamic task objective.')
+    diagnostic_load_conditions: list[str] = Field(default_factory=list)
     segment_counts: list[StrictInt] | None = Field(default=None,description='Omit for frozen singleton topology. Explicit out-of-domain choices are rejected, never clamped.')
     tendon_counts: list[StrictInt] | None = None
     span_strategies: list[str] | None = Field(default=None,description='Omit to explore legal strategies when spans is selected, otherwise retain original whole_chain search default.')
@@ -988,6 +1003,7 @@ class KnowledgePolicy(Contract):
     mode: Literal['enabled','off'] = 'enabled'
     exclude_entry_ids: list[str] = Field(default_factory=list)
     include_entry_ids: list[str] | None = None
+    include_entry_revisions: dict[str,list[str]] = Field(default_factory=dict)
     allowed_kinds: list[str] | None = None
     allow_benchmark_answers: bool = False
     delivery: Literal['optional_reads_v1','compact_skill_v1'] = 'optional_reads_v1'
@@ -996,6 +1012,7 @@ class KnowledgePolicy(Contract):
     def preserve_legacy_policy(self,handler):
         result=handler(self)
         if self.delivery=='optional_reads_v1':result.pop('delivery',None)
+        if not self.include_entry_revisions:result.pop('include_entry_revisions',None)
         return result
 
 

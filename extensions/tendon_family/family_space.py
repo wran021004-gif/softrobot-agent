@@ -31,11 +31,13 @@ class SegmentDomain(Contract):
     young_pa: Domain
     section_dimensions_m: dict[str, dict[str, Domain]]
     physical_domains: dict[str, Domain] = Field(default_factory=dict)
+    polygon_coordinate_m: Domain | None = None
 
     @model_serializer(mode='wrap')
     def legacy_domains(self, handler):
         result=handler(self)
         if not self.physical_domains:result.pop('physical_domains',None)
+        if self.polygon_coordinate_m is None:result.pop('polygon_coordinate_m',None)
         return result
 
     @model_validator(mode='after')
@@ -103,6 +105,8 @@ class FamilySpace(Contract):
                 'holding_tip_speed_weight','terminal_tip_speed_weight'}:
             raise ValueError('EXPLICIT_PHYSICAL_AND_CONTROL_DOMAINS_REQUIRED')
         for domain in [self.segment_domain, *self.segment_domains.values()]:
+            if 'polygon' in domain.section_dimensions_m and domain.polygon_coordinate_m is None:
+                raise ValueError('POLYGON_REQUIRES_BOUNDED_VERTEX_COORDINATES')
             if min(domain.length_m.minimum, domain.young_pa.minimum) <= 0:
                 raise ValueError('POSITIVE_LENGTH_AND_MODULUS_REQUIRED')
             if any(v.minimum <= 0 for dims in domain.section_dimensions_m.values() for v in dims.values()):
@@ -531,6 +535,16 @@ def parameter_capabilities(value, request):
             for k,domain in d.section_dimensions_m[section['kind']].items():
                 add(root+f'sections.{j}.parameters.'+k,'geometry','number','m',domain,source=source+'.section_dimensions_m.'+section['kind']+'.'+k)
                 rows[-1]['conditional_dependencies']['section_kind']=section['kind']
+            if section['kind']=='polygon':
+                for field in ('outer_yz_m','holes_yz_m'):
+                    rings=[section[field]] if field=='outer_yz_m' else section[field]
+                    for ring_index,ring in enumerate(rings):
+                        prefix=f'{root}sections.{j}.{field}.'+('' if field=='outer_yz_m' else str(ring_index)+'.')
+                        for vertex in range(len(ring)):
+                            for axis in range(2):
+                                add(prefix+f'{vertex}.{axis}','geometry','number','m',d.polygon_coordinate_m,
+                                    source=source+'.polygon_coordinate_m',
+                                    geometric_dependency='Simple nonintersecting rings and positive area; rebuild section properties')
         if isinstance(space,FamilySpaceV2):
             lo,hi=space.serial_assembly.cell_count_bounds
             add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells),reason='Numerical model resolution, not a physical structural gradient')
@@ -630,6 +644,8 @@ def search_domains(space, query, grant):
         d=space['segment_domains'].get(str(i),space['segment_domain'])
         for k in ('length_m','young_pa'):
             domains.setdefault(k,[]).append(d[k])
+        if query.evaluation_mode.startswith('passive_'):
+            for k,v in d.get('physical_domains',{}).items():domains.setdefault('physical.'+k,[]).append(v)
         proto=prototypes[space['serial_assembly']['root_segment' if i==0 else 'repeated_segment']]
         kinds=query.section_types or sorted({st['section']['kind'] for st in proto['sections']})
         for kind in kinds:
@@ -638,7 +654,9 @@ def search_domains(space, query, grant):
             for k,v in d['section_dimensions_m'][kind].items():
                 domains.setdefault('section.'+kind+'.'+k,[]).append(v)
     domains.update({'routing.'+k:[v] for k,v in space['routing_domains'].items()})
-    groups=dict(length_m='lengths',young_pa='materials',section='sections',routing='routing')
+    if query.evaluation_mode.startswith('passive_'):
+        domains['payout']=[d.model_dump() for d in payout_domains(parse_space(space),max(query.tendon_counts)).values()]
+    groups=dict(length_m='lengths',young_pa='materials',physical='materials',section='sections',routing='routing',payout='payout')
     for key,(lo,hi) in query.bounds.items():
         if key not in domains or groups[key.split('.')[0]] not in query.variable_groups or any(
                 not d['minimum']<=lo<hi<=d['maximum'] for d in domains[key]):

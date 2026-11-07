@@ -47,6 +47,8 @@ def freeze_study_entries(spec, index, policy=None):
 def _permitted(entry, policy, *, legacy=False):
     if entry['entry_id'] in policy.get('exclude_entry_ids',[]):return False
     if policy.get('include_entry_ids') is not None and entry['entry_id'] not in policy['include_entry_ids']:return False
+    revisions=policy.get('include_entry_revisions',{}).get(entry['entry_id'])
+    if revisions is not None and entry['revision'] not in revisions:return False
     if policy.get('allowed_kinds') is not None and entry['kind'] not in policy['allowed_kinds']:return False
     if entry.get('benchmark_sensitive') and not policy.get('allow_benchmark_answers',False):return False
     if legacy:return True

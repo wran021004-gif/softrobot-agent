@@ -924,6 +924,17 @@ def result_card(host, reference):
         # compact_evidence already owns search summaries. Response matrices stay in Store.
         summary={k:v for k,v in summary.items() if k not in ('local_responses',)}
         details.extend([_location(reference,'/candidates'),_location(reference,'/starts')])
+    elif value.get('result',{}).get('physical_problem'):
+        result=value['result']
+        summary['passive_family_search']=dict(status=result['status'],
+            problem=result['physical_problem'],score_semantics=result['score_semantics'],
+            termination_reason=result['termination_reason'],resource_use=result['resource_use'],
+            task_acceptance='unmeasured',
+            candidates=[dict(candidate=row.get('evidence',{}).get('candidate'),
+                status=row.get('computation_status'),scores=row.get('proxy_values'),
+                conditions=row.get('evidence',{}).get('conditions',{})) for row in result['evaluated']],
+            source=plain(_location(reference,'/result')))
+        details.append(_location(reference,'/result'))
     construction=recorded_static_summary(value,reference)
     if construction:summary['recorded_static_construction']=construction
     summary['scientific_interpretation']=SCIENTIFIC_INTERPRETATION

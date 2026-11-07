@@ -282,6 +282,13 @@ def generate_family(value):
                 domain.physical_domains['section_angle_rad'].check(section['angle_rad'],'section_angle_rad')
             if dims is None or set(dims)!=set(section['parameters']):raise ValueError('SECTION_OUTSIDE_FAMILY_DOMAIN')
             for key,v in section['parameters'].items():dims[key].check(v,key)
+            if section['kind']=='polygon':
+                rings=[section['outer_yz_m'],*section['holes_yz_m']]
+                if not 3<=sum(len(r) for r in rings)<=64:
+                    raise ValueError('POLYGON_REQUIRES_3_TO_64_TOTAL_VERTICES')
+                for ring in rings:
+                    for vertex in ring:
+                        for coordinate in vertex:domain.polygon_coordinate_m.check(coordinate,'polygon_coordinate_m')
             properties(section)
     tendon_values={k:r.tendon_parameters.get(k,d.default) for k,d in space.tendon_domains.items()}
     if tendon_values['pretension_n']>tendon_values['force_limit_n']:raise ValueError('PRETENSION_EXCEEDS_PHYSICAL_FORCE_LIMIT')

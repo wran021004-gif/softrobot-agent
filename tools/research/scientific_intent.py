@@ -175,7 +175,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         if passive:
             problem=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec['canonical_task']['physical_problem'])
             props=schema['$defs']['ScientificStructureV4']['properties']
-            for name in ('source_selection','control_scope','search_strategy','tensions_n','saved_state','execution','update_id','response_horizon_s','parameter_group'):
+            for name in ('source_selection','control_scope','search_strategy','tensions_n','saved_state','execution','update_id','response_horizon_s'):
                 props.pop(name,None)
             props['physical_problem']={'type':'string','const':problem['mode']}
             props['control_treatment']={'type':'string','const':'no_active_control'}
@@ -1047,8 +1047,12 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
     if q.load_condition not in (None,'all_frozen_conditions') or q.comparison_load_conditions or q.load_aggregation:
         return fail('ALL_FROZEN_CONDITIONS_REQUIRED')
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
+    paths=q.parameter_paths
+    if q.operation in ('differentiate','optimize') and not paths and q.parameter_group:
+        from tools.research.structure_research import select_group_parameters
+        paths=select_group_parameters(spec,c,q.parameter_group)
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
-        parameter_paths=q.parameter_paths,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
+        parameter_paths=paths,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
         max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates,
         passive_ablation=q.passive_ablation)
     try:
@@ -1086,7 +1090,10 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
     if isinstance(q.target,str) or problem['mode'] not in PRIMITIVES[q.target.quantity]['physical_modes']:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
     if q.target.quantity=='re_equilibrated_position_response' and q.effect_semantics!='re_equilibrated_passive_response':return fail('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
     paths=q.parameter_paths
-    if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETERS')
+    if q.operation in ('differentiate','optimize') and not paths and q.parameter_group:
+        from tools.research.structure_research import select_group_parameters
+        paths=select_group_parameters(spec,c,q.parameter_group)
+    if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETER_GROUP')
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
     study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
         load_condition=q.load_condition,comparison_load_conditions=q.comparison_load_conditions,load_aggregation=q.load_aggregation,

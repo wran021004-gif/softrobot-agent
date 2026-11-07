@@ -664,6 +664,8 @@ def _dispatch(host, value, request_id, origin='model'):
     from tools.research_tasks import passive_registered
     passive_task=state(host)['spec']['configuration']['task']
     passive_actions=('generate','propose','diagnose','stop','physical_replay','select') if passive_registered(passive_task) else ('generate','propose','diagnose','stop')
+    if plan.action=='search' and getattr(plan.search,'evaluation_mode','').startswith('passive_'):
+        passive_actions=(*passive_actions,'search')
     if passive_task.get('physical_problem') and plan.action not in passive_actions:
         raise ValueError('PASSIVE_HAS_NO_ACTIVE_CONTROL_OR_REGISTERED_DYNAMIC_ACCEPTANCE')
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
@@ -744,7 +746,7 @@ def _dispatch(host, value, request_id, origin='model'):
                 +json.dumps(scientific_preflight,sort_keys=True))
     if plan.action=='select':
         admission=dict(scope='selection without execution or numerical reservation')
-    elif plan.action=='search' and getattr(plan.search,'evaluation_mode','mathematical_proxy') in ('mathematical_proxy','mujoco_control'):
+    elif plan.action=='search' and getattr(plan.search,'evaluation_mode','mathematical_proxy') in ('mathematical_proxy','mujoco_control','passive_equilibrium','passive_task_response'):
         from tools.research.analysis import admission as mathematical_admission
         admission=mathematical_admission(host,plan.search.max_evaluations)
     else:
@@ -873,6 +875,10 @@ def _dispatch(host, value, request_id, origin='model'):
         from tools.research.reporter import RESULT_KEYS
         after=state(host)
         scientific_results=[r for key in RESULT_KEYS for r in after.get(key,[]) if r not in s.get(key,[])]
+        if plan.action=='search' and getattr(plan.search,'evaluation_mode','').startswith('passive_'):
+            # One explanation of the completed search, with per-load facts and
+            # original analysis references; do not spend calls on each subsolve.
+            scientific_results=[r for r in after.get('search_results',[]) if r not in s.get('search_results',[])]
         output=dict(plan=ref,result=result,scientific_results=scientific_results,scientific_preflight=scientific_preflight,
             resource_use=resource_use(host))
         if decision_admission and decision_admission.get('inference_status'):

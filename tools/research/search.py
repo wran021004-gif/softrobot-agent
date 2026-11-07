@@ -21,7 +21,8 @@ def search_problem(host,query,count):
     q=parse_search(query)
     s=state(host)
     native=isinstance(q,FamilyMixedSearch) and q.evaluation_mode=='mujoco_control'
-    if q.objective=='task_violation' and not native:
+    passive=isinstance(q,FamilyMixedSearch) and q.evaluation_mode.startswith('passive_')
+    if q.objective=='task_violation' and not (native or passive):
         from tools.research.task_constraints import describe_analysis_requirements,analysis_capabilities
         from tools.research.optimal_capability import CONIC
         cfg=s['base_configuration']
@@ -37,6 +38,12 @@ def search_problem(host,query,count):
         if q.evaluation_mode not in grant.get('evaluation_modes',['mathematical_proxy']):
             raise ValueError('SEARCH_MODE_OUTSIDE_FROZEN_GRANT')
         domains=search_domains(s['spec']['family_space'],q,grant)
+        passive_problem=None
+        if passive:
+            from tools.research.passive_search import problem
+            passive_problem=problem(s['spec'],q)
+            if count<passive_problem['analyses_per_structure']:
+                raise ValueError('ALL_SELECTED_PASSIVE_CONDITIONS_MUST_FIT_ANALYSIS_ALLOWANCE')
         if grant.get('require_explicit_start'):
             for name,choices in (('initial_segment_count',q.segment_counts),('initial_tendon_count',q.tendon_counts),('initial_span_strategy',q.span_strategies)):
                 if len(choices)>1 and getattr(q,name) is None:raise ValueError('EXPLICIT_INITIAL_SEARCH_POINT_REQUIRED: '+name)
@@ -67,6 +74,7 @@ def search_problem(host,query,count):
         return dict(query=plain(q),max_evaluations=count,domains=domains,profile=s['profile']['identity'],
             configuration_identity=s['spec']['resolved_identity'],task_identity=s['spec']['canonical_task_identity'],
             fidelity=s['spec']['fidelity_policy'],protocol=s['spec']['analysis_protocol'],
+            **(dict(passive_problem=passive_problem) if passive else {}),
             **(dict(conditions=[c['condition_id'] for c in s['spec'].get('task_conditions',[])] or ['primary'],
                 analyses_per_structure=len(tasks),native_callback_cap_per_condition=q.control_settings.evaluation_requests,
                 score_semantics='max of per-condition finite-budget best found Native signed J; no global optimum or task acceptance') if native else {}))
@@ -172,6 +180,20 @@ def request_guidance(spec):
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),
             applicable_span_strategies=span_strategies(spec['family_space']),
             initialization='Main chooses explicit discrete starts; continuous defaults are numerical starting assumptions. An optional representable candidate preserves its structure coordinates; unsupported routes/sections require generate or a fresh search. Every condition receives fresh controls.')
+    if any(m.startswith('passive_') for m in grant.get('evaluation_modes',[])):
+        guidance['search'].update(passive=dict(research_goal='passive_structure_research',
+            evaluation_models=[m for m in grant['evaluation_modes'] if m.startswith('passive_')],
+            control_treatment='no_active_control',
+            objectives=dict(equilibrium_qualification='Static KKT/stability diagnostic; full task performance unmeasured.',
+                task_violation='All registered static observations or complete frozen finite-time constraints, depending on selected model.'),
+            loads=[r['name'] for r in spec['configuration']['task']['physical_problem']['loads']],
+            diagnostic_load_conditions='Optional static subset, explicitly diagnostic. Full finite-time evaluation always retains every frozen condition.'),
+            initialization='Fixed program expands FamilySpace defaults, same design/payout in every load; no active inputs or historical solution seeds.')
+        guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
+        guidance['analysis']=dict(tool='research_analysis',interface='scientific_question_v4',
+            physical_problem='passive_unilateral_equilibrium',control_treatment='no_active_control',
+            parameter_groups='Choose an existing group; fixed program selects bounded representatives and records coverage.',
+            methods='mechanism_effect, re_equilibrated_passive_response, finite_time_task_response; validity and independent acceptance remain distinct.')
     return guidance
 
 
@@ -271,11 +293,15 @@ def run_search(host,query,key,*,guard,execute,capacity):
     q=parse_search(query)
     mixed=isinstance(q,FamilyMixedSearch)
     native=mixed and q.evaluation_mode=='mujoco_control'
+    passive=mixed and q.evaluation_mode.startswith('passive_')
     mathematical=mixed or q.evaluation_mode=='mathematical_proxy'
     s=state(host)
     per_evaluation=1
     if native:
         per_evaluation=len(s['spec'].get('task_conditions',[])) or 1
+    elif passive:
+        from tools.research.passive_search import problem
+        per_evaluation=problem(s['spec'],q)['analyses_per_structure']
     elif q.objective=='task_violation':
         from tools.research.optimal_capability import conic_subproblems
         from tools.research.task_constraints import describe_analysis_requirements
@@ -351,7 +377,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
                     continue
                 parent=best['evidence']['candidate'] if best else plain(q.previous_candidate_ref)
                 evidence=([r['analysis'] for r in best['evidence']['conditions'].values() if r.get('analysis')]
-                    if native and best else [best['evidence']['analysis']] if best and best['evidence'].get('analysis') else [plain(r) for r in q.evidence_used])
+                    if (native or passive) and best else [best['evidence']['analysis']] if best and best['evidence'].get('analysis') else [plain(r) for r in q.evidence_used])
                 checkpoint['pending']=dict(parameters=params,point=point,latent=[],proposal_id=str(checkpoint['proposal_count']),
                     feedback=parent,lineage=dict(version='search_lineage_v1',requesting_plan=requesting_plan,previous_candidate_ref=parent,evidence_used=evidence,
                         variables_or_topology_changed=changes,search_method=q.method,origin='optimizer_internal',
@@ -415,6 +441,9 @@ def run_search(host,query,key,*,guard,execute,capacity):
         c=verify_candidate(host,ref)
         if native:
             row=native_evaluation(host,q,proposal,op,persist,guard)
+        elif passive:
+            from tools.research.passive_search import evaluate
+            row=evaluate(host,q,proposal,op,persist,guard)
         elif not mathematical:
             completed=next((host.store.artifact(r) for r in state(host)['results'] if host.store.artifact(r)['operation_key']==op),None)
             output=completed or execute(host,ref,op,role='search')
@@ -448,7 +477,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
                     optimality_status=trajectory.get('optimality_status'),source_pointer='/trajectory/replayed_violation') if q.objective=='task_violation' else None)
         row.update(candidate_id=c['candidate_id'],scientific_identity=c['identity'],parameters=proposal['parameters'],
             latent_coordinates=proposal['latent'],objective_identity=digest(checkpoint['problem']),used_feedback=proposal['feedback'])
-        if native:
+        if native or passive:
             row.update(point=proposal['point'],resolved_parameters=c['resolved_parameters'],
                 physical_design_identity=c['physical_design_identity'],numerical_model_identity=c['numerical_model_identity'],
                 lineage={**proposal['lineage'],'new_candidate_ref':ref,
@@ -505,6 +534,10 @@ def run_search(host,query,key,*,guard,execute,capacity):
             comparison_summary=[dict(candidate=r.get('evidence',{}).get('candidate'),shared_J=r.get('proxy_values',{}).get('task_violation'),
                 conditions={cid:{k:v.get(k) for k in ('status','J','initial_J','measure','iterations_started','callbacks','stop_reason','cost','analysis','control_source')}
                     for cid,v in r.get('evidence',{}).get('conditions',{}).items()}) for r in rows])
+    if passive:
+        result.update(physical_problem=checkpoint['problem']['passive_problem'],task_acceptance='unmeasured',
+            best_passive_candidate=best if supported else None,
+            score_semantics=checkpoint['problem']['passive_problem']['score_semantics'])
     changed=None if mixed else sum(host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot'] for row in rows)
     ref=save(host,dict(result=result,structurally_changed_evaluations=changed,admission=fit),'design_search_result')
     checkpoint['result_reference']=ref

@@ -1,7 +1,7 @@
 {
   "defaults": "family_study_defaults.json",
   "start_mode": "family_space",
-  "family_space": "family_space_phs2d_topology_research_v3.json",
+  "family_space": "family_space_base_only_passive_v1.json",
   "candidate_initialization": "all_candidate_dofs_zero_v1",
   "base_commit": "15835ddd590f11f108b886b7e2bdc248ae6a6248",
   "mode": "engineering_numerical",
@@ -11,7 +11,8 @@
   "capabilities": [
     "analysis",
     "mathematics",
-    "physical_replay"
+    "physical_replay",
+    "search"
   ],
   "allowed_plan_actions": [
     "generate",
@@ -19,7 +20,8 @@
     "diagnose",
     "physical_replay",
     "select",
-    "stop"
+    "stop",
+    "search"
   ],
   "budgets": {
     "provider_requests": 8,
@@ -79,7 +81,8 @@
     "evidence_read_policy": {
       "version": "bounded_scientific_evidence_v1"
     },
-    "background": []
+    "background": [],
+    "structure_search_interface": "scientific_structure_search_v1"
   },
   "authorization": "User task 2026-11-07: isolated passive capability development and three small probes, shared real Provider budget at most eight; no historical answer or full physical replay.",
   "execution_instructions": "Study passive Base-only structures using the frozen task and legal FamilySpace. Main independently chooses falsifiable hypotheses, parameter groups and high-level research requests. Fixed programs own numerical methods and steps. Reporter interprets source-bound results without selecting designs or STOP. Knowledge is context only. Historical winning designs are unavailable. Static and partial-condition diagnostics never establish full dynamic task acceptance. No physical replay or training is authorized in these small capability probes. Use English.",
@@ -203,7 +206,144 @@
       "case"
     ],
     "allow_benchmark_answers": false,
-    "delivery": "compact_skill_v1"
+    "delivery": "compact_skill_v1",
+    "include_entry_revisions": {
+      "passive-force-response-research": [
+        "2"
+      ]
+    }
   },
-  "analysis_cap_s": null
+  "analysis_cap_s": null,
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing",
+      "payout"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64
+    ],
+    "max_proposals": 128,
+    "max_evaluations": 24,
+    "evaluation_modes": [
+      "passive_equilibrium",
+      "passive_task_response"
+    ]
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "diagnostic": {
+        "cells_per_segment": 8,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 8,
+      "backend": "backend.family_passive_mujoco@1.0.0"
+    }
+  }
 }

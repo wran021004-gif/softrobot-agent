@@ -50,7 +50,7 @@ class SourceIdResponse(Contract):
 
 
 RESULT_KEYS=('results','physical_replays','mechanics_results','analysis_results',
-    'matched_state_results','rl_evaluations','control_search_results')
+    'matched_state_results','rl_evaluations','control_search_results','search_results')
 
 
 def entries(host, *, status_only=False):
@@ -402,6 +402,7 @@ def interpretation_priority(report, previous, *, decision_v3=False):
         # Fall through for previously supported meaningful mathematical novelty.
     for card in report['results']:
         summary=card['deterministic_summary'];math=summary.get('task_capability',{})
+        if summary.get('passive_family_search'):return 'passive_family_search_result'
         if math.get('structural_comparison'):return 'structure_control_comparison'
         if card['mathematics'] and not any(c['identity']['operation']==card['identity']['operation'] for c in old):
             return 'first_mathematical_method'

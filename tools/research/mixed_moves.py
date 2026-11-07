@@ -41,15 +41,23 @@ def candidate_seed(space, query, candidate):
         raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: span strategy or stations')
     defaults=resolved_request(space,dict(version='serial_family_generation_v2',family_space_identity=r['family_space_identity'],segment_count=n,tendon_count=t))
     segments={}
+    passive=query.evaluation_mode.startswith('passive_')
     for i,v in r['segments'].items():
-        if v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters') or len({str((s['kind'],s['parameters'])) for s in v['sections']})!=1:
+        if (not passive and v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters')) or len({str(s) for s in v['sections']})!=1:
             raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: station-dependent sections or extra physics')
         s=v['sections'][0]
         if [s.get('angle_rad',0) for s in v['sections']]!=[s.get('angle_rad',0) for s in defaults['segments'][i]['sections']]:raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: section rotation')
         segments[i]=dict(length_m=v['length_m'],young_pa=v['young_pa'],section_kind=s['kind'],section_dimensions=s['parameters'])
+        if passive:segments[i].update(physical_parameters=v.get('physical_parameters',{}),cells=v['cells'])
+        if s['kind']=='polygon':
+            a=s['outer_yz_m'][1][0] if len(s['outer_yz_m'])==4 else None
+            if a is None or a<=0 or s['outer_yz_m']!=[[-a,-a],[a,-a],[a,a],[-a,a]] or s['holes_yz_m']:
+                raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: arbitrary polygon contours')
+            segments[i]['polygon_scale_m']=a
     routing={k:v['default'] for k,v in space['routing_domains'].items()}
     phase=expanded[0]['angle']%(2*math.pi);routing.update(phase_rad=phase,guide_s=expanded[0]['guide'],anchor_s=expanded[0]['anchor'],radius_m=expanded[0]['radius'])
     return dict(segment_count=n,tendon_count=t,span_strategy=strategy,segments=segments,routing=routing,
+        **(dict(payout_lengths_m=r['payout_lengths_m']) if passive else {}),
         radii_m=[v['radius'] for v in expanded],
         angular_offsets_rad=[(v['angle']-phase-2*math.pi*j/t+math.pi)%(2*math.pi)-math.pi for j,v in enumerate(expanded)])
 
@@ -72,10 +80,21 @@ def reshape(space, query, point, previous=None):
         for k,v in d['section_dimensions_m'][kind].items():
             lo,hi=interval(query,'section.'+kind+'.'+k,v)
             values['section_dimensions'][k]=min(hi,max(lo,prior.get('section_dimensions',{}).get(k,default(query,'section.'+kind+'.'+k,v))))
+        if query.evaluation_mode.startswith('passive_'):
+            values['physical_parameters']={k:prior.get('physical_parameters',{}).get(k,default(query,'physical.'+k,v))
+                for k,v in d.get('physical_domains',{}).items()}
+            values['cells']=prior.get('cells',rule['default_cells'])
+        if kind=='polygon':
+            v=d['polygon_coordinate_m']
+            values['polygon_scale_m']=prior.get('polygon_scale_m',v['default'])
         p['segments'][str(i)]=values
     p['routing']={k:old.get('routing',{}).get(k,default(query,'routing.'+k,v)) for k,v in space['routing_domains'].items()}
     p['angular_offsets_rad']=(old.get('angular_offsets_rad',[])+[p['routing']['angular_offset_rad']]*p['tendon_count'])[:p['tendon_count']]
     p['radii_m']=(old.get('radii_m',[])+[p['routing']['radius_m']]*p['tendon_count'])[:p['tendon_count']]
+    if query.evaluation_mode.startswith('passive_'):
+        from extensions.tendon_family.family_space import payout_domains,parse_space
+        domains=payout_domains(parse_space(space),p['tendon_count'])
+        p['payout_lengths_m']={k:old.get('payout_lengths_m',{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
     return p
 
 
@@ -105,7 +124,15 @@ def generation(space, query, point):
     for i,v in p['segments'].items():
         proto=prototypes[rule['root_segment'] if i=='0' else rule['repeated_segment']]
         sections=[dict(st['section'],kind=v['section_kind'],parameters=v['section_dimensions']) for st in proto['sections']]
+        for section in sections:
+            section['outer_yz_m']=[];section['holes_yz_m']=[]
+            if v['section_kind']=='polygon':
+                a=v['polygon_scale_m']
+                section['outer_yz_m']=[[-a,-a],[a,-a],[a,a],[-a,a]]
         request['segments'][i]=dict(length_m=v['length_m'],young_pa=v['young_pa'],sections=sections)
+        if query.evaluation_mode.startswith('passive_'):
+            request['segments'][i].update(physical_parameters=v['physical_parameters'],cells=v['cells'])
+    if query.evaluation_mode.startswith('passive_'):request['payout_lengths_m']=p['payout_lengths_m']
     return request
 
 
@@ -123,6 +150,17 @@ def next_move(space, query, best, cursor, step):
             if len(query.section_types)>1:groups['sections'].append((f'segments.{i}.section_kind',None))
             for k,d in domain['section_dimensions_m'][v['section_kind']].items():
                 groups['sections'].append((f'segments.{i}.section_dimensions.{k}',('section.'+v['section_kind']+'.'+k,d)))
+            if v['section_kind']=='polygon':
+                d=domain['polygon_coordinate_m'];scale=dict(minimum=max(1e-5,d['maximum']/1000),maximum=min(-d['minimum'],d['maximum']),default=d['default'])
+                groups['sections'].append((f'segments.{i}.polygon_scale_m',('polygon_scale_m',scale)))
+        if query.evaluation_mode.startswith('passive_'):
+            if 'materials' in groups:
+                for k,d in domain.get('physical_domains',{}).items():
+                    groups['materials'].append((f'segments.{i}.physical_parameters.{k}',('physical.'+k,d)))
+    if 'payout' in groups:
+        from extensions.tendon_family.family_space import payout_domains,parse_space
+        for k,d in payout_domains(parse_space(space),p['tendon_count']).items():
+            groups['payout'].append(('payout_lengths_m.'+k,('payout',d.model_dump())))
     if 'routing' in groups:
         for k in ('phase_rad','guide_s','anchor_s'):
             groups['routing'].append(('routing.'+k,('routing.'+k,space['routing_domains'][k])))
@@ -144,5 +182,6 @@ def next_move(space, query, best, cursor, step):
         p=reshape(space,query,p)
     else:
         name,d=domain;lo,hi=interval(query,name,d)
-        parent[key]=min(hi,max(lo,parent[key]+direction*effective*(hi-lo)))
+        parent[key]=(math.exp(min(math.log(hi),max(math.log(lo),math.log(parent[key])+direction*effective*math.log(hi/lo))))
+            if name=='payout' else min(hi,max(lo,parent[key]+direction*effective*(hi-lo))))
     return p,[path],effective

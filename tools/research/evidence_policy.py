@@ -238,7 +238,7 @@ def registered_references(host):
     s=state(host)
     known=[*s.get('results',[]),*s.get('physical_replays',[]),*s.get('analysis_results',[]),
         *s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('scoped_context',[]),
-        *s.get('control_search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
+        *s.get('control_search_results',[]),*s.get('search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
     known += list(s.get('candidates',{}).values())
     known += list(s.get('joint_results',[]))
     known += [e[k] for e in s.get('control_initializations',[]) for k in ('candidate','source')]
@@ -261,7 +261,7 @@ def citation_role(host, reference, *, current=None, known=None):
         return 'procedural_knowledge'
     if ref in [r for k in ('results','physical_replays','rl_evaluations') for r in s.get(k,[])]:
         return 'independent_evaluation'
-    if ref in [r for k in ('analysis_results','mechanics_results','research_mathematics','control_search_results','joint_results') for r in s.get(k,[])]:
+    if ref in [r for k in ('analysis_results','mechanics_results','research_mathematics','control_search_results','search_results','joint_results') for r in s.get(k,[])]:
         return 'scientific_result'
     if ref in (known if known is not None else registered_references(host)):
         summary=summarize_evidence(host.store.artifact(ref),ref)

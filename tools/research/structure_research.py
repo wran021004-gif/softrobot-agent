@@ -39,7 +39,22 @@ def parameters(spec, candidate):
 
 
 def group_matches(row, group):
+    group={'tendon_routing':'routing','material':'material_geometry','payout':'assembly',
+        'cross_section':'geometry'}.get(group,group)
     return (row['category']=='segment' and row['unit']=='m') if group=='segment_lengths' else row['category']==group
+
+
+def select_group_parameters(spec, candidate, group):
+    """Program-owned bounded representatives; unexamined coordinates remain explicit."""
+    rows=[r for r in parameters(spec,candidate) if r['mechanism_differentiation']['supported'] and group_matches(r,group)]
+    # First representative of each physical field, avoiding duplicate stations.
+    chosen=[];fields=set()
+    for row in rows:
+        field=row['parameter_id'].split('.')[-1]
+        if field in fields:continue
+        fields.add(field);chosen.append(row['parameter_id'])
+        if len(chosen)==2:break
+    return chosen
 
 
 def dynamic_protocol(configuration):
@@ -203,6 +218,17 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         minimum_evaluations=minimum,evaluation_cap=cap,
         evaluations=cap if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
+    if problem:
+        from extensions.math_analysis.differentiation_router import select_method
+        result['parameterized_problem']=dict(version='parameterized_physical_research_v1',
+            parameter_space=dict(source='FamilySpace/parameter_capabilities',selected=selected,
+                unselected='Held fixed; this bounded request does not exhaust the parameter group.'),
+            physical_problem=problem,observable=PRIMITIVES[study.target.quantity],
+            sensitivity_problem=dict(level='M2' if dynamic else 'M0',target=plain(study.target),
+                effect_semantics=study.effect_semantics,parameter_paths=study.paths),
+            differentiation_router=select_method(effect_semantics=study.effect_semantics,
+                capabilities=task_adapter(candidate['configuration']).physical_capabilities(),
+                target=study.target.quantity,operation=study.operation))
     if dynamic:
         result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
     return result
@@ -435,6 +461,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         scope='Task initial state, fixed generalized pose and saved native state are distinct. Changed structures use named-coordinate transfer/reset, not equal Cartesian state, energy or equilibrium.',
         unsupported_conclusions=['full task improvement','task success','strict derivative','structural descent certificate',
             'passive constraint nullspace','hardware performance'])
+    if context.get('parameterized_problem'):evidence['parameterized_problem']=context['parameterized_problem']
     evidence['effect_semantics']=study.effect_semantics
     from tools.research_tasks import task_adapter
     from extensions.math_analysis.differentiation_router import select_method
@@ -626,6 +653,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     evidence['method_selection'].update(actual_cost=cost,working_point=evidence['reference_semantics'],
         parameter=study.paths,evidence_source='/structure_research/records',
         numerical_consistency=[r['consistency'] for r in evidence.get('parameter_sensitivities',[])])
+    if passive:
+        evidence['sensitivity_evidence']=dict(version='physical_sensitivity_evidence_v1',
+            problem='/structure_research/parameterized_problem',
+            parameter_paths=study.paths,method=evidence['method_selection'],
+            sensitivities=evidence.get('parameter_sensitivities',[]),
+            active_set_and_kkt_sources=[f'/structure_research/records/{i}/mechanics/constraint_state' for i in range(len(records))],
+            scope=evidence['scope'],cost=cost,task_acceptance='unmeasured')
     if evidence.get('structure_direction'):evidence['structure_direction']['actual_cost']=cost
     result.update(structure_research=evidence,model_identity=records[0]['physics_identity'] if records else None,
         internal_calculations=[dict(purpose='native_mechanism_structure',**cost)])
@@ -779,4 +813,8 @@ def summary(value, reference):
         direction_source=dict(reference=reference,pointer='/structure_research/structure_direction') if direction else None,
         effect_semantics=raw.get('effect_semantics'),reference_semantics=raw.get('reference_semantics'),
         method_selection=raw.get('method_selection'),
+        **(dict(sensitivity_evidence=dict(version=raw['sensitivity_evidence']['version'],
+            parameter_paths=raw['sensitivity_evidence']['parameter_paths'],
+            raw_query=dict(reference=reference,view='full',pointer='/structure_research/sensitivity_evidence')))
+            if raw.get('sensitivity_evidence') else {}),
         cost=raw['cost'],task_acceptance='unmeasured',unsupported_conclusions=raw['unsupported_conclusions'])

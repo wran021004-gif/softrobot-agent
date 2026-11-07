@@ -186,7 +186,8 @@ def family_candidate_identity(cfg,s):
 def numerical_binding(cfg, spec):
     physical=digest(cfg['robot']['structure']['data'])
     model=digest(dict(physical_design_identity=physical,policy={k:cfg['policy'][k] for k in
-        ('discretization','dynamics_model','backend')},basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']))
+        ('discretization','dynamics_model','backend')},basis=(None if cfg['task'].get('physical_problem') else
+            cfg['policy']['controller']['parameters']['data']['recipe']['basis'])))
     return dict(physical_design_identity=physical,numerical_model_identity=model,
         effective_discretization=cfg['policy']['discretization'],
         fidelity_policy_identity=digest(spec['fidelity_policy']) if spec.get('fidelity_policy') else None,
