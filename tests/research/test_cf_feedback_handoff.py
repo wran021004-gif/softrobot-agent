@@ -1,6 +1,8 @@
 """Small offline regressions for existing handoff evidence projection."""
 import json
 import unittest
+from copy import deepcopy
+from types import SimpleNamespace
 from unittest.mock import Mock
 from tools.research.session_handoff import feedback_delivery
 
@@ -11,6 +13,7 @@ class SelectedFeedbackTests(unittest.TestCase):
         original=dict(tool_use=dict(toolUseId='fixture-tool',name='evidence_read',
             input=dict(reference={'artifact_id':'fixture'},view=view,pointer='/diagnostic')),result=result)
         host=Mock();host.run_id='fixture'
+        host.store.session.return_value=dict(state=dict(spec={}))
         host.store.events.return_value=[dict(kind='model_original_tool_feedback',outputs=['fixture-feedback'])]
         host.store.artifact.return_value=original
         delivery=feedback_delivery(host,['fixture-tool'])['items'][0]
@@ -78,6 +81,53 @@ class SelectedFeedbackTests(unittest.TestCase):
         brief=dict(latest_reports=[dict(interpretations=findings,findings=[])])
         shown=compact_scientific_delivery(brief,decision_only=True)
         self.assertEqual(shown['latest_reports'][0]['interpretations'],findings)
+
+
+class AnalysisContinuationTests(unittest.TestCase):
+    """Synthetic historical feedback; no model, Store write, or physics."""
+    def host(self, rows):
+        values={str(i):value for i,value in enumerate(rows)}
+        events=[dict(kind='model_original_tool_feedback',sequence=i,outputs=[str(i)]) for i in range(len(rows))]
+        return SimpleNamespace(run_id='fixture',store=SimpleNamespace(
+            events=lambda _:deepcopy(events),artifact=lambda ref:deepcopy(values[ref])))
+
+    def feedback(self, tool, payload, result, key='fixture'):
+        return dict(tool_use=dict(name=tool,toolUseId=key,input=payload),
+            result=dict(status='success',content=[dict(text=json.dumps(result))]))
+
+    def test_exact_cost_survives_reads_and_repeated_rejection_without_changing_cap(self):
+        from tools.research.research_context import tool_continuation
+        question=dict(operation='differentiate',effect_semantics='finite_time_task_response',
+            parameter_paths=['segments.7.young_pa'],target='finite_time_task_violation',requested_budget=4)
+        rejection=dict(status='insufficient_budget',reason='MECHANISM_QUESTION_BUDGET_CANNOT_FIT',
+            scientific_execution_started=False,minimum_evaluations=5,requested_evaluations=4)
+        row=self.feedback('research_analysis',dict(structure=question),rejection)
+        reads=[self.feedback('evidence_read',dict(subject='current_task'),{},str(i)) for i in range(5)]
+        rows=[row,*reads,row];before=deepcopy(rows)
+        view=tool_continuation(self.host(rows))
+        item=view['admission_feedback']['rejections'][0]
+        self.assertEqual(item['facts']['minimum_evaluations'],5)
+        self.assertEqual(item['facts']['requested_evaluations'],4)
+        self.assertEqual(item['facts']['question'],question)
+        self.assertEqual(item['repetitions'],2)
+        self.assertEqual(len(view['admission_feedback']['rejections']),1)
+        self.assertEqual(rows,before)
+        self.assertNotIn('source',item['facts'])
+
+    def test_completed_baseline_failure_remains_bound_to_question_across_routes(self):
+        from tools.research.research_context import tool_continuation
+        ref=dict(artifact_id='fixture-result',media_type='application/json')
+        question=dict(operation='differentiate',parameter_paths=['segments.7.young_pa'],requested_budget=5)
+        failure=dict(status='execution_incomplete',reason='DYNAMIC_STAGE_NOT_QUALIFIED:loaded',worker_started=True)
+        rows=[self.feedback('research_analysis',dict(structure=question),
+            dict(scientific_result_reference=ref,execution_feedback=failure)),
+            self.feedback('research_route',dict(tool='research_investigate'),{}),
+            self.feedback('research_route',dict(tool='research_analysis'),{})]
+        entry=tool_continuation(self.host(rows))['recent'][0]
+        self.assertEqual(entry['question'],question)
+        self.assertEqual(entry['execution_feedback'],failure)
+        self.assertEqual(entry['result_reference'],ref)
+        self.assertNotIn('accepted',entry)
 
 
 if __name__=='__main__':unittest.main()

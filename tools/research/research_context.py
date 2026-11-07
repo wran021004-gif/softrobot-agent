@@ -1103,10 +1103,10 @@ def diagnostic_brief(value):
 
 def tool_continuation(host):
     """Reconstruct navigation intent from existing events, separately from science."""
-    recent=[];selection=None;plan_action=None;plan_selection=None;contract_rejections=[]
+    recent=[];selection=None;plan_action=None;plan_selection=None;contract_rejections=[];admission_feedback=[]
     for event in host.store.events(host.run_id):
         if event['kind']=='authorized_continuation_activated':
-            selection=None;plan_action=None;plan_selection=None;contract_rejections=[]
+            selection=None;plan_action=None;plan_selection=None;contract_rejections=[];admission_feedback=[]
         elif event['kind']=='research_tool_route':
             route=host.store.artifact(event['outputs'][0])
             selection=dict(tool=route['tool'],action=route.get('action'),tool_use_id=route['tool_use_id'],sequence=event['sequence'],
@@ -1131,6 +1131,22 @@ def tool_continuation(host):
                 except ValueError:detail={}
             if result['status']=='error':
                 entry.update({k:detail[k] for k in ('error_code','expected') if k in detail})
+            if use['name']=='research_analysis':
+                question=use['input'].get('structure') or use['input'].get('control') or {}
+                entry['question']={k:deepcopy(question[k]) for k in ('operation','effect_semantics','target',
+                    'parameter_paths','load_condition','operating_point','requested_budget') if k in question}
+                execution=detail.get('execution_feedback') or detail
+                entry['execution_feedback']={k:deepcopy(execution[k]) for k in ('status','reason',
+                    'scientific_execution_started','worker_started','minimum_evaluations','requested_evaluations') if k in execution}
+                if detail.get('scientific_result_reference'):
+                    entry['result_reference']=detail['scientific_result_reference']
+                if detail.get('status')=='insufficient_budget' and detail.get('scientific_execution_started') is False:
+                    facts=dict(question=entry['question'],**entry['execution_feedback'])
+                    previous=next((r for r in admission_feedback if r['facts']==facts),None)
+                    if previous:admission_feedback.remove(previous)
+                    admission_feedback.append(dict(facts=facts,source=event['outputs'][0],
+                        repetitions=(previous['repetitions'] if previous else 0)+1))
+                    admission_feedback=admission_feedback[-3:]
             code=detail.get('error_code') or '';reason=detail.get('reason') or ''
             if code.startswith('TOOL_SCHEMA_') or reason.startswith('INVALID_SCIENTIFIC_') and reason.endswith('_INPUT'):
                 # A completed tool call may return a rejected scientific input.
@@ -1143,6 +1159,8 @@ def tool_continuation(host):
                 contract_rejections.append(rejection);contract_rejections=contract_rejections[-3:]
             recent.append(entry);recent=recent[-4:]
     return dict(selection=selection,plan_action=plan_action,plan_selection=plan_selection,recent=recent,
+        admission_feedback=dict(rejections=admission_feedback,
+            scope='Exact prior question cost rejections, retained across reads and handoffs. Repetitions add no new evidence. Main chooses any revised question or cap; nothing is changed or executed here.'),
         input_contract_feedback=dict(rejections=contract_rejections,
             scope='Historical validator rejections retained across reads and handoffs; current tool Schema is authoritative. No request is repaired or executed by this view; these are not scientific results.'),
         scope='Tool selection and navigation feedback only. No Plan submission or scientific execution is inferred.')
