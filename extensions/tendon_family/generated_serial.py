@@ -259,6 +259,7 @@ def generate_family(value):
     for guide in guides:guide['guide_holes']={}
     for i,part in enumerate(segments):
         domain=space.segment_domains.get(i,space.segment_domain);choice=r.segments.get(i)
+        if getattr(choice,'interpolation',None) is not None:part['interpolation']=choice.interpolation
         edits=getattr(choice,'physical_parameters',{}) if choice else {}
         for key,v in edits.items():
             if key not in domain.physical_domains:raise ValueError('UNDECLARED_SEGMENT_PHYSICS: '+key)
@@ -284,8 +285,9 @@ def generate_family(value):
             for key,v in section['parameters'].items():dims[key].check(v,key)
             if section['kind']=='polygon':
                 rings=[section['outer_yz_m'],*section['holes_yz_m']]
-                if not 3<=sum(len(r) for r in rings)<=64:
-                    raise ValueError('POLYGON_REQUIRES_3_TO_64_TOTAL_VERTICES')
+                limit=getattr(space,'polygon_vertex_limit',64)
+                if sum(len(r) for r in rings)<3 or limit is not None and sum(len(r) for r in rings)>limit:
+                    raise ValueError('POLYGON_VERTEX_COUNT_OUTSIDE_FAMILY_DOMAIN')
                 for ring in rings:
                     for vertex in ring:
                         for coordinate in vertex:domain.polygon_coordinate_m.check(coordinate,'polygon_coordinate_m')
@@ -399,6 +401,12 @@ def generate_family(value):
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
     result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
+    if getattr(space,'payout_initialization',None)=='zero_state_route_length_v1':
+        missing=[t['id'] for t in design['tendons'] if t['id'] not in r.payout_lengths_m]
+        if missing:
+            lengths=dict(zip([t['id'] for t in design['tendons']],result[2]['reference_lengths_m']))
+            for key in missing:design['fixed_payout_lengths_m'][key]=payouts[key].check(lengths[key],'payout_lengths_m.'+key)
+            result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
     from .geometry import geometry
     geometry(result[2],[0.]*len(result[2]['dofs']))  # Reject zero-length resolved spans.
     return result
@@ -421,7 +429,8 @@ def serial_components(space,request):
             components.extend([guide,connector])
         choice=request.segments.get(i)
         count=choice.cells if choice and choice.cells is not None else rule.default_cells
-        if not rule.cell_count_bounds[0]<=count<=rule.cell_count_bounds[1]:
+        from .family_space import in_bounds
+        if not in_bounds(count,rule.cell_count_bounds):
             raise ValueError('CELLS_OUTSIDE_FAMILY_DOMAIN')
         cells[part['id']]=count
         components.append(part)

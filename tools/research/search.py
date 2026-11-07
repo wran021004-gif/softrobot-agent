@@ -190,6 +190,9 @@ def request_guidance(spec):
             diagnostic_load_conditions='Optional static subset, explicitly diagnostic. Full finite-time evaluation always retains every frozen condition.'),
             initialization='Fixed program expands FamilySpace defaults, same design/payout in every load; no active inputs or historical solution seeds.')
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
+        if 'objectives' in guidance['search']:
+            guidance['search']['objectives']=guidance['search']['passive']['objectives']
+            guidance['search']['omit_legacy_fields']=[k for k in guidance['search']['omit_legacy_fields'] if k!='evaluation_mode']
         guidance['analysis']=dict(tool='research_analysis',interface='scientific_question_v4',
             physical_problem='passive_unilateral_equilibrium',control_treatment='no_active_control',
             parameter_groups='Choose an existing group; fixed program selects bounded representatives and records coverage.',

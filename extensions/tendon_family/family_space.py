@@ -5,19 +5,37 @@ from schemas.common import Contract
 from .contracts import Discretization, RoutePoint, Section, Segment, Rigid, Attachment, Vec3
 
 
+def in_bounds(value, bounds):
+    return (bounds[0] is None or bounds[0]<=value) and (bounds[1] is None or value<=bounds[1])
+
+
 class Domain(Contract):
-    minimum: FiniteFloat
-    maximum: FiniteFloat
+    minimum: FiniteFloat | None
+    maximum: FiniteFloat | None
     default: FiniteFloat
+    minimum_exclusive: bool = False
+
+    @model_serializer(mode='wrap')
+    def legacy_domain(self,handler):
+        result=handler(self)
+        if not self.minimum_exclusive:result.pop('minimum_exclusive',None)
+        return result
+
+    def contains(self,value):
+        return in_bounds(value,(self.minimum,self.maximum)) and not (self.minimum_exclusive and value==self.minimum)
+
+    @property
+    def positive(self):
+        return self.minimum is not None and (self.minimum>0 or self.minimum==0 and self.minimum_exclusive)
 
     @model_validator(mode='after')
     def ordered(self):
-        if not self.minimum <= self.default <= self.maximum:
+        if not self.contains(self.default):
             raise ValueError('ORDERED_DOMAIN_AND_DEFAULT_REQUIRED')
         return self
 
     def check(self, value, name):
-        if not self.minimum <= value <= self.maximum:
+        if not self.contains(value):
             error=ValueError('OUTSIDE_FAMILY_DOMAIN: '+name)
             error.diagnostic=dict(status='outside_frozen_domain',field=name,
                 requested_value=value,minimum=self.minimum,maximum=self.maximum,
@@ -45,7 +63,7 @@ class SegmentDomain(Contract):
         allowed={'density_kg_m3','viscosity_y_nm2_s','viscosity_z_nm2_s','curvature_y_rad_m','curvature_z_rad_m','section_angle_rad'}
         if set(self.physical_domains)-allowed:raise ValueError('UNSUPPORTED_SEGMENT_PHYSICAL_DOMAIN')
         for key,d in self.physical_domains.items():
-            if key=='density_kg_m3' and d.minimum<=0 or key.startswith('viscosity_') and d.minimum<0:
+            if key=='density_kg_m3' and not d.positive or key.startswith('viscosity_') and (d.minimum is None or d.minimum<0):
                 raise ValueError('POSITIVE_DENSITY_NONNEGATIVE_VISCOSITY_REQUIRED')
         return self
 
@@ -74,10 +92,10 @@ class FamilySpace(Contract):
     version: Literal['serial_family_space_v1'] = 'serial_family_space_v1'
     family_id: str
     assumptions: list[str]
-    segment_count_bounds: tuple[int, int]
-    tendon_count_bounds: tuple[int, int]
-    executable_segment_counts: list[int]
-    executable_tendon_count_bounds: tuple[int, int]
+    segment_count_bounds: tuple[int, int | None]
+    tendon_count_bounds: tuple[int, int | None]
+    executable_segment_counts: list[int] | None
+    executable_tendon_count_bounds: tuple[int, int | None]
     segment_domain: SegmentDomain
     segment_domains: dict[int, SegmentDomain] = Field(default_factory=dict)
     tendon_domains: dict[str, Domain]
@@ -92,13 +110,14 @@ class FamilySpace(Contract):
     @model_validator(mode='after')
     def domains(self):
         for bounds in (self.segment_count_bounds, self.tendon_count_bounds, self.executable_tendon_count_bounds):
-            if not 1 <= bounds[0] <= bounds[1]:
+            if bounds[0]<1 or bounds[1] is not None and bounds[0]>bounds[1]:
                 raise ValueError('POSITIVE_ORDERED_TOPOLOGY_BOUNDS_REQUIRED')
         if self.version == 'serial_family_space_v1' and self.executable_segment_counts != [2]:
             raise ValueError('C1_EXECUTES_ONLY_TWO_SEGMENTS')
-        if (self.version=='serial_family_space_v1' and not self.segment_count_bounds[0] <= 2 <= self.segment_count_bounds[1]) or not (
-                self.tendon_count_bounds[0] <= self.executable_tendon_count_bounds[0] <=
-                self.executable_tendon_count_bounds[1] <= self.tendon_count_bounds[1]):
+        if (self.version=='serial_family_space_v1' and not in_bounds(2,self.segment_count_bounds)) or not (
+                in_bounds(self.executable_tendon_count_bounds[0],self.tendon_count_bounds) and
+                (self.tendon_count_bounds[1] is None or self.executable_tendon_count_bounds[1] is not None and
+                    self.executable_tendon_count_bounds[1]<=self.tendon_count_bounds[1])):
             raise ValueError('EXECUTABLE_DOMAIN_MUST_BE_DECLARED')
         if set(self.tendon_domains) != {'diameter_m','force_limit_n','pretension_n','length_servo_gain_n_m'} or set(self.routing_domains) != {
                 'radius_m','guide_s','anchor_s','phase_rad','angular_offset_rad'} or set(self.control_domains) != {
@@ -107,19 +126,19 @@ class FamilySpace(Contract):
         for domain in [self.segment_domain, *self.segment_domains.values()]:
             if 'polygon' in domain.section_dimensions_m and domain.polygon_coordinate_m is None:
                 raise ValueError('POLYGON_REQUIRES_BOUNDED_VERTEX_COORDINATES')
-            if min(domain.length_m.minimum, domain.young_pa.minimum) <= 0:
+            if not domain.length_m.positive or not domain.young_pa.positive:
                 raise ValueError('POSITIVE_LENGTH_AND_MODULUS_REQUIRED')
-            if any(v.minimum <= 0 for dims in domain.section_dimensions_m.values() for v in dims.values()):
+            if any(not v.positive for dims in domain.section_dimensions_m.values() for v in dims.values()):
                 raise ValueError('POSITIVE_SECTION_DIMENSIONS_REQUIRED')
-        if any(not 0 <= i < self.segment_count_bounds[1] for i in self.segment_domains):
+        if any(i<0 or self.segment_count_bounds[1] is not None and i>=self.segment_count_bounds[1] for i in self.segment_domains):
             raise ValueError('SEGMENT_DOMAIN_INDEX_OUTSIDE_TOPOLOGY')
-        if any(d.minimum < 0 for d in [*self.tendon_domains.values(), *self.control_domains.values()]):
+        if any(d.minimum is None or d.minimum < 0 for d in [*self.tendon_domains.values(), *self.control_domains.values()]):
             raise ValueError('NONNEGATIVE_PHYSICAL_DOMAINS_REQUIRED')
-        if min(self.tendon_domains[k].minimum for k in ('diameter_m','force_limit_n','length_servo_gain_n_m')) <= 0:
+        if any(not self.tendon_domains[k].positive for k in ('diameter_m','force_limit_n','length_servo_gain_n_m')):
             raise ValueError('POSITIVE_TENDON_DOMAINS_REQUIRED')
-        if not (0 < self.routing_domains['radius_m'].minimum and
-                0 < self.routing_domains['guide_s'].minimum <= self.routing_domains['guide_s'].maximum < 1 and
-                0 < self.routing_domains['anchor_s'].minimum <= self.routing_domains['anchor_s'].maximum <= 1):
+        if not (self.routing_domains['radius_m'].positive and self.routing_domains['guide_s'].positive and
+                self.routing_domains['guide_s'].maximum is not None and self.routing_domains['guide_s'].maximum<=1 and
+                self.routing_domains['anchor_s'].positive and self.routing_domains['anchor_s'].maximum is not None and self.routing_domains['anchor_s'].maximum<=1):
             raise ValueError('PHYSICAL_ROUTING_DOMAIN_REQUIRED')
         return self
 
@@ -183,12 +202,12 @@ class SerialAssemblyRule(Contract):
     guide: str
     connector: str
     payload: str
-    cell_count_bounds: tuple[int,int]
+    cell_count_bounds: tuple[int,int | None]
     default_cells: int
 
     @model_validator(mode='after')
     def cells(self):
-        if not 1 <= self.cell_count_bounds[0] <= self.default_cells <= self.cell_count_bounds[1]:
+        if self.cell_count_bounds[0]<1 or not in_bounds(self.default_cells,self.cell_count_bounds):
             raise ValueError('POSITIVE_ORDERED_CELL_DOMAIN_REQUIRED')
         return self
 
@@ -201,6 +220,8 @@ class FamilySpaceV2(FamilySpace):
     terminal_payload_anchor: bool = False
     guide_hole_coordinate_domains_m: dict[int,Domain] = Field(default_factory=dict)
     route_coordinate_domains_m: dict[Literal['fixed_base','payload'],dict[int,Domain]] = Field(default_factory=dict)
+    payout_initialization: Literal['zero_state_route_length_v1'] | None = None
+    polygon_vertex_limit: int | None = Field(default=64,ge=3)
 
     @model_serializer(mode='wrap')
     def historical_space(self,handler):
@@ -208,22 +229,27 @@ class FamilySpaceV2(FamilySpace):
         if not self.passive_payout_domains_m:value.pop('passive_payout_domains_m',None)
         if self.passive_payout_domain_m is None:value.pop('passive_payout_domain_m',None)
         if not self.terminal_payload_anchor:value.pop('terminal_payload_anchor',None)
+        if self.payout_initialization is None:value.pop('payout_initialization',None)
+        if self.polygon_vertex_limit==64:value.pop('polygon_vertex_limit',None)
         for key in ('guide_hole_coordinate_domains_m','route_coordinate_domains_m'):
             if not getattr(self,key):value.pop(key,None)
         return value
 
     @model_validator(mode='after')
     def serial(self):
+        if self.payout_initialization and not (self.passive_payout_domain_m or self.passive_payout_domains_m):
+            raise ValueError('GEOMETRIC_PAYOUT_INITIALIZATION_REQUIRES_PASSIVE_DOMAIN')
         if self.passive_payout_domain_m is not None:
             if self.passive_payout_domains_m:raise ValueError('ONE_PASSIVE_PAYOUT_DOMAIN_FORMAT_REQUIRED')
-            if self.passive_payout_domain_m.minimum<=0:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
+            if not self.passive_payout_domain_m.positive:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
         coordinates=[self.guide_hole_coordinate_domains_m,*self.route_coordinate_domains_m.values()]
         if any(set(d)-{1,2} for d in coordinates):
             raise ValueError('ONLY_LOCAL_YZ_CONTINUOUS_ROUTING_COORDINATES_SUPPORTED')
         if any(coordinates) and not self.terminal_payload_anchor:
             raise ValueError('PHYSICAL_ROUTING_COORDINATES_REQUIRE_OPT_IN_SPACE')
-        if not self.executable_segment_counts or self.executable_segment_counts != sorted(set(self.executable_segment_counts)) or any(
-                not self.segment_count_bounds[0] <= i <= self.segment_count_bounds[1] for i in self.executable_segment_counts):
+        if self.executable_segment_counts is not None and (not self.executable_segment_counts or
+                self.executable_segment_counts != sorted(set(self.executable_segment_counts)) or any(
+                not in_bounds(i,self.segment_count_bounds) for i in self.executable_segment_counts)):
             raise ValueError('EXECUTABLE_SEGMENT_COUNTS_MUST_BE_DECLARED')
         parts={c.id:c for c in self.assembly.components}
         rule=self.serial_assembly
@@ -242,11 +268,13 @@ class FamilySpaceV2(FamilySpace):
 class SegmentChoiceV2(SegmentChoice):
     cells: int | None = Field(default=None,ge=1,strict=True)
     physical_parameters: dict[str,FiniteFloat] = Field(default_factory=dict)
+    interpolation: Literal['step','linear'] | None = None
 
     @model_serializer(mode='wrap')
     def legacy_choice(self,handler):
         result=handler(self)
         if not self.physical_parameters:result.pop('physical_parameters',None)
+        if self.interpolation is None:result.pop('interpolation',None)
         return result
 
 
@@ -303,11 +331,11 @@ def validate_request(space, request):
         raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
     for value, bounds, name in ((request.segment_count, space.segment_count_bounds, 'segment_count'),
                                 (request.tendon_count, space.tendon_count_bounds, 'tendon_count')):
-        if not bounds[0] <= value <= bounds[1]:
+        if not in_bounds(value,bounds):
             raise ValueError('OUTSIDE_FAMILY_DOMAIN: '+name)
-    if request.segment_count not in space.executable_segment_counts:
+    if space.executable_segment_counts is not None and request.segment_count not in space.executable_segment_counts:
         raise UnsupportedGeneration('segment_count='+str(request.segment_count)+'; outside frozen executable segment counts')
-    if not space.executable_tendon_count_bounds[0] <= request.tendon_count <= space.executable_tendon_count_bounds[1]:
+    if not in_bounds(request.tendon_count,space.executable_tendon_count_bounds):
         raise UnsupportedGeneration('tendon_count='+str(request.tendon_count)+'; outside current executable envelope')
     payouts=payout_domains(space,request.tendon_count)
     selected=getattr(request,'payout_lengths_m',{})
@@ -315,7 +343,7 @@ def validate_request(space, request):
     if payouts:
         if set(payouts)!={'tendon_'+str(i) for i in range(request.tendon_count)}:raise ValueError('PAYOUT_DOMAINS_MUST_MATCH_SELECTED_TOPOLOGY')
         for key,domain in payouts.items():
-            if domain.minimum<=0:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
+            if not domain.positive:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
             domain.check(selected.get(key,domain.default),'payout_lengths_m.'+key)
         if set(selected)-set(payouts):raise ValueError('UNKNOWN_PAYOUT_TENDON')
     if space.conditional_rules == 'base_only_consecutive_spans_v1' and any(
@@ -411,9 +439,9 @@ def decision_summary(value, evidence, operations):
         scope='Registered generator envelope; backend/model/controller admission remains candidate-specific')
     if getattr(space,'passive_payout_domain_m',None) is not None:
         result['passive_payout_domain_m']=plain(space.passive_payout_domain_m)
-        result['executable_domain'].update(payout_bound_tendon_counts=list(range(
-            space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)),
-            payout_rule='Each actual tendon gets its own payout_lengths_m.tendon_i value within the common domain; omitted values inherit the domain default.')
+        result['executable_domain'].update(payout_bound_tendon_counts=(list(range(
+            space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)) if space.executable_tendon_count_bounds[1] is not None else None),
+            payout_rule=('Omitted payout uses actual zero-state route length; explicit positive lengths need independent feasibility/slack qualification.' if space.payout_initialization else 'Each actual tendon gets its own payout_lengths_m.tendon_i value within the common domain; omitted values inherit the domain default.'))
     elif getattr(space,'passive_payout_domains_m',{}):
         counts=[i for i in range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)
             if set(space.passive_payout_domains_m)=={'tendon_'+str(j) for j in range(i)}]
@@ -423,8 +451,8 @@ def decision_summary(value, evidence, operations):
         'Route/section/attachment/guide clearance and valid mesh',
         'Backend model dimensions, tendon order and supported controller/solver']
     result['currently_unavailable']=dict(
-        tendon_counts=[i for i in range(space.tendon_count_bounds[0],space.tendon_count_bounds[1]+1)
-            if not space.executable_tendon_count_bounds[0]<=i<=space.executable_tendon_count_bounds[1]],
+        tendon_counts=([i for i in range(space.tendon_count_bounds[0],space.tendon_count_bounds[1]+1)
+            if not in_bounds(i,space.executable_tendon_count_bounds)] if space.tendon_count_bounds[1] is not None else []),
         reason='Outside registered execution bounds; retained in declared domain, no scientific infeasibility claim')
     result['domain_detail_query']=dict(reference=evidence,view='full')
     if space.conditional_rules == 'base_only_consecutive_spans_v1':
@@ -469,7 +497,12 @@ def resolved_request(value, request):
         if not span['angular_offsets_rad']:span['angular_offsets_rad']=[0.]*span['count']
     for k,d in space.tendon_domains.items():params['tendon_parameters'].setdefault(k,d.default)
     for k,d in space.control_domains.items():params['control_weights'].setdefault(k,d.default)
-    for k,d in payout_domains(space,r.tendon_count).items():params.setdefault('payout_lengths_m',{}).setdefault(k,d.default)
+    if getattr(space,'payout_initialization',None)=='zero_state_route_length_v1':
+        from .generated_serial import generate_family
+        design,_,_=generate_family(dict(space=value,request=params))
+        for k,v in design['fixed_payout_lengths_m'].items():params.setdefault('payout_lengths_m',{}).setdefault(k,v)
+    else:
+        for k,d in payout_domains(space,r.tendon_count).items():params.setdefault('payout_lengths_m',{}).setdefault(k,d.default)
     if isinstance(space,FamilySpaceV2) and space.guide_hole_coordinate_domains_m:
         # Materialize the current real holes, not independent invented sites.
         # This preserves a selected parent's exact physical routing when edited.
@@ -490,9 +523,13 @@ def parameter_capabilities(value, request):
     def add(path,category,kind,unit,domain=None,choices=None,effective=True,reason=None,source=None,physical_binding=None,**detail):
         try:current=parameter_value(params,path)
         except (KeyError,IndexError,ValueError):current=None
-        continuous=bool(kind=='number' and domain and domain.minimum<domain.maximum and effective and not reason)
+        finite=bool(domain and domain.minimum is not None and domain.maximum is not None)
+        continuous=bool(kind=='number' and finite and domain.minimum<domain.maximum and effective and not reason)
+        if kind=='number' and domain and not finite and not reason:
+            reason='Open physical domain; generation is available. Freeze a finite local study domain before normalized derivative/optimization.'
         rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,current_value=current,
             **(dict(minimum=domain.minimum,maximum=domain.maximum,default=domain.default) if domain else {}),
+            **(dict(minimum_exclusive=True) if domain and domain.minimum_exclusive else {}),
             choices=choices,conditional_dependencies=dict(segment_count=params['segment_count'],tendon_count=params['tendon_count']),
             effective_in_current_execution=effective,continuous_perturbation=continuous,
             analysis_status='conditional' if continuous else 'not_applicable' if not effective or reason else 'finite_comparison_only',
@@ -511,7 +548,7 @@ def parameter_capabilities(value, request):
         if physical_binding is not None:rows[-1]['physical_component']=physical_binding
 
     add('segment_count','topology','integer','count',choices=space.executable_segment_counts)
-    add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
+    add('tendon_count','topology','integer','count',choices=(list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)) if space.executable_tendon_count_bounds[1] is not None else None),count_bounds=list(space.executable_tendon_count_bounds))
     add('spans','topology','routing_topology','none')
     for i in range(params['segment_count']):
         d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.';choice=params['segments'][str(i)]
@@ -631,10 +668,13 @@ def search_domains(space, query, grant):
         raise ValueError('SPAN_STRATEGY_NOT_APPLICABLE_TO_FROZEN_FAMILY_RULE')
     if query.method!=grant['method'] or not set(query.variable_groups)<=set(grant['variable_groups']):
         raise ValueError('UNAUTHORIZED_FAMILY_SEARCH_METHOD_OR_GROUP')
-    if (not set(query.segment_counts)<=set(grant['segment_counts']) or
-            not set(query.tendon_counts)<=set(grant['tendon_counts']) or
+    if (grant['segment_counts'] is not None and not set(query.segment_counts)<=set(grant['segment_counts']) or
+            grant['tendon_counts'] is not None and not set(query.tendon_counts)<=set(grant['tendon_counts']) or
             query.max_proposals>grant['max_proposals'] or query.max_evaluations>grant['max_evaluations']):
         raise ValueError('SEARCH_OUTSIDE_FROZEN_NUMERICAL_SCOPE_OR_COUNT_CAP')
+    parsed=parse_space(space)
+    if any(not in_bounds(n,parsed.segment_count_bounds) or parsed.executable_segment_counts is not None and n not in parsed.executable_segment_counts for n in query.segment_counts) or any(not in_bounds(n,parsed.executable_tendon_count_bounds) for n in query.tendon_counts):
+        raise ValueError('SEARCH_OUTSIDE_FROZEN_FAMILY_TOPOLOGY')
     for group,choices in (('segment_count',query.segment_counts),('tendon_count',query.tendon_counts),('spans',query.span_strategies)):
         if len(choices)>1 and group not in query.variable_groups:
             raise ValueError('MULTIPLE_CHOICES_REQUIRE_SELECTED_GROUP: '+group)
@@ -656,9 +696,16 @@ def search_domains(space, query, grant):
     domains.update({'routing.'+k:[v] for k,v in space['routing_domains'].items()})
     if query.evaluation_mode.startswith('passive_'):
         domains['payout']=[d.model_dump() for d in payout_domains(parse_space(space),max(query.tendon_counts)).values()]
-    groups=dict(length_m='lengths',young_pa='materials',physical='materials',section='sections',routing='routing',payout='payout')
+    if 'polygon' in query.section_types:
+        d=space['segment_domain']['polygon_coordinate_m']
+        domains['polygon_scale_m']=[(dict(minimum=max(1e-5,d['maximum']/1000),maximum=min(-d['minimum'],d['maximum']),default=d['default']) if d['minimum'] is not None and d['maximum'] is not None else dict(minimum=0.,maximum=None,minimum_exclusive=True,default=d['default']))]
+    groups=dict(length_m='lengths',young_pa='materials',physical='materials',section='sections',routing='routing',payout='payout',polygon_scale_m='sections')
     for key,(lo,hi) in query.bounds.items():
         if key not in domains or groups[key.split('.')[0]] not in query.variable_groups or any(
-                not d['minimum']<=lo<hi<=d['maximum'] for d in domains[key]):
+                not in_bounds(lo,(d['minimum'],d['maximum'])) or not in_bounds(hi,(d['minimum'],d['maximum'])) or d.get('minimum_exclusive') and lo==d['minimum'] for d in domains[key]):
             raise ValueError('SEARCH_BOUND_OUTSIDE_SELECTED_PHYSICAL_DOMAIN: '+key)
-    return {k:[max(d['minimum'] for d in values),min(d['maximum'] for d in values)] for k,values in domains.items()}
+    for key,values in domains.items():
+        if groups[key.split('.')[0]] in query.variable_groups and any(d['minimum'] is None or d['maximum'] is None for d in values) and key not in query.bounds:
+            raise ValueError('FINITE_SEARCH_BOUNDS_REQUIRED: '+key)
+    return {k:[max((d['minimum'] for d in values if d['minimum'] is not None),default=None),
+        min((d['maximum'] for d in values if d['maximum'] is not None),default=None)] for k,values in domains.items()}

@@ -5,12 +5,15 @@ import math
 
 
 def interval(query, key, domain):
-    return query.bounds.get(key,(domain['minimum'],domain['maximum']))
+    bounds=query.bounds.get(key,(domain['minimum'],domain['maximum']))
+    if None in bounds:raise ValueError('FINITE_SEARCH_BOUNDS_REQUIRED: '+key)
+    return bounds
 
 
-def default(query, key, domain):
-    lo,hi=interval(query,key,domain)
-    return min(hi,max(lo,domain['default']))
+def default(query, key, domain, value=None):
+    lo,hi=query.bounds.get(key,(domain['minimum'],domain['maximum']))
+    value=domain['default'] if value is None else value
+    return min(hi if hi is not None else value,max(lo if lo is not None else value,value))
 
 
 def initial(space, query, previous=None):
@@ -43,6 +46,10 @@ def candidate_seed(space, query, candidate):
     segments={}
     passive=query.evaluation_mode.startswith('passive_')
     for i,v in r['segments'].items():
+        rule=space['serial_assembly']
+        prototype=next(c for c in space['assembly']['components'] if c['id']==rule['root_segment' if i=='0' else 'repeated_segment'])
+        if v.get('interpolation',prototype['interpolation'])!=prototype['interpolation']:
+            raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: segment interpolation')
         if (not passive and v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters')) or len({str(s) for s in v['sections']})!=1:
             raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: station-dependent sections or extra physics')
         s=v['sections'][0]
@@ -76,17 +83,16 @@ def reshape(space, query, point, previous=None):
         if kind not in kinds:kind=kinds[0]
         values=dict(section_kind=kind,section_dimensions={})
         for k in ('length_m','young_pa'):
-            lo,hi=interval(query,k,d[k]);values[k]=min(hi,max(lo,prior.get(k,default(query,k,d[k]))))
+            values[k]=default(query,k,d[k],prior.get(k))
         for k,v in d['section_dimensions_m'][kind].items():
-            lo,hi=interval(query,'section.'+kind+'.'+k,v)
-            values['section_dimensions'][k]=min(hi,max(lo,prior.get('section_dimensions',{}).get(k,default(query,'section.'+kind+'.'+k,v))))
+            values['section_dimensions'][k]=default(query,'section.'+kind+'.'+k,v,prior.get('section_dimensions',{}).get(k))
         if query.evaluation_mode.startswith('passive_'):
             values['physical_parameters']={k:prior.get('physical_parameters',{}).get(k,default(query,'physical.'+k,v))
                 for k,v in d.get('physical_domains',{}).items()}
             values['cells']=prior.get('cells',rule['default_cells'])
         if kind=='polygon':
             v=d['polygon_coordinate_m']
-            values['polygon_scale_m']=prior.get('polygon_scale_m',v['default'])
+            values['polygon_scale_m']=prior.get('polygon_scale_m',query.bounds.get('polygon_scale_m',(v['default'],))[0])
         p['segments'][str(i)]=values
     p['routing']={k:old.get('routing',{}).get(k,default(query,'routing.'+k,v)) for k,v in space['routing_domains'].items()}
     p['angular_offsets_rad']=(old.get('angular_offsets_rad',[])+[p['routing']['angular_offset_rad']]*p['tendon_count'])[:p['tendon_count']]
@@ -94,7 +100,8 @@ def reshape(space, query, point, previous=None):
     if query.evaluation_mode.startswith('passive_'):
         from extensions.tendon_family.family_space import payout_domains,parse_space
         domains=payout_domains(parse_space(space),p['tendon_count'])
-        p['payout_lengths_m']={k:old.get('payout_lengths_m',{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
+        p['payout_lengths_m']=({k:old.get('payout_lengths_m',{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
+            if not space.get('payout_initialization') or 'payout' in query.variable_groups else deepcopy(old.get('payout_lengths_m',{})))
     return p
 
 
@@ -132,7 +139,12 @@ def generation(space, query, point):
         request['segments'][i]=dict(length_m=v['length_m'],young_pa=v['young_pa'],sections=sections)
         if query.evaluation_mode.startswith('passive_'):
             request['segments'][i].update(physical_parameters=v['physical_parameters'],cells=v['cells'])
-    if query.evaluation_mode.startswith('passive_'):request['payout_lengths_m']=p['payout_lengths_m']
+    if query.evaluation_mode.startswith('passive_'):
+        if space.get('payout_initialization') and not p['payout_lengths_m']:
+            from extensions.tendon_family.generated_serial import generate_family
+            design,_,_=generate_family(dict(space=space,request=request))
+            p['payout_lengths_m']=design['fixed_payout_lengths_m']
+        request['payout_lengths_m']=p['payout_lengths_m']
     return request
 
 
@@ -151,7 +163,7 @@ def next_move(space, query, best, cursor, step):
             for k,d in domain['section_dimensions_m'][v['section_kind']].items():
                 groups['sections'].append((f'segments.{i}.section_dimensions.{k}',('section.'+v['section_kind']+'.'+k,d)))
             if v['section_kind']=='polygon':
-                d=domain['polygon_coordinate_m'];scale=dict(minimum=max(1e-5,d['maximum']/1000),maximum=min(-d['minimum'],d['maximum']),default=d['default'])
+                d=domain['polygon_coordinate_m'];scale=(dict(minimum=max(1e-5,d['maximum']/1000),maximum=min(-d['minimum'],d['maximum']),default=d['default']) if d['minimum'] is not None and d['maximum'] is not None else dict(minimum=0.,maximum=None,default=d['default']))
                 groups['sections'].append((f'segments.{i}.polygon_scale_m',('polygon_scale_m',scale)))
         if query.evaluation_mode.startswith('passive_'):
             if 'materials' in groups:

@@ -41,9 +41,10 @@ def compile_generation(host, value):
     params=resolved_request(space,candidate['parameters']) if q.changes else deepcopy(candidate['parameters'])
     for path,new in q.changes.items():
         row=rows.get(path)
-        if not row or '*' in path or row['category'] in ('controller','discretization') or not row['effective_in_current_execution'] or not row['continuous_perturbation']:
+        if not row or '*' in path or row['category'] in ('controller','discretization') or not row['effective_in_current_execution'] or not (row['continuous_perturbation'] or row['data_type']=='number' and None in (row['minimum'],row['maximum'])):
             raise ValueError('SELECT_REGISTERED_EFFECTIVE_CONTINUOUS_PHYSICAL_PARAMETER: '+path)
-        if not row['minimum']<=new<=row['maximum']:raise ValueError('PHYSICAL_CHANGE_OUTSIDE_FROZEN_DOMAIN: '+path)
+        from extensions.tendon_family.family_space import in_bounds
+        if not in_bounds(new,(row['minimum'],row['maximum'])):raise ValueError('PHYSICAL_CHANGE_OUTSIDE_FROZEN_DOMAIN: '+path)
         set_parameter(params,path,new)
     # The family validator, construction admission and frozen topology remain
     # authoritative. No candidate, control or T1 is created by this compiler.
@@ -69,9 +70,10 @@ def compile_search(host, value, request_id):
     for field,group in (('segment_counts','segment_count'),('tendon_counts','tendon_count')):
         choices=getattr(q,field)
         if choices is None:
-            if len(grant[field])==1 or group in groups:choices=grant[field]
+            if grant[field] is None:issue(field,'Choose explicit finite positive counts for this search; the generator has no fixed count cap')
+            elif len(grant[field])==1 or group in groups:choices=grant[field]
             else:issue(field,'Explicit fixed topology choice required',choices=grant[field])
-        elif not choices or not set(choices)<=set(grant[field]):
+        elif not choices or grant[field] is not None and not set(choices)<=set(grant[field]):
             issue(field,'Outside frozen topology; no automatic replacement',choices=grant[field])
         topology[field]=choices
     native=q.evaluation_model=='native_mujoco'

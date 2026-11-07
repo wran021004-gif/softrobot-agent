@@ -117,8 +117,8 @@ def configuration_ownership(configuration):
         # full family_space field below for existing readers.
         family_control_domains = design_space.pop('control_domains')
         lo, hi = space['segment_count_bounds']
-        declared_only = dict(segment_counts=[n for n in range(lo, hi+1)
-            if n not in space['executable_segment_counts']],
+        declared_only = dict(segment_counts=([n for n in range(lo, hi+1)
+            if n not in space['executable_segment_counts']] if hi is not None and space['executable_segment_counts'] is not None else []),
             tendon_counts=design_space['currently_unavailable']['tendon_counts'])
     else:
         family_control_domains, declared_only = None, None
@@ -334,14 +334,14 @@ def resolve(path, profile=None, *, backend_profile=None):
             counts=scope.get('segment_counts',[]);tendons=scope.get('tendon_counts',[])
             if (set(scope)-{'segment_counts','tendon_counts','cells_per_segment'} or not counts or not tendons
                     or any(type(v) is not int for v in [*counts,*tendons]) or counts!=sorted(set(counts))
-                    or not set(counts)<=set(family_space['executable_segment_counts'])
+                    or family_space['executable_segment_counts'] is not None and not set(counts)<=set(family_space['executable_segment_counts'])
                     or tendons!=list(range(min(tendons),max(tendons)+1))
-                    or not family_space['executable_tendon_count_bounds'][0]<=min(tendons)<=max(tendons)<=family_space['executable_tendon_count_bounds'][1]):
+                    or not family_space['executable_tendon_count_bounds'][0]<=min(tendons) or family_space['executable_tendon_count_bounds'][1] is not None and max(tendons)>family_space['executable_tendon_count_bounds'][1]):
                 raise ValueError('EXECUTABLE_COMMON_FAMILY_SUBDOMAIN_REQUIRED')
             family_space.update(executable_segment_counts=counts,executable_tendon_count_bounds=[min(tendons),max(tendons)])
             if 'cells_per_segment' in scope:
                 cells=scope['cells_per_segment'];assembly=family_space['serial_assembly']
-                if type(cells) is not int or not assembly['cell_count_bounds'][0]<=cells<=assembly['cell_count_bounds'][1]:
+                if type(cells) is not int or cells<assembly['cell_count_bounds'][0] or assembly['cell_count_bounds'][1] is not None and cells>assembly['cell_count_bounds'][1]:
                     raise ValueError('EXECUTABLE_FAMILY_MESH_SUBDOMAIN_REQUIRED')
                 assembly.update(cell_count_bounds=[cells,cells],default_cells=cells)
         study.update(start_mode='family_space',family_space=family_space,
@@ -363,12 +363,12 @@ def resolve(path, profile=None, *, backend_profile=None):
         from tools.research.contracts import FidelityPolicy
         policy=plain(FidelityPolicy.model_validate(additions['fidelity_policy']))
         cells=family_space['serial_assembly']['cell_count_bounds']
-        if any(not cells[0]<=level['cells_per_segment']<=cells[1] for level in [*policy['screening'].values(),policy['final_evaluation']]):
+        if any(level['cells_per_segment']<cells[0] or cells[1] is not None and level['cells_per_segment']>cells[1] for level in [*policy['screening'].values(),policy['final_evaluation']]):
             raise ValueError('FIDELITY_OUTSIDE_FROZEN_MESH_DOMAIN')
         grant=additions.get('family_search')
         if grant and (grant['method']!='bounded_mixed_coordinate_v1' or
-                not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
-                any(not family_space['executable_tendon_count_bounds'][0]<=v<=family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
+                grant['segment_counts'] is not None and family_space['executable_segment_counts'] is not None and not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
+                grant['tendon_counts'] is not None and any(v<family_space['executable_tendon_count_bounds'][0] or family_space['executable_tendon_count_bounds'][1] is not None and v>family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
                 not all(type(grant[k]) is int and grant[k]>=1 for k in ('max_proposals','max_evaluations'))):
             raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
         if grant and 'evaluation_modes' in grant and (not grant['evaluation_modes'] or
@@ -595,7 +595,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         if family_space['version']=='serial_family_space_v2':
             study['analysis_protocol']['baseline_lengths_m']={f'segment_{i}':
                 family_space['segment_domains'].get(str(i),family_space['segment_domain'])['length_m']['default']
-                for i in range(family_space['segment_count_bounds'][1])}
+                for i in range(family_space['segment_count_bounds'][1] or len(segments))}
             study['analysis_length_scale_source']='frozen_family_domain_defaults_v1'
     from schemas.platform_analysis import TaskAnalysisProtocol
     TaskAnalysisProtocol.model_validate(study['analysis_protocol'])
@@ -751,7 +751,7 @@ def family_bootstrap(space, execution):
     from extensions.tendon_family.family_space import parse_build
     from extensions.tendon_family.generated_serial import generate_family
     build = parse_build(dict(space=space, request=dict(family_space_identity=digest(space),
-        segment_count=min(space['executable_segment_counts']),
+        segment_count=min(space['executable_segment_counts']) if space['executable_segment_counts'] is not None else space['segment_count_bounds'][0],
         tendon_count=space['executable_tendon_count_bounds'][0])))
     design, mesh, physics = generate_family(build)
     robot = dict(family='tendon_robot_family',channels=['actuator_commands'],units='SI',

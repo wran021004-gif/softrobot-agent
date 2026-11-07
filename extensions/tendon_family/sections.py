@@ -113,7 +113,7 @@ def at(segment, s):
         raise ValueError('SECTION_STATIONS_ORDERED_FROM_ZERO')
     left = max((x for x in stations if x.s <= s), key=lambda x:x.s)
     right = next((x for x in stations if x.s > s), left)
-    if segment.interpolation == 'step' or left == right:
+    if segment.interpolation == 'step' or left == right or left.section == right.section:
         return left.section
     a, b = left.section, right.section
     if a.kind != b.kind or set(a.parameters) != set(b.parameters) or a.kind == 'polygon':
