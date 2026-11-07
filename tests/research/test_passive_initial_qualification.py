@@ -32,6 +32,23 @@ class InitialQualificationTests(unittest.TestCase):
         diagnosis=qualification_diagnosis(failure=error.exception)
         self.assertEqual(diagnosis['initial_qualification']['status'],'passed')
         self.assertEqual(diagnosis['status'],'initial_forward_failure')
+        # The same facts must survive the existing contained Worker exception
+        # serializer even outside qualification-only inspect.
+        from tests.research.test_cross_task_integration import fixture_directory
+        from pathlib import Path
+        from tools.research import execution_worker
+        with fixture_directory() as folder:
+            path=Path(folder)/'request.json'
+            path.write_text(json.dumps(dict(kind='candidate_analysis',implementation='offline-fixture',
+                configuration={},binding={},query={})))
+            with patch.object(execution_worker,'contain_worker_children',return_value=None),\
+                    patch('sys.argv',['worker',str(path)]),\
+                    patch('tools.research.analysis.calculate',side_effect=error.exception):execution_worker.main()
+            saved=json.loads(path.with_name('result.json').read_bytes())
+        self.assertEqual(saved['qualification_diagnosis']['initial_qualification']['status'],'passed')
+        self.assertEqual(saved['status'],'execution_incomplete')
+        from tools.research.analysis import diagnostic_layers
+        self.assertEqual(diagnostic_layers(saved)['geometry']['facts']['initial_qualification']['status'],'passed')
 
     def test_unknown_position_pipeline_continues_original_forward(self):
         native=self.native()

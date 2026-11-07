@@ -312,7 +312,7 @@ def retrieve(host,query,*,reader='agent'):
                 rows.append(dict(key=canonical,entry_id=entry['entry_id'],revision=entry['revision'],
                     status='source_unavailable',source_path=entry['path'],explanation='The historical guidance source is unavailable.'))
             continue
-        content=None;body_hash=None
+        content=None
         if q.operation=='read':
             body=source.read_bytes()
             content=json.loads(body) if source.suffix=='.json' else body.decode('utf8')
@@ -320,7 +320,6 @@ def retrieve(host,query,*,reader='agent'):
             if q.detail=='summary':
                 content={k:entry[k] for k in ('id','type','summary','trigger','source_refs','evidence_level',
                     'applicability','limitations','related_skills','knowledge_refs') if k in entry}
-            # Existing receipt identity only; never an admission/comparison gate.
         from tools.research.evidence_policy import english_sources
         if q.operation=='read' and english_sources(state(host)['spec']):
             # No silent translation or claim that historical prose is a fresh

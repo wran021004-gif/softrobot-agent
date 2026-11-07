@@ -772,9 +772,9 @@ def diagnostic_layers(value):
     structure=value.get('structure_research') or {}
     records=structure.get('records',[])
     mechanics=records[0].get('mechanics',{}) if records else (value.get('native_dynamics') or {}).get('mechanics',{})
-    diagnosis=structure.get('qualification_diagnosis') or mechanics.get('qualification_diagnosis') or {}
+    diagnosis=structure.get('qualification_diagnosis') or mechanics.get('qualification_diagnosis') or value.get('qualification_diagnosis') or {}
     diagnosis_pointer=('/structure_research/qualification_diagnosis' if structure.get('qualification_diagnosis') else
-        '/structure_research/records/0/mechanics/qualification_diagnosis')
+        '/structure_research/records/0/mechanics/qualification_diagnosis' if mechanics.get('qualification_diagnosis') else '/qualification_diagnosis')
     static_pointer=diagnosis_pointer+'/best_working_point'
     equilibrium=mechanics.get('equilibrium') or (mechanics.get('dynamic_execution') or {}).get('unloaded_equilibrium')
     if not diagnosis and equilibrium:
