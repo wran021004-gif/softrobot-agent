@@ -122,6 +122,18 @@ def initial_search_progress(host):
             'Unresolved math establishes neither structural infeasibility nor physical acceptance; interrupted/unadmitted work does not satisfy the start requirement.')
 
 
+def design_counts(rows):
+    """Construction rejections are entries, not numerically evaluated designs."""
+    evaluated=0
+    for row in rows:
+        evidence=row.get('evidence',{})
+        evaluated+=bool(evidence.get('analysis') or evidence.get('result') or
+            any(c.get('analysis') for c in evidence.get('conditions',{}).values()))
+    return dict(result_entries=len(rows),evaluated_designs=evaluated,
+        legally_constructed=sum(bool(row.get('candidate_id') or row.get('evidence',{}).get('candidate')) for row in rows),
+        construction_failures=sum(bool(row.get('construction')) and not row.get('evidence',{}).get('candidate') for row in rows))
+
+
 def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
     from extensions.tendon_family.family_space import span_strategies
@@ -528,8 +540,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
         requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported and not native else None,best_observed=best if supported or not mathematical else None,evaluated=rows,
         termination_reason=checkpoint['termination'],search_updates=checkpoint['updates'],search_state=checkpoint_ref,
         analysis_rejection=checkpoint.get('analysis_rejection'),
-        resource_use=dict(evaluated_designs=len(rows),proposed_designs=checkpoint['proposal_count'],
-            legally_constructed=sum(bool(row.get('candidate_id')) for row in rows),
+        resource_use=dict(**design_counts(rows),proposed_designs=checkpoint['proposal_count'],
             skipped_moves=checkpoint.get('skipped_moves',[]),
             actual_mathematical_evaluations=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mathematical else 0,
             elapsed_s=time.time()-checkpoint['started']),

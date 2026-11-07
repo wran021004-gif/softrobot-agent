@@ -411,6 +411,10 @@ def interpretation_priority(report, previous, *, decision_v3=False):
     """Observable novelty only; no action selection or inferred importance score."""
     if report['mode']=='investigation':return 'explicit_investigation'
     old=[c for r in previous for c in r['results']]
+    for card in report['results']:
+        if ((card['deterministic_summary'].get('structure_research') or {}).get('effect_semantics')=='finite_time_task_response'
+                and not any(c['identity']['result']==card['identity']['result'] for c in old)):
+            return 'new_finite_time_structure_result'
     if decision_v3:
         def signature(card):
             return dict(operation=card['identity'].get('operation'),task=card['identity'].get('task_identity'),
@@ -810,6 +814,9 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_INTERRUPTED_NO_AUTOMATIC_RETRY')
             continue
+        # An operator invocation pause is renewable, not scientific closeout.
+        # Keep the deferred report for the next invocation, without an attempt.
+        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:return
         previous=[host.store.artifact(r,paths=('report',))['report']
             for r,v in reports[:index] if not v['interpretation_for']]
         from tools.research.evidence_policy import english_native
@@ -822,8 +829,7 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
             continue
         # Keep protected closure capacity and at least one main decision request.
         reserve=s['spec']['budgets'].get('protected_provider_requests',0)
-        if (protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1
-                or (max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls)):
+        if protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1:
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_SKIPPED_TO_PRESERVE_CLOSEOUT')
             continue

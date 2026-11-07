@@ -754,6 +754,7 @@ def _resources(value, reference):
 def passive_search_summary(host, reference, result):
     """One bounded projection of saved passive search facts for Main/Reporter."""
     from tools.research.state import state
+    from tools.research.search import design_counts
     query=host.store.artifact(result['search_state'],paths=('problem.query',))['problem']['query']
     structures=[]
     for i,row in enumerate(result['evaluated']):
@@ -768,11 +769,13 @@ def passive_search_summary(host, reference, result):
             segment_count=row['parameters']['segment_count'],tendon_count=row['parameters']['tendon_count'],
             changed_coordinates=(row.get('lineage') or {}).get('variables_or_topology_changed',[]),
             status=row.get('computation_status'),scores=row.get('proxy_values'),conditions=conditions,
+            construction=row.get('construction'),
             source=dict(reference=reference,pointer='/result/evaluated/'+str(i))))
     best=result.get('best_passive_candidate') or {}
     return dict(status=result['status'],method=query['method'],plan=result.get('requesting_plan'),
         problem=result['physical_problem'],score_semantics=result['score_semantics'],
-        termination_reason=result['termination_reason'],actual_counts=result['resource_use'],
+        termination_reason=result['termination_reason'],actual_counts={**result['resource_use'],**design_counts(result['evaluated'])},
+        recorded_counts_query=dict(reference=reference,view='full',pointer='/result/resource_use'),
         best_passive_candidate=(best.get('evidence') or {}).get('candidate'),best_scores=best.get('proxy_values'),
         search_scope={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','span_strategies','bounds',
             'diagnostic_load_conditions','objective','evaluation_mode','max_proposals','max_evaluations') if k in query},
@@ -782,7 +785,7 @@ def passive_search_summary(host, reference, result):
         task_acceptance='unmeasured',scientific_citation_eligible=False,
         results_query=dict(reference=reference,view='full',pointer='/result'),
         source=dict(reference=reference,pointer='/result'),
-        scope='Finite passive static screening only. A qualification score is not task performance, global feasibility or optimum. Only recorded coordinate moves were explored; unselected loads and the full task remain unmeasured.')
+        scope='Finite passive screening under the recorded evaluation model. Rejected constructions are not numerically evaluated designs; saved legacy counts remain at recorded_counts_query. Scores do not establish independent task acceptance, global feasibility or optimum. Only recorded coordinates and conditions were explored.')
 
 
 def result_card(host, reference):

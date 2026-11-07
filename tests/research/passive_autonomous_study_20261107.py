@@ -74,7 +74,7 @@ def status():
     return dict(study=NAME,status=s['research_status'],implementation=s['freeze'],
         ledger=h.store.remaining(),provider_requests=sum(e['kind']=='r3_request' for e in events),
         candidates=len(s['candidates']),analyses=len(s['analysis_results']),searches=len(s.get('search_results',[])),
-        mathematical_evaluations=s['mathematical_evaluations'],physical_episodes=s.get('physical_replay_launches',0),
+        mathematical_evaluations=s['mathematical_evaluations'],independent_replay_episodes=s.get('physical_replay_launches',0),
         physical_results=len(s.get('physical_replays',[])),pending=s.get('pending'),
         latest_plan=latest,provider_addenda=s.get('provider_request_extensions',[]))
 
@@ -97,12 +97,18 @@ def audit():
     for ref in s['analysis_results']:
         value=h.store.artifact(ref);research=value.get('structure_research') or {}
         diagnosis=research.get('qualification_diagnosis') or {}
+        baseline=research.get('baseline') or {}
+        finite_time=(dict(value=baseline.get('value'),unit=baseline.get('unit'),
+            task_gap=baseline.get('task_gap'),qualification_diagnosis=baseline.get('qualification_diagnosis'),
+            source=dict(reference=ref,pointer='/structure_research/baseline'))
+            if research.get('effect_semantics')=='finite_time_task_response' else None)
         analyses.append(dict(reference=ref,candidate=value.get('candidate'),status=value['status'],
             implementation=value.get('implementation'),operation=value.get('operation'),
             constraint_state=research.get('constraint_state'),
             qualification={k:diagnosis[k] for k in ('status','failure_stage','failure_layers','initial_forward_completed') if k in diagnosis},
             charged_numerical_s=value.get('charged_numerical_s'),
-            internal_calculations=value.get('internal_calculations'),task_acceptance=value.get('task_acceptance')))
+            internal_calculations=value.get('internal_calculations'),finite_time_task=finite_time,
+            task_acceptance=value.get('task_acceptance')))
     events=h.store.events(h.run_id)
     value=status();value.update(dict(scope='Bounded exported facts; original immutable Store retains all inputs, raw results and failed attempts.',
         provider_usage=reporter.provider_usage(h),analyses=analyses,
@@ -113,7 +119,7 @@ def audit():
             if e['kind'] in ('original_research_plan','candidate_analysis_result','design_search_result','research_report','physical_playback_result',
                 'provider_request_extension','provider_transport_transition','model_original_tool_request','model_original_tool_feedback','supervisor_pause')]))
     OUT.mkdir(parents=True,exist_ok=True);atomic_json(OUT/'audit.json',value)
-    print(json.dumps({k:value[k] for k in ('study','status','provider_requests','candidates','mathematical_evaluations','physical_episodes')}))
+    print(json.dumps({k:value[k] for k in ('study','status','provider_requests','candidates','mathematical_evaluations','independent_replay_episodes')}))
 
 
 if __name__=='__main__':

@@ -106,7 +106,8 @@ def reshape(space, query, point, previous=None):
         from extensions.tendon_family.family_space import payout_domains,parse_space
         domains=payout_domains(parse_space(space),p['tendon_count'])
         p['payout_lengths_m']=({k:old.get('payout_lengths_m',{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
-            if not space.get('payout_initialization') or 'payout' in query.variable_groups else deepcopy(old.get('payout_lengths_m',{})))
+            if not space.get('payout_initialization') or 'payout' in query.variable_groups else
+            {k:v for k,v in old.get('payout_lengths_m',{}).items() if k in domains})
     return p
 
 

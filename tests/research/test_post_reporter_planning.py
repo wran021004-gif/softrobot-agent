@@ -67,16 +67,64 @@ class PostReporterPlanningTests(unittest.TestCase):
                     computation_status='computed' if qualified else 'unresolved',proxy_values={'equilibrium_qualification':-.5} if qualified else {},
                     mathematical_numerical_s=0.,lineage=dict(variables_or_topology_changed=paths[i])))
             checkpoint=save(h,dict(problem=dict(query=q.model_dump(mode='json'))))
+            rows.append(dict(parameters=rows[0]['parameters'],evidence={},computation_status='invalid',
+                construction=dict(status='invalid',reason='UNKNOWN_PAYOUT_TENDON'),actual_mathematical_evaluations=0))
             result=dict(physical_problem=dict(diagnostic_only=True),status='best_mathematical_candidate',score_semantics='Offline synthetic qualification fixture; no performance claim',
                 termination_reason='evaluation_budget_exhausted',resource_use=dict(actual_mathematical_evaluations=3),
                 search_state=checkpoint,evaluated=rows,best_passive_candidate=rows[0])
             ref=save(h,dict(result=result));update(h,analysis_results=analyses,search_results=[ref])
             delivered=scientific_result_delivery(h);fixed=delivered['latest_search']['fixed_result']
-            self.assertEqual(len(fixed['structures']),3)
+            self.assertEqual(len(fixed['structures']),4)
+            self.assertEqual(fixed['actual_counts']['evaluated_designs'],3)
+            self.assertEqual(fixed['actual_counts']['construction_failures'],1)
+            self.assertEqual(fixed['structures'][3]['construction']['reason'],'UNKNOWN_PAYOUT_TENDON')
             self.assertEqual(fixed['structures'][2]['conditions']['unloaded']['failure_layers'],['tendons'])
             self.assertIsNone(delivered['latest_evaluation'])  # Child solves owned by this batch.
             card=result_card(h,ref)
             self.assertEqual(card.deterministic_summary['passive_family_search'],fixed)
+            self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+
+    def test_passive_count_decrease_preserves_retained_payouts_without_stale_channels(self):
+        from extensions.tendon_family.generated_serial import generate_family
+        from tools.research.mixed_moves import initial,generation,reshape
+        spec=resolve(PROFILE);space=spec['family_space']
+        q=FamilyMixedSearch.model_validate(dict(version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],
+            variable_groups=['tendon_count'],segment_counts=[2],tendon_counts=[3,4],screening_fidelity='diagnostic',
+            objective='equilibrium_qualification',operating_point='standardized_initial_pretension',max_proposals=3,max_evaluations=3,
+            evaluation_mode='passive_equilibrium',diagnostic_load_conditions=['unloaded']))
+        point=initial(space,q);point['tendon_count']=4;point=reshape(space,q,point)
+        generation(space,q,point)  # Resolves the actual zero-route payouts, no dynamics.
+        retained=deepcopy(point['payout_lengths_m']);self.assertEqual(len(retained),4)
+        point['tendon_count']=3;point=reshape(space,q,point)
+        request=generation(space,q,point);design,_,_=generate_family(dict(space=space,request=request))
+        self.assertEqual(request['payout_lengths_m'],{k:v for k,v in retained.items() if k!='tendon_3'})
+        self.assertEqual(len(design['fixed_payout_lengths_m']),3)
+        # Direct malformed generation input remains an error; no general repair.
+        request['payout_lengths_m']['tendon_3']=retained['tendon_3']
+        with self.assertRaisesRegex(ValueError,'UNKNOWN_PAYOUT_TENDON'):generate_family(dict(space=space,request=request))
+
+    def test_finite_time_novelty_and_operator_pause_keep_reporter_available_on_resume(self):
+        import asyncio
+        from tools.research import reporter
+        from schemas.research_reporting import ScientificReport
+        def card(artifact,dynamic):
+            return dict(identity=dict(result=dict(reference=dict(artifact_id=artifact*64,media_type='application/json'),pointer=''),
+                operation='mechanism_structure_v1',task_identity='offline',candidate=None),
+                evidence_summary=dict(verification_status='computed'),metrics=[],main_violations=[],mathematics=dict(claim={}),
+                deterministic_summary=dict(structure_research=dict(effect_semantics='finite_time_task_response' if dynamic else 'mechanism_effect')))
+        old=dict(mode='result_summary',results=[card('a',False)])
+        new=dict(mode='result_summary',results=[card('b',True)])
+        self.assertEqual(reporter.interpretation_priority(new,[old],decision_v3=True),'new_finite_time_structure_result')
+        self.assertEqual(reporter.interpretation_priority(new,[new],decision_v3=True),'routine_or_repeated_result')
+        with passive_host(PROFILE) as h:
+            from tools.research.state import save
+            source=save(h,dict(fixture='Offline pause only; no numerical facts'))
+            reporter._save(h,ScientificReport(mode='investigation',question='Offline pause fixture; no numerical facts.',
+                results=[dict(identity=dict(result=dict(reference=source,pointer='')),
+                    evidence_summary=dict(claim_kind='UNVERIFIED_HYPOTHESIS',verification_status='offline_fixture'))]))
+            with patch('tools.research.reporter._wire',side_effect=AssertionError('NO_PROVIDER_REQUEST')):
+                asyncio.run(reporter.complete_reports(h,None,max_model_calls=0))
+            self.assertEqual(reporter.current_reports(h,status_only=True)[0][1]['interpretation_status'],'deferred')
             self.assertEqual(h.store.remaining()['used']['model_calls'],0)
 
     def test_direct_plan_original_admission_and_optional_route(self):
