@@ -796,6 +796,11 @@ def error_feedback(host, use, exc, before):
             candidate_scope='Candidates are query leads, not automatic replacements; verify candidate/task/model and formal-read gates.')
     new_analysis=[host.store.artifact(r) for r in s.get('analysis_results',[]) if r not in before.get('analysis_results',[])]
     worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
+    search_guidance={}
+    if code=='FINITE_SEARCH_BOUNDS_REQUIRED':
+        from tools.research.search import request_guidance
+        guidance=request_guidance(s['spec'])['search']
+        search_guidance=dict(search_requirements={k:guidance[k] for k in ('bounds_catalogue','evaluation_cost') if k in guidance})
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
         reason=message[:1000],
         **(dict(contract=contract,issues=issues) if contract else {}),
@@ -803,7 +808,7 @@ def error_feedback(host, use, exc, before):
         charged_method_counts={k:s.get(k,0)-before.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations')},
         evidence_navigation=getattr(exc,'evidence_navigation',None),
         expected=expected,input_query=dict(reference=full,view='full',pointer='/tool_use/input'),
-        scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
+        scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation,**search_guidance)
 
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload

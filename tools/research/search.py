@@ -189,6 +189,16 @@ def request_guidance(spec):
             loads=[r['name'] for r in spec['configuration']['task']['physical_problem']['loads']],
             diagnostic_load_conditions='Optional static subset, explicitly diagnostic. Full finite-time evaluation always retains every frozen condition.'),
             initialization='An explicit decision.selected_candidate strictly seeds its representable structure; station-dependent sections or unsupported routes are rejected without projection. Omit that seed for a fresh family-default search center and retain current science in supporting_evidence. Main chooses starts and finite bounds; the same design/payout applies across loads, with no active inputs or historical solution seeds.')
+        space=spec['family_space'];segment=space['segment_domain']
+        # Present the frozen fields used by mixed_moves/search_domains. Search
+        # groups differ from the ordinary parameter-category navigation labels.
+        guidance['search']['bounds_catalogue']=dict(
+            lengths={'length_m':segment['length_m']},
+            materials={'young_pa':segment['young_pa'],**{'physical.'+k:v for k,v in segment.get('physical_domains',{}).items()}},
+            routing={'routing.'+k:v for k,v in space['routing_domains'].items()},
+            payout={'payout':space.get('passive_payout_domain_m') or space.get('passive_payout_domains_m')},
+            scope='Exact Search.bounds keys and frozen common domains, not evidence_read group names. Every selected open coordinate needs a finite interval; materials includes physical.* as well as young_pa. Per-segment/channel overrides and original admission still apply.')
+        guidance['search']['evaluation_cost']='max_evaluations counts condition-analysis entries: each candidate costs the number of selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads can evaluate only one candidate. Main chooses coverage and effort; no interval or variable is selected here.'
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
         if 'objectives' in guidance['search']:
             guidance['search']['objectives']=guidance['search']['passive']['objectives']

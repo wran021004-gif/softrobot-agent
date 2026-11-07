@@ -90,6 +90,8 @@ class PostReporterPlanningTests(unittest.TestCase):
         self.assertEqual(decision['candidate'],candidate);self.assertEqual(decision['scientific_evidence'],ref)
         self.assertEqual(len(decision['hypothesis_feedback']),2)
         self.assertIn('lengths',decision['passive_search']['structural_groups'])
+        self.assertIn('physical.curvature_y_rad_m',decision['passive_search']['bounds_catalogue']['materials'])
+        self.assertIn('six entries',decision['passive_search']['evaluation_cost'])
         self.assertFalse(view['reporter_findings'][0]['scientific_citation_eligible'])
         self.assertEqual((brief,delivered),before)
 

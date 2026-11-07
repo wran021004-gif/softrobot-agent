@@ -1152,7 +1152,7 @@ def tool_continuation(host):
                         repetitions=(previous['repetitions'] if previous else 0)+1))
                     admission_feedback=admission_feedback[-3:]
             code=detail.get('error_code') or '';reason=detail.get('reason') or ''
-            if code.startswith('TOOL_SCHEMA_') or reason.startswith('INVALID_SCIENTIFIC_') and reason.endswith('_INPUT'):
+            if code.startswith('TOOL_SCHEMA_') or code=='FINITE_SEARCH_BOUNDS_REQUIRED' or reason.startswith('INVALID_SCIENTIFIC_') and reason.endswith('_INPUT'):
                 # A completed tool call may return a rejected scientific input.
                 # Keep its validator facts beyond the four most recent reads;
                 # neither a later success nor rotation rewrites that request.
@@ -2469,7 +2469,7 @@ def information_flow_brief(brief, delivered):
     search=(brief.get('structure_actions') or {}).get('search')
     if post_result and search and search.get('passive'):
         post_result['passive_search']={k:search[k] for k in ('tool','action','version','structural_groups','topology',
-            'applicable_span_strategies','passive','initialization') if k in search}
+            'applicable_span_strategies','passive','initialization','bounds_catalogue','evaluation_cost') if k in search}
         post_result['passive_search']['finite_bounds']='For each selected open continuous coordinate supply a finite bounds interval in the search request. The original FamilySpace remains open; only this request is bounded.'
     if brief.get('knowledge_catalogue'):
         result['knowledge']['catalogue']=brief['knowledge_catalogue']
