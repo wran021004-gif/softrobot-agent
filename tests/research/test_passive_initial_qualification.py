@@ -89,6 +89,33 @@ class InitialQualificationTests(unittest.TestCase):
         self.assertLess(p['checks']['contacts']['minimum_distance_m'],-.56)
         np.testing.assert_allclose([t['signed_residual_m'] for t in p['checks']['tendons']],.808)
         self.assertEqual(result['numerical_cost']['optimizer_iterations'],0)
+        # Replay this failed geometry through a fresh fixture Store and the
+        # existing Worker/Reporter projections, without a Provider request.
+        from tests.research.test_passive_capabilities import passive_host
+        from tests.research.test_organized_knowledge import enable
+        from tools.research import analysis,reporter
+        from tools.research.design import generate_candidate
+        from tools.research.state import state
+        archived=json.loads(path.read_bytes())
+        with passive_host() as h:
+            request=deepcopy(archived['design_context']['parameters'])
+            request['family_space_identity']=state(h)['spec']['family_space_identity']
+            generated=generate_candidate(h,request,dict(origin='archived failed C geometry regression only'))
+            self.assertEqual(generated['status'],'generated')
+            query=deepcopy(archived['query']);query['candidate']=generated['candidate']
+            output=analysis.dispatch(h,query,'initial-qualification-c-regression',guard=lambda *args:None)
+            self.assertEqual(output['status'],'computed')
+            self.assertEqual(output['structure_research']['qualification_diagnosis']['status'],'preflight_failed')
+            saved=h.store.artifact(output['reference'])
+            self.assertEqual(saved['structure_research']['cost']['native_forward_calls'],0)
+            self.assertEqual(saved['candidate'],generated['candidate'])
+            enable(h)
+            report=reporter.investigate(h,dict(question='Explain initial qualification, length excess and contact; no global infeasibility.',references=[output['reference']]))
+            wire=reporter._wire(h,report['report_reference'],h.store.artifact(report['report_reference']))
+            payload=json.loads(wire['messages'][-1]['content'])
+            self.assertIn('initial_geometry_preflight',json.dumps(payload['report']['results']))
+            self.assertTrue(any(v['reference']==output['reference'] for v in payload['source_catalog'].values()))
+            self.assertEqual(h.store.remaining()['used']['model_calls'],0)
 
     def test_existing_math_feedback_projects_preflight_with_source(self):
         from tools.research.analysis import diagnostic_layers
