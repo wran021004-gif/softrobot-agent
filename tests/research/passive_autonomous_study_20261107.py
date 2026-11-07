@@ -68,7 +68,7 @@ def prepare():
 def status():
     h=host();s=state(h);events=h.store.events(h.run_id)
     plans=[dict(sequence=e['sequence'],reference=e['outputs'][0],
-        plan=h.store.artifact(e['outputs'][0])) for e in events if e['kind']=='original_research_plan']
+        plan=h.store.artifact(e['outputs'][0])['original_plan']) for e in events if e['kind']=='original_research_plan']
     latest=plans[-1] if plans else None
     if latest:latest={**latest,'plan':{k:latest['plan'].get(k) for k in ('action','hypothesis','interpretation','stopping_condition','decision')}}
     return dict(study=NAME,status=s['research_status'],implementation=s['freeze'],
@@ -89,6 +89,33 @@ def extend(count,reason):
     print(json.dumps(result))
 
 
+def audit():
+    """Bounded derivative of the original Store; raw results stay authoritative."""
+    from tools.research import reporter
+    from tools.research.feedback import search_feedback
+    h=host();s=state(h);analyses=[]
+    for ref in s['analysis_results']:
+        value=h.store.artifact(ref);research=value.get('structure_research') or {}
+        diagnosis=research.get('qualification_diagnosis') or {}
+        analyses.append(dict(reference=ref,candidate=value.get('candidate'),status=value['status'],
+            implementation=value.get('implementation'),operation=value.get('operation'),
+            constraint_state=research.get('constraint_state'),
+            qualification={k:diagnosis[k] for k in ('status','failure_stage','failure_layers','initial_forward_completed') if k in diagnosis},
+            charged_numerical_s=value.get('charged_numerical_s'),
+            internal_calculations=value.get('internal_calculations'),task_acceptance=value.get('task_acceptance')))
+    events=h.store.events(h.run_id)
+    value=status();value.update(dict(scope='Bounded exported facts; original immutable Store retains all inputs, raw results and failed attempts.',
+        provider_usage=reporter.provider_usage(h),analyses=analyses,
+        plans=[dict(reference=r,plan=h.store.artifact(r)['original_plan']) for r in s['plans']],
+        searches=[search_feedback(h,r) for r in s.get('search_results',[])],
+        reports=[dict(reference=r,status=v['interpretation_status'],interpretations=v['report'].get('interpretations',[])) for r,v in reporter.current_reports(h)],
+        timeline=[dict(sequence=e['sequence'],kind=e['kind'],status=e['status'],references=e['outputs']) for e in events
+            if e['kind'] in ('original_research_plan','candidate_analysis_result','design_search_result','research_report','physical_playback_result',
+                'provider_request_extension','provider_transport_transition','model_original_tool_request','model_original_tool_feedback','supervisor_pause')]))
+    OUT.mkdir(parents=True,exist_ok=True);atomic_json(OUT/'audit.json',value)
+    print(json.dumps({k:value[k] for k in ('study','status','provider_requests','candidates','mathematical_evaluations','physical_episodes')}))
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['check','prepare','run','status','extend','audit'])
     p.add_argument('--requests',type=int,default=8);p.add_argument('--reason');a=p.parse_args()
@@ -99,6 +126,4 @@ if __name__=='__main__':
         if not a.reason:p.error('extend requires a progress-based --reason')
         extend(a.requests,a.reason)
     elif a.command=='run':asyncio.run(agent.converse(host(),max_new_provider_requests=a.requests,pause_exploration_remaining=4))
-    elif a.command=='audit':
-        from tests.research.passive_knowledge_loop_probe import audit
-        audit(host(),OUT)
+    elif a.command=='audit':audit()
