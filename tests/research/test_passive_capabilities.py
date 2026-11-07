@@ -78,6 +78,31 @@ class PassiveKnowledgeTests(unittest.TestCase):
 
 
 class PassiveSearchTests(unittest.TestCase):
+    def test_static_signed_constraints_and_unscored_baseline(self):
+        """Synthetic scalar fixtures only; verify objective semantics, not physics."""
+        from tools.research.passive_search import static_score,evaluate
+        from tools.research.state import save
+        from extensions.tendon_family.contracts import ConstrainedObservation
+        def raw(observations):
+            return dict(status='computed',structure_research=dict(records=[dict(mechanics=dict(
+                constraint_state=dict(qualified=True),task_observations=observations))]))
+        rows=[dict(name='minimum',value=2.,minimum=1.,maximum=None),
+            dict(name='maximum',value=3.,maximum=4.,minimum=None)]
+        self.assertEqual(static_score(raw(rows),'task_violation')[0],-.25)
+        zero=dict(name='zero',value=.002,maximum=0.,minimum=None,normalization_scale=.01)
+        self.assertAlmostEqual(static_score(raw([zero]),'task_violation')[0],.2)
+        self.assertEqual(ConstrainedObservation(name='zero',quantity='maximum_length_excess',
+            load_condition='load',maximum=0.,normalization_scale=.01).normalization_scale,.01)
+        self.assertIsNone(static_score(raw([]),'task_violation')[0])
+        with passive_host() as h:
+            refs=[save(h,raw([])),save(h,raw(rows))]
+            q=mixed_query(state(h)['spec'],objective='task_violation')
+            with patch('tools.research.passive_search.problem',return_value=dict(conditions=['unloaded','load'])),\
+                    patch('tools.research.analysis.dispatch',side_effect=[dict(reference=r) for r in refs]):
+                row=evaluate(h,q,dict(candidate=state(h)['family_space_reference']),'synthetic-scalar-minimax',lambda:None,lambda *a:None)
+            self.assertEqual(row['proxy_values']['task_violation'],-.25)
+            self.assertEqual(row['evidence']['conditions']['unloaded']['status'],'qualified_without_objective')
+
     def test_formal_plan_multiload_and_read_only_reporter(self):
         import asyncio
         import httpx
@@ -107,7 +132,7 @@ class PassiveSearchTests(unittest.TestCase):
             with patch('tools.research.provider.credential',return_value='offline-fixture'):
                 asyncio.run(reporter.complete_reports(h,httpx.MockTransport(respond)))
             self.assertEqual(reporter.entries(h)[-1][1]['interpretation_status'],'available',
-                [(v['interpretation_status'],v.get('error'),[c['deterministic_summary'] for c in v['report']['results']]) for _,v in reporter.entries(h)])
+                [(v['interpretation_status'],v.get('error')) for _,v in reporter.entries(h)])
             self.assertEqual(wires[0]['reasoning_effort'],'medium')
             self.assertEqual(h.store.artifact(ref),raw)
             self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
@@ -180,6 +205,21 @@ class PassiveSearchTests(unittest.TestCase):
             paths=select_group_parameters(spec,candidate,'tendon_routing')
             self.assertEqual(len(paths),2)
             self.assertTrue(all(p.startswith('spans.') for p in paths))
+            from tools.research import core
+            from tools.research.scientific_intent import compile_question
+            from tests.research.test_p63g3_action_handoff import diagnosis
+            intent=diagnosis(result['candidate'],'mechanism_research')
+            intent['decision']['requested_budget']=10
+            with patch.object(core,'guard'):
+                core.dispatch(h,intent,'offline-group-diagnose')
+            compiled=compile_question(h,dict(version='scientific_question_v4',domain='structure',structure=dict(
+                operation='differentiate',parameter_group='routing',physical_problem='passive_unilateral_equilibrium',
+                effect_semantics='re_equilibrated_passive_response',operating_point='re_equilibrated',
+                control_treatment='no_active_control',load_condition=spec['configuration']['task']['physical_problem']['loads'][1]['name'],
+                target=dict(quantity='re_equilibrated_position_response',reduction='norm',goal='decrease'))),tool_use_id='offline-group-compile')
+            self.assertEqual(compiled['status'],'ready',compiled)
+            self.assertEqual(compiled['request']['mechanism_study']['parameter_paths'],paths)
+            self.assertEqual(state(h)['mathematical_evaluations'],0)
             with self.assertRaisesRegex(ValueError,'STATIC_TASK_OBJECTIVE_UNAVAILABLE'):
                 search_problem(h,mixed_query(spec,objective='task_violation'),1)
 

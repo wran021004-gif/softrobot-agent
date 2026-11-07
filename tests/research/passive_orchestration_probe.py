@@ -97,8 +97,16 @@ def audit():
         for e in events:
             if e['kind']=='r3_request':
                 meta=h.store.artifact(e['outputs'][0]);wire=h.store.artifact(meta['request'])
+                packets=[json.loads(m['content'].split('\n',1)[1]) for m in wire['messages']
+                    if isinstance(m.get('content'),str) and m['content'].startswith('CURRENT_RESEARCH_PACKET\n')]
+                packet=packets[-1] if packets else {};research=packet.get('research',{})
                 requests.append(dict(request_id=e['request_id'],purpose=meta['purpose'],model=wire['model'],
-                    reasoning=wire.get('reasoning_effort'),tools=[t['function']['name'] for t in wire.get('tools',[])]))
+                    reasoning=wire.get('reasoning_effort'),tools=[t['function']['name'] for t in wire.get('tools',[])],
+                    context=dict(operator_question_delivered=packet.get('operator_request',{}).get('instruction',{}).get('case')==case,
+                        closeout=research.get('budget',{}).get('closeout'),
+                        knowledge_entries=[r['entry_id']+'@'+r['revision'] for r in research.get('knowledge',{}).get('catalogue',[])],
+                        reporter_statuses=[r.get('status') for r in research.get('reporter_findings',[])],
+                        latest_mathematics=research.get('mathematical_research',{}).get('latest_result'))))
             if e['kind']=='r3_response' and e['status']=='metadata_saved':
                 meta=h.store.artifact(e['outputs'][0]);body=json.loads(h.store.artifact(meta['body'],raw=True))
                 responses.append(dict(request_id=e['request_id'],purpose=meta['purpose'],http_status=meta['http_status'],

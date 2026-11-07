@@ -398,6 +398,7 @@ class ResearchTaskAdapter:
                 'maximum_tension':max(eq['tensions_n']),'maximum_length_excess':max(0.,max(eq['length_residual_m']))}[metric.quantity] if qualified else None
             bounded=metric.minimum is not None or metric.maximum is not None
             rows.append(dict(name=metric.name,value=value,unit=metric.physical_unit,maximum=metric.maximum,minimum=metric.minimum,
+                **(dict(normalization_scale=metric.normalization_scale) if metric.normalization_scale is not None else {}),
                 observation=metric.model_dump(),reference_load=problem['baseline_load'],
                 within_mathematical_limit=bool((metric.minimum is None or value>=metric.minimum) and
                     (metric.maximum is None or value<=metric.maximum)) if value is not None and bounded else None,

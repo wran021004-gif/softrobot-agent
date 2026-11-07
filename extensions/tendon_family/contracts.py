@@ -187,6 +187,8 @@ class ConstrainedObservation(Contract):
     material_scale: FiniteFloat = Field(default=1.,gt=0,
         description='For displacement_difference: tip response minus material_scale times material response, in metres; avoids division near zero.')
     unit: Literal['m','N','1'] | None = None
+    normalization_scale: FiniteFloat | None = Field(default=None,gt=0,
+        description='Positive scale in the observation unit; required for a dimensionless signed violation at a zero bound.')
 
     @property
     def physical_unit(self):
@@ -211,7 +213,7 @@ class ConstrainedObservation(Contract):
         result=handler(self)
         # Preserve absent defaults in frozen historical task identities.
         for key,default in dict(minimum=None,reduction='norm',direction_world=None,projection_world=None,
-                frame='world',reference_load=None,material_scale=1.,unit=None).items():
+                frame='world',reference_load=None,material_scale=1.,unit=None,normalization_scale=None).items():
             if getattr(self,key)==default:result.pop(key,None)
         return result
 
