@@ -2101,7 +2101,9 @@ def mechanism_direction_view(host, candidate, view, *, execution_block=None):
             if raw.get('candidate')!=candidate:continue
             static=raw.get('structure_research',{}).get('qualification_diagnosis')
             if static:
-                result['qualification_diagnosis']=static
+                from extensions.tendon_family.passive_equilibrium import qualification_projection
+                result['qualification_diagnosis']=qualification_projection(static)
+                result['qualification_diagnosis']['source']=dict(reference=ref,pointer='/structure_research/qualification_diagnosis')
                 break
             diagnosis=(raw.get('structure_research',{}).get('baseline') or {}).get('qualification_diagnosis')
             if diagnosis:

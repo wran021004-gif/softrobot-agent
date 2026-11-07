@@ -131,9 +131,13 @@ class OrganizedKnowledgeTests(unittest.TestCase):
         fixture_case.setUpClass();fixture_case.setUp();self.addCleanup(fixture_case.doCleanups)
         h=fixture_case.h;enable(h);reference=fixture_case.physical()
         original=h.store.artifact(reference);known=registered_references(h);wires=[]
+        main_read=experience.retrieve(h,dict(operation='read',entry_id='diagnostic-slack',revision='1'))['reference']
         result=reporter.investigate(h,dict(question='Explain tendon slack and competing causes.',references=[reference]))
         saved=h.store.artifact(result['report_reference'])
         refs=saved['request']['experience_receipts'];self.assertGreater(len(refs),0);self.assertLessEqual(len(refs),2)
+        self.assertIn(main_read,refs)
+        self.assertEqual(sum(h.store.artifact(r)['results'][0]['entry_id']=='diagnostic-slack'
+            for r in state(h)['retrievals']),1)
         def respond(request):
             wire=json.loads(request.content);wires.append(wire);payload=json.loads(wire['messages'][-1]['content'])
             rows=[r for rec in payload['procedural_guidance'] for r in rec['results']]

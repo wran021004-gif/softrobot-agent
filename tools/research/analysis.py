@@ -795,6 +795,13 @@ def diagnostic_layers(value):
                 'tendon_length_m','payout_m','length_residual_m','geometric_active','geometric_slack')),
             missing=['geometry qualification'] if geometry.get('status')=='computed' else ['position geometry'],
             failures=[geometry['reason']] if geometry.get('reason') else [],scope=geometry.get('scope','Position-only facts.'))
+    if diagnosis.get('initial_qualification'):
+        from extensions.tendon_family.passive_equilibrium import qualification_projection
+        preflight=qualification_projection(diagnosis)['initial_qualification']
+        layers['geometry']=layer(preflight['status'],dict(initial_qualification=preflight,
+            source_pointer=diagnosis_pointer+'/initial_qualification'),
+            missing=['Unclassified initial conditions'] if preflight['status']=='indeterminate' else [],
+            failures=diagnosis.get('failure_layers',[]) if preflight['status']=='failed' else [],scope=preflight['scope'])
     if diagnosis:
         trials=diagnosis.get('trials',[])
         process=[fields(t,('status','stage','initial_forward_completed','optimizer_entered','optimizer_success','optimizer_status',

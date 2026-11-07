@@ -6,6 +6,53 @@ from scipy.linalg import null_space
 from .passive import material_point
 
 
+def initial_qualification(native, initial):
+    """Actual compiled position pipeline; no acceleration solve or integration."""
+    m=native.model;d=mujoco.MjData(m);d.qpos[:]=initial
+    opts=native.protocol['static_solver'];cost=dict(native_position_attempts=1,native_position_calls=0,
+        native_forward_calls=0,physics_steps=0)
+    result=dict(status='indeterminate',stage='initial_geometry_preflight',model_identity=native.physics['identity'],
+        initial_qpos=d.qpos.tolist(),checks={},cost=cost,
+        worker=dict(started=True,numerical_solver_started=False,full_forward_entered=False,optimizer_entered=False,
+            meaning='Worker process has started; numerical solver flags describe this solve.'),
+        task_acceptance='unmeasured',scope='Initial state only; no equilibrium, stability, task acceptance or global infeasibility conclusion.')
+    try:mujoco.mj_fwdPosition(m,d)
+    except Exception as exc:
+        result['warning']=str(exc);return result
+    cost['native_position_calls']=1
+    pairs=[]
+    # Native collision masks, parent filters and explicit exclusions already
+    # selected these pairs. A gap within a native margin is not penetration.
+    for c in d.contact:
+        ids=[int(c.geom1),int(c.geom2)]
+        known=all(0<=i<m.ngeom for i in ids)
+        classification=('penetration_forbidden_by_contact_mode_none' if c.dist<0 else 'separated_or_touching') if known and native.problem.contact_mode=='none' else 'unclassified'
+        pairs.append(dict(geom_ids=ids,geoms=[m.geom(i).name for i in ids] if known else [],
+            body_ids=[int(m.geom_bodyid[i]) for i in ids] if known else [],distance_m=float(c.dist),
+            position_world_m=c.pos.tolist(),classification=classification))
+    contact_failed=any(p['classification']=='penetration_forbidden_by_contact_mode_none' for p in pairs)
+    contact_unknown=any(p['classification']=='unclassified' for p in pairs)
+    result['checks']['contacts']=dict(status='failed' if contact_failed else 'indeterminate' if contact_unknown else 'passed',
+        count=int(d.ncon),pairs=pairs,minimum_distance_m=min((p['distance_m'] for p in pairs),default=None),
+        basis='Native collision filtering; existing contact_mode=none forbids negative signed contact distance. Nonnegative margin contacts are allowed initial gaps; no added penetration tolerance.',
+        collision_scope='Only native-enabled pairs; excluded solid pairs are not certified collision-free.',
+        body_poses=[dict(body_id=i,name=m.body(i).name,position_world_m=d.xpos[i].tolist(),quaternion_world=d.xquat[i].tolist()) for i in range(m.nbody)])
+    tendons=[]
+    for i,(ell,payout) in enumerate(zip(d.ten_length,native.payout)):
+        g=float(ell-payout);limited=bool(m.tendon_limited[i]) and not native.unrestricted
+        finite=bool(np.isfinite(ell) and np.isfinite(payout))
+        status='indeterminate' if not finite else 'failed' if limited and g>opts['length_tolerance_m'] else 'passed'
+        tendons.append(dict(tendon_id=m.tendon(i).name,path_length_m=float(ell),payout_length_m=float(payout),
+            signed_residual_m=g,status=status,enforced=limited,
+            geometric_state='boundary' if abs(g)<=opts['active_tolerance_m'] else 'slack' if g<0 else 'length_excess',
+            basis='g=ell-L<=0; native position tendon path and fixed assembly payout; geometric activity does not measure tension.',
+            length_tolerance_m=opts['length_tolerance_m'],active_tolerance_m=opts['active_tolerance_m']))
+    result['checks']['tendons']=tendons
+    statuses=[result['checks']['contacts']['status'],*[t['status'] for t in tendons]]
+    result['status']='failed' if 'failed' in statuses else 'indeterminate' if 'indeterminate' in statuses else 'passed'
+    return result
+
+
 class StaticProblem:
     def __init__(self,native,s=.5,force=0.):
         from .backends import MujocoFailureSnapshot
@@ -91,8 +138,15 @@ class StaticProblem:
 
 
 def solve(native,s=.5,force=0.,initial=None,multistart=False):
-    problem=StaticProblem(native,s,force);problem.cost['equilibrium_solves']+=1;opts=native.protocol['static_solver'];n=native.model.nv
+    problem=StaticProblem(native,s,force);opts=native.protocol['static_solver'];n=native.model.nv
     starts=[np.zeros(n) if initial is None else np.array(initial)]
+    preflight=initial_qualification(native,starts[0])
+    problem.cost.update(preflight['cost'])
+    if preflight['status']=='failed':
+        return dict(method='passive_equilibrium_v1',s=s,force_n=force,status='preflight_failed',equilibrium=None,trials=[],
+            initial_qualification=preflight,numerical_cost=problem.cost,solver_settings=dict(opts),task_acceptance='unmeasured')
+    problem.cost['equilibrium_solves']+=1
+    preflight['worker']['numerical_solver_started']=True
     if multistart:starts.append(starts[0]+.001*np.sin(np.arange(n)))
     trials=[]
     for start in starts:
@@ -101,9 +155,11 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
         before=dict(problem.cost)
         trial=dict(initial=start.tolist(),initial_forward_completed=False,optimizer_entered=False,stage='initial_forward')
         try:
+            preflight['worker']['full_forward_entered']=True
             gap=problem.constraint(start).tolist();contacts=int(problem.at(start).ncon)
             trial.update(initial_forward_completed=True,initial_contacts=contacts,initial_length_residual_m=gap,
                 optimizer_entered=True,stage='optimizer')
+            preflight['worker']['optimizer_entered']=True
             result=minimize(lambda q:1000*problem.objective(q),start,jac=lambda q:1000*problem.gradient(q),
                 method='SLSQP',constraints=cons,options=dict(ftol=opts['ftol'],maxiter=opts['max_iterations']))
             problem.cost['optimizer_iterations']+=int(result.nit)
@@ -115,7 +171,7 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
             trial.update(status='aborted',failure_stage=trial['stage'],reason=str(exc),
                 numerical_cost={k:v-before[k] for k,v in problem.cost.items()})
             exc.equilibrium_progress=dict(trials=trials,starts_requested=len(starts),starts_attempted=len(trials)+1,
-                failed_trial=trial,
+                failed_trial=trial,initial_qualification=preflight,
                 initial_forward_completed=trial['initial_forward_completed'],
                 numerical_cost=dict(problem.cost))
             raise
@@ -130,13 +186,35 @@ def solve(native,s=.5,force=0.,initial=None,multistart=False):
     best=min(good or trials,key=lambda x:(x['primal_violation_m'],x['stationarity_inf_nm']))
     return dict(method='passive_equilibrium_v1',s=s,force_n=force,status=best['status'],equilibrium=best,trials=trials,
         multistart_same_branch=bool(max(np.linalg.norm(np.array(x['qpos'])-best['qpos']) for x in trials)<1e-4) if multistart else None,
-        numerical_cost=problem.cost,solver_settings=dict(opts),task_acceptance='unmeasured',regularization='none',
+        initial_qualification=preflight,numerical_cost=problem.cost,solver_settings=dict(opts),task_acceptance='unmeasured',regularization='none',
         assumptions='native 3D hinges, frictionless straight cable, rigid body gravity, ideal hard unilateral lengths; separate from MuJoCo soft constraint equilibrium')
+
+
+def qualification_projection(diagnosis):
+    """Small feedback view; full positions/contact pairs stay in the math result."""
+    result={k:v for k,v in diagnosis.items() if k!='numerical_failure'}
+    result['trials']=[{k:v for k,v in row.items() if k!='initial'} for row in diagnosis.get('trials',[])]
+    preflight=diagnosis.get('initial_qualification')
+    if preflight:
+        checks=preflight['checks'];contacts=checks.get('contacts',{})
+        result['initial_qualification']={**{k:v for k,v in preflight.items() if k not in ('initial_qpos','checks')},
+            'checks':dict(contacts={k:v for k,v in contacts.items() if k not in ('pairs','body_poses')},
+                tendons=checks.get('tendons',[]))}
+    return result
 
 
 def qualification_diagnosis(result=None, *, failure=None, multistart=False):
     """Physical eligibility facts, never a structural infeasibility conclusion."""
     progress=getattr(failure,'equilibrium_progress',{}) if failure is not None else {}
+    preflight=(result or progress).get('initial_qualification')
+    if preflight and preflight['status']=='failed':
+        return dict(status='preflight_failed',qualified=False,stability_qualified=False,trials=[],starts_attempted=0,
+            initial_qualification=preflight,failure_stage='initial_geometry_preflight',
+            failure_layers=[k for k,v in preflight['checks'].items() if
+                (v.get('status')=='failed' if isinstance(v,dict) else any(t['status']=='failed' for t in v))],
+            initial_forward_completed=False,task_acceptance='unmeasured',
+            unresolved_explanations=['Whether a qualified equilibrium exists elsewhere','Causal contribution to historical Hessian factorization failure'],
+            scope=preflight['scope'])
     trials=(result or progress).get('trials',[]);eq=(result or {}).get('equilibrium')
     qualified=bool(eq and eq['status']=='qualified_local_minimum')
     snapshot=getattr(failure,'mujoco_diagnostic',{}) if failure is not None else {}
@@ -166,6 +244,7 @@ def qualification_diagnosis(result=None, *, failure=None, multistart=False):
         starts_attempted=progress.get('starts_attempted',len(trials)),trials=rows,
         starts_skipped_after_abort=progress.get('starts_requested',0)-progress.get('starts_attempted',0),
         failure_layers=layers,initial_forward_completed=not initial_failure,
+        **(dict(initial_qualification=preflight) if preflight else {}),
         failure_stage=progress.get('failed_trial',{}).get('failure_stage'),
         numerical_failure=snapshot or None,
         failed_forward_geometry=({k:collision[k] for k in ('ncon','nefc','valid_complete_state','interpretation') if k in collision} if collision else None),
@@ -224,8 +303,14 @@ def mechanics(native,condition,material_s,initial=None,direction_world=None,*,ba
             constraint_state=dict(status='unqualified',qualified=False),task_observations=[],
             point_binding=dict(material_s=material_s,load=unloaded.model_dump(mode='json'),frame='world'),
             qualification_diagnosis=qualification_diagnosis(failure=exc,multistart=unloaded_multistart))
-    loaded=baseline if condition==native.problem.baseline_load else solve(native,load.material_s,load.force_world_n,initial[1] if initial else baseline['equilibrium']['qpos'])
+    loaded=baseline if baseline['status']=='preflight_failed' or condition==native.problem.baseline_load else solve(native,load.material_s,load.force_world_n,initial[1] if initial else baseline['equilibrium']['qpos'])
     cost={k:(baseline['numerical_cost'][k] if baseline_result is None else 0)+(loaded['numerical_cost'][k] if loaded is not baseline else 0) for k in baseline['numerical_cost']}
+    if loaded['status']=='preflight_failed':
+        for k,v in cost.items():native.cost[k]=native.cost.get(k,0)+v
+        return dict(physical_problem='passive_unilateral_equilibrium',equilibrium=None,baseline_equilibrium=baseline,
+            constraint_state=dict(status='unqualified',qualified=False),task_observations=[],
+            point_binding=dict(material_s=material_s,load=load.model_dump(mode='json'),frame='world'),
+            qualification_diagnosis=qualification_diagnosis(loaded,multistart=unloaded_multistart))
     p=StaticProblem(native,load.material_s,load.force_world_n);eq=loaded['equilibrium'];q=np.array(eq['qpos'])
     data=p.at(q);point,Jpoint,_=native.point(data,material_point(native.physics,material_s));Jtip=native.point(data,native.physics['tip'])[1]
     basepoint=native.point(p.at(np.array(baseline['equilibrium']['qpos'])),material_point(native.physics,material_s))[0]
@@ -239,7 +324,7 @@ def mechanics(native,condition,material_s,initial=None,direction_world=None,*,ba
     if response:
         for key,value in response['numerical_cost'].items():cost[key]+=value
     data=p.at(q);native.apply_force(data,load.material_s,load.force_world_n);mujoco.mj_forward(native.model,data)
-    for k,v in cost.items():native.cost[k]=native.cost.get(k,0)+v+p.cost[k]
+    for k,v in cost.items():native.cost[k]=native.cost.get(k,0)+v+p.cost.get(k,0)
     native.cost['native_forward_calls']+=1
     return dict(physical_problem='passive_unilateral_equilibrium',time_s=0.,qpos_rad=q.tolist(),qvel_rad_s=[0.]*len(q),
         coordinates=dict(dof_order=native.physics['dofs'],tendon_order=[t['entity'] for t in native.physics['tendons']]),

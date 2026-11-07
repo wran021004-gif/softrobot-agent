@@ -75,26 +75,6 @@ def dynamic_cost(configuration, evaluations, paired=False):
         physics_steps=arms*evaluations*round(duration/task['timing']['timestep_s']))
 
 
-def initial_geometry(native, initial=None):
-    """Position-only facts at the first start; no equilibrium or integration."""
-    import mujoco
-    data=mujoco.MjData(native.model)
-    data.qpos[:]=np.zeros(native.model.nv) if initial is None else initial
-    native.cost['native_position_attempts']=native.cost.get('native_position_attempts',0)+1
-    try:mujoco.mj_fwdPosition(native.model,data)
-    except Exception as exc:return dict(status='numerically_unresolved',reason=str(exc),scope='Initial geometry unavailable; no qualification inferred.')
-    native.cost['native_position_calls']=native.cost.get('native_position_calls',0)+1
-    contacts=[dict(geom1=native.model.geom(int(c.geom1)).name,geom2=native.model.geom(int(c.geom2)).name,
-        distance_m=float(c.dist),position_world_m=c.pos.tolist()) for c in data.contact]
-    return dict(status='computed',source='native position pipeline at first declared start',
-        contact_count=int(data.ncon),minimum_contact_distance_m=min((c['distance_m'] for c in contacts),default=None),
-        contact_examples=contacts[:3],tendon_length_m=data.ten_length.tolist(),payout_m=native.payout.tolist(),
-        length_residual_m=(data.ten_length-native.payout).tolist(),
-        geometric_active=((data.ten_length-native.payout)>=-native.protocol['static_solver']['active_tolerance_m']).tolist(),
-        geometric_slack=((data.ten_length-native.payout)<-native.protocol['static_solver']['active_tolerance_m']).tolist(),
-        scope='Initial geometry only; contact and length excess are observations, not proof of their causal role in factorization failure, equilibrium, stability or task acceptance.')
-
-
 def finite_time_discovery(configuration):
     from tools.research_tasks import task_adapter
     cap=task_adapter(configuration).physical_capabilities()
@@ -405,15 +385,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             native=PassiveModel(physics,cfg['task']['physical_problem'],scene=scene)
             if original:native.protocol['static_solver'].update(goal['unloaded_static_solver'])
             seed=None
-            if not original and records and native.physics['dofs']==models[0].physics['dofs']:
+            if not original and records and records[0]['mechanics']['equilibrium'] is not None and native.physics['dofs']==models[0].physics['dofs']:
                 seed=[records[0]['mechanics'][k]['equilibrium']['qpos'] for k in ('baseline_equilibrium','equilibrium')]
             qualification_only=(study.operation=='inspect' and study.target.quantity=='constraint_active_set'
                 and study.load_condition==native.problem.baseline_load)
-            geometry=initial_geometry(native,seed[0] if seed else None) if qualification_only else None
             mechanics=constrained_mechanics(native,study.load_condition,getattr(study.target,'material_s',.5),seed,
                 study.target.direction_world if study.target.quantity=='directional_material_response' else None,
                 unloaded_multistart=goal.get('unloaded_multistart',False),qualification_only=qualification_only)
-            if geometry is not None:mechanics['qualification_diagnosis']['initial_geometry']=geometry
             from tools.research_tasks import task_adapter
             if mechanics['equilibrium'] is not None:
                 mechanics['task_observations']=task_adapter(cfg).constrained_observations(mechanics)
@@ -778,8 +756,10 @@ def summary(value, reference):
     task_observations=deepcopy(raw.get('task_observations',[])[:4])
     diagnosis=raw.get('qualification_diagnosis')
     if diagnosis:
-        diagnosis={k:v for k,v in diagnosis.items() if k!='numerical_failure'}
-        diagnosis['trials']=[{k:v for k,v in row.items() if k!='initial'} for row in diagnosis.get('trials',[])]
+        from extensions.tendon_family.passive_equilibrium import qualification_projection
+        diagnosis=qualification_projection(diagnosis)
+        if diagnosis.get('initial_qualification'):
+            diagnosis['initial_qualification']['source']=dict(reference=reference,pointer='/structure_research/qualification_diagnosis/initial_qualification')
         if raw['qualification_diagnosis'].get('numerical_failure'):
             diagnosis['numerical_failure_pointer']='/structure_research/qualification_diagnosis/numerical_failure'
     if raw.get('physical_problem'):

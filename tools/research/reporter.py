@@ -55,6 +55,17 @@ RESULT_KEYS=('results','physical_replays','mechanics_results','analysis_results'
     'matched_state_results','rl_evaluations','control_search_results','search_results')
 
 
+def _knowledge_receipt(host, query):
+    from tools.research.experience import retrieve
+    if query.get('operation')=='read' and state(host)['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+        for ref in reversed(state(host).get('retrievals',[])):
+            receipt=host.store.artifact(ref);old=receipt['query']
+            if (all(old.get(k)==query.get(k) for k in ('operation','entry_id','revision'))
+                    and old.get('detail','full')==query.get('detail','full')
+                    and any(r.get('content') is not None for r in receipt['results'])):return ref
+    return retrieve(host,query,reader='reporter')['reference']
+
+
 def entries(host, *, status_only=False):
     references={e['outputs'][0]['artifact_id']:plain(e['outputs'][0])
         for e in host.store.events(host.run_id) if e['kind']=='research_report'}
@@ -224,7 +235,7 @@ def assemble(host, references, *, question=None):
 def _save(host, report, *, request=None, status='deferred', interpretation_for=None, error=None,rejection_details=None):
     from tools.research.provider import record
     if status=='deferred' and state(host)['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
-        from tools.research.experience import entries as knowledge_entries, retrieve
+        from tools.research.experience import entries as knowledge_entries
         request=deepcopy(request or {})
         if not request.get('experience_receipts'):
             value=plain(report)
@@ -238,8 +249,9 @@ def _save(host, report, *, request=None, status='deferred', interpretation_for=N
             context=focus if any(relevance(r,focus) for r in candidates) else findings
             relevant=[r for r in candidates if relevance(r,context)]
             relevant.sort(key=lambda r:(-relevance(r,context),r.get('type')!='diagnostic',r['entry_id']))
-            request['experience_receipts']=[retrieve(host,dict(operation='read',entry_id=r['entry_id'],
-                revision=r['revision']),reader='reporter')['reference'] for r in relevant[:2]]
+            # _wire explicitly delivers these owned receipts to Reporter.
+            request['experience_receipts']=[_knowledge_receipt(host,dict(operation='read',
+                entry_id=row['entry_id'],revision=row['revision'])) for row in relevant[:2]]
     return record(host,'research_report',dict(report=plain(report),request=plain(request),
         interpretation_status=status,interpretation_for=interpretation_for,error=error,rejection_details=rejection_details))
 
@@ -327,13 +339,12 @@ def investigate(host, request):
                 navigation=getattr(exc,'evidence_navigation',None),
                 suggested_query=plain(query) if isinstance(query,EvidenceIntentQuery) else
                     dict(reference=plain(query.reference),view='summary',pointer='')))
-    from tools.research.experience import retrieve
     request=plain(q)
     request['selected_reads']=selected_reads
     request['automatic_reads']=automatic
     request['previous_report_references']=previous_reports
     if supporting_plans:request['supporting_plan_references']=[plain(ref) for ref in supporting_plans]
-    request['experience_receipts']=[retrieve(host,plain(query),reader='reporter')['reference'] for query in q.experience_queries]
+    request['experience_receipts']=[_knowledge_receipt(host,plain(query)) for query in q.experience_queries]
     # Distinct explicit invocations may ask the identical question again.
     # Native receipt recovery reuses the saved report instead of calling here.
     request['invocation_step']=max((e['sequence'] for e in host.store.events(host.run_id)),default=0)+1
