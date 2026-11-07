@@ -44,6 +44,41 @@ def representable_candidate(h):
 
 
 class PostReporterPlanningTests(unittest.TestCase):
+    def test_passive_search_batch_reaches_main_and_reporter_without_native_j_fields(self):
+        from tools.research.mixed_moves import initial,generation,next_move
+        from tools.research.design import generate_candidate
+        from tools.research.state import save
+        from tools.research.feedback import scientific_result_delivery
+        from tools.research.evidence_views import result_card
+        with passive_host(PROFILE) as h:
+            spec=state(h)['spec'];space=spec['family_space'];seed=representable_candidate(h)
+            q=FamilyMixedSearch.model_validate(compile_search(h,search_plan(seed),'offline-projection-query')['search'])
+            points=[initial(space,q)];paths=[['family_defaults_and_authorized_ranges']]
+            for cursor in (0,1):
+                point,changed,_=next_move(space,q,points[-1],cursor,q.step);points.append(point);paths.append(changed)
+            rows=[];analyses=[]
+            for i,point in enumerate(points):
+                ref=generate_candidate(h,generation(space,q,point),dict(origin='offline projection fixture'))['candidate']
+                a=save(h,dict(fixture='Synthetic numerical fields only; no scientific Worker',index=i,status='computed',candidate=ref))
+                analyses.append(a);qualified=i<2
+                conditions={'unloaded':dict(analysis=a,status='computed' if qualified else 'unresolved',score=-.5 if qualified else None,
+                    facts=dict(constraint_state=dict(qualified=qualified),qualification_diagnosis=dict(status='qualified' if qualified else 'preflight_failed',failure_layers=[] if qualified else ['tendons'])))}
+                rows.append(dict(parameters=h.store.artifact(ref)['parameters'],evidence=dict(candidate=ref,conditions=conditions),
+                    computation_status='computed' if qualified else 'unresolved',proxy_values={'equilibrium_qualification':-.5} if qualified else {},
+                    mathematical_numerical_s=0.,lineage=dict(variables_or_topology_changed=paths[i])))
+            checkpoint=save(h,dict(problem=dict(query=q.model_dump(mode='json'))))
+            result=dict(physical_problem=dict(diagnostic_only=True),status='best_mathematical_candidate',score_semantics='Offline synthetic qualification fixture; no performance claim',
+                termination_reason='evaluation_budget_exhausted',resource_use=dict(actual_mathematical_evaluations=3),
+                search_state=checkpoint,evaluated=rows,best_passive_candidate=rows[0])
+            ref=save(h,dict(result=result));update(h,analysis_results=analyses,search_results=[ref])
+            delivered=scientific_result_delivery(h);fixed=delivered['latest_search']['fixed_result']
+            self.assertEqual(len(fixed['structures']),3)
+            self.assertEqual(fixed['structures'][2]['conditions']['unloaded']['failure_layers'],['tendons'])
+            self.assertIsNone(delivered['latest_evaluation'])  # Child solves owned by this batch.
+            card=result_card(h,ref)
+            self.assertEqual(card.deterministic_summary['passive_family_search'],fixed)
+            self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+
     def test_direct_plan_original_admission_and_optional_route(self):
         with passive_host(PROFILE) as h:
             c=representable_candidate(h)

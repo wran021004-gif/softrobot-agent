@@ -103,6 +103,12 @@ def search_feedback(host, reference):
     from tools.research.state import state
     from tools.research.design import final_generation_request
     result=host.store.artifact(reference)['result']
+    if result.get('physical_problem'):
+        from tools.research.evidence_views import passive_search_summary
+        fixed=passive_search_summary(host,reference,result)
+        return dict(reference=reference,status=result['status'],best_candidate=fixed['best_passive_candidate'],
+            proxy_values=fixed['best_scores'],fixed_result=fixed,final_materialization=None,
+            lineage_pointer='/result/evaluated',task_acceptance='unmeasured')
     best=result.get('best_native_candidate') or result.get('best_mathematical_candidate') or {}
     candidate=best.get('evidence',{}).get('candidate')
     materialization=None
@@ -251,7 +257,8 @@ def scientific_result_delivery(host):
             key=digest(fact['comparison_scope'])
             if key not in groups or fact['J']<groups[key]['fact']['J']:
                 groups[key]=dict(fact=fact,search=search)
-        raw=host.store.artifact(search['reference'],paths=('result.comparison_summary',))['result']
+        raw=host.store.artifact(search['reference'],paths=('result.comparison_summary','result.evaluated')).get('result',{})
+        covered.update(v['analysis']['artifact_id'] for row in raw.get('evaluated',[]) for v in row.get('evidence',{}).get('conditions',{}).values() if v.get('analysis'))
         covered.update(v['analysis']['artifact_id'] for row in raw.get('comparison_summary',[]) for v in row['conditions'].values() if v.get('analysis'))
         for i,row in enumerate(raw.get('comparison_summary',[])):
             for condition,value in row['conditions'].items():

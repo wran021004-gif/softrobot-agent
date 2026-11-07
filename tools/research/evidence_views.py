@@ -751,6 +751,40 @@ def _resources(value, reference):
     return resources
 
 
+def passive_search_summary(host, reference, result):
+    """One bounded projection of saved passive search facts for Main/Reporter."""
+    from tools.research.state import state
+    query=host.store.artifact(result['search_state'],paths=('problem.query',))['problem']['query']
+    structures=[]
+    for i,row in enumerate(result['evaluated']):
+        conditions={}
+        for name,condition in row.get('evidence',{}).get('conditions',{}).items():
+            facts=condition.get('facts') or {};diagnosis=facts.get('qualification_diagnosis') or {}
+            conditions[name]=dict(analysis=condition.get('analysis'),status=condition.get('status'),score=condition.get('score'),
+                constraint_state=facts.get('constraint_state'),baseline_qualification=diagnosis.get('status'),
+                failure_layers=diagnosis.get('failure_layers',[]),
+                initial_qualification=(diagnosis.get('initial_qualification') or {}).get('status'))
+        structures.append(dict(candidate=row.get('evidence',{}).get('candidate'),
+            segment_count=row['parameters']['segment_count'],tendon_count=row['parameters']['tendon_count'],
+            changed_coordinates=(row.get('lineage') or {}).get('variables_or_topology_changed',[]),
+            status=row.get('computation_status'),scores=row.get('proxy_values'),conditions=conditions,
+            source=dict(reference=reference,pointer='/result/evaluated/'+str(i))))
+    best=result.get('best_passive_candidate') or {}
+    return dict(status=result['status'],method=query['method'],plan=result.get('requesting_plan'),
+        problem=result['physical_problem'],score_semantics=result['score_semantics'],
+        termination_reason=result['termination_reason'],actual_counts=result['resource_use'],
+        best_passive_candidate=(best.get('evidence') or {}).get('candidate'),best_scores=best.get('proxy_values'),
+        search_scope={k:query[k] for k in ('variable_groups','segment_counts','tendon_counts','span_strategies','bounds',
+            'diagnostic_load_conditions','objective','evaluation_mode','max_proposals','max_evaluations') if k in query},
+        structures=structures,unsearched_parameter_groups=[g for g in state(host)['spec']['family_search']['variable_groups'] if g not in query['variable_groups']],
+        cost=dict(attributed_numerical_s=sum(r.get('mathematical_numerical_s',0.) for r in result['evaluated']),
+            scope='Recorded child receipts only; parent and child elapsed times overlap.'),
+        task_acceptance='unmeasured',scientific_citation_eligible=False,
+        results_query=dict(reference=reference,view='full',pointer='/result'),
+        source=dict(reference=reference,pointer='/result'),
+        scope='Finite passive static screening only. A qualification score is not task performance, global feasibility or optimum. Only recorded coordinate moves were explored; unselected loads and the full task remain unmeasured.')
+
+
 def result_card(host, reference):
     """L1 ResultCard from one trusted Store result; no formal read markers.
 
@@ -926,14 +960,7 @@ def result_card(host, reference):
         details.extend([_location(reference,'/candidates'),_location(reference,'/starts')])
     elif value.get('result',{}).get('physical_problem'):
         result=value['result']
-        summary['passive_family_search']=dict(status=result['status'],
-            problem=result['physical_problem'],score_semantics=result['score_semantics'],
-            termination_reason=result['termination_reason'],resource_use=result['resource_use'],
-            task_acceptance='unmeasured',
-            candidates=[dict(candidate=row.get('evidence',{}).get('candidate'),
-                status=row.get('computation_status'),scores=row.get('proxy_values'),
-                conditions=row.get('evidence',{}).get('conditions',{})) for row in result['evaluated']],
-            source=plain(_location(reference,'/result')))
+        summary['passive_family_search']=passive_search_summary(host,reference,result)
         details.append(_location(reference,'/result'))
     construction=recorded_static_summary(value,reference)
     if construction:summary['recorded_static_construction']=construction

@@ -2531,7 +2531,7 @@ def information_flow_brief(brief, delivered):
         settings_pointer='/result/comparison_scope/control_settings'
         effort(fixed.get('comparison_scope') or {},'control_settings',latest.get('reference'),settings_pointer)
         effort(fixed,'control_search_settings',latest.get('reference'),settings_pointer)
-        if fixed.get('structures'):
+        if fixed.get('structures') and not fixed.get('problem'):
             from collections import Counter
             fixed['control_search_termination']=dict(counts=dict(Counter(
                 c.get('stop_reason') or 'unrecorded' for row in fixed['structures'] for c in row['conditions'].values())),
