@@ -765,6 +765,23 @@ def passive_search_summary(host, reference, result):
                 constraint_state=facts.get('constraint_state'),baseline_qualification=diagnosis.get('status'),
                 failure_layers=diagnosis.get('failure_layers',[]),
                 initial_qualification=(diagnosis.get('initial_qualification') or {}).get('status'))
+            if query.get('evaluation_mode')=='passive_task_response' and condition.get('analysis'):
+                # The immutable child owns full-task failure layers and costs;
+                # legacy batch facts retained only a score and validity string.
+                child=host.store.artifact(condition['analysis'],paths=('diagnostic_layers','internal_calculations',
+                    'structure_research.baseline.reason','structure_research.baseline.task_gap.valid_complete',
+                    'structure_research.baseline.task_gap.dominant_constraints'))
+                baseline=child.get('structure_research',{}).get('baseline',{});layers=child.get('diagnostic_layers') or {}
+                initial=layers.get('geometry',{}).get('facts',{}).get('initial_qualification') or {}
+                failed=[t for t in (initial.get('checks') or {}).get('tendons',[]) if t.get('status')=='failed']
+                conditions[name]['finite_time_response']=dict(reason=baseline.get('reason'),
+                    valid_complete=(baseline.get('task_gap') or {}).get('valid_complete'),
+                    dominant_constraints=(baseline.get('task_gap') or {}).get('dominant_constraints',[]),
+                    layers={k:dict(status=v['status'],failure_reasons=v.get('failure_reasons',[])) for k,v in layers.items()},
+                    initial_tendon_failure_count=len(failed) if initial else None,
+                    initial_tendon_failure_examples=[{k:t[k] for k in ('tendon_id','path_length_m','payout_length_m','signed_residual_m','status') if k in t} for t in failed[:3]],
+                    recorded_costs=child.get('internal_calculations',[]),
+                    diagnosis_query=dict(reference=condition['analysis'],view='full',pointer='/diagnostic_layers'))
         structures.append(dict(candidate=row.get('evidence',{}).get('candidate'),
             segment_count=row['parameters']['segment_count'],tendon_count=row['parameters']['tendon_count'],
             changed_coordinates=(row.get('lineage') or {}).get('variables_or_topology_changed',[]),

@@ -480,6 +480,9 @@ def reporter_handoff_summary(host, reference, saved):
             projected=plain(result_card(host,card['identity']['result']['reference']))
             card['mathematics']=projected['mathematics']
             card['deterministic_summary']['native_analysis']=projected['deterministic_summary']['native_analysis']
+        if card['deterministic_summary'].get('passive_family_search'):
+            from tools.research.evidence_views import passive_search_summary
+            card['deterministic_summary']['passive_family_search']=passive_search_summary(host,card['identity']['result']['reference'],raw['result'])
         recorded=recorded_math_summary(raw,card['identity']['result']['reference'])
         if recorded is not None:card['deterministic_summary']['recorded_mathematics']=recorded
         if raw.get('execution_id'):card['deterministic_summary']['recorded_control_diagnostics']=recorded_control_diagnostics(host,raw)
@@ -509,7 +512,7 @@ def reporter_handoff_summary(host, reference, saved):
         if math:fact['mathematics']=math
         else:
             fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
-                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics')}
+                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics','passive_family_search')}
         if card.get('control_search'):
             search=card['control_search'];best=search.get('best')
             fact['control_search']=dict(stop_reason=search['stop_reason'],all_steps=search['all_steps'],
@@ -605,6 +608,13 @@ def _source_catalog(host, report, queries, *, semantic_sources=()):
         # Untyped dicts contain derived summaries, not provenance contracts.
     for card in report.results:
         collect(card)
+        passive=card.deterministic_summary.get('passive_family_search') or {}
+        if passive.get('search_scope',{}).get('evaluation_mode')=='passive_task_response':
+            for row in passive.get('structures',[]):
+                for condition in row['conditions'].values():
+                    if condition.get('analysis'):
+                        for pointer in ('/diagnostic_layers','/structure_research/baseline'):
+                            add(EvidenceLocation(reference=condition['analysis'],pointer=pointer))
         capability=card.deterministic_summary.get('task_capability')
         if capability:
             pointers=[capability[k] for k in ('problem_pointer','solver_starts_pointer','sample_records_pointer')]

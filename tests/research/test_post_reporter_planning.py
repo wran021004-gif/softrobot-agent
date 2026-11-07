@@ -103,6 +103,44 @@ class PostReporterPlanningTests(unittest.TestCase):
         request['payout_lengths_m']['tendon_3']=retained['tendon_3']
         with self.assertRaisesRegex(ValueError,'UNKNOWN_PAYOUT_TENDON'):generate_family(dict(space=space,request=request))
 
+    def test_full_task_batch_keeps_initial_failure_layers_and_actual_zero_integration(self):
+        from tools.research.state import save
+        from tools.research.feedback import scientific_result_delivery
+        from tools.research.evidence_views import result_card
+        with passive_host(PROFILE) as h:
+            c=representable_candidate(h)
+            query=dict(method='bounded_mixed_coordinate_v1',variable_groups=['routing'],evaluation_mode='passive_task_response')
+            checkpoint=save(h,dict(problem=dict(query=query)))
+            child=save(h,dict(fixture='Synthetic failed preflight fields, no scientific Worker.',status='execution_incomplete',candidate=c,
+                structure_research=dict(baseline=dict(reason='REQUIRED_LOAD_CASE_MISSING',task_gap=dict(valid_complete=False))),
+                diagnostic_layers=dict(geometry=dict(status='failed',failure_reasons=['tendons'],facts=dict(
+                    initial_qualification=dict(checks=dict(tendons=[dict(tendon_id='tendon_1',path_length_m=.254,payout_length_m=.25,signed_residual_m=.004,status='failed')])))),
+                    dynamic_validation=dict(status='unqualified',failure_reasons=['UNLOADED_HARD_EQUILIBRIUM_NOT_QUALIFIED'])),
+                internal_calculations=[dict(fixture=True,physics_steps=0,episodes_started=0)]))
+            row=dict(parameters=h.store.artifact(c)['parameters'],evidence=dict(candidate=c,conditions=dict(
+                all_frozen_conditions=dict(analysis=child,status='execution_incomplete',score=None,
+                    facts=dict(validity='unavailable',task_gap=dict(valid_complete=False))))),computation_status='unresolved')
+            ref=save(h,dict(result=dict(physical_problem=dict(diagnostic_only=False),status='no_supported_result',
+                score_semantics='Fixture only',termination_reason='proposal_budget_exhausted',resource_use=dict(actual_mathematical_evaluations=1),
+                search_state=checkpoint,evaluated=[row],best_passive_candidate=None)))
+            update(h,analysis_results=[child],search_results=[ref])
+            delivered=scientific_result_delivery(h)['latest_search']['fixed_result']
+            facts=delivered['structures'][0]['conditions']['all_frozen_conditions']['finite_time_response']
+            self.assertEqual(facts['layers']['geometry'],dict(status='failed',failure_reasons=['tendons']))
+            self.assertEqual(facts['recorded_costs'][0]['physics_steps'],0)
+            self.assertEqual(facts['initial_tendon_failure_count'],1)
+            self.assertEqual(facts['initial_tendon_failure_examples'][0]['signed_residual_m'],.004)
+            self.assertFalse(facts['valid_complete'])
+            self.assertEqual(result_card(h,ref).deterministic_summary['passive_family_search'],delivered)
+            from tools.research import reporter
+            report=reporter.assemble(h,[ref]);saved=dict(report=report.model_dump(mode='json'),
+                interpretation_status='deferred',request=None,error=None,rejection_details=None)
+            handoff=reporter.reporter_handoff_summary(h,ref,saved)
+            self.assertEqual(handoff['findings'][0]['recorded_summary']['passive_family_search'],delivered)
+            catalog=reporter._source_catalog(h,report,[])
+            self.assertIn(dict(reference=child,pointer='/diagnostic_layers'),catalog.values())
+            self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+
     def test_finite_time_novelty_and_operator_pause_keep_reporter_available_on_resume(self):
         import asyncio
         from tools.research import reporter
