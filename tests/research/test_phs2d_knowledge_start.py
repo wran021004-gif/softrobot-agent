@@ -2,7 +2,6 @@
 import asyncio
 from contextlib import contextmanager
 from copy import deepcopy
-import hashlib
 import json
 import unittest
 from unittest.mock import patch
@@ -261,7 +260,7 @@ class PhsKnowledgeStartTests(unittest.TestCase):
         for row in rows:
             self.assertEqual(row['kind'],'procedure')
             self.assertEqual(row['revision'],'1')
-            self.assertEqual(row['compact_skill']['source_sha256'],hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest())
+            self.assertNotIn('source_sha256',row['compact_skill'])
         self.assertFalse(new['supplied_evidence'])
         for key in ('history','mathematics','control_seeds'):
             self.assertFalse(new['research_decisions'][key])
@@ -291,13 +290,13 @@ class PhsKnowledgeStartTests(unittest.TestCase):
             self.assertFalse(state(h)['results'])
             self.assertFalse(state(h)['physical_replays'])
 
-    def test_read_rejects_content_drift_against_frozen_hash(self):
+    def test_old_manifest_reads_by_authorized_identity_and_revision(self):
         with fixture() as h:
             query=dict(operation='read',entry_id='skill-parameter-model',revision='1')
-            with patch('pathlib.Path.read_bytes',return_value=b'{"changed":true}'):
-                with self.assertRaisesRegex(ValueError,'FROZEN_KNOWLEDGE_CONTENT_CHANGED'):
-                    experience.retrieve(h,query)
-            self.assertFalse(state(h)['retrievals'])
+            receipt=experience.retrieve(h,query)
+            self.assertEqual(receipt['results'][0]['revision'],'1')
+            self.assertTrue(receipt['results'][0]['content']['principle'])
+            self.assertNotIn('content_sha256',receipt['results'][0])
 
     def test_knowledge_receipts_cannot_support_select_or_stop(self):
         from tools.research.contracts import Plan

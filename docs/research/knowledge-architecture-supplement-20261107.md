@@ -6,7 +6,7 @@
 
 继续使用 `memory/diagnostic_index.json`、冻结的 `knowledge_manifest`、`experience_retrieve` 和原 Store。新增 `memory/knowledge/research_organized_v2.json` 是该索引引用的内容集合；`content_key` 只选择一个记录，不是另一套注册器、存储或检索服务。既有 manifest 行、原正文和旧配置未改写。
 
-新增配置 `configs/research/study_passive_knowledge_organized_v2.json` 明确启用 `organization=typed_knowledge_v1`，精确冻结条目修订版及内容集合哈希。该配置只允许离线架构检查：真实 Provider、数学、物理预算均为零。新内容不会进入没有明确选择此组织版本的既有主动或被动 Study。
+新增配置 `configs/research/study_passive_knowledge_organized_v2.json` 明确启用 `organization=typed_knowledge_v1`，冻结授权条目、修订版和 content_key；正文按这些元数据读取，不使用内容 SHA 运行时门禁。该配置只允许离线架构检查：真实 Provider、数学、物理预算均为零。新内容不会进入没有明确选择此组织版本的既有主动或被动 Study。
 
 | 资源角色 | 本次组织 | 责任 |
 |---|---:|---|

@@ -4,7 +4,6 @@ from copy import deepcopy
 from tools.research.state import save,update,state,protected
 from tools.state_io import read
 ROOT=Path(__file__).resolve().parents[2]
-import hashlib
 import json
 from tools.research.contracts import ExperienceQuery
 from tools.platform_store import plain
@@ -78,9 +77,6 @@ def freeze_knowledge(policy):
     policy=plain(policy)
     if policy.get('mode')=='off':return dict(entries=[])
     rows=deepcopy([entry for entry in _index_rows() if _permitted(entry,policy)])
-    for row in rows:
-        if row.get('introduced_in')=='typed_knowledge_v1':
-            row['content_sha256']=hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest()
     if policy.get('delivery')=='compact_skill_v1':
         for row in rows:
             if row.get('introduced_in')=='phs2d_process_v1':
@@ -90,7 +86,7 @@ def freeze_knowledge(policy):
             if knowledge_type(row)!='skill' or row.get('introduced_in')!='knowledge_organization_v1':continue
             body=(ROOT/row['path']).read_bytes();value=json.loads(body)
             row['compact_skill']=dict(principle=value['principle'][:280],
-                when=value['problem_or_trigger'][:180],source_sha256=hashlib.sha256(body).hexdigest())
+                when=value['problem_or_trigger'][:180])
     return dict(entries=rows)
 
 
@@ -319,16 +315,12 @@ def retrieve(host,query,*,reader='agent'):
         content=None;body_hash=None
         if q.operation=='read':
             body=source.read_bytes()
-            frozen_hash=entry.get('content_sha256') or entry.get('compact_skill',{}).get('source_sha256')
-            if frozen_hash and hashlib.sha256(body).hexdigest()!=frozen_hash:
-                raise ValueError('FROZEN_KNOWLEDGE_CONTENT_CHANGED: '+canonical)
             content=json.loads(body) if source.suffix=='.json' else body.decode('utf8')
             if entry.get('content_key'):content=content['entries'][entry['content_key']]
             if q.detail=='summary':
                 content={k:entry[k] for k in ('id','type','summary','trigger','source_refs','evidence_level',
                     'applicability','limitations','related_skills','knowledge_refs') if k in entry}
             # Existing receipt identity only; never an admission/comparison gate.
-            body_hash=hashlib.sha256(body).hexdigest()
         from tools.research.evidence_policy import english_sources
         if q.operation=='read' and english_sources(state(host)['spec']):
             # No silent translation or claim that historical prose is a fresh
@@ -350,7 +342,7 @@ def retrieve(host,query,*,reader='agent'):
         if q.operation=='read':walk(content)
         rows.append(dict(**{k:v for k,v in entry.items() if k!='content_sha256'},key=entry.get('legacy_key',canonical),exact_key=canonical,
             knowledge_type=knowledge_type(entry),
-            **(dict(content_sha256=body_hash) if q.operation=='read' else {}),original_evidence_references=refs,
+            original_evidence_references=refs,
             read_query=dict(operation='read',entry_id=entry['entry_id'],revision=entry['revision']),
             content_role=entry.get('resource_role') or ('research_trace' if entry['kind'] in ('case','success_case') else 'procedural_knowledge'),
             **({} if 'applicability' in entry else dict(applicability='Transfer diagnostic principles only after checking trigger and scope; historical task numbers and controls do not transfer. Cross-task validity is unverified.')),
@@ -391,7 +383,7 @@ def disposition_bindings(host,dispositions):
         row=receipt['results'][0]
         if row.get('status')=='source_unavailable':continue
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
-            content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
+            reader=receipt.get('reader','agent'))
         if receipt['query'].get('detail')=='summary':binding['full_read']=False
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding
         if ref['artifact_id'] in aliases:reads[aliases[ref['artifact_id']]]=binding
