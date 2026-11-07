@@ -95,21 +95,26 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         if space:
             for name in ('segment_count','tendon_count'):
                 lower,upper=space[name+'_bounds']
-                schema['$defs'][generation]['properties'][name].update(minimum=lower,maximum=upper)
+                schema['$defs'][generation]['properties'][name].update({k:v for k,v in dict(minimum=lower,maximum=upper).items() if v is not None})
                 scoped=(study or {}).get('topology_scope',{}).get(name+'s')
                 if scoped:schema['$defs'][generation]['properties'][name]['enum']=scoped
-            schema['$defs'][generation]['properties']['segment_count'].setdefault('enum',space['executable_segment_counts'])
+            if space['executable_segment_counts'] is not None:
+                schema['$defs'][generation]['properties']['segment_count'].setdefault('enum',space['executable_segment_counts'])
             count=schema['$defs'][generation]['properties']['segment_count']
-            if 'default' in count and count['default'] not in count['enum']:
+            if 'default' in count and 'enum' in count and count['default'] not in count['enum']:
                 schema['$defs'][generation]['required'].append('segment_count')
                 count.pop('default')
             lower,upper=space['executable_tendon_count_bounds']
-            schema['$defs'][generation]['properties']['tendon_count'].update(minimum=lower,maximum=upper)
+            schema['$defs'][generation]['properties']['tendon_count'].update({k:v for k,v in dict(minimum=lower,maximum=upper).items() if v is not None})
             if space.get('passive_payout_domain_m') and generation=='GenerationRequestV2':
                 domain=space['passive_payout_domain_m']
                 schema['$defs'][generation]['properties']['payout_lengths_m'].update(
-                    additionalProperties=dict(type='number',minimum=domain['minimum'],maximum=domain['maximum']),
-                    description='Independent SI payout for each actual tendon_i, i < tendon_count. Omitted values inherit '+str(domain['default'])+' m.')
+                    additionalProperties=dict(type='number',**{k:v for k,v in {
+                        'exclusiveMinimum' if domain.get('min_exclusive') else 'minimum':domain['minimum'],
+                        'maximum':domain['maximum']}.items() if v is not None}),
+                    description='Independent SI payout for each actual tendon_i, i < tendon_count. Omitted values use '+(
+                        'the actual zero-state route length; no qualification implied.' if space.get('payout_initialization')=='zero_state_route_length_v1'
+                        else str(domain['default'])+' m.'))
             if space['conditional_rules']=='base_only_consecutive_spans_v1':
                 schema['$defs']['Span']['properties']['first_segment'].update(const=0,
                     description='Frozen FamilySpace requires a fixed-base start. last_segment chooses the anchor segment; other span variables remain selectable.')
@@ -133,7 +138,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             for field in ('control_search_effort','initial_tension_n'):properties.pop(field,None)
         for name in ('segment_counts','tendon_counts'):
             for branch in properties[name]['anyOf']:
-                if branch.get('type')=='array':branch['items']['enum']=grant[name]
+                if branch.get('type')=='array' and grant[name] is not None:branch['items']['enum']=grant[name]
         schema['$defs'].update(intent_schema.pop('$defs'))
         from tools.research.scientific_intent import project_control_effort
         project_control_effort(schema,study)
@@ -248,16 +253,16 @@ def compact_plan_schema(schema, action, study):
             for key in ('controller_recipe','controller_solver'):properties.pop(key,None)
             if passive_registered(study['canonical_task']):properties.pop('control_weights',None)
         properties['family_space_identity']={'type':'string','const':study['family_space_identity']}
-        properties['segment_count']={**properties['segment_count'],'enum':space['executable_segment_counts']}
+        if space['executable_segment_counts'] is not None:properties['segment_count']['enum']=space['executable_segment_counts']
         lo,hi=space['executable_tendon_count_bounds']
-        properties['tendon_count']={**properties['tendon_count'],'minimum':lo,'maximum':hi}
+        properties['tendon_count'].update({k:v for k,v in dict(minimum=lo,maximum=hi).items() if v is not None})
         schema['$defs'][name]['description']='Supply only intended design changes. Omitted optional overrides inherit frozen defaults/prototypes; sections and cells need not be filled. Valid generation does not establish task success.'
         choice=schema['$defs']['SegmentChoiceV2' if name=='GenerationRequestV2' else 'SegmentChoice']['properties']
         choice['sections']['description']='Optional override. Omit unchanged sections; otherwise match the exact count and order of the selected prototype stations shown in generation_inputs.'
         if name=='GenerationRequestV2':
             lo,hi=space['serial_assembly']['cell_count_bounds']
             for branch in choice['cells']['anyOf']:
-                if branch.get('type')=='integer':branch.update(minimum=lo,maximum=hi)
+                if branch.get('type')=='integer':branch.update({k:v for k,v in dict(minimum=lo,maximum=hi).items() if v is not None})
             choice['cells']['description']='Optional override within frozen cell_count_bounds; omit to inherit default_cells.'
     if action=='physical_replay':
         request=schema['$defs']['PhysicalReplayRequest']

@@ -25,6 +25,20 @@ class PassiveInterfaceAuditTests(unittest.TestCase):
         return dict(version='serial_family_generation_v2',family_space_identity=self.spec['family_space_identity'],
             segment_count=2,tendon_count=2,segments={'0':dict(cells=1),'1':dict(cells=1)})
 
+    def test_open_domain_plan_schema_has_no_null_numeric_or_enum_constraints(self):
+        from tools.research.agent import plan_schema,compact_plan_schema
+        full=plan_schema(self.spec['allowed_plan_actions'],decision_required=True,study=self.spec)
+        def walk(value):
+            if isinstance(value,dict):
+                for key,child in value.items():
+                    if key in ('enum','minimum','maximum'):self.assertIsNotNone(child)
+                    walk(child)
+            elif isinstance(value,list):
+                for child in value:walk(child)
+        walk(full)
+        walk(compact_plan_schema(deepcopy(full),'generate',self.spec))
+        self.assertNotIn('enum',full['$defs']['GenerationRequestV2']['properties']['segment_count'])
+
     def model(self,request):
         cfg,_,physics=family_configuration(self.spec['configuration'],self.spec['family_space'],request,'offline-parameter-audit')
         scene=assemble_physical(SessionInput.model_validate(cfg),physics)
