@@ -126,6 +126,9 @@ class PostReporterPlanningTests(unittest.TestCase):
                 asyncio.run(reporter.complete_reports(h,None,max_model_calls=0))
             self.assertEqual(reporter.current_reports(h,status_only=True)[0][1]['interpretation_status'],'deferred')
             self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+            update(h,count_closeout=True)
+            asyncio.run(reporter.complete_reports(h,None,max_model_calls=0))
+            self.assertEqual(reporter.current_reports(h,status_only=True)[0][1]['interpretation_status'],'unavailable')
 
     def test_direct_plan_original_admission_and_optional_route(self):
         with passive_host(PROFILE) as h:
@@ -174,6 +177,7 @@ class PostReporterPlanningTests(unittest.TestCase):
         self.assertEqual(len(decision['hypothesis_feedback']),2)
         self.assertIn('lengths',decision['passive_search']['structural_groups'])
         self.assertIn('physical.curvature_y_rad_m',decision['passive_search']['bounds_catalogue']['materials'])
+        self.assertIn('section.rectangle.width_y_m',decision['passive_search']['bounds_catalogue']['sections'])
         self.assertIn('six entries',decision['passive_search']['evaluation_cost'])
         self.assertFalse(view['reporter_findings'][0]['scientific_citation_eligible'])
         self.assertEqual((brief,delivered),before)

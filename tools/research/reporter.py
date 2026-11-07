@@ -816,7 +816,10 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
             continue
         # An operator invocation pause is renewable, not scientific closeout.
         # Keep the deferred report for the next invocation, without an attempt.
-        if max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls:return
+        reserve=s['spec']['budgets'].get('protected_provider_requests',0)
+        if (max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls
+                and not protected(host) and s['research_status']!='stopped'
+                and host.store.remaining()['remaining']['model_calls']>reserve+1):return
         previous=[host.store.artifact(r,paths=('report',))['report']
             for r,v in reports[:index] if not v['interpretation_for']]
         from tools.research.evidence_policy import english_native
@@ -828,7 +831,6 @@ async def complete_reports(host, transport, *, recover_only=False, max_model_cal
                 status='skipped',interpretation_for=ref,error='REPORTER_LOW_PRIORITY_DETERMINISTIC_REPORT_RETAINED')
             continue
         # Keep protected closure capacity and at least one main decision request.
-        reserve=s['spec']['budgets'].get('protected_provider_requests',0)
         if protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1:
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_SKIPPED_TO_PRESERVE_CLOSEOUT')

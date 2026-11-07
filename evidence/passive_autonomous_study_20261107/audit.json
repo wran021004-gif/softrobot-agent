@@ -1,7 +1,7 @@
 {
   "study": "passive-base-only-autonomous-study-20261107",
   "status": "ready",
-  "implementation": "fe819690c4ffaa9c86b25b804d7ba0269f7ca947",
+  "implementation": "1e13bc00e5497723738289b42b371ef1e785add0",
   "ledger": {
     "limit": {
       "backend_solves": null,
@@ -11,22 +11,22 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 37,
-      "model_calls": 24,
+      "tool_calls": 39,
+      "model_calls": 28,
       "backend_solves": 20,
       "worker_calls": 0,
-      "wall_s": 1178.0385059997207
+      "wall_s": 1308.8355059997411
     },
     "remaining": {
       "backend_solves": null,
-      "model_calls": 24,
+      "model_calls": 20,
       "tool_calls": null,
       "wall_s": null,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "provider_requests": 24,
+  "provider_requests": 28,
   "candidates": 20,
   "analyses": [
     {
@@ -31318,11 +31318,11 @@
   "scope": "Bounded exported facts; original immutable Store retains all inputs, raw results and failed attempts.",
   "provider_usage": {
     "conversation": {
-      "requests": 19,
+      "requests": 21,
       "usage_missing": 0,
-      "prompt_tokens": 1446958,
-      "completion_tokens": 11087,
-      "total_tokens": 1458045,
+      "prompt_tokens": 1760459,
+      "completion_tokens": 14497,
+      "total_tokens": 1774956,
       "prompt_cache_hit_tokens": null,
       "prompt_cache_miss_tokens": null,
       "cost_usd": "unknown",
@@ -31345,15 +31345,17 @@
         719746,
         610989,
         648039,
-        690805
+        690805,
+        718606,
+        723899
       ]
     },
     "reporter": {
-      "requests": 5,
+      "requests": 7,
       "usage_missing": 0,
-      "prompt_tokens": 77001,
-      "completion_tokens": 3754,
-      "total_tokens": 80755,
+      "prompt_tokens": 121445,
+      "completion_tokens": 5655,
+      "total_tokens": 127100,
       "prompt_cache_hit_tokens": null,
       "prompt_cache_miss_tokens": null,
       "cost_usd": "unknown",
@@ -31362,7 +31364,9 @@
         22291,
         146516,
         22291,
-        73760
+        73760,
+        58263,
+        119378
       ]
     }
   },
@@ -32633,11 +32637,332 @@
     },
     {
       "reference": {
-        "artifact_id": "ce04d115bacdc004e1f83cd9c8f13be3a2e71999f43bcae06831221225f8aeaa",
+        "artifact_id": "b3c581c8b31789efa00d84b9cd46cd50a015a595615cdf14d657e302000a9bc1",
         "media_type": "application/json"
       },
-      "status": "deferred",
-      "interpretations": []
+      "status": "available",
+      "interpretations": [
+        {
+          "kind": "new_information",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The candidate has a qualified local unloaded equilibrium within the frozen static model. Stationarity was 2.8643703937057154e-10 N·m, primal violation was 0.0 m, dual violation was 0.0 N, and complementarity was 1.9325126613094975e-15 N·m; second-order sufficiency and tension capacity passed, with zero native contacts. However, LICQ and strict complementarity both failed and must remain recorded limitations. Initial geometry preflight passed only at the initial state: tendons 0, 2, 4, and 6 were slack with signed residual -0.134 m, while tendons 1, 3, 5, and 7 were on the geometric boundary with residual 1.1102230246251565e-16 m. Boundary activity does not itself establish nonzero tension."
+        },
+        {
+          "kind": "supported_explanation",
+          "knowledge_refs": [
+            "general-equilibrium@1"
+          ],
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "Numerical convergence supports only a local static-equilibrium interpretation, not task success. Both equilibrium starts terminated as qualified local minima, and all 10 dynamic load-condition episodes completed, totaling 352000 physics steps. Nevertheless, the saved evaluation is invalid for task scoring because qualification reports ILLEGAL_TENDON_ROUTE_AT_CHECKED_POSES. Consequently, there is no complete signed task gap, valid objective, structural descent certificate, or best-valid candidate comparison. The dynamic-validation layer remains not evaluated for independent replay and original task acceptance. The static qualification therefore neither cures the route failure nor demonstrates whole-horizon compliance, robustness, hardware performance, or global feasibility/infeasibility."
+        },
+        {
+          "kind": "further_investigation",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/task_analysis",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The decisive missing evidence is a valid independently replayed execution with legal tendon routing at every checked pose and the original evaluator’s acceptance results over the frozen scoring windows. The corresponding episode qualifications, route-legality records, and scored constraint observations are needed before task performance can be compared. Although first and last samples exist for 801 saved samples in each condition, those samples cannot substitute for acceptance windows. Until the missing evidence is available, whether the candidate satisfies any load condition—or whether the route issue is the only barrier—remains unresolved."
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "ee5397c70f93eba98ccd9c2de89f547717141b25215e3598846dda78ea42e69d",
+        "media_type": "application/json"
+      },
+      "status": "available",
+      "interpretations": [
+        {
+          "kind": "new_information",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/baseline/qualification_diagnosis",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The saved second integration completed all 10 frozen load conditions (s3–s7, positive and negative), with 801 saved samples per episode, 352,000 physics steps, and an 8.0 s analysis horizon. Completion did not make the record valid: its qualification is invalid with reason ILLEGAL_TENDON_ROUTE_AT_CHECKED_POSES. In every episode, the first recorded issue is identical: tendon 0, span 1 intersects solid body guide_1 over route interval [0.9583333333344619, 1.0], already at score-grid pose 0 and time 0.0 s. Thus this is an initial checked-pose route violation, not evidence of a later-onset failure. The passed initial geometry preflight and qualified static equilibrium do not override this dynamic route qualification failure."
+        },
+        {
+          "kind": "supported_explanation",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/configuration",
+              "reference": {
+                "artifact_id": "cae8aa22774c3a13e394f7df184f93e42106ad8a65ebda4f9afe3426acfa1198",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/configuration",
+              "reference": {
+                "artifact_id": "bead59973768275baa54b41daa1a34274229cf3b08d616112fd78dcc38b565e3",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/baseline/qualification_diagnosis",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/baseline",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "The first same-task measurement is a valid complete task-metric observation but a failed task: under s3_positive, the recorded ratio was 2.678410681782763 against the frozen upper bound 0.3, giving normalized violation 7.9280356059425445. The second integration has no valid complete task signed gap because the route violation invalidated that score. Therefore task-performance improvement, worsening, recovery fraction, or a normalized secant cannot be computed between these records. Integration completion is comparable only as execution bookkeeping; it is not equivalent to valid geometry or independent acceptance. Moreover, model, structure, and control are recorded as changed or unidentified, so unequal outcomes would not identify a cause even if both scores were valid."
+        },
+        {
+          "kind": "unresolved_question",
+          "sources": [
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/scoped_claim",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research",
+              "reference": {
+                "artifact_id": "6de0342ca9ee6c9df975e90b121f58457aae3ec3a098eab27b56a58c314743d0",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/baseline/qualification_diagnosis",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            },
+            {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9/route_geometry",
+              "reference": {
+                "artifact_id": "7fdc59a20b4565bb0cda81d8973375698df3e70c0a8a92231acd896a95d59dec",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "status": "reporter_interpretation",
+          "text": "It remains unknown whether the second candidate would pass or fail the frozen task criteria under a valid route, whether the route issue affected its simulated response, and whether either record would receive independent Replay or original evaluator acceptance. The evidence also does not establish between-sample route legality, hardware behavior, robustness, repeatability, global feasibility, or infeasibility. No task success can be inferred, and the frozen route and task criteria cannot be relaxed."
+        }
+      ]
     }
   ],
   "timeline": [
@@ -36073,6 +36398,94 @@
       "references": [
         {
           "artifact_id": "46a37c85623664dae8e9ef768f200ec6641d9a7a46952bff48c9e37e087ee544",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1897,
+      "kind": "research_report",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "95a87c0e9553705613119ee8265e07d0fd965f1154578916a2bf6ecd6744d39f",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1906,
+      "kind": "research_report",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "b3c581c8b31789efa00d84b9cd46cd50a015a595615cdf14d657e302000a9bc1",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1918,
+      "kind": "research_report",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "ee5397c70f93eba98ccd9c2de89f547717141b25215e3598846dda78ea42e69d",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1932,
+      "kind": "model_original_tool_request",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "bd3cd1729e3dd9325a9dd9ec78d9dac360f36921d44d6a01d952ccc578980e6f",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1935,
+      "kind": "model_original_tool_feedback",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "e808400bd96ea1fa345b8aeb5d29cd5bf66e1cf8f9809f86e4b2dfef0eb657a2",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1949,
+      "kind": "model_original_tool_request",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "244175bdb00ebba7afdf0e7f37483a26f6a095ed2c0f904faabe96d0d0cfeb78",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1952,
+      "kind": "model_original_tool_feedback",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "9a1c7952e7952714452891eda19525adaa6c7fc54891d3ffe986718315e88238",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "sequence": 1955,
+      "kind": "supervisor_pause",
+      "status": "recorded",
+      "references": [
+        {
+          "artifact_id": "22403c5fbd199735aa88240b5362dcb0bc59bb0d5333c485879e4811e56da10d",
           "media_type": "application/json"
         }
       ]

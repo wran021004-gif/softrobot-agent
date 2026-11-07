@@ -207,10 +207,11 @@ def request_guidance(spec):
         guidance['search']['bounds_catalogue']=dict(
             lengths={'length_m':segment['length_m']},
             materials={'young_pa':segment['young_pa'],**{'physical.'+k:v for k,v in segment.get('physical_domains',{}).items()}},
+            sections={'section.'+kind+'.'+key:domain for kind,dimensions in segment['section_dimensions_m'].items() for key,domain in dimensions.items()},
             routing={'routing.'+k:v for k,v in space['routing_domains'].items()},
             payout={'payout':space.get('passive_payout_domain_m') or space.get('passive_payout_domains_m')},
-            scope='Exact Search.bounds keys and frozen common domains, not evidence_read group names. Every selected open coordinate needs a finite interval; materials includes physical.* as well as young_pa. Per-segment/channel overrides and original admission still apply.')
-        guidance['search']['evaluation_cost']='max_evaluations counts condition-analysis entries: each candidate costs the number of selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads can evaluate only one candidate. Main chooses coverage and effort; no interval or variable is selected here.'
+            scope='Exact Search.bounds keys and frozen common domains, not evidence_read group names. Every selected open coordinate needs a finite interval; materials includes physical.* as well as young_pa. Section dimension bounds are needed for selected section types (or inherited prototype kinds when types are omitted). Polygon scaling additionally uses polygon_scale_m; its frozen coordinate domain is segment_domain.polygon_coordinate_m. Per-segment/channel overrides and original admission still apply.')
+        guidance['search']['evaluation_cost']='For passive_equilibrium, max_evaluations counts condition-analysis entries: each candidate costs the selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads evaluate only one candidate. For passive_task_response, one mathematical entry runs the complete frozen task, with every actual episode and integration step separately charged; omit the equilibrium-only diagnostic_load_conditions. Main chooses finite effort with that full-task cost in mind; no interval or variable is selected here.'
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
         if 'objectives' in guidance['search']:
             guidance['search']['objectives']=guidance['search']['passive']['objectives']
