@@ -1,0 +1,404 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_base_only_passive_open_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "15835ddd590f11f108b886b7e2bdc248ae6a6248",
+  "mode": "formal_research",
+  "control": "control_passive_v1.json",
+  "study_id": "passive-post-reporter-mixed-search-20261107",
+  "evidence_destination": "runs/research/passive-post-reporter-mixed-search-20261107/private-evidence",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "physical_replay",
+    "search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "diagnose",
+    "search",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 16,
+    "protected_provider_requests": 2,
+    "public_operations": 100,
+    "protected_public_operations": 0,
+    "physical_launches": 0,
+    "mathematical_evaluations": 4,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "evaluation_episodes": 0,
+    "actions_per_trial": null,
+    "training_actions": null
+  },
+  "reserve_rl_evaluation": false,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    },
+    "analysis_interface": "scientific_question_v4",
+    "architecture": "english_decision_v1",
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "medium"
+      },
+      "reporter": {
+        "reasoning": "medium"
+      }
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    },
+    "evidence_read_policy": {
+      "version": "bounded_scientific_evidence_v1"
+    },
+    "background": [],
+    "structure_search_interface": "scientific_structure_search_v1"
+  },
+  "authorization": "User task c70bfb63 and direct clarification 2026-11-07 authorize one fresh continuous real passive mixed-search test and progress-based budget addenda through the existing ledger; preserve costs and failures, no full dynamic task or Replay.",
+  "execution_instructions": "Research Base-only passive soft structures under the frozen task, unilateral tendons and fixed payout semantics. Main independently selects falsifiable hypotheses, candidates, discrete and continuous parameter groups, finite search intervals and stopping conditions. Knowledge is context only; no historical winning design or prior Study candidate is provided. Start with a fresh small legal candidate and one informative non-dynamic mathematical evaluation, then use the existing Reporter before your next scientific Plan. After that feedback, judge whether a bounded passive FamilyMixedSearch is scientifically useful and independently submit your next formal Plan. Direct research_plan is available after Reporter; route only if needed for real tool/action ambiguity. Read missing evidence, avoid redundant discovery. If searching, choose a reasoned subset with at least one discrete and one continuous group, and request enough distinct proposals to exercise both in the small authorized search. Use finite intervals for every selected open coordinate. Main owns choices; fixed code owns generator, solver and numerical steps. Search authorization is only a finite test subdomain; the full FamilySpace stays open. At most 8 proposals and 3 search math evaluations, 4 total math evaluations including the initial diagnostic. No finite-time integration, full ten-condition task, physical Replay, BDF, NMPC or RL. Initial Provider total16 includes2 closeout, shared with Reporter. Supervisor preserves at least4 ordinary post-Reporter decisions using settled-boundary review, and can record finite progress-based user-authorized addenda without resetting costs. Once search completes, read its actual result and explain evaluated candidates, real parameter changes, qualification/failure, best mathematical candidate, unexplored scope and unmeasured task acceptance. End the invocation after that assessment; no extra physics needed. Use English.",
+  "task": "../../tasks/phs2d_original_ten_v1_2.json",
+  "supplied_evidence": [],
+  "require_task_guidance": false,
+  "runtime": "runtime_phs2d_topology_successor_20261106.json",
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_passive_mujoco",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.25,
+      4.0,
+      8.0
+    ],
+    "samples_s": [
+      0.0,
+      4.0,
+      8.0
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1,
+      10,
+      100
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "scoring_window_s": 0.25,
+  "mathematical_methods": {
+    "mechanism_structure_v1": "Stage III-A/B authorized existing bounded passive mechanism research; no dynamic acceptance inferred."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "guide_hole_positions_m.*.*.*",
+      "route_overrides.*.*.attachment.position_m.*",
+      "payout_lengths_m.*",
+      "segments.*.young_pa",
+      "segments.*.sections.*.parameters.*",
+      "segments.*.physical_parameters.*",
+      "segments.*.length_m",
+      "segments.*.sections.*.kind",
+      "spans.*.radius_m",
+      "spans.*.phase_rad",
+      "spans.*.anchor_s",
+      "spans.*.guide_s.*",
+      "spans.*.angular_offsets_rad.*",
+      "spans.*.guide_angle_offset_rad",
+      "spans.*.anchor_angle_offset_rad"
+    ]
+  },
+  "physical_replay_limit": null,
+  "physical_worker_watchdog_s": 1800,
+  "initial_structure_strategy": "agent_choice",
+  "mathematical_worker_watchdog_s": 120,
+  "knowledge": {
+    "version": "curated_knowledge_policy_v1",
+    "mode": "enabled",
+    "include_entry_ids": [
+      "passive-structure-mechanics",
+      "general-routing",
+      "general-equilibrium",
+      "general-material-inertia",
+      "general-multicondition",
+      "general-sensitivity",
+      "diagnostic-tip-drift",
+      "diagnostic-slack",
+      "diagnostic-static-dynamic",
+      "diagnostic-local-finite",
+      "diagnostic-relaxation",
+      "diagnostic-kkt",
+      "diagnostic-convergence",
+      "passive-force-response-research",
+      "validation-qualification",
+      "validation-replay",
+      "phs2d-case",
+      "p3-case",
+      "skill-finite-search",
+      "skill-parameter-model",
+      "skill-matched-comparison",
+      "skill-local-to-experiment",
+      "skill-continue-or-stop",
+      "skill-witness-replay",
+      "phs2d-research-process",
+      "m1-case",
+      "m2-case",
+      "m3-case",
+      "m4-case",
+      "m5-case",
+      "m6-case",
+      "c1-case",
+      "general-active-inputs",
+      "general-task-observables",
+      "general-finite-claims",
+      "diagnostic-holding",
+      "diagnostic-contact",
+      "diagnostic-near-bound",
+      "validation-active-protocol"
+    ],
+    "allowed_kinds": [
+      "procedure",
+      "case"
+    ],
+    "allow_benchmark_answers": false,
+    "delivery": "compact_skill_v1",
+    "include_entry_revisions": {
+      "passive-structure-mechanics": [
+        "2"
+      ],
+      "general-routing": [
+        "1"
+      ],
+      "general-equilibrium": [
+        "1"
+      ],
+      "general-material-inertia": [
+        "1"
+      ],
+      "general-multicondition": [
+        "1"
+      ],
+      "general-sensitivity": [
+        "1"
+      ],
+      "diagnostic-tip-drift": [
+        "1"
+      ],
+      "diagnostic-slack": [
+        "1"
+      ],
+      "diagnostic-static-dynamic": [
+        "1"
+      ],
+      "diagnostic-local-finite": [
+        "1"
+      ],
+      "diagnostic-relaxation": [
+        "1"
+      ],
+      "diagnostic-kkt": [
+        "1"
+      ],
+      "diagnostic-convergence": [
+        "1"
+      ],
+      "passive-force-response-research": [
+        "3"
+      ],
+      "validation-qualification": [
+        "1"
+      ],
+      "validation-replay": [
+        "1"
+      ],
+      "phs2d-case": [
+        "2"
+      ],
+      "p3-case": [
+        "2"
+      ],
+      "skill-finite-search": [
+        "2"
+      ],
+      "skill-parameter-model": [
+        "2"
+      ],
+      "skill-matched-comparison": [
+        "2"
+      ],
+      "skill-local-to-experiment": [
+        "2"
+      ],
+      "skill-continue-or-stop": [
+        "2"
+      ],
+      "skill-witness-replay": [
+        "2"
+      ],
+      "phs2d-research-process": [
+        "2"
+      ],
+      "m1-case": [
+        "1"
+      ],
+      "m2-case": [
+        "1"
+      ],
+      "m3-case": [
+        "1"
+      ],
+      "m4-case": [
+        "1"
+      ],
+      "m5-case": [
+        "1"
+      ],
+      "m6-case": [
+        "1"
+      ],
+      "c1-case": [
+        "1"
+      ],
+      "general-active-inputs": [
+        "1"
+      ],
+      "general-task-observables": [
+        "1"
+      ],
+      "general-finite-claims": [
+        "1"
+      ],
+      "diagnostic-holding": [
+        "1"
+      ],
+      "diagnostic-contact": [
+        "1"
+      ],
+      "diagnostic-near-bound": [
+        "1"
+      ],
+      "validation-active-protocol": [
+        "1"
+      ]
+    },
+    "organization": "typed_knowledge_v1"
+  },
+  "analysis_cap_s": null,
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing",
+      "payout"
+    ],
+    "segment_counts": [
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ],
+    "max_proposals": 8,
+    "max_evaluations": 3,
+    "evaluation_modes": [
+      "passive_equilibrium"
+    ],
+    "require_explicit_start": true
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "diagnostic": {
+        "cells_per_segment": 8,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 8,
+      "backend": "backend.family_passive_mujoco@1.0.0"
+    }
+  },
+  "provider_request_extension_policy": {
+    "version": "finite_provider_request_extension_v1",
+    "maximum_additional_requests": 32,
+    "maximum_requests_per_extension": 8
+  }
+}

@@ -26,7 +26,7 @@ def provision(*,tools=True):
     return h
 
 
-def run_fixture(h, responses, *, limit=None, id_offset=0):
+def run_fixture(h, responses, *, limit=None, id_offset=0, pause_exploration_remaining=None):
     sent=[]
     def respond(request):
         wire=json.loads(request.content);sent.append(wire);n=len(sent)-1
@@ -56,7 +56,8 @@ def run_fixture(h, responses, *, limit=None, id_offset=0):
             patch('tools.research.tool_readiness.execution_environment',return_value=dict(status='ready',scope='Mock HTTP fixture only; no scientific execution')),\
             patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
             patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
-        asyncio.run(agent.converse(h,max_new_provider_requests=limit,pause_after_completed_invocations=1))
+        asyncio.run(agent.converse(h,max_new_provider_requests=limit,pause_after_completed_invocations=1,
+            pause_exploration_remaining=pause_exploration_remaining))
     return sent
 
 

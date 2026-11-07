@@ -88,12 +88,21 @@ def prepare():
     print(json.dumps(check(h)))
 
 
-def audit():
-    h=host();s=state(h);requests=[];responses=[];tools=[];reporter_guidance=[]
+def audit(h=None, out=None):
+    h=h or host();out=out or OUT
+    s=state(h);requests=[];responses=[];tools=[];reporter_guidance=[];timeline=[]
     for e in h.store.events(h.run_id):
         if e['kind']=='r3_request':
             meta=h.store.artifact(e['outputs'][0]);wire=h.store.artifact(meta['request'])
-            requests.append(dict(request_id=e['request_id'],purpose=meta['purpose'],model=wire['model'],reasoning=wire.get('reasoning_effort')))
+            packets=[json.loads(m['content'].split('\n',1)[1]) for m in wire['messages'] if
+                isinstance(m.get('content'),str) and m['content'].startswith('CURRENT_RESEARCH_PACKET\n')]
+            research=(packets[-1] if packets else {}).get('research',{})
+            requests.append(dict(request_id=e['request_id'],purpose=meta['purpose'],model=wire['model'],reasoning=wire.get('reasoning_effort'),
+                phase=meta.get('request_phase'),sequence=e['sequence'],
+                plan_actions=next((t['function']['parameters'].get('properties',{}).get('action',{}).get('enum')
+                    for t in wire.get('tools',[]) if t['function']['name']=='research_plan'),None),
+                post_result_decision=research.get('post_result_decision'),
+                reporter_delivered=bool(research.get('reporter_findings'))))
             if meta['purpose']=='reporter':
                 payload=json.loads(wire['messages'][-1]['content'])
                 reporter_guidance.append(dict(request_id=e['request_id'],knowledge=[r['entry_id']+'@'+r['revision']
@@ -104,17 +113,23 @@ def audit():
                 choices=[dict(finish_reason=c.get('finish_reason'),message={k:v for k,v in (c.get('message') or {}).items() if k in ('role','content','tool_calls')}) for c in body.get('choices',[])]))
         if e['kind'] in ('model_original_tool_request','model_original_tool_feedback'):
             tools.append(dict(kind=e['kind'],value=h.store.artifact(e['outputs'][0])))
-    value=dict(study=NAME,implementation=s.get('freeze'),requests=requests,responses=responses,tools=tools,
+        if e['kind'] in ('original_research_plan','research_report','design_search_result','candidate_analysis_result',
+                'provider_request_extension','supervisor_pause'):
+            timeline.append(dict(sequence=e['sequence'],kind=e['kind'],outputs=e['outputs']))
+    value=dict(study=h.run_id,implementation=s.get('freeze'),requests=requests,responses=responses,tools=tools,timeline=timeline,
         provider_usage=reporter.provider_usage(h),ledger=h.store.remaining(),knowledge_progress=experience.read_progress(h),
         reporter_delivered_knowledge=reporter_guidance,
         plans=[dict(reference=r,plan=h.store.artifact(r)['original_plan']) for r in s['plans']],
+        searches=[dict(reference=r,**h.store.artifact(r)) for r in s.get('search_results',[])],
+        current_budgets=s['spec']['budgets'],provider_extensions=s.get('provider_request_extensions',[]),
         analyses=[dict(reference=r,status=(a:=h.store.artifact(r))['status'],summary=__import__('tools.research.analysis',fromlist=['compact_result']).compact_result(a,r)) for r in s['analysis_results']],
         reports=[dict(reference=r,status=v['interpretation_status'],error=v.get('error'),interpretations=v['report'].get('interpretations',[])) for r,v in reporter.current_reports(h)],
         mathematical_evaluations=s['mathematical_evaluations'],physical_replays=len(s['physical_replays']),
         research_status=s['research_status'],pending_science=bool(s.get('pending')),
         provider_pending=bool(__import__('tools.research.provider',fromlist=['pending']).pending(h)))
-    OUT.mkdir(parents=True,exist_ok=True);atomic_json(OUT/'audit.json',value)
+    out.mkdir(parents=True,exist_ok=True);atomic_json(out/'audit.json',value)
     print(json.dumps(dict(requests=len(requests),roles=value['provider_usage'],math=s['mathematical_evaluations'],plans=len(s['plans']),reports=[v['status'] for v in value['reports']]),default=str))
+    return value
 
 
 async def run():

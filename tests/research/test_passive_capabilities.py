@@ -18,10 +18,10 @@ SPEC=ROOT/'configs/research/study_passive_research_capabilities_v1.json'
 
 
 @contextmanager
-def passive_host():
+def passive_host(profile=SPEC):
     from tools.research import core
     from tests.research.test_cross_task_integration import fixture_directory
-    spec=resolve(SPEC);spec['study_id']='passive-capability-fixture-'+uuid4().hex[:8]
+    spec=resolve(profile);spec['study_id']='passive-capability-fixture-'+uuid4().hex[:8]
     spec['configuration']['run_id']=spec['study_id']
     with fixture_directory() as folder,patch('tools.research.config.resolve',return_value=spec):
         h=core.prepare(directory=folder)

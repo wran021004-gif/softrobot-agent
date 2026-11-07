@@ -192,8 +192,9 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
                 'then':{'properties':{'decision':{'required':['selected_candidate'],
                     'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
         bound=[a for a in actions if a in ('execute','initialize_control','control_search','physical_replay')]
-        schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
-            'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
+        if bound:
+            schema['allOf'].append({'if':{'properties':{'action':{'enum':bound}}},'then':{'properties':{
+                'decision':{'required':['selected_candidate'],'properties':{'selected_candidate':{'$ref':'#/$defs/EvidenceRef'}}}}}})
         if diagnose_candidate_required and 'diagnose' in actions:
             from tools.research.task_constraints import registered_analysis_method_names
             schema['allOf'].append({'if':{'properties':{'action':{'const':'diagnose'},'decision':{
@@ -404,11 +405,23 @@ def load_selected_tool_schema(host, registry, directory):
             retained.add('research_plan')
     if policy=='research_information_flow_v1':
         retained.update(k for k in ('evidence_read','research_recall','experience_retrieve','research_investigate') if k in registry)
+        # A completed Reporter boundary needs a decision, not another schema
+        # selection round. Expose the original admitted Plan actions together;
+        # Main still supplies every choice and the Host keeps all admission.
+        from tools.research.reporter import current_reports
+        reports=current_reports(host,status_only=True,limit=1)
+        entry=next((r for r in directory if r['tool']=='research_plan'),None)
+        if (entry and not protected(host) and reports and reports[-1][1]['interpretation_status']=='available'):
+            from tools.research.contracts import compact_schema
+            registry['research_plan'].tool_spec={**registry['research_plan'].tool_spec,
+                'inputSchema':{'json':compact_schema(plan_schema(entry['actions'],decision_required=True,study=s['spec']))},
+                'description':'Submit any advertised formal Plan action directly; research_route is optional for unresolved tool/action ambiguity. Main owns hypothesis, variables, evidence, effort and stopping conditions. Original admission still applies.'}
+            retained.add('research_plan')
     for key in list(registry):
         if key not in retained:registry.pop(key)
+    actions=registry['research_plan'].tool_spec['inputSchema']['json']['properties']['action']['enum'] if 'research_plan' in retained else []
     return dict(tool=name if selected else None,action=route.get('action') if selected else None,
-        **(dict(plan_action=registry['research_plan'].tool_spec['inputSchema']['json']['properties']['action']['enum'][0])
-           if 'research_plan' in retained else {}))
+        **(dict(plan_action=actions[0]) if len(actions)==1 else dict(plan_actions=actions) if actions else {}))
 
 
 

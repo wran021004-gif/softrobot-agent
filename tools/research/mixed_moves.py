@@ -50,7 +50,12 @@ def candidate_seed(space, query, candidate):
         prototype=next(c for c in space['assembly']['components'] if c['id']==rule['root_segment' if i=='0' else 'repeated_segment'])
         if v.get('interpolation',prototype['interpolation'])!=prototype['interpolation']:
             raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: segment interpolation')
-        if (not passive and v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters')) or len({str(s) for s in v['sections']})!=1:
+        # Fixed prototype station rotations are reproduced by generation() and
+        # checked separately below. They do not make uniform section dimensions
+        # unrepresentable; arbitrary station shapes/rotations still reject.
+        section_shape=lambda section:{k:item for k,item in section.items() if k!='angle_rad'}
+        if (not passive and v.get('physical_parameters')!=defaults['segments'][i].get('physical_parameters')) or any(
+                section_shape(s)!=section_shape(v['sections'][0]) for s in v['sections']):
             raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: station-dependent sections or extra physics')
         s=v['sections'][0]
         if [s.get('angle_rad',0) for s in v['sections']]!=[s.get('angle_rad',0) for s in defaults['segments'][i]['sections']]:raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: section rotation')

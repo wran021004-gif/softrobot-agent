@@ -188,7 +188,7 @@ def request_guidance(spec):
                 task_violation='All registered static observations or complete frozen finite-time constraints, depending on selected model.'),
             loads=[r['name'] for r in spec['configuration']['task']['physical_problem']['loads']],
             diagnostic_load_conditions='Optional static subset, explicitly diagnostic. Full finite-time evaluation always retains every frozen condition.'),
-            initialization='Fixed program expands FamilySpace defaults, same design/payout in every load; no active inputs or historical solution seeds.')
+            initialization='An explicit decision.selected_candidate strictly seeds its representable structure; station-dependent sections or unsupported routes are rejected without projection. Omit that seed for a fresh family-default search center and retain current science in supporting_evidence. Main chooses starts and finite bounds; the same design/payout applies across loads, with no active inputs or historical solution seeds.')
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
         if 'objectives' in guidance['search']:
             guidance['search']['objectives']=guidance['search']['passive']['objectives']

@@ -317,8 +317,11 @@ def context(host, *, evidence_references=None):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
     current=legacy_context(host,evidence_references=evidence_references)
     if s['spec']['configuration']['task'].get('physical_problem'):
-        current['actions']=[a for a in current['actions'] if a in (('generate','propose','diagnose','stop','physical_replay','select')
-            if passive_registered(s['spec']['configuration']['task']) else ('generate','propose','diagnose','stop'))]
+        passive=passive_registered(s['spec']['configuration']['task'])
+        allowed=('generate','propose','diagnose','stop','physical_replay','select') if passive else ('generate','propose','diagnose','stop')
+        if passive and any(m.startswith('passive_') for m in s['spec'].get('family_search',{}).get('evaluation_modes',[])):
+            allowed=(*allowed,'search')
+        current['actions']=[a for a in current['actions'] if a in allowed]
         current['control_search_starts']=[]
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
@@ -2277,6 +2280,10 @@ def information_flow_brief(brief, delivered):
                 instruction='Diagnose is loaded; tool selection has not submitted scientific choices. Submit research_plan(action=diagnose) directly with your hypothesis, candidate and registered method; no research_route call is needed.')
             if intent.get('action')=='diagnose' and intent.get('execution_status')=='completed' and loaded.get('tool')=='research_analysis':
                 continuation['direct_plan'].update(status='completed',instruction='Your diagnose is complete; submit scientific inputs to loaded research_analysis. A new Plan is optional when changing your research choice.')
+    if loaded.get('plan_actions'):
+        continuation['direct_plan']=dict(tool='research_plan',actions=loaded['plan_actions'],
+            instruction='Submit your next formal Plan directly with action, hypothesis, decision.selected_candidate, supporting scientific evidence, chosen variables, effort and stopping conditions. No route is required for these actions. Reporter text and Knowledge are context, not new experimental evidence.')
+        continuation['switch_tool']='Use the advertised research_plan directly for its actions. research_route is optional when tool/action ambiguity remains or another tool is needed; avoid routing or rereading facts already sufficient for your decision.'
     handoff=value.get('analysis_handoff')
     if handoff:
         continuation['analysis_handoff']={k:handoff[k] for k in ('method','operation','already_bound','required_parameters',
@@ -2397,6 +2404,16 @@ def information_flow_brief(brief, delivered):
             interpretations_at='reporter_findings',interpretation_role='Non-authoritative source-linked explanations; fixed facts remain available without Reporter.',
             read_progress_at='evidence_access.stop_index.read_progress',legal_actions_at='capabilities',remaining_resources_at='budget',
             decision='Assess the original hypothesis and choose further evidence, a new hypothesis or legal research action, or a justified STOP. No outcome or next action is selected by this projection.')
+        if loaded.get('plan_actions'):
+            post_result.update(formal_plan=dict(tool='research_plan',actions=loaded['plan_actions'],route_required=False),
+                candidate=current.get('current_candidate'),scientific_evidence=math_result['reference'],
+                hypothesis_feedback=[dict(report_reference=r['report_reference'],kind=i['kind'],
+                    interpretation_pointer='/report/interpretations/'+str(n))
+                    for r in reports for n,i in enumerate(r.get('interpretations',[]))
+                    if i['kind'] in ('supported_explanation','weakened_explanation','hypothesis','unresolved_question','further_investigation')],
+                parameter_groups_at='mechanism_research.effective_parameter_groups',
+                search_capability_at='capabilities.Design',
+                decision='Use the latest math and source-linked Reporter interpretations to judge hypothesis support, weakening and unknowns, then submit your chosen formal Plan directly. Read only missing evidence needed for that choice. No scientific action is selected here.')
     if brief.get('scientific_actions'):
         continuation.pop('analysis_handoff',None)
         settled=intent.get('action')=='diagnose' and intent.get('execution_status')=='completed'
@@ -2428,6 +2445,8 @@ def information_flow_brief(brief, delivered):
         if continuation.get('direct_plan',{}).get('action')=='diagnose':
             continuation['direct_plan'].update(scientific_fields=['hypothesis','decision.selected_candidate','next_research_action'],
                 instruction='Record hypothesis and candidate; optionally choose next_research_action. No action is inferred from hypothesis or method text; omitted choice keeps discovery neutral.')
+        if post_result and loaded.get('plan_actions'):
+            continuation['scientific_action_handoff']['next']='The previous result is complete. Submit your chosen next research_plan directly; route only when needed for a different tool or unresolved ambiguity.'
         continuation.pop('control_initialization_handoff',None)
         for category in capabilities:
             for row in category['actions']:
@@ -2447,6 +2466,11 @@ def information_flow_brief(brief, delivered):
         knowledge=dict(role='context_only',types=dict(skill='Conditional methods; current model facts take precedence.',experience='Scoped historical decision traces; no autonomous-discovery claim, current evidence or authorization.'),
             access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])
+    search=(brief.get('structure_actions') or {}).get('search')
+    if post_result and search and search.get('passive'):
+        post_result['passive_search']={k:search[k] for k in ('tool','action','version','structural_groups','topology',
+            'applicable_span_strategies','passive','initialization') if k in search}
+        post_result['passive_search']['finite_bounds']='For each selected open continuous coordinate supply a finite bounds interval in the search request. The original FamilySpace remains open; only this request is bounded.'
     if brief.get('knowledge_catalogue'):
         result['knowledge']['catalogue']=brief['knowledge_catalogue']
         result['knowledge']['reporter_role']=brief['reporter_role']
