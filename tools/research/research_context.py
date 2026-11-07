@@ -305,9 +305,11 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
         summary.update(task_gap=task_gap(value),constraints=(value['acceptance'] or {}).get('components',{}),
             limitations=['Only this recorded execution establishes its task outcome'])
     if isinstance(value,dict):
-        from tools.research.evidence_views import task_diagnosis
+        from tools.research.evidence_views import task_diagnosis,coupled_search_summary
         diagnosis=task_diagnosis(value,reference)
         if diagnosis:summary['task_diagnosis']=diagnosis
+        coupled=coupled_search_summary(value,reference)
+        if coupled:summary['coupled_block_search']=coupled
     if facts_only and summary:result=dict(read_pointer=pointer,available_keys=list(value))
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
         available_keys=list(value) if isinstance(value,dict) else None,summary=summary,

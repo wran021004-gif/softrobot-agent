@@ -151,6 +151,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             decision['properties'].pop('selected_method')
             decision['properties'].pop('requested_budget')
             decision['required']=[k for k in decision['required'] if k not in ('selected_method','requested_budget')]
+    if (study or {}).get('family_search',{}).get('coupled_block_enabled') and 'search' in actions:
+        schema['properties']['search']['anyOf'].insert(0,{'$ref':'#/$defs/FamilyMixedSearchV2'})
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
@@ -1007,7 +1009,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                             and 'changes' not in payload['generation']):
                         payload=deepcopy(payload)
                         payload['generation'].setdefault('family_space_identity',before['spec']['family_space_identity'])
-                    if main_context_enabled(before['spec']) and (payload.get('search') or {}).get('version')=='family_mixed_search_v1':
+                    if main_context_enabled(before['spec']) and (payload.get('search') or {}).get('version') in ('family_mixed_search_v1','family_mixed_search_v2'):
                         payload=deepcopy(payload)
                         payload['search'].setdefault('family_space_identity',before['spec']['family_space_identity'])
                     if payload!=use['input']:

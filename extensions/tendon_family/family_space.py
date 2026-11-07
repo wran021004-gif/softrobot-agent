@@ -527,7 +527,12 @@ def parameter_capabilities(value, request):
         continuous=bool(kind=='number' and finite and domain.minimum<domain.maximum and effective and not reason)
         if kind=='number' and domain and not finite and not reason:
             reason='Open physical domain; generation is available. Freeze a finite local study domain before normalized derivative/optimization.'
-        rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,current_value=current,
+        search_group=('lengths' if path.startswith('segments.') and path.endswith('.length_m') else
+            'sections' if path.startswith('segments.') and '.sections.' in path else
+            'materials' if path.startswith('segments.') else
+            'payout' if path.startswith('payout_lengths_m.') else
+            'routing' if category=='routing' else None)
+        rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,current_value=current,search_group=search_group,
             **(dict(minimum=domain.minimum,maximum=domain.maximum,default=domain.default) if domain else {}),
             **(dict(minimum_exclusive=True) if domain and domain.minimum_exclusive else {}),
             choices=choices,conditional_dependencies=dict(segment_count=params['segment_count'],tendon_count=params['tendon_count']),

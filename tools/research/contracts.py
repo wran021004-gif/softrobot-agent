@@ -651,6 +651,27 @@ class ScientificQuestionV4(Contract):
         return self
 
 
+class FamilyMixedSearchV2(Contract):
+    """Coupled mode of the existing search, using a scientific analysis question."""
+    version: Literal['family_mixed_search_v2'] = 'family_mixed_search_v2'
+    method: Literal['bounded_coupled_block_v1'] = 'bounded_coupled_block_v1'
+    family_space_identity: str = Field(min_length=1)
+    previous_candidate_ref: EvidenceRef
+    analysis: ScientificStructureV4
+    max_evaluations: Literal[4] = 4
+
+    @model_validator(mode='after')
+    def matched_block(self):
+        if self.analysis.operation!='interact' or len(self.analysis.parameter_paths)!=2:
+            raise ValueError('COUPLED_SEARCH_REQUIRES_TWO_PARAMETER_INTERACTION_QUESTION')
+        return self
+
+    @property
+    def evaluation_mode(self):
+        if self.analysis.effect_semantics=='finite_time_task_response':return 'passive_task_response'
+        return 'passive_equilibrium' if self.analysis.physical_problem else 'mathematical_proxy'
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef = Field(description='Exact current-Study owned structure candidate reference, not a control sequence. operation and model_source must match a registered mathematical_capabilities method.')
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1','mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1','mechanism_structure_v1']
@@ -953,7 +974,7 @@ class Plan(Contract):
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
     generation: GenerationRequest | GenerationRequestV2 | ScientificGeneration | None = None
-    search: Search | FamilyMixedSearch | None = None
+    search: Search | FamilyMixedSearch | FamilyMixedSearchV2 | None = None
     candidate: EvidenceRef | None = Field(default=None,description='Required top-level candidate for action=execute only. For initialize_control or physical_replay use the nested action payload candidate instead.')
     selected_execution: EvidenceRef | list[EvidenceRef] | None = Field(default=None, description='Exact publicly read passing evaluation. A frozen multi-condition Study requires a list containing one independent physical_replay result per condition on the identical structure; order is irrelevant.')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
@@ -980,6 +1001,11 @@ class Plan(Contract):
 
     @model_validator(mode='after')
     def required(self):
+        if isinstance(self.search,FamilyMixedSearchV2) and (not self.decision or
+                self.decision.selected_candidate!=self.search.previous_candidate_ref):
+            raise ValueError('COUPLED_SEARCH_REQUIRES_EXACT_DECISION_BASELINE')
+        if isinstance(self.search,FamilyMixedSearchV2) and self.decision.requested_budget<4:
+            raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_DECISION_CAP')
         if self.next_research_action is not None and (self.action!='diagnose' or self.diagnostic is not None):
             raise ValueError('NEXT_RESEARCH_ACTION_REQUIRES_READ_ONLY_DIAGNOSE')
         if isinstance(self.selected_execution,list) and (self.action!='select' or not self.selected_execution):

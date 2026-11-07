@@ -660,6 +660,12 @@ def _dispatch(host, value, request_id, origin='model'):
         if not explicit_actions(state(host)['spec']) or not entry or not entry['available']:
             raise ValueError('VERSIONED_AVAILABLE_SCIENTIFIC_ACTION_REQUIRED')
     search=value.get('search') or {}
+    if value.get('action')=='search' and search.get('version')=='family_mixed_search_v2':
+        value={**value,'decision':{'research_intent':'MATHEMATICAL_ANALYSIS',
+            'selected_method':'bounded_coupled_block_v1','requested_budget':4,
+            'selected_candidate':search.get('previous_candidate_ref'),
+            'selected_variables':(search.get('analysis') or {}).get('parameter_paths',[]),
+            **(value.get('decision') or {})}}
     if value.get('action')=='search' and (search.get('version')=='scientific_structure_search_v1' or
             structure_enabled(state(host)['spec']) and 'research_goal' in search):
         value=compile_search(host,value,request_id)

@@ -22,6 +22,16 @@ def _location(reference, pointer=''):
     return EvidenceLocation(reference=reference, pointer=pointer)
 
 
+def coupled_search_summary(value, reference):
+    result=value.get('result') or {}
+    if result.get('method')!='bounded_coupled_block_v1':return None
+    return dict(status=result['status'],method=result['method'],interaction=result.get('interaction'),
+        mathematical_analysis=result.get('mathematical_analysis'),interaction_source=result.get('interaction_source'),
+        resource_use=result['resource_use'],score_semantics=result['score_semantics'],
+        task_acceptance='unmeasured',scientific_citation_eligible=False,
+        raw_query=dict(reference=reference,view='full',pointer='/result'))
+
+
 def task_diagnosis(value, reference, *, detailed=False):
     """Project recorded TaskGap rows; never infer missing measurements or peaks."""
     research=value.get('structure_research') or {}

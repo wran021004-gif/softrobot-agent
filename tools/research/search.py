@@ -1,7 +1,7 @@
 """Candidate-bound coordinate search with sealed proposals and cumulative evaluator costs."""
 from copy import deepcopy
 import math,time
-from tools.research.contracts import Search, FamilyMixedSearch, AnalysisRequest
+from tools.research.contracts import Search, FamilyMixedSearch, FamilyMixedSearchV2, AnalysisRequest
 from tools.research.design import construct,verify_candidate,parameter_value,set_parameter
 from tools.research.state import state,update,save
 from tools.platform_store import plain
@@ -20,6 +20,7 @@ def coordinate_proposal(state):
 def search_problem(host,query,count):
     q=parse_search(query)
     s=state(host)
+    if isinstance(q,FamilyMixedSearchV2):return coupled_problem(host,q,count)
     native=isinstance(q,FamilyMixedSearch) and q.evaluation_mode=='mujoco_control'
     passive=isinstance(q,FamilyMixedSearch) and q.evaluation_mode.startswith('passive_')
     if q.objective=='task_violation' and not (native or passive):
@@ -90,7 +91,51 @@ def search_problem(host,query,count):
 
 def parse_search(query):
     raw=plain(query)
-    return (FamilyMixedSearch if raw.get('version')=='family_mixed_search_v1' else Search).model_validate(raw)
+    contract={'family_mixed_search_v1':FamilyMixedSearch,'family_mixed_search_v2':FamilyMixedSearchV2}.get(raw.get('version'),Search)
+    return contract.model_validate(raw)
+
+
+def coupled_problem(host, query, count):
+    """Bind one Main-selected block to the existing mechanism analysis worker."""
+    from tools.research.contracts import MechanismStudy,PhysicalMechanismTarget
+    from tools.research.structure_research import prepare_context,METHOD
+    from tools.research.mixed_moves import coupled_block
+    s=state(host);spec=s['spec'];grant=spec.get('family_search') or {};q=query.analysis
+    if grant.get('coupled_block_enabled') is not True:raise ValueError('FROZEN_COUPLED_BLOCK_GRANT_REQUIRED')
+    if query.family_space_identity!=spec['family_space_identity']:raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
+    if min(count,grant['max_proposals'],grant['max_evaluations'])<4:raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_ALLOWANCE')
+    if query.evaluation_mode not in grant.get('evaluation_modes',['mathematical_proxy']):raise ValueError('SEARCH_MODE_OUTSIDE_FROZEN_GRANT')
+    if not spec.get('mathematical_methods',{}).get(METHOD):raise ValueError('ORIGINAL_MECHANISM_METHOD_GRANT_REQUIRED')
+    if q.effect_semantics not in ('mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'):
+        raise ValueError('MATCHED_INTERACTION_BACKEND_UNAVAILABLE_FOR_EFFECT: '+q.effect_semantics)
+    if q.requested_budget is not None and q.requested_budget<4:raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_QUESTION_CAP')
+    c=verify_candidate(host,query.previous_candidate_ref);problem=c['configuration']['task'].get('physical_problem')
+    if c['family_space_identity']!=query.family_space_identity:raise ValueError('BASELINE_FAMILY_IDENTITY_MISMATCH')
+    if problem:
+        if q.physical_problem!=problem['mode'] or q.control_treatment!='no_active_control':raise ValueError('FROZEN_PASSIVE_MODE_AND_NO_ACTIVE_CONTROL_REQUIRED')
+        if q.tensions_n is not None or q.saved_state or q.execution or q.native_state_selection:raise ValueError('PASSIVE_BLOCK_CANNOT_BIND_ACTIVE_INPUT_OR_STATE_SOURCE')
+    elif q.physical_problem or q.control_treatment!='fixed_absolute_tensions' or q.effect_semantics!='mechanism_effect':
+        raise ValueError('ACTIVE_BLOCK_REQUIRES_FIXED_INPUT_MECHANISM_SEMANTICS')
+    if q.control_scope or q.search_strategy or q.response_horizon_s is not None or any(plain(q.source_selection).values()):
+        raise ValueError('MATCHED_BLOCK_CANNOT_START_IMPLICIT_CONTROL_OPTIMIZATION')
+    target=q.target
+    if isinstance(target,str):
+        if q.effect_semantics!='finite_time_task_response' or target!='finite_time_task_violation':raise ValueError('REGISTERED_SCALAR_MECHANISM_TARGET_REQUIRED')
+        target=PhysicalMechanismTarget(quantity=target,goal='decrease')
+    study=MechanismStudy(operation='interact',target=target,parameter_paths=q.parameter_paths,
+        point_semantics=q.operating_point,load_condition=q.load_condition,effect_semantics=q.effect_semantics,
+        passive_ablation=q.passive_ablation,max_evaluations=4)
+    context=prepare_context(spec,c,study,[])
+    points=coupled_block(context['selected_parameters'],grant['variable_groups'])
+    request=dict(candidate=plain(query.previous_candidate_ref),operation=METHOD,model_source='mujoco',
+        mechanism_study=plain(study),protocol=spec['analysis_protocol'],
+        operating_point='saved_state' if q.saved_state or q.execution else 'standardized_initial_pretension')
+    if q.tensions_n is not None:request['native']=dict(tensions_n=q.tensions_n)
+    for key in ('saved_state','execution','update_id','native_state_selection'):
+        if getattr(q,key) is not None:request[key]=plain(getattr(q,key))
+    return dict(query=plain(query),max_evaluations=4,points=points,analysis_request=plain(AnalysisRequest.model_validate(request)),
+        profile=s['profile']['identity'],task_identity=c['task_identity'],configuration_identity=spec['resolved_identity'],
+        score_semantics='Matched local independent and interaction effects; no ranking, optimum or task acceptance.')
 
 
 def initial_search_progress(host):
@@ -156,6 +201,12 @@ def request_guidance(spec):
         analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
             capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
         scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
+    if grant.get('coupled_block_enabled') is True:
+        guidance['coupled_block']=dict(version='family_mixed_search_v2',method='bounded_coupled_block_v1',
+            family_space_identity=spec['family_space_identity'],max_evaluations=4,
+            required=['previous_candidate_ref','analysis'],
+            analysis='ScientificStructureV4 operation interact; Main selects exactly two continuous parameter IDs and a registered scalar target. All nonresearch parameters and conditions remain fixed. M2/M3 interaction is unavailable.',
+            resources='One existing mechanism worker with whole-four-point admission and original accounting; no independent acceptance or automatic promotion.')
     if spec['family_space'].get('version')=='serial_family_space_v2':
         space=spec['family_space']; rule=space['serial_assembly']
         parts={p['id']:p for p in space['assembly']['components']}
@@ -247,6 +298,7 @@ def coordinate_layout(query,constraint):
 
 
 def rank(row,query,limits=None):
+    if isinstance(query,FamilyMixedSearchV2):return (1,float('inf'))
     if isinstance(query,FamilyMixedSearch) or query.evaluation_mode=='mathematical_proxy':
         value=row.get('proxy_values',{}).get(query.objective)
         valid=row.get('computation_status')=='computed' and value is not None and math.isfinite(value)
@@ -317,18 +369,19 @@ def run_search(host,query,key,*,guard,execute,capacity):
     from tools.research.analysis import admission,dispatch as analyze
     guard(host,True)
     q=parse_search(query)
-    mixed=isinstance(q,FamilyMixedSearch)
-    native=mixed and q.evaluation_mode=='mujoco_control'
-    passive=mixed and q.evaluation_mode.startswith('passive_')
+    coupled=isinstance(q,FamilyMixedSearchV2)
+    mixed=isinstance(q,(FamilyMixedSearch,FamilyMixedSearchV2))
+    native=not coupled and mixed and q.evaluation_mode=='mujoco_control'
+    passive=not coupled and mixed and q.evaluation_mode.startswith('passive_')
     mathematical=mixed or q.evaluation_mode=='mathematical_proxy'
     s=state(host)
-    per_evaluation=1
+    per_evaluation=4 if coupled else 1
     if native:
         per_evaluation=len(s['spec'].get('task_conditions',[])) or 1
     elif passive:
         from tools.research.passive_search import problem
         per_evaluation=problem(s['spec'],q)['analyses_per_structure']
-    elif q.objective=='task_violation':
+    elif not coupled and q.objective=='task_violation':
         from tools.research.optimal_capability import conic_subproblems
         from tools.research.task_constraints import describe_analysis_requirements
         per_evaluation=1+conic_subproblems(describe_analysis_requirements(s['base_configuration'],{}))
@@ -345,7 +398,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             return dict(status='budget_limited',admission=fit,evaluated=[])
         problem=search_problem(host,q,fit['admitted'])
         checkpoint=dict(problem=problem,problem_identity=identity,started=time.time(),evaluated=[],updates=[],
-            iteration=0,step=q.step,pending=None,termination=None,proposal_count=0,skipped_moves=[],
+            iteration=0,step=0 if coupled else q.step,pending=None,termination=None,proposal_count=0,skipped_moves=[],
             requesting_plan=next((r for r in s['plans'] if host.store.artifact(r)['request_id']==key),None))
         update(host,search_bindings={**s.get('search_bindings',{}),identity:owner})
     if checkpoint['problem_identity']!=identity:
@@ -361,6 +414,22 @@ def run_search(host,query,key,*,guard,execute,capacity):
         return save(host,checkpoint,'search_checkpoint')
     while not checkpoint['termination']:
         rows=checkpoint['evaluated']
+        if coupled:
+            output=analyze(host,checkpoint['problem']['analysis_request'],owner+':matched-block',
+                guard=guard,origin='model_search',plan_reference=requesting_plan)
+            if not output.get('reference'):
+                checkpoint.update(termination='analysis_not_admitted',analysis_rejection=output);persist();break
+            raw=host.store.artifact(output['reference']);research=raw.get('structure_research') or {}
+            records=research.get('records',[]);cost=research.get('cost') or {}
+            checkpoint['coupled_analysis']=output['reference'];checkpoint['proposal_count']=4
+            checkpoint['evaluated']=[dict(parameters=r['parameter_values'],computation_status=r['observation']['status'],
+                evidence=dict(analysis=output['reference'],record_pointer=f'/structure_research/records/{i}'),
+                actual_mathematical_evaluations=1) for i,r in enumerate(records)]
+            attempted=cost.get('evaluation_attempts',0)
+            checkpoint['skipped_moves']=[dict(point=p['label'],reason='not_attempted_after_incomplete_calculation',additional_evaluations=0)
+                for i,p in enumerate(checkpoint['problem']['points']) if i>=attempted]
+            checkpoint['termination']='matched_block_completed' if (research.get('interaction') or {}).get('status')=='computed_local_interaction' else 'matched_block_incomplete'
+            persist();break
         if checkpoint['pending'] is None:
             consumed=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mathematical else len(rows)
             if consumed+per_evaluation>checkpoint['problem']['max_evaluations']:
@@ -563,6 +632,19 @@ def run_search(host,query,key,*,guard,execute,capacity):
         result.update(physical_problem=checkpoint['problem']['passive_problem'],task_acceptance='unmeasured',
             best_passive_candidate=best if supported else None,
             score_semantics=checkpoint['problem']['passive_problem']['score_semantics'])
+    if coupled:
+        analysis_ref=checkpoint.get('coupled_analysis')
+        raw=host.store.artifact(analysis_ref) if analysis_ref else {};research=raw.get('structure_research') or {}
+        cost=research.get('cost') or {};attempted=cost.get('evaluation_attempts',0)
+        result.update(method=q.method,status=checkpoint['termination'],task_acceptance='unmeasured',
+            mathematical_analysis=analysis_ref,interaction_source=dict(reference=analysis_ref,pointer='/structure_research/interaction') if research.get('interaction') else None,
+            interaction=research.get('interaction'),score_semantics=checkpoint['problem']['score_semantics'],
+            resource_use=dict(result_entries=len(rows),evaluated_designs=len(rows),legally_constructed=len(rows),
+                candidate_materializations=0,proposed_designs=4,attempted_points=attempted,
+                unrecorded_failed_attempts=attempted-len(rows),skipped_moves=checkpoint['skipped_moves'],
+                actual_mathematical_evaluations=attempted,charged_mathematical_evaluations=raw.get('charged_analysis_evaluations',0),
+                numerical_cost_source=dict(reference=analysis_ref,pointer='/structure_research/cost') if analysis_ref else None,
+                elapsed_s=time.time()-checkpoint['started']))
     changed=None if mixed else sum(host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot'] for row in rows)
     ref=save(host,dict(result=result,structurally_changed_evaluations=changed,admission=fit),'design_search_result')
     checkpoint['result_reference']=ref

@@ -412,6 +412,10 @@ def interpretation_priority(report, previous, *, decision_v3=False):
     if report['mode']=='investigation':return 'explicit_investigation'
     old=[c for r in previous for c in r['results']]
     for card in report['results']:
+        if (((card['deterministic_summary'].get('structure_research') or {}).get('interaction')
+                or card['deterministic_summary'].get('coupled_block_search'))
+                and not any(c['identity']['result']==card['identity']['result'] for c in old)):
+            return 'new_matched_interaction_result'
         if ((card['deterministic_summary'].get('structure_research') or {}).get('effect_semantics')=='finite_time_task_response'
                 and not any(c['identity']['result']==card['identity']['result'] for c in old)):
             return 'new_finite_time_structure_result'
@@ -515,7 +519,7 @@ def reporter_handoff_summary(host, reference, saved):
         if math:fact['mathematics']=math
         else:
             fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
-                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics','passive_family_search')}
+                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics','passive_family_search','coupled_block_search')}
         if card.get('control_search'):
             search=card['control_search'];best=search.get('best')
             fact['control_search']=dict(stop_reason=search['stop_reason'],all_steps=search['all_steps'],
@@ -611,6 +615,9 @@ def _source_catalog(host, report, queries, *, semantic_sources=()):
         # Untyped dicts contain derived summaries, not provenance contracts.
     for card in report.results:
         collect(card)
+        coupled=card.deterministic_summary.get('coupled_block_search') or {}
+        if coupled.get('mathematical_analysis'):
+            add(EvidenceLocation(reference=coupled['mathematical_analysis'],pointer='/structure_research'))
         from tools.research.evidence_views import task_diagnosis
         ref=plain(card.identity.result.reference)
         diagnosis=task_diagnosis(host.store.artifact(ref),ref)

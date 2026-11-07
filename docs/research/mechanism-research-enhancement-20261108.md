@@ -73,3 +73,28 @@ embedded intervention request; matching now compares its resolved fixed
 coordinates while preserving builder versions and original records. Only the
 affected test was rerun. All calculations were explicitly synthetic, zero real
 Provider, MuJoCo integration, equilibrium or Replay cost; no full suite.
+
+## Phase 3 — completed
+
+Added the versioned `family_mixed_search_v2` / `bounded_coupled_block_v1`
+request to the existing Plan and search orchestrator. A frozen
+`family_search.coupled_block_enabled=true` grant is required. Main supplies an
+owned baseline and an `interact` scientific question, not solver settings or a
+random parameter vector. Registry-owned search-group metadata validates the
+selected block; all four points share Phase 2's implementation. Existing search
+checkpoints, immutable child analysis, recovery identities and ledger remain
+the owners. Four evaluated model variants do not materialize four new candidates.
+There is no automatic candidate promotion or black-box score ranking.
+
+Validation: three focused synthetic tests cover complete block/schema/Reporter
+delivery and reuse, partial failure/costs/skips, and whole-block/discrete/grant
+admission. One existing Coordinate feedback/lineage/reuse regression passed.
+The fixture initially lacked search action authorization; only its explicit
+offline grant was corrected. A separate binding-field defect found by native
+schema validation was fixed in the Plan compiler. Only affected tests reran.
+
+An incomplete block with two attempted points keeps the original four charged
+analysis units: actual attempts and charged units are separately projected.
+The pre-existing budget/settlement logic is unchanged, with no refund or reset.
+All tests used synthetic workers; zero real Provider, physical or numerical
+worker cost. No full benchmark suite, integration or Replay was launched.

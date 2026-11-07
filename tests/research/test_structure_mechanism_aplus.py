@@ -58,11 +58,11 @@ def prepare(*,physical=False):
     return h,c
 
 
-def synthetic_worker(h,c):
+def synthetic_worker(h,c,model=SyntheticNative):
     def worker(command,log,timeout,**kw):
         req=read(Path(command[-1]));query=AnalysisRequest.model_validate(req['query'])
         context=prepare_context(state(h)['spec'],h.store.artifact(c),query.mechanism_study,[])
-        with patch('extensions.tendon_family.mujoco_analysis.NativeModel',SyntheticNative):
+        with patch('extensions.tendon_family.mujoco_analysis.NativeModel',model):
             value=calculate(h.store.artifact(c)['configuration'],req['binding'],query,
                 dict(actual_time_s=0.,u=[1.],qpos_rad=[0.],qvel_rad_s=[0.]),context)
         from schemas.platform_analysis import TaskAnalysisRequirement

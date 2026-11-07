@@ -4,6 +4,14 @@ from itertools import zip_longest
 import math
 
 
+def coupled_block(parameters, allowed_groups):
+    """Reuse registry domains and the mathematics layer's four-point design."""
+    from extensions.math_analysis.differentiation_router import matched_points
+    if any(p.get('search_group') not in allowed_groups for p in parameters):
+        raise ValueError('COUPLED_PARAMETER_OUTSIDE_FROZEN_SEARCH_GROUPS')
+    return matched_points(parameters)
+
+
 def interval(query, key, domain):
     bounds=query.bounds.get(key,(domain['minimum'],domain['maximum']))
     if None in bounds:raise ValueError('FINITE_SEARCH_BOUNDS_REQUIRED: '+key)
