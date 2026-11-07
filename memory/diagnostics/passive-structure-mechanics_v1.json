@@ -1,0 +1,97 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "passive-structure-mechanics",
+  "revision": "1",
+  "kind": "procedure",
+  "authored_language": "en",
+  "language_origin": {
+    "kind": "authored_english",
+    "basis": "Answer-isolated synthesis of preserved PHS research process and existing native model contracts; no new experiment or human review claimed.",
+    "human_review": "not_claimed"
+  },
+  "retrieval_summary": "Passive mechanics, coupled design variables, unilateral sensitivity and historical failure lessons with explicit evidence grades.",
+  "topics": [
+    {
+      "topic": "Passive Tendon Mechanics",
+      "evidence_grade": "mathematical_derivation",
+      "source": "passive-force-response-research@2",
+      "knowledge": "With g=ell(q)-L<=0, tension>=0 and tension*g=0, static balance is grad U+Jell.T*tension-JF.T*F=0. A cable cannot push. Fixed payout is a constraint, not commanded force.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Unilateral Constraints and Slackening",
+      "evidence_grade": "historical_observation",
+      "source": "phs2d-research-process@1, trace 3",
+      "knowledge": "Good local row-space matching failed finite loading. Inspect actual lengths, positive multipliers and active-set changes. Zero tension alone does not classify a near-boundary constraint.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Tendon Routing and Geometric Coupling",
+      "evidence_grade": "physical_interpretation",
+      "source": "phs2d-research-process@1, traces 3-5",
+      "knowledge": "Fixed eccentric radius alone cannot predict tip translation constraints. Guides change path tangents and generalized force mapping. Finite bending shortens chords and can release constraints; installed holes and clearances must be checked separately.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Passive Equilibrium and Stability",
+      "evidence_grade": "historical_observation",
+      "source": "phs2d-research-process@1, traces 1-2,6",
+      "knowledge": "Failure to qualify an unloaded baseline prevents performance comparison. Apparent rest can coexist with force residual spikes. KKT and local second-order eligibility do not establish dynamic settling or global stability.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Material and Cross-section Design",
+      "evidence_grade": "mathematical_derivation",
+      "source": "extensions/tendon_family/compiler.py; sections.py; mjcf.py",
+      "knowledge": "Young modulus and section second moments determine bending stiffness. Density changes distributed mass, COM and inertia. Viscosity changes transient relaxation, not conservative static energy. Natural curvature changes elastic reference state; the unloaded equilibrium must be rebuilt.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Mass and Inertia Consistency",
+      "evidence_grade": "model_contract",
+      "source": "extensions/tendon_family/compiler.py; sections.py",
+      "knowledge": "Section dimensions, wall thickness and segment length must rebuild area, mass distribution and inertia through the compiler. Guide and connector inertias remain supplied prototype data; moving holes does not model removed material or friction.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Multi-condition Structural Design",
+      "evidence_grade": "historical_observation",
+      "source": "phs2d-research-process@1, trace 7",
+      "knowledge": "A shared design needs every frozen condition and independent validation. Different loads can have different taut sets. Do not combine successes from different designs or relax worst-case constraints.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Sensitivity and Mechanism Optimization",
+      "evidence_grade": "mathematical_derivation",
+      "source": "passive-force-response-research@2, procedure 2; passive_equilibrium.py",
+      "knowledge": "Implicit KKT derivatives require a regular qualified branch. Switching, deficient constraint rank or weak multipliers invalidate ordinary gradients. Mechanism sensitivity and task sensitivity are different objectives; mechanism improvement does not prove task improvement.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Numerical Qualification and Independent Validation",
+      "evidence_grade": "historical_observation",
+      "source": "phs2d-research-process@1, trace 7; passive-force-response-research@2",
+      "knowledge": "Retain solver termination, physical residuals, time-step refinement, independent replay and initial perturbation checks separately. Spatial refinement can invalidate previously stable coarse-grid results. Finite checks do not prove mathematical convergence or hardware validity.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Historical Research Lessons",
+      "evidence_grade": "historical_observation",
+      "source": "phs2d-research-process@1, traces 1-7",
+      "knowledge": "Early baseline failures, local Jacobian failure under finite load, uninstalled abstract routes and tail-window failures all changed the research method. Multiple guide, mass and material changes prevent a unique causal attribution. Failed local searches do not establish global infeasibility.",
+      "transfer_status": "requires_current_model_validation"
+    },
+    {
+      "topic": "Transferable Research Hypotheses",
+      "evidence_grade": "unverified_hypothesis",
+      "source": "phs2d-research-process@1, traces 3-6",
+      "knowledge": "Route distribution, slack margin, curvature and material relaxation may trade tip restraint against interior compliance. Test matched changes and competing explanations; no universal parameter direction or winning combination is known.",
+      "transfer_status": "requires_current_model_validation"
+    }
+  ],
+  "status": {
+    "current_scientific_evidence": false,
+    "generalization": "unverified"
+  },
+  "scope": "No winning design, exact topology, material combination, route, payout, trajectory, raw artifact or reconstruction location is disclosed. Sources identify methods and sanitized process only."
+}

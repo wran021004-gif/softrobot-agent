@@ -90,6 +90,15 @@ def knowledge_enabled(spec):
     return spec.get('knowledge',{}).get('mode','enabled')!='off'
 
 
+def research_catalogue(host):
+    """Short frozen entry identities; bodies and confirmed reads keep existing owners."""
+    rows=entries(host)
+    if not any(r.get('introduced_in')=='passive_research_v1' for r in rows):return None
+    return [dict(entry_id=r['entry_id'],revision=r['revision'],
+        knowledge_type=knowledge_type(r),summary=r.get('summary',''),
+        read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision'])) for r in rows]
+
+
 def entries(host):
     spec=state(host)['spec']
     policy=spec.get('knowledge',{})

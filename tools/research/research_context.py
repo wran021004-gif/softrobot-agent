@@ -1803,6 +1803,15 @@ def agent_decision_brief(host):
     if hint:brief['experience_guidance']=hint
     progress=read_progress(host)
     if progress:brief['experience_read_progress']=progress
+    from tools.research.experience import research_catalogue
+    catalogue=research_catalogue(host)
+    if catalogue:
+        from tools.research.config import role_provider
+        role=role_provider(state(host)['spec'],state(host)['pilot']['provider'],'reporter')
+        brief['knowledge_catalogue']=catalogue
+        brief['reporter_role']=dict(model=role['model'],reasoning=role.get('reasoning'),
+            status='available_for_important_results_and_explicit_investigation',
+            authority='Read-only interpretation; Main owns scientific decisions. Failed calls are recorded.')
     if s['spec'].get('task_conditions'):
         brief['task_conditions']=dict(frozen=[dict(condition_id=c['condition_id'],
             task={k:c['task'][k] for k in ('task_id','task_version','family','timing')},
@@ -2433,6 +2442,9 @@ def information_flow_brief(brief, delivered):
         knowledge=dict(role='context_only',types=dict(skill='Conditional methods; current model facts take precedence.',experience='Scoped historical decision traces; no autonomous-discovery claim, current evidence or authorization.'),
             access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])
+    if brief.get('knowledge_catalogue'):
+        result['knowledge']['catalogue']=brief['knowledge_catalogue']
+        result['knowledge']['reporter_role']=brief['reporter_role']
     if brief.get('analysis_interface')=='scientific_question_v4':
         # Presentation only: Store, pending feedback, budgets and read admission
         # retain their original owners. Latest numerical facts stay above.
