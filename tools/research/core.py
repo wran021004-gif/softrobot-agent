@@ -172,6 +172,9 @@ def read_evidence(host, query, *, record_read=True):
         if q.pointer=='/research_opportunities' or q.pointer.startswith('/research_opportunities/'):
             from tools.research.research_context import research_opportunity_review
             derived=dict(research_opportunities=research_opportunity_review(host,details=q.pointer!='/research_opportunities'))
+        elif q.pointer=='/task_diagnosis' or q.pointer.startswith('/task_diagnosis/'):
+            from tools.research.evidence_views import task_diagnosis
+            derived=dict(task_diagnosis=task_diagnosis(value,plain(q.reference),detailed=True))
         elif q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
             from tools.research.evidence_views import diagnostic_relations
             derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))

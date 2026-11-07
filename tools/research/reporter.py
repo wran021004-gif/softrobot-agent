@@ -504,6 +504,9 @@ def reporter_handoff_summary(host, reference, saved):
             access=data_access(host,card['identity']['result']['reference'],raw)
             if access.get('recorded_executions'):fact['recorded_data_access']=access
         fact['quantitative_facts']=quantitative_facts(raw,card['identity']['result']['reference'])
+        from tools.research.evidence_views import task_diagnosis
+        diagnosis=task_diagnosis(raw,card['identity']['result']['reference'])
+        if diagnosis:fact['task_diagnosis']=diagnosis
         fact['critical_observations']=card.get('critical_observations',[])
         for metric in fact['metrics']:metric['semantics']=metric_semantics(raw,metric['name'])
         fact['resources']=[plain(r) for r in _resources(raw,card['identity']['result']['reference']) if r.amount is not None]
@@ -608,6 +611,11 @@ def _source_catalog(host, report, queries, *, semantic_sources=()):
         # Untyped dicts contain derived summaries, not provenance contracts.
     for card in report.results:
         collect(card)
+        from tools.research.evidence_views import task_diagnosis
+        ref=plain(card.identity.result.reference)
+        diagnosis=task_diagnosis(host.store.artifact(ref),ref)
+        if diagnosis:
+            add(EvidenceLocation.model_validate(diagnosis['source']))
         passive=card.deterministic_summary.get('passive_family_search') or {}
         if passive.get('search_scope',{}).get('evaluation_mode')=='passive_task_response':
             for row in passive.get('structures',[]):
@@ -706,6 +714,11 @@ def _wire(host, reference, saved):
             'Facts, identities, metrics, costs and relations are frozen. '
             'Registered mechanism values, parameter directions and numerical consistency are authoritative; a structure direction is a proposal, with task improvement unmeasured. Do not reinterpret active tension channels as fixed-length constraints. Multi-factor differences do not '
             'identify causes. Do not choose experiments or parameters for the main Agent. '
+            'Organize the existing interpretation items into Observation (new_information), Hypotheses (hypothesis), '
+            'Evidence (supported_explanation/weakened_explanation), Discriminating Evidence (further_investigation), '
+            'and Unresolved (unresolved_question) when relevant. For competing hypotheses state distinct predictions '
+            'and observations that would weaken each, including parameter coupling and confounders; never select the next action. '
+            'Use task_diagnosis to retain per-condition actual values, bounds, units, small failures and source locations. '
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
             'State uncertainty when evidence is insufficient. '
             'quantitative_facts and comparison direction are authoritative derived facts. Do not reverse them. '

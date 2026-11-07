@@ -304,6 +304,10 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
     if isinstance(value,dict) and 'acceptance' in value:
         summary.update(task_gap=task_gap(value),constraints=(value['acceptance'] or {}).get('components',{}),
             limitations=['Only this recorded execution establishes its task outcome'])
+    if isinstance(value,dict):
+        from tools.research.evidence_views import task_diagnosis
+        diagnosis=task_diagnosis(value,reference)
+        if diagnosis:summary['task_diagnosis']=diagnosis
     if facts_only and summary:result=dict(read_pointer=pointer,available_keys=list(value))
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
         available_keys=list(value) if isinstance(value,dict) else None,summary=summary,
@@ -2810,6 +2814,7 @@ def mathematical_decision_view(card):
     if summary.get('structure_research'):
         result['quantities']=[]
         result['structure_research']=summary['structure_research']
+    if summary.get('task_diagnosis'):result['task_diagnosis']=summary['task_diagnosis']
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
     for key in ('nonlinear_capability','nonlinear_response'):
         if summary.get(key):result[key]=summary[key]

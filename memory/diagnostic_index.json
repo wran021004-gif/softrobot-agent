@@ -3245,6 +3245,318 @@
         "passive_progressive_stiffness",
         "soft_robot_research"
       ]
+    },
+    {
+      "id": "skill-parameter-model",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+      "source_refs": [
+        "skill-parameter-model@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-material-inertia@1",
+        "general-routing@1",
+        "general-sensitivity@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-parameter-model",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-parameter-model@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-matched-comparison",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Identify competing hypotheses, interventions and confounders before choosing a comparison. Match task, model protocol, named initial state, environment, evaluation conditions and control treatment.",
+      "source_refs": [
+        "skill-matched-comparison@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-multicondition@1",
+        "general-sensitivity@1",
+        "validation-qualification@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1",
+        "diagnostic-contact@1",
+        "diagnostic-near-bound@1"
+      ],
+      "entry_id": "skill-matched-comparison",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-matched-comparison@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-local-to-experiment",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Start from the observed phenomenon, including all constraint components and qualification layers. Separate observations from interpretations and unknown measurements.",
+      "source_refs": [
+        "skill-local-to-experiment@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-routing@1",
+        "general-equilibrium@1",
+        "diagnostic-local-finite@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-local-to-experiment",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-local-to-experiment@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-material-inertia",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Material, section, density and inertia change coupled parts of passive response.",
+      "type": "general",
+      "trigger": [
+        "material",
+        "density",
+        "section",
+        "inertia",
+        "relaxation",
+        "viscosity"
+      ],
+      "source_refs": [
+        "general-material-inertia@1"
+      ],
+      "evidence_level": "model_contract; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Use the actual constitutive law and generator/compiler mapping.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Slow simulated decay is not material calibration or proof of a unique relaxation mechanism.",
+      "related_skills": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "knowledge_refs": [
+        "diagnostic-relaxation@1"
+      ],
+      "entry_id": "general-material-inertia",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-material-inertia@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-routing",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Route geometry maps tension into generalized force; finite deformation can invalidate local predictions.",
+      "type": "general",
+      "trigger": [
+        "routing",
+        "jacobian",
+        "large deformation",
+        "geometry"
+      ],
+      "source_refs": [
+        "general-routing@1"
+      ],
+      "evidence_level": "model_derivation; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Ordinary derivatives require differentiable geometry and a regular fixed active set.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Guide contact or switching may break smooth assumptions.",
+      "related_skills": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "knowledge_refs": [
+        "passive-structure-mechanics@2",
+        "diagnostic-local-finite@1"
+      ],
+      "entry_id": "general-routing",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-routing@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "mechanism-research-process",
+      "revision": "1",
+      "resource_role": "expert_process",
+      "summary": "Choose a revisable mechanism research route from phenomena, theory, competing hypotheses and source-grounded mathematical feedback.",
+      "source_refs": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "limitations": [
+        "Context only; no current scientific evidence, acceptance or new execution authority.",
+        "Read relevant Knowledge only as needed; Skills own their detailed methods."
+      ],
+      "knowledge_refs": [
+        "general-task-observables@1",
+        "general-material-inertia@2",
+        "general-routing@2",
+        "general-sensitivity@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "mechanism-research-process",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "mechanism-research-process",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
     }
   ]
 }

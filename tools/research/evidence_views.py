@@ -22,6 +22,58 @@ def _location(reference, pointer=''):
     return EvidenceLocation(reference=reference, pointer=pointer)
 
 
+def task_diagnosis(value, reference, *, detailed=False):
+    """Project recorded TaskGap rows; never infer missing measurements or peaks."""
+    research=value.get('structure_research') or {}
+    gap=(research.get('baseline') or {}).get('task_gap')
+    pointer='/structure_research/baseline/task_gap'
+    if gap is None and value.get('task_gap') is not None:
+        gap=value['task_gap'];pointer='/task_gap'
+    if gap is None and (value.get('acceptance') or {}).get('constraint_observations'):
+        from tools.research.feedback import task_gap
+        gap=task_gap(value);pointer='/acceptance/constraint_observations'
+    if gap is None:return None
+    rows=gap.get('constraints',[]);conditions={}
+    fields=('constraint_id','signal','observed_value','bound','bound_type','unit',
+        'normalized_violation','passed','time_window','time_s','frame','material_s')
+    for i,row in enumerate(rows):
+        condition=row.get('condition_id') or row.get('load_condition') or 'unknown'
+        location=pointer+('/'+str(i) if pointer.endswith('constraint_observations') else '/constraints/'+str(i))
+        observation={k:deepcopy(row.get(k)) for k in fields}
+        observation['source']=dict(reference=reference,pointer=location)
+        conditions.setdefault(condition,[]).append(observation)
+    projected=[]
+    for condition,observations in conditions.items():
+        # Retain distinct signals and both lower and upper limits. In particular,
+        # a ratio must not replace its component observations or a small failure.
+        representatives={}
+        for row in observations:
+            key=(row['signal'],row['bound_type'],row['unit'])
+            old=representatives.get(key)
+            score=row['normalized_violation']
+            if old is None or (score is not None and (old['normalized_violation'] is None or score>old['normalized_violation'])):
+                representatives[key]=row
+        projected.append(dict(condition_id=condition,constraint_count=len(observations),
+            failed_constraint_count=sum(r['passed'] is False for r in observations),
+            unknown_constraint_count=sum(r['passed'] is None for r in observations),
+            **({'constraints':observations} if detailed else {'observations':list(representatives.values())})))
+    return dict(status='recorded_task_diagnosis',candidate=value.get('candidate'),
+        task_identity=(value.get('binding') or {}).get('task_identity'),model_identity=value.get('model_identity'),
+        valid_complete=gap.get('valid_complete'),comparable=gap.get('comparable'),
+        maximum_normalized_violation=gap.get('signed_task_gap'),hard_gate_status=gap.get('hard_gate_status'),
+        conditions=projected,source=dict(reference=reference,pointer=pointer),
+        detail_query=dict(reference=reference,view='working_set',pointer='/task_diagnosis'),
+        raw_query=dict(reference=reference,view='full',pointer=pointer),
+        numerical_qualification_query=dict(reference=reference,view='full',pointer='/diagnostic_layers')
+            if value.get('diagnostic_layers') else None,
+        parameter_changes=[dict(record_index=r.get('record_index'),parameter_values=r.get('parameter_values'),
+            source=dict(reference=reference,pointer=f'/structure_research/records/{i}/parameter_values'))
+            for i,r in enumerate(research.get('records',[])) if r.get('parameter_values')],
+        limitations=['Recorded constraints only; absent values, units and exact peak times remain unknown.',
+            'A scoring window is not a measured extremum time. Qualification and independent acceptance remain separate.',
+            'Compact observations show the worst recorded normalized violation per signal and bound type; exact rows are available on demand.'])
+
+
 def acceptance_certificate(host, reference):
     """Complete original task-acceptance contract, without copying trajectories.
 
@@ -985,6 +1037,10 @@ def result_card(host, reference):
     construction=recorded_static_summary(value,reference)
     if construction:summary['recorded_static_construction']=construction
     summary['scientific_interpretation']=SCIENTIFIC_INTERPRETATION
+    diagnosis=task_diagnosis(value,reference)
+    if diagnosis:
+        summary['task_diagnosis']=diagnosis
+        details.append(EvidenceLocation.model_validate(diagnosis['source']))
     return ResultCard(identity=identity,evidence_summary=evidence,
         recorded_context=context,metrics=metrics,main_violations=violations,critical_observations=critical,
         deterministic_summary=summary,mathematics=mathematics,control_search=search,

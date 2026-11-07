@@ -1107,6 +1107,9 @@ def decision_result(value, reference):
     if value.get('structure_research'):
         from tools.research.structure_research import summary as mechanism_summary
         result['structure_research']=mechanism_summary(value,reference)
+    from tools.research.evidence_views import task_diagnosis
+    diagnosis=task_diagnosis(value,reference)
+    if diagnosis:result['task_diagnosis']=diagnosis
     if value.get('native_analysis'):
         from tools.research.native_analysis import decision_summary
         result['native_analysis']=decision_summary(value)
