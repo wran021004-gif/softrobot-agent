@@ -24,6 +24,11 @@ def select_method(*, effect_semantics, capabilities, target=None, operation='dif
         elif 're_equilibrated' in capabilities.get('state_solution',[]):method='passive_re_equilibrated_pairs';strength='directional_comparison'
         else:missing.append('registered_instantaneous_mechanism_backend')
     else:missing.append('registered_effect_semantics')
+    if operation=='interact':
+        if method and effect_semantics in ('mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'):
+            method='matched_two_parameter_four_point_v1';strength='local_finite_interaction_estimate'
+        else:
+            method=None;missing.append('registered_matched_interaction_backend_for_effect')
     return dict(method=method,effect_semantics=effect_semantics,parameter=None,working_point=None,
         control_treatment=actuation,comparison_scope='same frozen task, model protocol and declared control treatment',
         numerical_consistency='requires_recorded_checks',direction_status=strength,
@@ -65,6 +70,54 @@ def stencil(parameter):
         steps=[abs(physical_value(mapping,z+(sign or 1)*s)-mapping['physical_value']) for s in (h,h/2)],
         scheme=scheme,one_sided_sign=sign,method='controlled_native_finite_difference',
         unavailable=['Analytic, AD or KKT structural derivatives are not available for this native observable/state binding.'])
+
+
+def matched_points(parameters):
+    """Four legal local points from actual continuous registry domains."""
+    if len(parameters)!=2:raise ValueError('INTERACTION_REQUIRES_TWO_CONTINUOUS_PARAMETERS')
+    plans=[stencil(p) for p in parameters]
+    base=[p['current_value'] for p in parameters]
+    changed=[plan['coordinates'][1 if plan['scheme']=='central_two_scales' else 0] for plan in plans]
+    ids=[p['parameter_id'] for p in parameters]
+    if len(set(ids))!=2 or any(a==b for a,b in zip(base,changed)):
+        raise ValueError('DISTINCT_NONZERO_PARAMETER_INTERVENTIONS_REQUIRED')
+    return [dict(label=label,parameter_values=dict(zip(ids,values))) for label,values in (
+        ('00',base),('10',[changed[0],base[1]]),('01',[base[0],changed[1]]),('11',changed))]
+
+
+def interaction_evidence(points, records):
+    """Matched finite contrasts only; missing validity never becomes a zero."""
+    selected=[next((r for r in records if r.get('parameter_values')==p['parameter_values']),None) for p in points]
+    evidence=dict(method='matched_two_parameter_four_point_v1',parameters=list(points[0]['parameter_values']),
+        points=[dict(**p,record_index=r['record_index'] if r else None) for p,r in zip(points,selected)],
+        strict_derivative=False,error_bound=None,uncertainty='Numerical estimate; no rigorous error bound.',
+        scope='Specified local finite region and matched conditions only; no global causal law or strict mixed derivative.')
+    issues=[]
+    for p,r in zip(points,selected):
+        observation=(r or {}).get('observation') or {};value=observation.get('value')
+        if r is None or observation.get('status')!='computed' or value is None or np.asarray(value).ndim or not np.isfinite(value):
+            issues.append(p['label']+': missing or invalid finite scalar observation')
+        elif ((r.get('mechanics') or {}).get('constraint_state',{}).get('qualified') is False
+                and not (observation.get('task_gap') or {}).get('valid_complete')):
+            issues.append(p['label']+': physical working point not qualified')
+    identities=[r.get('matching_identity') for r in selected if r]
+    if len(identities)!=4 or any(v is None for v in identities) or len(set(identities))!=1:
+        issues.append('Task/model/initial-state/control/environment/nonresearch-parameter match unverified')
+    units={r['observation'].get('unit') for r in selected if r}
+    if len(units)!=1 or None in units:issues.append('Observable unit unknown or mismatched')
+    if issues:return dict(**evidence,status='incomplete',issues=issues,independent_effects=None,interaction_effect=None)
+    y00,y10,y01,y11=[float(r['observation']['value']) for r in selected]
+    active_sets=[(r.get('mechanics') or {}).get('constraint_state') for r in selected]
+    branch_states=[]
+    for r in selected:
+        equilibrium=((r.get('mechanics') or {}).get('equilibrium') or {}).get('equilibrium') or {}
+        branch_states.append({k:equilibrium.get(k) for k in ('active','positive')})
+    return dict(**evidence,status='computed_local_interaction',unit=next(iter(units)),
+        baseline=y00,independent_effects=dict(delta1=y10-y00,delta2=y01-y00),
+        interaction_effect=y11-y10-y01+y00,total_joint_change=y11-y00,
+        active_sets=active_sets,branch_changed=(any(b!=branch_states[0] for b in branch_states[1:])
+            if any(v is not None for b in branch_states for v in b.values()) else None),
+        issues=[],interpretation='Branch changes remain finite comparisons and never authorize a smooth gradient.')
 
 
 def differentiate(parameter, baseline, evaluate, *, goal, allow_ineligible=False):

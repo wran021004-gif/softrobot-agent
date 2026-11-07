@@ -550,6 +550,7 @@ class MechanismQuestionV2(Contract):
 
 
 class ScientificStructureV4(MechanismQuestionV2):
+    operation: Literal['inspect','differentiate','optimize','compare','interact']
     effect_semantics: MechanismQuestionV2.model_fields['effect_semantics'].annotation | Literal['finite_time_task_response']
     target: PhysicalMechanismTarget | str
     control_treatment: Literal['fixed_absolute_tensions','reoptimized','closed_loop','no_active_control']
@@ -564,7 +565,7 @@ class ScientificStructureV4(MechanismQuestionV2):
 
 
 class MechanismStudy(Contract):
-    operation: Literal['inspect','differentiate','optimize','compare']
+    operation: Literal['inspect','differentiate','optimize','compare','interact']
     target: MechanismTarget | PhysicalMechanismTarget
     parameter_path: str | None = None
     parameter_paths: list[str] = Field(default_factory=list,max_length=2)
@@ -586,6 +587,7 @@ class MechanismStudy(Contract):
     def unambiguous_paths(self):
         if self.parameter_path and self.parameter_paths:raise ValueError('USE_LEGACY_PATH_OR_SELECTED_PATHS_NOT_BOTH')
         if len(set(self.paths))!=len(self.paths):raise ValueError('DISTINCT_PARAMETER_PATHS_REQUIRED')
+        if self.operation=='interact' and len(self.paths)!=2:raise ValueError('INTERACTION_REQUIRES_EXACTLY_TWO_PARAMETER_PATHS')
         return self
 
     @model_serializer(mode='wrap')

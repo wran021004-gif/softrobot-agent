@@ -171,7 +171,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         schema['$defs']['ScientificStructureV4']['allOf']=[dict(
             **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize'])),required=['operation'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
-        schema['description']='Structure research uses structure operations inspect/differentiate/optimize/compare; control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
+        schema['description']='Structure research uses inspect/differentiate/optimize/compare/interact (two registered continuous parameters, four matched local points); control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
         if passive:
             problem=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec['canonical_task']['physical_problem'])
             props=schema['$defs']['ScientificStructureV4']['properties']
@@ -226,12 +226,12 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
                     if branch.get('type')=='string':branch['enum']=groups
             structure['properties']['parameter_paths']['items'].pop('enum',None)
             structure['properties']['parameter_paths']['description']='Candidate-bound selectable continuous parameters under the frozen Study grant. Full structure_parameters retains design domains, authorization and unavailable reasons. The original compiler still checks the chosen operation, method, working point and shared budgets before execution. Evidence JSON navigation pointers are not parameter IDs.'
-            structure.setdefault('allOf',[]).append({'if':{'properties':{'operation':{'enum':['differentiate','optimize']}},'required':['operation']},
+            structure.setdefault('allOf',[]).append({'if':{'properties':{'operation':{'enum':['differentiate','optimize','interact']}},'required':['operation']},
                 'then':{'properties':{'parameter_paths':{'items':{'enum':[r['parameter_id'] for r in registered if r['selectable']]}}}}})
         structure['required']=[k for k in structure['required'] if k not in ('control_treatment','operating_point','physical_problem')]
         structure['description']='Choose operation, effect semantics, target, and parameters. Hypothesis and evaluation cap may reuse the completed diagnose decision. Only uniquely implied execution fields are compiled; distinct working points, sources and scientific methods remain Main choices.'
         from tools.research.structure_research import SCALAR_DIRECTION_TARGETS
-        structure['allOf'].append({'if':{'properties':{'operation':{'enum':['differentiate','optimize']},
+        structure['allOf'].append({'if':{'properties':{'operation':{'enum':['differentiate','optimize','interact']},
             'target':{'type':'object'}},'required':['operation','target']},
             'then':{'properties':{'target':{'anyOf':[
                 {'properties':{'reduction':{'not':{'const':'identity'}}},'required':['reduction']},
@@ -253,7 +253,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
         excluded=[k for k in mechanism_ids(mode) if k not in mechanism_ids(mode,'differentiate')]
         if excluded:
             structure.setdefault('allOf',[]).append({
-                'if':{'properties':{'operation':{'enum':['differentiate','optimize']}},'required':['operation']},
+                'if':{'properties':{'operation':{'enum':['differentiate','optimize','interact']}},'required':['operation']},
                 'then':{'properties':{'target':{'properties':{'quantity':{'not':{'enum':excluded}}}}}}})
         if passive:
             structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
@@ -534,7 +534,7 @@ def compile_question(host, payload, *, tool_use_id):
             return dict(status='unsupported',reason='PASSIVE_HAS_NO_ACTIVE_CONTROL_OPTIMIZATION',scientific_execution_started=False)
         if q.domain=='control' and q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
-        if q.domain=='structure' and candidate and q.structure.operation in ('differentiate','optimize'):
+        if q.domain=='structure' and candidate and q.structure.operation in ('differentiate','optimize','interact'):
             denial=mechanism_parameter_failure(spec,candidate,q.structure.parameter_paths)
             if denial:return denial
         from jsonschema import Draft202012Validator
@@ -859,6 +859,8 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     if v4 and (q.physical_problem or q.load_condition or q.control_treatment=='no_active_control'):
         return feedback('unsupported','FROZEN_PHYSICAL_MODE_MISMATCH')
     if v4 and (q.comparison_load_conditions or q.load_aggregation):return feedback('unsupported','LOAD_COMPARISON_REQUIRES_PASSIVE_ASSEMBLY')
+    if q.operation=='interact' and q.effect_semantics in ('fixed_input_response','reoptimized_task_capability','closed_loop_performance'):
+        return feedback('unsupported','MATCHED_INTERACTION_BACKEND_UNAVAILABLE_FOR_EFFECT',effect_semantics=q.effect_semantics)
     if q.effect_semantics=='reoptimized_task_capability':
         from extensions.math_analysis.differentiation_router import select_method
         route=select_method(effect_semantics=q.effect_semantics,capabilities=capabilities,
@@ -891,15 +893,15 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     candidate=intent['candidate'];c=verify_candidate(host,candidate);view=mathematical_method_view(host,candidate)
     rows=parameters(spec,c);by_path={r['parameter_id']:r for r in rows}
     paths=q.parameter_paths
-    if not paths and (not v4 or q.operation in ('differentiate','optimize')):
+    if not paths and (not v4 or q.operation in ('differentiate','optimize','interact')):
         paths=intent['agent_hypothesis']['decision'].get('selected_variables') or []
     if len(paths)>2:return feedback('needs_choice','SELECT_AT_MOST_TWO_PARAMETERS')
     if not paths and q.parameter_group:
         matches=[r['parameter_id'] for r in rows if r['mechanism_differentiation']['supported'] and group_matches(r,q.parameter_group)]
         if 1<=len(matches)<=2:paths=matches
-        elif q.operation in ('differentiate','optimize'):
+        elif q.operation in ('differentiate','optimize','interact'):
             return feedback('needs_choice','SELECT_UP_TO_TWO_EFFECTIVE_PARAMETERS_FROM_GROUP',choices=dict(parameter_paths=matches))
-    if q.operation in ('differentiate','optimize') and not paths:
+    if q.operation in ('differentiate','optimize','interact') and not paths:
         return feedback('needs_choice','REGISTERED_PARAMETER_SELECTION_REQUIRED',choices=dict(parameter_paths=[
             r['parameter_id'] for r in rows if r['mechanism_differentiation']['supported']]))
     for path in paths:
@@ -908,7 +910,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         if q.operation!='inspect' and row.get('input_set_changes'):
             return feedback('unsupported','INPUT_FEASIBLE_SET_CHANGE_REQUIRES_SEPARATE_SEMANTICS')
         if q.parameter_group and not group_matches(row,q.parameter_group):return feedback('needs_choice','PARAMETER_PATH_AND_GROUP_DISAGREE')
-        if q.operation in ('differentiate','optimize') and not row['mechanism_differentiation']['supported']:
+        if q.operation in ('differentiate','optimize','interact') and not row['mechanism_differentiation']['supported']:
             reason=row['mechanism_differentiation']['reason']
             return feedback('blocked' if reason=='ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED' else 'unsupported',reason,path=path)
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
@@ -1048,7 +1050,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         return fail('ALL_FROZEN_CONDITIONS_REQUIRED')
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
     paths=q.parameter_paths
-    if q.operation in ('differentiate','optimize') and not paths and q.parameter_group:
+    if q.operation in ('differentiate','optimize','interact') and not paths and q.parameter_group:
         from tools.research.structure_research import select_group_parameters
         paths=select_group_parameters(spec,c,q.parameter_group)
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
@@ -1090,10 +1092,10 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
     if isinstance(q.target,str) or problem['mode'] not in PRIMITIVES[q.target.quantity]['physical_modes']:return fail('REGISTERED_CONSTRAINED_OBSERVATION_REQUIRED')
     if q.target.quantity=='re_equilibrated_position_response' and q.effect_semantics!='re_equilibrated_passive_response':return fail('RELATIVE_POSITION_REQUIRES_RE_EQUILIBRATED_EFFECT')
     paths=q.parameter_paths
-    if q.operation in ('differentiate','optimize') and not paths and q.parameter_group:
+    if q.operation in ('differentiate','optimize','interact') and not paths and q.parameter_group:
         from tools.research.structure_research import select_group_parameters
         paths=select_group_parameters(spec,c,q.parameter_group)
-    if q.operation in ('differentiate','optimize') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETER_GROUP')
+    if q.operation in ('differentiate','optimize','interact') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETER_GROUP')
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
     study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
         load_condition=q.load_condition,comparison_load_conditions=q.comparison_load_conditions,load_aggregation=q.load_aggregation,

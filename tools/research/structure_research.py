@@ -5,10 +5,10 @@ import numpy as np
 from tools.platform_store import plain
 from extensions.tendon_family.family_space import resolved_request
 from extensions.math_analysis.mechanism_registry import observe,PRIMITIVES
-from extensions.math_analysis.differentiation_router import differentiate, stencil, coordinate, physical_value
+from extensions.math_analysis.differentiation_router import differentiate, stencil, coordinate, physical_value, matched_points, interaction_evidence
 
 METHOD='mechanism_structure_v1'
-OPERATIONS=('inspect','differentiate','optimize','compare')
+OPERATIONS=('inspect','differentiate','optimize','compare','interact')
 SCALAR_DIRECTION_TARGETS=('mass_balance_residual','total_mass','body_inertia_trace',
     'directional_tendon_row_residual','motion_decoupling','finite_time_task_violation')
 
@@ -143,7 +143,7 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         passive_source(candidate['configuration'],{'artifact_id':'0'*64},dict(passive_ablation=study.passive_ablation) if study.passive_ablation else {})
         if candidate['configuration']['task']['evaluator']['parameters']['data'].get('mechanism') and not study.passive_ablation:
             raise ValueError('FROZEN_MECHANISM_TASK_REQUIRES_EXPLICIT_PAIRED_LIMIT_SELECTION')
-        if study.operation in ('differentiate','optimize'):
+        if study.operation in ('differentiate','optimize','interact'):
             definitions=task_adapter(candidate['configuration']).constraint_observations({})
             if not any(d['normalization_scale'] for d in definitions):
                 raise ValueError('TASK_HAS_NO_NUMERICAL_OBJECTIVE_FEASIBILITY_COMPARISON_ONLY')
@@ -167,7 +167,7 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         if study.load_aggregation and study.target.reduction=='identity' and metadata['shape']:
             raise ValueError('LOAD_AGGREGATION_REQUIRES_SCALAR_REDUCTION')
     rows={r['parameter_id']:r for r in parameters(spec,candidate)};selected=[]
-    if study.operation in ('differentiate','optimize'):
+    if study.operation in ('differentiate','optimize','interact'):
         if spec.get('fixed_structure_reference'):raise ValueError('FROZEN_FIXED_STRUCTURE_FORBIDS_STRUCTURAL_PROBES')
         if not 1<=len(study.paths)<=2:raise ValueError('SELECT_ONE_OR_TWO_REGISTERED_PARAMETERS')
         for path in study.paths:
@@ -184,12 +184,14 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         if dynamic and dynamic_protocol(c['configuration'])!=dynamic_protocol(candidate['configuration']):
             raise ValueError('DYNAMIC_COMPARISON_REQUIRES_SAME_FROZEN_MODEL_PROTOCOL')
     plans=[stencil(row) for row in selected]
-    minimum=(1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
+    minimum=(4 if study.operation=='interact' else 1 if study.operation=='inspect' or loads else 2 if study.operation=='compare' else
         1+sum(len(set(p['coordinates'])) for p in plans)+int(len(plans)==2)+int(study.operation=='optimize'))
     cost_dependencies=dict(operation=study.operation,baseline_evaluations=1,
         parameter_stencil_evaluations={row['parameter_id']:len(set(plan['coordinates'])) for row,plan in zip(selected,plans)},
         joint_check_evaluations=int(len(plans)==2),local_search=study.operation=='optimize',
         rule='Actual legal stencil coordinates depend on selected parameter domains and operating values; two paths add a joint check; optimize adds a trial and uses the requested cap.')
+    if study.operation=='interact':
+        cost_dependencies=dict(operation='interact',baseline_evaluations=1,matched_contrasts=3,rule='All four matched evaluations require admission before any execution.')
     cost=dynamic_cost(candidate['configuration'],minimum,bool(study.passive_ablation)) if dynamic else None
     if not minimum_budget and study.max_evaluations<minimum:
         raise MechanismBudgetError(minimum,cost_dependencies,cost)
@@ -198,17 +200,23 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         minimum_evaluations=minimum,evaluation_cap=cap,
         evaluations=cap if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
         comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
-    if problem:
-        from extensions.math_analysis.differentiation_router import select_method
-        result['parameterized_problem']=dict(version='parameterized_physical_research_v1',
-            parameter_space=dict(source='FamilySpace/parameter_capabilities',selected=selected,
-                unselected='Held fixed; this bounded request does not exhaust the parameter group.'),
-            physical_problem=problem,observable=PRIMITIVES[study.target.quantity],
-            sensitivity_problem=dict(level='M2' if dynamic else 'M0',target=plain(study.target),
-                effect_semantics=study.effect_semantics,parameter_paths=study.paths),
-            differentiation_router=select_method(effect_semantics=study.effect_semantics,
-                capabilities=task_adapter(candidate['configuration']).physical_capabilities(),
-                target=study.target.quantity,operation=study.operation))
+    from extensions.math_analysis.differentiation_router import select_method
+    route=select_method(effect_semantics=study.effect_semantics,capabilities=capabilities,
+        target=study.target.quantity,operation=study.operation)
+    result['parameterized_problem']=dict(version='parameterized_physical_research_v1',
+        research_question=dict(operation=study.operation,target=plain(study.target)),
+        task_identity=candidate.get('task_identity'),candidate_identity=candidate.get('physical_design_identity'),
+        task_source=dict(reference=candidate.get('configuration_reference'),pointer='/task'),
+        model=candidate['configuration']['policy']['dynamics_model'],
+        parameter_space=dict(source='FamilySpace/parameter_capabilities',selected=selected,
+            unselected='Held fixed; this bounded request does not exhaust the parameter group.'),
+        physical_problem=problem,observable=dict(id=study.target.quantity,**PRIMITIVES[study.target.quantity]),
+        working_point=dict(semantics=study.point_semantics,load_condition=study.load_condition),
+        control_treatment='no_active_control' if problem else 'fixed_absolute_tensions',
+        fixed_conditions='Same frozen task, model protocol, initial-state treatment, environment and all unselected physical parameters.',
+        sensitivity_problem=dict(level='M1' if dynamic else 'M0',target=plain(study.target),
+            effect_semantics=study.effect_semantics,parameter_paths=study.paths),
+        differentiation_router=route)
     if dynamic:
         result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
     return result
@@ -221,7 +229,7 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
     minima=[1+n for n in probes.values()]
     problem=candidate['configuration']['task'].get('physical_problem')
     minimum=dict(inspect=1,compare=1 if problem and len(problem['loads'])>1 else 2,differentiate=min(minima) if minima else None,
-        optimize=min(minima)+1 if minima else None)
+        optimize=min(minima)+1 if minima else None,interact=4 if len(probes)>=2 else None)
     unavailable=execution_block or (detail.get('planning_status') if detail.get('planning_status') in
         ('unauthorized','unsupported','insufficient_budget','blocked') else None)
     operations={}
@@ -232,10 +240,12 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
         operations[operation]=dict(can_prepare=ready,execution_status='blocked' if reason else
             'conditional_on_original_request_admission' if ready else 'not_checked',reason=reason,
             minimum_evaluations=count,inputs_required=True)
+    from tools.research.math_capability_catalog import research_semantics
     return dict(version='structure_mechanism_discovery_v2',candidate=reference,operations=list(OPERATIONS),
+        research_semantics=research_semantics(),
         operation_admission=operations,remaining_evaluations=remaining_evaluations,
         evaluation_cost_preview=dict(baseline_evaluations=1,parameter_stencil_evaluations=probes,
-            two_parameter_joint_check_evaluations=1,optimize_additional_minimum=1,
+            two_parameter_joint_check_evaluations=1,matched_interaction_evaluations=4,optimize_additional_minimum=1,
             rule='differentiate = baseline + selected path probes + one joint check for two paths. optimize adds at least one trial. Request compilation validates the actual method, point, intervention and budgets; finite-time physical cost multiplies this count by per_evaluation_cost.'),
         method_admission={k:detail[k] for k in ('planning_status','execution_status','formal_execution_authorized','missing') if k in detail},
         mechanism_categories=['constraint_geometry','taut_slack_activity','tangent_compliance','re_equilibrated_response'] if candidate['configuration']['task'].get('physical_problem') else
@@ -314,6 +324,24 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     passive=bool(configuration['task'].get('physical_problem'))
     dynamic=study.effect_semantics=='finite_time_task_response'
 
+    def bind_matching_conditions(record):
+        if study.operation!='interact':return
+        from tools.state_io import digest
+        fixed=resolved_request(context['space'],record['parameters'] or context['parameters'])
+        for row,value in zip(rows,base_values):set_parameter(fixed,row['parameter_id'],value)
+        cfg=record['configuration'];mechanics=record['mechanics']
+        policy=deepcopy(cfg['policy'])
+        # Builder request records the intentional intervention. Compare its
+        # resolved fixed coordinates, while retaining builder/model versions.
+        policy['candidate_builder']['parameters']['data']['request']=fixed
+        initial=(mechanics.get('dynamic_execution') or {}).get('initial_state') if dynamic else mechanics
+        initial=initial or {}
+        record['matching_identity']=digest(dict(task=cfg['task'],model_protocol=policy,
+            robot_conditions={k:v for k,v in cfg['robot'].items() if k!='structure'},
+            fixed_parameters=fixed,point_semantics=study.point_semantics,
+            initial_state={k:initial.get(k) for k in ('qpos_rad','qvel_rad_s')} if not passive or dynamic else 'same frozen initialization and re-equilibration procedure',
+            control=mechanics.get('actual_tensions_n') if not passive else 'no_active_control'))
+
     def evaluate(values=None, *, comparison=None):
         nonlocal attempts,baseline_point
         values=base_values if values is None else list(values)
@@ -364,6 +392,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 configuration=cfg,observation=observation,mechanics=mechanics,state=dict(reference='frozen_dynamic_initial_state'),
                 physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None,
                 compiled_physical_changes=dict(model_recompiled=True) if records and native.physics['identity']!=records[0]['physics_identity'] else {})
+            bind_matching_conditions(record)
             records.append(record);cache[key]=record
             if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation,raw_execution=raw))
             if observation['status']!='computed':failures.append(dict(record_index=record['record_index'],reason=measured.get('reason')))
@@ -422,6 +451,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 provenance=baseline_point.get('provenance'),prefix_tensions_n=baseline_point.get('prefix_tensions_n'),
                 remaining_task_s=point.get('remaining_task_s'))
         record['compiled_physical_changes']=physical_changes(records[0]['mechanics'],mechanics) if records else {}
+        bind_matching_conditions(record)
         records.append(record);cache[key]=record
         if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation))
         if observation['status']!='computed':raise ValueError(observation['reason'])
@@ -493,6 +523,10 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                         if other['observation']['value'] is not None and base['observation']['value'] is not None else None)
         elif dynamic and base['observation']['value'] is None:
             evidence.update(derivative_status='not_defined',direction_status='feasibility_comparison_only')
+        elif study.operation=='interact':
+            for matched in matched_points(rows)[1:]:
+                record=evaluate(list(matched['parameter_values'].values()))
+                if record['observation']['status']!='computed':raise ValueError('INCOMPLETE_MATCHED_INTERACTION')
         elif study.operation in ('differentiate','optimize'):
             for i,row in enumerate(rows):
                 first=len(records)
@@ -614,6 +648,9 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         incomplete=dynamic and records and records[-1]['observation']['status']!='computed'
         result.update(status='execution_incomplete' if incomplete else 'not_applicable',reason=str(exc))
         evidence['failure']=dict(reason=str(exc),attempted_evaluations=attempts)
+    if study.operation=='interact':
+        evidence['interaction']=interaction_evidence(matched_points(rows),records)
+        evidence['interaction']['sources']=[f'/structure_research/records/{r["record_index"]}' for r in records]
     if dynamic:
         observed=observed_task_improvement(records,rows,evidence.get('local_search',{}).get('bounds_normalized'))
         evidence.update({k:v for k,v in observed.items() if k!='gaps'})
@@ -631,12 +668,13 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     evidence['method_selection'].update(actual_cost=cost,working_point=evidence['reference_semantics'],
         parameter=study.paths,evidence_source='/structure_research/records',
         numerical_consistency=[r['consistency'] for r in evidence.get('parameter_sensitivities',[])])
-    if passive:
+    if passive or study.operation=='interact':
         evidence['sensitivity_evidence']=dict(version='physical_sensitivity_evidence_v1',
             problem='/structure_research/parameterized_problem',
             parameter_paths=study.paths,method=evidence['method_selection'],
             sensitivities=evidence.get('parameter_sensitivities',[]),
-            active_set_and_kkt_sources=[f'/structure_research/records/{i}/mechanics/constraint_state' for i in range(len(records))],
+            **(dict(interaction_source='/structure_research/interaction') if study.operation=='interact' else {}),
+            active_set_and_kkt_sources=[f'/structure_research/records/{i}/mechanics/constraint_state' for i in range(len(records)) if passive],
             scope=evidence['scope'],cost=cost,task_acceptance='unmeasured')
     if evidence.get('structure_direction'):evidence['structure_direction']['actual_cost']=cost
     result.update(structure_research=evidence,model_identity=records[0]['physics_identity'] if records else None,
@@ -676,6 +714,8 @@ def dynamic_summary(raw, reference):
         diagnosis['source']['reference']=reference
         for failure in diagnosis['failed_qualifications']:failure['source']['reference']=reference
     return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
+        **(dict(interaction={**raw['interaction'],
+            'source':dict(reference=reference,pointer='/structure_research/interaction')}) if raw.get('interaction') else {}),
         qualification_diagnosis=diagnosis,
         baseline=compact(gaps[0]) if gaps else None,best_valid=compact(gaps[best]) if best is not None else None,
         hard_gates=gates,parameter_changes=direction['parameter_changes'] if direction else [],
@@ -771,6 +811,8 @@ def summary(value, reference):
                 row.pop('value',None);row['value_at']='structure_research.baseline'
             row['observation']={k:v for k,v in row.get('observation',{}).items() if k not in ('name','load_condition','minimum','maximum','unit')}
     return dict(operation=raw['operation'],target=raw['target'],baseline=baseline_summary,baseline_unit=raw.get('baseline',{}).get('unit'),
+        **(dict(interaction={**raw['interaction'],
+            'source':dict(reference=reference,pointer='/structure_research/interaction')}) if raw.get('interaction') else {}),
         physical_problem=raw.get('physical_problem'),constraint_state=constraint_state,point_binding=raw.get('point_binding'),
         constraint_state_load_condition=((raw.get('point_binding') or {}).get('load') or {}).get('name'),
         qualification_diagnosis=diagnosis,

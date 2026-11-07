@@ -129,6 +129,9 @@ PRIMITIVES['finite_time_task_violation']=dict(field='signed_task_gap',unit='1',s
     validity='Every frozen constraint must have valid measurements and a legal normalization scale for a scalar objective.',
     meaning='Maximum normalized signed violation over every required load and constraint; independent acceptance remains unmeasured.')
 
+for meta in PRIMITIVES.values():
+    if 'differentiate' in meta['operations']:meta['operations'].append('interact')
+
 
 def mechanism_ids(mode, operation=None):
     return [k for k,v in PRIMITIVES.items() if v['main_visible'] and mode in v['physical_modes'] and

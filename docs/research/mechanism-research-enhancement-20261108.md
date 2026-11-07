@@ -46,3 +46,30 @@ old knowledge interface). A read-only real Store check passed Store → ResultCa
 authored parameter/Observable IDs resolved against candidate_737's registries.
 Provider and scientific costs for these checks were zero. No full suite,
 benchmark sweep or physical remeasurement was run.
+
+## Phase 2 — completed
+
+V4 structure questions now accept `interact` with exactly two registered
+continuous parameters. The existing compiler, mechanism worker, domain checks
+and budget admission construct and execute one four-point matched calculation.
+Resolved nonresearch parameters, task, model/builder versions, initialization,
+environment and actual fixed input bind a common comparison identity. The
+existing sensitivity evidence references raw point records, effects and costs.
+Incomplete or mismatched results withhold all interaction conclusions; recorded
+branch changes retain finite contrasts without a smooth gradient claim.
+
+The existing parameterized problem now also describes active M0 research.
+Fresh fixed-input passive finite-time problems are correctly M1, not M2.
+M0 and the registered complete passive M1 response support four-point contrasts.
+Reoptimized M2 and closed-loop M3 interaction adapters explicitly remain
+unavailable; existing single-parameter M2 behavior is retained. No mathematical
+kernel, original task, threshold or frozen physical model was rewritten.
+
+Validation: three synthetic tests cover four-point compiler/worker execution
+and whole-group admission, independent/interaction effects, and changed branches,
+invalid/missing/mismatched points. One existing V2 single-parameter interface
+regression passed. An initial comparison-identity failure exposed the builder's
+embedded intervention request; matching now compares its resolved fixed
+coordinates while preserving builder versions and original records. Only the
+affected test was rerun. All calculations were explicitly synthetic, zero real
+Provider, MuJoCo integration, equilibrium or Replay cost; no full suite.
