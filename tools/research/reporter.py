@@ -6,6 +6,7 @@ registered evidence. Model interpretation runs at settled pre-decision boundarie
 from copy import deepcopy
 from typing import Literal
 import json
+import re
 import httpx
 from pydantic import Field
 from schemas.common import Contract
@@ -43,6 +44,7 @@ class SourceIdInterpretation(Contract):
     kind: ReporterInterpretation.model_fields['kind'].annotation
     text: str
     source_ids: list[str] = Field(min_length=1)
+    knowledge_refs: list[str] = Field(default_factory=list)
 
 
 class SourceIdResponse(Contract):
@@ -221,6 +223,23 @@ def assemble(host, references, *, question=None):
 
 def _save(host, report, *, request=None, status='deferred', interpretation_for=None, error=None,rejection_details=None):
     from tools.research.provider import record
+    if status=='deferred' and state(host)['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+        from tools.research.experience import entries as knowledge_entries, retrieve
+        request=deepcopy(request or {})
+        if not request.get('experience_receipts'):
+            value=plain(report)
+            focus=json.dumps([value.get('question'),request.get('focus',[])]).lower().replace('_',' ')
+            findings=json.dumps([{k:c.get(k) for k in ('main_violations','evidence_summary','deterministic_summary')}
+                for c in value['results']]).lower().replace('_',' ')
+            def relevance(row,context):
+                return sum(len(t) for t in row.get('trigger',[]) if
+                    re.search(r'(?<!\w)'+re.escape(t.lower())+r'(?!\w)',context))
+            candidates=[r for r in knowledge_entries(host) if r.get('resource_role')=='knowledge']
+            context=focus if any(relevance(r,focus) for r in candidates) else findings
+            relevant=[r for r in candidates if relevance(r,context)]
+            relevant.sort(key=lambda r:(-relevance(r,context),r.get('type')!='diagnostic',r['entry_id']))
+            request['experience_receipts']=[retrieve(host,dict(operation='read',entry_id=r['entry_id'],
+                revision=r['revision']),reader='reporter')['reference'] for r in relevant[:2]]
     return record(host,'research_report',dict(report=plain(report),request=plain(request),
         interpretation_status=status,interpretation_for=interpretation_for,error=error,rejection_details=rejection_details))
 
@@ -669,6 +688,9 @@ def _wire(host, reference, saved):
             'Retain every failed constraint, including tiny strict violations. valid_failure means valid evaluation with failed task. '
             'Solver failure is not infeasibility; target distance is not mechanical equilibrium residual. '
             'Historical procedural_guidance is advisory only; it is excluded from source_catalog. '
+            'If used for explanation, cite its exact entry_id@revision in knowledge_refs; only actually delivered reads are allowed. '
+            'Keep recorded facts in new_information, interpretations in supported_explanation/weakened_explanation, '
+            'competing hypotheses in hypothesis and unknowns in unresolved_question. Do not promote contextual knowledge to observed facts. '
             'Ground every interpretation in this Study evidence; advice grants no scientific evidence or permission. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
@@ -689,13 +711,18 @@ def _finish(host, boundary, wire, response):
         if 'source_catalog' in payload:
             output=SourceIdResponse.model_validate_json(choice['message']['content'])
             catalog=payload['source_catalog'];interpretations=[]
+            delivered_knowledge={r['entry_id']+'@'+r['revision']
+                for receipt in payload.get('procedural_guidance',[]) if receipt['query']['operation']=='read'
+                for r in receipt['results'] if r.get('status')!='source_unavailable'}
             for index,item in enumerate(output.interpretations):
                 invalid=[key for key in item.source_ids if key not in catalog]
                 if invalid:
                     rejection=dict(code='REPORTER_UNKNOWN_SOURCE_ID',interpretation_index=index,invalid_source_ids=invalid)
                     raise ValueError('REPORTER_UNKNOWN_SOURCE_ID')
+                if set(item.knowledge_refs)-delivered_knowledge:
+                    raise ValueError('REPORTER_KNOWLEDGE_NOT_READ')
                 interpretations.append(ReporterInterpretation(kind=item.kind,text=item.text,
-                    sources=[catalog[key] for key in item.source_ids]))
+                    sources=[catalog[key] for key in item.source_ids],knowledge_refs=item.knowledge_refs))
         else:
             # Replay uses the persisted request contract, never today's _wire().
             interpretations=InterpretationResponse.model_validate_json(choice['message']['content']).interpretations

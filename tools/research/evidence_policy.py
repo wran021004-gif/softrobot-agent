@@ -250,6 +250,15 @@ def registered_references(host):
     return known
 
 
+def study_references(host):
+    """Existing current-run outputs and registered domain/science references only."""
+    from tools.research.state import state
+    refs=[r for e in host.store.events(host.run_id) for r in e.get('outputs',[])]
+    refs.extend(registered_references(host))
+    if state(host).get('family_space_reference'):refs.append(state(host)['family_space_reference'])
+    return refs
+
+
 def citation_role(host, reference, *, current=None, known=None):
     """Role describes provenance, not strength or formal reading eligibility."""
     from tools.research.state import state

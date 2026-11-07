@@ -4,7 +4,7 @@ Existing EvidenceSummary and ScopedMathematicalClaim remain the scope owners.
 Construction validates shape and provenance, never the truth of free text.
 """
 from typing import Literal
-from pydantic import Field, FiniteFloat, JsonValue, model_validator
+from pydantic import Field, FiniteFloat, JsonValue, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import ScopedMathematicalClaim
@@ -170,6 +170,14 @@ class ReporterInterpretation(Contract):
     text: str
     sources: list[EvidenceLocation] = Field(default_factory=list)
     status: Literal['reporter_interpretation'] = 'reporter_interpretation'
+    knowledge_refs: list[str] = Field(default_factory=list,
+        description='Actual delivered contextual Knowledge identities; never current scientific evidence.')
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_interpretation(self,handler):
+        result=handler(self)
+        if not self.knowledge_refs:result.pop('knowledge_refs',None)
+        return result
 
 
 class ScientificReport(Contract):

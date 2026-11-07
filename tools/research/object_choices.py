@@ -37,6 +37,10 @@ def _reference_choices(host, *, include_all=False):
     with host.store.connect(True) as db:
         if include_all:
             refs=[dict(artifact_id=i,media_type=m) for i,m in db.execute('SELECT id,media FROM artifacts')]
+            if s['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+                from tools.research.evidence_policy import study_references
+                owned=study_references(host)
+                refs=[r for r in refs if r in owned]
         for ref in refs:
             if ref in choices.values():continue
             if ref in analyses:name='result_'+str(analyses.index(ref)+1)

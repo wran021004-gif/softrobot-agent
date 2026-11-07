@@ -15,7 +15,7 @@ PATTERN_STATUS='public_decision_pattern; generalization_unverified'
 
 
 def knowledge_type(entry):
-    return 'skill' if entry['kind']=='procedure' else 'experience'
+    return entry.get('resource_role') or ('skill' if entry['kind']=='procedure' else 'experience')
 
 
 def freeze_study_entries(spec, index, policy=None):
@@ -51,6 +51,9 @@ def _permitted(entry, policy, *, legacy=False):
     if revisions is not None and entry['revision'] not in revisions:return False
     if policy.get('allowed_kinds') is not None and entry['kind'] not in policy['allowed_kinds']:return False
     if entry.get('benchmark_sensitive') and not policy.get('allow_benchmark_answers',False):return False
+    if entry.get('introduced_in')=='typed_knowledge_v1':
+        return (policy.get('organization')=='typed_knowledge_v1' and
+            entry.get('disclosure')=='answer_isolated' and not entry.get('benchmark_sensitive'))
     if legacy:return True
     return ((entry['kind']=='procedure' and (entry['status']==PUBLIC_STATUS or
         entry.get('introduced_in')=='p3_knowledge_v1' and entry['status']=='reference_backed_scoped'))
@@ -75,6 +78,9 @@ def freeze_knowledge(policy):
     policy=plain(policy)
     if policy.get('mode')=='off':return dict(entries=[])
     rows=deepcopy([entry for entry in _index_rows() if _permitted(entry,policy)])
+    for row in rows:
+        if row.get('introduced_in')=='typed_knowledge_v1':
+            row['content_sha256']=hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest()
     if policy.get('delivery')=='compact_skill_v1':
         for row in rows:
             if row.get('introduced_in')=='phs2d_process_v1':
@@ -95,6 +101,13 @@ def knowledge_enabled(spec):
 def research_catalogue(host):
     """Short frozen entry identities; bodies and confirmed reads keep existing owners."""
     rows=entries(host)
+    if state(host)['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+        return dict(types=[dict(type=t,count=sum(r.get('type')==t for r in rows),
+            search_query=dict(operation='search',type=t)) for t in ('case','general','diagnostic','validation')],
+            capabilities=[dict(id=r['entry_id'],role=knowledge_type(r),summary=r['summary'],
+                read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision']))
+                for r in rows if knowledge_type(r) in ('skill','expert_process')],
+            scope='L0 index only. Search or summary read for L1; exact full read for Action Trace and workflow. Context only.')
     if not any(r.get('introduced_in')=='passive_research_v1' for r in rows):return None
     return [dict(entry_id=r['entry_id'],revision=r['revision'],
         knowledge_type=knowledge_type(r),summary=r.get('summary',''),
@@ -126,6 +139,9 @@ def entries(host):
 def retrieval_hint(host):
     s=state(host)
     if not knowledge_enabled(s['spec']) or s['spec'].get('rl_evaluation_source') or s.get('research_status')=='stopped' or protected(host):return None
+    if s['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+        return dict(query=dict(operation='search',type='diagnostic'),
+            scope='Optional scoped Knowledge search; bodies are not preloaded. Main chooses relevant Knowledge, Skill or Expert Process from the catalogue.')
     task=s['spec'].get('canonical_task',s['spec'].get('task',{}))
     family=task.get('family','') if isinstance(task,dict) else ''
     name=family.removeprefix('task.')
@@ -290,6 +306,7 @@ def retrieve(host,query,*,reader='agent'):
         if q.entry_id is not None and q.entry_id!=entry['entry_id']:continue
         if q.revision is not None and q.revision!=entry['revision']:continue
         if q.knowledge_type is not None and q.knowledge_type!=knowledge_type(entry):continue
+        if q.type is not None and q.type!=entry.get('type'):continue
         if any(getattr(q,name) is not None and getattr(q,name)!=entry[name]
             and getattr(q,name) not in entry.get('applicable_'+name+'s',[])
             for name in ('task','structure','failure_type','version','kind')):continue
@@ -302,10 +319,14 @@ def retrieve(host,query,*,reader='agent'):
         content=None;body_hash=None
         if q.operation=='read':
             body=source.read_bytes()
-            frozen_hash=entry.get('compact_skill',{}).get('source_sha256')
+            frozen_hash=entry.get('content_sha256') or entry.get('compact_skill',{}).get('source_sha256')
             if frozen_hash and hashlib.sha256(body).hexdigest()!=frozen_hash:
                 raise ValueError('FROZEN_KNOWLEDGE_CONTENT_CHANGED: '+canonical)
             content=json.loads(body) if source.suffix=='.json' else body.decode('utf8')
+            if entry.get('content_key'):content=content['entries'][entry['content_key']]
+            if q.detail=='summary':
+                content={k:entry[k] for k in ('id','type','summary','trigger','source_refs','evidence_level',
+                    'applicability','limitations','related_skills','knowledge_refs') if k in entry}
             # Existing receipt identity only; never an admission/comparison gate.
             body_hash=hashlib.sha256(body).hexdigest()
         from tools.research.evidence_policy import english_sources
@@ -331,8 +352,8 @@ def retrieve(host,query,*,reader='agent'):
             knowledge_type=knowledge_type(entry),
             **(dict(content_sha256=body_hash) if q.operation=='read' else {}),original_evidence_references=refs,
             read_query=dict(operation='read',entry_id=entry['entry_id'],revision=entry['revision']),
-            content_role='research_trace' if entry['kind'] in ('case','success_case') else 'procedural_knowledge',
-            applicability='Transfer diagnostic principles only after checking trigger and scope; historical task numbers and controls do not transfer. Cross-task validity is unverified.',
+            content_role=entry.get('resource_role') or ('research_trace' if entry['kind'] in ('case','success_case') else 'procedural_knowledge'),
+            **({} if 'applicability' in entry else dict(applicability='Transfer diagnostic principles only after checking trigger and scope; historical task numbers and controls do not transfer. Cross-task validity is unverified.')),
             historical_task_type=entry['task'], current_task_type=state(host)['spec'].get('canonical_task',{}).get('family'),
             **(dict(content=content) if q.operation=='read' else {})))
     if q.operation=='read' and len(rows)!=1:raise ValueError('EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION')
@@ -371,6 +392,7 @@ def disposition_bindings(host,dispositions):
         if row.get('status')=='source_unavailable':continue
         binding=dict(read_receipt=ref,entry_id=row['entry_id'],revision=row['revision'],exact_key=row['exact_key'],
             content_sha256=row['content_sha256'],reader=receipt.get('reader','agent'))
+        if receipt['query'].get('detail')=='summary':binding['full_read']=False
         reads[ref['artifact_id']]=binding;reads[row['exact_key']]=binding
         if ref['artifact_id'] in aliases:reads[aliases[ref['artifact_id']]]=binding
     if state(host)['spec'].get('knowledge',{}).get('delivery')=='compact_skill_v1':
@@ -393,7 +415,8 @@ def read_progress(host):
                 or len(receipt['results'])!=1):continue
         row=receipt['results'][0]
         if row.get('status')=='source_unavailable':continue
-        receipts[(row['entry_id'],row['revision'])]=(ref,receipt)
+        key=(row['entry_id'],row['revision'],receipt['query'].get('detail','full'))
+        receipts[key]=(ref,receipt)
     if not receipts:return None
     from tools.research.object_choices import main_projection
     deliveries,_=confirmed_tool_deliveries(host);provided=[]
@@ -403,7 +426,8 @@ def read_progress(host):
             except (ValueError,TypeError):continue
             if isinstance(value,dict) and value.get('query',{}).get('operation')=='read':provided.append(value)
     return dict(reads=[dict(entry_id=key[0],revision=key[1],read_receipt=ref,
-        tool_read_completed=True,body_delivered=any(value in (dict(reference=ref,**receipt),
+        **(dict(detail='summary') if key[2]=='summary' else {}),
+        tool_read_completed=True,body_delivered=key[2]=='full' and any(value in (dict(reference=ref,**receipt),
             main_projection(host,dict(reference=ref,**receipt))) for value in provided))
         for key,(ref,receipt) in receipts.items()],
         scope='Main read receipts only; body_delivered requires exact feedback in a confirmed Provider request. No card bodies preloaded here; delivery proves neither understanding, adoption nor scientific evidence.')

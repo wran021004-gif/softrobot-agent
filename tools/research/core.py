@@ -123,6 +123,10 @@ def read_evidence(host, query, *, record_read=True):
     """Use the existing evidence boundary; internal reads may omit read markers."""
     q = EvidenceQuery.model_validate(query)
     s = state(host)
+    if s['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
+        from tools.research.evidence_policy import study_references
+        if plain(q.reference) not in study_references(host):
+            raise ValueError('EVIDENCE_OUTSIDE_CURRENT_STUDY')
     # Whole JSON reads already have Store's request-local cache and copy isolation.
     # Caching that root a second time retains and copies large trajectories twice.
     cacheable=q.view in ('full','fields','range') and not (q.view=='full' and not q.pointer)

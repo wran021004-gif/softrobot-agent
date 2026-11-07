@@ -1007,12 +1007,14 @@ class KnowledgePolicy(Contract):
     allowed_kinds: list[str] | None = None
     allow_benchmark_answers: bool = False
     delivery: Literal['optional_reads_v1','compact_skill_v1'] = 'optional_reads_v1'
+    organization: Literal['typed_knowledge_v1'] | None = None
 
     @model_serializer(mode='wrap')
     def preserve_legacy_policy(self,handler):
         result=handler(self)
         if self.delivery=='optional_reads_v1':result.pop('delivery',None)
         if not self.include_entry_revisions:result.pop('include_entry_revisions',None)
+        if self.organization is None:result.pop('organization',None)
         return result
 
 
@@ -1026,10 +1028,20 @@ class ExperienceQuery(Contract):
     failure_type: str | None = None
     version: str | None = None
     kind: str | None = None
-    knowledge_type: Literal['experience','skill'] | None = Field(default=None,
-        description='Logical type: procedure maps to skill; case/success_case maps to experience. Original frozen authorization still applies.')
+    knowledge_type: Literal['experience','skill','knowledge','expert_process'] | None = Field(default=None,
+        description='Explicit knowledge, skill or expert_process role in typed manifests; legacy procedure/case mapping remains unchanged. Frozen authorization still applies.')
     limit: int | None = Field(default=None,ge=1,
         description='Optional search result count. Omit to return all authorized metadata. Exact reads identify one entry/revision.')
+    type: Literal['case','general','diagnostic','validation'] | None = Field(default=None,
+        description='Knowledge category in an explicitly enabled typed manifest; does not widen authorization.')
+    detail: Literal['summary','full'] = 'full'
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_query(self,handler):
+        result=handler(self)
+        if self.type is None:result.pop('type',None)
+        if self.detail=='full':result.pop('detail',None)
+        return result
 
 
 class EvidenceContinuation(Contract):

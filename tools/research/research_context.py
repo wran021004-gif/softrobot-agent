@@ -2186,9 +2186,11 @@ def research_decision_brief_v3(brief, *, complete_interpretations=False):
                 'Record hypothesis and candidate in diagnose, then submit ScientificQuestion to research_analysis.' if brief.get('analysis_interface') in INTERFACES else
                 'Select an owned candidate and registered method in a diagnose decision; execution is separately admitted.'),
             cost='Uses the shared mathematical allowance; inspect the method detail.'))
-    interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'])
+    interpretation=([dict(kind=i['kind'],text=i['text'],sources=i['sources'],
+        **(dict(knowledge_refs=i['knowledge_refs']) if i.get('knowledge_refs') else {}))
         for i in (report.get('interpretations') or [])] if complete_interpretations else
-        [dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'])
+        [dict(kind=i['kind'],excerpt=i['text'][:240],sources=i['sources'],
+            **(dict(knowledge_refs=i['knowledge_refs']) if i.get('knowledge_refs') else {}))
         for i in (report.get('interpretations') or [])[:3]])
     budget=brief.get('budget') or {};provider=budget.get('provider_budget') or {};public=budget.get('public_operation_budget') or {};science=budget.get('science_budget') or {}
     result=dict(version='research_decision_brief_v3',
@@ -2446,6 +2448,10 @@ def information_flow_brief(brief, delivered):
     if brief.get('knowledge_catalogue'):
         result['knowledge']['catalogue']=brief['knowledge_catalogue']
         result['knowledge']['reporter_role']=brief['reporter_role']
+        if isinstance(brief['knowledge_catalogue'],dict):
+            result['knowledge']['types']=dict(knowledge='Case, General, Diagnostic, Validation: facts and context only.',
+                skill='Executable high-level workflow; not new action authority.',
+                expert_process='Domain method selecting relevant Knowledge and existing Skills; Main owns decisions.')
     if brief.get('analysis_interface')=='scientific_question_v4':
         # Presentation only: Store, pending feedback, budgets and read admission
         # retain their original owners. Latest numerical facts stay above.
@@ -2677,7 +2683,7 @@ def compact_scientific_delivery(brief,*,decision_only=False,complete_interpretat
         for report in brief.get('latest_reports',[]):
             interpretations=report.get('interpretations',[])
             if not complete_interpretations:interpretations=interpretations[:3]
-            report['interpretations']=[{k:i[k] for k in ('kind','text','sources')} for i in interpretations]
+            report['interpretations']=[{k:i[k] for k in ('kind','text','sources','knowledge_refs') if k in i} for i in interpretations]
             for finding in report.get('findings',[]):
                 finding['metrics']=finding.get('metrics',[])[:3]
                 best=brief.get('best_valid')
