@@ -153,7 +153,7 @@ def compile_search(host, value, request_id):
 def contract_issues(payload, errors):
     """Select versioned union branch; expose a few actionable G1 field issues."""
     search=payload.get('search') or {};version=search.get('version') or (INTERFACE if 'research_goal' in search else None)
-    contract={'family_mixed_search_v1':'FamilyMixedSearch',INTERFACE:'ScientificStructureSearch'}.get(version)
+    contract={'family_mixed_search_v1':'FamilyMixedSearch','family_mixed_search_v2':'FamilyMixedSearchV2',INTERFACE:'ScientificStructureSearch'}.get(version)
     chosen=[e for e in errors if any(contract in str(p) for p in e['loc'])] if contract else []
     errors=chosen or errors
     issues=[dict(field='.'.join(str(p) for p in e['loc'] if not str(p).startswith('function-after[')),

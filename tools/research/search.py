@@ -418,16 +418,18 @@ def run_search(host,query,key,*,guard,execute,capacity):
             output=analyze(host,checkpoint['problem']['analysis_request'],owner+':matched-block',
                 guard=guard,origin='model_search',plan_reference=requesting_plan)
             if not output.get('reference'):
-                checkpoint.update(termination='analysis_not_admitted',analysis_rejection=output);persist();break
+                checkpoint.update(termination='analysis_not_admitted',analysis_rejection=output,
+                    skipped_moves=[dict(point=p['label'],reason='analysis_not_admitted',additional_evaluations=0)
+                        for p in checkpoint['problem']['points']]);persist();break
             raw=host.store.artifact(output['reference']);research=raw.get('structure_research') or {}
             records=research.get('records',[]);cost=research.get('cost') or {}
             checkpoint['coupled_analysis']=output['reference'];checkpoint['proposal_count']=4
             checkpoint['evaluated']=[dict(parameters=r['parameter_values'],computation_status=r['observation']['status'],
                 evidence=dict(analysis=output['reference'],record_pointer=f'/structure_research/records/{i}'),
                 actual_mathematical_evaluations=1) for i,r in enumerate(records)]
-            attempted=cost.get('evaluation_attempts',0)
-            checkpoint['skipped_moves']=[dict(point=p['label'],reason='not_attempted_after_incomplete_calculation',additional_evaluations=0)
-                for i,p in enumerate(checkpoint['problem']['points']) if i>=attempted]
+            attempted=cost.get('evaluation_attempts')
+            checkpoint['skipped_moves']=([dict(point=p['label'],reason='not_attempted_after_incomplete_calculation',additional_evaluations=0)
+                for i,p in enumerate(checkpoint['problem']['points']) if i>=attempted] if attempted is not None else None)
             checkpoint['termination']='matched_block_completed' if (research.get('interaction') or {}).get('status')=='computed_local_interaction' else 'matched_block_incomplete'
             persist();break
         if checkpoint['pending'] is None:
@@ -635,15 +637,16 @@ def run_search(host,query,key,*,guard,execute,capacity):
     if coupled:
         analysis_ref=checkpoint.get('coupled_analysis')
         raw=host.store.artifact(analysis_ref) if analysis_ref else {};research=raw.get('structure_research') or {}
-        cost=research.get('cost') or {};attempted=cost.get('evaluation_attempts',0)
+        cost=research.get('cost') or {};attempted=cost.get('evaluation_attempts') if analysis_ref else 0
         result.update(method=q.method,status=checkpoint['termination'],task_acceptance='unmeasured',
             mathematical_analysis=analysis_ref,interaction_source=dict(reference=analysis_ref,pointer='/structure_research/interaction') if research.get('interaction') else None,
             interaction=research.get('interaction'),score_semantics=checkpoint['problem']['score_semantics'],
-            resource_use=dict(result_entries=len(rows),evaluated_designs=len(rows),legally_constructed=len(rows),
+            resource_use=dict(result_entries=len(rows),evaluated_designs=len(rows) if attempted==len(rows) else None,
+                legally_constructed=len(rows) if attempted==len(rows) else None,
                 candidate_materializations=0,proposed_designs=4,attempted_points=attempted,
-                unrecorded_failed_attempts=attempted-len(rows),skipped_moves=checkpoint['skipped_moves'],
+                unrecorded_failed_attempts=attempted-len(rows) if attempted is not None else None,skipped_moves=checkpoint['skipped_moves'],
                 actual_mathematical_evaluations=attempted,charged_mathematical_evaluations=raw.get('charged_analysis_evaluations',0),
-                numerical_cost_source=dict(reference=analysis_ref,pointer='/structure_research/cost') if analysis_ref else None,
+                numerical_cost_source=dict(reference=analysis_ref,pointer='/structure_research/cost' if cost else '') if analysis_ref else None,
                 elapsed_s=time.time()-checkpoint['started']))
     changed=None if mixed else sum(host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot'] for row in rows)
     ref=save(host,dict(result=result,structurally_changed_evaluations=changed,admission=fit),'design_search_result')

@@ -3,12 +3,12 @@ from copy import deepcopy
 import json
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 from jsonschema import Draft202012Validator
 
 from tools.platform_store import plain
 from tools.research import core,search,reporter
 from tools.research.state import state,update
-from tools.research.contracts import FamilyMixedSearchV2
 from tools.research.research_context import compact_evidence
 from tests.research.test_matched_interaction import compiled_fixture,BilinearNative
 from tests.research.test_structure_mechanism_aplus import synthetic_worker
@@ -87,6 +87,16 @@ class CoupledSearchTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'DISCRETE_PARAMETER'):search.search_problem(h,discrete,4)
         spec=deepcopy(state(h)['spec']);spec['family_search']['coupled_block_enabled']=False;update(h,spec=spec)
         with self.assertRaisesRegex(ValueError,'FROZEN_COUPLED'):search.search_problem(h,q,4)
+
+    def test_worker_exit_without_cost_keeps_actual_attempts_unknown(self):
+        h,c,q,plan=fixture()
+        with patch.object(core,'guard'),patch('tools.service_execution._run_contained',return_value=SimpleNamespace(returncode=1)):
+            core.dispatch(h,plan,'synthetic-worker-exit')
+        result=h.store.artifact(state(h)['search_results'][-1])['result'];cost=result['resource_use']
+        self.assertEqual(result['status'],'matched_block_incomplete')
+        self.assertIsNone(result['interaction']);self.assertIsNone(cost['actual_mathematical_evaluations'])
+        self.assertIsNone(cost['attempted_points']);self.assertIsNone(cost['skipped_moves'])
+        self.assertEqual(cost['charged_mathematical_evaluations'],4)
 
 
 if __name__=='__main__':unittest.main()

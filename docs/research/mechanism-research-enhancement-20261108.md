@@ -98,3 +98,54 @@ analysis units: actual attempts and charged units are separately projected.
 The pre-existing budget/settlement logic is unchanged, with no refund or reset.
 All tests used synthetic workers; zero real Provider, physical or numerical
 worker cost. No full benchmark suite, integration or Replay was launched.
+
+## Phase 4 — offline plumbing passed; live scientific acceptance blocked
+
+Two targeted real-SDK/Mock-HTTP loops passed, one for the existing reach_free
+task and one for `bf4_tracking_direction_change_v1.json` with its own frozen
+public task, family and control definitions. Each scripted loop submits a
+diagnose hypothesis, compiles and executes four synthetic M0 points, delivers
+source-bound Reporter interpretations, and saves a new formal diagnose Plan
+after feedback. Task hashes remain unchanged; tracking binds its own task
+identity and constraints, without Reach holding requirements. These are
+scripted fixture decisions and a fabricated bilinear model: they do **not**
+demonstrate autonomous hypothesis selection or real mathematical findings.
+
+The tracking fixture's inherited Reach speed-cost settings were rejected by
+the existing strict checker. The fixture now uses the public tracking profile's
+own settings; no scientific condition was weakened. Only affected tests reran.
+A separate worker-exit check exposed unknown attempt counts being projected as
+zero. Missing worker costs now remain null, charged units remain separate, and
+unobserved skip counts stay unknown. This focused failure regression passed.
+
+Read-only inventory found no existing authorized tracking Study. Its public
+template is `PENDING_EXPLICIT_APPROVAL`. Existing reach_free stores with
+Provider remainder are either provider-only decision probes explicitly forbidding
+scientific workers, or older grants without the mechanism method. For example,
+`p63b6-m-native-sol-20261030` has four unused mathematics units but grants only
+Native T1/T2 and no mechanism analysis. Such balances are not transferable
+authorization. The original PHS allocation likewise belongs to its frozen task.
+No new real Study, allocation, physical budget or live benchmark computation
+was created to bypass this boundary.
+
+Concrete proposed live acceptance scope, **not allocated or executed**: each
+of the two frozen benchmark tasks may use at most six real shared Provider
+requests (including Reporter) and four M0 mathematical evaluations. Main must
+choose its own mechanisms, two actual parameters and effect interpretation;
+neither the pair nor an expected effect direction is supplied. Physical
+integration, control optimization, NMPC/PPO and Replay allocations remain zero.
+M2/M3 interaction remains unavailable. This requires explicit task-bound
+authorization before creating/running the live studies.
+
+Total verified development checks: 14 focused offline tests and one read-only
+real Store handoff check, without a full suite. Total new real Provider cost
+remains the single Phase 0 request; original PHS ledger stays 38/48, with ten
+remaining, 236 mathematics entries and 260 recorded backend units. No new real
+mathematics, physics or Replay was executed. Original task/evaluator files,
+scientific receipts, budgets, provider settlement and historical sources remain
+unchanged. No claim of general autonomous research capability is established.
+
+The original Study was not rebound to the changed implementation. Its saved
+Plan and evidence retain their historical identities; a future live resumption
+must use the existing explicit implementation migration boundary rather than
+silently reinterpret those sources.

@@ -28,17 +28,19 @@ from tools.research.state import state, update
 from tools.research.task_constraints import mathematical_method_view, describe_analysis_requirements, analysis_capabilities
 
 
-def fixture_host(*, task='bf7_shared_reach_v1_central_high.json', family_execution=None, control='control.json'):
+def fixture_host(*, task='bf7_shared_reach_v1_central_high.json', family_execution=None, control='control.json',
+                 family_space='family_space_stage0_base_only_v1.json',reference_parameters=None):
     """Prepare a fresh isolated M1 central_high condition, not a historical Store."""
     cfg=read(ROOT/'configs/research/study_s125_cold.json')
     cfg.update(study_id='p63a-fixture-'+uuid4().hex[:8],
         task=str(ROOT/'tasks'/task),
-        family_space=str(ROOT/'configs/research/family_space_stage0_base_only_v1.json'),
+        family_space=str(ROOT/'configs/research'/family_space),
         control=str(ROOT/'configs/research'/control),
         mathematical_methods={T1:'OFFLINE FIXTURE ONLY',T2:'OFFLINE FIXTURE ONLY'},
         family_sensitivity_variables=dict(version='family_sensitivity_v2',variables=['segments.*.length_m']))
     cfg['defaults']=str(ROOT/'configs/research/family_study_defaults.json')
     if family_execution is not None:cfg['family_execution']=deepcopy(family_execution)
+    if reference_parameters is not None:cfg['reference_parameters']=deepcopy(reference_parameters)
     cfg['budgets']['mathematical_evaluations']=12
     cfg['research_decisions'].update(analysis_interface='bound_scientific_variables_v2',
         architecture='english_decision_v1',tool_schema_policy=dict(version='research_information_flow_v1'),
