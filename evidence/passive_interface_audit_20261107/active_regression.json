@@ -1,0 +1,52 @@
+{
+  "scope": "One existing real active two-scale native regression, not a task-success or gradient-quality claim.",
+  "implementation": "10c2a0b2d",
+  "test": "ConstrainedMechanicsTests.test_real_active_two_scale_native_path",
+  "status": "passed",
+  "computation_status": "computed",
+  "reference": {
+    "artifact_id": "c950180aa21cc8b6d9ede930b479252dd0709e7276ebc0aacc0ff8b2cd924be4",
+    "media_type": "application/json"
+  },
+  "cost": {
+    "model_builds": 5,
+    "forward_evaluations": 16,
+    "physics_steps": 0,
+    "physics_step_attempts": 0,
+    "rollouts": 0,
+    "mechanics_evaluations": 5,
+    "evaluation_attempts": 5,
+    "kernel_wall_s": 1.4601477000396699
+  },
+  "direction_status": "unresolved",
+  "parameter_sensitivities": [
+    {
+      "parameter_path": "segments.0.length_m",
+      "derivatives": [
+        4.085620730620577e-09,
+        -6.394884621840903e-10
+      ],
+      "derivative_unit": "(m/s^2/N)/(m)",
+      "consistency": {
+        "same_direction": false,
+        "relative_difference": 1.1565217391304348,
+        "tolerance": 0.1,
+        "observed_change": 2.3135271476348862e-11,
+        "signal_floor": 2.8607851839741717e-07,
+        "passed": false,
+        "scope": "Two finite scales and an observed signal check; no rigorous error bound or differentiability proof."
+      },
+      "direction_status": "unresolved",
+      "derivative_status": "unreliable",
+      "strict_derivative": false
+    }
+  ],
+  "realistic_compilation_check": {
+    "model_builds": 1,
+    "nu": 4,
+    "physics_steps": 0
+  },
+  "provider_requests": 0,
+  "independent_physical_replays": 0,
+  "task_acceptance": "unmeasured"
+}

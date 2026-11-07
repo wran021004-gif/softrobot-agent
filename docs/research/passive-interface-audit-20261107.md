@@ -71,8 +71,10 @@ R/G/C/F 分别表示 Registered / Generated / Compiled / Reflected。F 使用真
 
 已通过新增三个定向检查：归档 C 及任务一致性、代表性参数到真实模型、开放搜索区间及主动/被动准入。另通过原四个定向回归：科学问题组编译、被动物理联动/Polygon/网格/Base-only、历史空间与设计序列化不变、旧主动配置身份不变。
 
-主动真实两尺度回归：待对已提交源码执行现有 `ConstrainedMechanicsTests.test_real_active_two_scale_native_path`。该测试走原 Worker，不用合成数值矩阵；不运行新的 Main 或 Provider，也不是完整 Replay。结果将在完成后追加到本报告。
+主动真实两尺度回归已通过：现有 `ConstrainedMechanicsTests.test_real_active_two_scale_native_path` 绑定实现提交 `10c2a0b2d`，走原 Worker，5 个模型、16 次 forward、5 次实际机制评价，核心墙钟约 1.460 s，零积分/rollout。另真实编译主动执行模型（4 个输入通道）。没有新的 Main、Provider 或完整 Replay。实际导数两尺度不同号且低于信号门槛，仍正确报告 `unreliable/unresolved`，没有声称可信改进方向或任务成功。实测摘要在 `evidence/passive_interface_audit_20261107/active_regression.json`，原工程 Store 与完整输出留在本地 runs。
+
+共八项必要测试通过；对最后涉及旧空间序列化的变化作了单项复核。`git diff --check` 通过。没有重跑历史十工况、C 数学 Worker、完整 Replay、大型混合搜索或新 Agent 测试。
 
 ## 9. Git
 
-使用现有 `codex/passive-research-capabilities-20261107`，保留此前所有提交及知识资产。实现与验证记录采用增量提交，待主动真实回归记录完成后一并正常 push；不 Force Push，不提交 Store、凭据或历史成功配置。
+使用现有 `codex/passive-research-capabilities-20261107`，保留此前所有提交及知识资产。实现提交 `10c2a0b2d`，随后增量保存真实主动回归摘要与完成报告并正常 push；不 Force Push，不提交 Store、凭据或历史成功配置。
