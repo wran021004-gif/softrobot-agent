@@ -98,8 +98,16 @@ def audit():
         value=h.store.artifact(ref);research=value.get('structure_research') or {}
         diagnosis=research.get('qualification_diagnosis') or {}
         baseline=research.get('baseline') or {}
+        gap=baseline.get('task_gap')
+        if gap and not gap.get('valid_complete'):
+            # Invalid entries repeat large missing-observation tables. Preserve
+            # their status and exact source rather than duplicating raw traces.
+            tables=('constraints','hard_gate_constraints','unscaled_constraints')
+            gap={**{k:v for k,v in gap.items() if k not in tables},
+                'omitted_table_counts':{k:len(gap.get(k) or []) for k in tables},
+                'complete_query':dict(reference=ref,pointer='/structure_research/baseline/task_gap')}
         finite_time=(dict(value=baseline.get('value'),unit=baseline.get('unit'),
-            task_gap=baseline.get('task_gap'),qualification_diagnosis=baseline.get('qualification_diagnosis'),
+            task_gap=gap,qualification_diagnosis=baseline.get('qualification_diagnosis'),
             source=dict(reference=ref,pointer='/structure_research/baseline'))
             if research.get('effect_semantics')=='finite_time_task_response' else None)
         analyses.append(dict(reference=ref,candidate=value.get('candidate'),status=value['status'],
@@ -109,8 +117,15 @@ def audit():
             charged_numerical_s=value.get('charged_numerical_s'),
             internal_calculations=value.get('internal_calculations'),finite_time_task=finite_time,
             task_acceptance=value.get('task_acceptance')))
+    native_costs=Counter()
+    for row in analyses:
+        for cost in row.get('internal_calculations') or []:
+            native_costs.update({k:v for k,v in cost.items() if isinstance(v,(int,float))})
     events=h.store.events(h.run_id)
     value=status();value.update(dict(scope='Bounded exported facts; original immutable Store retains all inputs, raw results and failed attempts.',
+        native_cost_totals=dict(native_costs),
+        charged_numerical_s=sum(r.get('charged_numerical_s') or 0 for r in analyses),
+        cost_scope='Child mathematical receipts only; parent elapsed times overlap. Ledger backend_solves include envelope charges, not only started programs. Independent Replay is separate.',
         provider_usage=reporter.provider_usage(h),analyses=analyses,
         plans=[dict(reference=r,plan=h.store.artifact(r)['original_plan']) for r in s['plans']],
         searches=[search_feedback(h,r) for r in s.get('search_results',[])],
