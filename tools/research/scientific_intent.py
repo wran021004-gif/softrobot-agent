@@ -537,7 +537,7 @@ def compile_question(host, payload, *, tool_use_id):
         if q.domain=='control' and q.control.question_type!='control_feasibility':
             return dict(status='needs_choice',reason='CONTROL_DOMAIN_REQUIRES_CONTROL_FEASIBILITY',scientific_execution_started=False)
         if q.domain=='structure' and candidate and q.structure.operation in ('differentiate','optimize','interact'):
-            denial=mechanism_parameter_failure(spec,candidate,q.structure.parameter_paths)
+            denial=mechanism_parameter_failure(spec,candidate,q.structure.parameter_paths,q.structure.parameter_bounds)
             if denial:return denial
         from jsonschema import Draft202012Validator
         schema=selected_question_schema(host) if intent else question_schema(spec,candidate,choice)
@@ -982,10 +982,12 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         minimum_evaluations=context['minimum_evaluations'],limitations=detail['limitations'],cost_scope=detail['cost_scope'])
 
 
-def mechanism_parameter_failure(spec,c,paths):
+def mechanism_parameter_failure(spec,c,paths,local_bounds=None):
     """Explain unavailable execution choices using the original parameter rows."""
     from tools.research.structure_research import parameters
-    rows={r['parameter_id']:r for r in parameters(spec,c)}
+    try:rows={r['parameter_id']:r for r in parameters(spec,c,local_bounds)}
+    except ValueError as exc:
+        return dict(status='unsupported',reason=str(exc),scientific_execution_started=False)
     for path in paths:
         row=rows.get(path)
         if row and row['mechanism_differentiation']['supported']:continue
@@ -1014,7 +1016,7 @@ def mechanism_context(host,c,study,budget):
             evaluation_cap_field='structure.requested_budget' if question_contract(spec) is ScientificQuestionV4 else 'requested_budget',
             next_choice='Main may reduce the question or explicitly choose a legal maximum at evaluation_cap_field. No field is moved and no explicit maximum is increased automatically.')
     except ValueError as exc:
-        return None,mechanism_parameter_failure(spec,c,study.paths) or fail('unsupported',str(exc))[1]
+        return None,mechanism_parameter_failure(spec,c,study.paths,study.parameter_bounds) or fail('unsupported',str(exc))[1]
     preview=dict(minimum_evaluations=context['minimum_evaluations'],required_evaluations=context['evaluations'],
         requested_evaluations=budget,effective_evaluation_cap=context['evaluation_cap'],
         budget_selection='minimum_legal' if budget is None else 'explicit_cap',

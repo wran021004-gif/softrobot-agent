@@ -148,3 +148,25 @@ prototypes and provides exact Store queries. No numerical kernel, allowed shape,
 station layout, design range or scientific choice is changed. Old rejected
 requests and construction time remain recorded. One metadata regression and
 read-only checks against both original failed requests verify the diagnostic.
+
+At the next settled boundary, the user explicitly requested an immediate return
+to Gateway, superseding the earlier 90-minute wait. The original transport
+addendum and committed bind preserved the Study, model, reasoning, profile and
+all costs. Its first real continuation returned HTTP 200 with a complete tool
+call; catalogue health was not used as proof. At request53 of60 the Study had26
+constructed candidates,27 charged mathematical evaluations and no Replay.
+
+Main independently materialized a new four-tendon routing child and diagnosed
+it for complete original-task response. This is construction, not a task pass.
+Before that, Main had supplied valid finite intervals for a two-parameter
+interaction, but the V4 early parameter check ignored those intervals and
+incorrectly rejected the open physical domain. The existing downstream context
+already admitted that exact bounded question. The early check and its failure
+explanation now use the same request-local intervals. Missing, out-of-domain or
+current-value-excluding intervals remain rejected; no FamilySpace, numerical
+kernel, scientific grant or evaluator changes. One focused offline V4 regression
+checks valid/missing/illegal intervals before dispatch, with unchanged ledger.
+A read-only check of the actual saved Main request confirms the corrected
+parameter admission. The original unsupported receipt and its costs remain;
+neither the proposed interaction nor the new candidate has been evaluated by
+this interface repair.

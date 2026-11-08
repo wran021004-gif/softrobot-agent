@@ -92,6 +92,31 @@ class FullAutonomyPreflight(unittest.TestCase):
             with self.assertRaises(ValueError):prepare_context(self.spec,self.c,study,[])
         with self.assertRaises(ValueError):prepare_context(self.spec,self.c,self.study().model_copy(update=dict(parameter_bounds={})),[])
 
+    def test_v4_precheck_honors_local_intervals_without_dispatching_science(self):
+        from tools.research.scientific_intent import compile_question
+        payload=dict(version='scientific_question_v4',domain='structure',structure=dict(
+            operation='interact',effect_semantics='finite_time_task_response',target='finite_time_task_violation',
+            parameter_paths=self.study().paths,parameter_bounds={k:list(v) for k,v in self.study().parameter_bounds.items()},
+            operating_point='frozen_task_initial_state',control_treatment='no_active_control',
+            physical_problem='passive_unilateral_equilibrium',load_condition='all_frozen_conditions',requested_budget=4))
+        intent=dict(candidate=self.ref,agent_hypothesis=dict(next_research_action='mechanism_research'))
+        before=self.h.store.remaining()
+        with patch('tools.research.scientific_intent.completed_question_plan',return_value=intent), \
+                patch('tools.research.scientific_intent.selected_question_schema',return_value=question_schema(self.spec,self.c)), \
+                patch('tools.research.scientific_intent.compile_mechanism',return_value=dict(status='metadata_admitted')) as dispatch:
+            result=compile_question(self.h,payload,tool_use_id='offline-local-domain')
+            self.assertEqual(result['status'],'metadata_admitted',result)
+            self.assertEqual(dispatch.call_count,1)
+            missing=deepcopy(payload);missing['structure']['parameter_bounds']={}
+            denied=compile_question(self.h,missing,tool_use_id='offline-missing-domain')
+            self.assertEqual(denied['status'],'unsupported')
+            self.assertIn('Open physical domain',denied['reason'])
+            outside=deepcopy(payload);outside['structure']['parameter_bounds']['segments.0.length_m']=[0.,.24]
+            denied=compile_question(self.h,outside,tool_use_id='offline-invalid-domain')
+            self.assertIn('LOCAL_INTERVAL_MUST_CONTAIN_CURRENT_VALUE_WITHIN_PHYSICAL_DOMAIN',denied['reason'])
+            self.assertEqual(dispatch.call_count,1)
+        self.assertEqual(self.h.store.remaining(),before)
+
     def test_coordinate_grant_and_scientific_schema(self):
         from extensions.tendon_family.family_space import search_domains
         for mode in ('passive_equilibrium','passive_task_response'):
