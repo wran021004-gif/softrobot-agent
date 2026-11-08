@@ -421,11 +421,15 @@ def interpretation_priority(report, previous, *, decision_v3=False):
             return 'new_finite_time_structure_result'
     if decision_v3:
         def signature(card):
+            mechanism=card['deterministic_summary'].get('structure_research') or {}
             return dict(operation=card['identity'].get('operation'),task=card['identity'].get('task_identity'),
                 candidate=card['identity'].get('candidate'),status=card['evidence_summary'].get('verification_status'),
                 gap=card['deterministic_summary'].get('task_gap'),
                 metrics=[{k:m.get(k) for k in ('name','value','unit','threshold','passed','scope')} for m in card.get('metrics',[])],
-                violations=card.get('main_violations',[]))
+                violations=card.get('main_violations',[]),
+                mechanism={k:mechanism.get(k) for k in ('operation','effect_semantics','physical_problem',
+                    'target','point_binding','constraint_state','baseline','parameter_sensitivities',
+                    'load_comparison','comparison','local_search')})
         prior=[signature(card) for card in old]
         for card in report['results']:
             if signature(card) in prior:continue
@@ -437,6 +441,7 @@ def interpretation_priority(report, previous, *, decision_v3=False):
             if any(word in status for word in ('incomplete','numerical_failure','inconclusive')):
                 return 'new_numerically_incomplete_result'
             if gap and gap.get('valid_complete'):return 'changed_complete_task_result'
+            if summary.get('structure_research'):return 'new_mechanism_observation'
         # Fall through for previously supported meaningful mathematical novelty.
     for card in report['results']:
         summary=card['deterministic_summary'];math=summary.get('task_capability',{})

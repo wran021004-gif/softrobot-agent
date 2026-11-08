@@ -10,6 +10,25 @@ from tests.research.test_organized_knowledge import organized_host
 
 
 class OrganizationTests(unittest.TestCase):
+    def test_mechanism_priority_tracks_observations_and_ignores_cost_only_changes(self):
+        from tools.research.reporter import interpretation_priority
+        card=dict(identity=dict(result=dict(reference=dict(artifact_id='a'*64)),operation='mechanism_structure_v1',
+                task_identity='metadata-only-fixture',candidate='same-fixture-candidate'),
+            evidence_summary=dict(verification_status='computed'),metrics=[],main_violations=[],mathematics=dict(fixture=True),
+            deterministic_summary=dict(structure_research=dict(operation='inspect',effect_semantics='mechanism_effect',
+                target='constraint_active_set',constraint_state=dict(active_count=4,slack_count=0,LICQ=False),
+                baseline=dict(norm=2.),cost=dict(kernel_wall_s=1.))))
+        old=[dict(mode='automatic',results=[card])]
+        changed=deepcopy(card);changed['identity']['result']['reference']['artifact_id']='b'*64
+        changed['deterministic_summary']['structure_research'].update(
+            constraint_state=dict(active_count=0,slack_count=4,LICQ=True),baseline=dict(norm=0.))
+        self.assertEqual(interpretation_priority(dict(mode='automatic',results=[changed]),old,decision_v3=True),'new_mechanism_observation')
+        changed=deepcopy(card);changed['identity']['candidate']='new-fixture-candidate'
+        self.assertEqual(interpretation_priority(dict(mode='automatic',results=[changed]),old,decision_v3=True),'new_mechanism_observation')
+        repeat=deepcopy(card);repeat['identity']['result']['reference']['artifact_id']='c'*64
+        repeat['deterministic_summary']['structure_research']['cost']['kernel_wall_s']=2.
+        self.assertEqual(interpretation_priority(dict(mode='automatic',results=[repeat]),old,decision_v3=True),'routine_or_repeated_result')
+
     def test_main_information_flow_retains_recorded_corrections(self):
         from tools.research.research_context import information_flow_brief
         correction=dict(source=dict(artifact_id='b'*64,media_type='application/json'),

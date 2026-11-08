@@ -95,3 +95,35 @@ acted on its new interpretation, but this separate correction channel was not
 delivered. The compact projection now preserves that channel, with a focused
 metadata regression and verification of the resulting live packet. Original
 reports, receipts, tasks and scientific conclusions remain unchanged.
+
+## First valid complete measurement and report novelty
+
+Candidate_444's complete ten-condition result
+`5495914d5bce8088053edfca56f21a65e6b0bc2f6ab2800046b562562870c983`
+is valid and comparable, with checked-pose routes legal and hard gates passed.
+All 251 constraint values are known; 26 fail. Worst normalized violation is
+11.063844798650509. Representative bottlenecks include s3_positive local
+displacement 0.0012476075 m against the 0.01 m minimum, s7_negative tip
+displacement 0.0235774152 m against the 0.005 m maximum, and s3_negative ratio
+3.61915344 against the 0.3 maximum. Plane and no-contact limits passed. Another
+352,000 actual integration steps were recorded, bringing the two complete
+executions to 704,000 steps. Independent Replay remains zero; no feasible design
+has been accepted. The earlier invalid result cannot be used for task-score
+improvement ranking.
+
+A further concrete interface defect was identified: the new static observation
+(four slack tendons rather than four active channels, and changed regularity)
+was skipped because the mathematical method name had been used before. The
+novelty check now considers the actual mechanism question, physical point,
+constraint state, baseline observation and structural response. Exact repeated
+observations with only different cost metadata remain routine. The original skip
+is retained and revalidated as a filtering error; the later valid dynamic
+measurement already received a real Reporter interpretation. One focused
+metadata regression and read-only reclassification of the original report verify
+the change without re-execution or a fabricated interpretation.
+
+At the next settled review, 28/36 Provider requests have been used. The first
+valid performance profile provides new discriminating information and a concrete
+basis for Main's next mechanism/parameter question. Supervisor approves another
+12-request addition under the existing policy; the Store addendum records its
+application, preserved usage and binding. No scientific direction is prescribed.
