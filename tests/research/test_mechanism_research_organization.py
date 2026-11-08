@@ -10,6 +10,20 @@ from tests.research.test_organized_knowledge import organized_host
 
 
 class OrganizationTests(unittest.TestCase):
+    def test_station_diagnostic_uses_actual_root_and_repeat_prototypes(self):
+        from tools.research.design import section_station_diagnostic
+        space=dict(serial_assembly=dict(root_segment='root',repeated_segment='repeat'),
+            assembly=dict(components=[dict(id='root',sections=[dict(s=0.)]),
+                dict(id='repeat',sections=[dict(s=0.),dict(s=1.)])]))
+        request=dict(version='serial_family_generation_v2',segments={'0':dict(sections=[{},{}]),'1':dict(sections=[{}]),'2':{}})
+        before=deepcopy(request);ref=dict(artifact_id='b'*64,media_type='application/json')
+        result=section_station_diagnostic(space,request,ref)
+        self.assertEqual([(x['field'],x['expected_count'],x['received_count']) for x in result['issues']],
+            [('segments.0.sections',1,2),('segments.1.sections',2,1)])
+        self.assertEqual(result['issues'][1]['source_query'],dict(reference=ref,view='full',pointer='/assembly/components/1/sections'))
+        self.assertEqual(result['issues'][1]['station_s'],[0.,1.])
+        self.assertEqual(request,before)
+
     def test_mechanism_priority_tracks_observations_and_ignores_cost_only_changes(self):
         from tools.research.reporter import interpretation_priority
         card=dict(identity=dict(result=dict(reference=dict(artifact_id='a'*64)),operation='mechanism_structure_v1',

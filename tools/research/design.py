@@ -264,6 +264,23 @@ def family_configuration(base_configuration, space, request, owner):
     return cfg,build,physics
 
 
+def section_station_diagnostic(space,request,reference):
+    """Explain a station-count rejection from the frozen assembly prototypes."""
+    parts=space['assembly']['components'];rule=space['serial_assembly'];issues=[]
+    for index,choice in request.get('segments',{}).items():
+        sections=choice.get('sections')
+        if sections is None:continue
+        prototype=rule['root_segment' if int(index)==0 else 'repeated_segment']
+        part_index,part=next((j,p) for j,p in enumerate(parts) if p['id']==prototype)
+        if len(sections)==len(part['sections']):continue
+        issues.append(dict(field=f'segments.{index}.sections',prototype=prototype,
+            expected_count=len(part['sections']),received_count=len(sections),
+            station_s=[s['s'] for s in part['sections']],
+            source_query=dict(reference=reference,view='full',pointer=f'/assembly/components/{part_index}/sections')))
+    return dict(status='input_contract_mismatch',contract=request['version'],issues=issues,
+        instruction='Provide exactly one section choice for each frozen prototype station, in order. Root and repeated segments can have different station counts. Omit sections to retain that prototype when no section change is intended. This selects no section type or dimensions and changes no physical domain.')
+
+
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import UnsupportedGeneration
@@ -343,6 +360,8 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             candidate=None,task_success=None)
     except ValueError as exc:
         diagnostic=deepcopy(getattr(exc,'diagnostic',dict(status='unavailable',reason='No structured facts captured by this check')))
+        if str(exc)=='EXACT_SECTION_STATIONS_REQUIRED' and spec['family_space'].get('serial_assembly'):
+            diagnostic=section_station_diagnostic(spec['family_space'],request,s['family_space_reference'])
         reference=save(host,dict(request=request,reason=str(exc),diagnostic=diagnostic,
             scientific_acceptance='unmeasured'),'generation_failure')
         return dict(status='invalid',reason=str(exc),candidate=None,task_success=None,

@@ -127,3 +127,24 @@ valid performance profile provides new discriminating information and a concrete
 basis for Main's next mechanism/parameter question. Supervisor approves another
 12-request addition under the existing policy; the Store addendum records its
 application, preserved usage and binding. No scientific direction is prescribed.
+
+## Distributed search and generation-contract feedback
+
+Main's fresh mixed search proposed 24 points, constructed/evaluated 23 and skipped
+one duplicate/clipped point. All 23 failed initial qualification before any
+equilibrium solve or integration. Recorded examples have actual path lengths
+0.2516 m and 0.3856 m against payouts of 0.25 m; one four-segment point also
+failed initial contact geometry. These failures establish neither task scores
+nor infeasibility of other structures. Actual integration remains 704,000 steps;
+the backend ledger's larger charged envelopes are not completed episodes.
+
+Main then chose a direct three-segment/twelve-tendon construction with payout
+omitted, so the existing zero-state route-length initializer can bind distinct
+physical lengths. Explicit section lists were rejected by the existing frozen
+prototype-station contract. The error supplied no structured expected counts,
+leading to repeated format guesses. The interface now derives field-specific
+required counts and station positions from the actual frozen root/repeated
+prototypes and provides exact Store queries. No numerical kernel, allowed shape,
+station layout, design range or scientific choice is changed. Old rejected
+requests and construction time remain recorded. One metadata regression and
+read-only checks against both original failed requests verify the diagnostic.
