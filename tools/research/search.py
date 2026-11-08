@@ -122,8 +122,11 @@ def coupled_problem(host, query, count):
     if isinstance(target,str):
         if q.effect_semantics!='finite_time_task_response' or target!='finite_time_task_violation':raise ValueError('REGISTERED_SCALAR_MECHANISM_TARGET_REQUIRED')
         target=PhysicalMechanismTarget(quantity=target,goal='decrease')
+    # Match the scientific-question compiler: internal None means the complete
+    # frozen task. An explicit individual load must still fail dynamic admission.
+    load_condition=None if q.effect_semantics=='finite_time_task_response' and q.load_condition=='all_frozen_conditions' else q.load_condition
     study=MechanismStudy(operation='interact',target=target,parameter_paths=q.parameter_paths,parameter_bounds=q.parameter_bounds,
-        point_semantics=q.operating_point,load_condition=q.load_condition,effect_semantics=q.effect_semantics,
+        point_semantics=q.operating_point,load_condition=load_condition,effect_semantics=q.effect_semantics,
         passive_ablation=q.passive_ablation,max_evaluations=4)
     context=prepare_context(spec,c,study,[])
     points=coupled_block(context['selected_parameters'],grant['variable_groups'])

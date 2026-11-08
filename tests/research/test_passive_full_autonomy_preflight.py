@@ -92,6 +92,27 @@ class FullAutonomyPreflight(unittest.TestCase):
             with self.assertRaises(ValueError):prepare_context(self.spec,self.c,study,[])
         with self.assertRaises(ValueError):prepare_context(self.spec,self.c,self.study().model_copy(update=dict(parameter_bounds={})),[])
 
+    def test_dynamic_block_all_conditions_alias_preserves_frozen_scope(self):
+        query=dict(version='family_mixed_search_v2',method='bounded_coupled_block_v1',
+            family_space_identity=self.spec['family_space_identity'],previous_candidate_ref=self.ref,
+            analysis=dict(operation='interact',effect_semantics='finite_time_task_response',
+                operating_point='frozen_task_initial_state',physical_problem='passive_unilateral_equilibrium',
+                control_treatment='no_active_control',target='finite_time_task_violation',
+                parameter_paths=self.study().paths,parameter_bounds=self.study().parameter_bounds))
+        before=self.h.store.remaining()
+        implicit=search.coupled_problem(self.h,FamilyMixedSearchV2.model_validate(query),4)
+        query['analysis']['load_condition']='all_frozen_conditions'
+        explicit_query=FamilyMixedSearchV2.model_validate(query)
+        explicit=search.coupled_problem(self.h,explicit_query,4)
+        self.assertEqual(explicit_query.analysis.load_condition,'all_frozen_conditions')
+        self.assertEqual(explicit['analysis_request'],implicit['analysis_request'])
+        for key in ('points','profile','task_identity','protocol','max_evaluations'):
+            self.assertEqual(explicit.get(key),implicit.get(key))
+        query['analysis']['load_condition']='s3_positive'
+        with self.assertRaisesRegex(ValueError,'DYNAMIC_TASK_ALWAYS_REQUIRES_ALL_FROZEN_LOADS'):
+            search.coupled_problem(self.h,FamilyMixedSearchV2.model_validate(query),4)
+        self.assertEqual(self.h.store.remaining(),before)
+
     def test_v4_precheck_honors_local_intervals_without_dispatching_science(self):
         from tools.research.scientific_intent import compile_question
         payload=dict(version='scientific_question_v4',domain='structure',structure=dict(
