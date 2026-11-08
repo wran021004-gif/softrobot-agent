@@ -2766,6 +2766,7 @@ def current_evidence_corrections(value, reference):
         full_history_query=dict(reference=reference,pointer='',view='full'),
         mathematics=mathematics,historical_control_updates=controls,
         static_constructions=deepcopy(value.get('static_constructions',[])),
+        route_qualifications=deepcopy(value.get('route_qualifications',[])),
         reporter_saved_output_revalidation=deepcopy(value.get('reporter_saved_output_revalidation',[])),
         scope=value['scope'],
         interpretation='These corrections supersede conflicting prior Agent interpretations only. Original numbers, acceptance, task identities and past delivery history are unchanged. Mechanisms and counterfactual performance remain unknown.')

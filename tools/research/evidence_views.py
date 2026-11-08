@@ -67,11 +67,20 @@ def task_diagnosis(value, reference, *, detailed=False):
             failed_constraint_count=sum(r['passed'] is False for r in observations),
             unknown_constraint_count=sum(r['passed'] is None for r in observations),
             **({'constraints':observations} if detailed else {'observations':list(representatives.values())})))
+    routes=[]
+    for i,record in enumerate(research.get('records',[])):
+        execution=(record.get('mechanics') or {}).get('dynamic_execution') or {}
+        for j,episode in enumerate(execution.get('episodes',[])):
+            route=episode.get('route_geometry')
+            if route is None:continue
+            routes.append(dict(record_index=i,condition_id=episode.get('load_condition'),
+                **{k:deepcopy(route.get(k)) for k in ('status','checked_poses','first_issue')},
+                source=dict(reference=reference,pointer=f'/structure_research/records/{i}/mechanics/dynamic_execution/episodes/{j}/route_geometry')))
     return dict(status='recorded_task_diagnosis',candidate=value.get('candidate'),
         task_identity=(value.get('binding') or {}).get('task_identity'),model_identity=value.get('model_identity'),
         valid_complete=gap.get('valid_complete'),comparable=gap.get('comparable'),
         maximum_normalized_violation=gap.get('signed_task_gap'),hard_gate_status=gap.get('hard_gate_status'),
-        conditions=projected,source=dict(reference=reference,pointer=pointer),
+        conditions=projected,route_geometry=routes,source=dict(reference=reference,pointer=pointer),
         detail_query=dict(reference=reference,view='working_set',pointer='/task_diagnosis'),
         raw_query=dict(reference=reference,view='full',pointer=pointer),
         numerical_qualification_query=dict(reference=reference,view='full',pointer='/diagnostic_layers')
@@ -432,6 +441,8 @@ def data_access(host,reference,value):
                 path=pointer+f'/episodes/{j}';samples=episode.get('samples',[])
                 row=dict(load_condition=episode.get('load_condition'),sample_count=len(samples),
                     qualifications_query=dict(reference=reference,view='full',pointer=path+'/qualifications'))
+                if 'route_geometry' in episode:
+                    row['route_geometry_query']=dict(reference=reference,view='full',pointer=path+'/route_geometry')
                 if samples:
                     row['sample_queries']={name:dict(reference=reference,view='fields',pointer=path+f'/samples/{index}',
                         fields=[key for key in fields if key in samples[index]]) for name,index in (('first',0),('last',len(samples)-1))}

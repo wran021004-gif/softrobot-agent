@@ -673,7 +673,12 @@ def error_feedback(host, use, exc, before):
         if (use.get('input',{}).get('search') or {}).get('version')=='scientific_structure_search_v1' or 'research_goal' in (use.get('input',{}).get('search') or {}):
             contract='ScientificStructureSearch'
             issues=[dict(field=field,error_type=str(exc.validator),reason=exc.message)]
+    from tools.research.contracts import ScientificStructureSearch
     hints={
+        'SEARCH_BOUND_OUTSIDE_SELECTED_PHYSICAL_DOMAIN':('search.bounds',
+            'Check both coordinate name and numeric physical interval. Coordinate-search bounds use its declared shared coordinates, not arbitrary candidate parameter paths. '
+            +ScientificStructureSearch.model_fields['bounds'].description+
+            ' For example, routing.radius_m is a search coordinate; spans.0.radius_m is a candidate registry path for a V4 parameter question. No bound is renamed or altered automatically.'),
         'SELECTED_ANALYSIS_CANDIDATE_REQUIRED':('decision.selected_candidate','Choose an exact owned candidate reference from the current candidate index, then resubmit the diagnose Plan with that reference. Method selection is not settled and research_analysis is unavailable until this identity is explicit; no candidate is inferred.'),
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
         'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('experience_disposition','Use an actual full-read receipt / entry_id@revision, or a confirmed delivered summary:entry_id@revision. Summaries do not grant full-read credit. Scientific artifact IDs and hypothesis names are not Knowledge keys.'),

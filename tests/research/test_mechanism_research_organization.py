@@ -10,6 +10,21 @@ from tests.research.test_organized_knowledge import organized_host
 
 
 class OrganizationTests(unittest.TestCase):
+    def test_route_failure_preserves_zero_time_unknowns_and_exact_raw_source(self):
+        ref=dict(artifact_id='b'*64,media_type='application/json')
+        issue=dict(time_s=0.0,pose=0,tendon=0,span=3,body='payload',reason='cable_solid_intersection',interval=[.84,1.])
+        raw=dict(structure_research=dict(baseline=dict(task_gap=dict(constraints=[],valid_complete=False)),
+            records=[dict(mechanics=dict(dynamic_execution=dict(episodes=[
+                dict(load_condition='load_a',route_geometry=dict(status='illegal',checked_poses=801,first_issue=issue)),
+                dict(load_condition='load_b',route_geometry=dict(status='unknown',first_issue=None))])))]))
+        original=deepcopy(raw);view=task_diagnosis(raw,ref)
+        self.assertFalse(view['valid_complete'])
+        self.assertEqual(view['route_geometry'][0]['first_issue'],issue)
+        self.assertEqual(view['route_geometry'][0]['source'],dict(reference=ref,
+            pointer='/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry'))
+        self.assertIsNone(view['route_geometry'][1]['first_issue'])
+        self.assertEqual(raw,original)
+
     def test_diagnosis_keeps_components_small_failures_unknown_times_and_sources(self):
         ref=dict(artifact_id='a'*64,media_type='application/json')
         rows=[dict(constraint_id=k,condition_id='condition',signal=s,observed_value=v,

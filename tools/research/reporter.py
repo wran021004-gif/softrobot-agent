@@ -594,7 +594,7 @@ def applicable_corrections(host, references):
     if not ref:return []
     value=host.store.artifact(ref)
     return [dict(reference=ref,pointer=f'/{key}/{i}',view='full',result=row['reference'])
-        for key in ('mathematics','historical_control_updates','static_constructions')
+        for key in ('mathematics','historical_control_updates','static_constructions','route_qualifications')
         for i,row in enumerate(value.get(key,[])) if row.get('reference') in references]
 
 
@@ -623,6 +623,8 @@ def _source_catalog(host, report, queries, *, semantic_sources=()):
         diagnosis=task_diagnosis(host.store.artifact(ref),ref)
         if diagnosis:
             add(EvidenceLocation.model_validate(diagnosis['source']))
+            for route in diagnosis['route_geometry']:
+                add(EvidenceLocation.model_validate(route['source']))
         passive=card.deterministic_summary.get('passive_family_search') or {}
         if passive.get('search_scope',{}).get('evaluation_mode')=='passive_task_response':
             for row in passive.get('structures',[]):
@@ -726,6 +728,7 @@ def _wire(host, reference, saved):
             'and Unresolved (unresolved_question) when relevant. For competing hypotheses state distinct predictions '
             'and observations that would weaken each, including parameter coupling and confounders; never select the next action. '
             'Use task_diagnosis to retain per-condition actual values, bounds, units, small failures and source locations. '
+            'Use recorded route_geometry first_issue times and checked poses directly. Contact/length preflight does not certify cable/body route clearance; a recorded time_s=0 failure is not a later-onset defect. '
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
             'State uncertainty when evidence is insufficient. '
             'quantitative_facts and comparison direction are authoritative derived facts. Do not reverse them. '
