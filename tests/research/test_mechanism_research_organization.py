@@ -10,6 +10,16 @@ from tests.research.test_organized_knowledge import organized_host
 
 
 class OrganizationTests(unittest.TestCase):
+    def test_main_information_flow_retains_recorded_corrections(self):
+        from tools.research.research_context import information_flow_brief
+        correction=dict(source=dict(artifact_id='b'*64,media_type='application/json'),
+            route_qualifications=[dict(first_issue=dict(time_s=0.,pose=0),meaning='Metadata-only regression fixture')])
+        brief=dict(recorded_evidence_corrections=correction)
+        view=information_flow_brief(brief,dict(budget={}))
+        self.assertEqual(view['recorded_evidence_corrections'],correction)
+        view['recorded_evidence_corrections']['route_qualifications'][0]['first_issue']['time_s']=1.
+        self.assertEqual(brief['recorded_evidence_corrections']['route_qualifications'][0]['first_issue']['time_s'],0.)
+
     def test_route_failure_preserves_zero_time_unknowns_and_exact_raw_source(self):
         ref=dict(artifact_id='b'*64,media_type='application/json')
         issue=dict(time_s=0.0,pose=0,tendon=0,span=3,body='payload',reason='cable_solid_intersection',interval=[.84,1.])

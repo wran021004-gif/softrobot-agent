@@ -73,3 +73,25 @@ no budget is reset and Main cannot grant its own extension.
 Time-stamped factual checkpoints are local under the Study's `supervision/`
 directory. They distinguish actual settled numerical costs, current pending
 work, original Plans and rejected requests from scientific conclusions.
+
+## Follow-up at 24 requests
+
+The 12-request addition was applied: total 36, all historical usage retained.
+The repaired live Reporter subsequently stated the exact shared t=0 payload
+intersection with raw citations and withdrew the later-onset interpretation.
+Main then independently generated candidate
+`33350ca2f1e4a8a001a00f3c3fffa2b86c40e7c3316c3773e01d45f54ff4ec71`,
+changing only `spans.0.anchor_s` from 1 to 0.9 while keeping all four fixed
+payouts exactly 0.254 m. Main explicitly treats induced slack as a competing
+outcome and chose unloaded qualification before further complete dynamics.
+Its third mathematical result is settled; no additional integration was used
+for that static calculation. Generation/static qualification is not route or
+task acceptance.
+
+Verification of an actual post-repair Main request also exposed a pre-existing
+omission: the compact information-flow projection dropped the recorded
+evidence-correction channel. Reporter delivery was already repaired and Main
+acted on its new interpretation, but this separate correction channel was not
+delivered. The compact projection now preserves that channel, with a focused
+metadata regression and verification of the resulting live packet. Original
+reports, receipts, tasks and scientific conclusions remain unchanged.

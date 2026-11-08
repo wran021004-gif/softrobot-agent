@@ -2472,6 +2472,8 @@ def information_flow_brief(brief, delivered):
         knowledge=dict(role='context_only',types=dict(skill='Conditional methods; current model facts take precedence.',experience='Scoped historical decision traces; no autonomous-discovery claim, current evidence or authorization.'),
             access=value.get('experience_guidance'),read_progress=value.get('experience_read_progress')),
         reporter_findings=findings,evidence_access=access,budget=value['budget'])
+    if brief.get('recorded_evidence_corrections'):
+        result['recorded_evidence_corrections']=deepcopy(brief['recorded_evidence_corrections'])
     search=(brief.get('structure_actions') or {}).get('search')
     if post_result and search and search.get('passive'):
         post_result['passive_search']={k:search[k] for k in ('tool','action','version','structural_groups','topology',
