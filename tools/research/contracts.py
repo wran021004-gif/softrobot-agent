@@ -550,6 +550,8 @@ class MechanismQuestionV2(Contract):
 
 
 class ScientificStructureV4(MechanismQuestionV2):
+    parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,
+        description='Finite local intervals for selected actual parameter_paths, required for open domains. Preserve the full FamilySpace; include the current value and obey physical bounds. These intervals apply only to this request.')
     operation: Literal['inspect','differentiate','optimize','compare','interact']
     effect_semantics: MechanismQuestionV2.model_fields['effect_semantics'].annotation | Literal['finite_time_task_response']
     target: PhysicalMechanismTarget | str
@@ -565,6 +567,7 @@ class ScientificStructureV4(MechanismQuestionV2):
 
 
 class MechanismStudy(Contract):
+    parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     operation: Literal['inspect','differentiate','optimize','compare','interact']
     target: MechanismTarget | PhysicalMechanismTarget
     parameter_path: str | None = None

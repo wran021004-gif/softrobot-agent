@@ -106,17 +106,19 @@ def parameter_catalog(spec, candidate, group=None, method=None):
         if v4:kind=row['category']
         if not kind or group and kind!=group:continue
         legal=row['continuous_perturbation'] and row['effective_in_current_execution'] and '*' not in path
-        if v4:legal=legal and row['mechanism_differentiation']['supported']
+        if v4:legal=(legal and row['mechanism_differentiation']['supported']) or (row['local_domain_required'] and row['study_authorized'])
         methods=row['applicable_mathematical_methods']
         rows.append(dict(parameter_group=kind,parameter_id=path,physical_meaning=path.rsplit('.',1)[-1].replace('_',' '),
             physical_component=row['physical_component'],unit=row['unit'],current_value=row['current_value'],
-            domain={k:deepcopy(row[k]) for k in ('data_type','minimum','maximum','choices') if k in row},
+            domain={k:deepcopy(row[k]) for k in ('data_type','minimum','maximum','minimum_exclusive','choices') if k in row},
             design_supported='generate' in row['supported_methods'],
             generation_available='generate' in row['supported_methods'] and 'generate' in spec.get('allowed_plan_actions',[]),
             differentiation=deepcopy(row.get('mechanism_differentiation')),
+            local_domain_required=row.get('local_domain_required',False),
             authorization_reason=row.get('authorization_reason'),execution_admission='not_checked',
             effective=row['effective_in_current_execution'],continuous=row['continuous_perturbation'],
-            selectable=bool(legal and (method in methods if method else methods)),applicable_methods=methods,
+            selectable=bool(legal and ((method in methods if method else methods) or
+                v4 and row['local_domain_required'] and method in (None,'mechanism_structure_v1') and spec.get('mathematical_methods',{}).get('mechanism_structure_v1'))),applicable_methods=methods,
             validity=row['analysis_reason'],study_authorized=row['study_authorized'],
             execution_semantics=row['execution_semantics']))
     return rows
@@ -955,6 +957,7 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
         constraints={r['constraint']['constraint_id'] for r in view['research_opportunities']['metrics'] if r.get('constraint')}
         return feedback('unsupported','TASK_TARGET_REQUIRES_M1_OR_M2_TASK_RESPONSE' if q.target in constraints else 'UNREGISTERED_TARGET')
     study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,
+        parameter_bounds=getattr(q,'parameter_bounds',{}),
         point_semantics=q.operating_point,max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,
         comparison_candidates=q.comparison_candidates)
     try:context=prepare_context(spec,c,study,[(plain(r),verify_candidate(host,r)) for r in q.comparison_candidates],minimum_budget=budget is None)
@@ -1054,7 +1057,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         from tools.research.structure_research import select_group_parameters
         paths=select_group_parameters(spec,c,q.parameter_group)
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
-        parameter_paths=paths,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
+        parameter_paths=paths,parameter_bounds=q.parameter_bounds,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
         max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates,
         passive_ablation=q.passive_ablation)
     try:
@@ -1097,7 +1100,7 @@ def compile_constrained(host,q,payload,intent,*,tool_use_id):
         paths=select_group_parameters(spec,c,q.parameter_group)
     if q.operation in ('differentiate','optimize','interact') and not paths:return fail('SELECT_REGISTERED_CONTINUOUS_PARAMETER_GROUP')
     budget=q.requested_budget if q.requested_budget is not None else intent['agent_hypothesis']['decision'].get('requested_budget') or None
-    study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,point_semantics='re_equilibrated',
+    study=MechanismStudy(operation=q.operation,target=q.target,parameter_paths=paths,parameter_bounds=q.parameter_bounds,point_semantics='re_equilibrated',
         load_condition=q.load_condition,comparison_load_conditions=q.comparison_load_conditions,load_aggregation=q.load_aggregation,
         effect_semantics=q.effect_semantics,max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates)
     try:

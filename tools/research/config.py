@@ -258,6 +258,11 @@ def frozen_analysis_protocol(spec, candidate):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    if study.get('base_commit')=='HEAD':
+        # Resolve once at new-Study preparation; existing Stores keep the exact
+        # saved commit and never reinterpret this mutable source declaration.
+        import subprocess
+        study['base_commit']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     study.pop('knowledge_manifest',None)
     knowledge=study.pop('knowledge',{})
     provider_reserve_policy=study.get('budgets',{}).pop('provider_reserve_policy',None)

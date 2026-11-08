@@ -22,18 +22,43 @@ class MechanismBudgetError(ValueError):
         self.dynamic_cost_bound=dynamic_cost_bound
 
 
-def parameters(spec, candidate):
+def parameters(spec, candidate, local_bounds=None):
     if not spec.get('family_space') or not candidate.get('generation_version'):return []
     from tools.research.optimal_capability import family_analysis_parameters
     rows=family_analysis_parameters(spec,candidate)
+    local_bounds=local_bounds or {}
+    known={r['parameter_id'] for r in rows if '*' not in r['parameter_id']}
+    if set(local_bounds)-known:raise ValueError('LOCAL_BOUNDS_REQUIRE_REGISTERED_PARAMETER')
     for row in rows:
+        path=row['parameter_id']
+        open_domain=(row['data_type']=='number' and row['effective_in_current_execution'] and
+            row['analysis_reason'].startswith('Open physical domain;'))
+        row['local_domain_required']=open_domain
+        if open_domain:
+            row['analysis_status']='conditional'
+            if (row['study_authorized'] and 'analysis' in spec.get('capabilities',[]) and
+                    spec.get('mathematical_methods',{}).get(METHOD)):
+                row['applicable_mathematical_methods'].append(METHOD)
+        if path in local_bounds:
+            lo,hi=local_bounds[path]
+            if (row['data_type']!='number' or not row['effective_in_current_execution'] or
+                    not np.isfinite([lo,hi]).all() or not lo<hi or
+                    row['minimum'] is not None and (lo<row['minimum'] or row.get('minimum_exclusive') and lo==row['minimum']) or
+                    row['maximum'] is not None and hi>row['maximum'] or
+                    row['current_value'] is None or not lo<=row['current_value']<=hi):
+                raise ValueError('LOCAL_INTERVAL_MUST_CONTAIN_CURRENT_VALUE_WITHIN_PHYSICAL_DOMAIN: '+path)
+            row['physical_domain']={k:row[k] for k in ('minimum','maximum','domain_source')}
+            row.update(minimum=lo,maximum=hi,local_domain_required=False)
+            if open_domain:
+                row.update(continuous_perturbation=True,analysis_status='conditional',
+                    analysis_reason='Finite request-local interval; original physical domain and rebuild qualification retained.')
         method_reason=('INPUT_FEASIBLE_SET_CHANGE_REQUIRES_SEPARATE_SEMANTICS' if row.get('input_set_changes') else
             'CONTROLLER_OR_NUMERICAL_PARAMETER_NOT_PHYSICAL_STRUCTURE' if row['category'] in ('controller','discretization') else
             'DISCRETE_PARAMETER_REQUIRES_COMPARISON' if row['data_type']!='number' else
             row['analysis_reason'] if not row['continuous_perturbation'] or not row['effective_in_current_execution'] else None)
         reason=method_reason or ('ORIGINAL_FROZEN_PARAMETER_AUTHORIZATION_REQUIRED' if not row['study_authorized'] else None)
         row['mechanism_differentiation']=dict(supported=reason is None,reason=reason,
-            method_supported=method_reason is None,study_authorized=row['study_authorized'],working_point_admission='not_checked',
+            method_supported=method_reason is None or open_domain,study_authorized=row['study_authorized'],working_point_admission='not_checked',
             method='normalized_two_scale_native_finite_difference' if reason is None else None)
     return rows
 
@@ -166,7 +191,8 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
             raise ValueError('DISTINCT_FROZEN_LOAD_CONDITIONS_REQUIRED')
         if study.load_aggregation and study.target.reduction=='identity' and metadata['shape']:
             raise ValueError('LOAD_AGGREGATION_REQUIRES_SCALAR_REDUCTION')
-    rows={r['parameter_id']:r for r in parameters(spec,candidate)};selected=[]
+    if set(study.parameter_bounds)-set(study.paths):raise ValueError('LOCAL_BOUNDS_ONLY_FOR_SELECTED_PARAMETER_PATHS')
+    rows={r['parameter_id']:r for r in parameters(spec,candidate,study.parameter_bounds)};selected=[]
     if study.operation in ('differentiate','optimize','interact'):
         if spec.get('fixed_structure_reference'):raise ValueError('FROZEN_FIXED_STRUCTURE_FORBIDS_STRUCTURAL_PROBES')
         if not 1<=len(study.paths)<=2:raise ValueError('SELECT_ONE_OR_TWO_REGISTERED_PARAMETERS')

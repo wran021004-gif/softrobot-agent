@@ -27,7 +27,7 @@ def freeze_family_variables(space, grant):
     if grant['version']=='family_sensitivity_v2':
         # Authorization is a path selector, never a second physical domain. Resolve
         # existence, type and effectiveness against each actual candidate later.
-        if any(not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*(?:\.(?:[A-Za-z_][A-Za-z_0-9]*|0|[1-9][0-9]*|\*))*',v) for v in grant['variables']):
+        if grant['variables']!=['*'] and any(not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*(?:\.(?:[A-Za-z_][A-Za-z_0-9]*|0|[1-9][0-9]*|\*))*',v) for v in grant['variables']):
             raise ValueError('FAMILY_PARAMETER_PATH_SELECTOR_REQUIRED')
         return deepcopy(grant)
     request=dict(family_space_identity=digest(space),segment_count=max(space['executable_segment_counts']),
@@ -47,6 +47,9 @@ def family_variable_authorized(spec,path):
     grant=spec.get('family_sensitivity_variables',{})
     if grant.get('version')=='family_sensitivity_v1':return path in grant.get('variables',[])
     if grant.get('version')!='family_sensitivity_v2':return False
+    # All-registry opt-in: actual existence/effectiveness still belongs to the
+    # candidate's parameter_capabilities, not this authorization selector.
+    if grant.get('variables')==['*']:return '*' not in path
     return any(len(p.split('.'))==len(path.split('.')) and all(a=='*' or a==b for a,b in zip(p.split('.'),path.split('.')))
         for p in grant.get('variables',[]))
 
