@@ -281,6 +281,25 @@ def section_station_diagnostic(space,request,reference):
         instruction='Provide exactly one section choice for each frozen prototype station, in order. Root and repeated segments can have different station counts. Omit sections to retain that prototype when no section change is intended. This selects no section type or dimensions and changes no physical domain.')
 
 
+def construction_diagnostic(exc):
+    """Retain first-failure facts already computed by the frozen constructor."""
+    if hasattr(exc,'diagnostic'):return deepcopy(exc.diagnostic)
+    if str(exc)=='SECTION_ROUTE_CLEARANCE':
+        trace=exc.__traceback__
+        while trace:
+            if trace.tb_frame.f_code is family.generate_family.__code__:
+                values=trace.tb_frame.f_locals
+                attachment=values['p']['attachment'];radius=values['tendon_values']['diameter_m']/2
+                return dict(status='failed_geometry_check',check=str(exc),
+                    span_index=values['span_index'],tendon=values['name'],segment=attachment['part'],
+                    station_s=attachment['s'],role=values['p']['role'],local_position_m=deepcopy(attachment['position_m']),
+                    actual_distance_m=float(values['distance']),section_envelope_radius_m=float(values['envelope']),
+                    tendon_radius_m=float(radius),required_distance_m=float(values['envelope']+radius),
+                    scope='First failed construction check only. Values captured from the original constructor exception; no geometry re-check, route repair, candidate or dynamic evaluation.')
+            trace=trace.tb_next
+    return dict(status='unavailable',reason='No structured facts captured by this check')
+
+
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import UnsupportedGeneration
@@ -359,7 +378,7 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             '; executable_tendon_count_bounds='+str(spec['family_space']['executable_tendon_count_bounds']),
             candidate=None,task_success=None)
     except ValueError as exc:
-        diagnostic=deepcopy(getattr(exc,'diagnostic',dict(status='unavailable',reason='No structured facts captured by this check')))
+        diagnostic=construction_diagnostic(exc)
         if str(exc)=='EXACT_SECTION_STATIONS_REQUIRED' and spec['family_space'].get('serial_assembly'):
             diagnostic=section_station_diagnostic(spec['family_space'],request,s['family_space_reference'])
         reference=save(host,dict(request=request,reason=str(exc),diagnostic=diagnostic,

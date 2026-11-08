@@ -117,6 +117,24 @@ class FullAutonomyPreflight(unittest.TestCase):
             self.assertEqual(dispatch.call_count,1)
         self.assertEqual(self.h.store.remaining(),before)
 
+    def test_clearance_failure_retains_original_constructor_measurements(self):
+        from extensions.tendon_family import generated_serial as family
+        from tools.research.design import construction_diagnostic
+        request=dict(version='serial_family_generation_v2',family_space_identity=self.spec['family_space_identity'],
+            segment_count=2,tendon_count=4,spans=[dict(first_segment=0,last_segment=1,count=4,radius_m=.001)])
+        try:family.generate_family(dict(space=self.spec['family_space'],request=request))
+        except ValueError as exc:
+            self.assertEqual(str(exc),'SECTION_ROUTE_CLEARANCE')
+            diagnostic=construction_diagnostic(exc)
+        else:self.fail('Fixture must fail the original route-clearance check')
+        self.assertEqual(diagnostic['status'],'failed_geometry_check')
+        self.assertEqual(diagnostic['segment'],'segment_0')
+        self.assertEqual(diagnostic['tendon'],'tendon_0')
+        self.assertEqual(diagnostic['span_index'],0)
+        self.assertAlmostEqual(diagnostic['actual_distance_m'],.001)
+        self.assertLess(diagnostic['actual_distance_m'],diagnostic['required_distance_m'])
+        self.assertEqual(construction_diagnostic(ValueError('SECTION_ROUTE_CLEARANCE'))['status'],'unavailable')
+
     def test_coordinate_grant_and_scientific_schema(self):
         from extensions.tendon_family.family_space import search_domains
         for mode in ('passive_equilibrium','passive_task_response'):

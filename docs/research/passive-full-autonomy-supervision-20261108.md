@@ -170,3 +170,15 @@ A read-only check of the actual saved Main request confirms the corrected
 parameter admission. The original unsupported receipt and its costs remain;
 neither the proposed interaction nor the new candidate has been evaluated by
 this interface repair.
+
+A later five-segment generation passed the corrected station contract but failed
+the original section-route-clearance check. Its receipt retained no actual
+distance or required clearance, and subsequent model turns remained in evidence
+navigation. The interface now captures the first failure's already-computed
+constructor values from its exception traceback: exact span/tendon/segment,
+attachment, actual radial distance, section envelope and tendon-radius threshold.
+The numerical constructor, inequality, physical profile and chosen input remain
+unchanged; this is failure diagnostics, not a repaired route or candidate. Existing
+structured diagnostics take precedence, and an exception without the original
+constructor frame stays explicitly unavailable. A focused offline test exercises
+the real failing constructor path and checks source measurements and fallback.
