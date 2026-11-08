@@ -1,9 +1,9 @@
 # Full Base-only autonomous Study capability audit
 
-New Study: `passive-base-only-full-autonomous-study-20261108-01`.
+New Study: `passive-base-only-full-autonomous-study-20261108-02`.
 Profile: `configs/research/study_passive_base_only_full_autonomous_20261108.json`.
-Store: `runs/research/passive-base-only-full-autonomous-study-20261108-01/platform.sqlite`.
-The unique suffix avoids an operator preflight name reservation; no reservation,
+Store: `runs/research/passive-base-only-full-autonomous-study-20261108-02/platform.sqlite`.
+The unique suffix preserves an earlier zero-request startup failure (legacy Knowledge metadata missing an optional summary) and an offline name reservation; no reservation,
 candidate, budget, checkpoint or Worker is transferred. The original Study is
 read-only historical background. Its failed observations are supplied as a small
 source-linked report, without successful design parameters or an old Store copy.

@@ -100,7 +100,7 @@ def research_catalogue(host):
     if state(host)['spec'].get('knowledge',{}).get('organization')=='typed_knowledge_v1':
         return dict(types=[dict(type=t,count=sum(r.get('type')==t for r in rows),
             search_query=dict(operation='search',type=t)) for t in ('case','general','diagnostic','validation')],
-            capabilities=[dict(id=r['entry_id'],role=knowledge_type(r),summary=r['summary'],
+            capabilities=[dict(id=r['entry_id'],role=knowledge_type(r),summary=r.get('summary',''),
                 read_query=dict(operation='read',entry_id=r['entry_id'],revision=r['revision']))
                 for r in rows if knowledge_type(r) in ('skill','expert_process')],
             scope='L0 index only. Search or summary read for L1; exact full read for Action Trace and workflow. Context only.')

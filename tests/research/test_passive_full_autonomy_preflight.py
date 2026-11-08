@@ -30,6 +30,10 @@ class FullAutonomyPreflight(unittest.TestCase):
         fixture.pop('resolved_identity');fixture['resolved_identity']=digest(fixture)
         with patch('tools.research.config.resolve',return_value=fixture):
             cls.h=core.prepare(PROFILE,directory=Path(cls.temp.name)/'fresh-offline-fixture')
+        from tools.research.agent import decision_packet
+        # Exercise the actual empty-Study startup packet, including legacy
+        # Knowledge metadata, before any candidate exists. No Provider send.
+        cls.startup_packet=decision_packet(cls.h,research_only=True)
         cls.spec=state(cls.h)['spec']
         generated=generate_candidate(cls.h,dict(version='serial_family_generation_v2',
             family_space_identity=cls.spec['family_space_identity'],segment_count=2,tendon_count=4),
@@ -108,6 +112,7 @@ class FullAutonomyPreflight(unittest.TestCase):
         from tools.research.task_constraints import registered_analysis_method_names
         from tools.research.math_capability_catalog import capability_inventory
         original=read(ROOT/'tasks/phs2d_original_ten_v1_2.json')
+        self.assertEqual(self.startup_packet['study_id'],self.h.run_id)
         canonical=deepcopy(original['task'])
         canonical['initializer']['parameters']['data']=dict(rule='all_candidate_dofs_zero_v1')
         self.assertEqual(self.spec['canonical_task_identity'],digest(canonical))
