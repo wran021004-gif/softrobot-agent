@@ -4,7 +4,7 @@
 
 The six protocol blockers are closed in the registered generic interfaces. The task remains **development_valid**. A formal autonomous research Study does not confer Benchmark certification. The original scientific thresholds and historical records are retained.
 
-The user explicitly authorized direct launch after readiness. No additional permission is required. The concrete launch receipt, first real Main Plan and live costs will be linked below after the committed implementation is bound. Preparation and unit fixtures do not establish a scientific success.
+The user explicitly authorized direct launch after readiness. No additional permission is required. The committed implementation is bound and the real Main loop is running in the background. See launch-receipt.json, first-main-plan.json and live-status.json. Preparation and unit fixtures do not establish a scientific success.
 
 ## 1. Existing A–C repair
 
@@ -85,4 +85,14 @@ These checks use clearly labeled synthetic fixtures and mocks for execution comp
 
 ## 13–14. First real Plan and actual costs
 
-Pending the committed launch. The launch and bounded live audit files in this directory will contain actual Store references, Main's unedited first Plan, Provider usage by role and observed scientific costs. No scientific Plan or successful experiment is fabricated by preparation.
+The new Study is running under implementation `cfd96ba8d6da6a027966880ec5aba6b0a1e7c700`. Frozen resolved identity: `97b4feeae3e91d05fb2fa68e1537dbe154a9dfbe6c4391f46a4c0c5f9d1efbef`; task identity: `caed522bcc35dc253e59e292ed3371e6f534465e69791c0fca62e639c798bc05`; Knowledge manifest identity: `1aebfec9a3cbf8955797a6f2fec9c22f654b207f4c2e105519d153c01e99f886`.
+
+`launch-receipt.json` verifies zero initial candidates, Plans, Provider requests, mathematical evaluations and physical cases. `first-wire-audit.json` records the actual 63,158-byte initial request, no forbidden historical answer/path, safe Knowledge delivery and no prescribed first scientific choice.
+
+Main's first genuine Plan is the unedited `generate` Plan in **first-main-plan.json**, Store artifact `12f28ab2dd6c6ed221ec92cf42b94728dd6e7326d739710955188136408d00ba`. It proposes hypothesis H1_symmetric_delayed_engagement and a new symmetric full-span structure with relative payout slack. It was Main's choice; preparation supplied no candidate or parameter pair. Main generated a new candidate, then independently chose an unloaded hard-equilibrium/active-set mathematical inspection. It subsequently chose a complete finite-time M1 observation with its selected tendon-limit ablation. The latter is currently running from Main's actual registered research_analysis request. It has not established an independent task pass.
+
+At the delivery snapshot, seven Provider sends are charged (six Main/conversation, one Reporter), leaving73 of80. Reported usage is 123,183 input tokens and3,541 output tokens, total126,724; currency cost is unknown. Two mathematical evaluations are admitted: one is complete and one Worker is active. Settled numerical wall time is1.7637218000090797 s. The completed static calculation records one equilibrium solve, one model build,100 native forward calls and zero integration steps. The running finite-time request reserved four episode slots and an upper bound640,000 physical steps; these reservations are **not** a claim that four episodes or that many steps have completed. Its running integrations and costs will settle into the same ledger. Independent PhysicalReplay results are currently zero.
+
+The initial SDK snapshot replacement hit transient Windows WinError5 after the first returned request and seven read-only tools. Original bytes and the failed log were preserved; two identical SDK writes and restore-only validation succeeded with no Provider send or tool replay. The same Study resumed, has completed subsequent handoffs and is now performing Main-requested science. See startup-recovery.json. There was no reset or budget replacement.
+
+The background PID at delivery is17616. It continues until a scientific stopping/selection boundary, an actionable failure or the settled Supervisor request review boundary. It cannot add Provider quota. Current immutable Store receipts remain authoritative; **live-status.json is a bounded timestamped snapshot**, not a final scientific result. On process exit the lifecycle helper refreshes that audit. No automation was created or old Study resumed.

@@ -1,0 +1,296 @@
+{
+  "study_id": "p3-passive-progressive-stiffness-autonomous-20261109-01",
+  "store": "D:\\softrobot-agent\\.worktrees\\passive-research-capabilities-20261107\\runs\\research\\p3-passive-progressive-stiffness-autonomous-20261109-01\\platform.sqlite",
+  "implementation": "cfd96ba8d6da6a027966880ec5aba6b0a1e7c700",
+  "resolved_identity": "97b4feeae3e91d05fb2fa68e1537dbe154a9dfbe6c4391f46a4c0c5f9d1efbef",
+  "task_identity": "caed522bcc35dc253e59e292ed3371e6f534465e69791c0fca62e639c798bc05",
+  "task_status": "development_valid",
+  "knowledge_manifest_identity": "1aebfec9a3cbf8955797a6f2fec9c22f654b207f4c2e105519d153c01e99f886",
+  "research_status": "ready",
+  "pending": {
+    "analysis_evaluations": 1,
+    "dynamic_cost_bound": {
+      "episodes": 4,
+      "model_builds": 2,
+      "physics_steps": 640000
+    },
+    "folder": "D:\\softrobot-agent\\.worktrees\\passive-research-capabilities-20261107\\runs\\research\\p3-passive-progressive-stiffness-autonomous-20261109-01\\analyses\\05f7a443dbff44a6a2867ab093d577b3",
+    "implementation": "cfd96ba8d6da6a027966880ec5aba6b0a1e7c700",
+    "kind": "candidate_analysis",
+    "origin": "model",
+    "plan_reference": {
+      "artifact_id": "b16fad513eaa83d6cbf7c9f141b4d3ce4271724bc23efd69b5e1b4928d7aeb65",
+      "media_type": "application/json"
+    },
+    "request": {
+      "candidate": {
+        "artifact_id": "f5e6dedcbdc44845f27dbbb2ed92ce9464a4435174892eabb2f1e143c6ad4556",
+        "media_type": "application/json"
+      },
+      "execution": null,
+      "mechanism_study": {
+        "comparison_candidates": [],
+        "effect_semantics": "finite_time_task_response",
+        "max_evaluations": 1,
+        "operation": "inspect",
+        "parameter_bounds": {},
+        "parameter_path": null,
+        "passive_ablation": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "point_semantics": "frozen_task_initial_state",
+        "target": {
+          "direction_generalized": null,
+          "direction_world": null,
+          "goal": "decrease",
+          "material_s": 0.5,
+          "quantity": "finite_time_task_violation",
+          "reduction": "identity",
+          "tendon_channel": null
+        }
+      },
+      "model_source": "mujoco",
+      "native": {
+        "correction_radius_n": 0.0,
+        "difference_step_n": 0.02,
+        "horizon_s": 0.01,
+        "tensions_n": null
+      },
+      "operating_point": "standardized_initial_pretension",
+      "operation": "mechanism_structure_v1",
+      "protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.1,
+          "segment_1": 0.1,
+          "segment_2": 0.1,
+          "segment_3": 0.1,
+          "segment_4": 0.1,
+          "segment_5": 0.1
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 20.0,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.01,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          4.0,
+          8.0,
+          12.0,
+          16.0,
+          20.0
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.25,
+          4.0,
+          8.0,
+          20.0
+        ]
+      },
+      "saved_state": null,
+      "scoring_window_s": null,
+      "update_id": null
+    },
+    "reserved_s": 0.0,
+    "started_unix": 1794239546.22789,
+    "worker_request_id": "native-call_bff8a9c898bf47408a12a39eb0b124ff-analysis"
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": null,
+      "model_calls": 80,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 11,
+      "model_calls": 7,
+      "backend_solves": 4,
+      "worker_calls": 0,
+      "wall_s": 132.77586660000088
+    },
+    "remaining": {
+      "backend_solves": null,
+      "model_calls": 73,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_usage": {
+    "conversation": {
+      "requests": 6,
+      "usage_missing": 0,
+      "prompt_tokens": 113134,
+      "completion_tokens": 2825,
+      "total_tokens": 115959,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        63158,
+        106274,
+        81483,
+        80607,
+        101353,
+        158083
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 10049,
+      "completion_tokens": 716,
+      "total_tokens": 10765,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        43432
+      ]
+    }
+  },
+  "provider_requests": 7,
+  "candidates": 1,
+  "plans": 2,
+  "first_real_plan": {
+    "reference": {
+      "artifact_id": "12f28ab2dd6c6ed221ec92cf42b94728dd6e7326d739710955188136408d00ba",
+      "media_type": "application/json"
+    },
+    "plan": {
+      "action": "generate",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "H1_symmetric_delayed_engagement",
+        "requested_budget": 1,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "symmetric four-tendon full-span delayed-engagement structure",
+        "selected_variables": [
+          "segment_count",
+          "tendon_count",
+          "span topology",
+          "payout offset"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "For both load directions, low-load displacement exceeds 0.006 m with selected tendon tension at or below 0.005 N and positive slack; by the high stage the direction-appropriate tendon exceeds 0.05 N, its constraint residual is at most 5e-05 m, and the late stiffness ratio exceeds 1.5 while displacement stays below 0.025 m.",
+      "experience_disposition": {
+        "mechanism-research-process@2": "adopted",
+        "passive-force-response-research@2": "adopted",
+        "passive-structure-mechanics@1": "adopted"
+      },
+      "fixed_conditions": "Keep the frozen passive-response evaluator, prototype segment sections and cells, material defaults, equal angular tendon spacing, common full-span routing, and identical payout offsets across all four tendons. Treat mathematical screening as distinct from finite dynamic acceptance.",
+      "generation": {
+        "control_weights": {},
+        "family_space_identity": "73ecb82dde87673155508670b841575f93b12867f8b234383393f04706dffef6",
+        "payout_offsets_m": {
+          "tendon_0": 0.0008,
+          "tendon_1": 0.0008,
+          "tendon_2": 0.0008,
+          "tendon_3": 0.0008
+        },
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {},
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": null,
+            "angular_offsets_rad": [],
+            "count": 4,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": null,
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": null
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      },
+      "hypothesis": "A two-segment arm with four equally spaced full-span tendons and identical positive payout offsets will remain compliant and effectively slack at low loads, while the tendon on the extending side will engage under each opposite high-load bend, producing approximately symmetric progressive stiffness for plus-x and minus-x.",
+      "interpretation": "This is a new unmeasured structure designed to test delayed unilateral engagement, not a claim of task success. Fourfold symmetry is intended to remove a directional confounder; the common positive payout offset is the primary engagement-delay intervention.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": null,
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": null,
+      "stopping_condition": "Stop this design branch if it cannot produce a qualified unloaded state or bilateral delayed activation under current scoped analysis; otherwise proceed to candidate-bound mechanism diagnosis and then a matched physical evaluation before any validation replay.",
+      "supporting_evidence": [],
+      "weakening_observation": "Either unloaded or low-stage tendons are already taut, neither direction activates a tendon by the high stage, activation is strongly one-sided, the arm remains too stiff at low load, or high-load dynamics are unstable or exceed the displacement bound."
+    }
+  },
+  "mathematical_evaluations": 2,
+  "analysis_results": 1,
+  "physical_results": 0,
+  "physical_replay_cases": 0,
+  "numerical_s": 1.7637218000090797,
+  "observed_native_costs": {
+    "KKT_solves": 0,
+    "QP_calls": 0,
+    "constraint_calls": 4,
+    "constraint_jacobian_calls": 98,
+    "equilibrium_solves": 1,
+    "evaluation_attempts": 1,
+    "gradient_calls": 98,
+    "hessian_columns": 48,
+    "kernel_wall_s": 0.11954820000391919,
+    "material_point_jacobian_calls": 126,
+    "model_builds": 1,
+    "multiplier_fits": 0,
+    "native_forward_calls": 100,
+    "native_position_attempts": 1,
+    "native_position_calls": 1,
+    "objective_calls": 2,
+    "optimizer_iterations": 1,
+    "physics_steps": 0,
+    "rollouts": 0,
+    "tendon_jacobian_extractions": 98
+  },
+  "supervisor_pauses": [],
+  "timestamp_unix": 1794239552.2663896
+}
