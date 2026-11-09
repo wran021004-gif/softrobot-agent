@@ -340,6 +340,99 @@ def abandon_unrecoverable_reporter_attempt(host,request_id,*,authorization):
     return disposition
 
 
+def abandon_unrecoverable_main_attempt(host,request_id,*,authorization):
+    """User-authorized local disposition at an unchanged committed SDK handoff.
+
+    No response, upstream cancellation, scientific action or new send is inferred.
+    The existing charge survives; only the local exclusive reservation is sealed.
+    """
+    from tools.research.state import state
+    from tools.research.session_handoff import session_storage_path,INVOCATION_PROMPT,unmatched
+    from tools.service_execution import process_exit_observation
+    if (authorization.get('approved') is not True
+            or authorization.get('scope')!='abandon_unrecoverable_main_attempt_v1'
+            or authorization.get('study_id')!=host.run_id or authorization.get('request_id')!=request_id
+            or not authorization.get('source_sha256') or not authorization.get('reason')):
+        raise ValueError('EXACT_USER_AUTHORIZATION_REQUIRED')
+    events=host.store.events(host.run_id)
+    prior=[e for e in events if e['kind']=='main_attempt_abandoned_locally' and e['request_id']==request_id]
+    if prior:
+        saved=host.store.artifact(prior[0]['outputs'][0])
+        if saved['authorization']!=authorization:raise ValueError('ABANDONMENT_AUTHORIZATION_MISMATCH')
+        return saved
+    sends=[e for e in events if e['kind']=='r3_request' and e['request_id']==request_id]
+    row=host.store.lookup(host.run_id,request_id)
+    if len(sends)!=1 or not row or row['caller']!=CALLER or row['status']!='unknown' or row['receipt']:
+        raise ValueError('ONE_UNKNOWN_PROVIDER_ATTEMPT_REQUIRED')
+    if received(host,request_id) is not None:raise ValueError('SAVED_RESPONSE_MUST_USE_ORIGINAL_RECOVERY')
+    send=sends[0];meta=host.store.artifact(send['outputs'][0]);wire=host.store.artifact(meta['request'])
+    if meta.get('purpose')!='conversation':raise ValueError('MAIN_CONVERSATION_ATTEMPT_REQUIRED')
+    exited=process_exit_observation(meta['pid'])
+    before=state(host)
+    if (before.get('pending') or before['pilot'].get('unconsumed_response')
+            or any(v.get('active_reservation') or v.get('status',{}).get('worker_alive',False)
+                   for v in before.get('rl_runs',{}).values())):
+        raise ValueError('QUIESCENT_MAIN_BOUNDARY_REQUIRED')
+    for folder in ('analyses','physical_replay','mechanics','local_diagnostics'):
+        for path in (host.store.root/folder).glob('*/boundary.json'):
+            if not json.loads(path.read_text(encoding='utf-8')).get('termination_confirmed'):
+                raise ValueError('UNSEALED_SCIENTIFIC_WORKER_BLOCKS_ABANDONMENT')
+    if any(e['sequence']>send['sequence'] and e['kind'] in ('r3_request','model_original_turn',
+            'model_original_tool_request','model_original_tool_feedback','original_research_plan',
+            'candidate_constructed','candidate_analysis','physical_replay','tool') for e in events):
+        raise ValueError('POST_SEND_ACTION_BLOCKS_ABANDONMENT')
+    failures=[host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='r3_boundary_failure']
+    if not any(e.get('request_id')==request_id and e.get('response_saved') is False for e in failures):
+        raise ValueError('ORIGINAL_LOST_RESPONSE_BOUNDARY_REQUIRED')
+    session=before['pilot']['framework_session_id'];preparation=before['pilot']['handoff']
+    prep=host.store.artifact(preparation);verification=host.store.artifact(before['pilot']['handoff_verification'])
+    commits=[e for e in events if e['kind']=='session_handoff' and e['status']=='committed'
+             and e['outputs'][0]==preparation and e['sequence']<send['sequence']]
+    if (not commits or prep['next_session']!=session or verification.get('preparation')!=preparation
+            or not verification.get('independently_restored')):
+        raise ValueError('COMMITTED_RESTORED_SDK_HANDOFF_REQUIRED')
+    if [e['request_id'] for e in events if e['kind']=='r3_request' and e['sequence']>commits[-1]['sequence']]!=[request_id]:
+        raise ValueError('ONE_SEND_AFTER_COMMITTED_HANDOFF_REQUIRED')
+    snapshot=Path(session_storage_path(host.store.root/'framework_sessions'))/'session'/session/'scopes/agent/default/snapshots/snapshot_latest.json'
+    snapshot_body=snapshot.read_bytes();messages=json.loads(snapshot_body)['data']['messages']
+    normalized=[{k:v for k,v in m.items() if k!='tracking_id'} for m in messages]
+    if (normalized!=prep['initial_messages']+[dict(role='user',content=[dict(text=INVOCATION_PROMPT)])]
+            or unmatched(messages)):
+        raise ValueError('ORIGINAL_COMMITTED_SDK_PROMPT_REQUIRED')
+    if (not wire.get('messages') or not wire['messages'][-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
+            or model_messages(host,normalized,wire['messages'][0]['content'])!=wire['messages'][:-1]
+            or digest(wire)!=row['request_hash']):
+        raise ValueError('ORIGINAL_REQUEST_AND_SDK_HISTORY_MISMATCH')
+    packets=[e for e in events if e['kind']=='model_decision_packet' and e['sequence']<send['sequence']]
+    if not packets or json.loads(wire['messages'][-1]['content'].split('\n',1)[1])!=host.store.artifact(packets[-1]['outputs'][0]):
+        raise ValueError('ORIGINAL_DECISION_PACKET_MISMATCH')
+    used=host.store.remaining()['used']['model_calls']
+    if (used!=before['pilot']['live_model_requests'] or used!=authorization.get('expected_provider_requests')
+            or json.loads(row['charged'])['model_calls']!=1 or json.loads(row['reserved'])['model_calls']!=1):
+        raise ValueError('ORIGINAL_PROVIDER_CHARGE_MUST_BE_PRESERVED')
+    disposition=dict(version='local_main_attempt_abandonment_v1',study_id=host.run_id,request_id=request_id,
+        original_send=send['outputs'][0],original_wire=meta['request'],original_session=session,preparation=preparation,
+        provider_outcome='unknown',response_saved=False,upstream_cancelled=False,new_send=False,
+        tokens=None,money=None,provider_elapsed_s=None,provider_requests_charged=1,
+        local_execution_status='cancelled',authorization=authorization,sdk_message_identity=digest(messages),
+        sender_exit=exited,scientific_results_preserved=True,native_tool_action='not_submitted',
+        scope='Local reservation abandonment only; preserve unknown upstream outcome and all charges. No output reconstructed.')
+    with host.store.transaction() as db:
+        unsealed=db.execute('select request_id,status from calls where receipt is null').fetchall()
+        if host.store.session(host.run_id,db)['state']!=before or [tuple(r) for r in unsealed]!=[(request_id,'unknown')]:
+            raise ValueError('QUIESCENT_SINGLE_UNKNOWN_BOUNDARY_REQUIRED')
+        if snapshot.read_bytes()!=snapshot_body:raise ValueError('SDK_CHANGED_DURING_ABANDONMENT')
+        if any(json.loads(r[0]).get('request_id')==request_id for r in db.execute("select body from events where json_extract(body,'$.kind')='r3_response'")):
+            raise ValueError('SAVED_RESPONSE_MUST_USE_ORIGINAL_RECOVERY')
+        receipt=host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=CALLER,
+            tool_id='model.'+before['pilot']['provider']['adapter'],execution_status='cancelled',charged=zero(),
+            error='LOCAL_MAIN_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN'),disposition,
+            elapsed=json.loads(row['charged'])['wall_s'],kind='main_attempt_local_disposition',db=db)
+        host.store.event(db,host.run_id,'main_attempt_abandoned_locally','cancelled',request=request_id,
+            execution=row['execution_id'],caller=CALLER,inputs=[meta['request'],preparation],outputs=[receipt['output']])
+    return disposition
+
+
 class IncompleteModelOutput(ValueError):
     """Confirmed Provider output, never a transport failure or scientific action."""
     def __init__(self,diagnostic):
@@ -366,10 +459,13 @@ def provider_outcome(host,request_id):
     row=host.store.lookup(host.run_id,request_id)
     if not reception:
         receipt=json.loads(row['receipt']) if row and row['receipt'] else {}
-        abandoned=receipt.get('error')=='LOCAL_REPORTER_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN'
+        abandoned=receipt.get('error') in ('LOCAL_REPORTER_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN',
+                                         'LOCAL_MAIN_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN')
+        main=receipt.get('error')=='LOCAL_MAIN_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN'
         return dict(request_id=request_id,transport='outcome_unknown',outcome_unknown=True,
             response_saved=False,provider_charged=abandoned,model_output='unknown',finish_reasons=[],
-            **(dict(local_disposition='abandoned_reporter_attempt',charged_model_requests=1,tokens=None,money=None) if abandoned else {}),
+            **(dict(local_disposition='abandoned_main_attempt' if main else 'abandoned_reporter_attempt',
+                    charged_model_requests=1,tokens=None,money=None) if abandoned else {}),
             native_tool_action='not_submitted')
     reasons=[];calls=[];decoded=False
     try:

@@ -627,12 +627,29 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
                         and not any(e['kind'] in ('model_original_turn','model_original_tool_request','model_original_tool_feedback') for e in after)):
                     # Repeated settled failures can share this initial snapshot.
                     # Verify every send against the exact saved prompt; an earlier
-                    # successful, unknown or different send cannot be skipped.
+                    # successful, unresolved or different send cannot be skipped.
+                    # An explicitly disposed lost Main response retains its cost
+                    # and requires the same committed snapshot and saved wire.
                     for send in sends:
                         row=host.store.lookup(host.run_id,send['request_id']);reception=received(host,send['request_id'])
                         meta=host.store.artifact(send['outputs'][0]);wire=host.store.artifact(meta['request'])
-                        if not (row and row['receipt'] and json.loads(row['receipt'])['execution_status']=='failed'
-                                and reception and reception['http_status'] in (429,502,503,504)
+                        receipt=json.loads(row['receipt']) if row and row['receipt'] else {}
+                        abandoned=(host.store.artifact(receipt['output']) if receipt.get('error')==
+                                   'LOCAL_MAIN_ABANDONMENT_UPSTREAM_OUTCOME_UNKNOWN' else {})
+                        local_disposition=bool(receipt.get('execution_status')=='cancelled' and not reception
+                            and abandoned.get('version')=='local_main_attempt_abandonment_v1'
+                            and abandoned.get('request_id')==send['request_id']
+                            and abandoned.get('original_session')==session_id
+                            and abandoned.get('preparation')==preparation
+                            and abandoned.get('sdk_message_identity')==digest(agent.messages)
+                            and abandoned.get('original_wire')==meta['request']
+                            and abandoned.get('provider_outcome')=='unknown'
+                            and abandoned.get('authorization',{}).get('approved') is True
+                            and any(e['kind']=='main_attempt_abandoned_locally' and e['request_id']==send['request_id']
+                                    and e['outputs']==[receipt['output']] for e in events))
+                        settled_http=bool(receipt.get('execution_status')=='failed' and reception
+                                          and reception['http_status'] in (429,502,503,504))
+                        if not ((settled_http or local_disposition)
                                 and meta.get('purpose')=='conversation'
                                 and wire['messages'][-1].get('content','').startswith('CURRENT_RESEARCH_PACKET\n')
                                 and model_messages(host,normalized,wire['messages'][0]['content'])==wire['messages'][:-1]):
