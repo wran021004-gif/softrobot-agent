@@ -1,0 +1,2426 @@
+{
+  "source": {
+    "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+    "media_type": "application/json"
+  },
+  "projection": "actual mathematical_decision_view(result_card) used by Main and Reporter",
+  "sent_to_provider": false,
+  "historical_main_read_claimed": false,
+  "decision_view": {
+    "claim_source": {
+      "reference": {
+        "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+        "media_type": "application/json"
+      },
+      "pointer": "/scoped_claim"
+    },
+    "requirement_source": {
+      "reference": {
+        "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+        "media_type": "application/json"
+      },
+      "pointer": "/task_analysis"
+    },
+    "problem_definition": {
+      "reference": {
+        "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+        "media_type": "application/json"
+      },
+      "pointer": "/structure_research"
+    },
+    "scope": {
+      "model_declaration": {
+        "model_id": "model.mujoco_native",
+        "model_version": "1.0.0",
+        "relevant_assumptions": [
+          "Contact-free ideal unilateral fixed-payout equilibrium; native tendon soft limits are a separate dynamic model."
+        ],
+        "representation_id": "native_named_hinges_v1"
+      },
+      "computation_status": "execution_incomplete",
+      "verification_status": "insufficient",
+      "supported_interpretation": "No verified witness or certificate is available for this attempt.",
+      "unsupported_conclusions": [
+        "task acceptance",
+        "whole holding-window compliance",
+        "global nonlinear feasibility or infeasibility",
+        "hardware performance",
+        "robustness",
+        "repeatability",
+        "equilibrium validity at a non-equilibrium point"
+      ],
+      "horizon": {
+        "analysis_horizon_s": 8.0,
+        "interpretation": "Complete frozen dynamic research observation; no independent acceptance.",
+        "task_duration_s": 8.0
+      },
+      "constraint_coverage": []
+    },
+    "operating_point": {
+      "actual_time_s": 0.0,
+      "name": "standardized_initial_pretension"
+    },
+    "quantities": [],
+    "capability": null,
+    "owning_study": "passive-base-only-full-autonomous-study-20261108-02",
+    "unresolved": {
+      "supported_facts": [
+        "No verified witness or exclusion certificate."
+      ],
+      "unresolved_questions": [
+        "Task expressibility does not resolve feasibility."
+      ],
+      "potential_discriminating_checks": [
+        "Inspect solver, operating point or another design hypothesis."
+      ],
+      "unsupported_inferences": [
+        "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+      ],
+      "evidence_limits": [
+        "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+        "Original independent physical task acceptance is unmeasured by this evidence."
+      ]
+    },
+    "diagnostic_overview": {
+      "layer_status": {
+        "geometry": "not_evaluated",
+        "numerical_solve": "passed",
+        "static_qualification": "passed",
+        "dynamic_validation": "not_evaluated"
+      },
+      "computation_status": {
+        "geometry": "completed",
+        "numerical_solve": "partial",
+        "static_qualification": "completed",
+        "dynamic_validation": "completed"
+      },
+      "observed_layers": [
+        "geometry",
+        "numerical_solve",
+        "static_qualification",
+        "dynamic_validation"
+      ],
+      "qualified_layers": [
+        "numerical_solve",
+        "static_qualification"
+      ],
+      "primary_failure_layer": null,
+      "key_facts": {
+        "stationarity_inf_nm": 2.447948400517881e-11,
+        "primal_violation_m": 0.0,
+        "complementarity_nm": 6.7529167081842e-20
+      }
+    },
+    "diagnostic_query": {
+      "reference": {
+        "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+        "media_type": "application/json"
+      },
+      "pointer": "/diagnostic_layers"
+    },
+    "structure_research": {
+      "operation": "inspect",
+      "effect_semantics": "finite_time_task_response",
+      "qualification_diagnosis": {
+        "category": "dynamic_stage_qualification",
+        "diagnostic_options": [
+          {
+            "cost_entry": "mechanism_research.operation_admission",
+            "effect_semantics": "mechanism_effect",
+            "prerequisites": [
+              "Frozen load and re_equilibrated point; actual static qualification is checked separately.",
+              "Smooth sensitivities also require unchanged active set, numerical consistency and original parameter authorization."
+            ],
+            "status": "conditional_not_yet_evaluated",
+            "targets": [
+              "constraint_length_residual",
+              "constraint_multiplier",
+              "constraint_kkt_residual",
+              "tangent_stiffness"
+            ]
+          },
+          {
+            "effect_semantics": "saved_stage_comparison",
+            "new_physics_steps": 0,
+            "status": "read_only"
+          }
+        ],
+        "failed_qualifications": [
+          {
+            "failed_checks": [
+              "tip_speed",
+              "monitor_speed",
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s4_positive",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": false,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": false
+              },
+              "drift_m": 5.256016607051735e-05,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s4_negative",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.996707595644966e-07,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s6_positive",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.757594405937895e-06,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s6_negative",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.6058238050180405e-06,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          }
+        ],
+        "invalidated_conclusions": [
+          "complete_task_signed_gap",
+          "ordinary_task_gradient",
+          "structural_descent",
+          "qualified_mechanism_certificate"
+        ],
+        "new_physics_steps": 0,
+        "reason": "DYNAMIC_STAGE_NOT_QUALIFIED:loaded",
+        "scope": "Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.",
+        "source": {
+          "pointer": "/structure_research/records/0/mechanics/dynamic_execution",
+          "reference": {
+            "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+            "media_type": "application/json"
+          }
+        },
+        "validity": "invalid"
+      },
+      "baseline": {
+        "signed_task_gap": null,
+        "normalized_gap": null,
+        "objective_status": "incomplete_or_invalid",
+        "valid_complete": false,
+        "observation_feasible": false,
+        "hard_gate_status": "unknown",
+        "dominant_constraints": []
+      },
+      "best_valid": null,
+      "hard_gates": [
+        {
+          "constraint_id": "evaluator:no_contact",
+          "condition_id": "all_load_conditions",
+          "bound": 0,
+          "unit": "count",
+          "baseline_passed": null,
+          "best_passed": null,
+          "failed_observations": 0,
+          "failed_values": []
+        }
+      ],
+      "parameter_changes": [],
+      "direction_status": "not_requested",
+      "derivative_status": "not_requested",
+      "maximum_constraint_switch": false,
+      "parameter_sensitivities": [],
+      "candidate_improvement_status": "not_comparable",
+      "best_valid_record_index": null,
+      "improved_record_index": null,
+      "observed_reduction": null,
+      "resolution_floor": null,
+      "scope": "Best recorded complete task objective under the same frozen protocol; no strict descent or global optimum.",
+      "task_acceptance": "unmeasured",
+      "reference_semantics": {
+        "constraint_model": "mujoco_unilateral_soft_limits",
+        "displacement": "same_episode_unloaded_sample",
+        "initial": "frozen_dynamic_initial_state"
+      },
+      "observation_counts": {
+        "total": 1,
+        "invalid_or_incomplete": 1,
+        "hard_gate_failed": 0
+      },
+      "cost": {
+        "KKT_solves": 0,
+        "QP_calls": 0,
+        "attempted_steps": 352000,
+        "constraint_calls": 383,
+        "constraint_jacobian_calls": 373,
+        "constraint_observations": 352001,
+        "episodes_completed": 10,
+        "episodes_started": 10,
+        "equilibrium_solves": 1,
+        "evaluation_attempts": 1,
+        "gradient_calls": 373,
+        "hessian_columns": 128,
+        "integration_state_restores": 0,
+        "integration_state_saves": 31,
+        "kernel_wall_s": 396.5153489000004,
+        "material_point_jacobian_calls": 458430,
+        "model_builds": 1,
+        "multiplier_fits": 2,
+        "native_forward_calls": 361458,
+        "native_position_attempts": 1,
+        "native_position_calls": 1,
+        "objective_calls": 379,
+        "optimizer_iterations": 115,
+        "physics_steps": 352000,
+        "route_checked_poses": 4401,
+        "route_segment_body_checks": 12358008,
+        "static_balance_forwards": 4401,
+        "tendon_jacobian_extractions": 352374
+      },
+      "generation_handoff": null,
+      "source": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "pointer": "/structure_research"
+      },
+      "records_query": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "pointer": "/structure_research/records"
+      },
+      "unsupported_conclusions": [
+        "task success",
+        "strict derivative",
+        "structural descent certificate",
+        "hardware performance",
+        "independent task acceptance"
+      ],
+      "projection": "Read-only TaskGap reduction of saved constraint observations; original records and acceptance unchanged."
+    },
+    "task_diagnosis": {
+      "status": "recorded_task_diagnosis",
+      "candidate": {
+        "artifact_id": "aec951cff2ae5054c9a59f7a3e90c477a5444c1d04f24ca46a8a365408cf6850",
+        "media_type": "application/json"
+      },
+      "task_identity": "6977befa97a2278614525566f0c8af03ab1174823fb0242f902cea85d8ed790c",
+      "model_identity": "74b8bab9d6bbd0d1ba36c211bd1ac373c8fcb65a6d165a1cc51314a0106dbabf",
+      "diagnostic_status": "complete",
+      "diagnostic_maximum_normalized_violation": 3.1394643924373375,
+      "diagnostic_worst_constraints": [
+        {
+          "constraint_id": "evaluator:s3_positive_ratio_maximum",
+          "condition_id": "s3_positive",
+          "load_condition": "s3_positive",
+          "time_window": [
+            7.99,
+            8.0
+          ],
+          "bound_type": "upper",
+          "bound": 0.3,
+          "unit": "1",
+          "signal": "displacement_ratio",
+          "material_s": 0.3,
+          "frame": "world",
+          "observed_value": 1.2418393177312013,
+          "passed": false,
+          "signed_violation": 0.9418393177312012,
+          "normalization_scale": 0.3,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 3.1394643924373375,
+          "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0",
+          "candidate_identity": {
+            "artifact_id": "aec951cff2ae5054c9a59f7a3e90c477a5444c1d04f24ca46a8a365408cf6850",
+            "media_type": "application/json"
+          },
+          "task_identity": "6977befa97a2278614525566f0c8af03ab1174823fb0242f902cea85d8ed790c",
+          "source_reference": {
+            "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+            "media_type": "application/json"
+          },
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "aec951cff2ae5054c9a59f7a3e90c477a5444c1d04f24ca46a8a365408cf6850",
+            "media_type": "application/json"
+          },
+          "sample_time": 8.0,
+          "missing_reason": null,
+          "aggregation": "last",
+          "reference_window": "unloaded",
+          "reference_reduction": "last"
+        }
+      ],
+      "qualification": {
+        "category": "dynamic_stage_qualification",
+        "diagnostic_options": [
+          {
+            "cost_entry": "mechanism_research.operation_admission",
+            "effect_semantics": "mechanism_effect",
+            "prerequisites": [
+              "Frozen load and re_equilibrated point; actual static qualification is checked separately.",
+              "Smooth sensitivities also require unchanged active set, numerical consistency and original parameter authorization."
+            ],
+            "status": "conditional_not_yet_evaluated",
+            "targets": [
+              "constraint_length_residual",
+              "constraint_multiplier",
+              "constraint_kkt_residual",
+              "tangent_stiffness"
+            ]
+          },
+          {
+            "effect_semantics": "saved_stage_comparison",
+            "new_physics_steps": 0,
+            "status": "read_only"
+          }
+        ],
+        "failed_qualifications": [
+          {
+            "failed_checks": [
+              "tip_speed",
+              "monitor_speed",
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s4_positive",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": false,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": false
+              },
+              "drift_m": 5.256016607051735e-05,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s4_negative",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.996707595644966e-07,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s6_positive",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.757594405937895e-06,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          },
+          {
+            "failed_checks": [
+              "static_balance"
+            ],
+            "frozen_rule": {
+              "length_excess_max_m": 5e-05,
+              "monitor_speed_max_m_s": 0.001,
+              "qvel_max_rad_s": 0.01,
+              "sampling": "score_grid",
+              "stage": "loaded",
+              "static_balance_max_nm": 1e-05,
+              "tail_drift_max_m": 0.0005,
+              "tip_speed_max_m_s": 0.001,
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "load_condition": "s6_negative",
+            "observed": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": false,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.6058238050180405e-06,
+              "passed": false,
+              "sampling": "score_grid",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "source": {
+              "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7/qualifications/loaded",
+              "reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              }
+            },
+            "stage": "loaded"
+          }
+        ],
+        "invalidated_conclusions": [
+          "complete_task_signed_gap",
+          "ordinary_task_gradient",
+          "structural_descent",
+          "qualified_mechanism_certificate"
+        ],
+        "new_physics_steps": 0,
+        "reason": "DYNAMIC_STAGE_NOT_QUALIFIED:loaded",
+        "scope": "Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.",
+        "source": {
+          "pointer": "/structure_research/records/0/mechanics/dynamic_execution",
+          "reference": {
+            "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+            "media_type": "application/json"
+          }
+        },
+        "validity": "invalid"
+      },
+      "formal_task_gap": {
+        "valid_complete": false,
+        "comparable": false,
+        "signed_task_gap": null,
+        "accepted": null
+      },
+      "valid_complete": false,
+      "comparable": false,
+      "maximum_normalized_violation": null,
+      "hard_gate_status": null,
+      "conditions": [
+        {
+          "condition_id": "s3_positive",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s3_positive_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0013839420077931255,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.8616057992206876,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_positive_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.001718633598737364,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.6562732802525272,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_positive_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.2418393177312013,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 3.1394643924373375,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_positive_plane_75_maximum",
+              "signal": "material_displacement",
+              "observed_value": 6.08479249102395e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9695760375448803,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.75,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s3_negative",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s3_negative_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0013837511352379549,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.8616248864762045,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_negative_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0017112901296083359,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.6577419740783328,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_negative_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.236703686110477,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 3.1223456203682565,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.3,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s3_negative_plane_70_maximum",
+              "signal": "material_displacement",
+              "observed_value": 6.0205804229664774e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9698970978851675,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s4_positive",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s4_positive_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.00209987013640284,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.790012986359716,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_positive_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0022270556780940916,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.5545888643811817,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_positive_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.0605682891938857,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.5352276306462858,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_positive_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 1.7731266801037277e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9911343665994813,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s4_negative",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s4_negative_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0021015095157466113,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.7898490484253389,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_negative_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0022248382345337906,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.5550323530932418,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_negative_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.0586857769917657,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.5289525899725525,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.4,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s4_negative_plane_100_maximum",
+              "signal": "material_displacement",
+              "observed_value": 2.6749840320555294e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9866250798397224,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 1.0,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s5_positive",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s5_positive_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0024247763339500447,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.7575223666049955,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_positive_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0026101490045374095,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.4779701990925181,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_positive_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.076449389575403,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.5881646319180103,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_positive_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 4.4113394212349466e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9779433028938253,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s5_negative",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s5_negative_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0024244535568538187,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.7575546443146182,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_negative_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.00261318147035239,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.47736370592952204,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_negative_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.0778434847576461,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.5928116158588206,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.5,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s5_negative_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 4.397029731738149e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9780148513413092,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s6_positive",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s6_positive_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0027969696743458173,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.7203030325654183,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_positive_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0031026283876398613,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.3794743224720278,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_positive_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.1092820977279756,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.6976069924265853,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_positive_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 5.309309109769975e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9734534544511501,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s6_negative",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s6_negative_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0027974269987958594,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.7202573001204141,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_negative_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.003104625887941547,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.37907482241169066,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_negative_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.1098148009860203,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.6993826699534007,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.6,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s6_negative_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 5.350679625759944e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9732466018712003,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s7_positive",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s7_positive_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.003350258418687141,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.6649741581312859,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_positive_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0036628330040863427,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.26743339918273146,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_positive_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.0932986493387247,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.6443288311290822,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_positive_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 5.7242471147618734e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9713787644261906,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "s7_negative",
+          "constraint_count": 25,
+          "failed_constraint_count": 2,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:s7_negative_point_minimum",
+              "signal": "material_displacement",
+              "observed_value": 0.0033504376539315443,
+              "bound": 0.01,
+              "bound_type": "lower",
+              "unit": "m",
+              "normalized_violation": 0.6649562346068456,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_negative_tip_maximum",
+              "signal": "tip_displacement",
+              "observed_value": 0.0036653118547843927,
+              "bound": 0.005,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.26693762904312146,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_negative_ratio_maximum",
+              "signal": "displacement_ratio",
+              "observed_value": 1.0939800209334927,
+              "bound": 0.3,
+              "bound_type": "upper",
+              "unit": "1",
+              "normalized_violation": 2.6466000697783088,
+              "passed": false,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.7,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9"
+              }
+            },
+            {
+              "constraint_id": "evaluator:s7_negative_plane_25_maximum",
+              "signal": "material_displacement",
+              "observed_value": 5.716927052570374e-05,
+              "bound": 0.002,
+              "bound_type": "upper",
+              "unit": "m",
+              "normalized_violation": -0.9714153647371481,
+              "passed": true,
+              "time_window": [
+                7.99,
+                8.0
+              ],
+              "time_s": null,
+              "frame": "world",
+              "material_s": 0.25,
+              "sample_time": 8.0,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": "unloaded",
+              "reference_reduction": "last",
+              "aggregation": "last",
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9"
+              }
+            }
+          ]
+        },
+        {
+          "condition_id": "all_load_conditions",
+          "constraint_count": 1,
+          "failed_constraint_count": 0,
+          "unknown_constraint_count": 0,
+          "observations": [
+            {
+              "constraint_id": "evaluator:no_contact",
+              "signal": "maximum_contacts",
+              "observed_value": 0,
+              "bound": 0,
+              "bound_type": "upper",
+              "unit": "count",
+              "normalized_violation": null,
+              "passed": true,
+              "time_window": [
+                0.0,
+                8.0
+              ],
+              "time_s": null,
+              "frame": null,
+              "material_s": null,
+              "sample_time": null,
+              "missing_reason": null,
+              "source_pointer": "/structure_research/records/0/mechanics/dynamic_execution",
+              "source_reference": {
+                "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                "media_type": "application/json"
+              },
+              "reference_window": null,
+              "reference_reduction": null,
+              "aggregation": null,
+              "source": {
+                "reference": {
+                  "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+                  "media_type": "application/json"
+                },
+                "pointer": "/structure_research/records/0/mechanics/dynamic_execution"
+              }
+            }
+          ]
+        }
+      ],
+      "route_geometry": [
+        {
+          "record_index": 0,
+          "condition_id": "s3_positive",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s3_negative",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/1/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s4_positive",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/2/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s4_negative",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/3/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s5_positive",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/4/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s5_negative",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/5/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s6_positive",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/6/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s6_negative",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/7/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s7_positive",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/8/route_geometry"
+          }
+        },
+        {
+          "record_index": 0,
+          "condition_id": "s7_negative",
+          "status": "legal_at_checked_poses",
+          "checked_poses": 801,
+          "first_issue": null,
+          "source": {
+            "reference": {
+              "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+              "media_type": "application/json"
+            },
+            "pointer": "/structure_research/records/0/mechanics/dynamic_execution/episodes/9/route_geometry"
+          }
+        }
+      ],
+      "source": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "pointer": "/structure_research/records/0/mechanics/dynamic_execution"
+      },
+      "detail_query": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "view": "working_set",
+        "pointer": "/task_diagnosis"
+      },
+      "raw_query": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/structure_research/records/0/mechanics/dynamic_execution"
+      },
+      "numerical_qualification_query": {
+        "reference": {
+          "artifact_id": "d671cd6b1f7200b80fa98239c53fb4e4f5425f5cb7a3551fed445d3fdfb50543",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/diagnostic_layers"
+      },
+      "parameter_changes": [],
+      "limitations": [
+        "Recorded constraints only; absent values, units and exact peak times remain unknown.",
+        "A scoring window is not a measured extremum time. Qualification and independent acceptance remain separate.",
+        "Compact observations show the worst recorded normalized violation per signal and bound type; exact rows are available on demand."
+      ]
+    }
+  }
+}

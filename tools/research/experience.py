@@ -2,7 +2,8 @@
 from pathlib import Path
 from copy import deepcopy
 from tools.research.state import save,update,state,protected
-from tools.state_io import read
+from tools.state_io import read,digest
+import hashlib
 ROOT=Path(__file__).resolve().parents[2]
 import json
 from tools.research.contracts import ExperienceQuery
@@ -77,6 +78,10 @@ def freeze_knowledge(policy):
     policy=plain(policy)
     if policy.get('mode')=='off':return dict(entries=[])
     rows=deepcopy([entry for entry in _index_rows() if _permitted(entry,policy)])
+    for row in rows:
+        source=ROOT/row['path'];body=source.read_bytes()
+        row['content_sha256']=(digest(json.loads(body)['entries'][row['content_key']])
+            if row.get('content_key') else hashlib.sha256(body).hexdigest())
     if policy.get('delivery')=='compact_skill_v1':
         for row in rows:
             if row.get('introduced_in')=='phs2d_process_v1':
@@ -317,6 +322,9 @@ def retrieve(host,query,*,reader='agent'):
             body=source.read_bytes()
             content=json.loads(body) if source.suffix=='.json' else body.decode('utf8')
             if entry.get('content_key'):content=content['entries'][entry['content_key']]
+            identity=digest(content) if entry.get('content_key') else hashlib.sha256(body).hexdigest()
+            if entry.get('content_sha256') and identity!=entry['content_sha256']:
+                raise ValueError('FROZEN_KNOWLEDGE_CONTENT_CHANGED: '+canonical)
             if q.detail=='summary':
                 content={k:entry[k] for k in ('id','type','summary','trigger','source_refs','evidence_level',
                     'applicability','limitations','related_skills','knowledge_refs') if k in entry}

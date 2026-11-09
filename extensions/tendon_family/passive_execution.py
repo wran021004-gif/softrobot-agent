@@ -73,7 +73,7 @@ def backend_result(inp,raw):
             'Contact-free serial bending model; no hardware, friction, mixed actuation or robustness claim.'])
 
 
-def model_signature(model,*,exclude_limits=False):
+def model_signature(model,*,exclude_limits=False,exclude_timestep=False):
     """Compiled numeric assembly identity; the intervention may change one array."""
     h=hashlib.sha256()
     for name in sorted(dir(model)):
@@ -81,7 +81,7 @@ def model_signature(model,*,exclude_limits=False):
         value=getattr(model,name)
         if isinstance(value,np.ndarray):
             h.update(name.encode());h.update(str((value.shape,value.dtype.str)).encode());h.update(value.tobytes())
-    h.update(str((model.opt.timestep,int(model.opt.integrator),model.opt.iterations,model.opt.tolerance)).encode())
+    h.update(str((None if exclude_timestep else model.opt.timestep,int(model.opt.integrator),model.opt.iterations,model.opt.tolerance)).encode())
     return h.hexdigest()
 
 
@@ -131,11 +131,12 @@ def constraint_mechanism(native,data,goal):
         constraint_direction_error=error)
 
 
-def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None):
+def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None,common_equilibrium=None):
     from tools.platform_registry import registry
     goal,bounds,problem=task_definition(inp.task,registry())
     v2=goal.version=='passive_response_v2'
     original=v2 and goal.execution_protocol=='phs2d_original_v1'
+    hard=v2 and goal.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
     if (disabled_limits or initial_state is not None) and not v2:raise ValueError('PASSIVE_V2_STATE_OR_INTERVENTION_REQUIRED')
     if initial_state is not None and not goal.allow_saved_state:raise ValueError('SAVED_PASSIVE_STATE_NOT_ALLOWED_BY_FROZEN_TASK')
     p=physics_for(inp);scene=assemble_physical(inp,p)
@@ -176,6 +177,8 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
             initial_state_result=plain(initial_state_result),trace_files=[],
             intervention=dict(kind='disable_selected_passive_limits' if disabled else 'none',tendons=list(disabled_limits),
                 timing='after_identical_unloaded_qualification',only_limit_array_changed=True))
+        if goal.execution_protocol=='hard_equilibrium_continuous_v1':
+            raw['numerical_invariant_model_signature']=model_signature(model,exclude_timestep=True)
     dt=inp.task.timing.timestep_s;steps=round(inp.task.timing.duration_s/dt);stride=round(inp.task.timing.sample_period_s/dt)
     failure=MujocoFailureSnapshot(model,binding['model_identity'],folder)
     tendon_ids={model.tendon(t['entity']).id:i for i,t in enumerate(p['tendons'])}
@@ -195,33 +198,35 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
             tendon_jacobian_extractions=native.cost['tendon_jacobian_extractions'],
             route_checked_poses=sum(e.get('route_geometry',{}).get('checked_poses',0) for e in raw['episodes']),
             route_segment_body_checks=sum(e.get('route_geometry',{}).get('segment_body_checks',0) for e in raw['episodes']))
+        if hard:
+            raw['cost'].update({k:raw['cost'].get(k,0)+v for k,v in raw.get('cost_initialization',{}).items()})
         if original:
             for key in ('route_checked_poses','route_segment_body_checks'):
                 field='checked_poses' if key=='route_checked_poses' else 'segment_body_checks'
                 raw['cost'][key]-=sum(e.get('shared_baseline_route_cost',{}).get(field,0) for e in raw['episodes'])
-            raw['cost'].update({k:raw['cost'].get(k,0)+v for k,v in raw.get('cost_initialization',{}).items()})
         raw['timings_s']['total']=time.perf_counter()-started
         if folder:atomic_json(folder/'passive_progress.json',raw)
     if v2:checkpoint()
     shared=None
-    if original:
+    if hard:
         from .passive_equilibrium import solve
         native.protocol['static_solver'].update(goal.unloaded_static_solver)
         unloaded=native.load(problem.baseline_load)
-        equilibrium=solve(native,unloaded.material_s,unloaded.force_world_n,multistart=goal.unloaded_multistart)
+        equilibrium=common_equilibrium if common_equilibrium is not None else solve(native,unloaded.material_s,unloaded.force_world_n,multistart=goal.unloaded_multistart)
         raw['unloaded_equilibrium']=equilibrium
-        raw['cost_initialization']=equilibrium['numerical_cost']
+        raw['cost_initialization']=equilibrium['numerical_cost'] if common_equilibrium is None else {}
         if equilibrium['status']!='qualified_local_minimum':
             raw.update(status='invalid',reason='UNLOADED_HARD_EQUILIBRIUM_NOT_QUALIFIED')
             checkpoint()
             return backend_result(inp,raw)
-        raw['initial_state']=dict(qpos_rad=equilibrium['equilibrium']['qpos'],qvel_rad_s=[0.]*model.nv)
+        initial_qpos=np.asarray(equilibrium['equilibrium']['qpos'])+goal.initial_perturbation_rad*np.sin(np.arange(model.nv))
+        raw['initial_state']=dict(qpos_rad=initial_qpos.tolist(),qvel_rad_s=[0.]*model.nv)
         checkpoint()
     for case in goal.load_conditions:
         if v2:model.tendon_limited[:]=base_limited
         data=mujoco.MjData(model);mujoco.mj_resetData(model,data)
         data.qpos[:]=scene['qpos_rad'];data.qvel[:]=scene['qvel_rad_s']
-        if original:data.qpos[:]=raw['initial_state']['qpos_rad'];data.qvel[:]=0.
+        if hard:data.qpos[:]=raw['initial_state']['qpos_rad'];data.qvel[:]=0.
         if initial_state is not None:restore_state(model,data,initial_state,binding);state_restores+=1
         load=native.load(case)
         episode=dict(load_condition=case,initial_state=raw['initial_state'],complete=False,samples=[],
@@ -349,16 +354,16 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                     episode['intervention_at_s']=tick*dt
                 # v1 is unchanged. v2 explicitly freezes interval-start/end force semantics.
                 applied_time=(tick+1)*dt if v2 and goal.force_sampling=='interval_end' else tick*dt
-                if original:
+                if hard:
                     force,phase=load_at(goal,load,applied_time)
                     _,J=native.apply_force(data,load.material_s,force)
                     map_error=float(np.max(abs(data.qfrc_applied-J.T@np.asarray(force))))
                 else:force,phase=refresh(applied_time)
                 failure.call(data,mujoco.mj_step,'passive_time_integration')
                 episode['physics_steps']+=1
-                if original:
+                if hard:
                     failure.call(data,mujoco.mj_forward,'passive_original_post_step_geometry')
-                    if (tick+1)%stride==0:
+                    if original and (tick+1)%stride==0:
                         native.apply_force(data,load.material_s,force)
                         failure.call(data,mujoco.mj_forward,'passive_original_snapshot_constraints')
                 else:force,phase=refresh(applied_time if v2 else (tick+1)*dt)
@@ -417,7 +422,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
 
 def baseline_arm(raw):
     """Recover the exact primary arm from a composite result without its twin."""
-    pair=raw['paired_ablation'];value={k:v for k,v in raw.items() if k not in ('paired_ablation','boundary','implementation','cost_observation_scope','unobserved_work_possible')}
+    pair=raw['paired_ablation'];value={k:v for k,v in raw.items() if k not in ('paired_ablation','boundary','implementation','cost_observation_scope','unobserved_work_possible','numerical_confirmation')}
     value.update(cost=pair['baseline_cost'],timings_s=pair['baseline_timings_s'],
         trace_files=pair['baseline_trace_files'],model_builds=1,status=pair['baseline_status'])
     if pair.get('baseline_reason') is None:value.pop('reason',None)
@@ -470,7 +475,7 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
     atomic_json(folder/'passive_progress.json',combined)
     try:
         second=execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
-            initial_state_result=initial_state_result).data.data
+            initial_state_result=initial_state_result,common_equilibrium=first.get('unloaded_equilibrium')).data.data
     except Exception as exc:
         from tools.state_io import read
         path=folder/'ablation/passive_progress.json'
@@ -479,6 +484,103 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
     combined=paired_raw(first,second,folder,disabled_limits,time.perf_counter()-started,interrupted=second.get('physical_binding') is None)
     atomic_json(folder/'passive_progress.json',combined)
     return backend_result(inp,combined)
+
+
+def replay_saved_traces(inp,raw,folder):
+    """Read every saved row and reconstruct measured positions without stepping."""
+    goal,_,problem=task_definition(inp.task,__import__('tools.platform_registry',fromlist=['registry']).registry())
+    scene=assemble_physical(inp,physics_for(inp));scene['control']=dict(tension_execution_mode='passive_fixed_payout_v1',
+        solreflimit=goal.solreflimit,solimplimit=goal.solimplimit)
+    native=PassiveModel(physics_for(inp),plain(problem),scene=scene);m=native.model;data=mujoco.MjData(m)
+    native.design_components=inp.robot.structure.data['components']
+    capacities=np.array([t['force_limit_n'] for t in native.physics['tendons']])
+    rows_checked=0;forwards=0;route_checks=0;maximum=0.;dt=inp.task.timing.timestep_s
+    for trace,episode in zip(raw['trace_files'],raw['episodes']):
+        path=Path(folder)/trace['path']
+        with path.open('rb') as stream:identity=hashlib.file_digest(stream,'sha256').hexdigest()
+        if identity!=trace['sha256'] or path.stat().st_size!=trace['bytes']:raise ValueError('SAVED_TRACE_BYTES_MISMATCH')
+        expected={round(r['time_s']/dt):r for r in episode['samples']+episode['qualification_samples']}
+        with path.open(newline='') as stream:
+            count=0
+            for count,row in enumerate(csv.DictReader(stream),1):
+                t=float(row['time_s']);q=np.array([float(row['qpos_'+str(i)]) for i in range(m.nq)])
+                v=np.array([float(row['qvel_'+str(i)]) for i in range(m.nv)])
+                lengths=np.array([float(row['length_m_'+str(i)]) for i in range(m.ntendon)])
+                tensions=np.array([float(row['tension_n_'+str(i)]) for i in range(m.ntendon)])
+                gaps=np.array([float(row['length_residual_m_'+str(i)]) for i in range(m.ntendon)])
+                force,phase=load_at(goal,native.load(episode['load_condition']),t)
+                disabled=raw['intervention']['tendons'] if t>goal.programs[episode['load_condition']][0].end_s+1e-10 else []
+                enabled=[i for i,name in enumerate(raw['tendon_order']) if name not in disabled]
+                if (abs(t-count*dt)>1e-8 or not np.isfinite(np.r_[q,v]).all()
+                        or row['stage']!=phase or abs(float(row['engine_time_s'])-t)>1e-8
+                        or not np.allclose([float(row['force_'+a+'_n']) for a in 'xyz'],force,rtol=0,atol=1e-12)
+                        or not np.isfinite(np.r_[lengths,tensions,gaps]).all()
+                        or not np.allclose(lengths-native.payout,gaps,rtol=0,atol=1e-12)
+                        or min(tensions)<-goal.multiplier_sign_tolerance_n or np.max(tensions/capacities)>1.
+                        or max([0.]+[gaps[i] for i in enabled])>goal.length_tolerance_m
+                        or int(row['contacts']) or int(row['warnings'])
+                        or float(row['constraint_direction_error_m_rad'])>goal.constraint_direction_tolerance
+                        or float(row['force_map_error_nm'])>goal.force_map_tolerance_nm):
+                    raise ValueError('SAVED_TRACE_STEP_CHECK_FAILED')
+                mujoco.mj_resetData(m,data);data.qpos[:]=q;data.qvel[:]=v;mujoco.mj_forward(m,data);forwards+=1
+                from .route_validation import validate_routes
+                route=validate_routes(native,[q],data=data);route_checks+=route['segment_body_checks']
+                if route['issues']:raise ValueError('SAVED_STATE_ILLEGAL_ROUTE')
+                if count not in expected:continue
+                recorded=expected[count]
+                if not np.allclose(q,recorded['qpos_rad'],rtol=0,atol=1e-14) or not np.allclose(v,recorded['qvel_rad_s'],rtol=0,atol=1e-14):
+                    raise ValueError('SAVED_TRACE_STATE_MISMATCH')
+                positions=np.array([native.point(data,b)[0] for b in native.points])
+                measured=np.array(recorded['material_positions_m']+[recorded['tip_m']])
+                maximum=max(maximum,float(np.max(np.linalg.norm(positions-measured,axis=1))))
+            if count!=trace['physics_steps']:raise ValueError('SAVED_TRACE_ROW_COVERAGE_MISMATCH')
+            rows_checked+=count
+    if maximum>1e-10:raise ValueError('SAVED_STATE_POSITION_RECONSTRUCTION_MISMATCH')
+    return dict(status='verified',integrations=0,raw_identity=digest(raw),traces=raw['trace_files'],
+        rows_checked=rows_checked,route_checked_poses=forwards,maximum_position_difference_m=maximum,
+        cost=dict(model_builds=1,native_forward_calls=forwards,route_checked_poses=forwards,route_segment_body_checks=route_checks,
+            material_point_jacobian_calls=native.cost['material_point_jacobian_calls']))
+
+
+def execute_confirmation(inp,folder,source,source_result,source_execution_id):
+    """Complete numerical scope using the ordinary executor and recorded CSVs."""
+    from extensions.reference.passive_program import confirmation_task
+    from extensions.reference.passive_evaluation_v2 import stiffness,inspect
+    from extensions.reference.contracts import PassiveResponseEvaluationV2
+    ev=PassiveResponseEvaluationV2.model_validate(inp.task.evaluator.parameters.data)
+    folder=Path(folder);started=time.perf_counter();names=source['paired_ablation']['requested_tendons']
+    raw=execute_pair(inp,folder/'independent',names).data.data
+    # Preserve the signed pair before adding the enclosing validation fields.
+    pair=deepcopy(raw);base=baseline_arm(pair)
+    raw['status']='incomplete'
+    certificate=dict(version='passive_numerical_confirmation_v1',source_result=plain(source_result),
+        source_execution_id=source_execution_id,independent_execution_id=folder.name+'/independent',
+        source_raw_identity=digest(source),source_binding=source['physical_binding'],executions={},saved_state_replay={},
+        source_displacements_m={s.load_condition:stiffness(inp.task,baseline_arm(source),s)['displacement_m'] for s in ev.progressive_stiffness})
+    raw['numerical_confirmation']=certificate
+    traces=[dict(t,path='independent/'+t['path']) for t in pair['trace_files']]
+    costs=[pair['cost']]
+    def checkpoint():
+        raw['cost']={k:sum(c.get(k,0) for c in costs) for k in set().union(*(c.keys() for c in costs))}
+        raw['trace_files']=traces;raw['timings_s']['total']=time.perf_counter()-started
+        atomic_json(folder/'passive_progress.json',raw)
+    checkpoint()
+    if inspect(inp.task,base)[0]!='valid' or 'ablation' not in pair['paired_ablation']:return backend_result(inp,raw)
+    for variant in ('half_timestep','initial_perturbation'):
+        effective=confirmation_task(inp.task,variant);varied=inp.model_copy(update=dict(task=effective))
+        value=execute(varied,folder/variant,common_equilibrium=base['unloaded_equilibrium']).data.data
+        certificate['executions'][variant]=dict(task=plain(effective),raw=value,raw_identity=digest(value),execution_id=folder.name+'/'+variant)
+        costs.append(value['cost']);traces.extend(dict(t,path=variant+'/'+t['path']) for t in value['trace_files']);checkpoint()
+        if inspect(effective,value)[0]!='valid':return backend_result(inp,raw)
+    arms=dict(baseline=(inp,base,folder/'independent/baseline'),
+        ablation=(inp,pair['paired_ablation']['ablation'],folder/'independent/ablation'),
+        **{v:(inp.model_copy(update=dict(task=confirmation_task(inp.task,v))),certificate['executions'][v]['raw'],folder/v)
+            for v in ('half_timestep','initial_perturbation')})
+    for name,(effective,value,directory) in arms.items():
+        replay=replay_saved_traces(effective,value,directory);certificate['saved_state_replay'][name]=replay
+        costs.append(replay['cost']);checkpoint()
+    raw['status']=pair['status'];checkpoint()
+    return backend_result(inp,raw)
 
 
 class NoActiveControl:

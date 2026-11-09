@@ -1,0 +1,771 @@
+{
+  "task": {
+    "contract_version": "1.0.0",
+    "task_id": "passive-progressive-stiffness-dev-v1",
+    "task_version": "1.0.0",
+    "name": "Passive progressive stiffness development task",
+    "status": "development_valid",
+    "source": "Registered translation of passive_progressive_stiffness_dev_v1; original development status retained, no benchmark certification. Original canonical protocol SHA256 7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+    "family": "task.passive_response",
+    "goal": {
+      "contract": "reference.passive_response_goal",
+      "version": "2.0.0",
+      "data": {
+        "version": "passive_response_v2",
+        "execution_protocol": "hard_equilibrium_continuous_v1",
+        "unloaded_static_solver": {
+          "max_iterations": 400,
+          "ftol": 1e-13,
+          "length_tolerance_m": 1e-08,
+          "stationarity_tolerance_nm": 1e-06,
+          "complementarity_tolerance_nm": 1e-08,
+          "active_tolerance_m": 1e-07,
+          "rank_relative_tolerance": 1e-08,
+          "hessian_step_rad": 1e-05,
+          "minimum_reduced_eigenvalue": 1e-07
+        },
+        "load_conditions": [
+          "plus_x",
+          "minus_x"
+        ],
+        "programs": {
+          "plus_x": [
+            {
+              "name": "unloaded",
+              "start_s": 0.0,
+              "end_s": 4.0,
+              "force_start_world_n": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 0.5,
+              "observation_window_s": [
+                0.0,
+                4.0
+              ],
+              "scoring_window_s": [
+                3.75,
+                4.0
+              ]
+            },
+            {
+              "name": "low",
+              "start_s": 4.0,
+              "end_s": 8.0,
+              "force_start_world_n": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                0.05,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 4.5,
+              "observation_window_s": [
+                4.0,
+                8.0
+              ],
+              "scoring_window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            {
+              "name": "middle",
+              "start_s": 8.0,
+              "end_s": 12.0,
+              "force_start_world_n": [
+                0.05,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                0.1,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 8.5,
+              "observation_window_s": [
+                8.0,
+                12.0
+              ],
+              "scoring_window_s": [
+                11.75,
+                12.0
+              ]
+            },
+            {
+              "name": "high",
+              "start_s": 12.0,
+              "end_s": 16.0,
+              "force_start_world_n": [
+                0.1,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                0.2,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 12.5,
+              "observation_window_s": [
+                12.0,
+                16.0
+              ],
+              "scoring_window_s": [
+                15.75,
+                16.0
+              ]
+            },
+            {
+              "name": "recovery",
+              "start_s": 16.0,
+              "end_s": 20.0,
+              "force_start_world_n": [
+                0.2,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 16.5,
+              "observation_window_s": [
+                16.0,
+                20.0
+              ],
+              "scoring_window_s": [
+                19.75,
+                20.0
+              ]
+            }
+          ],
+          "minus_x": [
+            {
+              "name": "unloaded",
+              "start_s": 0.0,
+              "end_s": 4.0,
+              "force_start_world_n": [
+                -0.0,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                -0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 0.5,
+              "observation_window_s": [
+                0.0,
+                4.0
+              ],
+              "scoring_window_s": [
+                3.75,
+                4.0
+              ]
+            },
+            {
+              "name": "low",
+              "start_s": 4.0,
+              "end_s": 8.0,
+              "force_start_world_n": [
+                -0.0,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                -0.05,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 4.5,
+              "observation_window_s": [
+                4.0,
+                8.0
+              ],
+              "scoring_window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            {
+              "name": "middle",
+              "start_s": 8.0,
+              "end_s": 12.0,
+              "force_start_world_n": [
+                -0.05,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                -0.1,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 8.5,
+              "observation_window_s": [
+                8.0,
+                12.0
+              ],
+              "scoring_window_s": [
+                11.75,
+                12.0
+              ]
+            },
+            {
+              "name": "high",
+              "start_s": 12.0,
+              "end_s": 16.0,
+              "force_start_world_n": [
+                -0.1,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                -0.2,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 12.5,
+              "observation_window_s": [
+                12.0,
+                16.0
+              ],
+              "scoring_window_s": [
+                15.75,
+                16.0
+              ]
+            },
+            {
+              "name": "recovery",
+              "start_s": 16.0,
+              "end_s": 20.0,
+              "force_start_world_n": [
+                -0.2,
+                0.0,
+                0.0
+              ],
+              "force_end_world_n": [
+                -0.0,
+                0.0,
+                0.0
+              ],
+              "interpolation": "smoothstep",
+              "ramp_until_s": 16.5,
+              "observation_window_s": [
+                16.0,
+                20.0
+              ],
+              "scoring_window_s": [
+                19.75,
+                20.0
+              ]
+            }
+          ]
+        },
+        "protocol_source": {
+          "artifact_id": "7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+          "media_type": "application/json"
+        },
+        "force_sampling": "interval_end",
+        "static_balance_reference": "cold_zero_velocity",
+        "reset": "same_complete_initial_state_each_episode",
+        "initial_source": "fresh_unloaded_hard_equilibrium",
+        "allow_saved_state": false,
+        "unloaded_stage": "unloaded",
+        "solreflimit": [
+          0.004,
+          1
+        ],
+        "solimplimit": [
+          0.999,
+          0.999,
+          0.001,
+          0.5,
+          2
+        ],
+        "length_tolerance_m": 5e-05,
+        "tension_tolerance_n": 1e-07,
+        "multiplier_sign_tolerance_n": 1e-10,
+        "constraint_direction_tolerance": 1e-08,
+        "force_map_tolerance_nm": 1e-10,
+        "allowed_ablation": "disable_selected_passive_limits",
+        "recording": "full_physics_csv",
+        "route_check": "every_physics_step",
+        "qualifications": [
+          {
+            "stage": "unloaded",
+            "window_s": [
+              3.75,
+              4.0
+            ],
+            "tip_speed_max_m_s": 0.001,
+            "monitor_speed_max_m_s": 0.001,
+            "qvel_max_rad_s": 0.01,
+            "tail_drift_max_m": 0.0005,
+            "static_balance_max_nm": 1e-05,
+            "length_excess_max_m": 5e-05,
+            "sampling": "every_physics_step"
+          },
+          {
+            "stage": "low",
+            "window_s": [
+              7.75,
+              8.0
+            ],
+            "tip_speed_max_m_s": 0.001,
+            "monitor_speed_max_m_s": 0.001,
+            "qvel_max_rad_s": 0.01,
+            "tail_drift_max_m": 0.0005,
+            "static_balance_max_nm": 1e-05,
+            "length_excess_max_m": 5e-05,
+            "sampling": "every_physics_step"
+          },
+          {
+            "stage": "middle",
+            "window_s": [
+              11.75,
+              12.0
+            ],
+            "tip_speed_max_m_s": 0.001,
+            "monitor_speed_max_m_s": 0.001,
+            "qvel_max_rad_s": 0.01,
+            "tail_drift_max_m": 0.0005,
+            "static_balance_max_nm": 1e-05,
+            "length_excess_max_m": 5e-05,
+            "sampling": "every_physics_step"
+          },
+          {
+            "stage": "high",
+            "window_s": [
+              15.75,
+              16.0
+            ],
+            "tip_speed_max_m_s": 0.001,
+            "monitor_speed_max_m_s": 0.001,
+            "qvel_max_rad_s": 0.01,
+            "tail_drift_max_m": 0.0005,
+            "static_balance_max_nm": 1e-05,
+            "length_excess_max_m": 5e-05,
+            "sampling": "every_physics_step"
+          },
+          {
+            "stage": "recovery",
+            "window_s": [
+              19.75,
+              20.0
+            ],
+            "tip_speed_max_m_s": 0.001,
+            "monitor_speed_max_m_s": 0.001,
+            "qvel_max_rad_s": 0.01,
+            "tail_drift_max_m": 0.0005,
+            "static_balance_max_nm": 1e-05,
+            "length_excess_max_m": 5e-05,
+            "sampling": "every_physics_step"
+          }
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0,
+            0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0,
+            0,
+            0.5
+          ],
+          "quaternion_wxyz": [
+            0.7071067811865475,
+            0.0,
+            0.7071067811865475,
+            0.0
+          ]
+        }
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [],
+    "physical_problem": {
+      "mode": "passive_unilateral_equilibrium",
+      "gravity": [
+        0,
+        0,
+        -9.81
+      ],
+      "mount_position": [
+        0,
+        0,
+        0.5
+      ],
+      "mount_rotation": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "monitor_s": [
+        0,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9,
+        0.95,
+        1
+      ],
+      "baseline_load": "unloaded",
+      "loads": [
+        {
+          "name": "unloaded",
+          "material_s": 0.7,
+          "force_world_n": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "plus_x",
+          "material_s": 0.7,
+          "force_world_n": [
+            0.2,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "minus_x",
+          "material_s": 0.7,
+          "force_world_n": [
+            -0.2,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "observations": []
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {
+          "qpos_rad": {},
+          "qvel_rad_s": {},
+          "unspecified": "zero"
+        }
+      }
+    },
+    "timing": {
+      "timestep_s": 0.000125,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 20.0,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.passive_response",
+      "version": "2.0.0",
+      "parameters": {
+        "contract": "reference.passive_response_evaluation",
+        "version": "2.0.0",
+        "data": {
+          "bounds": [
+            {
+              "name": "plus_x_low",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "plus_x",
+              "window": "low",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "component",
+              "minimum": 0.006,
+              "direction_world": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "name": "plus_x_high",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "plus_x",
+              "window": "high",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "component",
+              "maximum": 0.025,
+              "direction_world": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "name": "plus_x_residual",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "plus_x",
+              "window": "recovery",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "norm",
+              "maximum": 0.002
+            },
+            {
+              "name": "minus_x_low",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "minus_x",
+              "window": "low",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "component",
+              "minimum": 0.006,
+              "direction_world": [
+                -1,
+                0,
+                0
+              ]
+            },
+            {
+              "name": "minus_x_high",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "minus_x",
+              "window": "high",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "component",
+              "maximum": 0.025,
+              "direction_world": [
+                -1,
+                0,
+                0
+              ]
+            },
+            {
+              "name": "minus_x_residual",
+              "quantity": "material_displacement",
+              "material_s": 0.7,
+              "load_condition": "minus_x",
+              "window": "recovery",
+              "reference_window": "unloaded",
+              "reference_reduction": "mean",
+              "aggregation": "mean_state",
+              "reduction": "norm",
+              "maximum": 0.002
+            }
+          ],
+          "prohibit_contact": true,
+          "progressive_stiffness": [
+            {
+              "load_condition": "plus_x",
+              "stages": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "reference_stage": "unloaded",
+              "material_s": 0.7,
+              "direction_world": [
+                1,
+                0,
+                0
+              ],
+              "denominator_min_m": 1e-06,
+              "denominator_uncertainty_multiplier": 10.0,
+              "stiffness_ratio_min": 1.5,
+              "low_tension_max_n": 0.005,
+              "high_tension_min_n": 0.05,
+              "low_slack_min_m": 1e-07,
+              "high_constraint_residual_max_m": 5e-05
+            },
+            {
+              "load_condition": "minus_x",
+              "stages": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "reference_stage": "unloaded",
+              "material_s": 0.7,
+              "direction_world": [
+                -1,
+                0,
+                0
+              ],
+              "denominator_min_m": 1e-06,
+              "denominator_uncertainty_multiplier": 10.0,
+              "stiffness_ratio_min": 1.5,
+              "low_tension_max_n": 0.005,
+              "high_tension_min_n": 0.05,
+              "low_slack_min_m": 1e-07,
+              "high_constraint_residual_max_m": 5e-05
+            }
+          ],
+          "mechanism": {
+            "high_displacement_increase_min": 1.25,
+            "late_stiffness_ratio_max": 0.8,
+            "require_stable_comparable": true
+          },
+          "numerical_confirmation": {
+            "half_timestep_s": 6.25e-05,
+            "perturbation_rad": 0.001,
+            "max_displacement_difference_m": 0.001,
+            "saved_state_replay": true
+          }
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "plus_x_residual_maximum",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "plus_x__tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      },
+      {
+        "name": "tip_position",
+        "entity": "minus_x__tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        1
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        20.0
+      ]
+    }
+  },
+  "seed": 1
+}

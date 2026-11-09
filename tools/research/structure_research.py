@@ -116,8 +116,8 @@ def finite_time_discovery(configuration):
         paired_required=paired,legal_intervention_tendons=tendons if legal else [],
         intervention_rule='Main selects exact passive limits; both baseline and ablation run every frozen episode. No legal intervention means no paired mechanism certification.',
         per_evaluation_cost=dynamic_cost(configuration,1,paired),
-        initialization_dependency=('Before any integration, original PHS independently repeats the same solve(), native scene, unloaded_static_solver and unloaded_multistart used by unloaded qualification inspect. Changing to finite_time_task_response cannot bypass that initial forward failure. A precheck is optional, and a static pass grants no dynamic acceptance.'
-            if goal.get('execution_protocol')=='phs2d_original_v1' else 'Independent execution uses the frozen task initializer.'),
+        initialization_dependency=('Before integration, repeat the frozen unloaded hard-equilibrium solve, native scene and static solver used by unloaded qualification inspect. Each direction follows its frozen reset and continuity semantics. Finite-time response cannot bypass initialization failure. A static precheck is optional and grants no dynamic acceptance.'
+            if goal.get('execution_protocol') in ('phs2d_original_v1','hard_equilibrium_continuous_v1') else 'Independent execution uses the frozen task initializer.'),
         evaluation_cap='Optional explicit maximum; omitted question/diagnose cap uses the legal minimum. An explicit low cap is rejected without execution.',
         cost_rule='Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.',
         evidence_scope='Complete qualified finite-time numerical observation; static proxies cannot certify dynamic acceptance.')
@@ -393,14 +393,22 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             folder=directory/('dynamic_'+str(index)) if directory else None
             backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder))
             raw=backend.data.data
-            measured=task_metrics(SessionInput.model_validate(cfg).task,raw)
+            task=SessionInput.model_validate(cfg).task
+            if task.goal.data.get('version')=='passive_response_v2':
+                from extensions.reference.passive_evaluation_v2 import metrics
+                # Mathematical response measures the qualified program/pair.
+                # The registered evaluator still requires independent confirmation.
+                measured=metrics(task,raw,check_confirmation=False)
+            else:measured=task_metrics(task,raw)
             components={'evaluator:'+c.name:dict(value=c.observed,passed=c.satisfied,limit=c.limit,unit=c.units)
                 for c in measured['constraints']}
             gap=constraint_gap(task_adapter(cfg).constraint_observations(components),valid_complete=measured['validity']=='valid')
             observation=dict(status='computed' if measured['validity']=='valid' else 'unavailable',
                 value=gap['signed_task_gap'],unit='1',reason=measured.get('reason'),
                 objective_status=gap['objective_status'],
-                task_gap=gap,task_acceptance='unmeasured')
+                task_gap=gap,task_acceptance='unmeasured',independent_numerical_confirmation='unmeasured')
+            observation['diagnostic_task_gap']=task_adapter(cfg).diagnostic_task_gap(raw,plain(query.candidate),
+                pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
             diagnosis=task_adapter(cfg).qualification_diagnosis(raw,None,
                 pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
             if diagnosis:observation['qualification_diagnosis']=diagnosis
@@ -427,7 +435,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             from extensions.tendon_family.passive import PassiveModel
             from extensions.tendon_family.passive_equilibrium import mechanics as constrained_mechanics
             from extensions.tendon_family.compiler import resolve
-            goal=cfg['task']['goal']['data'];original=goal.get('execution_protocol')=='phs2d_original_v1'
+            goal=cfg['task']['goal']['data'];original=goal.get('execution_protocol') in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
             scene=None
             if original:
                 from schemas.platform import SessionInput

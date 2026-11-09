@@ -217,6 +217,8 @@ class FamilySpaceV2(FamilySpace):
     serial_assembly: SerialAssemblyRule
     passive_payout_domains_m: dict[str,Domain] = Field(default_factory=dict)
     passive_payout_domain_m: Domain | None = None
+    passive_payout_offset_domain_m: Domain | None = None
+    full_assembly_length_max_m: FiniteFloat | None = Field(default=None,gt=0)
     terminal_payload_anchor: bool = False
     guide_hole_coordinate_domains_m: dict[int,Domain] = Field(default_factory=dict)
     route_coordinate_domains_m: dict[Literal['fixed_base','payload'],dict[int,Domain]] = Field(default_factory=dict)
@@ -228,6 +230,8 @@ class FamilySpaceV2(FamilySpace):
         value=handler(self)
         if not self.passive_payout_domains_m:value.pop('passive_payout_domains_m',None)
         if self.passive_payout_domain_m is None:value.pop('passive_payout_domain_m',None)
+        if self.passive_payout_offset_domain_m is None:value.pop('passive_payout_offset_domain_m',None)
+        if self.full_assembly_length_max_m is None:value.pop('full_assembly_length_max_m',None)
         if not self.terminal_payload_anchor:value.pop('terminal_payload_anchor',None)
         if self.payout_initialization is None:value.pop('payout_initialization',None)
         if self.polygon_vertex_limit==64:value.pop('polygon_vertex_limit',None)
@@ -237,6 +241,11 @@ class FamilySpaceV2(FamilySpace):
 
     @model_validator(mode='after')
     def serial(self):
+        if self.passive_payout_offset_domain_m is not None:
+            if self.passive_payout_domain_m or self.passive_payout_domains_m or self.payout_initialization:
+                raise ValueError('ONE_PASSIVE_PAYOUT_PARAMETERIZATION_REQUIRED')
+            if self.passive_payout_offset_domain_m.minimum is None or self.passive_payout_offset_domain_m.minimum<0:
+                raise ValueError('NONNEGATIVE_ROUTE_LENGTH_OFFSET_REQUIRED')
         if self.payout_initialization and not (self.passive_payout_domain_m or self.passive_payout_domains_m):
             raise ValueError('GEOMETRIC_PAYOUT_INITIALIZATION_REQUIRES_PASSIVE_DOMAIN')
         if self.passive_payout_domain_m is not None:
@@ -284,12 +293,13 @@ class GenerationRequestV2(GenerationRequest):
     controller_recipe: dict = Field(default_factory=dict)
     controller_solver: dict = Field(default_factory=dict)
     payout_lengths_m: dict[str,FiniteFloat] = Field(default_factory=dict)
+    payout_offsets_m: dict[str,FiniteFloat] = Field(default_factory=dict)
     guide_hole_positions_m: dict[str,dict[str,Vec3]] = Field(default_factory=dict)
 
     @model_serializer(mode='wrap')
     def legacy_generation(self,handler):
         result=handler(self)
-        for key in ('controller_recipe','controller_solver','payout_lengths_m','guide_hole_positions_m'):
+        for key in ('controller_recipe','controller_solver','payout_lengths_m','payout_offsets_m','guide_hole_positions_m'):
             if not getattr(self,key):result.pop(key,None)
         return result
 
@@ -315,13 +325,17 @@ class UnsupportedGeneration(ValueError):
 
 def payout_domains(space,tendon_count):
     """Expand the common domain per actual tendon; retain frozen legacy maps."""
-    common=getattr(space,'passive_payout_domain_m',None)
+    common=getattr(space,'passive_payout_offset_domain_m',None) or getattr(space,'passive_payout_domain_m',None)
     return ({'tendon_'+str(i):common for i in range(tendon_count)} if common is not None
         else getattr(space,'passive_payout_domains_m',{}))
 
 
 def passive_space(space):
-    return bool(getattr(space,'passive_payout_domain_m',None) or getattr(space,'passive_payout_domains_m',{}))
+    return bool(getattr(space,'passive_payout_offset_domain_m',None) or getattr(space,'passive_payout_domain_m',None) or getattr(space,'passive_payout_domains_m',{}))
+
+
+def payout_parameter(space):
+    return 'payout_offsets_m' if getattr(space,'passive_payout_offset_domain_m',None) is not None else 'payout_lengths_m'
 
 
 def validate_request(space, request):
@@ -338,13 +352,15 @@ def validate_request(space, request):
     if not in_bounds(request.tendon_count,space.executable_tendon_count_bounds):
         raise UnsupportedGeneration('tendon_count='+str(request.tendon_count)+'; outside current executable envelope')
     payouts=payout_domains(space,request.tendon_count)
-    selected=getattr(request,'payout_lengths_m',{})
+    field=payout_parameter(space);selected=getattr(request,field,{})
+    if getattr(request,'payout_offsets_m' if field=='payout_lengths_m' else 'payout_lengths_m',{}):
+        raise ValueError('PAYOUT_PARAMETERIZATION_MISMATCH')
     if selected and not payouts:raise ValueError('PAYOUT_REQUIRES_FROZEN_PASSIVE_ASSEMBLY_GRANT')
     if payouts:
         if set(payouts)!={'tendon_'+str(i) for i in range(request.tendon_count)}:raise ValueError('PAYOUT_DOMAINS_MUST_MATCH_SELECTED_TOPOLOGY')
         for key,domain in payouts.items():
-            if not domain.positive:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
-            domain.check(selected.get(key,domain.default),'payout_lengths_m.'+key)
+            if field=='payout_lengths_m' and not domain.positive:raise ValueError('POSITIVE_PAYOUT_DOMAIN_REQUIRED')
+            domain.check(selected.get(key,domain.default),field+'.'+key)
         if set(selected)-set(payouts):raise ValueError('UNKNOWN_PAYOUT_TENDON')
     if space.conditional_rules == 'base_only_consecutive_spans_v1' and any(
             span.first_segment != 0 for span in request.spans):
@@ -437,7 +453,12 @@ def decision_summary(value, evidence, operations):
     result['executable_domain']=dict(segment_counts=frozen['executable_segment_counts'],
         tendon_count_bounds=frozen['executable_tendon_count_bounds'],
         scope='Registered generator envelope; backend/model/controller admission remains candidate-specific')
-    if getattr(space,'passive_payout_domain_m',None) is not None:
+    if getattr(space,'passive_payout_offset_domain_m',None) is not None:
+        result['passive_payout_offset_domain_m']=plain(space.passive_payout_offset_domain_m)
+        result['executable_domain'].update(payout_bound_tendon_counts=list(range(
+            space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)),
+            payout_rule='Each actual tendon has payout_offsets_m.tendon_i; fixed payout is its own zero-state routed length plus that offset. Geometry changes recompute the routed reference length.')
+    elif getattr(space,'passive_payout_domain_m',None) is not None:
         result['passive_payout_domain_m']=plain(space.passive_payout_domain_m)
         result['executable_domain'].update(payout_bound_tendon_counts=(list(range(
             space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)) if space.executable_tendon_count_bounds[1] is not None else None),
@@ -450,6 +471,8 @@ def decision_summary(value, evidence, operations):
     result['candidate_specific_conditions']=['Selected topology and segment indices',
         'Route/section/attachment/guide clearance and valid mesh',
         'Backend model dimensions, tendon order and supported controller/solver']
+    if getattr(space,'full_assembly_length_max_m',None) is not None:
+        result['full_assembly_length_max_m']=space.full_assembly_length_max_m
     result['currently_unavailable']=dict(
         tendon_counts=([i for i in range(space.tendon_count_bounds[0],space.tendon_count_bounds[1]+1)
             if not in_bounds(i,space.executable_tendon_count_bounds)] if space.tendon_count_bounds[1] is not None else []),
@@ -502,7 +525,7 @@ def resolved_request(value, request):
         design,_,_=generate_family(dict(space=value,request=params))
         for k,v in design['fixed_payout_lengths_m'].items():params.setdefault('payout_lengths_m',{}).setdefault(k,v)
     else:
-        for k,d in payout_domains(space,r.tendon_count).items():params.setdefault('payout_lengths_m',{}).setdefault(k,d.default)
+        for k,d in payout_domains(space,r.tendon_count).items():params.setdefault(payout_parameter(space),{}).setdefault(k,d.default)
     if isinstance(space,FamilySpaceV2) and space.guide_hole_coordinate_domains_m:
         # Materialize the current real holes, not independent invented sites.
         # This preserves a selected parent's exact physical routing when edited.
@@ -530,7 +553,7 @@ def parameter_capabilities(value, request):
         search_group=('lengths' if path.startswith('segments.') and path.endswith('.length_m') else
             'sections' if path.startswith('segments.') and '.sections.' in path else
             'materials' if path.startswith('segments.') else
-            'payout' if path.startswith('payout_lengths_m.') else
+            'payout' if path.startswith(('payout_lengths_m.','payout_offsets_m.')) else
             'routing' if category=='routing' else None)
         rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,current_value=current,search_group=search_group,
             **(dict(minimum=domain.minimum,maximum=domain.maximum,default=domain.default) if domain else {}),
@@ -559,6 +582,15 @@ def parameter_capabilities(value, request):
         d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.';choice=params['segments'][str(i)]
         source=f'segment_domains.{i}' if i in space.segment_domains else 'segment_domain'
         for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k),source=source+'.'+k)
+        if isinstance(space,FamilySpaceV2):
+            prototype=next(c for c in space.assembly.components if c.id==(
+                space.serial_assembly.root_segment if i==0 else space.serial_assembly.repeated_segment))
+            for k,value in zip(('curvature_y_rad_m','curvature_z_rad_m'),prototype.natural_curvature_rad_m):
+                if k not in d.physical_domains:
+                    add(root+'physical_parameters.'+k,'material_geometry','number','rad/m',
+                        Domain(minimum=value,maximum=value,default=value),
+                        reason='Fixed inherited prototype value; no variable domain is granted by this frozen FamilySpace.',source='assembly.components.'+prototype.id+'.natural_curvature_rad_m')
+                    rows[-1]['current_value']=value
         for k,domain in d.physical_domains.items():
             unit='kg/m^3' if k=='density_kg_m3' else 'N*m^2*s' if k.startswith('viscosity') else 'rad/m' if k.startswith('curvature') else 'rad'
             effective=True
@@ -591,7 +623,8 @@ def parameter_capabilities(value, request):
             lo,hi=space.serial_assembly.cell_count_bounds
             add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells),reason='Numerical model resolution, not a physical structural gradient')
     for k,d in payout_domains(space,params['tendon_count']).items():
-        add('payout_lengths_m.'+k,'assembly','number','m',d,source=(
+        add(payout_parameter(space)+'.'+k,'assembly','number','m',d,source=(
+            'passive_payout_offset_domain_m' if getattr(space,'passive_payout_offset_domain_m',None) is not None else
             'passive_payout_domain_m' if getattr(space,'passive_payout_domain_m',None) is not None else 'passive_payout_domains_m.'+k))
     for k,d in space.tendon_domains.items():
         reason={'length_servo_gain_n_m':'Ideal tension bypasses the length servo',

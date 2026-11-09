@@ -33,7 +33,9 @@ def coupled_search_summary(value, reference):
 
 
 def task_diagnosis(value, reference, *, detailed=False):
-    """Project recorded TaskGap rows; never infer missing measurements or peaks."""
+    """Project formal and deterministic diagnostic facts as separate scopes."""
+    from tools.research.feedback import diagnostic_task_gap
+    diagnostic=diagnostic_task_gap(value,reference)
     research=value.get('structure_research') or {}
     gap=(research.get('baseline') or {}).get('task_gap')
     pointer='/structure_research/baseline/task_gap'
@@ -42,15 +44,23 @@ def task_diagnosis(value, reference, *, detailed=False):
     if gap is None and (value.get('acceptance') or {}).get('constraint_observations'):
         from tools.research.feedback import task_gap
         gap=task_gap(value);pointer='/acceptance/constraint_observations'
+    formal_gap=gap
+    if diagnostic is not None:
+        gap=diagnostic
+        pointer=('/diagnostic_task_gap' if value.get('diagnostic_task_gap') is not None else
+            '/structure_research/records/0/observation/diagnostic_task_gap' if
+            (research.get('records',[{}])[0].get('observation') or {}).get('diagnostic_task_gap') is not None else
+            '/structure_research/records/0/mechanics/dynamic_execution')
     if gap is None:return None
     rows=gap.get('constraints',[]);conditions={}
     fields=('constraint_id','signal','observed_value','bound','bound_type','unit',
-        'normalized_violation','passed','time_window','time_s','frame','material_s')
+        'normalized_violation','passed','time_window','time_s','frame','material_s','sample_time','missing_reason',
+        'source_pointer','source_reference','reference_window','reference_reduction','aggregation')
     for i,row in enumerate(rows):
         condition=row.get('condition_id') or row.get('load_condition') or 'unknown'
         location=pointer+('/'+str(i) if pointer.endswith('constraint_observations') else '/constraints/'+str(i))
         observation={k:deepcopy(row.get(k)) for k in fields}
-        observation['source']=dict(reference=reference,pointer=location)
+        observation['source']=dict(reference=row.get('source_reference') or reference,pointer=row.get('source_pointer',location))
         conditions.setdefault(condition,[]).append(observation)
     projected=[]
     for condition,observations in conditions.items():
@@ -67,6 +77,8 @@ def task_diagnosis(value, reference, *, detailed=False):
             failed_constraint_count=sum(r['passed'] is False for r in observations),
             unknown_constraint_count=sum(r['passed'] is None for r in observations),
             **({'constraints':observations} if detailed else {'observations':list(representatives.values())})))
+    numeric=[r for r in rows if isinstance(r.get('normalized_violation'),(int,float))]
+    worst=max((r['normalized_violation'] for r in numeric),default=None)
     routes=[]
     for i,record in enumerate(research.get('records',[])):
         execution=(record.get('mechanics') or {}).get('dynamic_execution') or {}
@@ -76,9 +88,18 @@ def task_diagnosis(value, reference, *, detailed=False):
             routes.append(dict(record_index=i,condition_id=episode.get('load_condition'),
                 **{k:deepcopy(route.get(k)) for k in ('status','checked_poses','first_issue')},
                 source=dict(reference=reference,pointer=f'/structure_research/records/{i}/mechanics/dynamic_execution/episodes/{j}/route_geometry')))
+    qualification=deepcopy((research.get('baseline') or {}).get('qualification_diagnosis'))
+    if qualification:
+        for item in [qualification,*qualification.get('failed_qualifications',[])]:
+            if item.get('source') is not None:item['source']['reference']=reference
     return dict(status='recorded_task_diagnosis',candidate=value.get('candidate'),
         task_identity=(value.get('binding') or {}).get('task_identity'),model_identity=value.get('model_identity'),
-        valid_complete=gap.get('valid_complete'),comparable=gap.get('comparable'),
+        diagnostic_status=diagnostic.get('status') if diagnostic else None,
+        diagnostic_maximum_normalized_violation=worst if diagnostic else None,
+        diagnostic_worst_constraints=[deepcopy(r) for r in numeric if r['normalized_violation']==worst] if diagnostic else [],
+        qualification=qualification,
+        formal_task_gap={k:deepcopy((formal_gap or {}).get(k)) for k in ('valid_complete','comparable','signed_task_gap','accepted')},
+        valid_complete=(formal_gap or {}).get('valid_complete'),comparable=(formal_gap or {}).get('comparable'),
         maximum_normalized_violation=gap.get('signed_task_gap'),hard_gate_status=gap.get('hard_gate_status'),
         conditions=projected,route_geometry=routes,source=dict(reference=reference,pointer=pointer),
         detail_query=dict(reference=reference,view='working_set',pointer='/task_diagnosis'),
@@ -91,6 +112,24 @@ def task_diagnosis(value, reference, *, detailed=False):
         limitations=['Recorded constraints only; absent values, units and exact peak times remain unknown.',
             'A scoring window is not a measured extremum time. Qualification and independent acceptance remain separate.',
             'Compact observations show the worst recorded normalized violation per signal and bound type; exact rows are available on demand.'])
+
+
+def compact_task_diagnosis(diagnosis):
+    """Few numerical ranges for history; complete per-condition facts stay readable."""
+    if not diagnosis:return None
+    groups={}
+    for condition in diagnosis['conditions']:
+        for row in condition.get('observations',condition.get('constraints',[])):
+            if row['observed_value'] is None:continue
+            key=(row['signal'],row['bound_type'],row['unit'])
+            groups.setdefault(key,[]).append(row)
+    return dict(diagnostic_status=diagnosis.get('diagnostic_status'),
+        formal_task_gap=diagnosis.get('formal_task_gap'),
+        worst_constraints=diagnosis.get('diagnostic_worst_constraints',[])[:2],
+        metrics=[dict(signal=key[0],bound_type=key[1],unit=key[2],
+            minimum=min(r['observed_value'] for r in rows),maximum=max(r['observed_value'] for r in rows),
+            bounds=list(dict.fromkeys(r['bound'] for r in rows)),scope='per-condition representative observations')
+            for key,rows in groups.items()],detail_query=diagnosis['detail_query'])
 
 
 def acceptance_certificate(host, reference):

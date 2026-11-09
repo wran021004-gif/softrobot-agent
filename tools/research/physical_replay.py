@@ -400,6 +400,11 @@ def calculate(request,folder):
                 store.artifact(request['source_reference'])!=expected):
             raise ValueError('PASSIVE_WORKER_SOURCE_BINDING_MISMATCH')
         options=request['passive_source'].get('execution',{})
+        if options.get('validation_source'):
+            from extensions.tendon_family.passive_execution import execute_confirmation
+            source_result,source_raw=resolve_passive_confirmation(store,request['study_id'],request['candidate'],request['configuration'],options)
+            return execute_confirmation(SessionInput.model_validate(request['configuration']),folder,source_raw,
+                options['validation_source'],source_result['execution_id']).data.data
         initial=resolve_passive_state(store,request['study_id'],request['candidate'],request['configuration'],options)
         if options.get('passive_ablation'):
             from extensions.tendon_family.passive_execution import execute_pair
@@ -426,7 +431,7 @@ def passive_source(configuration,candidate,options=None):
     from extensions.reference.passive_response import goal_definition
     from tools.research.contracts import PhysicalReplayRequest
     parsed=PhysicalReplayRequest.model_validate(dict(candidate=candidate,**(options or {})))
-    options={k:plain(getattr(parsed,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode') if getattr(parsed,k) is not None}
+    options={k:plain(getattr(parsed,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode','validation_source') if getattr(parsed,k) is not None}
     inp=SessionInput.model_validate(configuration);goal=goal_definition(inp.task)
     if options and goal.version!='passive_response_v2':raise ValueError('PASSIVE_V2_EXECUTION_CHOICES_REQUIRED')
     names=options.get('passive_ablation',[])
@@ -434,7 +439,25 @@ def passive_source(configuration,candidate,options=None):
             or set(names)-{t['entity'] for t in physics_for(inp)['tendons']}):raise ValueError('EXACT_GRANTED_PASSIVE_LIMIT_NAMES_REQUIRED')
     if bool(options.get('initial_state_result'))!=bool(options.get('initial_state_episode')):raise ValueError('SAVED_STATE_RESULT_AND_EPISODE_REQUIRED')
     if options.get('initial_state_result') and not goal.allow_saved_state:raise ValueError('SAVED_STATE_NOT_GRANTED_BY_TASK')
+    if options.get('validation_source'):
+        if len(options)!=1 or not inp.task.evaluator.parameters.data.get('numerical_confirmation'):
+            raise ValueError('EXCLUSIVE_FROZEN_NUMERICAL_CONFIRMATION_SOURCE_REQUIRED')
     return dict(**source_binding(configuration),candidate=plain(candidate),**(dict(execution=options) if options else {}))
+
+
+def resolve_passive_confirmation(store,study_id,candidate,configuration,options):
+    """Owned source results only; no user-supplied metric or historical seed."""
+    from extensions.reference.passive_evaluation_v2 import metrics
+    from extensions.tendon_family.passive_execution import source_binding
+    ref=options['validation_source'];current=store.session(study_id)['state']
+    if ref not in current.get('physical_replays',[]):raise ValueError('CURRENT_OWNED_CONFIRMATION_SOURCE_REQUIRED')
+    result=store.artifact(ref);raw=store.artifact(result['raw_reference'])
+    if (result.get('owning_study')!=study_id or result.get('candidate')!=candidate or result.get('status')!='evaluated'
+            or not result.get('boundary',{}).get('termination_confirmed') or raw.get('numerical_confirmation')
+            or raw.get('physical_binding')!=source_binding(configuration)
+            or metrics(SessionInput.model_validate(configuration).task,raw,check_confirmation=False).get('task_success') is not True):
+        raise ValueError('COMPLETE_MATCHED_PASSING_PAIRED_SOURCE_REQUIRED')
+    return result,raw
 
 
 def resolve_passive_state(store,study_id,candidate,configuration,options):
@@ -480,10 +503,12 @@ def dispatch(host,arguments,key,*,role='development',selected=None,plan_referenc
     route='passive_protocol' if passive else 'fixed_tension'
     if cfg['task'].get('physical_problem') and not passive:raise ValueError('PASSIVE_INDEPENDENT_EVALUATOR_NOT_REGISTERED')
     if passive:
-        options={k:plain(getattr(arguments,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode') if getattr(arguments,k) is not None}
+        options={k:plain(getattr(arguments,k)) for k in ('passive_ablation','initial_state_result','initial_state_episode','validation_source') if getattr(arguments,k) is not None}
         if arguments.source and not options:options=host.store.artifact(arguments.source).get('execution',{})
         expected=passive_source(cfg,candidate,options)
         resolve_passive_state(host.store,host.run_id,candidate,cfg,options)
+        if options.get('validation_source'):
+            resolve_passive_confirmation(host.store,host.run_id,candidate,cfg,options);episodes*=4
         if options.get('passive_ablation'):episodes*=2
         if cfg['task']['goal']['data'].get('version')=='passive_response_v2':
             host.store.artifact(cfg['task']['goal']['data']['protocol_source'])
@@ -675,9 +700,16 @@ def recover(host):
     if p.get('route')=='passive_protocol' and raw.get('status')!='completed' and (folder/'passive_progress.json').exists():
         if not raw.get('unobserved_work_possible'):
             partial=read(folder/'passive_progress.json')
-            partial.update(status='incomplete',reason=raw.get('reason','worker_interrupted'))
+            partial.update(status='incomplete',reason=raw.get('reason','worker_interrupted'),
+                cost_observation_scope='last_durable_observed_lower_bounds',unobserved_work_possible=True)
             if raw.get('numerical_failure'):partial['numerical_failure']=raw['numerical_failure']
             raw=partial
+    if p.get('route')=='passive_protocol' and raw.get('kind')!='passive_dynamic_execution_v2' and (folder/'independent/passive_progress.json').exists():
+        partial=read(folder/'independent/passive_progress.json')
+        partial['trace_files']=[dict(t,path='independent/'+t['path']) for t in partial.get('trace_files',[])]
+        partial.update(status='incomplete',reason=raw.get('reason','validation_worker_interrupted'),
+            cost_observation_scope='last_durable_observed_lower_bounds',unobserved_work_possible=True)
+        raw=partial
     # Preserve compiled-load and first-contact facts even if a later engine call raises.
     if (folder/'rigid_tool_binding.json').exists():raw.setdefault('rigid_tool_binding',read(folder/'rigid_tool_binding.json'))
     if (folder/'first_environment_contact.json').exists():raw.setdefault('environment_contact',read(folder/'first_environment_contact.json'))
@@ -708,7 +740,7 @@ def recover(host):
                         owning_study=host.run_id,parent_boundary=boundary,parent_implementation=p['implementation'])
                     passive_l2['arms'][arm]=dict(raw_reference=ref,receipt_reference=plain(host.store.put(db,receipt)))
             accounted={v['path'] for v in raw.get('trace_files',[])}
-            for path in sorted(folder.glob('*/episode_*.csv')):
+            for path in sorted(folder.rglob('episode_*.csv')):
                 relative=path.relative_to(folder).as_posix()
                 if relative in accounted:continue
                 body=path.read_bytes()
@@ -762,6 +794,8 @@ def recover(host):
         backend_reference=backend_reference,mathematical_reintegrations=0,rl_actions=0,nmpc_updates=0)
     if p.get('plan_reference'):final['plan_reference']=p['plan_reference']
     if raw.get('kind')=='passive_dynamic_execution_v2':
+        from tools.research_tasks import task_adapter
+        final['diagnostic_task_gap']=task_adapter(cfg).diagnostic_task_gap(raw,p['candidate'],raw_ref)
         final['physical_cost_status']=dict(observation_scope=raw.get('cost_observation_scope',raw.get('cost',{}).get('observation_scope','observed_native_counts')),
             unobserved_work_possible=raw.get('unobserved_work_possible',raw.get('cost',{}).get('unobserved_work_possible',False)))
     if passive_l2 is not None:final['passive_l2']=passive_l2

@@ -95,6 +95,38 @@ def parse_search(query):
     return contract.model_validate(raw)
 
 
+def search_failure(query, error):
+    """Compact repair facts derived from the same request contract as execution."""
+    from pydantic import ValidationError
+    from tools.research.contracts import ScientificStructureSearch
+    raw=plain(query)
+    contract=ScientificStructureSearch if raw.get('version')=='scientific_structure_search_v1' else {
+        'family_mixed_search_v1':FamilyMixedSearch,'family_mixed_search_v2':FamilyMixedSearchV2}.get(raw.get('version'),Search)
+    try:contract.model_validate(raw)
+    except ValidationError as exc:
+        issues=[];schema=contract.model_json_schema()
+        def choices(node):
+            if '$ref' in node:node=schema['$defs'][node['$ref'].rsplit('/',1)[-1]]
+            if 'const' in node:return [node['const']]
+            if 'enum' in node:return node['enum']
+            values=[v for branch in node.get('anyOf',[]) for v in choices(branch) or []]
+            return values or None
+        for issue in exc.errors(include_url=False,include_input=False,include_context=False)[:3]:
+            path=issue['loc'];node=schema
+            for part in path:
+                if '$ref' in node:node=schema['$defs'][node['$ref'].rsplit('/',1)[-1]]
+                node=node.get('properties',{}).get(str(part),{})
+            issues.append(dict(field='search'+''.join('.'+str(v) for v in path),
+                error_code=issue['type'],expected=issue['msg'][:200],
+                legal_values=choices(node)))
+        return dict(error_code='INVALID_SEARCH_REQUEST',issues=issues,retryable=True)
+    code,_,coordinate=str(error).partition(':')
+    field='search.bounds' if 'BOUND' in code else 'search.previous_candidate_ref' if 'SEED_NOT_REPRESENTABLE' in code else 'search'
+    expected=('Supply a finite ordered local interval within the frozen physical domain for '+coordinate.strip() if 'BOUND' in code else
+        'Use generate or matched structural comparison to preserve the complete geometry.' if 'SEED_NOT_REPRESENTABLE' in code else str(error)[:200])
+    return dict(error_code=code,issues=[dict(field=field,expected=expected,legal_values=None)],retryable=True)
+
+
 def coupled_problem(host, query, count):
     """Bind one Main-selected block to the existing mechanism analysis worker."""
     from tools.research.contracts import MechanismStudy,PhysicalMechanismTarget
@@ -108,7 +140,7 @@ def coupled_problem(host, query, count):
     if not spec.get('mathematical_methods',{}).get(METHOD):raise ValueError('ORIGINAL_MECHANISM_METHOD_GRANT_REQUIRED')
     if q.effect_semantics not in ('mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'):
         raise ValueError('MATCHED_INTERACTION_BACKEND_UNAVAILABLE_FOR_EFFECT: '+q.effect_semantics)
-    if q.requested_budget is not None and q.requested_budget<4:raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_QUESTION_CAP')
+    if q.requested_budget not in (None,4):raise ValueError('COUPLED_BLOCK_REQUIRES_EXACTLY_FOUR_EVALUATIONS')
     c=verify_candidate(host,query.previous_candidate_ref);problem=c['configuration']['task'].get('physical_problem')
     if c['family_space_identity']!=query.family_space_identity:raise ValueError('BASELINE_FAMILY_IDENTITY_MISMATCH')
     if problem:
@@ -208,7 +240,7 @@ def request_guidance(spec):
         guidance['coupled_block']=dict(version='family_mixed_search_v2',method='bounded_coupled_block_v1',
             family_space_identity=spec['family_space_identity'],max_evaluations=4,
             required=['previous_candidate_ref','analysis'],
-            analysis='ScientificStructureV4 operation interact; Main selects exactly two continuous parameter IDs and a registered scalar target. All nonresearch parameters and conditions remain fixed. M2/M3 interaction is unavailable.',
+            analysis='CoupledInteraction operation interact only; exactly two continuous parameter IDs and a registered scalar target. Four points: baseline, A only, B only, A+B. max_evaluations=4; analysis.requested_budget is omitted or 4. All other parameters and conditions remain fixed. Repeat in a new Plan for further exploration. M2/M3 interaction is unavailable.',
             resources='One existing mechanism worker with whole-four-point admission and original accounting; no independent acceptance or automatic promotion.')
     if spec['family_space'].get('version')=='serial_family_space_v2':
         space=spec['family_space']; rule=space['serial_assembly']
@@ -238,6 +270,7 @@ def request_guidance(spec):
     if enabled(spec):
         guidance['search']=dict(tool='research_plan',action='search',payload='search',version='scientific_structure_search_v1',
             required=['research_goal','design_variable_groups','evaluation_model','control_treatment','structure_search_effort'],
+            evaluation_budget_location='search.structure_search_effort.max_evaluations; the compiled family_mixed_search_v1 uses search.max_evaluations internally',
             structural_groups=[g for g in grant['variable_groups'] if g!='control'],
             native='structure_control_codesign + native_mujoco + reoptimized, with control_search_effort; full frozen task and every constraint retained.',
             proxy='structural_capability_screening + mathematical_proxy, explicit proxy_objective. CONIC task_violation requires proxy_optimized (affine-model control solve); static/held-input objectives require not_optimized. No Native substitution.',
@@ -246,6 +279,7 @@ def request_guidance(spec):
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),
             applicable_span_strategies=span_strategies(spec['family_space']),
             initialization='Main chooses explicit discrete starts; continuous defaults are numerical starting assumptions. An optional representable candidate preserves its structure coordinates; unsupported routes/sections require generate or a fresh search. Every condition receives fresh controls.')
+        guidance['search']['required'].extend(name for name in ('segment_counts','tendon_counts') if grant[name] is None)
     if any(m.startswith('passive_') for m in grant.get('evaluation_modes',[])):
         guidance['search'].update(passive=dict(research_goal='passive_structure_research',
             evaluation_models=[m for m in grant['evaluation_modes'] if m.startswith('passive_')],
@@ -263,7 +297,7 @@ def request_guidance(spec):
             materials={'young_pa':segment['young_pa'],**{'physical.'+k:v for k,v in segment.get('physical_domains',{}).items()}},
             sections={'section.'+kind+'.'+key:domain for kind,dimensions in segment['section_dimensions_m'].items() for key,domain in dimensions.items()},
             routing={'routing.'+k:v for k,v in space['routing_domains'].items()},
-            payout={'payout':space.get('passive_payout_domain_m') or space.get('passive_payout_domains_m')},
+            payout={'payout':space.get('passive_payout_offset_domain_m') or space.get('passive_payout_domain_m') or space.get('passive_payout_domains_m')},
             scope='Exact Search.bounds keys and frozen common domains, not evidence_read group names. Every selected open coordinate needs a finite interval; materials includes physical.* as well as young_pa. Section dimension bounds are needed for selected section types (or inherited prototype kinds when types are omitted). Polygon scaling additionally uses polygon_scale_m; its frozen coordinate domain is segment_domain.polygon_coordinate_m. Per-segment/channel overrides and original admission still apply.')
         guidance['search']['evaluation_cost']='For passive_equilibrium, max_evaluations counts condition-analysis entries: each candidate costs the selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads evaluate only one candidate. For passive_task_response, one mathematical entry runs the complete frozen task, with every actual episode and integration step separately charged; omit the equilibrium-only diagnostic_load_conditions. Main chooses finite effort with that full-task cost in mind; no interval or variable is selected here.'
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)

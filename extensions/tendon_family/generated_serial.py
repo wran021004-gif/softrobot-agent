@@ -238,7 +238,7 @@ class GeometryFailure(ValueError):
 
 def generate_family(value):
     """Expand polar spans; v1 preserves its assembly, v2 expands named prototypes."""
-    from .family_space import parse_build, Span, validate_request, FamilyBuildV2,payout_domains
+    from .family_space import parse_build, Span, validate_request, FamilyBuildV2,payout_domains,payout_parameter
     from .sections import properties
     build=parse_build(value);space=build.space;r=build.request
     validate_request(space,r)
@@ -397,10 +397,15 @@ def generate_family(value):
     payouts=payout_domains(space,r.tendon_count)
     if payouts:
         design['actuators']=[]
-        design['fixed_payout_lengths_m']={k:r.payout_lengths_m.get(k,d.default) for k,d in payouts.items()}
+        # Positive temporary lengths permit compilation of the route geometry.
+        design['fixed_payout_lengths_m']={k:(1. if payout_parameter(space)=='payout_offsets_m' else r.payout_lengths_m.get(k,d.default)) for k,d in payouts.items()}
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
     result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
+    if payout_parameter(space)=='payout_offsets_m':
+        lengths=dict(zip([t['id'] for t in design['tendons']],result[2]['reference_lengths_m']))
+        design['fixed_payout_lengths_m']={k:lengths[k]+r.payout_offsets_m.get(k,d.default) for k,d in payouts.items()}
+        result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
     if getattr(space,'payout_initialization',None)=='zero_state_route_length_v1':
         missing=[t['id'] for t in design['tendons'] if t['id'] not in r.payout_lengths_m]
         if missing:
@@ -408,7 +413,12 @@ def generate_family(value):
             for key in missing:design['fixed_payout_lengths_m'][key]=payouts[key].check(lengths[key],'payout_lengths_m.'+key)
             result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
     from .geometry import geometry
-    geometry(result[2],[0.]*len(result[2]['dofs']))  # Reject zero-length resolved spans.
+    zero_geometry=geometry(result[2],[0.]*len(result[2]['dofs']))  # Reject zero-length resolved spans.
+    if getattr(space,'full_assembly_length_max_m',None) is not None:
+        # Use the same undeformed axial tip coordinate as the frozen constructor.
+        tip_position=zero_geometry['tip']
+        if tip_position[0]>space.full_assembly_length_max_m+1e-12:
+            raise ValueError('FULL_UNDEFORMED_ASSEMBLY_LENGTH_EXCEEDED')
     return result
 
 

@@ -38,6 +38,29 @@ def _dominant_metrics(signed, metrics):
         for key,value in signed.items() if value==worst]
 
 
+def diagnostic_task_gap(result, reference=None):
+    """Recompute historical saved trajectories without writing their Store."""
+    def bound(saved):
+        value=deepcopy(saved)
+        value['candidate_identity']=value.get('candidate_identity') or result.get('candidate')
+        for row in value['constraints']:
+            row['candidate_identity']=row.get('candidate_identity') or result.get('candidate')
+            row['definition_reference']=row.get('definition_reference') or result.get('candidate')
+            row['source_reference']=row.get('source_reference') or reference
+        return value
+    if result.get('diagnostic_task_gap') is not None:return bound(result['diagnostic_task_gap'])
+    records=(result.get('structure_research') or {}).get('records',[])
+    if not records:return None
+    record=records[0]
+    saved=(record.get('observation') or {}).get('diagnostic_task_gap')
+    if saved is not None:return bound(saved)
+    cfg=record.get('configuration');raw=(record.get('mechanics') or {}).get('dynamic_execution')
+    if not cfg or raw is None:return None
+    from tools.research_tasks import task_adapter
+    return task_adapter(cfg).diagnostic_task_gap(raw,result.get('candidate'),reference,
+        '/structure_research/records/0/mechanics/dynamic_execution')
+
+
 def task_gap(result):
     """Rank recorded physical metrics only; original acceptance owns validity."""
     if result.get('kind')=='joint_condition_result_v1':return result['task_gap']

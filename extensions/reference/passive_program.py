@@ -33,6 +33,11 @@ def validate_program(task,goal,bounds,problem):
         raise ValueError('EVERY_PASSIVE_EPISODE_REQUIRES_BOUNDS')
     if any(s.load_condition not in goal.load_conditions for s in bounds.progressive_stiffness):raise ValueError('UNKNOWN_STIFFNESS_EPISODE')
     if bounds.mechanism and goal.allowed_ablation=='none':raise ValueError('FROZEN_MECHANISM_INTERVENTION_REQUIRED')
+    if bounds.numerical_confirmation:
+        if (goal.execution_protocol!='hard_equilibrium_continuous_v1' or not bounds.mechanism
+                or goal.recording!='full_physics_csv' or goal.route_check!='every_physics_step'
+                or dt not in (bounds.numerical_confirmation.half_timestep_s,2*bounds.numerical_confirmation.half_timestep_s)):
+            raise ValueError('COMPLETE_HARD_EQUILIBRIUM_NUMERICAL_CONFIRMATION_REQUIRED')
 
 
 def force_at(goal,case,time_s):
@@ -49,6 +54,16 @@ def force_at(goal,case,time_s):
 
 def window_rows(rows,window):
     return [r for r in rows if window[0]-1e-10<=r['time_s']<=window[1]+1e-10]
+
+
+def confirmation_task(task,variant):
+    """The only permitted numerical changes to the frozen physical task."""
+    from schemas.platform import TaskDefinition
+    value=task.model_dump(mode='json');spec=value['evaluator']['parameters']['data']['numerical_confirmation']
+    if variant=='half_timestep':value['timing']['timestep_s']=spec['half_timestep_s']
+    elif variant=='initial_perturbation':value['goal']['data']['initial_perturbation_rad']=spec['perturbation_rad']
+    else:raise ValueError('UNKNOWN_PASSIVE_CONFIRMATION_VARIANT')
+    return TaskDefinition.model_validate(value)
 
 
 def qualification(rows,rule,*,disabled_limits=()):

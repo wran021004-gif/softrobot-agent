@@ -14,6 +14,7 @@ from schemas.platform import EvidenceRef
 from schemas.research_reporting import (EvidenceLocation, EvidenceRelation,
     RecordedField, ReportedMetric, ReporterInterpretation, ScientificReport)
 from tools.platform_store import plain
+from tools.state_io import digest
 from tools.research.core import read_evidence
 from tools.research.contracts import EvidenceQuery, EvidenceIntentQuery, ExperienceQuery
 from tools.research.evidence_views import (result_card,recorded_math_summary,recorded_control_diagnostics,
@@ -345,8 +346,18 @@ def investigate(host, request):
     request['previous_report_references']=previous_reports
     if supporting_plans:request['supporting_plan_references']=[plain(ref) for ref in supporting_plans]
     request['experience_receipts']=[_knowledge_receipt(host,plain(query)) for query in q.experience_queries]
-    # Distinct explicit invocations may ask the identical question again.
-    # Native receipt recovery reuses the saved report instead of calling here.
+    # Same evidence/question/reads reuse the saved report and interpretation.
+    # Source identities and versions stay in artifacts; there is no second cache.
+    request['evidence_question_identity']=digest(dict(report=plain(report),
+        request={k:request.get(k) for k in ('question','focus','constraints','selected_reads','experience_receipts')}))
+    reused=next(((r,v) for r,v in reversed(entries(host,status_only=True)) if
+        (host.store.artifact(r,paths=('request.evidence_question_identity',)).get('request') or {}).get('evidence_question_identity')==request['evidence_question_identity']),None)
+    if reused:
+        ref,saved=reused
+        return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
+            report_reference=ref,question=q.question,result_count=len(report.results),
+            interpretation_status=saved['interpretation_status'],reused=True,
+            detail_access='evidence_read(report_reference); existing source-bound interpretation reused')
     request['invocation_step']=max((e['sequence'] for e in host.store.events(host.run_id)),default=0)+1
     ref=_save(host,report,request=request)
     return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
@@ -711,6 +722,15 @@ def _wire(host, reference, saved):
                 finding['resources']=[r for r in finding['resources'] if r['name'] not in cost_fields]
     compact_report=dict(mode=report.mode,question=report.question,results=findings,
         relations=summary['comparisons'],scope=summary['scope'],limitations=summary['limitations'])
+    versions=current_reports(host,status_only=True)
+    base=saved.get('interpretation_for') or reference
+    position=next((i for i,(r,v) in enumerate(versions) if r==base or v.get('interpretation_for')==base),len(versions))
+    prior_ref=versions[position-1][0] if position else None
+    prior=(prior_ref,host.store.artifact(prior_ref,paths=('report.results',))) if prior_ref else None
+    delta=dict(previous_report=prior[0] if prior else None,
+        new_result_references=[plain(c.identity.result.reference) for c in report.results if not prior or
+            plain(c.identity.result.reference) not in [r['identity']['result']['reference'] for r in prior[1]['report']['results']]],
+        question=report.question)
     return dict(**request_settings(provider),
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Write directly in English. Return JSON with only interpretations, a list '
@@ -732,6 +752,8 @@ def _wire(host, reference, saved):
             'Evidence (supported_explanation/weakened_explanation), Discriminating Evidence (further_investigation), '
             'and Unresolved (unresolved_question) when relevant. For competing hypotheses state distinct predictions '
             'and observations that would weaken each, including parameter coupling and confounders; never select the next action. '
+            'Use evidence_delta to explain what this evidence adds to the previous report; avoid retelling unchanged history. '
+            'Never calculate constraint values, extrema, displacement ratios, normalized violations or scores from CSV or trajectories. Use deterministic task_diagnosis and quantitative_facts; unavailable values stay unknown. '
             'Use task_diagnosis to retain per-condition actual values, bounds, units, small failures and source locations. '
             'Use recorded route_geometry first_issue times and checked poses directly. Contact/length preflight does not certify cable/body route clearance; a recorded time_s=0 failure is not a later-onset defect. '
             'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
@@ -747,7 +769,7 @@ def _wire(host, reference, saved):
             'Ground every interpretation in this Study evidence; advice grants no scientific evidence or permission. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=compact_report,request={k:q[k] for k in ('question','focus','constraints') if k in q},
+                report=compact_report,evidence_delta=delta,request={k:q[k] for k in ('question','focus','constraints') if k in q},
                 selected_reads=_compact_reads(reads,q.get('automatic_reads',[])),source_catalog=catalog,procedural_guidance=guidance,
                 score_comparisons=comparisons),separators=(',',':')))])
 

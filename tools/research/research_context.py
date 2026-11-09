@@ -734,14 +734,14 @@ def execution_preview(host,candidate,evaluations):
         if (values[r['artifact_id']].get('candidate') or values[r['artifact_id']].get('design_candidate'))==candidate]
     qualifications=[(r,v) for r,v in related if (v.get('diagnostic_layers') or {}).get('static_qualification')]
     latest=qualifications[-1] if qualifications else None
-    hard=passive and goal.get('execution_protocol')=='phs2d_original_v1'
+    hard=passive and goal.get('execution_protocol') in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
     failed=bool(latest and latest[1]['diagnostic_layers']['static_qualification']['status']!='passed')
     from tools.research_tasks import passive_registered
     episodes=(len(goal['load_conditions']) if passive_registered(task) else None) if passive else 1
     return dict(candidate=candidate,mode=task['physical_problem']['mode'] if passive else 'active_ideal_tension',
         requirements={k:v for k,v in adapter.execution_requirements().items() if k in
             ('registered_acceptance','execution_admission','known_blockers','protocol_id','physical_inputs')},
-        initializer=('Every full execution repeats the frozen unloaded hard-equilibrium solve and both original starts before loading. A previous initialization failure cannot be bypassed by selecting full ten-case dynamics.' if hard else
+        initializer=('Every full execution requires the frozen unloaded hard-equilibrium solve and its declared episode reset/continuity semantics. Choosing full dynamics cannot bypass initialization failure.' if hard else
             'Frozen passive task initializer and loading protocol.' if passive else adapter.lifecycle()['initialization']),
         control_sources=[e['source'] for e in state(host).get('control_initializations',[]) if e['candidate']==candidate] if not passive else [],
         latest_qualification=(dict(reference=latest[0],**latest[1]['diagnostic_layers']['static_qualification']) if latest else None),
@@ -1238,11 +1238,68 @@ def compact_action_trace(trace):
     return value
 
 
-def trace_entry(row):
+def milestone_facts(host, row):
+    """Bounded projection of actual evidence, separate from authored hypotheses."""
+    from tools.research.evidence_views import task_diagnosis,compact_task_diagnosis
+    references=row.get('result_references',[])
+    facts=dict(candidate=row.get('candidate'),method=row.get('method'),evidence=references)
+    candidate=host.store.artifact(row['candidate']) if isinstance(row.get('candidate'),dict) else {}
+    origin=candidate.get('origin') or {}
+    parent=origin.get('parent') or origin.get('candidate') or origin.get('selected_candidate')
+    construction_plan=(candidate.get('provenance') or {}).get('plan')
+    if construction_plan:
+        construction=host.store.artifact(construction_plan).get('original_plan',{})
+        parent=parent or (construction.get('decision') or {}).get('selected_candidate')
+    # Parent belongs to the original Plan, not an inferred nearest structure.
+    source=row.get('source') or {}
+    plan=host.store.artifact(source['reference']).get('original_plan',{}) if source.get('reference') else {}
+    parent=parent or (plan.get('decision') or {}).get('selected_candidate')
+    if parent==row.get('candidate'):parent=None
+    facts['parent_candidate']=parent
+    changes=[]
+    if parent and candidate.get('parameters'):
+        before=host.store.artifact(parent).get('parameters',{})
+        def compare(a,b,path=''):
+            if isinstance(a,dict) and isinstance(b,dict):
+                for key in sorted(set(a)|set(b)):compare(a.get(key),b.get(key),(path+'.' if path else '')+key)
+            elif isinstance(a,list) and isinstance(b,list) and len(a)==len(b):
+                for i,(x,y) in enumerate(zip(a,b)):compare(x,y,path+'.'+str(i))
+            elif a!=b:
+                changes.append(dict(parameter=path,before=a,after=b,
+                    delta=b-a if type(a) in (int,float) and type(b) in (int,float) else None))
+        compare(before,candidate['parameters'])
+        from tools.research.optimal_capability import family_analysis_parameters
+        units={r['parameter_id']:r.get('unit') for r in family_analysis_parameters(state(host)['spec'],candidate)}
+        for change in changes:change['unit']=units.get(change['parameter'])
+    facts['parameter_changes']=changes[:8]
+    facts['parameter_change_count']=len(changes)
+    facts['results']=[]
+    for ref in references[-1:]:
+        value=host.store.artifact(ref)
+        research=value.get('structure_research') or {}
+        diagnosis=task_diagnosis(value,ref)
+        qualification=(diagnosis or {}).get('qualification') or (research.get('baseline') or {}).get('qualification_diagnosis')
+        if qualification:
+            qualification={k:deepcopy(qualification[k]) for k in ('validity','category','reason','source') if k in qualification}
+            failures=((diagnosis or {}).get('qualification') or (research.get('baseline') or {}).get('qualification_diagnosis') or {}).get('failed_qualifications',[])
+            qualification.update(failed_count=len(failures),failures=[{k:r.get(k) for k in ('load_condition','stage','failed_checks','source')} for r in failures[:2]])
+        facts['results'].append(dict(reference=ref,status=value.get('status'),
+            observable=research.get('target'),value=(research.get('baseline') or {}).get('value'),
+            unit=(research.get('baseline') or {}).get('unit'),task_diagnosis=compact_task_diagnosis(diagnosis),
+            qualification=qualification,
+            task_gap={k:(research.get('baseline',{}).get('task_gap') or value.get('task_gap') or {}).get(k)
+                for k in ('valid_complete','comparable','signed_task_gap','accepted')},
+            cost=research.get('cost') or value.get('actual_resource_consumption') or value.get('cost'),
+            charged_analysis_evaluations=value.get('charged_analysis_evaluations'),
+            charged_numerical_s=value.get('charged_numerical_s')))
+    return facts
+
+
+def trace_entry(row, host=None):
     """One short factual line; original hypotheses and receipts stay in Store."""
     outcome=row['outcome'];execution=outcome.get('execution_feedback') or {}
     status=execution.get('status') or outcome.get('status') or row['execution_status']
-    return dict(step=row['step'],action=row['action'],
+    entry=dict(step=row['step'],action=row['action'],
         text='#'+str(row['step'])+' '+row['action']+((': '+row['method']) if row.get('method') else '')+'; '+str(status),
         execution_status=row['execution_status'],execution_kind=row['execution_kind'],
         scientific_result=bool(row['result_references']),
@@ -1252,13 +1309,38 @@ def trace_entry(row):
             'result_recorded' if row['result_references'] else 'unknown; inspect original receipt'),
         unresolved=row['execution_status'] in ('failed','rejected','pending')
             or outcome.get('task_passed') is False or status in ('failed','unsupported','inconclusive','unresolved'))
+    if host is not None:
+        intent=row.get('agent_hypothesis') or {}
+        if not intent and row.get('prior_intent_source'):
+            prior=host.store.artifact(row['prior_intent_source']['reference'])
+            intent=prior.get('original_plan') or (prior.get('tool_use') or {}).get('input') or {}
+        entry.update(observed_facts=milestone_facts(host,row),
+            main_hypothesis={k:deepcopy(intent.get(k)) for k in ('hypothesis','expected_observation','weakening_observation')},
+            reporter_interpretation=dict(status='not_found',scope='Interpretation is not an observed fact'),
+            unresolved_question=intent.get('weakening_observation'),source=row.get('source'))
+        entry['unresolved']=entry['unresolved'] or any(r.get('status') in ('invalid','execution_incomplete','unavailable')
+            or r['task_gap'].get('valid_complete') is False for r in entry['observed_facts']['results'])
+        from tools.research.reporter import entries
+        for ref,meta in reversed(entries(host,status_only=True)):
+            saved=host.store.artifact(ref,paths=('report.results','report.interpretations'))
+            report=saved.get('report') or {}
+            if any(c['identity']['result']['reference'] in row.get('result_references',[]) for c in report.get('results',[])):
+                entry['reporter_interpretation']=dict(reference=ref,status=meta.get('interpretation_status'),
+                    interpretation_for=meta.get('interpretation_for'),
+                    items=[dict(kind=item['kind'],text=item['text'][:600],excerpt=len(item['text'])>600,
+                        sources=deepcopy(item.get('sources',[]))[:2]) for item in report.get('interpretations',[])[:2]],
+                    detail_query=dict(reference=ref,view='full',pointer='/report/interpretations'),
+                    scope='Reporter interpretation at its saved evidence version; new deterministic diagnostics may add observations. No automatic hypothesis confirmation')
+                break
+    return entry
 
 
-def bounded_action_trace(trace, limit=8):
+def bounded_action_trace(trace, limit=8, host=None):
     rows=trace['recent'];recent=rows[-limit:];steps={r['step'] for r in recent}
-    unresolved=[r for r in rows[:-limit] if r['execution_status'] in ('failed','rejected','pending')][-2:]
-    return dict(version='research_trace_v1',total=trace['total'],recent=[trace_entry(r) for r in recent],
-        unresolved=[trace_entry(r) for r in unresolved if r['step'] not in steps],
+    unresolved=[r for r in rows[:-limit] if r['execution_status'] in ('failed','rejected','pending')
+        or r['outcome'].get('task_passed') is False or r['outcome'].get('status') in ('invalid','execution_incomplete','unavailable')][-2:]
+    return dict(version='research_trace_v1',total=trace['total'],recent=[trace_entry(r,host) for r in recent],
+        unresolved=[trace_entry(r,host) for r in unresolved if r['step'] not in steps],
         page_query=dict(view='summary',offset=max(0,len(rows)-limit),limit=limit),
         recall='research_recall(step=<stable step>, view="summary" or "details"); omit step for paginated history.',
         scope='Recorded actions and actual statuses only. Request acceptance, computation, verification and physical acceptance are distinct.')
@@ -1287,13 +1369,13 @@ def research_recall(host, query):
     if q.trace=='milestones' and q.step is None:rows=milestone_trace(trace)['recent']
     if q.step is None:
         page=rows[q.offset:q.offset+q.limit]
-        return dict(total=len(rows),items=[dict(**trace_entry(r),source=r['source'],
+        return dict(total=len(rows),items=[dict(**trace_entry(r,host),
             receipt_output=r['receipt_output'],result_references=r['result_references']) for r in page],
             next_offset=q.offset+q.limit if q.offset+q.limit<len(rows) else None,formal_read_credit=False)
     row=next((r for r in rows if r['step']==q.step),None)
     if row is None:raise ValueError('RESEARCH_STEP_NOT_FOUND: use research_recall without step to list saved steps')
     source=row.get('feedback_source') or row['source']
-    result=dict(**trace_entry(row),candidate=row.get('candidate'),source=source,
+    result=dict(**trace_entry(row,host),candidate=row.get('candidate'),
         receipt_output=row['receipt_output'],scientific_results=row['result_references'],formal_read_credit=False,
         detail_query=dict(step=q.step,view='details'),
         original_read_query=dict(reference=source['reference'],view='full',pointer=source['pointer']),
@@ -1324,7 +1406,7 @@ def _research_action_trace(host, limit=5):
     requests={};feedback={}
     for event in events:
         if event['kind'] not in ('model_original_tool_request','model_original_tool_feedback'):continue
-        value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
+        value=host.store.artifact(event['outputs'][0],paths=('tool_use',));use=value['tool_use']
         key='native-'+use['toolUseId']+('-analysis' if use['name']=='research_analysis' else '')
         if event['kind']=='model_original_tool_request':requests[key]=event['sequence']
         else:feedback[key]=dict(reference=event['outputs'][0],pointer='/result')
@@ -1346,7 +1428,7 @@ def _research_action_trace(host, limit=5):
         if not refs and result.get('reference') in known:refs=[result['reference']]
         if not refs and receipt and receipt.get('output') in known:refs=[receipt['output']]
         decision=plan.get('decision') or {}
-        candidate=plan_candidate(plan) or result.get('candidate')
+        candidate=(result.get('candidate') or plan_candidate(plan)) if plan.get('action')=='generate' else plan_candidate(plan) or result.get('candidate')
         if isinstance(candidate,str):
             from tools.research.object_choices import reference_choices
             candidate=reference_choices(host,include_all=True).get(candidate,candidate)
@@ -1368,7 +1450,7 @@ def _research_action_trace(host, limit=5):
         rows[key]=item(key,saved['original_plan'],dict(reference=ref,pointer='/original_plan'),positions[ref['artifact_id']])
     for i,event in enumerate(events):
         if event['kind'] not in ('tool_request_error','model_original_tool_feedback','model_original_tool_request'):continue
-        value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
+        value=host.store.artifact(event['outputs'][0],paths=('tool_use','message','result.status'));use=value['tool_use']
         if use['name'] not in ('research_plan','research_analysis','research_rl','research_investigate'):continue
         key='native-'+use['toolUseId']+('-analysis' if use['name']=='research_analysis' else '')
         if event['kind']=='model_original_tool_request' and key in feedback:continue
@@ -2007,7 +2089,7 @@ def agent_decision_brief(host):
                     metrics=finding.get('metrics',[]),quantitative_facts=finding.get('quantitative_facts'),
                     comparisons=finding.get('comparisons',[]),mathematics=finding.get('mathematics')))
         milestones=milestone_trace(trace)
-        brief['milestone_trace']=bounded_action_trace(milestones,4)
+        brief['milestone_trace']=bounded_action_trace(milestones,min(6,policy['trace_limit']) if policy else 4,host)
         brief['milestone_trace']['action_total']=trace['total']
         brief['milestone_trace']['page_query']['trace']='milestones'
     brief['route_review']=route_review(host,current,brief,trace)

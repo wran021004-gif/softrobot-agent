@@ -105,9 +105,11 @@ class PassiveQualificationV2(Contract):
 class PassiveResponseGoalV2(Contract):
     """Finite frozen programs; the Agent chooses owned objects, never engine state."""
     version: Literal['passive_response_v2'] = 'passive_response_v2'
-    execution_protocol: Literal['continuous_v1','phs2d_original_v1'] = 'continuous_v1'
+    execution_protocol: Literal['continuous_v1','phs2d_original_v1','hard_equilibrium_continuous_v1'] = 'continuous_v1'
     unloaded_static_solver: dict[str, FiniteFloat] = Field(default_factory=dict)
     unloaded_multistart: bool = False
+    initial_perturbation_rad: FiniteFloat = Field(default=0.,ge=0,
+        description='Frozen cold initial qpos perturbation amplitude times sin(coordinate_index), applied to the common qualified unloaded equilibrium. Stages retain the full continuous state.')
     load_conditions: list[str] = Field(min_length=1,max_length=32)
     programs: dict[str,list[PassiveStageV2]]
     protocol_source: EvidenceRef
@@ -138,15 +140,21 @@ class PassiveResponseGoalV2(Contract):
         if self.execution_protocol=='continuous_v1':value.pop('execution_protocol',None)
         if not self.unloaded_static_solver:value.pop('unloaded_static_solver',None)
         if not self.unloaded_multistart:value.pop('unloaded_multistart',None)
+        if not self.initial_perturbation_rad:value.pop('initial_perturbation_rad',None)
         return value
 
     @model_validator(mode='after')
     def programs_match(self):
-        if self.execution_protocol=='phs2d_original_v1':
-            if (self.initial_source!='fresh_unloaded_hard_equilibrium' or self.reset!='qpos_only_shared_unloaded' or self.allow_saved_state or
+        hard=self.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
+        if hard:
+            if self.execution_protocol=='phs2d_original_v1' and (self.initial_source!='fresh_unloaded_hard_equilibrium' or self.reset!='qpos_only_shared_unloaded' or self.allow_saved_state or
                     self.force_sampling!='interval_start' or self.static_balance_reference!='copied_integration_zero_velocity' or
                     self.allowed_ablation!='none' or not self.unloaded_static_solver):
                 raise ValueError('EXPLICIT_ORIGINAL_PHS_INITIALIZATION_AND_PHASE_REQUIRED')
+            if self.execution_protocol=='hard_equilibrium_continuous_v1' and (
+                    self.initial_source!='fresh_unloaded_hard_equilibrium' or self.reset!='same_complete_initial_state_each_episode'
+                    or self.allow_saved_state or not self.unloaded_static_solver):
+                raise ValueError('EXPLICIT_COMMON_HARD_EQUILIBRIUM_CONTINUOUS_INITIALIZATION_REQUIRED')
             keys={'max_iterations','ftol','length_tolerance_m','stationarity_tolerance_nm',
                 'complementarity_tolerance_nm','active_tolerance_m','rank_relative_tolerance',
                 'hessian_step_rad','minimum_reduced_eigenvalue'}
@@ -156,6 +164,8 @@ class PassiveResponseGoalV2(Contract):
                 raise ValueError('VALID_FROZEN_UNLOADED_STATIC_SOLVER_REQUIRED')
         elif self.initial_source=='fresh_unloaded_hard_equilibrium' or self.unloaded_static_solver or self.unloaded_multistart or self.reset!='same_complete_initial_state_each_episode':
             raise ValueError('VERSIONED_HARD_EQUILIBRIUM_PROTOCOL_REQUIRED')
+        if self.initial_perturbation_rad and self.execution_protocol!='hard_equilibrium_continuous_v1':
+            raise ValueError('PERTURBATION_REQUIRES_COMMON_HARD_EQUILIBRIUM_PROTOCOL')
         if len(set(self.load_conditions))!=len(self.load_conditions) or set(self.programs)!=set(self.load_conditions):
             raise ValueError('EXACT_ORDERED_EPISODE_PROGRAMS_REQUIRED')
         for stages in self.programs.values():
@@ -211,11 +221,25 @@ class PassiveMechanismV2(Contract):
     require_stable_comparable: Literal[True] = True
 
 
+class PassiveNumericalConfirmationV2(Contract):
+    half_timestep_s: FiniteFloat = Field(gt=0)
+    perturbation_rad: FiniteFloat = Field(gt=0)
+    max_displacement_difference_m: FiniteFloat = Field(gt=0)
+    saved_state_replay: Literal[True] = True
+
+
 class PassiveResponseEvaluationV2(Contract):
     bounds: list[PassiveResponseBoundV2] = Field(min_length=1)
     prohibit_contact: bool = True
     progressive_stiffness: list[PassiveStiffnessV2] = Field(default_factory=list,max_length=32)
     mechanism: PassiveMechanismV2 | None = None
+    numerical_confirmation: PassiveNumericalConfirmationV2 | None = None
+
+    @model_serializer(mode='wrap')
+    def historical_evaluation(self,handler):
+        value=handler(self)
+        if self.numerical_confirmation is None:value.pop('numerical_confirmation',None)
+        return value
 
     @model_validator(mode='after')
     def names(self):
@@ -226,7 +250,7 @@ class PassiveResponseEvaluationV2(Contract):
 
 
 class PassiveInitialExecutionV2(Contract):
-    source: Literal['frozen_named_state','qualified_unloaded','saved_integration_state']
+    source: Literal['frozen_named_state','qualified_unloaded','saved_integration_state','fresh_unloaded_hard_equilibrium']
     state_identities: dict[str,str]
     source_result: EvidenceRef | None = None
 

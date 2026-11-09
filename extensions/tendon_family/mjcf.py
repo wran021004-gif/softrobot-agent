@@ -131,7 +131,7 @@ def parameter_effect_semantics(path, execution_mode, *, input_source='operation_
         ['rest_geometry','passive_force'] if key.startswith('curvature_') else
         ['section_geometry','backbone_stiffness'] if key=='section_angle_rad' else
         ['numerical_discretization'] if key=='cells' else
-        ['constraint_activation'] if path.startswith('payout_lengths_m.') else
+        ['constraint_activation'] if path.startswith(('payout_lengths_m.','payout_offsets_m.')) else
         ['routing_geometry','drive_mapping'] if path.startswith(('spans.','route_overrides.','guide_hole_positions_m.')) else
         ['topology','geometry','mass','drive_mapping'] if key in ('segment_count','tendon_count','spans') else [])
     result=dict(version='execution_parameter_effect_v1',execution_mode=execution_mode,

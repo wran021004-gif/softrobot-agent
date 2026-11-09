@@ -1,0 +1,181 @@
+"""Explicit bounded development experiment commands; no Agent or optimizer."""
+import argparse
+import hashlib
+import json
+import sys
+import os
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+import numpy as np
+import mujoco
+from tools.state_io import read,atomic_json,digest
+from tools.platform_store import plain
+from tools.research.passive_load import open_record,request
+from tools.research.passive_evaluation import evaluate,response_metrics
+from extensions.tendon_family.family_space import parse_space
+from extensions.tendon_family.generated_serial import generate_family
+from extensions.tendon_family.compiler import resolve
+from extensions.tendon_family.passive import PassiveModel,material_point
+from extensions.tendon_family.passive_equilibrium import solve
+from extensions.tendon_family.passive_response import run_schedule,read_schedule
+from extensions.tendon_family.route_validation import validate_routes
+
+OWNER=ROOT/'runs/passive-progressive-stiffness-v1'
+
+
+def context():
+    paths=[ROOT/'configs/research'/n for n in ('passive_progressive_stiffness_dev_v1.json','family_space_passive_response_v1.json')]
+    for path in paths:
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=path.with_suffix('.sha256').read_text().strip():raise ValueError('FREEZE_HASH_CHANGED')
+    p,f=map(read,paths);store,run_id=open_record(OWNER,p,f)
+    return p,f,store,run_id
+
+
+def candidate(args):
+    p,f,store,run_id=context();identity=digest(plain(parse_space(f)))
+    segments={str(i):dict(length_m=args.length/args.segments,young_pa=args.young,cells=args.cells,
+        sections=[dict(kind='circle',parameters=dict(radius_m=args.radius),angle_rad=0.)],
+        physical_parameters=dict(viscosity_y_nm2_s=args.viscosity,viscosity_z_nm2_s=args.viscosity)) for i in range(args.segments)}
+    generation=dict(version='serial_family_generation_v2',family_space_identity=identity,segment_count=args.segments,
+        tendon_count=args.tendons,segments=segments,spans=[dict(last_segment=args.anchor_segment if args.anchor_segment is not None else args.segments-1,
+        count=args.tendons,phase_rad=np.pi/2,radius_m=args.route_radius,anchor_s=args.anchor,guide_s=args.guides)])
+    details=dict(generation=generation,payout_offset_m=args.slack)
+    cid=digest(details)
+    label_path=OWNER/'candidates'/(args.label+'.json')
+    if label_path.exists():
+        if read(label_path)['id']!=cid:raise ValueError('IMMUTABLE_CANDIDATE_LABEL')
+        print(json.dumps(dict(label=args.label,id=cid,status='already_recorded')));return
+    def build(_):
+        design,mesh,physics=generate_family(dict(space=f,request=generation))
+        # Full undeformed assembly uses physical chain and actual tool binding.
+        from extensions.tendon_family.geometry import geometry
+        g=geometry(physics,np.zeros(len(physics['dofs'])))
+        tip=physics['tip'];body=g['bodies'][tip['body']]
+        tip_p=body['p']+body['R']@tip['position_m']
+        full=float(tip_p[0])
+        if not 0<full<=p['design_domain']['full_assembly_length_max_m']:raise ValueError('FULL_LENGTH_LIMIT')
+        if not p['design_domain']['payout_offset_m'][0]<=args.slack<=p['design_domain']['payout_offset_m'][1]:raise ValueError('PAYOUT_DOMAIN')
+        a=dict(id=cid,design=design,mesh=mesh,generation=generation,full_length_m=full,
+            payout=(np.array(physics['reference_lengths_m'])+args.slack).tolist())
+        n=build_native(a,p,OWNER/'models'/cid)
+        a['geometry']=validate_routes(n,[np.zeros(n.model.nv)])
+        a['nu']=n.model.nu;a['nv']=n.model.nv
+        return a
+    a,ref=request(store,run_id,p,dict(kind='candidate',**details),build,candidate=cid)
+    atomic_json(OWNER/'candidates'/(args.label+'.json'),dict(artifact=ref,id=cid))
+    print(json.dumps(dict(label=args.label,id=cid,status=a.get('status'),geometry=a.get('geometry'),full_length_m=a.get('full_length_m'),error=a.get('error'))))
+
+
+def build_native(a,p,folder,unrestricted=False):
+    physics=resolve(a['design'],a['mesh']);p={**p,'robot_self_collision':True}
+    n=PassiveModel(physics,p,a['payout'],folder,unrestricted)
+    n.design_components=a['design']['components'];return n
+
+
+def assembly(label):
+    p,f,store,run_id=context();link=read(OWNER/'candidates'/(label+'.json'));a=store.artifact(link['artifact'])
+    return p,store,run_id,a,link
+
+
+def screen(label):
+    p,store,run_id,a,link=assembly(label)
+    if a.get('geometry',{}).get('status')!='legal_at_checked_poses':print('invalid geometry');return
+    n=build_native(a,p,OWNER/'models'/a['id']);results={};refs={}
+    for direction in (0,1,-1):
+        initial=None if direction==0 else results['0']['equilibrium']['qpos']
+        for force in ([0.] if direction==0 else [.05,.10,.20]):
+            key=str(direction) if direction==0 else f'{direction}_{force}'
+            result,ref=request(store,run_id,p,dict(kind='static',assembly=link['artifact'],force=direction*force,s=.7,initial=initial),
+                lambda _,force=force,direction=direction,initial=initial:solve(n,.7,direction*force,initial),math=1)
+            results[key]=result;refs[key]=ref
+            if result.get('status')!='qualified_local_minimum':break
+            initial=result['equilibrium']['qpos']
+        if direction==0 and results['0'].get('status')!='qualified_local_minimum':break
+    points={k:n.point(_data(n,r['equilibrium']['qpos']),material_point(n.physics,.7))[0] for k,r in results.items() if 'equilibrium' in r}
+    curves={}
+    for direction in (1,-1):
+        keys=[f'{direction}_{f}' for f in (.05,.10,.20)]
+        if not all(k in points for k in keys):continue
+        ds=[float((points[k]-points['0'])[0]*direction) for k in keys]
+        curve=response_metrics([.05,.10,.20],ds,0.,p['acceptance'])
+        curve['qualified']=all(results[k]['status']=='qualified_local_minimum' for k in keys)
+        curve['tensions_n']=[results[k]['equilibrium']['tensions_n'] for k in keys]
+        curve['length_residual_m']=[results[k]['equilibrium']['length_residual_m'] for k in keys]
+        curves[str(direction)]=curve
+    summary=dict(label=label,assembly=link,results=refs,curves=curves,statuses={k:r['status'] for k,r in results.items()})
+    atomic_json(OWNER/'screens'/(label+'.json'),summary)
+    print(json.dumps(summary))
+
+
+def _data(n,q):
+    d=mujoco.MjData(n.model);d.qpos[:]=q;mujoco.mj_forward(n.model,d);return d
+
+
+def dynamics(args):
+    p,store,run_id,a,link=assembly(args.label);p={**p}
+    if args.half:p['timestep_s']=p['confirmation']['half_timestep_s']
+    screen_result=read(OWNER/'screens'/(args.label+'.json'));base=store.artifact(screen_result['results']['0'])
+    if base['status']!='qualified_local_minimum':raise ValueError('QUALIFIED_BASELINE_REQUIRED')
+    initial=np.array(base['equilibrium']['qpos'])+args.perturb*np.sin(np.arange(len(base['equilibrium']['qpos'])))
+    case=args.case;name=f'{args.label}_{case}_abl{int(args.ablation)}_half{int(args.half)}_perturb{args.perturb:g}_r{args.replicate}'
+    folder=OWNER/'dynamics'/name
+    def run(attempt):
+        n=build_native(a,p,folder,args.ablation)
+        raw=run_schedule(n,p,p['directions'][case],initial,folder/'trajectory.csv',attempt)
+        raw['geometry']=validate_routes(n,[r['qpos'] for r in raw['samples']])
+        raw['python']=sys.version;raw['mujoco']=mujoco.__version__
+        raw['execution_protocol']=n.protocol
+        raw['process_id']=os.getpid()
+        raw['model_sha256']=hashlib.sha256((folder/'model.xml').read_bytes()).hexdigest()
+        raw['trajectory_sha256']=hashlib.sha256(Path(raw['trajectory']).read_bytes()).hexdigest()
+        raw['evaluation']=evaluate(p,raw)
+        raw=json.loads(json.dumps(raw,default=lambda x:x.item() if isinstance(x,np.generic) else x.tolist()))
+        atomic_json(folder/'result.json',raw)
+        return raw
+    out,ref=request(store,run_id,p,dict(kind='dynamics',assembly=link['artifact'],case=case,ablation=args.ablation,half=args.half,
+        perturbation=args.perturb,replicate=args.replicate),run,steps=round(20/p['timestep_s']),candidate=a['id'],dynamic=True,confirmation=args.confirmation)
+    print(json.dumps(dict(reference=ref,evaluation=out.get('evaluation'),cost=out['cost'],error=out.get('error'))))
+
+
+def analyze(args):
+    p,store,run_id,a,link=assembly(args.label)
+    folder=OWNER/'dynamics'/args.folder
+    n=build_native(a,p,folder/'reanalysis',args.ablation)
+    xml=folder/'model.xml'
+    from extensions.tendon_family.passive import load_passive_model
+    n.model=load_passive_model(xml,True)
+    n.model.opt.iterations=100;n.model.opt.tolerance=1e-10
+    # Disabled limits are a paired-ablation model property; no mass entity is removed.
+    if args.ablation:n.model.tendon_limited[:]=False
+    p={**p,'timestep_s':float(n.model.opt.timestep)}
+    def run(_):
+        raw=read_schedule(n,p,p['directions'][args.case],folder/'trajectory.csv',full_tail=args.full)
+        poses=[r['qpos'] for r in raw['samples']]
+        if args.full:
+            poses=np.loadtxt(folder/'trajectory.csv',delimiter=',',skiprows=1,usecols=[5+i for i in range(n.model.nq)],ndmin=2)
+        raw['geometry']=validate_routes(n,poses)
+        raw['process_id']=os.getpid();raw['model_sha256']=hashlib.sha256(xml.read_bytes()).hexdigest()
+        raw['trajectory_sha256']=hashlib.sha256((folder/'trajectory.csv').read_bytes()).hexdigest()
+        raw['evaluation']=evaluate(p,raw)
+        return raw
+    raw,ref=request(store,run_id,p,dict(kind='csv_reanalysis',assembly=link['artifact'],folder=args.folder,case=args.case,ablation=args.ablation,full=args.full),run)
+    atomic_json(folder/('full_audit.json' if args.full else 'reanalysis.json'),raw)
+    print(json.dumps(dict(evaluation=raw.get('evaluation'),reference=ref,error=raw.get('error'))))
+
+
+if __name__=='__main__':
+    cli=argparse.ArgumentParser();sub=cli.add_subparsers(dest='action',required=True)
+    c=sub.add_parser('candidate');c.add_argument('label');c.add_argument('--segments',type=int,default=2);c.add_argument('--tendons',type=int,default=2)
+    for flag,default in [('length',.24),('young',2e6),('radius',.005),('route-radius',.018),('slack',.001),('viscosity',.0004),('anchor',1.)]:c.add_argument('--'+flag,type=float,default=default)
+    c.add_argument('--cells',type=int,default=8);c.add_argument('--guides',type=float,nargs='*',default=[.5]);c.add_argument('--anchor-segment',type=int)
+    s=sub.add_parser('screen');s.add_argument('label')
+    d=sub.add_parser('dynamics');d.add_argument('label');d.add_argument('--case',choices=['plus_x','minus_x'],required=True)
+    for flag in ('ablation','half','confirmation'):d.add_argument('--'+flag,action='store_true')
+    d.add_argument('--perturb',type=float,default=0.);d.add_argument('--replicate',type=int,default=0)
+    a=sub.add_parser('analyze');a.add_argument('label');a.add_argument('folder');a.add_argument('--case',choices=['plus_x','minus_x'],required=True);a.add_argument('--ablation',action='store_true');a.add_argument('--full',action='store_true')
+    args=cli.parse_args()
+    if args.action=='candidate':candidate(args)
+    elif args.action=='screen':screen(args.label)
+    elif args.action=='dynamics':dynamics(args)
+    else:analyze(args)

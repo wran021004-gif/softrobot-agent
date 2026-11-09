@@ -443,14 +443,14 @@ class ScientificStructureSearch(Contract):
     initial_tension_n: FiniteFloat | None = Field(default=None,ge=0,description='Native common absolute initial tension. Omit only to use the unique frozen tendon pretension default; if unavailable an explicit choice is required.')
     proxy_objective: Literal['task_violation','target_equilibrium_residual','held_position_min_eigenvalue','equilibrium_qualification'] | None = Field(default=None,description='Static passive qualification is a diagnostic, never a dynamic task objective.')
     diagnostic_load_conditions: list[str] = Field(default_factory=list)
-    segment_counts: list[StrictInt] | None = Field(default=None,description='Omit for frozen singleton topology. Explicit out-of-domain choices are rejected, never clamped.')
+    segment_counts: list[StrictInt] | None = Field(default=None,description='Choose finite positive topology counts; omit only for a frozen finite grant. An open FamilySpace requires explicit finite choices. Topology is discrete, never a continuous gradient.')
     tendon_counts: list[StrictInt] | None = None
     span_strategies: list[str] | None = Field(default=None,description='Omit to explore legal strategies when spans is selected, otherwise retain original whole_chain search default.')
     section_types: list[str] = Field(default_factory=list,description='Omit to retain original prototype section kinds; dimension changes still use frozen domains.')
     initial_segment_count: StrictInt | None = Field(default=None,description='Explicit numerical starting point within selected range, not a claim of optimal topology.')
     initial_tendon_count: StrictInt | None = None
     initial_span_strategy: str | None = None
-    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,description='Optional subranges of selected existing coordinates: length_m, young_pa, section.<kind>.<dimension>, routing.<name>. Original FamilySpace admission applies.')
+    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,description='Finite ordered local subranges for selected search coordinates, within the frozen physical domain. Required for every selected open coordinate. See bounds_catalogue for length_m, young_pa, physical.<name>, section.<kind>.<dimension>, routing.<name>, payout; candidate paths use the separate parameter registry.')
 
 
 class MechanismTarget(Contract):
@@ -654,18 +654,27 @@ class ScientificQuestionV4(Contract):
         return self
 
 
+class CoupledInteraction(ScientificStructureV4):
+    """The existing four-point backend; this is not an iterative optimizer."""
+    operation: Literal['interact'] = 'interact'
+    parameter_paths: list[str] = Field(min_length=2,max_length=2,json_schema_extra={'uniqueItems':True},
+        description='Exactly two distinct registered continuous parameters on the same baseline. All other parameters, task and conditions are fixed.')
+    requested_budget: Literal[4] | None = Field(default=None,
+        description='Four matched points: baseline, A only, B only, A+B. Omit or choose 4; repeat exploration in a new Plan.')
+
+
 class FamilyMixedSearchV2(Contract):
     """Coupled mode of the existing search, using a scientific analysis question."""
     version: Literal['family_mixed_search_v2'] = 'family_mixed_search_v2'
     method: Literal['bounded_coupled_block_v1'] = 'bounded_coupled_block_v1'
     family_space_identity: str = Field(min_length=1)
     previous_candidate_ref: EvidenceRef
-    analysis: ScientificStructureV4
+    analysis: CoupledInteraction
     max_evaluations: Literal[4] = 4
 
     @model_validator(mode='after')
     def matched_block(self):
-        if self.analysis.operation!='interact' or len(self.analysis.parameter_paths)!=2:
+        if len(set(self.analysis.parameter_paths))!=2:
             raise ValueError('COUPLED_SEARCH_REQUIRES_TWO_PARAMETER_INTERACTION_QUESTION')
         return self
 
@@ -815,6 +824,7 @@ class PhysicalReplayRequest(Contract):
     passive_ablation: list[str] | None = Field(default=None,min_length=1,max_length=64,description='passive_response_v2 only: exact passive tendon entities; two fresh paired native executions, double episode budget.')
     initial_state_result: EvidenceRef | None = Field(default=None,description='passive_response_v2 only: current owned completed physical result containing a qualified complete integration state.')
     initial_state_episode: str | None = None
+    validation_source: EvidenceRef | None = Field(default=None,description='Registered passive numerical confirmation only: current owned completed paired physical result. A fresh independent pair, constrained half-timestep and initial perturbation executions plus saved-CSV state checks form the complete frozen confirmation scope. No historical candidate transfer.')
 
 
 class ControlCorrectionSettings(Contract):

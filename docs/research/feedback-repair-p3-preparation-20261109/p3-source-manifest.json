@@ -1,0 +1,811 @@
+{
+  "source_branch": "codex/passive-progressive-stiffness",
+  "source_commit": "83d9b8f35b4015a924e0f8c32d073607247f92b9",
+  "task_id": "passive_progressive_stiffness_dev_v1",
+  "protocol_file_sha256": "3f88a70e4461a384969d2173ae7c5da68379556344fd89df3fed7a7e993b064d",
+  "canonical_protocol_identity": "7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+  "canonical_family_identity": "823432cb8ef0f1324e6b497e0dcb101dfcd8ee886a2e57f63c7e18d3d449fc92",
+  "source_store": {
+    "run_id": "passive_progressive_stiffness_dev_v1",
+    "snapshot": {
+      "development_freeze": {
+        "family": {
+          "actuator_defaults": {
+            "limits_m": [
+              -0.015,
+              0.015
+            ],
+            "rule": "independent_displacement_ideal_tension_v1",
+            "velocity_limit_m_s": 0.025
+          },
+          "assembly": {
+            "components": [
+              {
+                "connection": {
+                  "part": "fixed_base",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_0",
+                "interpolation": "step",
+                "kind": "flexible_segment",
+                "length_m": 0.16,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0004,
+                    0.0004
+                  ],
+                  "density_kg_m3": 1100.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 7200000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": 0.0,
+                      "holes_yz_m": [],
+                      "kind": "circle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "radius_m": 0.006
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "segment_0",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.002,
+                  0.025,
+                  0.025
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0015,
+                "id": "mid_guide",
+                "inertia_com_local_kg_m2": [
+                  [
+                    4e-07,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    2e-07,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    2e-07
+                  ]
+                ],
+                "kind": "guide",
+                "mass_kg": 0.002
+              },
+              {
+                "com_local_m": [
+                  0.006,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "mid_guide",
+                  "position_m": [
+                    0.002,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "envelope_halfsize_m": [
+                  0.006,
+                  0.006,
+                  0.006
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "connector",
+                "inertia_com_local_kg_m2": [
+                  [
+                    5e-08,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    7e-08,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    7e-08
+                  ]
+                ],
+                "kind": "rigid_connector",
+                "mass_kg": 0.003
+              },
+              {
+                "connection": {
+                  "part": "connector",
+                  "position_m": [
+                    0.012,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_1",
+                "interpolation": "linear",
+                "kind": "flexible_segment",
+                "length_m": 0.11,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0004,
+                    0.0004
+                  ],
+                  "density_kg_m3": 1100.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 5400000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": 0.0,
+                      "holes_yz_m": [],
+                      "kind": "circle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "radius_m": 0.006
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.007,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "segment_1",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.009,
+                  0.009,
+                  0.008
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "payload",
+                "inertia_com_local_kg_m2": [
+                  [
+                    6e-07,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    8e-07,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    8e-07
+                  ]
+                ],
+                "kind": "payload",
+                "mass_kg": 0.01
+              }
+            ],
+            "mesh": {
+              "cells": {
+                "segment_0": 12,
+                "segment_1": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "provenance": {
+              "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics",
+              "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+              "source": "Stage 0 Base-only space; unchanged public SI serial-family prototypes"
+            },
+            "tip": {
+              "part": "payload",
+              "position_m": [
+                0.014,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            }
+          },
+          "assumptions": [
+            "SI; generated serial bending hinges; linear elastic material and physical bending viscosity",
+            "Passive fixed payout replaces actuator compilation; no active controller",
+            "Prototype masses, inertias and physical envelopes frozen here; 1000-1200 kg/m3 segment density",
+            "Full axial assembly includes connector offsets and tool offset; frictionless cable and guide model"
+          ],
+          "conditional_rules": "base_only_consecutive_spans_v1",
+          "control_domains": {
+            "holding_tip_speed_weight": {
+              "default": 0.1,
+              "maximum": 1.0,
+              "minimum": 0.0
+            },
+            "terminal_tip_speed_weight": {
+              "default": 0.1,
+              "maximum": 1.0,
+              "minimum": 0.0
+            }
+          },
+          "executable_segment_counts": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "executable_tendon_count_bounds": [
+            2,
+            4
+          ],
+          "family_id": "passive_serial_development_v1",
+          "routing_domains": {
+            "anchor_s": {
+              "default": 1.0,
+              "maximum": 1.0,
+              "minimum": 0.8
+            },
+            "angular_offset_rad": {
+              "default": 0.0,
+              "maximum": 3.141592653589793,
+              "minimum": -3.141592653589793
+            },
+            "guide_s": {
+              "default": 0.5,
+              "maximum": 0.999,
+              "minimum": 0.001
+            },
+            "phase_rad": {
+              "default": 0.0,
+              "maximum": 6.283185307179586,
+              "minimum": -6.283185307179586
+            },
+            "radius_m": {
+              "default": 0.018,
+              "maximum": 0.022,
+              "minimum": 0.009
+            }
+          },
+          "segment_count_bounds": [
+            2,
+            6
+          ],
+          "segment_domain": {
+            "length_m": {
+              "default": 0.1,
+              "maximum": 0.14,
+              "minimum": 0.025
+            },
+            "physical_domains": {
+              "density_kg_m3": {
+                "default": 1100.0,
+                "maximum": 1200.0,
+                "minimum": 1000.0
+              },
+              "section_angle_rad": {
+                "default": 0.0,
+                "maximum": 3.141592653589793,
+                "minimum": -3.141592653589793
+              },
+              "viscosity_y_nm2_s": {
+                "default": 0.0004,
+                "maximum": 0.0007,
+                "minimum": 3e-05
+              },
+              "viscosity_z_nm2_s": {
+                "default": 0.0004,
+                "maximum": 0.0007,
+                "minimum": 3e-05
+              }
+            },
+            "section_dimensions_m": {
+              "circle": {
+                "radius_m": {
+                  "default": 0.008,
+                  "maximum": 0.012,
+                  "minimum": 0.003
+                }
+              },
+              "ellipse": {
+                "semi_y_m": {
+                  "default": 0.0095,
+                  "maximum": 0.012,
+                  "minimum": 0.003
+                },
+                "semi_z_m": {
+                  "default": 0.0076,
+                  "maximum": 0.012,
+                  "minimum": 0.003
+                }
+              },
+              "rectangle": {
+                "height_z_m": {
+                  "default": 0.0095,
+                  "maximum": 0.018,
+                  "minimum": 0.006
+                },
+                "width_y_m": {
+                  "default": 0.0133,
+                  "maximum": 0.018,
+                  "minimum": 0.006
+                }
+              },
+              "tube": {
+                "inner_radius_m": {
+                  "default": 0.003,
+                  "maximum": 0.004,
+                  "minimum": 0.001
+                },
+                "outer_radius_m": {
+                  "default": 0.009,
+                  "maximum": 0.012,
+                  "minimum": 0.005
+                }
+              }
+            },
+            "young_pa": {
+              "default": 7000000.0,
+              "maximum": 15000000.0,
+              "minimum": 2000000.0
+            }
+          },
+          "segment_domains": {},
+          "serial_assembly": {
+            "cell_count_bounds": [
+              1,
+              32
+            ],
+            "connector": "connector",
+            "default_cells": 12,
+            "guide": "mid_guide",
+            "payload": "payload",
+            "repeated_segment": "segment_1",
+            "root_segment": "segment_0",
+            "version": "repeat_serial_prototypes_v1"
+          },
+          "tendon_count_bounds": [
+            2,
+            4
+          ],
+          "tendon_domains": {
+            "diameter_m": {
+              "default": 0.001,
+              "maximum": 0.0012,
+              "minimum": 0.0005
+            },
+            "force_limit_n": {
+              "default": 8.0,
+              "maximum": 8.0,
+              "minimum": 1.0
+            },
+            "length_servo_gain_n_m": {
+              "default": 900.0,
+              "maximum": 1500.0,
+              "minimum": 300.0
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "maximum": 1.0,
+              "minimum": 0.0
+            }
+          },
+          "terminal_payload_anchor": true,
+          "unsupported": [
+            "polygon section domain not granted in this example",
+            "axial extension",
+            "shear",
+            "twist",
+            "friction",
+            "swept self-collision",
+            "High segment-count dynamics and controller compatibility require candidate-specific validation",
+            "Expanded topologies are candidate-specific until actual compile/Jacobian/static/dynamics verified; expansion alone is not execution evidence."
+          ],
+          "version": "serial_family_space_v2"
+        },
+        "protocol": {
+          "acceptance": {
+            "denominator_min_m": 1e-06,
+            "denominator_uncertainty_multiplier": 10.0,
+            "high_constraint_residual_max_m": 5e-05,
+            "high_displacement_max_m": 0.025,
+            "high_tension_min_n": 0.05,
+            "low_displacement_min_m": 0.006,
+            "low_slack_min_m": 1e-07,
+            "low_tension_max_n": 0.005,
+            "residual_max_m": 0.002,
+            "stiffness_ratio_min": 1.5
+          },
+          "confirmation": {
+            "half_timestep_s": 6.25e-05,
+            "max_displacement_difference_m": 0.001,
+            "perturbation_rad": 0.001
+          },
+          "design_domain": {
+            "full_assembly_length_max_m": 0.35,
+            "payout_offset_m": [
+              0,
+              0.003
+            ],
+            "segments": [
+              2,
+              6
+            ],
+            "tendons": [
+              2,
+              4
+            ]
+          },
+          "directions": {
+            "minus_x": [
+              -1,
+              0,
+              0
+            ],
+            "plus_x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "force_point": {
+            "kind": "material_coordinate",
+            "s": 0.7
+          },
+          "gravity": [
+            0,
+            0,
+            -9.81
+          ],
+          "initial_state": "same qualified unloaded equilibrium for each direction; continuous stages without resets",
+          "length_excess_limit_m": 5e-05,
+          "limits": {
+            "candidates": 40,
+            "dynamic_candidates": 12,
+            "final_reserved_steps": 2000000,
+            "math_requests": 300,
+            "physics_step_attempts": 8000000
+          },
+          "mechanism": {
+            "high_displacement_increase_min": 1.25,
+            "late_stiffness_ratio_max": 0.8,
+            "require_stable_comparable": true
+          },
+          "monitor_s": [
+            0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1
+          ],
+          "monitor_speed_limit_m_s": 0.001,
+          "mount_position": [
+            0,
+            0,
+            0.5
+          ],
+          "mount_rotation": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ],
+          "qvel_inf_limit_rad_s": 0.01,
+          "ramp_s": 0.5,
+          "raw_recording": "every attempted successful mj_step; post-step forward; applied force held over preceding step",
+          "restrictions": {
+            "NMPC": 0,
+            "PPO": 0,
+            "base_only": true,
+            "fixed_payout": true,
+            "nu": 0,
+            "provider": 0,
+            "research_agent": 0
+          },
+          "route_check_semantics": "scoring poses during exploration; every recorded physical step required for final witness",
+          "scoring_interval_s": 0.01,
+          "solimplimit": [
+            0.999,
+            0.999,
+            0.001,
+            0.5,
+            2
+          ],
+          "solreflimit": [
+            0.004,
+            1
+          ],
+          "stability_source": "phs2d_protocol_inverse_v2; only physical stability/constraint thresholds reused",
+          "stages": [
+            {
+              "duration_s": 4.0,
+              "force_n": 0.0,
+              "name": "unloaded"
+            },
+            {
+              "duration_s": 4.0,
+              "force_n": 0.05,
+              "name": "low"
+            },
+            {
+              "duration_s": 4.0,
+              "force_n": 0.1,
+              "name": "middle"
+            },
+            {
+              "duration_s": 4.0,
+              "force_n": 0.2,
+              "name": "high"
+            },
+            {
+              "duration_s": 4.0,
+              "force_n": 0.0,
+              "name": "recovery"
+            }
+          ],
+          "static_balance_inf_limit_nm": 1e-05,
+          "static_solver": {
+            "active_tolerance_m": 1e-07,
+            "complementarity_tolerance_nm": 1e-08,
+            "ftol": 1e-13,
+            "hessian_step_rad": 1e-05,
+            "length_tolerance_m": 1e-08,
+            "max_iterations": 400,
+            "method": "SLSQP",
+            "minimum_reduced_eigenvalue": 1e-07,
+            "rank_relative_tolerance": 1e-08,
+            "stationarity_tolerance_nm": 1e-06
+          },
+          "status": "development_not_registered_SELECT",
+          "tail_drift_limit_m": 0.0005,
+          "tail_s": 0.25,
+          "task_id": "passive_progressive_stiffness_dev_v1",
+          "timestep_s": 0.000125,
+          "tip_speed_limit_m_s": 0.001,
+          "version": "passive_force_response_v1"
+        }
+      },
+      "input": {
+        "policy": {
+          "budget": {
+            "backend_solves": 100,
+            "model_calls": 0,
+            "tool_calls": 2000,
+            "wall_s": null,
+            "worker_calls": 0
+          }
+        },
+        "run_id": "passive_progressive_stiffness_dev_v1"
+      }
+    },
+    "task_identity_semantics": "development_freeze.protocol canonical digest; no platform TaskDefinition/SELECT identity existed"
+  },
+  "final_freeze": {
+    "sha256": "e657c7ed3fa36a40e0e4e03706ed0735c49558cea31a4a666a8b7070f995c7ce",
+    "protocol_matches": true,
+    "family_matches": true,
+    "case_scope": {
+      "plus_x": {
+        "folder": "c26_plus_x_abl0_half0_perturb0_r1",
+        "ablation": false,
+        "half": false,
+        "perturbation_rad": 0.0,
+        "direction": "plus_x"
+      },
+      "ablation_plus_x": {
+        "folder": "c26_plus_x_abl1_half0_perturb0_r1",
+        "ablation": true,
+        "half": false,
+        "perturbation_rad": 0.0,
+        "direction": "plus_x"
+      },
+      "half_plus_x": {
+        "folder": "c26_plus_x_abl0_half1_perturb0_r1",
+        "ablation": false,
+        "half": true,
+        "perturbation_rad": 0.0,
+        "direction": "plus_x"
+      },
+      "perturb_plus_x": {
+        "folder": "c26_plus_x_abl0_half0_perturb0.001_r1",
+        "ablation": false,
+        "half": false,
+        "perturbation_rad": 0.001,
+        "direction": "plus_x"
+      },
+      "minus_x": {
+        "folder": "c26_minus_x_abl0_half0_perturb0_r1",
+        "ablation": false,
+        "half": false,
+        "perturbation_rad": 0.0,
+        "direction": "minus_x"
+      },
+      "ablation_minus_x": {
+        "folder": "c26_minus_x_abl1_half0_perturb0_r1",
+        "ablation": true,
+        "half": false,
+        "perturbation_rad": 0.0,
+        "direction": "minus_x"
+      },
+      "half_minus_x": {
+        "folder": "c26_minus_x_abl0_half1_perturb0_r1",
+        "ablation": false,
+        "half": true,
+        "perturbation_rad": 0.0,
+        "direction": "minus_x"
+      },
+      "perturb_minus_x": {
+        "folder": "c26_minus_x_abl0_half0_perturb0.001_r1",
+        "ablation": false,
+        "half": false,
+        "perturbation_rad": 0.001,
+        "direction": "minus_x"
+      }
+    }
+  },
+  "sources": {
+    "configs/research/passive_progressive_stiffness_dev_v1.json": {
+      "destination": "configs/research/passive_progressive_stiffness_dev_v1.json",
+      "sha256": "3f88a70e4461a384969d2173ae7c5da68379556344fd89df3fed7a7e993b064d",
+      "git_blob": "82582106fa2b1b7bfec5cbea4ba6e458229c55b3"
+    },
+    "configs/research/passive_progressive_stiffness_dev_v1.sha256": {
+      "destination": "configs/research/passive_progressive_stiffness_dev_v1.sha256",
+      "sha256": "936a933acefeafdc1a80274591f65564b3d55b10bc6efc10dd1075b40a0ba5be",
+      "git_blob": "d11b45879eeb21a32c77bf403967ad2837a553a5"
+    },
+    "configs/research/family_space_passive_response_v1.json": {
+      "destination": "configs/research/family_space_p3_original_v1.json",
+      "sha256": "78ce1cd38f857313ddb176918569d628d130374808615a5bd811c81982e59e8c",
+      "git_blob": "1ec4ec0f8b86b1b5246e29d8e9dcc763efce1ddd"
+    },
+    "extensions/tendon_family/passive_response.py": {
+      "destination": "docs/research/feedback-repair-p3-preparation-20261109/p3-authority/passive_response.py.txt",
+      "sha256": "df1be86a2b2d77412b21e717e0f22200391aa1de7412a05ba8108d8c036ca19b",
+      "git_blob": "b8fad9fd850e170c8e24197b2a91053edcab1cd0"
+    },
+    "tools/research/passive_evaluation.py": {
+      "destination": "docs/research/feedback-repair-p3-preparation-20261109/p3-authority/passive_evaluation.py.txt",
+      "sha256": "42c7dd0b4134e3822c0f8734e671574234082c5d3aff43d0837c4731d3b7249e",
+      "git_blob": "7aa93f5560395cc878489a32dcbcabf7fda2b790"
+    },
+    "examples/passive_response_study.py": {
+      "destination": "docs/research/feedback-repair-p3-preparation-20261109/p3-authority/passive_response_study.py.txt",
+      "sha256": "f18e0fadc21e9b4340b4285ef9949445f30ee37a10f033caef3e195a764a5d98",
+      "git_blob": "bdc6b310f38915b347dd71ffbb31e7351ea81e1a"
+    },
+    "evidence/passive_progressive_stiffness_dev_v1/validation.json": {
+      "destination": "docs/research/feedback-repair-p3-preparation-20261109/p3-authority/validation.json",
+      "sha256": "4a8e32dd4c26bf0dd90dccdb79b6bee5ecd911caf7d167c44e712f134b662ca6",
+      "git_blob": "df19709e30202ad574dab20bd1a02db8a12689c6"
+    },
+    "evidence/passive_progressive_stiffness_dev_v1/export_manifest.json": {
+      "destination": "docs/research/feedback-repair-p3-preparation-20261109/p3-authority/export_manifest.json",
+      "sha256": "705f7b8760a318b5c29e75caffa7d0330afc1a34dd05b4b4eba6fde3cdefc41b",
+      "git_blob": "eb93d0874b800fb5a87bce52aac582fdeab5d54e"
+    }
+  },
+  "historical_success_parameters_delivered_to_main": false,
+  "integrations": 0,
+  "provider_requests": 0,
+  "workers": 0,
+  "new_stores": 0,
+  "historical_replay": "validation.json records independent saved-state replay, zero integrations; not new-study evidence",
+  "success_trace": "memory/cases/p3_passive_progressive_stiffness_v1/success_trace.json is historical method context only, not authority or a new candidate"
+}

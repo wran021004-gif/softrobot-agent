@@ -106,15 +106,17 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
                 count.pop('default')
             lower,upper=space['executable_tendon_count_bounds']
             schema['$defs'][generation]['properties']['tendon_count'].update({k:v for k,v in dict(minimum=lower,maximum=upper).items() if v is not None})
-            if space.get('passive_payout_domain_m') and generation=='GenerationRequestV2':
-                domain=space['passive_payout_domain_m']
-                schema['$defs'][generation]['properties']['payout_lengths_m'].update(
+            if (space.get('passive_payout_domain_m') or space.get('passive_payout_offset_domain_m')) and generation=='GenerationRequestV2':
+                relative=bool(space.get('passive_payout_offset_domain_m'))
+                domain=space['passive_payout_offset_domain_m'] if relative else space['passive_payout_domain_m']
+                schema['$defs'][generation]['properties']['payout_offsets_m' if relative else 'payout_lengths_m'].update(
                     additionalProperties=dict(type='number',**{k:v for k,v in {
                         'exclusiveMinimum' if domain.get('min_exclusive') else 'minimum':domain['minimum'],
                         'maximum':domain['maximum']}.items() if v is not None}),
-                    description='Independent SI payout for each actual tendon_i, i < tendon_count. Omitted values use '+(
+                    description=('Independent SI offset above each actual zero-state routed tendon length; geometry edits recompute the reference. Omitted offsets use '+str(domain['default'])+' m.' if relative else
+                        'Independent SI payout for each actual tendon_i, i < tendon_count. Omitted values use '+(
                         'the actual zero-state route length; no qualification implied.' if space.get('payout_initialization')=='zero_state_route_length_v1'
-                        else str(domain['default'])+' m.'))
+                        else str(domain['default'])+' m.')))
             if space['conditional_rules']=='base_only_consecutive_spans_v1':
                 schema['$defs']['Span']['properties']['first_segment'].update(const=0,
                     description='Frozen FamilySpace requires a fixed-base start. last_segment chooses the anchor segment; other span variables remain selectable.')
@@ -139,6 +141,10 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         for name in ('segment_counts','tendon_counts'):
             for branch in properties[name]['anyOf']:
                 if branch.get('type')=='array' and grant[name] is not None:branch['items']['enum']=grant[name]
+            if grant[name] is None:
+                properties[name]['anyOf']=[branch for branch in properties[name]['anyOf'] if branch.get('type')!='null']
+                properties[name].pop('default',None)
+                intent_schema['required'].append(name)
         schema['$defs'].update(intent_schema.pop('$defs'))
         from tools.research.scientific_intent import project_control_effort
         project_control_effort(schema,study)
@@ -153,6 +159,7 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             decision['required']=[k for k in decision['required'] if k not in ('selected_method','requested_budget')]
     if (study or {}).get('family_search',{}).get('coupled_block_enabled') and 'search' in actions:
         schema['properties']['search']['anyOf'].insert(0,{'$ref':'#/$defs/FamilyMixedSearchV2'})
+        schema['$defs']['FamilyMixedSearchV2']['description']='Four matched local interaction points only: baseline, A, B, A+B. No optimize operation or iterative evaluation budget. Use a new Plan for further exploration.'
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
@@ -804,10 +811,17 @@ def error_feedback(host, use, exc, before):
     new_analysis=[host.store.artifact(r) for r in s.get('analysis_results',[]) if r not in before.get('analysis_results',[])]
     worker_started=(new_analysis[-1].get('boundary') or {}).get('worker_started') if new_analysis else False if counts(before)==counts(s) else None
     search_guidance={}
-    if code=='FINITE_SEARCH_BOUNDS_REQUIRED':
+    if code in ('FINITE_SEARCH_BOUNDS_REQUIRED','SEARCH_BOUND_OUTSIDE_SELECTED_PHYSICAL_DOMAIN'):
         from tools.research.search import request_guidance
         guidance=request_guidance(s['spec'])['search']
         search_guidance=dict(search_requirements={k:guidance[k] for k in ('bounds_catalogue','evaluation_cost') if k in guidance})
+    if use.get('name')=='research_plan' and isinstance(use.get('input',{}).get('search'),dict):
+        from tools.research.search import search_failure
+        repair=search_failure(use['input']['search'],exc)
+        if repair['issues'] and (repair['error_code']=='INVALID_SEARCH_REQUEST' or any(k in code for k in ('SEARCH','COUPLED','ALL_FOUR','FINITE_SEARCH','PARAMETER','FROZEN_FAMILY'))):
+            code=repair['error_code'];issues=repair['issues'];field=issues[0]['field'];expected=issues[0]['expected']
+            message='; '.join(i['field']+': '+i['expected'] for i in issues)
+            search_guidance.update(retryable=repair['retryable'],legal_values=issues[0].get('legal_values'))
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
         reason=message[:1000],
         **(dict(contract=contract,issues=issues) if contract else {}),
@@ -1307,7 +1321,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 and state(host)['pilot'].get('session_handoff_boundary')=='request_feedback'):
             from tools.research.session_handoff import rotation_ready,request_feedback_boundary
             if rotation_ready(host,agent.messages):
-                review=(pause_exploration_remaining is not None and not protected(host)
+                review=(pause_exploration_remaining is not None
                     and decision_budget(host)['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
                 await request_feedback_boundary(host,agent)
                 if review:raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
@@ -1482,7 +1496,7 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 agent.messages.pop()
                 raise CompletedBoundaryHandoff('Verified completed boundary; next model send has not started')
             if not paired or s['pilot'].get('session_handoff_boundary')!='request_feedback':return
-            review=(pause_exploration_remaining is not None and not protected(host)
+            review=(pause_exploration_remaining is not None
                 and current['research']['budget']['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
             if review:
                 from tools.research.session_handoff import request_feedback_boundary

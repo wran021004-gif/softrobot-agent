@@ -32,7 +32,7 @@ def initial(space, query, previous=None):
 
 def candidate_seed(space, query, candidate):
     """Preserve the existing coordinate representation, or reject lossy seeding."""
-    from extensions.tendon_family.family_space import resolved_request
+    from extensions.tendon_family.family_space import resolved_request,parse_space,payout_parameter
     r=resolved_request(space,candidate['parameters']);n=r['segment_count'];t=r['tendon_count']
     if r.get('route_overrides') or r.get('tendon_parameters')!= {k:v['default'] for k,v in space['tendon_domains'].items()}:
         raise ValueError('SEARCH_SEED_NOT_REPRESENTABLE_USE_GENERATE: route overrides or tendon parameters')
@@ -77,7 +77,7 @@ def candidate_seed(space, query, candidate):
     routing={k:v['default'] for k,v in space['routing_domains'].items()}
     phase=expanded[0]['angle']%(2*math.pi);routing.update(phase_rad=phase,guide_s=expanded[0]['guide'],anchor_s=expanded[0]['anchor'],radius_m=expanded[0]['radius'])
     return dict(segment_count=n,tendon_count=t,span_strategy=strategy,segments=segments,routing=routing,
-        **(dict(payout_lengths_m=r['payout_lengths_m']) if passive else {}),
+        **({payout_parameter(parse_space(space)):r[payout_parameter(parse_space(space))]} if passive else {}),
         radii_m=[v['radius'] for v in expanded],
         angular_offsets_rad=[(v['angle']-phase-2*math.pi*j/t+math.pi)%(2*math.pi)-math.pi for j,v in enumerate(expanded)])
 
@@ -111,11 +111,11 @@ def reshape(space, query, point, previous=None):
     p['angular_offsets_rad']=(old.get('angular_offsets_rad',[])+[p['routing']['angular_offset_rad']]*p['tendon_count'])[:p['tendon_count']]
     p['radii_m']=(old.get('radii_m',[])+[p['routing']['radius_m']]*p['tendon_count'])[:p['tendon_count']]
     if query.evaluation_mode.startswith('passive_'):
-        from extensions.tendon_family.family_space import payout_domains,parse_space
-        domains=payout_domains(parse_space(space),p['tendon_count'])
-        p['payout_lengths_m']=({k:old.get('payout_lengths_m',{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
+        from extensions.tendon_family.family_space import payout_domains,parse_space,payout_parameter
+        parsed=parse_space(space);field=payout_parameter(parsed);domains=payout_domains(parsed,p['tendon_count'])
+        p[field]=({k:old.get(field,{}).get(k,default(query,'payout',v.model_dump())) for k,v in domains.items()}
             if not space.get('payout_initialization') or 'payout' in query.variable_groups else
-            {k:v for k,v in old.get('payout_lengths_m',{}).items() if k in domains})
+            {k:v for k,v in old.get(field,{}).items() if k in domains})
     return p
 
 
@@ -154,11 +154,13 @@ def generation(space, query, point):
         if query.evaluation_mode.startswith('passive_'):
             request['segments'][i].update(physical_parameters=v['physical_parameters'],cells=v['cells'])
     if query.evaluation_mode.startswith('passive_'):
+        from extensions.tendon_family.family_space import parse_space,payout_parameter
+        field=payout_parameter(parse_space(space))
         if space.get('payout_initialization') and not p['payout_lengths_m']:
             from extensions.tendon_family.generated_serial import generate_family
             design,_,_=generate_family(dict(space=space,request=request))
             p['payout_lengths_m']=design['fixed_payout_lengths_m']
-        request['payout_lengths_m']=p['payout_lengths_m']
+        request[field]=p[field]
     return request
 
 
@@ -184,9 +186,9 @@ def next_move(space, query, best, cursor, step):
                 for k,d in domain.get('physical_domains',{}).items():
                     groups['materials'].append((f'segments.{i}.physical_parameters.{k}',('physical.'+k,d)))
     if 'payout' in groups:
-        from extensions.tendon_family.family_space import payout_domains,parse_space
+        from extensions.tendon_family.family_space import payout_domains,parse_space,payout_parameter
         for k,d in payout_domains(parse_space(space),p['tendon_count']).items():
-            groups['payout'].append(('payout_lengths_m.'+k,('payout',d.model_dump())))
+            groups['payout'].append((payout_parameter(parse_space(space))+'.'+k,('payout',d.model_dump())))
     if 'routing' in groups:
         for k in ('phase_rad','guide_s','anchor_s'):
             groups['routing'].append(('routing.'+k,('routing.'+k,space['routing_domains'][k])))
@@ -209,5 +211,5 @@ def next_move(space, query, best, cursor, step):
     else:
         name,d=domain;lo,hi=interval(query,name,d)
         parent[key]=(math.exp(min(math.log(hi),max(math.log(lo),math.log(parent[key])+direction*effective*math.log(hi/lo))))
-            if name=='payout' else min(hi,max(lo,parent[key]+direction*effective*(hi-lo))))
+            if name=='payout' and lo>0 else min(hi,max(lo,parent[key]+direction*effective*(hi-lo))))
     return p,[path],effective

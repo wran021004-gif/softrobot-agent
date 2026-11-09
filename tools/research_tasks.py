@@ -177,6 +177,42 @@ class ResearchTaskAdapter:
                 dict(effect_semantics='saved_stage_comparison',status='read_only',new_physics_steps=0)],
             scope='Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.')
 
+    def diagnostic_task_gap(self, raw, candidate=None, source_reference=None, pointer=''):
+        """Deterministic observations from frozen definitions and saved trajectories.
+
+        Qualification and the formal gap remain separate and non-comparable.
+        This function never executes, integrates, persists or grants acceptance.
+        """
+        components={}
+        supported=passive_registered(self.task) and self.task['goal']['data'].get('version')=='passive_response_v2'
+        if supported:
+            from types import SimpleNamespace
+            from extensions.reference.passive_evaluation_v2 import diagnostic_metrics
+            task=SimpleNamespace(goal=SimpleNamespace(data=self.task['goal']['data']),
+                evaluator=SimpleNamespace(parameters=SimpleNamespace(data=self.task['evaluator']['parameters']['data'])),
+                timing=SimpleNamespace(**self.task['timing']),
+                physical_problem=self.task['physical_problem'])
+            if raw.get('physical_binding',{}).get('task_identity')==digest(self.task):
+                components=diagnostic_metrics(task,raw)
+        rows=self.constraint_observations(components)
+        for row in rows:
+            component=components.get(row['constraint_id'],{})
+            episode_index=next((i for i,e in enumerate(raw.get('episodes',[])) if e.get('load_condition')==row.get('condition_id')),None)
+            row.update(candidate_identity=candidate,task_identity=digest(self.task),source_reference=source_reference,
+                source_pointer=pointer+('/episodes/'+str(episode_index) if episode_index is not None else ''),
+                definition_pointer='/configuration/task/evaluator/parameters/data',definition_reference=candidate,
+                sample_time=component.get('sample_time'),
+                missing_reason=component.get('missing_reason') or (None if row['observed_value'] is not None else
+                    'QUALIFIED_MECHANISM_EVIDENCE_REQUIRED' if row.get('signal')=='paired_mechanism' else
+                    'REQUIRED_TRAJECTORY_OR_TASK_BINDING_UNAVAILABLE' if supported else 'DIAGNOSTIC_EXTRACTOR_UNAVAILABLE'))
+            row.update({k:component[k] for k in ('aggregation','reference_window','reference_reduction') if k in component})
+        known=sum(row['observed_value'] is not None for row in rows)
+        return dict(version='diagnostic_task_gap_v1',status='complete' if rows and known==len(rows) else 'partial' if known else 'unavailable',
+            candidate_identity=candidate,task_identity=digest(self.task),constraints=rows,
+            valid_complete=False,comparable=False,normalized_gap=None,signed_task_gap=None,accepted=None,
+            missing_reason=None if known else 'REQUIRED_TRAJECTORY_OR_EXTRACTOR_UNAVAILABLE',
+            interpretation='Diagnostic observations only. Original qualification, formal acceptance, normalization and ranking eligibility remain unchanged.')
+
     def constraint_observations(self, components):
         """Join frozen task meanings to recorded evaluator values; never evaluate physics."""
         definitions=[]

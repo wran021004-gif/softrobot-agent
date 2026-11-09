@@ -22,6 +22,7 @@ def state_ok(value, raw):
 def inspect(task,raw,*,intervention=False):
     goal=PassiveResponseGoalV2.model_validate(task.goal.data)
     original=goal.execution_protocol=='phs2d_original_v1'
+    hard=goal.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
     source=raw.get('physical_binding',{})
     if (raw.get('kind')!='passive_dynamic_execution_v2' or source.get('task_identity')!=digest(task.model_dump(mode='json'))
             or raw.get('active_actuators')!=0 or not source.get('design_identity') or not source.get('model_identity')):
@@ -53,13 +54,19 @@ def inspect(task,raw,*,intervention=False):
             elif initial!=first_state:return 'invalid','EPISODES_DID_NOT_RESET_SAME_COMPLETE_STATE'
             if raw['initial_state_source']=='saved_integration_state':
                 if not goal.allow_saved_state or not raw.get('initial_state_result'):return 'invalid','SAVED_STATE_SOURCE_REQUIRED'
-            elif original:
+            elif hard:
                 eq=raw['unloaded_equilibrium']
+                expected_q=(np.asarray(eq['equilibrium']['qpos'])+goal.initial_perturbation_rad*np.sin(np.arange(n))).tolist()
                 if (eq['status']!='qualified_local_minimum' or not eq['equilibrium']['kkt_pass'] or
                         not eq['equilibrium']['second_order_sufficient'] or not eq['equilibrium']['capacity'] or
                         any(eq['solver_settings'].get(k)!=v for k,v in goal.unloaded_static_solver.items()) or
-                        initial['qpos_rad']!=eq['equilibrium']['qpos'] or any(initial['qvel_rad_s']) or initial['time_s']!=0):
+                        initial['qpos_rad']!=expected_q or any(initial['qvel_rad_s']) or initial['time_s']!=0):
                     return 'invalid','QUALIFIED_FRESH_UNLOADED_EQUILIBRIUM_REQUIRED'
+            else:
+                named=task.initializer.parameters.data
+                expected={key:[named[key].get(j,0.) for j in raw['coordinate_order']] for key in ('qpos_rad','qvel_rad_s')}
+                if any(initial[k]!=v for k,v in expected.items()) or initial['time_s']!=0:return 'invalid','FROZEN_NAMED_INITIAL_STATE_MISMATCH'
+            if original:
                 loading=e['loading_initial'];boundary=e['phase_boundaries'][0]['integration_state']
                 if (not state_ok(loading,raw) or loading['qpos_rad']!=boundary['qpos_rad'] or
                         any(loading['qvel_rad_s']) or loading['time_s']!=0 or
@@ -70,10 +77,6 @@ def inspect(task,raw,*,intervention=False):
                 if prefix!=first_prefix:return 'invalid','SHARED_UNLOADED_BASELINE_MISMATCH'
                 expected_steps=steps if e is episodes[0] else steps-round(stages[0].end_s/dt)
                 if e['executed_physics_steps']!=expected_steps:return 'invalid','SHARED_BASELINE_COST_MISMATCH'
-            else:
-                named=task.initializer.parameters.data
-                expected={key:[named[key].get(j,0.) for j in raw['coordinate_order']] for key in ('qpos_rad','qvel_rad_s')}
-                if any(initial[k]!=v for k,v in expected.items()) or initial['time_s']!=0:return 'invalid','FROZEN_NAMED_INITIAL_STATE_MISMATCH'
             if rows[0]['qpos_rad']!=initial['qpos_rad'] or rows[0]['qvel_rad_s']!=initial['qvel_rad_s']:
                 return 'invalid','INITIAL_MEASUREMENT_MISMATCH'
             if len(e['phase_boundaries'])!=len(stages):return 'incomplete','PHASE_BOUNDARY_STATE_MISSING'
@@ -183,7 +186,93 @@ def constraint_names(task):
     return names
 
 
-def metrics(task,raw):
+def bound_values(task, primary, b):
+    """Pure frozen metric extraction shared by formal and diagnostic evaluation."""
+    from .passive_response import reduce_vector
+    goal=PassiveResponseGoalV2.model_validate(task.goal.data)
+    e=next(e for e in primary['episodes'] if e['load_condition']==b.load_condition);stages={s.name:s for s in goal.programs[b.load_condition]}
+    rows=stage_rows(goal,e,b.window);refs=stage_rows(goal,e,b.reference_window)
+    if not rows or not refs:raise ValueError('SCORING_OR_REFERENCE_WINDOW_UNAVAILABLE')
+    for name,selected,last_only in ((b.window,rows,b.aggregation=='last'),(b.reference_window,refs,b.reference_reduction=='last')):
+        stage=stages[name];window=stage.scoring_window_s
+        dense=any(q.stage==name and q.sampling=='every_physics_step' and q.window_s[0]<=window[0] and q.window_s[1]>=window[1] for q in goal.qualifications)
+        period=task.timing.timestep_s if dense else task.timing.sample_period_s
+        expected=[window[1]] if last_only else np.arange(round(window[0]/period),round(window[1]/period)+1)*period
+        observed=[selected[-1]['time_s']] if last_only else [r['time_s'] for r in selected]
+        if len(observed)!=len(expected) or not np.allclose(observed,expected,rtol=0,atol=1e-10):
+            raise ValueError('COMPLETE_SCORING_OR_REFERENCE_GRID_REQUIRED')
+    times=[r['time_s'] for r in rows]
+    if b.aggregation=='mean_state':
+        rows=[{**rows[-1],**{key:np.mean([r[key] for r in rows],axis=0).tolist() for key in ('material_positions_m','tip_m','material_velocities_m_s','tip_velocity_m_s')}}]
+    reference=lambda key:np.asarray(refs[-1][key]) if b.reference_reduction=='last' else np.mean([r[key] for r in refs],axis=0)
+    i=task.physical_problem['monitor_s'].index(b.material_s);values=[]
+    for r in rows:
+        delta_point=np.asarray(r['material_positions_m'][i])-reference('material_positions_m')[i];delta_tip=np.asarray(r['tip_m'])-reference('tip_m')
+        point=float(np.linalg.norm(np.asarray(b.material_projection_world)@delta_point)) if b.material_projection_world is not None else reduce_vector(b,delta_point)
+        tip=float(np.linalg.norm(np.asarray(b.tip_projection_world)@delta_tip)) if b.tip_projection_world is not None else reduce_vector(b,delta_tip)
+        if b.quantity=='displacement_ratio' and max(point,b.denominator_floor_m)==0:raise ValueError('ZERO_DISPLACEMENT_RATIO_DENOMINATOR')
+        value={'material_displacement':lambda:point,'tip_displacement':lambda:tip,'displacement_ratio':lambda:tip/max(point,b.denominator_floor_m),
+            'displacement_difference':lambda:tip-b.material_scale*point,'maximum_tension':lambda:max(r['actual_tension_n']),
+            'maximum_length_excess':lambda:max([0.]+r['length_residual_m']),'material_speed':lambda:reduce_vector(b,np.asarray(r['material_velocities_m_s'][i])),
+            'tip_speed':lambda:reduce_vector(b,np.asarray(r['tip_velocity_m_s'])),'unloaded_tip_drift':lambda:tip,
+            'maximum_joint_position':lambda:max(abs(v) for v in r['qpos_rad']),'maximum_joint_speed':lambda:max(abs(v) for v in r['qvel_rad_s'])}[b.quantity]()
+        values.append(value)
+    if b.aggregation=='mean':values=[float(np.mean(values))]
+    elif b.aggregation=='last':values=values[-1:]
+    elif b.quantity in ('maximum_tension','maximum_length_excess','maximum_joint_position','maximum_joint_speed'):
+        values.append(e['stage_extrema'][b.window]['scoring'][b.quantity])
+    if not np.isfinite(values).all():raise ValueError('NONFINITE_DYNAMIC_METRIC')
+    return values,times
+
+
+def diagnostic_metrics(task, raw):
+    """Saved observations only, independently of qualification; no acceptance."""
+    ev=PassiveResponseEvaluationV2.model_validate(task.evaluator.parameters.data)
+    primary=raw
+    if 'baseline_cost' in (raw.get('paired_ablation') or {}):
+        from extensions.tendon_family.passive_execution import baseline_arm
+        primary=baseline_arm(raw)
+    observations={}
+    for b in ev.bounds:
+        try:
+            values,times=bound_values(task,primary,b)
+            error=None
+        except (KeyError,IndexError,StopIteration,ValueError) as exc:
+            values=[];times=[];error=str(exc) or 'REQUIRED_TRAJECTORY_UNAVAILABLE'
+        for side,reduce in (('minimum',min),('maximum',max)):
+            limit=getattr(b,side)
+            if limit is None:continue
+            value=reduce(values) if values else None
+            # Aggregated states/extrema have no unique measured peak timestamp.
+            sample_time=(times[-1] if b.aggregation=='last' else
+                times[values.index(value)] if b.aggregation=='range' and len(values)==len(times) else None) if values else None
+            observations['evaluator:'+b.name+'_'+side]=dict(value=value,limit=limit,unit=b.physical_unit,
+                passed=(value>=limit if side=='minimum' else value<=limit) if value is not None else None,
+                sample_time=sample_time,missing_reason=error,
+                aggregation=b.aggregation,reference_window=b.reference_window,reference_reduction=b.reference_reduction)
+    if ev.prohibit_contact:
+        episodes=primary.get('episodes',[])
+        complete=({e.get('load_condition') for e in episodes}>=set(task.goal.data['load_conditions'])
+            and all('maximum_contacts' in e for e in episodes))
+        value=max((e['maximum_contacts'] for e in episodes),default=None) if complete else None
+        observations['evaluator:no_contact']=dict(value=value,passed=value==0 if value is not None else None,
+            missing_reason=None if value is not None else 'REQUIRED_EPISODES_UNAVAILABLE')
+    for spec in ev.progressive_stiffness:
+        try:
+            response=stiffness(task,primary,spec)
+            error=None if response['valid'] else response['reason']
+        except (KeyError,IndexError,StopIteration,ValueError) as exc:
+            response={};error=str(exc) or 'REQUIRED_STIFFNESS_TRAJECTORY_UNAVAILABLE'
+        for suffix,limit,key in (('stiffness_ratio',spec.stiffness_ratio_min,'stiffness_ratio'),('slack_to_taut',1,'slack_to_taut')):
+            value=float(response[key]) if error is None else None
+            observations['evaluator:'+spec.load_condition+'_'+suffix]=dict(value=value,limit=limit,unit='1',
+                passed=value>=limit if value is not None else None,missing_reason=error)
+    # Paired causal conclusions retain the formal qualification/pairing gates.
+    # They remain unavailable on invalid arms even when geometry is measurable.
+    return observations
+
+
+def metrics(task,raw,*,check_confirmation=True,check_mechanism=True):
     from .passive_response import reduce_vector
     goal=PassiveResponseGoalV2.model_validate(task.goal.data);ev=PassiveResponseEvaluationV2.model_validate(task.evaluator.parameters.data)
     pair=raw.get('paired_ablation');primary=raw
@@ -198,28 +287,8 @@ def metrics(task,raw):
         measured.append(Metric(name=name,value=float(value),units=unit))
         constraints.append(ConstraintResult(name=name,observed=float(value),limit=float(limit),units=unit,satisfied=bool(satisfied)))
     for b in ev.bounds:
-        e=next(e for e in primary['episodes'] if e['load_condition']==b.load_condition);stages={s.name:s for s in goal.programs[b.load_condition]}
-        rows=stage_rows(goal,e,b.window);refs=stage_rows(goal,e,b.reference_window)
-        if b.aggregation=='mean_state':
-            rows=[{**rows[-1],**{key:np.mean([r[key] for r in rows],axis=0).tolist() for key in ('material_positions_m','tip_m','material_velocities_m_s','tip_velocity_m_s')}}]
-        reference=lambda key:np.asarray(refs[-1][key]) if b.reference_reduction=='last' else np.mean([r[key] for r in refs],axis=0)
-        i=task.physical_problem['monitor_s'].index(b.material_s);values=[]
-        for r in rows:
-            delta_point=np.asarray(r['material_positions_m'][i])-reference('material_positions_m')[i];delta_tip=np.asarray(r['tip_m'])-reference('tip_m')
-            point=float(np.linalg.norm(np.asarray(b.material_projection_world)@delta_point)) if b.material_projection_world is not None else reduce_vector(b,delta_point)
-            tip=float(np.linalg.norm(np.asarray(b.tip_projection_world)@delta_tip)) if b.tip_projection_world is not None else reduce_vector(b,delta_tip)
-            if b.quantity=='displacement_ratio' and max(point,b.denominator_floor_m)==0:return unknown('invalid','ZERO_DISPLACEMENT_RATIO_DENOMINATOR')
-            value={'material_displacement':lambda:point,'tip_displacement':lambda:tip,'displacement_ratio':lambda:tip/max(point,b.denominator_floor_m),
-                'displacement_difference':lambda:tip-b.material_scale*point,'maximum_tension':lambda:max(r['actual_tension_n']),
-                'maximum_length_excess':lambda:max([0.]+r['length_residual_m']),'material_speed':lambda:reduce_vector(b,np.asarray(r['material_velocities_m_s'][i])),
-                'tip_speed':lambda:reduce_vector(b,np.asarray(r['tip_velocity_m_s'])),'unloaded_tip_drift':lambda:tip,
-                'maximum_joint_position':lambda:max(abs(v) for v in r['qpos_rad']),'maximum_joint_speed':lambda:max(abs(v) for v in r['qvel_rad_s'])}[b.quantity]()
-            values.append(value)
-        if b.aggregation=='mean':values=[float(np.mean(values))]
-        elif b.aggregation=='last':values=values[-1:]
-        elif b.quantity in ('maximum_tension','maximum_length_excess','maximum_joint_position','maximum_joint_speed'):
-            values.append(e['stage_extrema'][b.window]['scoring'][b.quantity])
-        if not np.isfinite(values).all():return unknown('invalid','NONFINITE_DYNAMIC_METRIC')
+        try:values,_=bound_values(task,primary,b)
+        except ValueError as exc:return unknown('invalid',str(exc))
         if b.minimum is not None:add(b.name+'_minimum',min(values),b.minimum,b.physical_unit,min(values)>=b.minimum)
         if b.maximum is not None:add(b.name+'_maximum',max(values),b.maximum,b.physical_unit,max(values)<=b.maximum)
     if ev.prohibit_contact:
@@ -230,7 +299,7 @@ def metrics(task,raw):
         if not value['valid']:return unknown('invalid',value['reason'])
         add(s.load_condition+'_stiffness_ratio',value['stiffness_ratio'],s.stiffness_ratio_min,'1',value['stiffness_ratio']>=s.stiffness_ratio_min)
         add(s.load_condition+'_slack_to_taut',int(value['slack_to_taut']),1,'1',value['slack_to_taut'])
-    if ev.mechanism:
+    if ev.mechanism and check_mechanism:
         if not pair or pair.get('status')!='completed':return unknown('incomplete','COMPLETED_PAIRED_ABLATION_REQUIRED')
         other=pair['ablation'];valid,reason=inspect(task,other,intervention=True)
         if valid!='valid':return unknown(valid,'ABLATION_'+str(reason))
@@ -250,7 +319,61 @@ def metrics(task,raw):
             late=other_value['interval_stiffness_n_m'][-1]/base['interval_stiffness_n_m'][-1]
             passed=high>=ev.mechanism.high_displacement_increase_min or late<=ev.mechanism.late_stiffness_ratio_max
             add(s.load_condition+'_paired_mechanism',int(passed),1,'1',passed)
+    if ev.numerical_confirmation and check_confirmation:
+        valid,reason=confirmation(task,raw)
+        if valid!='valid':return dict(validity=valid,task_success=None,metrics=measured,constraints=constraints,reason=reason)
     return dict(validity='valid',task_success=all(c.satisfied for c in constraints),metrics=measured,constraints=constraints)
+
+
+def confirmation(task,raw):
+    """Verify measured independent executions, never a score-grid surrogate."""
+    from .passive_program import confirmation_task
+    from extensions.tendon_family.passive_execution import baseline_arm
+    ev=PassiveResponseEvaluationV2.model_validate(task.evaluator.parameters.data);spec=ev.numerical_confirmation
+    c=raw.get('numerical_confirmation')
+    if not c or c.get('version')!='passive_numerical_confirmation_v1':return 'incomplete','INDEPENDENT_NUMERICAL_CONFIRMATION_REQUIRED'
+    try:
+        if (c['source_execution_id']==c['independent_execution_id'] or not c['source_result']['artifact_id']
+                or c['source_binding']!=raw['physical_binding'] or len(c['source_raw_identity'])!=64):
+            return 'invalid','CONFIRMATION_SOURCE_IDENTITY_MISMATCH'
+        independent=baseline_arm(raw)
+        for variant in ('half_timestep','initial_perturbation'):
+            record=c['executions'][variant];effective=confirmation_task(task,variant);other=record['raw']
+            if (record['raw_identity']!=digest(other) or record['task']!=effective.model_dump(mode='json')
+                    or record['execution_id'] in (c['source_execution_id'],c['independent_execution_id'])
+                    or other['physical_binding']['design_identity']!=raw['physical_binding']['design_identity']
+                    or other['numerical_invariant_model_signature']!=raw['numerical_invariant_model_signature']
+                    or any(other[k]!=raw[k] for k in ('coordinate_order','tendon_order','payout_lengths_m'))
+                    or other['unloaded_equilibrium']['equilibrium']['qpos']!=raw['unloaded_equilibrium']['equilibrium']['qpos']):
+                return 'invalid','CONFIRMATION_VARIANT_IDENTITY_MISMATCH'
+            valid,reason=inspect(effective,other)
+            if valid!='valid':return valid,'CONFIRMATION_'+variant+':'+str(reason)
+            if other['intervention']['kind']!='none':return 'invalid','CONSTRAINED_NUMERICAL_CONFIRMATION_REQUIRED'
+            if metrics(effective,other,check_confirmation=False,check_mechanism=False).get('task_success') is not True:
+                return 'invalid','CONFIRMATION_TASK_BOUNDS_FAILED:'+variant
+        if c['executions']['half_timestep']['execution_id']==c['executions']['initial_perturbation']['execution_id']:
+            return 'invalid','DISTINCT_NUMERICAL_EXECUTIONS_REQUIRED'
+        for s in ev.progressive_stiffness:
+            base=np.asarray(stiffness(task,independent,s)['displacement_m'])
+            source=np.asarray(c['source_displacements_m'][s.load_condition])
+            if base.shape!=(3,) or source.shape!=base.shape or not np.isfinite(source).all():return 'invalid','CONFIRMATION_DISPLACEMENTS_MISSING'
+            values=[source]+[np.asarray(stiffness(confirmation_task(task,v),c['executions'][v]['raw'],s)['displacement_m'])
+                for v in ('half_timestep','initial_perturbation')]
+            if any(a.shape!=base.shape or not np.isfinite(a).all() or np.max(abs(a-base))>spec.max_displacement_difference_m for a in values):
+                return 'invalid','CROSS_EXECUTION_DISPLACEMENT_DIFFERENCE'
+        required={'baseline','ablation','half_timestep','initial_perturbation'}
+        if set(c['saved_state_replay'])!=required:return 'incomplete','COMPLETE_SAVED_STATE_REPLAY_SCOPE_REQUIRED'
+        arms=dict(baseline=independent,ablation=raw['paired_ablation']['ablation'],
+            **{v:c['executions'][v]['raw'] for v in ('half_timestep','initial_perturbation')})
+        for name,arm in arms.items():
+            replay=c['saved_state_replay'][name]
+            if (replay['status']!='verified' or replay['integrations']!=0 or replay['raw_identity']!=digest(arm)
+                    or replay['traces']!=arm['trace_files'] or replay['rows_checked']!=arm['physics_steps']
+                    or replay['route_checked_poses']!=arm['physics_steps']
+                    or replay['maximum_position_difference_m']>1e-10):
+                return 'invalid','SAVED_STATE_REPLAY_BINDING_MISMATCH'
+    except (KeyError,TypeError,ValueError,IndexError):return 'incomplete','COMPLETE_NUMERICAL_CONFIRMATION_RECORD_REQUIRED'
+    return 'valid',None
 
 
 def summary(task,raw):

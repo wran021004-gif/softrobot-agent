@@ -1,0 +1,3246 @@
+{
+  "entries": [
+    {
+      "entry_id": "research-contact-causality",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-contact-causality_v1.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_serial_bending",
+      "failure_type": "contact_numerical_failure",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-stable-start",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-stable-start_v1.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_serial_bending",
+      "failure_type": "unstable_initialization",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-bounded-continuation",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-bounded-continuation_v1.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_serial_bending",
+      "failure_type": "local_residual",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-strict-near-tolerance",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-strict-near-tolerance_v1.json",
+      "task": "position_tool_axis",
+      "structure": "tendon_serial_bending",
+      "failure_type": "near_tolerance",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-timed-tracking",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-timed-tracking_v1.json",
+      "task": "tracking",
+      "structure": "tendon_serial_bending",
+      "failure_type": "finite_tracking_failure",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-witness-and-cost",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-witness-and-cost_v1.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_serial_bending",
+      "failure_type": "acceptance_accounting",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified"
+    },
+    {
+      "entry_id": "research-strict-near-tolerance",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-strict-near-tolerance_v2.json",
+      "task": "position_tool_axis",
+      "structure": "tendon_serial_bending",
+      "failure_type": "near_tolerance",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of hash-verified original historical summaries; not a reviewed translation.",
+        "human_review": "not_claimed"
+      }
+    },
+    {
+      "entry_id": "passive-force-response-research",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "passive_progressive_stiffness",
+      "structure": "serial_passive_soft_arm",
+      "failure_type": "not_applicable",
+      "version": "1",
+      "path": "memory/diagnostics/passive-force-response-research_v1.json",
+      "status": "reference_backed_scoped",
+      "summary": "用张力/长度/活跃集核查机制；静力后做连续动力学、有效消融、时空离散检查，明确未决边界。",
+      "confidence": {
+        "observations": "reference_backed",
+        "physical_interpretation": "within valid paired models",
+        "generalization": "hypothesis requiring task-local validation"
+      },
+      "applicability_summary": [
+        "适用于含被动约束、分阶段外载或结构机制归因的软体机器人研究。",
+        "推荐动作是待新任务检验的方法经验，不是可复用的获胜设计。"
+      ],
+      "applicable_tasks": [
+        "passive_force_response",
+        "soft_robot_research",
+        "reach_and_hold",
+        "tracking"
+      ],
+      "applicable_structures": [
+        "tendon_robot_family",
+        "tendon_soft_arm"
+      ],
+      "introduced_in": "p3_knowledge_v1",
+      "source_case_ids": [
+        "P3"
+      ]
+    },
+    {
+      "entry_id": "research-timed-tracking",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-timed-tracking_v2.json",
+      "task": "tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Evaluate time-indexed tracking predicates over the full frozen grid, rather than substituting endpoint reach.",
+      "applicable_tasks": [
+        "tracking"
+      ],
+      "source_case_ids": [
+        "BF4",
+        "M4",
+        "C1"
+      ]
+    },
+    {
+      "entry_id": "research-strict-near-tolerance",
+      "revision": "3",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-strict-near-tolerance_v3.json",
+      "task": "position_tool_axis",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Preserve unrounded joint residuals and original evaluator thresholds before considering finite continuation.",
+      "applicable_tasks": [
+        "position_tool_axis",
+        "reach",
+        "reach_and_hold",
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF5",
+        "BF6",
+        "M2"
+      ]
+    },
+    {
+      "entry_id": "research-stable-start",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-stable-start_v2.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Establish a complete, correctly loaded execution before interpreting task-performance differences.",
+      "applicable_tasks": [
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF6",
+        "M6",
+        "C1"
+      ]
+    },
+    {
+      "entry_id": "research-contact-causality",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-contact-causality_v2.json",
+      "task": "oriented_tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Use phase-aligned diagnostics and competing hypotheses to distinguish contact, instability and numerical failure.",
+      "applicable_tasks": [
+        "oriented_tracking"
+      ],
+      "source_case_ids": [
+        "BF6",
+        "M6",
+        "PHS-2D"
+      ]
+    },
+    {
+      "entry_id": "research-bounded-continuation",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-bounded-continuation_v2.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Compare bounded continuation against structural hypotheses while preserving identities, budgets and fair optimization opportunities.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "BF4",
+        "BF6",
+        "M1",
+        "M2",
+        "M3"
+      ]
+    },
+    {
+      "entry_id": "research-witness-and-cost",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/research-witness-and-cost_v2.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Keep numerical witnesses, independent acceptance, same-structure joint conditions and actual resource ledgers distinct.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "BF5",
+        "BF6",
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "C1",
+        "PHS-2D",
+        "P3"
+      ]
+    },
+    {
+      "entry_id": "passive-force-response-research",
+      "revision": "2",
+      "kind": "procedure",
+      "path": "memory/diagnostics/passive-force-response-research_v2.json",
+      "task": "passive_force_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Validate unilateral constraint activation and finite loaded dynamics after geometry or static/KKT screening.",
+      "applicable_tasks": [
+        "passive_force_response",
+        "passive_progressive_stiffness",
+        "passive_head_stabilization",
+        "soft_robot_research",
+        "passive_response"
+      ],
+      "source_case_ids": [
+        "P3",
+        "PHS-2D"
+      ]
+    },
+    {
+      "entry_id": "model-physics-comparison",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/model-physics-comparison_v1.json",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "p62k",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "New English synthesis of verified historical traces and preserved method versions; no human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Interpret local proxies and matched physical observations at their own scope before proposing structural mechanisms.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "source_case_ids": [
+        "C1",
+        "PHS-2D",
+        "P3"
+      ]
+    },
+    {
+      "entry_id": "skill-finite-search",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-finite-search_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "A nonpassing finite search is an observation about its parameterization, initialization and allowance, not a verified exclusion of the structure.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ],
+      "skill_type": "Failure Diagnosis",
+      "compact_skill": {
+        "principle": "A nonpassing finite search is an observation about its parameterization, initialization and allowance, not a verified exclusion of the structure.",
+        "when": "A finite control search did not pass."
+      }
+    },
+    {
+      "entry_id": "skill-parameter-model",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-parameter-model_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "Trace a parameter through the actual generator, compiler, force law and operation input before proposing its effect. Explicit inputs may override defaults.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "first_scientific_plan"
+      ],
+      "skill_type": "Physical / Mathematical Reasoning",
+      "compact_skill": {
+        "principle": "Trace a parameter through the actual generator, compiler, force law and operation input before proposing its effect. Explicit inputs may override defaults.",
+        "when": "A parameter name is being used as a causal mechanism."
+      }
+    },
+    {
+      "entry_id": "skill-matched-comparison",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-matched-comparison_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "Attribute structural effects only after matching condition, load, initialization, scoring window, model fidelity and fair control adaptation opportunities.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ],
+      "skill_type": "Experiment Design",
+      "compact_skill": {
+        "principle": "Attribute structural effects only after matching condition, load, initialization, scoring window, model fidelity and fair control adaptation opportunities.",
+        "when": "Two structures have different scores."
+      }
+    },
+    {
+      "entry_id": "skill-local-to-experiment",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-local-to-experiment_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "Use a local mechanism result to form a falsifiable hypothesis; a local acceleration derivative does not identify full-horizon task capability.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ],
+      "skill_type": "Experiment Design",
+      "compact_skill": {
+        "principle": "Use a local mechanism result to form a falsifiable hypothesis; a local acceleration derivative does not identify full-horizon task capability.",
+        "when": "An instantaneous derivative suggests a direction."
+      }
+    },
+    {
+      "entry_id": "skill-continue-or-stop",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-continue-or-stop_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "Compare the expected information value of remaining legal experiments with their cost and actual limitations. Closure may be justified before budget exhaustion, but lack of success alone does not establish closure.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "voluntary_stop"
+      ],
+      "skill_type": "Scientific Decision",
+      "compact_skill": {
+        "principle": "Compare the expected information value of remaining legal experiments with their cost and actual limitations. Closure may be justified before budget exhaustion, but lack of success alone does not establish closure.",
+        "when": "Considering a route change or voluntary STOP."
+      }
+    },
+    {
+      "entry_id": "skill-witness-replay",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-witness-replay_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "A mathematical witness and a fresh independent registered evaluation have different evidence roles. Joint success requires all frozen conditions on one structure.",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "tracking",
+        "oriented_tracking",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "first_scientific_plan",
+        "voluntary_stop"
+      ],
+      "skill_type": "Evidence Interpretation",
+      "compact_skill": {
+        "principle": "A mathematical witness and a fresh independent registered evaluation have different evidence roles. Joint success requires all frozen conditions on one structure.",
+        "when": "A mathematical improvement is being promoted to acceptance."
+      }
+    },
+    {
+      "entry_id": "experience-accepted-control",
+      "revision": "1",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/cases/experience-accepted-control_v1.json",
+      "status": "public_decision_pattern; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "A changed candidate had a complete independent task failure on a remaining condition. Abstract decision pattern; no autonomous-discovery claim.",
+      "benchmark_sensitive": false,
+      "disclosure": "abstract_decision_pattern_only",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ]
+    },
+    {
+      "entry_id": "experience-structure-readaptation",
+      "revision": "1",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/cases/experience-structure-readaptation_v1.json",
+      "status": "public_decision_pattern; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "A condition remained failing after finite control continuation. Abstract decision pattern; no autonomous-discovery claim.",
+      "benchmark_sensitive": false,
+      "disclosure": "abstract_decision_pattern_only",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ]
+    },
+    {
+      "entry_id": "experience-premature-stop",
+      "revision": "1",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/cases/experience-premature-stop_v1.json",
+      "status": "public_decision_pattern; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "The Main considered STOP with nonpassing finite searches and unused allowance. Abstract decision pattern; no autonomous-discovery claim.",
+      "benchmark_sensitive": false,
+      "disclosure": "abstract_decision_pattern_only",
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "voluntary_stop"
+      ]
+    },
+    {
+      "entry_id": "skill-control-or-structure",
+      "revision": "1",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/diagnostics/skill-control-or-structure_v1.json",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "knowledge_organization_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english"
+      },
+      "summary": "Distinguish limited control-search domains from weak relevant drive or braking; choose a discriminating experiment. Conditional historical method, not a task answer.",
+      "benchmark_sensitive": false,
+      "applicable_tasks": [
+        "reach",
+        "reach_and_hold",
+        "soft_robot_research"
+      ],
+      "applicable_triggers": [
+        "finite_search_structural_review"
+      ],
+      "compact_skill": {
+        "principle": "Separate control-search limits from structural limits: inspect the actual input domain, then test a changed control search or relevant drive/braking mechanism. Local failure and local mechanism improvement do not establish full-task feasibility.",
+        "when": "A finite control search failed and a structural change is being considered."
+      }
+    },
+    {
+      "entry_id": "passive-structure-mechanics",
+      "revision": "1",
+      "kind": "procedure",
+      "path": "memory/diagnostics/passive-structure-mechanics_v1.json",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "passive_research_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated synthesis of preserved PHS research process and existing native model contracts; no new experiment or human review claimed.",
+        "human_review": "not_claimed"
+      },
+      "summary": "Passive mechanics, coupled design variables, unilateral sensitivity and historical failure lessons with explicit evidence grades.",
+      "applicable_tasks": [
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "passive-structure-mechanics",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Unilateral constraints, taut/slack activation and passive force balance.",
+      "type": "general",
+      "trigger": [
+        "slack",
+        "taut",
+        "tendon",
+        "pretension"
+      ],
+      "source_refs": [
+        "passive-force-response-research@2:procedure-1",
+        "phs2d-research-process@1:trace-3"
+      ],
+      "evidence_level": "model_derivation; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2"
+      ],
+      "knowledge_refs": [
+        "general-routing@1",
+        "general-equilibrium@1"
+      ],
+      "entry_id": "passive-structure-mechanics",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "passive-structure-mechanics",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-routing",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Route geometry maps tension into generalized force; finite deformation can invalidate local predictions.",
+      "type": "general",
+      "trigger": [
+        "routing",
+        "jacobian",
+        "large deformation",
+        "geometry"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-5-9",
+        "passive-force-response-research@2:procedure-2-3"
+      ],
+      "evidence_level": "model_derivation; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Ordinary derivatives require differentiable geometry and a regular fixed active set.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Guide contact or switching may break smooth assumptions.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2"
+      ],
+      "knowledge_refs": [
+        "passive-structure-mechanics@2",
+        "diagnostic-local-finite@1"
+      ],
+      "entry_id": "general-routing",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-routing",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-equilibrium",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Equilibrium, KKT regularity and stability are separate qualifications.",
+      "type": "general",
+      "trigger": [
+        "kkt",
+        "stability",
+        "equilibrium",
+        "hessian"
+      ],
+      "source_refs": [
+        "passive-force-response-research@2:procedure-1-2",
+        "phs2d-case@2:steps-2-3"
+      ],
+      "evidence_level": "conditional_model_derivation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Specify admissible tangent directions and active constraints.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Singular tangent systems do not establish physical impossibility.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "validation-qualification@1"
+      ],
+      "entry_id": "general-equilibrium",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-equilibrium",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-material-inertia",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Material, section, density and inertia change coupled parts of passive response.",
+      "type": "general",
+      "trigger": [
+        "material",
+        "density",
+        "section",
+        "inertia",
+        "relaxation",
+        "viscosity"
+      ],
+      "source_refs": [
+        "passive-structure-mechanics@1:topics",
+        "phs2d-case@2:step-8"
+      ],
+      "evidence_level": "model_contract; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Use the actual constitutive law and generator/compiler mapping.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Slow simulated decay is not material calibration or proof of a unique relaxation mechanism.",
+      "related_skills": [
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2"
+      ],
+      "knowledge_refs": [
+        "diagnostic-relaxation@1"
+      ],
+      "entry_id": "general-material-inertia",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-material-inertia",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-multicondition",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "One passive structure must satisfy every required load under the frozen protocol.",
+      "type": "general",
+      "trigger": [
+        "multi-condition",
+        "multi-load",
+        "holdout",
+        "worst condition"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-10-12",
+        "p3-case@2:steps-8-11"
+      ],
+      "evidence_level": "historical_observation; task_contract",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Tested conditions do not establish untested-load or continuum robustness.",
+      "related_skills": [
+        "skill-matched-comparison@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "validation-replay@1"
+      ],
+      "entry_id": "general-multicondition",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-multicondition",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-sensitivity",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Mechanism sensitivity and task-performance sensitivity answer different questions.",
+      "type": "general",
+      "trigger": [
+        "sensitivity",
+        "mechanism",
+        "ablation",
+        "parameter"
+      ],
+      "source_refs": [
+        "p3-case@2:steps-7-12",
+        "passive-structure-mechanics@1:topics"
+      ],
+      "evidence_level": "conditional_model_derivation; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Declare fixed versus reoptimized inputs and active-set regularity.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Parameter activity does not imply beneficial task direction or identify multifactor causes.",
+      "related_skills": [
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2"
+      ],
+      "knowledge_refs": [
+        "general-equilibrium@1",
+        "diagnostic-static-dynamic@1"
+      ],
+      "entry_id": "general-sensitivity",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-sensitivity",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-tip-drift",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Loaded tip drifts despite a promising static or local result.",
+      "type": "diagnostic",
+      "trigger": [
+        "tip drift",
+        "drift",
+        "loaded response"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-3-5"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-routing@1",
+        "general-equilibrium@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "diagnostic-tip-drift",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-tip-drift",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-slack",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Tendon becomes slack or tension intermittently vanishes.",
+      "type": "diagnostic",
+      "trigger": [
+        "slack",
+        "tension vanishes",
+        "active set"
+      ],
+      "source_refs": [
+        "phs2d-case@2:step-5",
+        "p3-case@2:step-12"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "passive-structure-mechanics@2",
+        "general-routing@1"
+      ],
+      "entry_id": "diagnostic-slack",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-slack",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-static-dynamic",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Static equilibrium passes but dynamic qualification fails.",
+      "type": "diagnostic",
+      "trigger": [
+        "static passes",
+        "dynamic invalid",
+        "static dynamic",
+        "ablation"
+      ],
+      "source_refs": [
+        "p3-case@2:steps-4-7"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-equilibrium@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "diagnostic-static-dynamic",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-static-dynamic",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-local-finite",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Local Jacobian prediction disagrees with large deformation.",
+      "type": "diagnostic",
+      "trigger": [
+        "jacobian",
+        "large deformation",
+        "local finite",
+        "row space"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-5-9"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-routing@1",
+        "general-equilibrium@1"
+      ],
+      "entry_id": "diagnostic-local-finite",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-local-finite",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-relaxation",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Response or residual decays slowly after loading.",
+      "type": "diagnostic",
+      "trigger": [
+        "relaxation",
+        "slow decay",
+        "tail residual",
+        "viscosity"
+      ],
+      "source_refs": [
+        "phs2d-research-process@1:trace-6",
+        "phs2d-case@2:step-8"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-material-inertia@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "diagnostic-relaxation",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-relaxation",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-kkt",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "KKT regularity or stability qualification fails.",
+      "type": "diagnostic",
+      "trigger": [
+        "kkt",
+        "hessian",
+        "stability qualification",
+        "singular tangent"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-1-3",
+        "passive-force-response-research@2:procedure-2"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-equilibrium@1"
+      ],
+      "entry_id": "diagnostic-kkt",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-kkt",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-convergence",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Solver convergence and physical qualification disagree.",
+      "type": "diagnostic",
+      "trigger": [
+        "convergence",
+        "numerical physical",
+        "residual",
+        "invalid"
+      ],
+      "source_refs": [
+        "p3-case@2:steps-5-6-12",
+        "phs2d-case@2:step-3"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "validation-qualification@1",
+        "validation-replay@1"
+      ],
+      "entry_id": "diagnostic-convergence",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-convergence",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "passive-force-response-research",
+      "revision": "3",
+      "resource_role": "knowledge",
+      "summary": "Classify a passive-response failure before transferring a historical explanation.",
+      "type": "diagnostic",
+      "trigger": [
+        "passive response",
+        "force response",
+        "qualification failure"
+      ],
+      "source_refs": [
+        "passive-force-response-research@2:procedure-1-6"
+      ],
+      "evidence_level": "conditional_diagnostic_method; not_unique_cause",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "diagnostic-tip-drift@1",
+        "diagnostic-slack@1",
+        "diagnostic-static-dynamic@1",
+        "diagnostic-local-finite@1",
+        "diagnostic-relaxation@1",
+        "diagnostic-kkt@1",
+        "diagnostic-convergence@1"
+      ],
+      "entry_id": "passive-force-response-research",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "passive-force-response-research",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "validation-qualification",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Separate static, dynamic and stability evidence; audit the complete required horizon.",
+      "type": "validation",
+      "trigger": [
+        "qualification",
+        "static",
+        "stability",
+        "timestep audit"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-1-4",
+        "p3-case@2:steps-4-7"
+      ],
+      "evidence_level": "validation_method; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Thresholds belong exclusively to the frozen Task Specification.",
+      "related_skills": [
+        "skill-matched-comparison@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-equilibrium@1",
+        "diagnostic-convergence@1"
+      ],
+      "entry_id": "validation-qualification",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "validation-qualification",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "validation-replay",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Freeze identities for independent replay, step refinement, perturbation and spatial checks.",
+      "type": "validation",
+      "trigger": [
+        "replay",
+        "refinement",
+        "perturbation",
+        "convergence",
+        "holdout"
+      ],
+      "source_refs": [
+        "phs2d-case@2:steps-10-12",
+        "p3-case@2:steps-8-12"
+      ],
+      "evidence_level": "bounded_development_validation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Finite grids/perturbations do not prove universal robustness or spatial convergence.",
+      "related_skills": [
+        "skill-matched-comparison@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-multicondition@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "validation-replay",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "validation-replay",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "phs2d-case",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "PHS-2D history retains unqualified, valid-failing, local-model, material and installation branches.",
+      "type": "case",
+      "trigger": [
+        "historical case",
+        "passive response",
+        "research trace"
+      ],
+      "source_refs": [
+        {
+          "record": "PHS2D-owner-history",
+          "sha256": "22a7ddb2cbc13ff7fed1d82b8ae34ff1ff567701a618ec5a6aabdb3ba8621cae",
+          "scope": "Owner-preserved trace; opaque provenance, not an evidence-read handle."
+        },
+        "phs2d-research-process@1:trace-1-7"
+      ],
+      "evidence_level": "historical_development_observation; not_formal_SELECT",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Exact design values, topology, XML, candidate labels, Store references and reconstruction locations are withheld.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "entry_id": "phs2d-case",
+      "kind": "case",
+      "task": "passive_head_stabilization",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "phs2d-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "passive_head_stabilization"
+      ]
+    },
+    {
+      "id": "p3-case",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "P3 history retains dynamic invalidity, unresolved outputs, invalid ablation and spatial counterexamples.",
+      "type": "case",
+      "trigger": [
+        "historical case",
+        "passive response",
+        "research trace"
+      ],
+      "source_refs": [
+        {
+          "record": "P3-owner-history",
+          "sha256": "cf18ffb5124a61bf7f7bdd8c39d590bdc710163a65d9bdcfc8fe37794285cdd7",
+          "scope": "Owner-preserved trace; opaque provenance, not an evidence-read handle."
+        }
+      ],
+      "evidence_level": "historical_development_observation; not_formal_SELECT",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Exact design values, topology, XML, candidate labels, Store references and reconstruction locations are withheld.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "entry_id": "p3-case",
+      "kind": "case",
+      "task": "passive_progressive_stiffness",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "p3-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "passive_progressive_stiffness"
+      ]
+    },
+    {
+      "id": "skill-finite-search",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "A nonpassing finite search is an observation about its parameterization, initialization and allowance, not a verified exclusion of the structure.",
+      "source_refs": [
+        "skill-finite-search@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-sensitivity@1",
+        "diagnostic-convergence@1",
+        "general-equilibrium@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1",
+        "general-finite-claims@1",
+        "diagnostic-holding@1"
+      ],
+      "entry_id": "skill-finite-search",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-finite-search",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-parameter-model",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "Trace a parameter through the actual generator, compiler, force law and operation input before proposing its effect. Explicit inputs may override defaults.",
+      "source_refs": [
+        "skill-parameter-model@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-material-inertia@1",
+        "general-routing@1",
+        "general-sensitivity@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-parameter-model",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-parameter-model",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-matched-comparison",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "Attribute structural effects only after matching condition, load, initialization, scoring window, model fidelity and fair control adaptation opportunities.",
+      "source_refs": [
+        "skill-matched-comparison@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-multicondition@1",
+        "general-sensitivity@1",
+        "validation-qualification@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1",
+        "diagnostic-contact@1",
+        "diagnostic-near-bound@1"
+      ],
+      "entry_id": "skill-matched-comparison",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-matched-comparison",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-local-to-experiment",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "Use a local mechanism result to form a falsifiable hypothesis; a local acceleration derivative does not identify full-horizon task capability.",
+      "source_refs": [
+        "skill-local-to-experiment@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-routing@1",
+        "general-equilibrium@1",
+        "diagnostic-local-finite@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-local-to-experiment",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-local-to-experiment",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-continue-or-stop",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "Compare the expected information value of remaining legal experiments with their cost and actual limitations. Closure may be justified before budget exhaustion, but lack of success alone does not establish closure.",
+      "source_refs": [
+        "skill-continue-or-stop@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "phs2d-case@2",
+        "p3-case@2",
+        "validation-replay@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-continue-or-stop",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-continue-or-stop",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-witness-replay",
+      "revision": "2",
+      "resource_role": "skill",
+      "summary": "A mathematical witness and a fresh independent registered evaluation have different evidence roles. Joint success requires all frozen conditions on one structure.",
+      "source_refs": [
+        "skill-witness-replay@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "validation-qualification@1",
+        "validation-replay@1",
+        "general-multicondition@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-witness-replay",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-witness-replay",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "phs2d-research-process",
+      "revision": "2",
+      "resource_role": "expert_process",
+      "summary": "Organize PHS domain research by selecting relevant Knowledge and existing Skills.",
+      "source_refs": [
+        "phs2d-research-process@1"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "Advisory Expert Process content in the existing manifest, not a registered executor or seventh Skill. Historical organization was operator/Codex driven."
+      ],
+      "knowledge_refs": [
+        "phs2d-case@2",
+        "passive-force-response-research@3",
+        "general-routing@1",
+        "general-equilibrium@1",
+        "general-sensitivity@1",
+        "validation-replay@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "phs2d-research-process",
+      "kind": "case",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "phs2d-research-process",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "m1-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M1: answer-isolated historical decision trace; accepted.",
+      "type": "case",
+      "trigger": [
+        "m1",
+        "historical case",
+        "reach_and_hold"
+      ],
+      "source_refs": [
+        {
+          "record": "M1-owner-history",
+          "sha256": "50417e4930f5fa7a0c797797f228d0765cb3d2fa361436f1593d9f301ae195ca",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_registered_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m1-case",
+      "kind": "case",
+      "task": "reach_and_hold",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m1-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold"
+      ]
+    },
+    {
+      "id": "m2-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M2: answer-isolated historical decision trace; accepted.",
+      "type": "case",
+      "trigger": [
+        "m2",
+        "historical case",
+        "reach_and_hold"
+      ],
+      "source_refs": [
+        {
+          "record": "M2-owner-history",
+          "sha256": "92e71847c6ef62b42965d849afed54af17762ebebcea4981b23b0a548c6d77cf",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_registered_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m2-case",
+      "kind": "case",
+      "task": "reach_and_hold",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m2-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold"
+      ]
+    },
+    {
+      "id": "m3-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M3: answer-isolated historical decision trace; draft_protocol_accepted.",
+      "type": "case",
+      "trigger": [
+        "m3",
+        "historical case",
+        "reach_and_hold"
+      ],
+      "source_refs": [
+        {
+          "record": "M3-owner-history",
+          "sha256": "bdfa59bcc6d261e4c674e2f7086cd86375e531e49e88f9c722bf2abea2a80316",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_development_draft_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m3-case",
+      "kind": "case",
+      "task": "reach_and_hold",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m3-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold"
+      ]
+    },
+    {
+      "id": "m4-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M4: answer-isolated historical decision trace; accepted.",
+      "type": "case",
+      "trigger": [
+        "m4",
+        "historical case",
+        "tracking"
+      ],
+      "source_refs": [
+        {
+          "record": "M4-owner-history",
+          "sha256": "9fcce92c5304a15ea7dce0fdf1d7ddafded000b3c28b9cf65bc301c6ee9b767b",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_registered_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m4-case",
+      "kind": "case",
+      "task": "tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m4-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "tracking"
+      ]
+    },
+    {
+      "id": "m5-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M5: answer-isolated historical decision trace; accepted.",
+      "type": "case",
+      "trigger": [
+        "m5",
+        "historical case",
+        "position_tool_axis"
+      ],
+      "source_refs": [
+        {
+          "record": "M5-owner-history",
+          "sha256": "c6064b5778734a8c5ad88298c3cc2805395662f7868515c355adddcbe879633e",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_registered_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m5-case",
+      "kind": "case",
+      "task": "position_tool_axis",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m5-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "position_tool_axis"
+      ]
+    },
+    {
+      "id": "m6-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "M6: answer-isolated historical decision trace; accepted.",
+      "type": "case",
+      "trigger": [
+        "m6",
+        "historical case",
+        "oriented_tracking"
+      ],
+      "source_refs": [
+        {
+          "record": "M6-owner-history",
+          "sha256": "937b31039cd5ea8d6514002c7e413c169e37969d7e398f344d1db607ac2d265a",
+          "scope": "Opaque provenance; not a Store handle or reconstruction location."
+        }
+      ],
+      "evidence_level": "historical_registered_acceptance",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Not blind discovery, global infeasibility/optimality, hardware, repeatability or general robustness evidence.",
+        "Changed structures required new controls and independent evaluation; differences do not isolate a single cause.",
+        "Original private short cards remain scoped to their owner Study and are not copied or made public.",
+        "Exact winning geometry, material values, XML, controls and original evidence handles are withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "m6-case",
+      "kind": "case",
+      "task": "oriented_tracking",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "m6-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "oriented_tracking"
+      ]
+    },
+    {
+      "id": "c1-case",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "C1: joint shared-design witness, failed lower-count trials and intersample limitations.",
+      "type": "case",
+      "trigger": [
+        "c1",
+        "multi-condition",
+        "multicondition_reach_tool_axis"
+      ],
+      "source_refs": [
+        {
+          "record": "C1-owner-history",
+          "sha256": "b7a21328406c147712d9adc2756e0068b511efe49f43907cac4eb71e3d42c7f2",
+          "scope": "Opaque provenance only; no original design or evidence handle."
+        }
+      ],
+      "evidence_level": "historical_development_independent_checks",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": [
+        "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+        "Smallest successful tested count is not a global minimum. No continuous-time speed guarantee. Exact winning topology, parameters, XML and controls withheld."
+      ],
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-multicondition@1",
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "c1-case",
+      "kind": "case",
+      "task": "multicondition_reach_tool_axis",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "c1-case",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "multicondition_reach_tool_axis"
+      ]
+    },
+    {
+      "id": "general-active-inputs",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Active force channels, passive length constraints and external loads have different model semantics.",
+      "type": "general",
+      "trigger": [
+        "active control",
+        "input channels",
+        "external load",
+        "com force"
+      ],
+      "source_refs": [
+        "m2-case@1",
+        "m6-case@1",
+        "passive-structure-mechanics@2"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-sensitivity@1"
+      ],
+      "entry_id": "general-active-inputs",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-active-inputs",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-task-observables",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Holding, timed tracking and directed tool-axis tasks require different observables and time scopes.",
+      "type": "general",
+      "trigger": [
+        "holding speed",
+        "tracking",
+        "tool axis",
+        "orientation",
+        "timed reference"
+      ],
+      "source_refs": [
+        "m1-case@1",
+        "m4-case@1",
+        "m5-case@1",
+        "m6-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "general-task-observables",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-task-observables",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-finite-claims",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Finite success, failure, local rank and tested-count minima have distinct logical strength.",
+      "type": "general",
+      "trigger": [
+        "finite search",
+        "minimality",
+        "rank",
+        "near threshold"
+      ],
+      "source_refs": [
+        "m1-case@1",
+        "m2-case@1",
+        "m3-case@1",
+        "c1-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "general-finite-claims",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-finite-claims",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-holding",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Position approaches target but holding speed or settling fails.",
+      "type": "diagnostic",
+      "trigger": [
+        "holding speed",
+        "settling",
+        "overshoot"
+      ],
+      "source_refs": [
+        "m1-case@1",
+        "m2-case@1",
+        "m3-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "general-task-observables@1"
+      ],
+      "entry_id": "diagnostic-holding",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-holding",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-contact",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Loaded oriented motion is incomplete or violates no-contact qualification.",
+      "type": "diagnostic",
+      "trigger": [
+        "contact",
+        "incomplete execution",
+        "rigid tool"
+      ],
+      "source_refs": [
+        "m6-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-active-inputs@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "diagnostic-contact",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-contact",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "diagnostic-near-bound",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Rounded display appears passing while the strict evaluator fails.",
+      "type": "diagnostic",
+      "trigger": [
+        "near bound",
+        "strict failure",
+        "rounding",
+        "positive excess"
+      ],
+      "source_refs": [
+        "m2-case@1",
+        "m5-case@1",
+        "c1-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-finite-claims@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "diagnostic-near-bound",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-near-bound",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "validation-active-protocol",
+      "revision": "1",
+      "resource_role": "knowledge",
+      "summary": "Validate active control on exact task identities, observables, sampling and shared structure.",
+      "type": "validation",
+      "trigger": [
+        "active control",
+        "holding",
+        "tracking",
+        "tool axis",
+        "intersample"
+      ],
+      "source_refs": [
+        "m1-case@1",
+        "m2-case@1",
+        "m3-case@1",
+        "m4-case@1",
+        "m5-case@1",
+        "m6-case@1",
+        "c1-case@1"
+      ],
+      "evidence_level": "conditional_model_reasoning; scoped_historical_observation",
+      "applicability": "Check the current frozen model, task, load, input channels and time grid before transfer.",
+      "limitations": "Context only; no new Study acceptance, global guarantee, optimality or hardware claim.",
+      "related_skills": [
+        "skill-finite-search@2",
+        "skill-parameter-model@2",
+        "skill-matched-comparison@2",
+        "skill-local-to-experiment@2",
+        "skill-continue-or-stop@2",
+        "skill-witness-replay@2"
+      ],
+      "knowledge_refs": [
+        "general-task-observables@1",
+        "validation-replay@1"
+      ],
+      "entry_id": "validation-active-protocol",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "validation-active-protocol",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-parameter-model",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+      "source_refs": [
+        "skill-parameter-model@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-material-inertia@2",
+        "general-routing@2",
+        "general-sensitivity@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-parameter-model",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-parameter-model@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-matched-comparison",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Identify competing hypotheses, interventions and confounders before choosing a comparison. Match task, model protocol, named initial state, environment, evaluation conditions and control treatment.",
+      "source_refs": [
+        "skill-matched-comparison@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-multicondition@1",
+        "general-sensitivity@1",
+        "validation-qualification@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1",
+        "diagnostic-contact@1",
+        "diagnostic-near-bound@1"
+      ],
+      "entry_id": "skill-matched-comparison",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-matched-comparison@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "skill-local-to-experiment",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Start from the observed phenomenon, including all constraint components and qualification layers. Separate observations from interpretations and unknown measurements.",
+      "source_refs": [
+        "skill-local-to-experiment@2"
+      ],
+      "limitations": [
+        "Context only; no current task acceptance, universal stability, global feasibility or hardware claim.",
+        "No solver implementation sequence or new action authority is provided."
+      ],
+      "knowledge_refs": [
+        "general-routing@2",
+        "general-equilibrium@1",
+        "diagnostic-local-finite@1",
+        "general-active-inputs@1",
+        "general-task-observables@1",
+        "validation-active-protocol@1"
+      ],
+      "entry_id": "skill-local-to-experiment",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-local-to-experiment@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-material-inertia",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Material, section, density and inertia change coupled parts of passive response.",
+      "type": "general",
+      "trigger": [
+        "material",
+        "density",
+        "section",
+        "inertia",
+        "relaxation",
+        "viscosity"
+      ],
+      "source_refs": [
+        "general-material-inertia@1"
+      ],
+      "evidence_level": "model_contract; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Use the actual constitutive law and generator/compiler mapping.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Slow simulated decay is not material calibration or proof of a unique relaxation mechanism.",
+      "related_skills": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "knowledge_refs": [
+        "diagnostic-relaxation@1"
+      ],
+      "entry_id": "general-material-inertia",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-material-inertia@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "general-routing",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Route geometry maps tension into generalized force; finite deformation can invalidate local predictions.",
+      "type": "general",
+      "trigger": [
+        "routing",
+        "jacobian",
+        "large deformation",
+        "geometry"
+      ],
+      "source_refs": [
+        "general-routing@1"
+      ],
+      "evidence_level": "model_derivation; historical_observation",
+      "applicability": "Check the frozen current model, task, loads and parameter domain before transfer. Ordinary derivatives require differentiable geometry and a regular fixed active set.",
+      "limitations": "Context only; no current task acceptance, universal stability, global feasibility or hardware claim. Guide contact or switching may break smooth assumptions.",
+      "related_skills": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "knowledge_refs": [
+        "passive-structure-mechanics@2",
+        "diagnostic-local-finite@1"
+      ],
+      "entry_id": "general-routing",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-routing@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    },
+    {
+      "id": "mechanism-research-process",
+      "revision": "1",
+      "resource_role": "expert_process",
+      "summary": "Choose a revisable mechanism research route from phenomena, theory, competing hypotheses and source-grounded mathematical feedback.",
+      "source_refs": [
+        "skill-parameter-model@3",
+        "skill-matched-comparison@3",
+        "skill-local-to-experiment@3"
+      ],
+      "limitations": [
+        "Context only; no current scientific evidence, acceptance or new execution authority.",
+        "Read relevant Knowledge only as needed; Skills own their detailed methods."
+      ],
+      "knowledge_refs": [
+        "general-task-observables@1",
+        "general-material-inertia@2",
+        "general-routing@2",
+        "general-sensitivity@1",
+        "validation-qualification@1"
+      ],
+      "entry_id": "mechanism-research-process",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "1",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "mechanism-research-process",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Answer-isolated historical synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ]
+    }
+  ]
+}

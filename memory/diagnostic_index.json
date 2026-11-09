@@ -3557,6 +3557,1004 @@
         "passive_progressive_stiffness",
         "soft_robot_research"
       ]
+    },
+    {
+      "id": "p3-case",
+      "revision": "3",
+      "resource_role": "knowledge",
+      "summary": "Eight answer-isolated milestones connect qualified mechanisms, failures, valid interventions and independent numerical checks.",
+      "type": "case",
+      "trigger": [
+        "historical case",
+        "passive response",
+        "research trace"
+      ],
+      "source_refs": [
+        "p3-case@2",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "historical_development_observation; independent_saved_state_validation; retrospective_interpretation; not_formal_benchmark",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4",
+        "skill-finite-search@3",
+        "skill-continue-or-stop@3",
+        "skill-witness-replay@3"
+      ],
+      "entry_id": "p3-case",
+      "kind": "case",
+      "task": "passive_progressive_stiffness",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "p3-case@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "passive_progressive_stiffness"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "knowledge_refs": [
+        "passive-structure-mechanics@3",
+        "general-routing@3",
+        "general-material-inertia@3",
+        "general-multicondition@2",
+        "diagnostic-slack@2",
+        "diagnostic-static-dynamic@2",
+        "diagnostic-convergence@2",
+        "validation-qualification@2",
+        "validation-replay@2"
+      ]
+    },
+    {
+      "id": "passive-structure-mechanics",
+      "revision": "3",
+      "resource_role": "knowledge",
+      "summary": "Unilateral tension, geometric gap and actual active rows jointly define a passive mechanism.",
+      "type": "general",
+      "trigger": [
+        "slack",
+        "taut",
+        "tendon",
+        "pretension"
+      ],
+      "source_refs": [
+        "passive-structure-mechanics@2",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "passive-structure-mechanics",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "passive-structure-mechanics@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "general-routing",
+      "revision": "3",
+      "resource_role": "knowledge",
+      "summary": "Routing and payout interact through the actual deformed tendon length and its Jacobian.",
+      "type": "general",
+      "trigger": [
+        "routing",
+        "jacobian",
+        "large deformation",
+        "geometry"
+      ],
+      "source_refs": [
+        "general-routing@2",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "general-routing",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-routing@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "general-material-inertia",
+      "revision": "3",
+      "resource_role": "knowledge",
+      "summary": "Material, section, inertia and damping affect distinct static and dynamic mechanisms.",
+      "type": "general",
+      "trigger": [
+        "material",
+        "density",
+        "section",
+        "inertia",
+        "relaxation",
+        "viscosity"
+      ],
+      "source_refs": [
+        "general-material-inertia@2",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "general-material-inertia",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-material-inertia@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "general-multicondition",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "A staged passive response carries its continuous state and active-set history.",
+      "type": "general",
+      "trigger": [
+        "multi-condition",
+        "multi-load",
+        "holdout",
+        "worst condition"
+      ],
+      "source_refs": [
+        "general-multicondition@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "general-multicondition",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-multicondition@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "general-sensitivity",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Choose derivatives, four-point interactions or matched contrasts to fit the scientific uncertainty.",
+      "type": "general",
+      "trigger": [
+        "sensitivity",
+        "mechanism",
+        "ablation",
+        "parameter"
+      ],
+      "source_refs": [
+        "general-sensitivity@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "general-sensitivity",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "general-sensitivity@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "diagnostic-slack",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Jointly inspect tension, gap and actual constraint activation.",
+      "type": "diagnostic",
+      "trigger": [
+        "slack",
+        "tension vanishes",
+        "active set"
+      ],
+      "source_refs": [
+        "diagnostic-slack@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "diagnostic-slack",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-slack@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "diagnostic-static-dynamic",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Static qualification, finite-time qualification and output availability are separate.",
+      "type": "diagnostic",
+      "trigger": [
+        "static passes",
+        "dynamic invalid",
+        "static dynamic",
+        "ablation"
+      ],
+      "source_refs": [
+        "diagnostic-static-dynamic@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "diagnostic-static-dynamic",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-static-dynamic@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "diagnostic-convergence",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Keep time refinement, initial perturbation and spatial refinement as different evidence.",
+      "type": "diagnostic",
+      "trigger": [
+        "convergence",
+        "numerical physical",
+        "residual",
+        "invalid"
+      ],
+      "source_refs": [
+        "diagnostic-convergence@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "diagnostic-convergence",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "diagnostic-convergence@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "validation-qualification",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Full-window and per-step qualification are prerequisites for scoped evidence.",
+      "type": "validation",
+      "trigger": [
+        "qualification",
+        "static",
+        "stability",
+        "timestep audit"
+      ],
+      "source_refs": [
+        "validation-qualification@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "validation-qualification",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "validation-qualification@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "validation-replay",
+      "revision": "2",
+      "resource_role": "knowledge",
+      "summary": "Independent validation requires source-bound complete evidence and explicit comparison scope.",
+      "type": "validation",
+      "trigger": [
+        "replay",
+        "refinement",
+        "perturbation",
+        "convergence",
+        "holdout"
+      ],
+      "source_refs": [
+        "validation-replay@1",
+        "p3-case@3:source_catalog"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ],
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "validation-replay",
+      "kind": "procedure",
+      "task": "passive_response",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "validation-replay@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified."
+    },
+    {
+      "id": "skill-parameter-model",
+      "revision": "4",
+      "resource_role": "skill",
+      "summary": "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+      "source_refs": [
+        "skill-parameter-model@3",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-parameter-model",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "4",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-parameter-model@4",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "skill-matched-comparison",
+      "revision": "4",
+      "resource_role": "skill",
+      "summary": "Identify competing hypotheses, interventions and confounders before choosing a comparison. Match task, model protocol, named initial state, environment, evaluation conditions and control treatment.",
+      "source_refs": [
+        "skill-matched-comparison@3",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-matched-comparison",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "4",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-matched-comparison@4",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "skill-local-to-experiment",
+      "revision": "4",
+      "resource_role": "skill",
+      "summary": "Start from the observed phenomenon, including all constraint components and qualification layers. Separate observations from interpretations and unknown measurements.",
+      "source_refs": [
+        "skill-local-to-experiment@3",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-local-to-experiment",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "4",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-local-to-experiment@4",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "skill-finite-search",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "A nonpassing finite search is an observation about its parameterization, initialization and allowance, not a verified exclusion of the structure.",
+      "source_refs": [
+        "skill-finite-search@2",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-finite-search",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-finite-search@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "skill-continue-or-stop",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "Compare the expected information value of remaining legal experiments with their cost and actual limitations. Closure may be justified before budget exhaustion, but lack of success alone does not establish closure.",
+      "source_refs": [
+        "skill-continue-or-stop@2",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-continue-or-stop",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-continue-or-stop@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "skill-witness-replay",
+      "revision": "3",
+      "resource_role": "skill",
+      "summary": "A mathematical witness and a fresh independent registered evaluation have different evidence roles. Joint success requires all frozen conditions on one structure.",
+      "source_refs": [
+        "skill-witness-replay@2",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "skill-witness-replay",
+      "kind": "procedure",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "3",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "skill-witness-replay@3",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
+    },
+    {
+      "id": "mechanism-research-process",
+      "revision": "2",
+      "resource_role": "expert_process",
+      "summary": "Choose a revisable mechanism research route from phenomena, theory, competing hypotheses and source-grounded mathematical feedback.",
+      "source_refs": [
+        "mechanism-research-process@1",
+        "p3-case@3:source_catalog"
+      ],
+      "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+      "knowledge_refs": [
+        "p3-case@3",
+        "validation-qualification@2"
+      ],
+      "entry_id": "mechanism-research-process",
+      "kind": "case",
+      "task": "soft_robot_research",
+      "structure": "tendon_robot_family",
+      "failure_type": "research_method",
+      "version": "2",
+      "path": "memory/knowledge/research_organized_v2.json",
+      "content_key": "mechanism-research-process@2",
+      "status": "public_procedural_guidance; generalization_unverified",
+      "introduced_in": "typed_knowledge_v1",
+      "authored_language": "en",
+      "language_origin": {
+        "kind": "authored_english",
+        "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed."
+      },
+      "benchmark_sensitive": false,
+      "disclosure": "answer_isolated",
+      "applicable_tasks": [
+        "reach_and_hold",
+        "tracking",
+        "position_tool_axis",
+        "oriented_tracking",
+        "multicondition_reach_tool_axis",
+        "passive_force_response",
+        "passive_head_stabilization",
+        "passive_progressive_stiffness",
+        "soft_robot_research"
+      ],
+      "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+      "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+      "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+      "related_skills": [
+        "skill-parameter-model@4",
+        "skill-matched-comparison@4",
+        "skill-local-to-experiment@4"
+      ]
     }
   ]
 }
