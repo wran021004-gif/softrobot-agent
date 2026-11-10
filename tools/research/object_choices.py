@@ -276,6 +276,23 @@ def main_projection(host, value):
 def main_packet(host, packet):
     """One fact owner in normal L0; replay/menu/history carry navigation only."""
     value=deepcopy(packet);research=value.get('research',{})
+    from tools.research.research_context import compact_result_diagnostics
+    for fact in research.get('verified_facts',[]):
+        if fact.get('mathematics'):fact['mathematics']=compact_result_diagnostics(fact['mathematics'])
+    mathematics=research.get('mathematical_research') or {}
+    if mathematics.get('latest_result'):
+        mathematics['latest_result']=compact_result_diagnostics(mathematics['latest_result'])
+    scientific=research.get('scientific_results') or {}
+    if scientific.get('latest_evaluation'):
+        scientific['latest_evaluation']=compact_result_diagnostics(scientific['latest_evaluation'])
+    for step in (research.get('research_trace') or {}).get('recent',[]):
+        for result in (step.get('observed_facts') or {}).get('results',[]):
+            diagnosis=result.get('task_diagnosis')
+            if diagnosis and result.get('reference'):
+                compact=compact_result_diagnostics(result)['task_diagnosis']
+                result['task_diagnosis']={k:compact[k] for k in
+                    ('diagnostic_status','formal_task_gap','metrics','worst_constraints','coverage','detail_query') if k in compact}
+                result['task_diagnosis']['scope']='Historical metric summary; full component observables and qualification windows remain at detail_query.'
     replay=value.get('saved_replay_choices',{}).get('options',[])
     for row in replay:
         for key in ('result_reference','candidate','control_source','metrics','J'):

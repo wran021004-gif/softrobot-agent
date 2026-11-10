@@ -46,3 +46,5 @@ Main 与 Reporter 共用 **80 次实际发送请求**，无角色子预算、隐
 原 Store 保留逐请求、数学和物理成本；上表不把正在执行或尚未结算的工作记作零成本。Provider 美元价格未提供，不能捏造金额。后续研究继续写入新 Store；此处仅记录启动状态，不将数学结果或生成候选当作任务成功。旧 Study 状态与完整账本再次核对未变。
 
 第 28 次请求的工具 Schema 中断及用户授权的原 Study 恢复，见 [schema-recovery.md](schema-recovery.md)。原启动快照不覆盖后续运行状态。
+
+35 次请求后的通用状态包重复展开与容量错误修复，见 [context-recovery.md](context-recovery.md)。

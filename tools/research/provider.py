@@ -687,6 +687,13 @@ def live_model_class(boundary):
             except Exception as exc:
                 try:boundary.require_complete()
                 except IncompleteModelOutput as confirmed:raise confirmed from exc
+                from tools.research.provider_context import ProviderCapacityError
+                cause=exc;seen=set()
+                while cause is not None and id(cause) not in seen:
+                    seen.add(id(cause))
+                    if isinstance(cause,ProviderCapacityError):
+                        raise ProviderCapacityError(str(cause)) from exc
+                    cause=cause.__cause__
                 raise
             boundary.consumed()  # Failed conversion leaves the saved response available.
     return AccountedModel

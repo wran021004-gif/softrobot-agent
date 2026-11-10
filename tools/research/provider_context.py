@@ -7,6 +7,10 @@ TOKENIZER_PATH=ROOT/'configs/research/provider/deepseek_v4_tokenizer.json'
 TOKENIZER_SHA256='89085f12ef79460ac5f66d1119325ddfc694b4ab209d80bbd81d35f081dc9614'
 
 
+class ProviderCapacityError(ValueError):
+    """Local pre-send rejection; SDK connection wrappers must not hide this cause."""
+
+
 @lru_cache(maxsize=1)
 def official_tokenizer():
     from tokenizers import Tokenizer
@@ -25,7 +29,7 @@ def capacity_estimate(content,provider):
     """
     context=provider['context_guard']
     maximum=(provider.get('model_capabilities') or {}).get('max_request_bytes')
-    if maximum and len(content)>maximum:raise ValueError('GATEWAY_REQUEST_BODY_TOO_LARGE')
+    if maximum and len(content)>maximum:raise ProviderCapacityError('GATEWAY_REQUEST_BODY_TOO_LARGE')
     # A v2 reserve is a context-planning margin, not an output generation cap.
     output_reserve=provider.get('output_context_reserve_tokens') or provider.get('max_tokens') or 32768
     reserved=output_reserve+context['framing_headroom_tokens']
@@ -35,12 +39,12 @@ def capacity_estimate(content,provider):
         context_limit_tokens=context['context_limit_tokens'])
     if len(content)+reserved>context['context_limit_tokens']:
         if provider['adapter']!='deepseek' or provider['model'] not in ('deepseek-flash','deepseek-v4-pro'):
-            raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_CONSERVATIVE_UTF8_ESTIMATE')
+            raise ProviderCapacityError('R3_CONTEXT_CAPACITY_EXCEEDED_CONSERVATIVE_UTF8_ESTIMATE')
         encoded=official_tokenizer().encode(content.decode('utf-8'),add_special_tokens=False)
         estimate.update(method='pinned_official_deepseek_v4_serialized_token_estimate',
             input_estimate=len(encoded.ids),tokenizer_sha256=TOKENIZER_SHA256)
     if estimate['input_estimate']+reserved>context['context_limit_tokens']:
-        raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_OFFLINE_TOKEN_ESTIMATE')
+        raise ProviderCapacityError('R3_CONTEXT_CAPACITY_EXCEEDED_OFFLINE_TOKEN_ESTIMATE')
     return estimate
 
 

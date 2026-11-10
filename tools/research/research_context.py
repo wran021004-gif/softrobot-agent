@@ -2922,6 +2922,29 @@ def mathematical_decision_view(card):
     return result
 
 
+def compact_result_diagnostics(value):
+    """One diagnostic owner in L0; canonical cards and complete reads stay intact."""
+    diagnosis=value.get('task_diagnosis') if isinstance(value,dict) else None
+    if not diagnosis or not diagnosis.get('source'):return value
+    from tools.research.evidence_views import compact_task_diagnosis
+    result=deepcopy(value)
+    compact=compact_task_diagnosis(diagnosis)
+    for key in ('status','comparable','valid_complete','coverage','hard_gate_status','maximum_normalized_violation',
+            'diagnostic_maximum_normalized_violation','numerical_qualification_query','raw_query','route_geometry','limitations'):
+        if key in diagnosis:compact[key]=deepcopy(diagnosis[key])
+    # The existing compact view keeps all observed constraints (including UNKNOWN),
+    # windows, tendon observables and qualification measurements. Its ID list replaces
+    # repeated worst-constraint rows; original queries restore the canonical layout.
+    result['task_diagnosis']=compact
+    structure=result.get('structure_research') or {}
+    qualification=structure.get('qualification_diagnosis')
+    if qualification and qualification==diagnosis.get('qualification'):
+        structure['qualification_diagnosis']=dict(
+            **{k:qualification[k] for k in ('validity','reason','category','new_physics_steps') if k in qualification},
+            facts_at='task_diagnosis.qualification',detail_query=diagnosis.get('numerical_qualification_query') or diagnosis['detail_query'])
+    return result
+
+
 def tool_feedback(host,value):
     """Return new facts once, distinguishing the wrapper from registered evidence."""
     from tools.research.evidence_policy import registered_references
