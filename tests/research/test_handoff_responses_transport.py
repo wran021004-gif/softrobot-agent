@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import unittest
 from tools.research.openai_responses import chat_view
 from tools.research.session_handoff import verified_request_transport
+from tools.research.provider import transport_endpoint
 
 class ResponsesHandoffTransport(unittest.TestCase):
     def setUp(self):
@@ -31,5 +32,19 @@ class ResponsesHandoffTransport(unittest.TestCase):
         self.setUp();self.artifacts['chat']=b'{"choices":[]}'
         self.assertFalse(verified_request_transport(self.host,self.provider,self.meta,self.reception))
         self.assertFalse(verified_request_transport(self.host,self.provider,self.meta,{**self.reception,'body_is_derived_chat_view':False}))
+
+    def test_explicit_loopback_gateway_instances_share_only_protocol_evidence(self):
+        provider={**self.provider,'adapter':'chatgpt_gateway','base_url':'http://127.0.0.1:8789/v1'}
+        for port in (8787,8788,8789):
+            base='http://127.0.0.1:'+str(port)+'/v1'
+            self.assertTrue(transport_endpoint('chatgpt_gateway',base))
+            self.assertTrue(verified_request_transport(self.host,provider,dict(endpoint=base+'/chat/completions'),None))
+        for base in ('http://example.com:8789/v1','http://127.0.0.1:8789/wrong',
+                'http://user@127.0.0.1:8789/v1','http://127.0.0.1:8789/v1?x=1',
+                'http://127.0.0.1:8789/v1#x','http://127.0.0.1:99999/v1'):
+            self.assertFalse(transport_endpoint('chatgpt_gateway',base))
+            self.assertFalse(verified_request_transport(self.host,provider,dict(endpoint=base+'/chat/completions'),None))
+        self.assertTrue(transport_endpoint('openai_api','https://api.openai.com/v1'))
+        self.assertFalse(transport_endpoint('openai_api','https://elsewhere/v1'))
 
 if __name__=='__main__':unittest.main()

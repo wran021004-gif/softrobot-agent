@@ -3,6 +3,7 @@ from copy import deepcopy
 import json, os, time
 from pathlib import Path
 from uuid import uuid4
+from urllib.parse import urlsplit
 import httpx
 from strands.models.openai import OpenAIModel
 from openai import AsyncOpenAI
@@ -174,6 +175,18 @@ def pending(host):
     with host.store.connect(True) as db:
         return [dict(r) for r in db.execute("SELECT * FROM calls WHERE run_id=? AND caller=? AND status IN ('running','unknown')",(host.run_id,CALLER))]
 
+def transport_endpoint(adapter,base_url):
+    """Official API or an explicitly approved IPv4 loopback Gateway instance."""
+    if adapter=='openai_api':return base_url.rstrip('/')=='https://api.openai.com/v1'
+    if adapter!='chatgpt_gateway':return False
+    try:
+        u=urlsplit(base_url)
+        return (u.scheme=='http' and u.hostname=='127.0.0.1' and u.port is not None
+            and 1<=u.port<=65535 and u.path.rstrip('/')=='/v1'
+            and u.username is None and u.password is None and not u.query and not u.fragment)
+    except ValueError:return False
+
+
 def transition_transport(host, approval):
     """Explicit local Gateway/API addendum; never a Main tool or a new send.
 
@@ -199,9 +212,8 @@ def transition_transport(host, approval):
         target=plain(ModelConfig.model_validate(scope['provider']))
         normalized=plain(ModelConfig.model_validate(old))
         transport_keys={'adapter','adapter_version','base_url','proxy_url','model_capabilities'}
-        endpoints={'openai_api':'https://api.openai.com/v1','chatgpt_gateway':'http://127.0.0.1:8787/v1'}
-        if ({old['adapter'],target.get('adapter')}!=set(endpoints)
-                or any(p['base_url'].rstrip('/')!=endpoints[p['adapter']] for p in (old,target))
+        if ({old['adapter'],target.get('adapter')}!={'openai_api','chatgpt_gateway'}
+                or any(not transport_endpoint(p['adapter'],p['base_url']) for p in (old,target))
                 or {k:v for k,v in normalized.items() if k not in transport_keys}!=
                    {k:v for k,v in target.items() if k not in transport_keys}
                 or not isinstance(scope['credentials_reference'],str) or not scope['credentials_reference']):

@@ -67,7 +67,13 @@ def verified_request_transport(host,provider,meta,reception):
     """Verify real Responses transport and its archived deterministic SDK view."""
     base=provider['base_url'].rstrip('/')
     if meta.get('protocol')!='openai_responses_v1':
-        return meta.get('endpoint')==base+'/chat/completions'
+        endpoint=meta.get('endpoint','');suffix='/chat/completions'
+        from tools.research.provider import transport_endpoint
+        # The proof covers the same Gateway protocol/model, not account quota.
+        # Account-specific discovery and credential binding remain separate.
+        return (endpoint==base+suffix or (provider['adapter']=='chatgpt_gateway'
+            and transport_endpoint('chatgpt_gateway',base) and endpoint.endswith(suffix)
+            and transport_endpoint('chatgpt_gateway',endpoint[:-len(suffix)])))
     if (provider['adapter']!='openai_api' or meta.get('endpoint')!=base+'/responses'
             or meta.get('sdk_endpoint')!=base+'/chat/completions' or not meta.get('upstream_request')
             or not reception or reception.get('protocol')!='openai_responses_v1'
