@@ -127,9 +127,6 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         from tools.research.contracts import fidelity_levels
         properties['screening_fidelity']={'type':'string','enum':list(fidelity_levels(study['fidelity_policy']))}
         if len(study['fidelity_policy']['screening'])!=1:intent_schema['required'].append('screening_fidelity')
-        from tools.research.contracts import fidelity_levels
-        properties['screening_fidelity']={'type':'string','enum':list(fidelity_levels(study['fidelity_policy']))}
-        if len(study['fidelity_policy']['screening'])!=1:intent_schema['required'].append('screening_fidelity')
         from extensions.tendon_family.family_space import span_strategies
         applicable_spans=span_strategies(study['family_space'])
         for branch in properties['span_strategies']['anyOf']:
@@ -240,6 +237,8 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         if actions[0] in ('stop','select'):
             schema['description']+=' Observation/condition fields describe existing evidence and closure criteria; state unmeasured or not applicable where appropriate.'
     from tools.research.contracts import prune_schema_definitions
+    from tools.research.scientific_intent import project_execution_profile
+    project_execution_profile(schema,study or {})
     prune_schema_definitions(schema)
     if focused and study and study.get('research_decisions',{}).get('tool_schema_policy',{}).get('version') in ('on_demand_tools_v3','research_information_flow_v1'):
         schema=compact_plan_schema(schema,actions[0],study)
@@ -1144,7 +1143,6 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     from tools.research.object_choices import main_context_enabled
     if main_context_enabled(state(host)['spec']):
-        instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Use exploration execution_profile to choose declared fidelity, load conditions and a continuous stage prefix; it grants no acceptance. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
         instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Use exploration execution_profile to choose declared fidelity, load conditions and a continuous stage prefix; it grants no acceptance. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
         instructions+='\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search).'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))

@@ -532,6 +532,11 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             return httpx.Response(reception['http_status'],content=store.artifact(reception['body'],raw=True),request=request)
         if pending(host):
             raise ValueError('R3_UNCONFIRMED_ATTEMPT_BLOCKS_SEND')
+        # Validate the final wire before reservation/debit, not only SDK schemas.
+        # Saved responses above must retain their exact historical wire.
+        from jsonschema import Draft202012Validator
+        for tool in wire.get('tools',[]):
+            Draft202012Validator.check_schema(tool['function']['parameters'])
         upstream=request;responses=expected['adapter']=='openai_api' and expected.get('reasoning')=='medium' and bool(wire.get('tools'))
         if responses:
             from tools.research.openai_responses import request_wire

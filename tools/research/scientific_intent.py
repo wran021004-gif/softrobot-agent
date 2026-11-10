@@ -311,6 +311,7 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
     schema=prune_schema_definitions(schema)
     if question_contract(spec) is ScientificQuestionV4:
         schema['description']='Root fields only: '+', '.join(schema['properties'])+'. Put execution options inside the selected structure/control payload. The completed diagnose Plan already owns the hypothesis and candidate. '+schema['description']
+        project_execution_profile(schema,spec,(candidate or {}).get('configuration',{}).get('task'))
     return compact_schema(schema) if question_contract(spec) is ScientificQuestionV4 else schema
 
 
@@ -445,6 +446,37 @@ def expand_v4(spec, payload, candidate=None):
             bind('control_treatment','reoptimized' if semantics=='reoptimized_task_capability' else 'fixed_absolute_tensions','selected effect semantics')
             if semantics=='reoptimized_task_capability':bind('operating_point','frozen_task_initial_state','complete frozen-task reoptimization semantics')
     return full,sources
+
+
+def project_execution_profile(schema,spec,task=None):
+    """Advertise frozen execution choices without changing Worker semantics."""
+    profile=schema.get('$defs',{}).get('PassiveExecutionProfile')
+    task=task or spec.get('canonical_task',{})
+    goal=task.get('goal',{}).get('data',{})
+    if profile is None or goal.get('version')!='passive_response_v2':return
+    props=profile['properties']
+    props['load_conditions']['items']['enum']=goal['load_conditions']
+    stages=list(dict.fromkeys(s['name'] for rows in goal['programs'].values() for s in rows))
+    props['stage_prefix']={'anyOf':[{'type':'string','enum':stages},{'type':'null'}],
+        'description':'Exploration only: execute continuously from the frozen initial state through this stage; omit for the complete program.'}
+    if spec.get('fidelity_policy'):
+        from tools.research.contracts import fidelity_levels
+        levels=fidelity_levels(spec['fidelity_policy'])
+        props['fidelity']={'anyOf':[{'type':'string','enum':list(levels)},{'type':'null'}],
+            'description':'Use an exact declared Fidelity name, not a physical description. Names and cells/segment: '+
+                ', '.join(f'{name}={level["cells_per_segment"]}' for name,level in levels.items())+'. Null keeps the candidate discretization.'}
+    props['requested_observables']['description']=('Optional recorded observables, not free-text research goals. Omit for default observations. '
+        'Native diagnostics include tendon_transitions, stiffness_ratio, slack_to_taut and stage_qualification; '
+        'task observation names and evaluator bound names/quantities are also supported.')
+    profile['description']=('Choose exploration scope explicitly. For final_acceptance, omit load_conditions, stage_prefix, observation_window_s, '
+        'sample_period_s, route_sampling, recording and requested_observables: the Worker uses the entire frozen protocol. '
+        'This does not grant acceptance or require an ablation for baseline research.')
+    profile['allOf']=[{'if':{'properties':{'purpose':{'const':'final_acceptance'}},'required':['purpose']},
+        'then':{'properties':{**{k:{'maxItems':0} for k in ('load_conditions','requested_observables')},
+            **{k:{'type':'null'} for k in ('stage_prefix','observation_window_s','sample_period_s','route_sampling','recording')}}}}]
+    if spec.get('fidelity_policy'):
+        profile['allOf'][0]['then']['properties']['fidelity']={'enum':[None,*[
+            name for name,level in levels.items() if level==spec['fidelity_policy']['final_evaluation']]]}
 
 
 def selected_question_schema(host):
@@ -1082,7 +1114,12 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
     if detail['planning_status'] in ('unauthorized','blocked','unsupported','insufficient_budget'):
         return fail('ORIGINAL_MECHANISM_ADMISSION_REQUIRED',detail['planning_status'],missing=detail['missing'])
     context,preview=mechanism_context(host,c,study,budget)
-    if context is None:return dict(preview,method_selection=route)
+    if context is None:
+        result=dict(preview,method_selection=route)
+        if preview.get('reason') in ('FINAL_ACCEPTANCE_REQUIRES_COMPLETE_FROZEN_PROTOCOL','UNREGISTERED_REQUESTED_OBSERVABLE','UNDECLARED_EXECUTION_FIDELITY',
+                'FINAL_FIDELITY_REQUIRED','FINAL_ACCEPTANCE_REQUIRES_FROZEN_FIDELITY_AND_CHECKS'):
+            result['execution_profile_contract']=selected_question_schema(host)['$defs']['PassiveExecutionProfile']
+        return result
     study=study.model_copy(update=dict(max_evaluations=context['evaluation_cap']))
     request=bind_selected_analysis_request(host,dict(operating_point='standardized_initial_pretension',mechanism_study=plain(study)),
         tool_use_id=tool_use_id,selection=(METHOD,detail),scientific_question=payload)
