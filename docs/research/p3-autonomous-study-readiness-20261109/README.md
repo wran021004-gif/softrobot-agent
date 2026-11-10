@@ -6,6 +6,10 @@ The six protocol blockers are closed in the registered generic interfaces. The t
 
 The user explicitly authorized direct launch after readiness. No additional permission is required. The committed implementation is bound and the real Main loop is running in the background. See launch-receipt.json, first-main-plan.json and live-status.json. Preparation and unit fixtures do not establish a scientific success.
 
+2026-11-10 update: the user's explicit 80-to-100 request is applied to this same Study through an immutable authorization addendum. The shared Main/Reporter total is now **100 including reserve8**, with62 used and38 remaining at the migration boundary. Scientific profile1, task, candidates, results and cumulative costs are preserved. Summary I/O was repaired and the same SDK checkpoint resumed under implementation `64c413f5fed094418c56d1482d52256419088552`. See [budget-and-performance-20261110.json](budget-and-performance-20261110.json); the launch observations below remain historical snapshots.
+
+At11:20:06 +08, the resumed Main sent request63 (585,935 wire bytes, within the existing1MiB limit), leaving37 shared requests. The ledger and actual outgoing packet confirm the new allowance; the current send is charged and not yet a returned scientific result.
+
 ## 1. Existing A–C repair
 
 The initial HEAD was `8f5a1e7619134d1218f277629f7dce974cfc3f77`, branch `codex/passive-research-capabilities-20261107`, worktree `D:\softrobot-agent\.worktrees\passive-research-capabilities-20261107`. Every prior delivery hash was checked before edits; see `preserved-baseline.json`. Qualification diagnostics, actual Coordinate/Coupled contracts, compact milestones, Reporter result reuse and the prohibition on Reporter calculating CSV metrics remain in place. The previous 251/251 result75 audit and prior A–C tests were not needlessly repeated.
@@ -71,7 +75,7 @@ A preflight fixture initially used the unsuffixed proposed ID and failed before 
 
 ## 10–11. Budget and accounting
 
-Provider80 is shared by Main and Reporter; closeout8 is included. There is no extension policy granted to Main. Supervisor pauses at a settled feedback boundary once normal allowance reaches zero, preserving closeout capacity; exhausted allocation is not scientific infeasibility. No automatic request additions are authorized.
+Provider100 is shared by Main and Reporter; closeout8 is included. The original80 limit was increased by an exact20-request user addendum on2026-11-10. There is no extension policy granted to Main. Supervisor pauses at a settled feedback boundary once normal allowance reaches zero, preserving closeout capacity; exhausted allocation is not scientific infeasibility. No automatic request additions are authorized.
 
 Actual parsed null limits: mathematical_evaluations, physical_launches, physical_replay_limit, public_operations, analysis_cap_s, activity_s, numerical_s, local_solve_s and delivery_reserve_s. No cumulative integration-step quota exists. local_solves/offline_nlp/bdf_replays/NMPC/RL zero values disable ungranted active-control routes; they do not represent infinity and do not cap passive mathematics or Replay. Native Store worker_calls=0 is the ungranted agent-worker channel; contained mathematics/physics use their existing recorded scientific receipts, not that channel. Per-request search ceilings256 and per-worker watchdogs7200/14400 s remain engineering protections, not cumulative budgets.
 
@@ -83,7 +87,7 @@ Failed sends keep the existing Provider ledger semantics. Local schema rejection
 
 These checks use clearly labeled synthetic fixtures and mocks for execution composition. They establish interface/contract readiness, not dynamic success of any new design. Actual physical evidence starts only when Main submits its formal Plan.
 
-## 13–14. First real Plan and actual costs
+## 13–14. Original launch snapshot: first real Plan and actual costs
 
 The new Study is running under implementation `cfd96ba8d6da6a027966880ec5aba6b0a1e7c700`. Frozen resolved identity: `97b4feeae3e91d05fb2fa68e1537dbe154a9dfbe6c4391f46a4c0c5f9d1efbef`; task identity: `caed522bcc35dc253e59e292ed3371e6f534465e69791c0fca62e639c798bc05`; Knowledge manifest identity: `1aebfec9a3cbf8955797a6f2fec9c22f654b207f4c2e105519d153c01e99f886`.
 
