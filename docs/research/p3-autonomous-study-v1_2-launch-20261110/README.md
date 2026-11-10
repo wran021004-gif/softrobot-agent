@@ -16,4 +16,31 @@ Main 与 Reporter 共用 **80 次实际发送请求**，无角色子预算、隐
 
 代码与配置先本地提交，再创建 Store。为避免 Git 提交哈希自引用，启动脚本从已提交配置生成同目录忽略的启动叶配置，仅将 `base_commit` 固定为当时真实完整 HEAD；不保留字符串 HEAD。冻结实现与任务身份见 [launch-receipt.json](launch-receipt.json)。旧 Study 的状态摘要和完整账本在预检与启动后只读核对，未迁移或重置。此次不 Push。
 
-实际启动状态、首份 Main Plan 与成本将在启动后据原 Store 更新。Study 创建、Main 启动、Plan 提交、Worker 执行、发现可行候选与正式通过分别记录，不能相互替代。
+## 实际启动记录
+
+冻结执行 HEAD 与 `base_commit` 均为 **`4245e5a4501e6ee915877ab0b80892e4a799bf7a`**；代码、任务与启动工具提交为 `7d74577773eaf2cd712e8dd963d08ccf4af82559`，其后仅将已审查的实现哈希固定到版本化配置，再以当时真实完整 HEAD 创建冻结启动配置。后续报告提交不迁移正在运行的实现。
+
+2026-11-10 18:24:02 +08:00 的启动快照见 [live-status.json](live-status.json)。后台进程已正式运行，以真实 Main 组织研究，80 次初始额度用尽后在现有 request-feedback 结算边界暂停；未自动追加。下表描述启动快照，不是最终研究结果。
+
+| 状态 | 已核实事实 |
+|---|---|
+| Study 已创建 | 独立 `runs/research/p3-passive-progressive-stiffness-autonomous-20261110-v1_2/platform.sqlite`；初始候选、Plan、成本及 Provider 使用均为零 |
+| Main 已启动 | 已有真实 Provider 请求；与 Reporter 共用同一 80 次账本 |
+| Main 已提交 Plan | 两份 Plan；首份为 Main 自主生成三段、四腱对称 slack-to-taut 假设，并生成一个新候选 |
+| Worker 已执行 | 已完成一次真实 `mechanism_structure_v1` 数学 Worker，状态 computed：卸载平衡与活动约束检查 |
+| 找到可行候选 | 尚未证实；当前仅为研究候选 |
+| 通过正式验收 | 否；未完成完整动态任务、有效机制及独立 Replay 验收 |
+
+首份完整 Plan 见 [first-main-plan.json](first-main-plan.json)。该 Plan 由真实 Main 返回并登记，启动脚本未编写其假设、参数选择或执行顺序。Main 在此前已真实读取 `passive-structure-mechanics@1`、`mechanism-research-process@2`、`skill-parameter-model@4`，其他已冻结条目继续由 Main 按需检索读取。
+
+| 实际成本（同一启动快照） | 数值 |
+|---|---:|
+| Provider 已记账请求 | 7 / 80，剩余 73；当时 1 个请求进行中 |
+| 已完成数学评价 / Worker 结果 | 1 / 1 |
+| 卸载平衡求解 / native model build | 1 / 1 |
+| native forward / 约束 Jacobian 提取 | 28 / 26 |
+| 物理积分步 / 动态 rollout | 0 / 0 |
+| 正式物理 Replay 结果 / 案例 | 0 / 0 |
+| 已结算研究数值时间（含构造） | 1.670472 s |
+
+原 Store 保留逐请求、数学和物理成本；上表不把正在执行或尚未结算的工作记作零成本。Provider 美元价格未提供，不能捏造金额。后续研究继续写入新 Store；此处仅记录启动状态，不将数学结果或生成候选当作任务成功。旧 Study 状态与完整账本再次核对未变。
