@@ -12,6 +12,27 @@ from tests.research.test_cross_task_integration import fixture_directory
 
 
 class ContextPerformanceTests(unittest.TestCase):
+    def test_omitted_array_projection_preserves_full_evidence_and_integrity(self):
+        with fixture_directory() as folder:
+            store=Store(folder)
+            value=dict(progress=[dict(trace=list(range(1000)))],records=[dict(episodes=[
+                dict(samples=[1,2],qualification_samples=list(range(1000)),qualified=False),
+                dict(samples=[3],qualification_samples=[],qualified=None)])],missing=None)
+            ref=store.put_context_checkpoint(value);original=store.artifact(ref,raw=True)
+            omit=('progress','records[*].episodes[*].qualification_samples','absent[*].trace')
+            expected=deepcopy(value);expected.pop('progress')
+            for episode in expected['records'][0]['episodes']:episode.pop('qualification_samples')
+            with store.read_snapshot():
+                actual=store.artifact(ref,omit=omit);self.assertEqual(actual,expected)
+                actual['records'][0]['episodes'][0]['samples'].append(9)
+                self.assertEqual(store.artifact(ref,omit=omit),expected)
+                self.assertEqual(store.artifact(ref),value)
+                self.assertEqual(store.artifact(ref,raw=True),original)
+                with self.assertRaises(ValueError):store.artifact(ref,omit=omit,paths=('missing',))
+                with closing(store.connect()) as db:
+                    db.execute('UPDATE artifacts SET body=? WHERE id=?',(b'{}',ref['artifact_id']));db.commit()
+                with self.assertRaisesRegex(ValueError,'EVIDENCE_MISSING_OR_CHANGED'):store.artifact(ref,omit=omit)
+
     def test_report_status_and_latest_selection_preserve_revision_order_without_raw_history(self):
         from tools.research.reporter import current_reports,entries
         with fixture_directory() as folder:

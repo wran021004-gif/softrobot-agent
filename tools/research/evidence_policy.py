@@ -97,7 +97,9 @@ def summarize_saved_evidence(host,reference):
         # This scope projection checks the actual numerical root's existence;
         # neither sampled trajectories nor per-probe configurations are used.
         value.update(host.store.artifact(reference,paths=('structure_research.operation',)))
-    elif not value.get('native_dynamics'):value=host.store.artifact(reference)
+    elif not value.get('native_dynamics'):
+        from tools.research.analysis import result_metadata
+        value=result_metadata(host,reference)
     return summarize_evidence(value,reference)
 
 

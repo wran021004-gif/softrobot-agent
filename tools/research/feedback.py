@@ -308,8 +308,8 @@ def scientific_result_delivery(host):
     if latest_standalone is not None:
         # Earlier standalone views are overwritten, not ranked or delivered.
         # Keep their verified metadata reads; materialize only the final view.
-        from tools.research.analysis import decision_result
-        latest_evaluation=decision_result(host.store.artifact(latest_standalone),latest_standalone)
+        from tools.research.analysis import decision_result,result_metadata
+        latest_evaluation=decision_result(result_metadata(host,latest_standalone),latest_standalone)
     latest=searches[-1] if searches else None
     best=[]
     for row in groups.values():

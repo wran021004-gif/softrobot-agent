@@ -22,19 +22,25 @@ def extend_provider_requests(host, approval):
         policy=spec.get('provider_request_extension_policy',{})
         scope=approval.get('scope',{});extra=scope.get('additional_requests')
         limit=spec['budgets']['provider_requests']
-        if (approval.get('version')!='provider_request_extension_approval_v1' or approval.get('approved') is not True or
+        version=approval.get('version')
+        if (version not in ('provider_request_extension_approval_v1','provider_request_extension_approval_v2') or approval.get('approved') is not True or
                 not approval.get('source') or approval.get('scope_identity')!=digest(scope) or
                 set(scope)!={'study_id','resolved_identity','previous_request_limit','additional_requests'} or
                 scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity'] or
                 scope['previous_request_limit']!=limit or type(extra) is not int or extra<=0 or
-                policy.get('version')!='finite_provider_request_extension_v1'):
+                (policy.get('version')!='finite_provider_request_extension_v1' if policy else
+                    version!='provider_request_extension_approval_v2')):
             raise ValueError('EXACT_USER_APPROVED_FINITE_PROVIDER_EXTENSION_REQUIRED')
-        used=sum(host.store.artifact(ref,db=db)['additional_requests'] for ref in current.get('provider_request_extensions',[]))
-        batch=policy.get('maximum_requests_per_extension',policy['maximum_additional_requests'])
-        if batch is not None and extra>batch:
-            raise ValueError('FROZEN_PROVIDER_EXTENSION_BATCH_CAP_EXCEEDED')
-        if policy['maximum_additional_requests'] is not None and used+extra>policy['maximum_additional_requests']:
-            raise ValueError('FROZEN_PROVIDER_EXTENSION_CAP_EXCEEDED')
+        # v2 is an explicit, exact finite user addendum, including to a Study
+        # without a preauthorized extension policy. It grants no future batch.
+        # Existing frozen caps still apply when such a policy is present.
+        if policy:
+            used=sum(host.store.artifact(ref,db=db)['additional_requests'] for ref in current.get('provider_request_extensions',[]))
+            batch=policy.get('maximum_requests_per_extension',policy['maximum_additional_requests'])
+            if batch is not None and extra>batch:
+                raise ValueError('FROZEN_PROVIDER_EXTENSION_BATCH_CAP_EXCEEDED')
+            if policy['maximum_additional_requests'] is not None and used+extra>policy['maximum_additional_requests']:
+                raise ValueError('FROZEN_PROVIDER_EXTENSION_CAP_EXCEEDED')
         if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
                 or current.get('selected') or current.get('success_gate') or
                 current['research_status']=='stopped' or

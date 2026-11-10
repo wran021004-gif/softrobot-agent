@@ -490,12 +490,13 @@ def current_reports(host, *, status_only=False, limit=None):
 def reporter_handoff_summary(host, reference, saved):
     """L1: bounded facts plus explicitly non-authoritative saved interpretation."""
     from tools.research.research_context import mathematical_decision_view
+    from tools.research.analysis import result_metadata
     report=saved['report'];findings=[];scope=[];limitations=[];unresolved=[]
     corrections=applicable_corrections(host,[c['identity']['result']['reference'] for c in report['results']])
     for card in report['results']:
         # Refresh projections from the same immutable source, preserving old reports.
         card=deepcopy(card)
-        raw=host.store.artifact(card['identity']['result']['reference'])
+        raw=result_metadata(host,card['identity']['result']['reference'])
         if raw.get('native_analysis'):
             projected=plain(result_card(host,card['identity']['result']['reference']))
             card['mathematics']=projected['mathematics']

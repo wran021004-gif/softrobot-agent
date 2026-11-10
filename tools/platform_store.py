@@ -177,13 +177,13 @@ class Store:
         db.execute('INSERT OR IGNORE INTO artifacts VALUES (?,?,?)', (identity, media, body))
         return EvidenceRef(artifact_id=identity, media_type=media)
 
-    def artifact(self, ref, *, raw=False, db=None, paths=None, pointers=None):
+    def artifact(self, ref, *, raw=False, db=None, paths=None, pointers=None, omit=None):
         """Hash-verified artifact; optional dot paths avoid decoding unrelated arrays."""
         ref = EvidenceRef.model_validate(ref)
         if db is None:
             def read():
                 current=_READ_SNAPSHOT.get()
-                if paths and not raw and pointers is None and current is not None and current[0] is self:
+                if paths and not raw and pointers is None and omit is None and current is not None and current[0] is self:
                     # Metadata consumers often ask for different overlapping
                     # field sets. Reuse verified fields, including absent ones,
                     # without retaining a second copy of a large raw JSON blob.
@@ -216,17 +216,17 @@ class Store:
                         target[keys[-1]]=value
                     return result
                 with closing(self.connect(True)) as conn:
-                    return self.artifact(ref, raw=raw, db=conn, paths=paths,pointers=pointers)
+                    return self.artifact(ref, raw=raw, db=conn, paths=paths,pointers=pointers,omit=omit)
             return self.snapshot_value(('artifact',ref.artifact_id,raw,tuple(paths) if paths is not None else None,
-                tuple(pointers) if pointers is not None else None),read)
+                tuple(pointers) if pointers is not None else None,tuple(omit) if omit is not None else None),read)
         def verified_body():
             row = db.execute('SELECT body,media FROM artifacts WHERE id=?', (ref.artifact_id,)).fetchone()
             if row is None or hashlib.sha256(row['body']).hexdigest() != ref.artifact_id or row['media'] != ref.media_type:
                 raise ValueError('EVIDENCE_MISSING_OR_CHANGED: ' + ref.artifact_id)
             return row['body']
-        projected=paths is not None or pointers is not None
+        projected=paths is not None or pointers is not None or omit is not None
         if projected:
-            if raw or ref.media_type!='application/json' or paths is not None and pointers is not None:
+            if raw or ref.media_type!='application/json' or sum(v is not None for v in (paths,pointers,omit))>1:
                 verified_body()
                 raise ValueError('JSON_POINTER_PROJECTION_REQUIRED' if pointers is not None else 'JSON_PATH_PROJECTION_REQUIRED')
             def document():
@@ -237,6 +237,22 @@ class Store:
                 if db.execute('PRAGMA query_only').fetchone()[0] else document())
         else:
             body=verified_body()
+        if omit is not None:
+            # Internal metadata projections may omit large arrays. Expand only
+            # array lengths in SQLite; never materialize their elements in Python.
+            # Original full/pointer reads and their content identity are unchanged.
+            concrete=[]
+            for pattern in omit:
+                pending=['$.'+pattern]
+                while pending:
+                    path=pending.pop()
+                    if '[*]' not in path:
+                        concrete.append(path);continue
+                    prefix,suffix=path.split('[*]',1)
+                    length=db.execute('SELECT json_array_length(?,?)',(body,prefix)).fetchone()[0] or 0
+                    pending.extend(prefix+'['+str(i)+']'+suffix for i in range(length))
+            if not concrete:return json.loads(db.execute('SELECT json(?)',(body,)).fetchone()[0])
+            return json.loads(db.execute('SELECT json_remove(?'+',?'*len(concrete)+')',[body,*concrete]).fetchone()[0])
         def extract(queries):
             # Bind the binary document once. Types distinguish absent fields from
             # explicit JSON null without reparsing the full document per miss.

@@ -8,6 +8,21 @@ from tools.platform_store import zero
 from tests.research.test_passive_program_v2 import prepared_host_v2
 
 class ProviderExtensionTests(unittest.TestCase):
+    def test_exact_new_user_addendum_without_pregranted_policy_retains_usage_and_reserve(self):
+        h,a=self.fixture();spec=deepcopy(state(h)['spec']);spec.pop('provider_request_extension_policy')
+        update(h,spec=spec);before=h.store.remaining();reserve=spec['budgets']['protected_provider_requests']
+        with self.assertRaisesRegex(ValueError,'EXACT_USER_APPROVED'):extend_provider_requests(h,a)
+        a['version']='provider_request_extension_approval_v2'
+        a['scope']['additional_requests']=20;a['scope_identity']=digest(a['scope'])
+        result=extend_provider_requests(h,a)
+        self.assertEqual(result['request_limit'],spec['budgets']['provider_requests']+20)
+        self.assertEqual(h.store.remaining()['used'],before['used'])
+        self.assertEqual(state(h)['spec']['budgets']['protected_provider_requests'],reserve)
+        self.assertNotIn('provider_request_extension_policy',state(h)['spec'])
+        self.assertTrue(extend_provider_requests(h,a)['already_applied'])
+        stale=deepcopy(a);stale['source']='another approval with stale identity'
+        with self.assertRaisesRegex(ValueError,'EXACT_USER_APPROVED'):extend_provider_requests(h,stale)
+
     def fixture(self):
         h,_=prepared_host_v2();spec=deepcopy(state(h)['spec'])
         spec['provider_request_extension_policy']=dict(version='finite_provider_request_extension_v1',maximum_additional_requests=3)

@@ -410,7 +410,8 @@ def context(host, *, evidence_references=None):
     latest=next((r for e in reversed(host.store.events(host.run_id)) for r in e.get('outputs',[]) if r['artifact_id'] in ids),None)
     current['latest_scientific_feedback']=None
     if latest:
-        value=host.store.artifact(latest)
+        from tools.research.analysis import result_metadata
+        value=result_metadata(host,latest)
         if latest in s.get('analysis_results',[]):
             from tools.research.analysis import compact_result
             result=compact_result(value,latest)
@@ -1275,7 +1276,8 @@ def milestone_facts(host, row):
     facts['parameter_change_count']=len(changes)
     facts['results']=[]
     for ref in references[-1:]:
-        value=host.store.artifact(ref)
+        from tools.research.analysis import result_metadata
+        value=result_metadata(host,ref)
         research=value.get('structure_research') or {}
         diagnosis=task_diagnosis(value,ref)
         qualification=(diagnosis or {}).get('qualification') or (research.get('baseline') or {}).get('qualification_diagnosis')
@@ -1723,6 +1725,7 @@ def initialization_review(host):
 def research_opportunity_review(host, *, details=False):
     """On-demand facts and existing admission leads; never choose an experiment."""
     from tools.research.evidence_views import native_search_summary
+    from tools.research.analysis import result_metadata
     from tools.research.budget import decision_budget
     from tools.research.task_constraints import mathematical_method_view,mathematical_opportunity_summary
     from tools.research.feedback import result_view
@@ -1744,7 +1747,7 @@ def research_opportunity_review(host, *, details=False):
             item=conditions[key[0],key[1]]
             item.setdefault('control_sources',[]).append(row['source'])
     for ref in s.get('analysis_results',[]):
-        a=host.store.artifact(ref);key=candidates.get(a.get('candidate',{}).get('artifact_id'))
+        a=result_metadata(host,ref);key=candidates.get(a.get('candidate',{}).get('artifact_id'))
         if not key:continue
         physical,cid,c=key;search=native_search_summary(a,ref);m=a.get('structure_research') or {}
         row=dict(reference=ref,candidate=a['candidate'],condition=cid,task_identity=c.get('task_identity') or digest(c['configuration']['task']),

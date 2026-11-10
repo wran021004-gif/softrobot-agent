@@ -1036,6 +1036,27 @@ def compact_result(value, reference):
         'input_response_observation','retrieval_note') if k in summary},**summary}
 
 
+def result_metadata(host, reference):
+    """Summary inputs retain samples and qualifications, omitting audit-only arrays.
+
+    Qualification sample traces remain available through original evidence reads;
+    summaries consume the saved qualification outcomes and diagnostic facts.
+    """
+    meta=host.store.artifact(reference,paths=('structure_research.effect_semantics',))
+    if (meta.get('structure_research') or {}).get('effect_semantics')!='finite_time_task_response':
+        return host.store.artifact(reference)
+    base='structure_research.records[*].mechanics.dynamic_execution'
+    result=host.store.artifact(reference,omit=('dynamic_execution_progress',
+        base+'.episodes[*].qualification_samples',
+        base+'.paired_ablation.ablation.episodes[*].qualification_samples'))
+    if any((r.get('observation') or {}).get('diagnostic_task_gap') is None
+            for r in result['structure_research'].get('records',[])):
+        # Legacy results may need the original dense trajectories to derive
+        # diagnostic observations. Never substitute a sparse calculation.
+        return host.store.artifact(reference)
+    return result
+
+
 def decision_result(value, reference):
     """Small deterministic Agent view; the immutable scientific result is untouched."""
     claim=value.get('scoped_claim') or {}
