@@ -250,7 +250,8 @@ class ContextPerformanceTests(unittest.TestCase):
         from tools.research.state import state
         original=agent.converse
         async def bounded(*args,**kwargs):
-            return await original(*args,**kwargs,pause_exploration_remaining=100)
+            kwargs['pause_exploration_remaining']=100
+            return await original(*args,**kwargs)
         with fixture() as h:
             approve(h,[REGISTERED_MATHEMATICS_SCOPE])
             with patch('tools.research.agent.credential',return_value='offline-fixture'), patch(
