@@ -94,6 +94,8 @@ class SparseNativeTests(unittest.TestCase):
         scoped=scoped_result(result,requirements,applicability,q)
         self.assertEqual(scoped['scoped_claim']['verification_status'],'sparse_route_screening_diagnostic')
         self.assertEqual(scoped['scoped_claim']['conclusion'],'diagnostic')
+        self.assertFalse(scoped['analysis_applicability']['full_task_supported'])
+        self.assertIn('full physics-step route coverage',scoped['diagnostic_layers']['dynamic_validation']['missing_checks'])
 
 
 class SparseContractTests(unittest.TestCase):

@@ -244,6 +244,10 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
 def scoped_result(result, requirements, applicability, query):
     """Classify trusted kernel verification fields; solver success is not a proof."""
     conclusion, verification = 'inconclusive', 'insufficient'
+    if getattr(query,'mechanism_study',None) and query.mechanism_study.execution_checks=='screening':
+        applicability=deepcopy(applicability)
+        applicability['full_task_supported']=False
+        applicability.setdefault('reasons',[]).append('Sparse route screening has no full physics-step route coverage or original task acceptance.')
     interpretation = 'No verified witness or certificate is available for this attempt.'
     endpoint = result.get('endpoint') or {}
     checks = endpoint.get('checks') or {}
@@ -910,6 +914,8 @@ def diagnostic_layers(value):
         layers['dynamic_validation']=layer('not_evaluated' if complete else 'unqualified',dict(executions=runs),
             missing=['independent Replay','original task acceptance']+([] if complete else ['complete loading integration']),
             failures=[r['reason'] for r in runs if r['reason']],scope=layers['dynamic_validation']['scope'])
+        if any(r.get('execution_checks',{}).get('level')=='screening' for r in executions):
+            layers['dynamic_validation']['missing_checks'].append('full physics-step route coverage')
     elif native.get('input_response') or native.get('structure_baseline') or (native.get('cost') or {}).get('physics_steps',0)>0:
         layers['dynamic_validation']=layer('not_evaluated' if value.get('status')=='computed' else 'unqualified',
             dict(source_pointer='/native_dynamics',cost=native.get('cost'),operation=value.get('operation')),
