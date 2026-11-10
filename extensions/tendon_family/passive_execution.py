@@ -131,10 +131,13 @@ def constraint_mechanism(native,data,goal):
         constraint_direction_error=error)
 
 
-def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None,common_equilibrium=None):
+def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None,common_equilibrium=None,execution_checks='full'):
     from tools.platform_registry import registry
     goal,bounds,problem=task_definition(inp.task,registry())
     v2=goal.version=='passive_response_v2'
+    if execution_checks not in ('full','screening') or execution_checks=='screening' and not v2:
+        raise ValueError('SUPPORTED_PASSIVE_EXECUTION_CHECKS_REQUIRED')
+    route_sampling='score_grid' if execution_checks=='screening' else getattr(goal,'route_check','not_required')
     original=v2 and goal.execution_protocol=='phs2d_original_v1'
     hard=v2 and goal.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
     if (disabled_limits or initial_state is not None) and not v2:raise ValueError('PASSIVE_V2_STATE_OR_INTERVENTION_REQUIRED')
@@ -166,6 +169,11 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
         timings_s=dict(model_compile=compile_s),mujoco_version=mujoco.__version__,
         solver_options=dict(timestep_s=float(model.opt.timestep),integrator=int(model.opt.integrator),
             iterations=int(model.opt.iterations),tolerance=float(model.opt.tolerance)))
+    if execution_checks=='screening':
+        policy=dict(version='sparse_route_screening_v1',level='screening',route_check=route_sampling,
+            route_period_s=inp.task.timing.sample_period_s,qualification='original_dense_windows',
+            recording=goal.recording,task_acceptance='unmeasured')
+        raw['execution_checks']={**policy,'identity':digest(policy)}
     base_limited=model.tendon_limited.copy();disabled=[];unchanged=None
     if v2:
         if len(set(disabled_limits))!=len(disabled_limits) or any(name not in raw['tendon_order'] for name in disabled_limits):raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
@@ -239,7 +247,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 qualification_samples=[],qualifications={},phase_boundaries=[],maximum_constraint_direction_error=0.,
                 maximum_force_map_error_nm=0.,minimum_constraint_multiplier_n=0.,maximum_capacity_ratio=0.,
                 maximum_enabled_length_excess_m=0.,stage_extrema={},constraint_transitions=[])
-            episode['route_geometry']=dict(sampling=goal.route_check,checked_poses=0,segment_body_checks=0,status='not_required',first_issue=None)
+            episode['route_geometry']=dict(sampling=route_sampling,checked_poses=0,segment_body_checks=0,status='not_required',first_issue=None)
             if goal.recording=='full_physics_csv':
                 path=folder/('episode_'+str(len(raw['episodes'])-1)+'.csv');trace=path.open('x',newline='')
                 writer=csv.writer(trace)
@@ -289,7 +297,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                         current=mechanism['constraint_classification'],actual_tension_n=tension(),
                         length_residual_m=(data.ten_length-native.payout).tolist(),constraint_states=mechanism['constraint_states']))
                 episode['last_constraint_classification']=mechanism['constraint_classification']
-                if goal.route_check=='every_physics_step' or goal.route_check=='score_grid' and abs(time_s/inp.task.timing.sample_period_s-round(time_s/inp.task.timing.sample_period_s))<1e-8:
+                if route_sampling=='every_physics_step' or route_sampling=='score_grid' and abs(time_s/inp.task.timing.sample_period_s-round(time_s/inp.task.timing.sample_period_s))<1e-8:
                     from .route_validation import validate_routes
                     check=validate_routes(native,[data.qpos],data=data);record=episode['route_geometry']
                     record['checked_poses']+=1;record['segment_body_checks']+=check['segment_body_checks']
@@ -456,7 +464,7 @@ def paired_raw(first,second,folder,requested_tendons,elapsed,*,interrupted=False
         unobserved_work_possible=interrupted)
 
 
-def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None):
+def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None,execution_checks='full'):
     """Two fresh native executions in one contained, fully accounted Worker.
 
     Each arm owns a complete raw record and a separate immutable execution
@@ -466,7 +474,8 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
     if not disabled_limits or len(set(disabled_limits))!=len(disabled_limits) or any(name not in names for name in disabled_limits):
         raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
     folder=Path(folder);started=time.perf_counter()
-    first=execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result).data.data
+    checks=dict(execution_checks=execution_checks) if execution_checks!='full' else {}
+    first=execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result,**checks).data.data
     if first['status']!='completed':
         combined=paired_raw(first,None,folder,disabled_limits,time.perf_counter()-started)
         atomic_json(folder/'passive_progress.json',combined)
@@ -475,7 +484,7 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
     atomic_json(folder/'passive_progress.json',combined)
     try:
         second=execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
-            initial_state_result=initial_state_result,common_equilibrium=first.get('unloaded_equilibrium')).data.data
+            initial_state_result=initial_state_result,common_equilibrium=first.get('unloaded_equilibrium'),**checks).data.data
     except Exception as exc:
         from tools.state_io import read
         path=folder/'ablation/passive_progress.json'

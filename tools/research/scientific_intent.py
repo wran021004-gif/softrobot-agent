@@ -174,6 +174,12 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize'])),required=['operation'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses inspect/differentiate/optimize/compare/interact (two registered continuous parameters, four matched local points); control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
+        if not passive or spec.get('research_execution_checks')!={'version':'sparse_route_screening_v1'}:
+            schema['$defs']['ScientificStructureV4']['properties'].pop('execution_checks',None)
+        else:
+            schema['$defs']['ScientificStructureV4']['allOf'].append({
+                'if':{'properties':{'execution_checks':{'const':'screening'}},'required':['execution_checks']},
+                'then':{'properties':{'operation':{'const':'inspect'},'effect_semantics':{'const':'finite_time_task_response'}}}})
         if passive:
             problem=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec['canonical_task']['physical_problem'])
             props=schema['$defs']['ScientificStructureV4']['properties']
@@ -851,6 +857,8 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     capabilities=task_adapter(c['configuration']).physical_capabilities()
     if capabilities['status']=='unsupported':
         return feedback('unsupported','UNSUPPORTED_PHYSICAL_CAPABILITIES',missing=capabilities['missing'])
+    if v4 and q.execution_checks=='screening' and (q.effect_semantics!='finite_time_task_response' or q.operation!='inspect'):
+        return feedback('unsupported','SCREENING_CHECKS_REQUIRE_PASSIVE_FINITE_TIME_INSPECT')
     if v4 and q.effect_semantics=='finite_time_task_response':
         return compile_dynamic(host,q,payload,intent,tool_use_id=tool_use_id)
     if v4 and q.passive_ablation:
@@ -1018,6 +1026,7 @@ def mechanism_context(host,c,study,budget):
     except ValueError as exc:
         return None,mechanism_parameter_failure(spec,c,study.paths,study.parameter_bounds) or fail('unsupported',str(exc))[1]
     preview=dict(minimum_evaluations=context['minimum_evaluations'],required_evaluations=context['evaluations'],
+        **({'execution_checks':context['execution_checks']} if context.get('execution_checks') else {}),
         requested_evaluations=budget,effective_evaluation_cap=context['evaluation_cap'],
         budget_selection='minimum_legal' if budget is None else 'explicit_cap',
         cost_dependencies=context['cost_dependencies'],
@@ -1059,6 +1068,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         from tools.research.structure_research import select_group_parameters
         paths=select_group_parameters(spec,c,q.parameter_group)
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
+        execution_checks=q.execution_checks,
         parameter_paths=paths,parameter_bounds=q.parameter_bounds,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
         max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates,
         passive_ablation=q.passive_ablation)

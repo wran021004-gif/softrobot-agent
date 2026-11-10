@@ -261,6 +261,9 @@ def scoped_result(result, requirements, applicability, query):
             if result['structure_research'].get('effect_semantics')=='finite_time_task_response':
                 verification='frozen_finite_time_research_observation'
                 interpretation='All recorded frozen dynamic load cases and task bounds retained, including unscaled conditions; independent Replay, acceptance certificate and Main SELECT remain separate.'
+                if result['structure_research'].get('execution_checks',{}).get('level')=='screening':
+                    verification='sparse_route_screening_diagnostic'
+                    interpretation='Exploratory sampled-route diagnostic with unchanged physical integration and dense qualification windows. Full route coverage, independent Replay and original task acceptance remain unmeasured; cannot SELECT this screening result.'
         elif result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'

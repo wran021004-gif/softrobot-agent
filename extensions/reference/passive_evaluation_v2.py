@@ -20,6 +20,8 @@ def state_ok(value, raw):
 
 
 def inspect(task,raw,*,intervention=False):
+    if raw.get('execution_checks',{}).get('level')=='screening':
+        return 'incomplete','SCREENING_REQUIRES_ORIGINAL_FULL_VALIDATION'
     goal=PassiveResponseGoalV2.model_validate(task.goal.data)
     original=goal.execution_protocol=='phs2d_original_v1'
     hard=goal.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')

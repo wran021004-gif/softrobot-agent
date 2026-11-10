@@ -117,6 +117,44 @@ def authorize_unmetered_mathematics(host, approval):
         requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
 
 
+def authorize_sparse_research_checks(host, approval):
+    """Exact user opt-in in the original Study; full task and costs stay frozen."""
+    from copy import deepcopy
+    from tools.state_io import digest
+    from tools.research.provider import pending
+    identity=digest(approval)
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state'];spec=current['spec']
+        for ref in current.get('research_check_authorizations',[]):
+            if host.store.artifact(ref,db=db)['approval_identity']==identity:
+                return dict(already_applied=True,reference=ref)
+        scope=approval.get('scope',{});policy=dict(version='sparse_route_screening_v1')
+        if (approval.get('version')!='sparse_research_checks_approval_v1' or approval.get('approved') is not True
+                or not approval.get('source') or approval.get('scope_identity')!=digest(scope)
+                or set(scope)!={'study_id','resolved_identity','execution_policy'}
+                or scope['study_id']!=host.run_id or scope['resolved_identity']!=spec['resolved_identity']
+                or scope['execution_policy']!=policy or spec.get('research_execution_checks') is not None
+                or 'analysis' not in spec.get('capabilities',[])):
+            raise ValueError('EXACT_USER_APPROVED_SPARSE_RESEARCH_CHECKS_REQUIRED')
+        if (current.get('pending') or pending(host) or current['pilot'].get('unconsumed_response')
+                or current.get('selected') or current.get('success_gate') or current['research_status']=='stopped'
+                or db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]):
+            raise ValueError('SETTLED_NONSUCCESS_BOUNDARY_REQUIRED_FOR_RESEARCH_CHECKS')
+        ref=plain(host.store.put(db,dict(version='sparse_research_checks_addendum_v1',approval=approval,
+            approval_identity=identity,previous_state=plain(host.store.put(db,current)),
+            full_task_unchanged=True,all_costs_and_failures_retained=True)))
+        updated=deepcopy(spec);updated.pop('resolved_identity')
+        updated['research_execution_checks']=policy
+        updated.setdefault('authorization_addenda',[]).append(ref)
+        updated['resolved_identity']=digest(updated)
+        current.update(spec=updated,validation_extension_pending_binding=True)
+        current.setdefault('research_check_authorizations',[]).append(ref)
+        host.store.update_state(db,host.run_id,current)
+        host.store.event(db,host.run_id,'research_check_authorization','authorized',outputs=[ref])
+    return dict(already_applied=False,reference=ref,resolved_identity=updated['resolved_identity'],
+        requires_committed_binding=True,requires_current_identity_research_authorization=True,provider_requests_sent=0)
+
+
 def mathematical_remaining(spec, used=0):
     """None is an authorized absence of a count quota; usage is still recorded."""
     limit=spec['budgets']['mathematical_evaluations']

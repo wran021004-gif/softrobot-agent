@@ -157,6 +157,12 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
     capabilities=task_adapter(candidate['configuration']).physical_capabilities()
     if capabilities['status']=='unsupported':raise ValueError('UNSUPPORTED_PHYSICAL_CAPABILITIES: '+','.join(capabilities['missing']))
     dynamic=study.effect_semantics=='finite_time_task_response'
+    if study.execution_checks=='screening':
+        if spec.get('research_execution_checks')!={'version':'sparse_route_screening_v1'}:
+            raise ValueError('FROZEN_SPARSE_RESEARCH_CHECK_AUTHORIZATION_REQUIRED')
+        goal=candidate['configuration']['task']['goal']['data']
+        if goal.get('version')!='passive_response_v2' or goal.get('route_check')!='every_physics_step':
+            raise ValueError('SCREENING_REQUIRES_PASSIVE_V2_WITH_ORIGINAL_DENSE_ROUTE_CHECKS')
     if study.passive_ablation and not dynamic:raise ValueError('PAIRED_LIMIT_INTERVENTION_REQUIRES_FINITE_TIME_RESPONSE')
     if dynamic:
         if not capabilities['evaluation']['finite_time_structure_response']:raise ValueError('REGISTERED_FINITE_TIME_STRUCTURE_RESPONSE_REQUIRED')
@@ -245,6 +251,10 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         differentiation_router=route)
     if dynamic:
         result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
+        if study.execution_checks=='screening':
+            result['execution_checks']=dict(version='sparse_route_screening_v1',level='screening',
+                route_period_s=candidate['configuration']['task']['timing']['sample_period_s'],
+                task_acceptance='unmeasured',full_validation_required=True)
     return result
 
 
@@ -269,6 +279,12 @@ def discovery(spec, candidate, reference, *, latest_direction=None, formal_candi
     from tools.research.math_capability_catalog import research_semantics
     return dict(version='structure_mechanism_discovery_v2',candidate=reference,operations=list(OPERATIONS),
         research_semantics=research_semantics(),
+        **(dict(execution_checks=dict(default='full',screening=dict(operation='inspect',
+            effect_semantics='finite_time_task_response',route_sampling='score_grid',
+            route_period_s=candidate['configuration']['task']['timing']['sample_period_s'],
+            physics_and_qualification='unchanged',task_acceptance='unmeasured',
+            full_validation='Use original full checks and independently registered PhysicalReplay before SELECT.')))
+            if spec.get('research_execution_checks')=={'version':'sparse_route_screening_v1'} else {}),
         operation_admission=operations,remaining_evaluations=remaining_evaluations,
         evaluation_cost_preview=dict(baseline_evaluations=1,parameter_stencil_evaluations=probes,
             two_parameter_joint_check_evaluations=1,matched_interaction_evaluations=4,optimize_additional_minimum=1,
@@ -391,7 +407,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             from tools.research_tasks import task_adapter,constraint_gap
             directory=getattr(checkpoint,'directory',None)
             folder=directory/('dynamic_'+str(index)) if directory else None
-            backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder))
+            checks=dict(execution_checks=study.execution_checks) if study.execution_checks!='full' else {}
+            backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation,**checks) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder,**checks))
             raw=backend.data.data
             task=SessionInput.model_validate(cfg).task
             if task.goal.data.get('version')=='passive_response_v2':
@@ -409,6 +426,12 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 task_gap=gap,task_acceptance='unmeasured',independent_numerical_confirmation='unmeasured')
             observation['diagnostic_task_gap']=task_adapter(cfg).diagnostic_task_gap(raw,plain(query.candidate),
                 pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
+            if study.execution_checks=='screening':
+                complete=raw.get('status')=='completed' and all(e.get('complete') for e in raw.get('episodes',[]))
+                observation.update(status='computed' if complete else 'unavailable',value=None,
+                    reason='SCREENING_REQUIRES_ORIGINAL_FULL_VALIDATION',
+                    screening=raw['execution_checks'],
+                    scope='Diagnostic observations from unchanged physics and dense qualification; sparse route coverage cannot establish full-task validity or acceptance.')
             diagnosis=task_adapter(cfg).qualification_diagnosis(raw,None,
                 pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
             if diagnosis:observation['qualification_diagnosis']=diagnosis
@@ -505,6 +528,8 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             'passive constraint nullspace','hardware performance'])
     if context.get('parameterized_problem'):evidence['parameterized_problem']=context['parameterized_problem']
     evidence['effect_semantics']=study.effect_semantics
+    if study.execution_checks=='screening':
+        evidence['execution_checks']=context['execution_checks']
     from tools.research_tasks import task_adapter
     from extensions.math_analysis.differentiation_router import select_method
     evidence['method_selection']=select_method(effect_semantics=study.effect_semantics,
@@ -748,6 +773,7 @@ def dynamic_summary(raw, reference):
         diagnosis['source']['reference']=reference
         for failure in diagnosis['failed_qualifications']:failure['source']['reference']=reference
     return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
+        **(dict(execution_checks=raw['execution_checks']) if raw.get('execution_checks') else {}),
         **(dict(interaction={**raw['interaction'],
             'source':dict(reference=reference,pointer='/structure_research/interaction')}) if raw.get('interaction') else {}),
         qualification_diagnosis=diagnosis,

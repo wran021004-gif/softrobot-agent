@@ -550,6 +550,8 @@ class MechanismQuestionV2(Contract):
 
 
 class ScientificStructureV4(MechanismQuestionV2):
+    execution_checks: Literal['full','screening'] = Field(default='full',
+        description='Passive finite-time inspect only: screening checks routing on the score grid while retaining physics, dense qualification and full traces. Diagnostic screening cannot certify task acceptance. full retains every frozen check.')
     parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,
         description='Finite local intervals for selected actual parameter_paths, required for open domains. Preserve the full FamilySpace; include the current value and obey physical bounds. These intervals apply only to this request.')
     operation: Literal['inspect','differentiate','optimize','compare','interact']
@@ -567,6 +569,7 @@ class ScientificStructureV4(MechanismQuestionV2):
 
 
 class MechanismStudy(Contract):
+    execution_checks: Literal['full','screening'] = 'full'
     parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     operation: Literal['inspect','differentiate','optimize','compare','interact']
     target: MechanismTarget | PhysicalMechanismTarget
@@ -588,6 +591,8 @@ class MechanismStudy(Contract):
 
     @model_validator(mode='after')
     def unambiguous_paths(self):
+        if self.execution_checks=='screening' and (self.effect_semantics!='finite_time_task_response' or self.operation!='inspect'):
+            raise ValueError('SCREENING_CHECKS_REQUIRE_PASSIVE_FINITE_TIME_INSPECT')
         if self.parameter_path and self.parameter_paths:raise ValueError('USE_LEGACY_PATH_OR_SELECTED_PATHS_NOT_BOTH')
         if len(set(self.paths))!=len(self.paths):raise ValueError('DISTINCT_PARAMETER_PATHS_REQUIRED')
         if self.operation=='interact' and len(self.paths)!=2:raise ValueError('INTERACTION_REQUIRES_EXACTLY_TWO_PARAMETER_PATHS')
@@ -596,6 +601,7 @@ class MechanismStudy(Contract):
     @model_serializer(mode='wrap')
     def legacy_request(self,handler):
         value=handler(self)
+        if self.execution_checks=='full':value.pop('execution_checks',None)
         if not self.parameter_paths:value.pop('parameter_paths',None)
         if self.local_radius_fraction==.02:value.pop('local_radius_fraction',None)
         if self.load_condition is None:value.pop('load_condition',None)
