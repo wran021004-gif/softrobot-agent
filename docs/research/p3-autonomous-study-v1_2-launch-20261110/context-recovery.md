@@ -15,3 +15,11 @@
 [恢复前快照](context-recovery-before.json) 记录对真实旧状态包的只读回归：状态包压缩到 **475,295 bytes**；使用相同旧 system/tools、干净调用及新 L0 重构的请求为 **577,544 bytes**，通过原容量保护。该数值是离线重构，不是 Provider 实测 token 数或原未发送请求的精确副本。逐项核对真实约束数值、UNKNOWN、窗口、阈值、observable、覆盖及资格测量不变，原始 packet 身份不变。离线期间 Provider 与新积分均为零。
 
 原 Study 继续使用 `p3-passive-progressive-stiffness-autonomous-20261110-v1_2`、原 Store 及原总额度。先提交修复、绑定并离线验证 SDK，再恢复真实 Main；恢复后的实际 wire、HTTP 响应、原账本和状态保留情况见后续恢复收据。此次不 Push。
+
+## 恢复核验
+
+修复及当前运行绑定为 `bfb51e5bf9dd6f8b0c3aefb074a9a746001ac514`。原 `base_commit`、完整冻结配置、科研 profile、7 个候选、6 份 Plan、9 项分析及已有搜索均未重置。绑定记录为 `material_behavior_change=false`；SDK 独立 restore 成功，恢复前账本仍为 35/80，没有离线 Provider 费用或积分。
+
+截至 **2026-11-10 19:51:39 +08:00**，恢复后的两次真实 Main 请求均为 **HTTP 200 / tool_calls**。实际完整 wire 分别为 **547,790** 和 **564,289 bytes**；原 1,048,576 bytes 请求上限、1,050,000 上下文保守容量、32,768 输出预留及 8,192 framing 预留均保持不变。Main 已继续读取 Knowledge，尚未获得新的正式验收通过结论。
+
+原共享 Provider 账本为 **37/80，剩余 43**，研究在后台继续。原始大 packet 摘要身份和旧 Study 状态再次核对未变。[恢复收据](context-recovery-after.json) 保留绑定、离线 SDK 证明、实际新请求/响应引用和同一账本快照。后续进展与成本以原 Store 为准。
