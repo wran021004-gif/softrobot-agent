@@ -1,0 +1,445 @@
+{
+  "ready": true,
+  "checks": [
+    {
+      "name": "task_parser",
+      "passed": true,
+      "details": {
+        "task_id": "passive-progressive-stiffness-dev-v1-2",
+        "identity": "caebecf0aa56c6abfe9516d51676d4ed8335ed1de5bdf72333f78c870e2d01db"
+      }
+    },
+    {
+      "name": "core_thresholds_unchanged",
+      "passed": true,
+      "details": {
+        "exact_task_comparison_exclusions": [
+          "identity metadata",
+          "confirmation variants"
+        ],
+        "legacy_confirmation_serialization_unchanged": true
+      }
+    },
+    {
+      "name": "final_two_cells_optional_higher",
+      "passed": true,
+      "details": {
+        "policy": {
+          "version": "numerical_fidelity_v1",
+          "screening": {
+            "screening": {
+              "cells_per_segment": 2,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            },
+            "screening1": {
+              "cells_per_segment": 1,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            }
+          },
+          "refinement": {
+            "refinement2": {
+              "cells_per_segment": 2,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            }
+          },
+          "numerical_sensitivity": {
+            "diagnostic4": {
+              "cells_per_segment": 4,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            },
+            "diagnostic8": {
+              "cells_per_segment": 8,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            },
+            "diagnostic12": {
+              "cells_per_segment": 12,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            },
+            "diagnostic16": {
+              "cells_per_segment": 16,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            },
+            "diagnostic32": {
+              "cells_per_segment": 32,
+              "backend": "backend.family_passive_mujoco@1.0.0"
+            }
+          },
+          "final_evaluation": {
+            "cells_per_segment": 2,
+            "backend": "backend.family_passive_mujoco@1.0.0"
+          },
+          "require_exact_fidelity": true,
+          "alternative_runtimes": [],
+          "runtime_preflight_limit": 2
+        },
+        "required_confirmation_variants": []
+      }
+    },
+    {
+      "name": "original_p3_domain_no_seed",
+      "passed": true,
+      "details": {
+        "segment_bounds": [
+          2,
+          6
+        ],
+        "tendon_bounds": [
+          2,
+          4
+        ],
+        "candidate_pool": "not created by preflight"
+      }
+    },
+    {
+      "name": "real_two_cell_compiler_worker_evaluator_admission",
+      "passed": true,
+      "details": {
+        "backend": "backend.family_passive_mujoco",
+        "cells": {
+          "segment_0": 2,
+          "segment_1": 2
+        },
+        "worker": "tools.research.execution_worker -> physical_replay.calculate -> PassiveBackend",
+        "integration_calls": 0
+      }
+    },
+    {
+      "name": "baseline_coordinate_coupled_admission",
+      "passed": true,
+      "details": {
+        "single_direction_prefix_episodes": 1,
+        "baseline_ablation_required": false,
+        "coordinate_search": true,
+        "coupled_blocks": true
+      }
+    },
+    {
+      "name": "main_parameter_and_method_discovery",
+      "passed": true,
+      "details": {
+        "parameter_count": 46,
+        "parameter_ids": [
+          "segment_count",
+          "tendon_count",
+          "spans",
+          "segments.0.length_m",
+          "segments.0.young_pa",
+          "segments.0.physical_parameters.curvature_y_rad_m",
+          "segments.0.physical_parameters.curvature_z_rad_m",
+          "segments.0.physical_parameters.section_angle_rad",
+          "segments.0.physical_parameters.viscosity_y_nm2_s",
+          "segments.0.physical_parameters.viscosity_z_nm2_s",
+          "segments.0.physical_parameters.density_kg_m3",
+          "segments.0.sections.0.kind",
+          "segments.0.sections.0.parameters.radius_m",
+          "segments.0.cells",
+          "segments.1.length_m",
+          "segments.1.young_pa",
+          "segments.1.physical_parameters.curvature_y_rad_m",
+          "segments.1.physical_parameters.curvature_z_rad_m",
+          "segments.1.physical_parameters.section_angle_rad",
+          "segments.1.physical_parameters.viscosity_y_nm2_s",
+          "segments.1.physical_parameters.viscosity_z_nm2_s",
+          "segments.1.physical_parameters.density_kg_m3",
+          "segments.1.sections.0.kind",
+          "segments.1.sections.0.parameters.radius_m",
+          "segments.1.cells",
+          "payout_offsets_m.tendon_0",
+          "payout_offsets_m.tendon_1",
+          "tendon_parameters.diameter_m",
+          "tendon_parameters.force_limit_n",
+          "tendon_parameters.pretension_n",
+          "tendon_parameters.length_servo_gain_n_m",
+          "spans.*.radius_m",
+          "spans.*.guide_s",
+          "spans.*.anchor_s",
+          "spans.*.phase_rad",
+          "spans.*.angular_offset_rad",
+          "spans.0.radius_m",
+          "spans.0.phase_rad",
+          "spans.0.anchor_s",
+          "spans.0.guide_s.0",
+          "spans.0.guide_angle_offset_rad",
+          "spans.0.anchor_angle_offset_rad",
+          "spans.0.angular_offsets_rad.0",
+          "spans.0.angular_offsets_rad.1",
+          "control_weights.holding_tip_speed_weight",
+          "control_weights.terminal_tip_speed_weight"
+        ],
+        "finite_time": {
+          "status": "conditional_on_request_admission",
+          "effect_semantics": "finite_time_task_response",
+          "target": "finite_time_task_violation",
+          "operations": [
+            "inspect",
+            "differentiate",
+            "optimize",
+            "compare",
+            "interact"
+          ],
+          "operating_point": "frozen_task_initial_state",
+          "load_condition": "all_frozen_conditions",
+          "required_inputs": [
+            "operation",
+            "target",
+            "parameter_paths for differentiate/optimize",
+            "comparison_candidates for compare"
+          ],
+          "paired_required": false,
+          "final_mechanism_requires_pair": true,
+          "actions": [
+            "baseline_response",
+            "paired_mechanism"
+          ],
+          "legal_intervention_tendons": [
+            "tendon_0",
+            "tendon_1"
+          ],
+          "intervention_rule": "Baseline response needs no intervention. For paired_mechanism, Main selects exact passive limits; both arms use the same selected execution scope and matched common states. Only qualified complete pairs support formal mechanism conclusions.",
+          "per_evaluation_cost": {
+            "model_builds": 1,
+            "episodes": 2,
+            "physics_steps": 320000
+          },
+          "initialization_dependency": "Before integration, repeat the frozen unloaded hard-equilibrium solve, native scene and static solver used by unloaded qualification inspect. Each direction follows its frozen reset and continuity semantics. Finite-time response cannot bypass initialization failure. A static precheck is optional and grants no dynamic acceptance.",
+          "evaluation_cap": "Optional explicit maximum; omitted question/diagnose cap uses the legal minimum. An explicit low cap is rejected without execution.",
+          "cost_rule": "Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.",
+          "execution_profile": "Optional exploration: select frozen directions, continuous stage prefix, observation grid, routing, recording and declared fidelity. final_acceptance retains complete frozen scope.",
+          "evidence_scope": "Measured response and qualification are separate; exploration, baseline objectives and static proxies grant no independent acceptance."
+        },
+        "search": {
+          "method": "bounded_mixed_coordinate_v1",
+          "variable_groups": [
+            "segment_count",
+            "tendon_count",
+            "spans",
+            "lengths",
+            "materials",
+            "sections",
+            "routing",
+            "payout"
+          ],
+          "segment_counts": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "tendon_counts": [
+            2,
+            3,
+            4
+          ],
+          "max_proposals": null,
+          "max_evaluations": null,
+          "evaluation_modes": [
+            "passive_equilibrium",
+            "passive_task_response"
+          ],
+          "require_explicit_start": false,
+          "coupled_block_enabled": true
+        }
+      }
+    },
+    {
+      "name": "specified_answer_isolated_knowledge",
+      "passed": true,
+      "details": {
+        "entries": [
+          "skill-finite-search@1",
+          "skill-parameter-model@1",
+          "skill-matched-comparison@1",
+          "skill-local-to-experiment@1",
+          "skill-continue-or-stop@1",
+          "skill-witness-replay@1",
+          "phs2d-research-process@1",
+          "passive-structure-mechanics@1",
+          "passive-structure-mechanics@2",
+          "general-routing@1",
+          "general-material-inertia@1",
+          "diagnostic-slack@1",
+          "diagnostic-static-dynamic@1",
+          "diagnostic-convergence@1",
+          "validation-qualification@1",
+          "validation-replay@1",
+          "skill-finite-search@2",
+          "skill-parameter-model@2",
+          "skill-matched-comparison@2",
+          "skill-local-to-experiment@2",
+          "skill-continue-or-stop@2",
+          "skill-witness-replay@2",
+          "phs2d-research-process@2",
+          "skill-parameter-model@3",
+          "skill-matched-comparison@3",
+          "skill-local-to-experiment@3",
+          "general-material-inertia@2",
+          "general-routing@2",
+          "mechanism-research-process@1",
+          "p3-case@3",
+          "passive-structure-mechanics@3",
+          "general-routing@3",
+          "general-material-inertia@3",
+          "diagnostic-slack@2",
+          "diagnostic-static-dynamic@2",
+          "diagnostic-convergence@2",
+          "validation-qualification@2",
+          "validation-replay@2",
+          "skill-parameter-model@4",
+          "skill-matched-comparison@4",
+          "skill-local-to-experiment@4",
+          "skill-finite-search@3",
+          "skill-continue-or-stop@3",
+          "skill-witness-replay@3",
+          "mechanism-research-process@2"
+        ],
+        "manifest_identity": "682e69f472003ec3a9a20737235cd5ebf6d06093533a4f6bb55defac3bf3cbc6"
+      }
+    },
+    {
+      "name": "provider_shared_80",
+      "passed": true,
+      "details": {
+        "total": 80,
+        "role_subbudgets": false,
+        "extra_requests": false
+      }
+    },
+    {
+      "name": "cumulative_science_unlimited",
+      "passed": true,
+      "details": {
+        "budgets": {
+          "provider_requests": 80,
+          "protected_provider_requests": 0,
+          "public_operations": null,
+          "protected_public_operations": 0,
+          "physical_launches": null,
+          "local_solves": 0,
+          "local_solve_s": null,
+          "offline_nlp": null,
+          "bdf_replays": null,
+          "mathematical_evaluations": null,
+          "numerical_s": null,
+          "activity_s": null,
+          "delivery_reserve_s": null,
+          "provider_reserve_policy": "last_requests_v2"
+        },
+        "replay_limit": null,
+        "search_limits": null,
+        "physics_step_limit": null,
+        "candidate_limit": null,
+        "worker_watchdogs_s": [
+          14400,
+          7200
+        ],
+        "legacy_local_solves": "inactive NMPC diagnostic, not passive research"
+      }
+    },
+    {
+      "name": "independent_new_store",
+      "passed": true,
+      "details": {
+        "old_store": "D:\\softrobot-agent\\.worktrees\\passive-research-capabilities-20261107\\runs\\research\\p3-passive-progressive-stiffness-autonomous-20261109-01\\platform.sqlite",
+        "new_store": "D:\\softrobot-agent\\.worktrees\\passive-research-capabilities-20261107\\runs\\research\\p3-passive-progressive-stiffness-autonomous-20261110-v1_2",
+        "old_state_identity": "b6ebd9fc21180e4dc1d1788874cd411e86e395e4671c39b9cff74a4119424932",
+        "old_ledger": {
+          "limit": {
+            "backend_solves": null,
+            "model_calls": 100,
+            "tool_calls": null,
+            "wall_s": null,
+            "worker_calls": 0
+          },
+          "used": {
+            "tool_calls": 107,
+            "model_calls": 84,
+            "backend_solves": 64,
+            "worker_calls": 0,
+            "wall_s": 30435.036206100056
+          },
+          "remaining": {
+            "backend_solves": null,
+            "model_calls": 16,
+            "tool_calls": null,
+            "wall_s": null,
+            "worker_calls": 0
+          },
+          "occupied": {}
+        },
+        "new_store_exists": false,
+        "old_supervisor_pauses": [
+          "supervisor_pause"
+        ]
+      }
+    },
+    {
+      "name": "runtime_environment",
+      "passed": true,
+      "details": {
+        "status": "ready",
+        "host_python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+        "expected_research_python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+        "exact_execution_interpreter": true,
+        "mathematical_worker_python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+        "conic": {
+          "python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+          "available": false,
+          "reason": "No module named 'cvxpy'"
+        },
+        "threads": {
+          "MKL_NUM_THREADS": {
+            "expected": "1",
+            "actual": "1"
+          },
+          "OMP_NUM_THREADS": {
+            "expected": "1",
+            "actual": "1"
+          },
+          "OPENBLAS_NUM_THREADS": {
+            "expected": "1",
+            "actual": "1"
+          }
+        },
+        "packages": {
+          "numpy": "2.4.6",
+          "scipy": "1.17.1",
+          "casadi": "3.7.2",
+          "mujoco": "3.13.0",
+          "pydantic": "2.14.0",
+          "strands-agents": "1.59.0",
+          "strands-harness": "0.2.0"
+        },
+        "scope": "Imports and interpreter/thread admission only; no NMPC, PPO, physics or Provider request"
+      }
+    }
+  ],
+  "physics_integrations": 0,
+  "provider_requests": 0,
+  "high_fidelity_builds": 0,
+  "old_state_identity": "b6ebd9fc21180e4dc1d1788874cd411e86e395e4671c39b9cff74a4119424932",
+  "old_ledger": {
+    "limit": {
+      "backend_solves": null,
+      "model_calls": 100,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 107,
+      "model_calls": 84,
+      "backend_solves": 64,
+      "worker_calls": 0,
+      "wall_s": 30435.036206100056
+    },
+    "remaining": {
+      "backend_solves": null,
+      "model_calls": 16,
+      "tool_calls": null,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  }
+}

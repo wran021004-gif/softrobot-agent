@@ -617,7 +617,7 @@ def execute_confirmation(inp,folder,source,source_result,source_execution_id):
         atomic_json(folder/'passive_progress.json',raw)
     checkpoint()
     if inspect(inp.task,base)[0]!='valid' or 'ablation' not in pair['paired_ablation']:return backend_result(inp,raw)
-    for variant in ('half_timestep','initial_perturbation'):
+    for variant in ev.numerical_confirmation.variants:
         effective=confirmation_task(inp.task,variant);varied=inp.model_copy(update=dict(task=effective))
         value=execute(varied,folder/variant,common_equilibrium=base['unloaded_equilibrium']).data.data
         certificate['executions'][variant]=dict(task=plain(effective),raw=value,raw_identity=digest(value),execution_id=folder.name+'/'+variant)
@@ -626,7 +626,7 @@ def execute_confirmation(inp,folder,source,source_result,source_execution_id):
     arms=dict(baseline=(inp,base,folder/'independent/baseline'),
         ablation=(inp,pair['paired_ablation']['ablation'],folder/'independent/ablation'),
         **{v:(inp.model_copy(update=dict(task=confirmation_task(inp.task,v))),certificate['executions'][v]['raw'],folder/v)
-            for v in ('half_timestep','initial_perturbation')})
+            for v in ev.numerical_confirmation.variants})
     for name,(effective,value,directory) in arms.items():
         replay=replay_saved_traces(effective,value,directory);certificate['saved_state_replay'][name]=replay
         costs.append(replay['cost']);checkpoint()

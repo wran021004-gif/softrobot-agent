@@ -487,7 +487,9 @@ def confirmation(task,raw):
                 or c['source_binding']!=raw['physical_binding'] or len(c['source_raw_identity'])!=64):
             return 'invalid','CONFIRMATION_SOURCE_IDENTITY_MISMATCH'
         independent=baseline_arm(raw)
-        for variant in ('half_timestep','initial_perturbation'):
+        if set(c['executions'])!=set(spec.variants):return 'incomplete','FROZEN_CONFIRMATION_VARIANT_SCOPE_REQUIRED'
+        execution_ids=[c['source_execution_id'],c['independent_execution_id']]
+        for variant in spec.variants:
             record=c['executions'][variant];effective=confirmation_task(task,variant);other=record['raw']
             if (record['raw_identity']!=digest(other) or record['task']!=effective.model_dump(mode='json')
                     or record['execution_id'] in (c['source_execution_id'],c['independent_execution_id'])
@@ -501,20 +503,21 @@ def confirmation(task,raw):
             if other['intervention']['kind']!='none':return 'invalid','CONSTRAINED_NUMERICAL_CONFIRMATION_REQUIRED'
             if metrics(effective,other,check_confirmation=False,check_mechanism=False).get('task_success') is not True:
                 return 'invalid','CONFIRMATION_TASK_BOUNDS_FAILED:'+variant
-        if c['executions']['half_timestep']['execution_id']==c['executions']['initial_perturbation']['execution_id']:
+            execution_ids.append(record['execution_id'])
+        if len(set(execution_ids))!=len(execution_ids):
             return 'invalid','DISTINCT_NUMERICAL_EXECUTIONS_REQUIRED'
         for s in ev.progressive_stiffness:
             base=np.asarray(stiffness(task,independent,s)['displacement_m'])
             source=np.asarray(c['source_displacements_m'][s.load_condition])
             if base.shape!=(3,) or source.shape!=base.shape or not np.isfinite(source).all():return 'invalid','CONFIRMATION_DISPLACEMENTS_MISSING'
             values=[source]+[np.asarray(stiffness(confirmation_task(task,v),c['executions'][v]['raw'],s)['displacement_m'])
-                for v in ('half_timestep','initial_perturbation')]
+                for v in spec.variants]
             if any(a.shape!=base.shape or not np.isfinite(a).all() or np.max(abs(a-base))>spec.max_displacement_difference_m for a in values):
                 return 'invalid','CROSS_EXECUTION_DISPLACEMENT_DIFFERENCE'
-        required={'baseline','ablation','half_timestep','initial_perturbation'}
+        required={'baseline','ablation',*spec.variants}
         if set(c['saved_state_replay'])!=required:return 'incomplete','COMPLETE_SAVED_STATE_REPLAY_SCOPE_REQUIRED'
         arms=dict(baseline=independent,ablation=raw['paired_ablation']['ablation'],
-            **{v:c['executions'][v]['raw'] for v in ('half_timestep','initial_perturbation')})
+            **{v:c['executions'][v]['raw'] for v in spec.variants})
         for name,arm in arms.items():
             replay=c['saved_state_replay'][name]
             if (replay['status']!='verified' or replay['integrations']!=0 or replay['raw_identity']!=digest(arm)

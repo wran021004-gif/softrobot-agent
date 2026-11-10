@@ -508,7 +508,10 @@ def dispatch(host,arguments,key,*,role='development',selected=None,plan_referenc
         expected=passive_source(cfg,candidate,options)
         resolve_passive_state(host.store,host.run_id,candidate,cfg,options)
         if options.get('validation_source'):
-            resolve_passive_confirmation(host.store,host.run_id,candidate,cfg,options);episodes*=4
+            resolve_passive_confirmation(host.store,host.run_id,candidate,cfg,options)
+            from extensions.reference.contracts import PassiveResponseEvaluationV2
+            confirmation_spec=PassiveResponseEvaluationV2.model_validate(cfg['task']['evaluator']['parameters']['data']).numerical_confirmation
+            episodes*=2+len(confirmation_spec.variants)
         if options.get('passive_ablation'):episodes*=2
         if cfg['task']['goal']['data'].get('version')=='passive_response_v2':
             host.store.artifact(cfg['task']['goal']['data']['protocol_source'])

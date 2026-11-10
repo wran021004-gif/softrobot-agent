@@ -240,6 +240,18 @@ class PassiveNumericalConfirmationV2(Contract):
     perturbation_rad: FiniteFloat = Field(gt=0)
     max_displacement_difference_m: FiniteFloat = Field(gt=0)
     saved_state_replay: Literal[True] = True
+    variants: tuple[Literal['half_timestep','initial_perturbation'], ...] = ('half_timestep','initial_perturbation')
+
+    @model_validator(mode='after')
+    def unique_variants(self):
+        if len(set(self.variants))!=len(self.variants):raise ValueError('UNIQUE_CONFIRMATION_VARIANTS_REQUIRED')
+        return self
+
+    @model_serializer(mode='wrap')
+    def historical_confirmation(self,handler):
+        value=handler(self)
+        if self.variants==('half_timestep','initial_perturbation'):value.pop('variants',None)
+        return value
 
 
 class PassiveResponseEvaluationV2(Contract):
