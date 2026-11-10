@@ -6,6 +6,18 @@ The six protocol blockers are closed in the registered generic interfaces. The t
 
 The user explicitly authorized direct launch after readiness. No additional permission is required. The committed implementation is bound and the real Main loop is running in the background. See launch-receipt.json, first-main-plan.json and live-status.json. Preparation and unit fixtures do not establish a scientific success.
 
+2026-11-10 15:06 update: the same Study now has the explicitly authorized
+`sparse_route_screening_v1` exploration policy, under committed implementation
+`674a7fe2a699ba59535ca8d68742f993e657adac` and evaluation profile2. Passive
+finite-time `inspect` can choose `execution_checks="screening"` for score-grid
+route checks, retaining the original physics, dense qualification and full
+traces. Omission and independent validation retain original full checks.
+Screening cannot satisfy SELECT or original task acceptance. The migration
+retained11 candidates,13 analyses,23 Plans and77/100 used Provider requests.
+The same SDK checkpoint has resumed. See
+[sparse-research-checks-20261110.md](sparse-research-checks-20261110.md) and its
+JSON receipt for tests, limits and actual continuation verification.
+
 2026-11-10 update: the user's explicit 80-to-100 request is applied to this same Study through an immutable authorization addendum. The shared Main/Reporter total is now **100 including reserve8**, with62 used and38 remaining at the migration boundary. Scientific profile1, task, candidates, results and cumulative costs are preserved. Summary I/O was repaired and the same SDK checkpoint resumed under implementation `64c413f5fed094418c56d1482d52256419088552`. See [budget-and-performance-20261110.json](budget-and-performance-20261110.json); the launch observations below remain historical snapshots.
 
 At11:20:06 +08, the resumed Main sent request63 (585,935 wire bytes, within the existing1MiB limit), leaving37 shared requests. The ledger and actual outgoing packet confirm the new allowance; the current send is charged and not yet a returned scientific result.
