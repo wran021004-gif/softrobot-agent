@@ -40,6 +40,7 @@ class SparseNativeTests(unittest.TestCase):
         self.assertEqual(screen['status'],'completed',screen.get('reason'))
         self.assertEqual(full['cost']['physics_steps'],screen['cost']['physics_steps'])
         self.assertEqual(full['physical_binding'],screen['physical_binding'])
+        self.assertEqual([r['sha256'] for r in full['trace_files']],[r['sha256'] for r in screen['trace_files']])
         for a,b in ((baseline_arm(full),baseline_arm(screen)),
                 (full['paired_ablation']['ablation'],screen['paired_ablation']['ablation'])):
             for original,sampled in zip(a['episodes'],b['episodes']):
@@ -85,6 +86,14 @@ class SparseNativeTests(unittest.TestCase):
         self.assertFalse(observation['task_gap']['valid_complete'])
         self.assertIsNone(r['best_valid_record_index'])
         self.assertEqual(observation['diagnostic_task_gap']['status'],'complete')
+        from tools.research.analysis import scoped_result
+        from tools.research.task_constraints import describe_analysis_requirements
+        requirements=describe_analysis_requirements(self.cfg,dict(candidate=q.candidate))
+        applicability=dict(status='diagnostic',model_assessment=dict(model_id='fixture',model_version='1',
+            representation_id='fixture',relevant_assumptions=[]),horizon={},constraint_coverage=[])
+        scoped=scoped_result(result,requirements,applicability,q)
+        self.assertEqual(scoped['scoped_claim']['verification_status'],'sparse_route_screening_diagnostic')
+        self.assertEqual(scoped['scoped_claim']['conclusion'],'diagnostic')
 
 
 class SparseContractTests(unittest.TestCase):
