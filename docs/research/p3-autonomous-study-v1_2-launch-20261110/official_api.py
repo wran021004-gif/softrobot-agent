@@ -14,7 +14,7 @@ from tools.platform_host import Host
 ROOT=Path(__file__).resolve().parents[3]
 DOC=Path(__file__).resolve().parent
 NAME='p3-passive-progressive-stiffness-autonomous-20261110-v1_2'
-SOURCE='phs2d-workflow-successor-20261106'
+SOURCE='phs2d-mechanism-successor-20261105'
 
 def host():return Host(ROOT/'runs/research'/NAME,NAME,actor='user-authorized-official-api-continuation')
 
@@ -50,10 +50,14 @@ def apply():
     approval=dict(version='provider_transport_approval_v1',approved=True,
         source='User 2026-11-10: 使用官方API接续. Continue the same Study using the existing official API credential; retain model, reasoning, scientific scope and original 80-send shared budget. No push.',
         scope=scope,scope_identity=digest(scope))
-    transition=transition_transport(h,approval)
+    if s['spec']['runtime']['provider']['adapter']=='chatgpt_gateway':
+        transition=transition_transport(h,approval)
+    else:
+        assert s['spec']['runtime']['provider']==runtime['provider']
+        transition=dict(already_applied=True,reference=s['provider_transport_transitions'][-1])
     core.bind(h,reason='User-authorized official API transport continuation after Gateway quota exhaustion; same model, scientific requirements, SDK session and complete ledger.')
     assert invariant(h)==baseline['invariant']
-    evidence=assess_live_admission(h,ROOT.parent/'stage2-research-workflow-20261106/runs/research'/SOURCE,SOURCE)
+    evidence=assess_live_admission(h,ROOT.parents[1]/'runs/phs2d-initialization-successor-20261105/runs/research'/SOURCE,SOURCE)
     evidence_ref=save(h,evidence,'handoff_transport_evidence');s=state(h)
     scope=dict(study_id=NAME,resolved_identity=s['spec']['resolved_identity'],implementation_freeze=s['freeze'],
         capabilities=s['spec']['capabilities'],execution_scopes=['registered mathematics','physical replay','request-feedback session handoff'],

@@ -20,7 +20,7 @@ def assess_live_admission(host,source_root,source_study):
     def request(event):
         meta=parent.store.artifact(event['outputs'][0]);wire=parent.store.artifact(meta['request'])
         reception=received(parent,event['request_id']);row=parent.store.lookup(source_study,event['request_id'])
-        if (meta.get('purpose')!='conversation' or meta.get('endpoint')!=provider['base_url'].rstrip('/')+'/chat/completions'
+        if (meta.get('purpose')!='conversation' or not verified_request_transport(parent,provider,meta,reception)
                 or wire.get('model')!=provider['model'] or wire.get('reasoning_effort')!=provider['reasoning']
                 or not row or not row['receipt'] or row['request_hash']!=digest(wire)
                 or json.loads(row['receipt']).get('execution_status')!='completed'
@@ -61,6 +61,24 @@ def assess_live_admission(host,source_root,source_study):
                 independent_sdk_restore=True,exact_feedback_delivered=True,
                 scope='Technical same-model/transport request-feedback evidence only; no inherited scientific result or authorization.')
     raise ValueError('SAME_PROVIDER_LIVE_HANDOFF_RESTORE_AND_EXACT_FEEDBACK_EVIDENCE_REQUIRED')
+
+
+def verified_request_transport(host,provider,meta,reception):
+    """Verify real Responses transport and its archived deterministic SDK view."""
+    base=provider['base_url'].rstrip('/')
+    if meta.get('protocol')!='openai_responses_v1':
+        return meta.get('endpoint')==base+'/chat/completions'
+    if (provider['adapter']!='openai_api' or meta.get('endpoint')!=base+'/responses'
+            or meta.get('sdk_endpoint')!=base+'/chat/completions' or not meta.get('upstream_request')
+            or not reception or reception.get('protocol')!='openai_responses_v1'
+            or reception.get('body_is_derived_chat_view') is not True or not reception.get('upstream_body')):
+        return False
+    upstream=host.store.artifact(meta['upstream_request'])
+    if upstream.get('model')!=provider['model'] or upstream.get('reasoning',{}).get('effort')!=provider['reasoning']:
+        return False
+    from tools.research.openai_responses import chat_view
+    return json.loads(chat_view(host.store.artifact(reception['upstream_body'],raw=True)))==json.loads(
+        host.store.artifact(reception['body'],raw=True))
 
 
 def admit_formal_study(host,authorization_reference):
