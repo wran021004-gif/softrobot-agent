@@ -9,3 +9,13 @@
 仅运行 `tests.research.test_p3_schema_recovery` 的三项定向回归，全部通过：多 Fidelity 全量/聚焦工具 Schema、执行范围与原 Worker 准入一致、非法最终 Schema 在发送和扣费前拦截。离线阶段无 Provider 请求、新物理积分或高精度实验。
 
 [恢复前快照](schema-recovery-before.json) 保留原冻结配置、科研 profile、候选/Plan/结果集合、原账本、原失败 wire/响应/receipt 身份及旧 Study 摘要。修复先本地提交，再通过原 `core.bind` 做说明明确的实现迁移；任务、FamilySpace、Knowledge、80 次额度、2-cell 正式验收与原科学结果不迁移。离线 SDK restore 验证通过后，使用原会话和剩余额度恢复真实 Main。绑定、恢复及真实新响应的核验另记恢复收据；不 Push。
+
+## 已核实恢复
+
+修复提交与当前执行绑定为 `9b1f4b9da48f79a97fd2184f2338328e1c1a861a`。原 `base_commit`、完整冻结配置与科研 profile 不变；绑定记录的 `material_behavior_change=false`，原候选和结果继续有效，不需要复制或重算。
+
+原 SDK 会话已离线独立重开并验证，Provider 使用仍为 28、剩余 52；随后恢复后台真实 Main。第 29 次请求的全部七个实际工具 Schema 通过本地校验，Provider 返回 **HTTP 200 / tool_calls**，Main 成功登记新 Plan 并生成第二个候选。它自主选择将四根腱的 payout offset 从 1.0 mm 改为 1.5 mm，保持原路由及主干刚度，用于检验延迟低载提前啮合的假设；该选择不是修复脚本预设的研究方向。
+
+截至 **2026-11-10 18:49:21 +08:00**：共 5 份 Plan、2 个候选，Provider 已记账 **31/80**、剩余 **49**，其中一个请求进行中；既有 2 项数学结果和 32 万步物理探索证据均保留。尚无正式验收通过或独立 Replay。运行继续使用原 Store、原共享总额和原耗尽安全暂停机制。
+
+详细证据见 [恢复后收据](schema-recovery-after.json)，包括原失败 receipt 身份未变、离线 restore 证明、实际新请求及响应、实现绑定和账本。旧 P3 Study 状态再次核对未变。报告是恢复时快照，后续成本以原 Store 为准。
