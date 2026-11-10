@@ -55,7 +55,7 @@ def task_diagnosis(value, reference, *, detailed=False):
     rows=gap.get('constraints',[]);conditions={}
     fields=('constraint_id','signal','observed_value','bound','bound_type','unit',
         'normalized_violation','passed','time_window','time_s','frame','material_s','sample_time','missing_reason',
-        'source_pointer','source_reference','reference_window','reference_reduction','aggregation')
+        'source_pointer','source_reference','reference_window','reference_reduction','aggregation','signed_violation','measurement_status','observable','source_pointers')
     for i,row in enumerate(rows):
         condition=row.get('condition_id') or row.get('load_condition') or 'unknown'
         location=pointer+('/'+str(i) if pointer.endswith('constraint_observations') else '/constraints/'+str(i))
@@ -64,19 +64,10 @@ def task_diagnosis(value, reference, *, detailed=False):
         conditions.setdefault(condition,[]).append(observation)
     projected=[]
     for condition,observations in conditions.items():
-        # Retain distinct signals and both lower and upper limits. In particular,
-        # a ratio must not replace its component observations or a small failure.
-        representatives={}
-        for row in observations:
-            key=(row['signal'],row['bound_type'],row['unit'])
-            old=representatives.get(key)
-            score=row['normalized_violation']
-            if old is None or (score is not None and (old['normalized_violation'] is None or score>old['normalized_violation'])):
-                representatives[key]=row
         projected.append(dict(condition_id=condition,constraint_count=len(observations),
             failed_constraint_count=sum(r['passed'] is False for r in observations),
             unknown_constraint_count=sum(r['passed'] is None for r in observations),
-            **({'constraints':observations} if detailed else {'observations':list(representatives.values())})))
+            **({'constraints':observations} if detailed else {'observations':observations})))
     numeric=[r for r in rows if isinstance(r.get('normalized_violation'),(int,float))]
     worst=max((r['normalized_violation'] for r in numeric),default=None)
     routes=[]
@@ -88,7 +79,7 @@ def task_diagnosis(value, reference, *, detailed=False):
             routes.append(dict(record_index=i,condition_id=episode.get('load_condition'),
                 **{k:deepcopy(route.get(k)) for k in ('status','checked_poses','first_issue')},
                 source=dict(reference=reference,pointer=f'/structure_research/records/{i}/mechanics/dynamic_execution/episodes/{j}/route_geometry')))
-    qualification=deepcopy((research.get('baseline') or {}).get('qualification_diagnosis'))
+    qualification=deepcopy((diagnostic or {}).get('qualification') or (research.get('baseline') or {}).get('qualification_diagnosis'))
     if qualification:
         for item in [qualification,*qualification.get('failed_qualifications',[])]:
             if item.get('source') is not None:item['source']['reference']=reference
@@ -101,7 +92,7 @@ def task_diagnosis(value, reference, *, detailed=False):
         formal_task_gap={k:deepcopy((formal_gap or {}).get(k)) for k in ('valid_complete','comparable','signed_task_gap','accepted')},
         valid_complete=(formal_gap or {}).get('valid_complete'),comparable=(formal_gap or {}).get('comparable'),
         maximum_normalized_violation=gap.get('signed_task_gap'),hard_gate_status=gap.get('hard_gate_status'),
-        conditions=projected,route_geometry=routes,source=dict(reference=reference,pointer=pointer),
+        conditions=projected,coverage=(diagnostic or {}).get('coverage'),route_geometry=routes,source=dict(reference=reference,pointer=pointer),
         detail_query=dict(reference=reference,view='working_set',pointer='/task_diagnosis'),
         raw_query=dict(reference=reference,view='full',pointer=pointer),
         numerical_qualification_query=dict(reference=reference,view='full',pointer='/diagnostic_layers')
@@ -115,21 +106,32 @@ def task_diagnosis(value, reference, *, detailed=False):
 
 
 def compact_task_diagnosis(diagnosis):
-    """Few numerical ranges for history; complete per-condition facts stay readable."""
+    """All component facts with one shared source reference, no duplicated definitions."""
     if not diagnosis:return None
-    groups={}
+    reference=diagnosis['source']['reference'];conditions=[]
+    fields=('constraint_id','signal','observed_value','bound','bound_type','unit','passed','signed_violation',
+        'time_window','sample_time','missing_reason','observable','source_pointers')
     for condition in diagnosis['conditions']:
+        rows=[]
         for row in condition.get('observations',condition.get('constraints',[])):
-            if row['observed_value'] is None:continue
-            key=(row['signal'],row['bound_type'],row['unit'])
-            groups.setdefault(key,[]).append(row)
-    return dict(diagnostic_status=diagnosis.get('diagnostic_status'),
-        formal_task_gap=diagnosis.get('formal_task_gap'),
-        worst_constraints=diagnosis.get('diagnostic_worst_constraints',[])[:2],
-        metrics=[dict(signal=key[0],bound_type=key[1],unit=key[2],
-            minimum=min(r['observed_value'] for r in rows),maximum=max(r['observed_value'] for r in rows),
-            bounds=list(dict.fromkeys(r['bound'] for r in rows)),scope='per-condition representative observations')
-            for key,rows in groups.items()],detail_query=diagnosis['detail_query'])
+            value={k:row[k] for k in fields if row.get(k) is not None}
+            if row.get('observed_value') is None:value['observed_value']=None
+            if row.get('passed') is None:value['passed']=None
+            source=row['source']
+            value['source_pointer']=source['pointer']
+            if source['reference']!=reference:value['source_reference']=source['reference']
+            rows.append(value)
+        conditions.append(dict(condition_id=condition['condition_id'],observations=rows))
+    q=diagnosis.get('qualification') or {}
+    qualification={k:q[k] for k in ('validity','reason','category') if k in q}
+    qualification['measurements']=[{k:v for k,v in row.items() if k not in ('source','qualification')} for row in q.get('measurements',[])]
+    qualification['failed_checks']=[dict(load_condition=r['load_condition'],stage=r['stage'],checks=r['failed_checks'],
+        source_pointer=r.get('source',{}).get('pointer')) for r in q.get('failed_qualifications',[])]
+    return dict(diagnostic_status=diagnosis.get('diagnostic_status'),formal_task_gap=diagnosis.get('formal_task_gap'),
+        conditions=conditions,qualification=qualification,source_reference=reference,
+        worst_constraints=[r['constraint_id'] for r in diagnosis.get('diagnostic_worst_constraints',[])],
+        metrics=[dict(constraint_id=r['constraint_id'],value=r['observed_value'],threshold=r['bound'],unit=r['unit'],passed=r['passed'])
+            for c in conditions for r in c['observations']],detail_query=diagnosis['detail_query'])
 
 
 def acceptance_certificate(host, reference):
@@ -943,6 +945,16 @@ def result_card(host, reference):
         operation=value.get('operation'), model_identity=evidence['model_identity'] or value.get('numerical_failure',{}).get('model_identity'),
         design_identity=evidence['design_identity'],
         evaluation_profile_identity=value.get('profile_identity'),evaluation_identity=value.get('execution_id'))
+    records=(value.get('structure_research') or {}).get('records',[])
+    if records:
+        from tools.state_io import digest
+        execution=records[0].get('mechanics',{}).get('dynamic_execution',{})
+        execution_id=execution.get('execution_identity') or {}
+        fields=execution_id.get('fields',{})
+        identity=identity.model_copy(update=dict(physical_execution_identity=execution_id.get('identity'),
+            fidelity=records[0].get('configuration',{}).get('policy',{}).get('discretization'),
+            implementation_identity=digest(fields['implementation']) if fields.get('implementation') else None,
+            solver_configuration=execution.get('solver_options')))
     summary=compact_evidence(value,reference,facts_only=True)['summary']
     native_search=native_search_summary(value,reference)
     if native_search:summary['control_search']=native_search

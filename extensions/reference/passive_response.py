@@ -154,57 +154,78 @@ def reduce_vector(bound, vector):
     return float(np.linalg.norm(vector))
 
 
-def task_metrics(task, raw):
-    """Pure frozen metric extraction shared by research observations and evaluation."""
-    if task.goal.data.get('version')=='passive_response_v2':return task_metrics_v2(task,raw)
+def bound_values_v1(task,raw,b):
     from extensions.tendon_family.contracts import ConstrainedPhysicalProblem
     goal=PassiveResponseGoal.model_validate(task.goal.data)
-    bounds=PassiveResponseEvaluation.model_validate(task.evaluator.parameters.data)
     problem=ConstrainedPhysicalProblem.model_validate(task.physical_problem)
+    rows=next(e['samples'] for e in raw['episodes'] if e['load_condition']==b.load_condition)
+    relative=b.quantity in ('material_displacement','tip_displacement','displacement_difference','displacement_ratio','unloaded_tip_drift')
+    baseline=next(r for r in rows if abs(r['time_s']-goal.unloaded_until_s)<1e-10) if relative else None
+    selected=[r for r in rows if (b.window=='full' or b.window=='unloaded' and r['time_s']<=goal.unloaded_until_s+1e-10 or
+        b.window=='hold' and goal.hold_window_s[0]-1e-10<=r['time_s']<=goal.hold_window_s[1]+1e-10)]
+    values=[]
+    for row in selected:
+        i=problem.monitor_s.index(b.material_s)
+        point=lambda:reduce_vector(b,np.asarray(row['material_positions_m'][i])-baseline['material_positions_m'][i])
+        tip=lambda:reduce_vector(b,np.asarray(row['tip_m'])-baseline['tip_m'])
+        if b.quantity=='displacement_ratio' and point()==0:raise ValueError('ZERO_DISPLACEMENT_RATIO_DENOMINATOR')
+        value={'material_displacement':point,'tip_displacement':tip,
+            'displacement_difference':lambda:tip()-b.material_scale*point(),'displacement_ratio':lambda:tip()/point(),
+            'maximum_tension':lambda:max(row['actual_tension_n']),
+            'maximum_length_excess':lambda:max(0.,max(row['length_residual_m'])),
+            'material_speed':lambda:reduce_vector(b,np.asarray(row['material_velocities_m_s'][i])),
+            'tip_speed':lambda:reduce_vector(b,np.asarray(row['tip_velocity_m_s'])),
+            'unloaded_tip_drift':lambda:reduce_vector(b,np.asarray(row['tip_m'])-rows[0]['tip_m']),
+            'maximum_joint_position':lambda:max(abs(v) for v in row['qpos_rad']),
+            'maximum_joint_speed':lambda:max(abs(v) for v in row['qvel_rad_s'])}[b.quantity]()
+        values.append(value)
+    if b.window=='full' and b.quantity in ('maximum_tension','maximum_length_excess'):
+        episode=next(e for e in raw['episodes'] if e['load_condition']==b.load_condition)
+        field='maximum_tension_n' if b.quantity=='maximum_tension' else 'maximum_length_excess_m'
+        if field not in episode:
+            raise ValueError('PER_STEP_CONSTRAINT_EXTREMA_MISSING')
+        values.append(episode[field])
+    if not np.isfinite(values).all():
+        raise ValueError('NONFINITE_DYNAMIC_METRIC')
+    if not values:raise ValueError('SCORING_WINDOW_UNAVAILABLE')
+    return values,[r['time_s'] for r in selected]
+
+
+def task_metrics(task, raw):
+    """Independent recorded measurements; full evidence alone grants acceptance."""
+    if task.goal.data.get('version')=='passive_response_v2':return task_metrics_v2(task,raw)
+    from tools.state_io import digest
+    bounds=PassiveResponseEvaluation.model_validate(task.evaluator.parameters.data)
     validity,reason=inspect_evidence(task,raw)
-    if validity!='valid':return dict(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason)
-    metrics=[];constraints=[]
+    if raw.get('physical_binding',{}).get('task_identity')!=digest(task.model_dump(mode='json')):
+        return dict(validity=validity,task_success=None,metrics=[],constraints=[],reason=reason)
+    measured=[];constraints=[];observations={}
     for b in bounds.bounds:
-        rows=next(e['samples'] for e in raw['episodes'] if e['load_condition']==b.load_condition)
-        baseline=next(r for r in rows if abs(r['time_s']-goal.unloaded_until_s)<1e-10)
-        selected=[r for r in rows if (b.window=='full' or b.window=='unloaded' and r['time_s']<=goal.unloaded_until_s+1e-10 or
-            b.window=='hold' and goal.hold_window_s[0]-1e-10<=r['time_s']<=goal.hold_window_s[1]+1e-10)]
-        values=[]
-        for row in selected:
-            i=problem.monitor_s.index(b.material_s)
-            point=reduce_vector(b,np.asarray(row['material_positions_m'][i])-baseline['material_positions_m'][i])
-            tip=reduce_vector(b,np.asarray(row['tip_m'])-baseline['tip_m'])
-            if b.quantity=='displacement_ratio' and point==0:
-                return dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='ZERO_DISPLACEMENT_RATIO_DENOMINATOR')
-            value={'material_displacement':lambda:point,'tip_displacement':lambda:tip,
-                'displacement_difference':lambda:tip-b.material_scale*point,'displacement_ratio':lambda:tip/point,
-                'maximum_tension':lambda:max(row['actual_tension_n']),
-                'maximum_length_excess':lambda:max(0.,max(row['length_residual_m'])),
-                'material_speed':lambda:reduce_vector(b,np.asarray(row['material_velocities_m_s'][i])),
-                'tip_speed':lambda:reduce_vector(b,np.asarray(row['tip_velocity_m_s'])),
-                'unloaded_tip_drift':lambda:reduce_vector(b,np.asarray(row['tip_m'])-rows[0]['tip_m']),
-                'maximum_joint_position':lambda:max(abs(v) for v in row['qpos_rad']),
-                'maximum_joint_speed':lambda:max(abs(v) for v in row['qvel_rad_s'])}[b.quantity]()
-            values.append(value)
-        if b.window=='full' and b.quantity in ('maximum_tension','maximum_length_excess'):
-            episode=next(e for e in raw['episodes'] if e['load_condition']==b.load_condition)
-            field='maximum_tension_n' if b.quantity=='maximum_tension' else 'maximum_length_excess_m'
-            if field not in episode:
-                return dict(validity='incomplete',task_success=None,metrics=[],constraints=[],reason='PER_STEP_CONSTRAINT_EXTREMA_MISSING')
-            values.append(episode[field])
-        if not np.isfinite(values).all():
-            return dict(validity='invalid',task_success=None,metrics=[],constraints=[],reason='NONFINITE_DYNAMIC_METRIC')
-        for suffix,limit,value,satisfied in [('minimum',b.minimum,min(values),b.minimum is None or min(values)>=b.minimum),
-                ('maximum',b.maximum,max(values),b.maximum is None or max(values)<=b.maximum)]:
+        try:values,times=bound_values_v1(task,raw,b);error=None
+        except (KeyError,IndexError,StopIteration,ValueError,TypeError) as exc:values=[];times=[];error=str(exc)
+        for suffix,reduce in (('minimum',min),('maximum',max)):
+            limit=getattr(b,suffix)
             if limit is None:continue
-            name=b.name+'_'+suffix
-            metrics.append(Metric(name=name,value=value,units=b.physical_unit))
-            constraints.append(ConstraintResult(name=name,satisfied=satisfied,observed=value,limit=limit,units=b.physical_unit))
+            value=reduce(values) if values else None;name=b.name+'_'+suffix
+            passed=(value>=limit if suffix=='minimum' else value<=limit) if value is not None else None
+            observations['evaluator:'+name]=dict(value=value,limit=limit,unit=b.physical_unit,passed=passed,
+                sample_time=times[values.index(value)] if value is not None and len(values)==len(times) else None,missing_reason=error)
+            if value is None:continue
+            measured.append(Metric(name=name,value=value,units=b.physical_unit))
+            constraints.append(ConstraintResult(name=name,satisfied=passed,observed=value,limit=limit,units=b.physical_unit))
     if bounds.prohibit_contact:
-        maximum=max(e['maximum_contacts'] for e in raw['episodes'])
-        metrics.append(Metric(name='maximum_contacts',value=maximum,units='count'))
-        constraints.append(ConstraintResult(name='no_contact',satisfied=maximum==0,observed=maximum,limit=0,units='count'))
-    return dict(validity='valid',task_success=all(c.satisfied for c in constraints),metrics=metrics,constraints=constraints)
+        episodes=raw.get('episodes',[]);complete={e.get('load_condition') for e in episodes}==set(task.goal.data['load_conditions']) and all(e.get('complete') for e in episodes)
+        value=max((e['maximum_contacts'] for e in episodes if 'maximum_contacts' in e),default=None)
+        passed=(value==0 if complete or value>0 else None) if value is not None else None
+        observations['evaluator:no_contact']=dict(value=value,limit=0,unit='count',passed=passed)
+        if value is not None:measured.append(Metric(name='maximum_contacts',value=value,units='count'))
+        if passed is not None:constraints.append(ConstraintResult(name='no_contact',satisfied=passed,observed=value,limit=0,units='count'))
+    missing=any(r['value'] is None or r['passed'] is None for r in observations.values())
+    if missing and validity=='valid':validity='incomplete';reason='MEASUREMENTS_MISSING'
+    status='FAIL' if validity=='invalid' or any(c.satisfied is False for c in constraints) else 'INCOMPLETE' if validity!='valid' else 'PASS'
+    return dict(validity=validity,task_success=all(c.satisfied for c in constraints) if validity=='valid' else None,
+        metrics=measured,constraints=constraints,reason=reason,overall_status=status,acceptance_status=status,
+        diagnostics=dict(observations=observations))
 
 
 def evaluate(task, result, source, reg, identity):

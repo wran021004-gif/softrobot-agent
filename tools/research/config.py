@@ -365,16 +365,16 @@ def resolve(path, profile=None, *, backend_profile=None):
     if additions:
         if not family_mode:
             raise ValueError('NEW_FIDELITY_SEARCH_POLICY_REQUIRES_FAMILY_STUDY')
-        from tools.research.contracts import FidelityPolicy
+        from tools.research.contracts import FidelityPolicy,fidelity_levels
         policy=plain(FidelityPolicy.model_validate(additions['fidelity_policy']))
         cells=family_space['serial_assembly']['cell_count_bounds']
-        if any(level['cells_per_segment']<cells[0] or cells[1] is not None and level['cells_per_segment']>cells[1] for level in [*policy['screening'].values(),policy['final_evaluation']]):
+        if any(level['cells_per_segment']<cells[0] or cells[1] is not None and level['cells_per_segment']>cells[1] for level in fidelity_levels(policy).values()):
             raise ValueError('FIDELITY_OUTSIDE_FROZEN_MESH_DOMAIN')
         grant=additions.get('family_search')
         if grant and (grant['method']!='bounded_mixed_coordinate_v1' or
                 grant['segment_counts'] is not None and family_space['executable_segment_counts'] is not None and not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
                 grant['tendon_counts'] is not None and any(v<family_space['executable_tendon_count_bounds'][0] or family_space['executable_tendon_count_bounds'][1] is not None and v>family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
-                not all(type(grant[k]) is int and grant[k]>=1 for k in ('max_proposals','max_evaluations'))):
+                not all(grant[k] is None or type(grant[k]) is int and grant[k]>=1 for k in ('max_proposals','max_evaluations'))):
             raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
         if grant and 'evaluation_modes' in grant and (not grant['evaluation_modes'] or
                 not set(grant['evaluation_modes'])<={'mathematical_proxy','mujoco_control','passive_equilibrium','passive_task_response'}):
@@ -462,7 +462,7 @@ def resolve(path, profile=None, *, backend_profile=None):
                 or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
             raise ValueError('REQUEST_ONLY_REQUIRES_PASSIVE_FORMAL_SCOPE_AND_USAGE_ONLY_COUNTS')
         study['request_budget_only']=True
-    nullable=('mathematical_evaluations','physical_launches','public_operations') if request_only else ('mathematical_evaluations','physical_launches')
+    nullable=('mathematical_evaluations','physical_launches','public_operations','offline_nlp','bdf_replays') if request_only else ('mathematical_evaluations','physical_launches')
     if any((b[k] is not None or k not in nullable) and (type(b[k]) is not int or b[k] < 0) for k in count_keys):
         raise ValueError('FINITE_NONNEGATIVE_COUNT_REQUIRED')
     if b['mathematical_evaluations'] is None and (study['mode']!='formal_research' or 'analysis' not in study['capabilities']):
@@ -588,7 +588,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     if additions:
         backend=cfg['policy']['backend']
         backend_name=backend['extension_id']+'@'+backend['version']
-        if any(level['backend']!=backend_name for level in [*policy['screening'].values(),policy['final_evaluation']]):
+        if any(level['backend']!=backend_name for level in fidelity_levels(policy).values()):
             raise ValueError('FIDELITY_REQUIRES_FROZEN_BACKEND')
     from extensions.tendon_family.contracts import MujocoParameters
     cfg['policy']['backend']['parameters']['data'] = MujocoParameters.model_validate(

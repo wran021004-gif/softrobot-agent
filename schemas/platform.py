@@ -348,7 +348,10 @@ class ConstraintResult(Contract):
 
 
 class EvaluationResult(Contract):
-    contract_version: Literal['1.0.0', '1.1.0', '1.2.0'] = '1.2.0'
+    overall_status: Literal['PASS','FAIL','INCOMPLETE'] | None = None
+    acceptance_status: Literal['PASS','FAIL','INCOMPLETE','not_evaluated'] | None = None
+    diagnostics: dict = Field(default_factory=dict)
+    contract_version: Literal['1.0.0', '1.1.0', '1.2.0', '1.3.0'] = '1.3.0'
     validity: Literal['valid', 'invalid', 'incomplete', 'unsupported']
     task_success: bool | None
     metrics: list[Metric]
@@ -364,7 +367,7 @@ class EvaluationResult(Contract):
 
     @model_validator(mode='after')
     def valid_success(self):
-        if self.validity != 'valid' and (self.task_success is not None or self.metrics):
+        if self.validity != 'valid' and self.task_success is not None:
             raise ValueError('INVALID_EVALUATION_CANNOT_HAVE_SCORE_OR_TASK_SUCCESS')
         if self.validity == 'valid' and (self.task_success is None or not self.metrics):
             raise ValueError('VALID_EVALUATION_REQUIRES_METRICS_AND_TASK_RESULT')

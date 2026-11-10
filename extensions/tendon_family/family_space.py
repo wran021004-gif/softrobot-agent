@@ -708,7 +708,7 @@ def search_domains(space, query, grant):
         raise ValueError('UNAUTHORIZED_FAMILY_SEARCH_METHOD_OR_GROUP')
     if (grant['segment_counts'] is not None and not set(query.segment_counts)<=set(grant['segment_counts']) or
             grant['tendon_counts'] is not None and not set(query.tendon_counts)<=set(grant['tendon_counts']) or
-            query.max_proposals>grant['max_proposals'] or query.max_evaluations>grant['max_evaluations']):
+            grant['max_proposals'] is not None and query.max_proposals>grant['max_proposals'] or grant['max_evaluations'] is not None and query.max_evaluations>grant['max_evaluations']):
         raise ValueError('SEARCH_OUTSIDE_FROZEN_NUMERICAL_SCOPE_OR_COUNT_CAP')
     parsed=parse_space(space)
     if any(not in_bounds(n,parsed.segment_count_bounds) or parsed.executable_segment_counts is not None and n not in parsed.executable_segment_counts for n in query.segment_counts) or any(not in_bounds(n,parsed.executable_tendon_count_bounds) for n in query.tendon_counts):

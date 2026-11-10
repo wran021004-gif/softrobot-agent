@@ -48,17 +48,18 @@ def diagnostic_task_gap(result, reference=None):
             row['definition_reference']=row.get('definition_reference') or result.get('candidate')
             row['source_reference']=row.get('source_reference') or reference
         return value
-    if result.get('diagnostic_task_gap') is not None:return bound(result['diagnostic_task_gap'])
+    saved=result.get('diagnostic_task_gap')
     records=(result.get('structure_research') or {}).get('records',[])
-    if not records:return None
-    record=records[0]
-    saved=(record.get('observation') or {}).get('diagnostic_task_gap')
-    if saved is not None:return bound(saved)
-    cfg=record.get('configuration');raw=(record.get('mechanics') or {}).get('dynamic_execution')
-    if not cfg or raw is None:return None
-    from tools.research_tasks import task_adapter
-    return task_adapter(cfg).diagnostic_task_gap(raw,result.get('candidate'),reference,
-        '/structure_research/records/0/mechanics/dynamic_execution')
+    if not saved and records:saved=records[0].get('observation',{}).get('diagnostic_task_gap')
+    if saved and saved.get('version')=='diagnostic_task_gap_v2':return bound(saved)
+    if records:
+        record=records[0];cfg=record.get('configuration');raw=(record.get('mechanics') or {}).get('dynamic_execution')
+        if cfg and raw is not None:
+            from tools.research_tasks import task_adapter
+            return task_adapter(cfg).diagnostic_task_gap(raw,result.get('candidate'),reference,
+                '/structure_research/records/0/mechanics/dynamic_execution')
+    if result.get('diagnostic_task_gap') is not None:return bound(result['diagnostic_task_gap'])
+    return None
 
 
 def task_gap(result):

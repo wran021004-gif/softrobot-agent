@@ -194,6 +194,20 @@ def numerical_binding(cfg, spec):
         final_evaluation_identity=spec.get('final_evaluation_identity'))
 
 
+def fidelity_configuration(spec,candidate,name):
+    """Rebuild a numerical variant using the original family compiler."""
+    from tools.research.contracts import fidelity_levels
+    from extensions.tendon_family.family_space import resolved_request
+    levels=fidelity_levels(spec['fidelity_policy'])
+    if name not in levels:raise ValueError('UNDECLARED_EXECUTION_FIDELITY')
+    level=levels[name];cfg=candidate['configuration'];backend=cfg['policy']['backend']
+    if level['backend']!=backend['extension_id']+'@'+backend['version']:raise ValueError('FIDELITY_BACKEND_REQUIRES_MATCHED_RUNTIME')
+    params=resolved_request(spec['family_space'],candidate['parameters'])
+    for i in range(params['segment_count']):params.setdefault('segments',{}).setdefault(str(i),{})['cells']=level['cells_per_segment']
+    configuration,_,_=family_configuration(cfg,spec['family_space'],params,cfg['run_id'])
+    return configuration,params
+
+
 def final_fidelity_matches(spec, candidate):
     """Legacy studies retain their original frozen execution semantics."""
     policy=spec.get('fidelity_policy')
@@ -311,13 +325,12 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     try:
         request=deepcopy(plain(request))
         if screening_fidelity is not None:
-            level=spec.get('fidelity_policy',{}).get('screening',{}).get(screening_fidelity)
+            from tools.research.contracts import fidelity_levels
+            level=fidelity_levels(spec['fidelity_policy']).get(screening_fidelity)
             if level is None:
                 raise ValueError('UNAUTHORIZED_SCREENING_FIDELITY')
             for i in range(request['segment_count']):
                 segment=request.setdefault('segments',{}).setdefault(str(i),{})
-                if segment.get('cells',level['cells_per_segment'])!=level['cells_per_segment']:
-                    raise ValueError('SCREENING_MESH_CONFLICT')
                 segment['cells']=level['cells_per_segment']
         cfg,build,physics=family_configuration(s['base_configuration'],spec['family_space'],request,host.run_id)
         robot=cfg['robot']['structure']['data'];mesh=cfg['policy']['discretization']['data']

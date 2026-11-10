@@ -4,6 +4,7 @@ Archived evaluators, kernels and campaigns retain their original semantics.
 The new reach/hold protocol composes their outputs rather than replacing them.
 """
 from dataclasses import dataclass
+from copy import deepcopy
 import math
 
 from tools.state_io import digest, effective_input
@@ -134,18 +135,19 @@ class ResearchTaskAdapter:
                         mathematical_coverage='Recorded qualification facts; static equilibrium cannot certify this gate'))
         return rows
 
-    def qualification_diagnosis(self, raw, reference, *, pointer=''):
+    def qualification_diagnosis(self, raw, reference, *, pointer='',evaluation=None):
         """Read saved v2 facts; no integration, repaired validity or inferred cause."""
         if not passive_registered(self.task) or self.task['goal']['data'].get('version')!='passive_response_v2':return None
         from schemas.platform import TaskDefinition
         from extensions.reference.passive_response import inspect_evidence
         task=TaskDefinition.model_validate(self.task)
-        validity,reason=inspect_evidence(task,raw)
+        validity,reason=(evaluation['validity'],evaluation.get('reason')) if evaluation is not None else inspect_evidence(task,raw)
         execution_validity=validity
+        if evaluation and evaluation.get('diagnostics',{}).get('qualification_status')=='PASS':execution_validity='valid'
         task_success=None
         if validity=='valid':
             from extensions.reference.passive_evaluation_v2 import metrics
-            measured=metrics(task,raw)
+            measured=evaluation if evaluation is not None else metrics(task,raw)
             validity,reason=measured['validity'],measured.get('reason')
             task_success=measured['task_success']
         failures=[]
@@ -162,10 +164,15 @@ class ResearchTaskAdapter:
                         frozen_rule=rule,observed=facts,
                         source=dict(reference=reference,pointer=pointer+arm+'/episodes/'+str(i)+'/qualifications/'+stage)))
         category=('unloaded_initial_qualification' if any(f['stage']==self.task['goal']['data']['unloaded_stage'] for f in failures) else
-            'dynamic_stage_qualification' if failures else 'insufficient_mechanism_evidence' if execution_validity=='valid' and validity!='valid' else
+            'dynamic_stage_qualification' if failures else 'incomplete_acceptance_evidence' if execution_validity=='valid' and validity!='valid' else
             'numerical_or_source_failure' if raw.get('numerical_failure') or validity!='valid' else
             'valid_task_metric_failure' if task_success is False else 'valid_execution')
-        return dict(validity=validity,reason=reason,category=category,failed_qualifications=failures,
+        from extensions.reference.passive_evaluation_v2 import qualification_observations
+        measured_qualifications=evaluation.get('diagnostics',{}).get('qualification') if evaluation is not None else None
+        if measured_qualifications is None:measured_qualifications=qualification_observations(task,raw)
+        measured_qualifications=deepcopy(measured_qualifications)
+        for fact in measured_qualifications:fact['source']=dict(reference=reference,pointer=pointer+fact.get('source_pointer',''))
+        return dict(validity=validity,reason=reason,category=category,failed_qualifications=failures,measurements=measured_qualifications,
             source=dict(reference=reference,pointer=pointer),new_physics_steps=0,
             invalidated_conclusions=[] if validity=='valid' else
                 ['complete_task_signed_gap','ordinary_task_gradient','structural_descent','qualified_mechanism_certificate'],
@@ -177,38 +184,51 @@ class ResearchTaskAdapter:
                 dict(effect_semantics='saved_stage_comparison',status='read_only',new_physics_steps=0)],
             scope='Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.')
 
-    def diagnostic_task_gap(self, raw, candidate=None, source_reference=None, pointer=''):
+    def diagnostic_task_gap(self, raw, candidate=None, source_reference=None, pointer='',*,evaluation=None):
         """Deterministic observations from frozen definitions and saved trajectories.
 
         Qualification and the formal gap remain separate and non-comparable.
         This function never executes, integrates, persists or grants acceptance.
         """
         components={}
-        supported=passive_registered(self.task) and self.task['goal']['data'].get('version')=='passive_response_v2'
+        supported=passive_registered(self.task)
         if supported:
-            from types import SimpleNamespace
+            from schemas.platform import TaskDefinition
             from extensions.reference.passive_evaluation_v2 import diagnostic_metrics
-            task=SimpleNamespace(goal=SimpleNamespace(data=self.task['goal']['data']),
-                evaluator=SimpleNamespace(parameters=SimpleNamespace(data=self.task['evaluator']['parameters']['data'])),
-                timing=SimpleNamespace(**self.task['timing']),
-                physical_problem=self.task['physical_problem'])
+            task=TaskDefinition.model_validate(self.task)
             if raw.get('physical_binding',{}).get('task_identity')==digest(self.task):
-                components=diagnostic_metrics(task,raw)
+                if self.task['goal']['data'].get('version')=='passive_response_v2':
+                    if evaluation is None:
+                        from extensions.reference.passive_evaluation_v2 import metrics
+                        evaluation=metrics(task,raw)
+                    components=evaluation['diagnostics']['observations']
+                else:
+                    from extensions.reference.passive_response import task_metrics
+                    components=task_metrics(task,raw).get('diagnostics',{}).get('observations',{})
+        if not supported:
+            components=raw.get('components',raw.get('acceptance',{}).get('components',{}))
         rows=self.constraint_observations(components)
         for row in rows:
             component=components.get(row['constraint_id'],{})
             episode_index=next((i for i,e in enumerate(raw.get('episodes',[])) if e.get('load_condition')==row.get('condition_id')),None)
             row.update(candidate_identity=candidate,task_identity=digest(self.task),source_reference=source_reference,
-                source_pointer=pointer+('/episodes/'+str(episode_index) if episode_index is not None else ''),
+                source_pointer=pointer+('/episodes/'+str(episode_index) if episode_index is not None else '' if supported else
+                    row['source_pointer'] if 'acceptance' in raw else '/components/'+row['constraint_id'].replace('~','~0').replace('/','~1')),
                 definition_pointer='/configuration/task/evaluator/parameters/data',definition_reference=candidate,
                 sample_time=component.get('sample_time'),
                 missing_reason=component.get('missing_reason') or (None if row['observed_value'] is not None else
                     'QUALIFIED_MECHANISM_EVIDENCE_REQUIRED' if row.get('signal')=='paired_mechanism' else
                     'REQUIRED_TRAJECTORY_OR_TASK_BINDING_UNAVAILABLE' if supported else 'DIAGNOSTIC_EXTRACTOR_UNAVAILABLE'))
-            row.update({k:component[k] for k in ('aggregation','reference_window','reference_reduction') if k in component})
+            row.update({k:component[k] for k in ('aggregation','reference_window','reference_reduction','observable') if k in component})
+            if component.get('source_pointers'):row['source_pointers']=[pointer+p for p in component['source_pointers']]
+            row['measurement_status']='UNKNOWN' if row['observed_value'] is None or row['passed'] is None else 'PASS' if row['passed'] else 'FAIL'
         known=sum(row['observed_value'] is not None for row in rows)
-        return dict(version='diagnostic_task_gap_v1',status='complete' if rows and known==len(rows) else 'partial' if known else 'unavailable',
+        return dict(version='diagnostic_task_gap_v2',status='complete' if rows and known==len(rows) else 'partial' if known else 'unavailable',
             candidate_identity=candidate,task_identity=digest(self.task),constraints=rows,
+            coverage=dict(measured=[r['constraint_id'] for r in rows if r['observed_value'] is not None],
+                unmeasured=[r['constraint_id'] for r in rows if r['observed_value'] is None],
+                execution_profile=raw.get('execution_profile')),
+            qualification=self.qualification_diagnosis(raw,source_reference,pointer=pointer,evaluation=evaluation) if supported else None,
             valid_complete=False,comparable=False,normalized_gap=None,signed_task_gap=None,accepted=None,
             missing_reason=None if known else 'REQUIRED_TRAJECTORY_OR_EXTRACTOR_UNAVAILABLE',
             interpretation='Diagnostic observations only. Original qualification, formal acceptance, normalization and ranking eligibility remain unchanged.')
@@ -716,6 +736,7 @@ def constraint_observation(definition, component):
     scale=abs(bound) if type(bound) in (int,float) and math.isfinite(bound) and bound!=0 else None
     key=row['constraint_id'].replace('~','~0').replace('/','~1')
     row.update(observed_value=value,bound=bound,passed=component.get('passed'),signed_violation=signed,
+        measurement_status='UNKNOWN' if value is None or component.get('passed') is None else 'PASS' if component.get('passed') else 'FAIL',
         normalization_scale=scale,normalization_source='absolute_frozen_bound' if scale else None,
         normalized_violation=signed/scale if scale and signed is not None else None,
         source_pointer='/acceptance/components/'+key)

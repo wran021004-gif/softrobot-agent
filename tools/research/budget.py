@@ -328,8 +328,8 @@ def science_fits(host):
         ('rl' in capabilities and evaluations>0 and ((backend>=2 and
             s.get('admitted_training_stages',len(runs))<limits['training_stages']) or (backend>=1 and runs))) or
         (s.get('local_solves',0)<b['local_solves'] and any(host.store.artifact(r).get('status')=='evaluated' for r in s.get('results',[]))) or
-        ('mathematics' in capabilities and s.get('offline_nlp',0)<b['offline_nlp']) or
-        ('replay' in capabilities and s.get('bdf_replays',0)<b['bdf_replays']))
+        ('mathematics' in capabilities and (b['offline_nlp'] is None or s.get('offline_nlp',0)<b['offline_nlp'])) or
+        ('replay' in capabilities and (b['bdf_replays'] is None or s.get('bdf_replays',0)<b['bdf_replays'])))
 
 
 def closeout_operations(host):

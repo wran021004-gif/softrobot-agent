@@ -83,17 +83,27 @@ def select_group_parameters(spec, candidate, group):
 
 
 def dynamic_protocol(configuration):
-    """Comparison identity excludes the changed structure, not the task or model."""
-    return dict(task=configuration['task'],policy={k:configuration['policy'].get(k) for k in
-        ('backend','controller','dynamics_model','discretization')},
-        seed=configuration.get('seed'),robot={k:v for k,v in configuration['robot'].items() if k!='structure'})
+    """Compare task/model/fidelity and initialization treatment across structures."""
+    task=deepcopy(configuration['task']);initial=task['initializer']['parameters']['data']
+    if all(field in initial and all(value==0 for value in initial[field].values()) for field in ('qpos_rad','qvel_rad_s')):
+        task['initializer']['parameters']['data']=dict(initial, qpos_rad='all_candidate_dofs_zero',qvel_rad_s='all_candidate_dofs_zero')
+    policy={k:deepcopy(configuration['policy'].get(k)) for k in ('backend','controller','dynamics_model','discretization')}
+    cells=policy['discretization']['data']['cells']
+    if len(set(cells.values()))==1:policy['discretization']['data']['cells']=dict(uniform_cells_per_segment=next(iter(cells.values())))
+    return dict(task=task,policy=policy,seed=configuration.get('seed'),
+        robot={k:v for k,v in configuration['robot'].items() if k!='structure'})
 
 
-def dynamic_cost(configuration, evaluations, paired=False):
+def dynamic_cost(configuration, evaluations, paired=False,profile=None):
     """Same frozen episode/time-grid bound for discovery, compile and reservation."""
     task=configuration['task'];arms=2 if paired else 1
     episodes=len(task['goal']['data']['load_conditions'])
     duration=episodes*task['timing']['duration_s']
+    if profile:
+        from schemas.platform import TaskDefinition
+        from extensions.reference.passive_program import execution_scope
+        scope=execution_scope(TaskDefinition.model_validate(task),plain(profile))
+        episodes=len(scope['load_conditions']);duration=sum(scope['end_s'].values())
     if task['goal']['data'].get('execution_protocol')=='phs2d_original_v1':
         duration-=(episodes-1)*next(iter(task['goal']['data']['programs'].values()))[0]['end_s']
     return dict(model_builds=arms*evaluations,episodes=arms*evaluations*episodes,
@@ -108,19 +118,20 @@ def finite_time_discovery(configuration):
     paired=bool(task['evaluator']['parameters']['data'].get('mechanism'))
     tendons=list(configuration['robot']['structure']['data'].get('fixed_payout_lengths_m',{}))
     legal=goal.get('allowed_ablation')=='disable_selected_passive_limits' and bool(tendons)
-    return dict(status='requires_explicit_intervention' if paired and legal else 'not_applicable' if paired else 'conditional_on_request_admission',
+    return dict(status='conditional_on_request_admission',
         effect_semantics='finite_time_task_response',target='finite_time_task_violation',
         operations=list(OPERATIONS),operating_point='frozen_task_initial_state',load_condition='all_frozen_conditions',
         required_inputs=['operation','target','parameter_paths for differentiate/optimize',
-            'comparison_candidates for compare']+(['passive_ablation'] if paired else []),
-        paired_required=paired,legal_intervention_tendons=tendons if legal else [],
-        intervention_rule='Main selects exact passive limits; both baseline and ablation run every frozen episode. No legal intervention means no paired mechanism certification.',
-        per_evaluation_cost=dynamic_cost(configuration,1,paired),
+            'comparison_candidates for compare'],
+        paired_required=False,final_mechanism_requires_pair=paired,actions=['baseline_response','paired_mechanism'],legal_intervention_tendons=tendons if legal else [],
+        intervention_rule='Baseline response needs no intervention. For paired_mechanism, Main selects exact passive limits; both arms use the same selected execution scope and matched common states. Only qualified complete pairs support formal mechanism conclusions.',
+        per_evaluation_cost=dynamic_cost(configuration,1,False),
         initialization_dependency=('Before integration, repeat the frozen unloaded hard-equilibrium solve, native scene and static solver used by unloaded qualification inspect. Each direction follows its frozen reset and continuity semantics. Finite-time response cannot bypass initialization failure. A static precheck is optional and grants no dynamic acceptance.'
             if goal.get('execution_protocol') in ('phs2d_original_v1','hard_equilibrium_continuous_v1') else 'Independent execution uses the frozen task initializer.'),
         evaluation_cap='Optional explicit maximum; omitted question/diagnose cap uses the legal minimum. An explicit low cap is rejected without execution.',
         cost_rule='Multiply by actual baseline, two-scale stencil, joint check and requested search cap. Original Worker charges actual model/episode/step counts; independent Replay costs extra.',
-        evidence_scope='Complete qualified finite-time numerical observation; static proxies cannot certify dynamic acceptance.')
+        execution_profile='Optional exploration: select frozen directions, continuous stage prefix, observation grid, routing, recording and declared fidelity. final_acceptance retains complete frozen scope.',
+        evidence_scope='Measured response and qualification are separate; exploration, baseline objectives and static proxies grant no independent acceptance.')
 
 
 def observed_task_improvement(records, rows=(), bounds=None):
@@ -145,7 +156,7 @@ def observed_task_improvement(records, rows=(), bounds=None):
     delta=base['signed_task_gap']-gaps[best]['signed_task_gap'] if comparable else None
     floor=max(1e-12,abs(base['signed_task_gap'])*1e-9) if comparable else None
     improved=comparable and best!=0 and delta>floor
-    return dict(candidate_improvement_status='observed_full_task_improvement' if improved else 'not_observed' if comparable else 'not_comparable',
+    return dict(candidate_improvement_status=('observed_baseline_response_improvement' if records[0]['observation']['task_gap'].get('scope')=='baseline_response' else 'observed_full_task_improvement') if improved else 'not_observed' if comparable else 'not_comparable',
         best_valid_record_index=best,improved_record_index=best if improved else None,
         observed_reduction=delta,resolution_floor=floor,gaps=gaps,
         scope='Best recorded complete task objective under the same frozen protocol; no strict descent or global optimum.')
@@ -157,7 +168,22 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
     capabilities=task_adapter(candidate['configuration']).physical_capabilities()
     if capabilities['status']=='unsupported':raise ValueError('UNSUPPORTED_PHYSICAL_CAPABILITIES: '+','.join(capabilities['missing']))
     dynamic=study.effect_semantics=='finite_time_task_response'
-    if study.execution_checks=='screening':
+    execution_configuration=candidate['configuration'];execution_parameters=candidate['parameters']
+    if study.execution_profile:
+        from extensions.reference.passive_program import execution_scope
+        from tools.research.contracts import fidelity_levels
+        from schemas.platform import TaskDefinition
+        execution_scope(TaskDefinition.model_validate(execution_configuration['task']),plain(study.execution_profile))
+        name=study.execution_profile.fidelity
+        if name:
+            levels=fidelity_levels(spec['fidelity_policy'])
+            if name not in levels:raise ValueError('UNDECLARED_EXECUTION_FIDELITY')
+            if study.execution_profile.purpose=='final_acceptance' and levels[name]!=spec['fidelity_policy']['final_evaluation']:raise ValueError('FINAL_FIDELITY_REQUIRED')
+            from tools.research.design import fidelity_configuration
+            execution_configuration,execution_parameters=fidelity_configuration(spec,candidate,name)
+    if study.execution_profile and study.execution_profile.purpose=='final_acceptance':
+        if study.execution_checks!='full' or set(execution_configuration['policy']['discretization']['data']['cells'].values())!={spec['fidelity_policy']['final_evaluation']['cells_per_segment']}:raise ValueError('FINAL_ACCEPTANCE_REQUIRES_FROZEN_FIDELITY_AND_CHECKS')
+    if study.execution_checks=='screening' and not study.execution_profile:
         if spec.get('research_execution_checks')!={'version':'sparse_route_screening_v1'}:
             raise ValueError('FROZEN_SPARSE_RESEARCH_CHECK_AUTHORIZATION_REQUIRED')
         goal=candidate['configuration']['task']['goal']['data']
@@ -170,14 +196,6 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
             raise ValueError('DYNAMIC_TASK_REQUIRES_FROZEN_INITIAL_STATE_AND_COMPLETE_TASK_TARGET')
         if study.load_condition is not None or study.comparison_load_conditions or study.load_aggregation:
             raise ValueError('DYNAMIC_TASK_ALWAYS_REQUIRES_ALL_FROZEN_LOADS')
-        from tools.research.physical_replay import passive_source
-        passive_source(candidate['configuration'],{'artifact_id':'0'*64},dict(passive_ablation=study.passive_ablation) if study.passive_ablation else {})
-        if candidate['configuration']['task']['evaluator']['parameters']['data'].get('mechanism') and not study.passive_ablation:
-            raise ValueError('FROZEN_MECHANISM_TASK_REQUIRES_EXPLICIT_PAIRED_LIMIT_SELECTION')
-        if study.operation in ('differentiate','optimize','interact'):
-            definitions=task_adapter(candidate['configuration']).constraint_observations({})
-            if not any(d['normalization_scale'] for d in definitions):
-                raise ValueError('TASK_HAS_NO_NUMERICAL_OBJECTIVE_FEASIBILITY_COMPARISON_ONLY')
     problem=candidate['configuration']['task'].get('physical_problem')
     mode=problem['mode'] if problem else 'active_ideal_tension'
     metadata=PRIMITIVES[study.target.quantity]
@@ -224,14 +242,15 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
         rule='Actual legal stencil coordinates depend on selected parameter domains and operating values; two paths add a joint check; optimize adds a trial and uses the requested cap.')
     if study.operation=='interact':
         cost_dependencies=dict(operation='interact',baseline_evaluations=1,matched_contrasts=3,rule='All four matched evaluations require admission before any execution.')
-    cost=dynamic_cost(candidate['configuration'],minimum,bool(study.passive_ablation)) if dynamic else None
+    cost=dynamic_cost(execution_configuration,minimum,bool(study.passive_ablation),study.execution_profile) if dynamic else None
     if not minimum_budget and study.max_evaluations<minimum:
         raise MechanismBudgetError(minimum,cost_dependencies,cost)
     cap=minimum if minimum_budget else study.max_evaluations
-    result=dict(space=spec.get('family_space'),parameters=candidate['parameters'],selected_parameters=selected,
+    result=dict(space=spec.get('family_space'),parameters=execution_parameters,selected_parameters=selected,execution_configuration=execution_configuration,
         minimum_evaluations=minimum,evaluation_cap=cap,
         evaluations=cap if study.operation=='optimize' else minimum,cost_dependencies=cost_dependencies,
-        comparisons=[dict(reference=ref,configuration=c['configuration']) for ref,c in comparisons])
+        comparisons=[dict(reference=ref,configuration=fidelity_configuration(spec,c,study.execution_profile.fidelity)[0]
+            if study.execution_profile and study.execution_profile.fidelity else c['configuration']) for ref,c in comparisons])
     from extensions.math_analysis.differentiation_router import select_method
     route=select_method(effect_semantics=study.effect_semantics,capabilities=capabilities,
         target=study.target.quantity,operation=study.operation)
@@ -250,7 +269,7 @@ def prepare_context(spec, candidate, study, comparisons, *, minimum_budget=False
             effect_semantics=study.effect_semantics,parameter_paths=study.paths),
         differentiation_router=route)
     if dynamic:
-        result['dynamic_cost_bound']=dynamic_cost(candidate['configuration'],result['evaluations'],bool(study.passive_ablation))
+        result['dynamic_cost_bound']=dynamic_cost(execution_configuration,result['evaluations'],bool(study.passive_ablation),study.execution_profile)
         if study.execution_checks=='screening':
             result['execution_checks']=dict(version='sparse_route_screening_v1',level='screening',
                 route_period_s=candidate['configuration']['task']['timing']['sample_period_s'],
@@ -349,6 +368,30 @@ def joint_consistency(rows, responses, baseline, changed):
         relative_difference=relative,passed=bool(passed))
 
 
+def reusable_execution(store,sources,identity,*,independent_replay=False,matching_baseline=None):
+    """Look up immutable Result metadata, loading only an exact matching execution."""
+    if independent_replay:return None
+    from extensions.tendon_family.passive_execution import baseline_arm
+    for reference in reversed(sources):
+        metadata=store.artifact(reference,paths=('physical_execution_index','raw_reference'))
+        entries=metadata.get('physical_execution_index',[])
+        if metadata.get('raw_reference'):
+            raw_ref=metadata['raw_reference'];raw_meta=store.artifact(raw_ref,paths=('execution_identity','status'))
+            if raw_meta.get('execution_identity')==identity:entries=[dict(identity=identity['identity'],pointer='',reference=raw_ref,directory=None)]
+        for entry in entries:
+            if entry['identity']!=identity['identity']:continue
+            ref=entry.get('reference',reference);pointer=entry['pointer']
+            raw=store.artifact(ref,pointers=(pointer,))[pointer]
+            if raw.get('paired_ablation',{}).get('baseline_cost'):raw=baseline_arm(raw)
+            if raw.get('execution_identity')!=identity or raw.get('status')!='completed':continue
+            if not raw.get('episodes') or not all(e.get('complete') for e in raw['episodes']):continue
+            if matching_baseline and any(a.get('integration_initial')!=b.get('integration_initial') or a.get('qualified_state')!=b.get('qualified_state')
+                    for a,b in zip(matching_baseline['episodes'],raw['episodes'])):continue
+            return dict(raw=raw,execution_directory=entry.get('directory'),source=dict(reference=ref,pointer=pointer),
+                actual_new_cost=dict(physics_steps=0,model_builds=0,episodes_started=0))
+    return None
+
+
 class EvaluationLimit(ValueError):
     pass
 
@@ -359,6 +402,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
     from tools.platform_tasks import compile_input
     from tools.platform_registry import registry
     from extensions.tendon_family.family_space import parse_build
+    configuration=context.get('execution_configuration',configuration)
     started=time.perf_counter();study=query.mechanism_study;records=[];models=[];failures=[];cache={}
     rows=context['selected_parameters'];mappings=[coordinate(row) for row in rows]
     center=np.asarray([m['origin'] for m in mappings]);base_values=[r['current_value'] for r in rows]
@@ -408,32 +452,46 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             directory=getattr(checkpoint,'directory',None)
             folder=directory/('dynamic_'+str(index)) if directory else None
             checks=dict(execution_checks=study.execution_checks) if study.execution_checks!='full' else {}
-            backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation,**checks) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder,**checks))
-            raw=backend.data.data
+            if study.execution_profile:checks['execution_profile']=plain(study.execution_profile)
+            from extensions.reference.passive_program import execution_identity
+            from tools.platform_store import Store
+            identity=execution_identity(cfg,profile=plain(study.execution_profile) if study.execution_profile else None,execution_checks=study.execution_checks)
+            reuse=reusable_execution(Store(context['result_store']),context['result_sources'],identity) if context.get('result_store') else None
+            other_reuse=None
+            if study.passive_ablation and context.get('result_store'):
+                other_identity=execution_identity(cfg,profile=plain(study.execution_profile) if study.execution_profile else None,execution_checks=study.execution_checks,intervention=study.passive_ablation)
+                other_reuse=reusable_execution(Store(context['result_store']),context['result_sources'],other_identity,matching_baseline=reuse['raw'] if reuse else None)
+            if reuse and not study.passive_ablation:raw=reuse['raw']
+            else:
+                backend=(execute_pair(SessionInput.model_validate(cfg),folder,study.passive_ablation,baseline=reuse,ablation=other_reuse,**checks) if study.passive_ablation else execute(SessionInput.model_validate(cfg),folder,**checks))
+                raw=backend.data.data
             task=SessionInput.model_validate(cfg).task
             if task.goal.data.get('version')=='passive_response_v2':
                 from extensions.reference.passive_evaluation_v2 import metrics
                 # Mathematical response measures the qualified program/pair.
                 # The registered evaluator still requires independent confirmation.
-                measured=metrics(task,raw,check_confirmation=False)
+                measured=metrics(task,raw,check_confirmation=False,check_mechanism=bool(study.passive_ablation))
             else:measured=task_metrics(task,raw)
             components={'evaluator:'+c.name:dict(value=c.observed,passed=c.satisfied,limit=c.limit,unit=c.units)
                 for c in measured['constraints']}
-            gap=constraint_gap(task_adapter(cfg).constraint_observations(components),valid_complete=measured['validity']=='valid')
+            objective_rows=task_adapter(cfg).constraint_observations(components)
+            if not study.passive_ablation:objective_rows=[r for r in objective_rows if r.get('signal')!='paired_mechanism']
+            gap=constraint_gap(objective_rows,valid_complete=measured['validity']=='valid')
+            gap.update(scope='paired_response' if study.passive_ablation else 'baseline_response',
+                acceptance_components_excluded=['independent_numerical_confirmation']+([] if study.passive_ablation else ['paired_mechanism']))
             observation=dict(status='computed' if measured['validity']=='valid' else 'unavailable',
                 value=gap['signed_task_gap'],unit='1',reason=measured.get('reason'),
                 objective_status=gap['objective_status'],
                 task_gap=gap,task_acceptance='unmeasured',independent_numerical_confirmation='unmeasured')
             observation['diagnostic_task_gap']=task_adapter(cfg).diagnostic_task_gap(raw,plain(query.candidate),
-                pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
+                pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution',evaluation=measured)
             if study.execution_checks=='screening':
                 complete=raw.get('status')=='completed' and all(e.get('complete') for e in raw.get('episodes',[]))
                 observation.update(status='computed' if complete else 'unavailable',value=None,
                     reason='SCREENING_REQUIRES_ORIGINAL_FULL_VALIDATION',
                     screening=raw['execution_checks'],
                     scope='Diagnostic observations from unchanged physics and dense qualification; sparse route coverage cannot establish full-task validity or acceptance.')
-            diagnosis=task_adapter(cfg).qualification_diagnosis(raw,None,
-                pointer='/structure_research/records/'+str(len(records))+'/mechanics/dynamic_execution')
+            diagnosis=observation['diagnostic_task_gap'].get('qualification')
             if diagnosis:observation['qualification_diagnosis']=diagnosis
             mechanics=dict(dynamic_execution=raw,task_constraints=gap['constraints'],
                 reference_semantics=dict(initial='frozen_dynamic_initial_state',displacement='same_episode_unloaded_sample',
@@ -443,12 +501,16 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                     time_grid=cfg['task']['timing'],protocol_version=cfg['task']['goal']['data'].get('version','passive_response_v1')),
                 task_observations=[],constraint_state=dict(status='finite_time_soft_constraints',qualified=False),
                 point_binding=dict(reference='frozen_dynamic_initial_state'))
-            native=SimpleNamespace(cost=raw['cost'],physics=dict(identity=raw['physical_binding']['model_identity']))
+            new_cost={k:0 for k in raw['cost']} if reuse and not study.passive_ablation else deepcopy(raw['cost'])
+            native=SimpleNamespace(cost=new_cost,physics=dict(identity=raw['physical_binding']['model_identity']))
             models.append(native)
             record=dict(record_index=len(records),parameter_values=dict(zip(study.paths,values)),parameters=params,
-                configuration=cfg,observation=observation,mechanics=mechanics,state=dict(reference='frozen_dynamic_initial_state'),
+                configuration=cfg,execution_directory=str(folder.resolve()) if folder else None,observation=observation,mechanics=mechanics,state=dict(reference='frozen_dynamic_initial_state'),
                 physics_identity=native.physics['identity'],source_comparison=comparison['reference'] if comparison else None,
                 compiled_physical_changes=dict(model_recompiled=True) if records and native.physics['identity']!=records[0]['physics_identity'] else {})
+            record['response_action']='paired_mechanism' if study.passive_ablation else 'baseline_response'
+            if reuse:record['reuse']={k:v for k,v in reuse.items() if k!='raw'}
+            if other_reuse:record['ablation_reuse']={k:v for k,v in other_reuse.items() if k!='raw'}
             bind_matching_conditions(record)
             records.append(record);cache[key]=record
             if checkpoint:checkpoint('mechanism_return_'+str(index),dict(index=index,cost=native.cost,observation=observation,raw_execution=raw))
@@ -545,7 +607,7 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         evidence['unsupported_conclusions'].remove('passive constraint nullspace')
     try:
         base=evaluate();evidence['baseline']=base['observation'];selected=None;responses=[]
-        if dynamic and base['observation']['status']!='computed':raise ValueError('INCOMPLETE_OR_INVALID_DYNAMIC_TASK: '+str(base['observation']['reason']))
+        # Missing formal scalar does not suppress explicitly requested diagnostics.
         if passive:evidence.update(physical_problem='passive_unilateral_equilibrium',
             constraint_state=base['mechanics']['constraint_state'],point_binding=base['mechanics']['point_binding'],
             task_observations=base['mechanics']['task_observations'],
@@ -580,12 +642,17 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
                 evidence['comparison']=dict(baseline=base['observation']['value'],other=other['observation']['value'],
                     delta=(np.asarray(other['observation']['value'])-np.asarray(base['observation']['value'])).tolist()
                         if other['observation']['value'] is not None and base['observation']['value'] is not None else None)
-        elif dynamic and base['observation']['value'] is None:
-            evidence.update(derivative_status='not_defined',direction_status='feasibility_comparison_only')
+        elif dynamic and base['observation']['value'] is None and study.operation!='interact':
+            evidence.update(derivative_status='not_defined',direction_status='diagnostic_comparison')
+            if study.operation in ('differentiate','optimize'):
+                for i,row in enumerate(rows):
+                    for value in set(stencil(row)['coordinates']):
+                        values=list(base_values);values[i]=value;evaluate(values)
+                if len(rows)==2:evaluate(list(matched_points(rows)[-1]['parameter_values'].values()))
         elif study.operation=='interact':
             for matched in matched_points(rows)[1:]:
                 record=evaluate(list(matched['parameter_values'].values()))
-                if record['observation']['status']!='computed':raise ValueError('INCOMPLETE_MATCHED_INTERACTION')
+                if not dynamic and record['observation']['status']!='computed':raise ValueError('INCOMPLETE_MATCHED_INTERACTION')
         elif study.operation in ('differentiate','optimize'):
             for i,row in enumerate(rows):
                 first=len(records)
@@ -709,7 +776,24 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
         evidence['failure']=dict(reason=str(exc),attempted_evaluations=attempts)
     if study.operation=='interact':
         evidence['interaction']=interaction_evidence(matched_points(rows),records)
+        if dynamic and any(r['observation']['value'] is None for r in records):
+            evidence['interaction'].update(status='diagnostic_comparison',formal_causal_conclusion=False,
+                observations=[dict(record_index=r['record_index'],parameter_values=r['parameter_values'],
+                    task_gap=r['observation'].get('diagnostic_task_gap'),qualification=r['observation'].get('qualification_diagnosis')) for r in records])
         evidence['interaction']['sources']=[f'/structure_research/records/{r["record_index"]}' for r in records]
+    if dynamic and records and any(r['observation']['value'] is None for r in records):
+        baseline={r['constraint_id']:r for r in records[0]['observation']['diagnostic_task_gap']['constraints']}
+        comparisons=[]
+        for record in records[1:]:
+            changes=[]
+            for row in record['observation']['diagnostic_task_gap']['constraints']:
+                base_row=baseline[row['constraint_id']];a=base_row['observed_value'];b=row['observed_value']
+                changes.append(dict(constraint_id=row['constraint_id'],baseline=a,value=b,unit=row['unit'],
+                    delta=b-a if a is not None and b is not None and row['unit']==base_row['unit'] else None,
+                    baseline_source=base_row['source_pointer'],source=row['source_pointer']))
+            comparisons.append(dict(record_index=record['record_index'],changes=changes,qualification=record['observation'].get('qualification_diagnosis')))
+        evidence['diagnostic_comparison']=dict(status='diagnostic_comparison',comparisons=comparisons,
+            formal_gradient=None,formal_descent=None,scope='Recorded component changes only; qualifications and missing measurements remain explicit.')
     if dynamic:
         observed=observed_task_improvement(records,rows,evidence.get('local_search',{}).get('bounds_normalized'))
         evidence.update({k:v for k,v in observed.items() if k!='gaps'})
@@ -736,6 +820,15 @@ def calculate(configuration, binding, query, point, context, *, checkpoint=None)
             active_set_and_kkt_sources=[f'/structure_research/records/{i}/mechanics/constraint_state' for i in range(len(records)) if passive],
             scope=evidence['scope'],cost=cost,task_acceptance='unmeasured')
     if evidence.get('structure_direction'):evidence['structure_direction']['actual_cost']=cost
+    execution_index=[]
+    from pathlib import Path
+    for i,record in enumerate(records):
+        raw=record.get('mechanics',{}).get('dynamic_execution') or {}
+        directory=record.get('execution_directory');pointer=f'/structure_research/records/{i}/mechanics/dynamic_execution'
+        arms=[(raw,pointer,str(Path(directory)/'baseline') if directory and raw.get('paired_ablation') else directory)]
+        if raw.get('paired_ablation',{}).get('ablation'):arms.append((raw['paired_ablation']['ablation'],pointer+'/paired_ablation/ablation',str(Path(directory)/'ablation') if directory else None))
+        execution_index.extend(dict(identity=arm['execution_identity']['identity'],pointer=source,directory=folder) for arm,source,folder in arms if arm.get('execution_identity'))
+    if execution_index:result['physical_execution_index']=execution_index
     result.update(structure_research=evidence,model_identity=records[0]['physics_identity'] if records else None,
         internal_calculations=[dict(purpose='native_mechanism_structure',**cost)])
     return result
@@ -772,11 +865,15 @@ def dynamic_summary(raw, reference):
         diagnosis=deepcopy(diagnosis)
         diagnosis['source']['reference']=reference
         for failure in diagnosis['failed_qualifications']:failure['source']['reference']=reference
-    return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],
+    executions=[dict(response_action=r.get('response_action'),identity=r.get('mechanics',{}).get('dynamic_execution',{}).get('execution_identity',{}).get('identity'),
+        execution_profile=r.get('mechanics',{}).get('dynamic_execution',{}).get('execution_profile'),
+        reuse=r.get('reuse'),ablation_reuse=r.get('ablation_reuse'),
+        source=dict(reference=reference,pointer='/structure_research/records/'+str(i))) for i,r in enumerate(raw['records'])]
+    return dict(operation=raw['operation'],effect_semantics=raw['effect_semantics'],executions=executions,
         **(dict(execution_checks=raw['execution_checks']) if raw.get('execution_checks') else {}),
         **(dict(interaction={**raw['interaction'],
             'source':dict(reference=reference,pointer='/structure_research/interaction')}) if raw.get('interaction') else {}),
-        qualification_diagnosis=diagnosis,
+        qualification_diagnosis=diagnosis,diagnostic_comparison=raw.get('diagnostic_comparison'),
         baseline=compact(gaps[0]) if gaps else None,best_valid=compact(gaps[best]) if best is not None else None,
         hard_gates=gates,parameter_changes=direction['parameter_changes'] if direction else [],
         direction_status=raw.get('direction_status','not_requested'),derivative_status=raw.get('derivative_status','not_requested'),

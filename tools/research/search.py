@@ -34,7 +34,8 @@ def search_problem(host,query,count):
     if isinstance(q,FamilyMixedSearch):
         from extensions.tendon_family.family_space import search_domains
         grant=s['spec'].get('family_search')
-        if not grant or q.screening_fidelity not in s['spec']['fidelity_policy']['screening']:
+        from tools.research.contracts import fidelity_levels
+        if not grant or q.screening_fidelity not in fidelity_levels(s['spec']['fidelity_policy']):
             raise ValueError('FROZEN_MIXED_SEARCH_AND_SCREENING_GRANT_REQUIRED')
         if q.evaluation_mode not in grant.get('evaluation_modes',['mathematical_proxy']):
             raise ValueError('SEARCH_MODE_OUTSIDE_FROZEN_GRANT')
@@ -135,7 +136,7 @@ def coupled_problem(host, query, count):
     s=state(host);spec=s['spec'];grant=spec.get('family_search') or {};q=query.analysis
     if grant.get('coupled_block_enabled') is not True:raise ValueError('FROZEN_COUPLED_BLOCK_GRANT_REQUIRED')
     if query.family_space_identity!=spec['family_space_identity']:raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
-    if min(count,grant['max_proposals'],grant['max_evaluations'])<4:raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_ALLOWANCE')
+    if min([count,*[grant[k] for k in ('max_proposals','max_evaluations') if grant[k] is not None]])<4:raise ValueError('ALL_FOUR_MATCHED_POINTS_MUST_FIT_ALLOWANCE')
     if query.evaluation_mode not in grant.get('evaluation_modes',['mathematical_proxy']):raise ValueError('SEARCH_MODE_OUTSIDE_FROZEN_GRANT')
     if not spec.get('mathematical_methods',{}).get(METHOD):raise ValueError('ORIGINAL_MECHANISM_METHOD_GRANT_REQUIRED')
     if q.effect_semantics not in ('mechanism_effect','re_equilibrated_passive_response','finite_time_task_response'):
@@ -159,7 +160,7 @@ def coupled_problem(host, query, count):
     load_condition=None if q.effect_semantics=='finite_time_task_response' and q.load_condition=='all_frozen_conditions' else q.load_condition
     study=MechanismStudy(operation='interact',target=target,parameter_paths=q.parameter_paths,parameter_bounds=q.parameter_bounds,
         point_semantics=q.operating_point,load_condition=load_condition,effect_semantics=q.effect_semantics,
-        passive_ablation=q.passive_ablation,max_evaluations=4)
+        passive_ablation=q.passive_ablation,execution_profile=q.execution_profile,execution_checks=q.execution_checks,max_evaluations=4)
     context=prepare_context(spec,c,study,[])
     points=coupled_block(context['selected_parameters'],grant['variable_groups'])
     request=dict(candidate=plain(query.previous_candidate_ref),operation=METHOD,model_source='mujoco',
@@ -217,13 +218,14 @@ def design_counts(rows):
 def request_guidance(spec):
     """Discovery works before a candidate exists; no scientific choice is made."""
     from extensions.tendon_family.family_space import span_strategies
+    from tools.research.contracts import fidelity_levels
     grant=spec['family_search']
     guidance=dict(generate=dict(tool='research_plan',action='generate',payload='generation',
             version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
         search=dict(tool='research_plan',action='search',payload='search',
             version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant['method'],
             required=['variable_groups','segment_counts','tendon_counts','screening_fidelity','objective','operating_point','max_proposals','max_evaluations'],
-            grant=grant,screening_fidelities=list(spec['fidelity_policy']['screening']),
+            grant=grant,screening_fidelities=list(fidelity_levels(spec['fidelity_policy'])),fidelity_policy=spec['fidelity_policy'],
             parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',
                 sections='Section type/dimensions in m',routing='Span phase, station, channel angle and radius',
                 spans='Consecutive span strategy',segment_count='Discrete number of segments',tendon_count='Discrete number of channels'),
@@ -241,7 +243,7 @@ def request_guidance(spec):
             family_space_identity=spec['family_space_identity'],max_evaluations=4,
             required=['previous_candidate_ref','analysis'],
             analysis='CoupledInteraction operation interact only; exactly two continuous parameter IDs and a registered scalar target. Four points: baseline, A only, B only, A+B. max_evaluations=4; analysis.requested_budget is omitted or 4. All other parameters and conditions remain fixed. Repeat in a new Plan for further exploration. M2/M3 interaction is unavailable.',
-            resources='One existing mechanism worker with whole-four-point admission and original accounting; no independent acceptance or automatic promotion.')
+            resources='One existing mechanism worker with whole-four-point admission and original accounting; no independent acceptance or automatic promotion. For finite-time exploration, choose execution_profile to bound directions, continuous stage prefix, fidelity and recording; a missing formal scalar still permits diagnostic component comparisons.')
     if spec['family_space'].get('version')=='serial_family_space_v2':
         space=spec['family_space']; rule=space['serial_assembly']
         parts={p['id']:p for p in space['assembly']['components']}
@@ -274,7 +276,7 @@ def request_guidance(spec):
             structural_groups=[g for g in grant['variable_groups'] if g!='control'],
             native='structure_control_codesign + native_mujoco + reoptimized, with control_search_effort; full frozen task and every constraint retained.',
             proxy='structural_capability_screening + mathematical_proxy, explicit proxy_objective. CONIC task_violation requires proxy_optimized (affine-model control solve); static/held-input objectives require not_optimized. No Native substitution.',
-            program_bound=['FamilySpace identity','singleton topology','exact final screening fidelity','Native operating point','internal research_intent'],
+            program_bound=['FamilySpace identity','singleton topology','declared request-selected fidelity','Native operating point','internal research_intent'],
             control_effort='Choose resolution=coarse/moderate/fine, exploration=local_refinement/broad and evaluation_requests as a shared finite callback cap. The compiler binds response search, actual time knots, physical scales and iteration/Worker limits; actual settings remain recoverable.',
             topology=dict(segment_counts=grant['segment_counts'],tendon_counts=grant['tendon_counts']),
             applicable_span_strategies=span_strategies(spec['family_space']),
@@ -299,7 +301,7 @@ def request_guidance(spec):
             routing={'routing.'+k:v for k,v in space['routing_domains'].items()},
             payout={'payout':space.get('passive_payout_offset_domain_m') or space.get('passive_payout_domain_m') or space.get('passive_payout_domains_m')},
             scope='Exact Search.bounds keys and frozen common domains, not evidence_read group names. Every selected open coordinate needs a finite interval; materials includes physical.* as well as young_pa. Section dimension bounds are needed for selected section types (or inherited prototype kinds when types are omitted). Polygon scaling additionally uses polygon_scale_m; its frozen coordinate domain is segment_domain.polygon_coordinate_m. Per-segment/channel overrides and original admission still apply.')
-        guidance['search']['evaluation_cost']='For passive_equilibrium, max_evaluations counts condition-analysis entries: each candidate costs the selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads evaluate only one candidate. For passive_task_response, one mathematical entry runs the complete frozen task, with every actual episode and integration step separately charged; omit the equilibrium-only diagnostic_load_conditions. Main chooses finite effort with that full-task cost in mind; no interval or variable is selected here.'
+        guidance['search']['evaluation_cost']='For passive_equilibrium, max_evaluations counts condition-analysis entries: each candidate costs the selected diagnostic loads. Three candidates with two loads need six entries; three entries with two loads evaluate only one candidate. For passive_task_response, one entry evaluates baseline_response without ablation. An optional exploration execution_profile selects directions, continuous stage prefix, sampling and recording; incomplete objectives remain diagnostic and unranked. Without that profile the full frozen baseline runs. Actual episodes and steps are charged; omit equilibrium-only diagnostic_load_conditions. No cumulative search quota is implied by finite per-request effort.'
         guidance['search'].pop('native',None);guidance['search'].pop('proxy',None);guidance['search'].pop('control_effort',None)
         if 'objectives' in guidance['search']:
             guidance['search']['objectives']=guidance['search']['passive']['objectives']
@@ -336,6 +338,10 @@ def coordinate_layout(query,constraint):
 
 def rank(row,query,limits=None):
     if isinstance(query,FamilyMixedSearchV2):return (1,float('inf'))
+    if isinstance(query,FamilyMixedSearch) and row.get('comparison_scope'):
+        expected=dict(fidelity=query.screening_fidelity,evaluation_mode=query.evaluation_mode,
+            execution_profile=plain(query.execution_profile),objective=query.objective)
+        if row['comparison_scope']!=expected:return (1,float('inf'))
     if isinstance(query,FamilyMixedSearch) or query.evaluation_mode=='mathematical_proxy':
         value=row.get('proxy_values',{}).get(query.objective)
         valid=row.get('computation_status')=='computed' and value is not None and math.isfinite(value)
@@ -609,6 +615,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             row.update(proxy_values=proxies,actual_mathematical_evaluations=r.get('charged_analysis_evaluations',1),
                 task_violation_scope=dict(task_identity=c.get('task_identity'),coverage=r.get('analysis_applicability'),
                     optimality_status=trajectory.get('optimality_status'),source_pointer='/trajectory/replayed_violation') if q.objective=='task_violation' else None)
+        if mixed and not coupled:row['comparison_scope']=dict(fidelity=q.screening_fidelity,evaluation_mode=q.evaluation_mode,execution_profile=plain(q.execution_profile),objective=q.objective)
         row.update(candidate_id=c['candidate_id'],scientific_identity=c['identity'],parameters=proposal['parameters'],
             latent_coordinates=proposal['latent'],objective_identity=digest(checkpoint['problem']),used_feedback=proposal['feedback'])
         if native or passive:

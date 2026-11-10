@@ -124,6 +124,12 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
         from tools.research.contracts import ScientificStructureSearch
         intent_schema=ScientificStructureSearch.model_json_schema()
         properties=intent_schema['properties'];grant=study['family_search']
+        from tools.research.contracts import fidelity_levels
+        properties['screening_fidelity']={'type':'string','enum':list(fidelity_levels(study['fidelity_policy']))}
+        if len(study['fidelity_policy']['screening'])!=1:intent_schema['required'].append('screening_fidelity')
+        from tools.research.contracts import fidelity_levels
+        properties['screening_fidelity']={'type':'string','enum':list(fidelity_levels(study['fidelity_policy']))}
+        if len(study['fidelity_policy']['screening'])!=1:intent_schema['required'].append('screening_fidelity')
         from extensions.tendon_family.family_space import span_strategies
         applicable_spans=span_strategies(study['family_space'])
         for branch in properties['span_strategies']['anyOf']:
@@ -132,6 +138,9 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
             if branch.get('type')=='string':branch['enum']=applicable_spans
         properties['design_variable_groups']['items']['enum']=[g for g in grant['variable_groups'] if g!='control']
         modes=grant.get('evaluation_modes',[])
+        if 'passive_task_response' in modes and study['canonical_task']['goal']['data'].get('version')=='passive_response_v2':
+            intent_schema.setdefault('allOf',[]).append({'if':{'properties':{'evaluation_model':{'const':'passive_task_response'}},'required':['evaluation_model']},
+                'then':{'required':['execution_profile'],'properties':{'execution_profile':{'type':'object'}}}})
         if modes and all(m.startswith('passive_') for m in modes):
             properties['research_goal']={'type':'string','const':'passive_structure_research'}
             properties['evaluation_model']={'type':'string','enum':modes}
@@ -160,6 +169,9 @@ def plan_schema(actions, *, decision_required=False,family_version=None,diagnose
     if (study or {}).get('family_search',{}).get('coupled_block_enabled') and 'search' in actions:
         schema['properties']['search']['anyOf'].insert(0,{'$ref':'#/$defs/FamilyMixedSearchV2'})
         schema['$defs']['FamilyMixedSearchV2']['description']='Four matched local interaction points only: baseline, A, B, A+B. No optimize operation or iterative evaluation budget. Use a new Plan for further exploration.'
+        if (study or {}).get('canonical_task',{}).get('goal',{}).get('data',{}).get('version')=='passive_response_v2':
+            schema['$defs']['CoupledInteraction'].setdefault('allOf',[]).append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
+                'then':{'required':['execution_profile'],'properties':{'execution_profile':{'type':'object'}}}})
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
@@ -1132,6 +1144,8 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
         instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     from tools.research.object_choices import main_context_enabled
     if main_context_enabled(state(host)['spec']):
+        instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Use exploration execution_profile to choose declared fidelity, load conditions and a continuous stage prefix; it grants no acceptance. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
+        instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Use exploration execution_profile to choose declared fidelity, load conditions and a continuous stage prefix; it grants no acceptance. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
         instructions+='\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search).'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
@@ -1647,7 +1661,7 @@ def decision_packet(host, *, research_only=False):
             source_relative_design=dict(reference_parameters=spec['reference_parameters'],allowed_parameters=spec['allowed_parameters'],
                 length_constraint=spec.get('length_constraint')) if spec.get('start_mode')!='family_space' else None,
             analysis_protocol=spec['analysis_protocol'],
-            guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. Execution sources must match the selected structure and frozen task. Do not infer global feasibility/infeasibility. Stop at the first complete task pass; for a multi-condition Study this means every frozen condition on the identical structure. Publicly read each evaluation and select the complete result set. Retrieve the exact stop_result_index before STOP; cite every new result.')
+            guidance='Use deterministic tool facts directly; request research_investigate for synthesis, competing mechanisms or interpretation. Reporter is optional for simple calculations. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. Execution sources must match the selected structure and frozen task. Do not infer global feasibility/infeasibility. Stop at the first complete task pass; for a multi-condition Study this means every frozen condition on the identical structure. Publicly read each evaluation and select the complete result set. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)
     spec=result.pop('specification')
     result['configuration_identity']=spec['resolved_identity']

@@ -2,6 +2,7 @@
 from typing import Literal
 from pydantic import Field, FiniteFloat, StrictInt, RootModel, model_validator, model_serializer
 from schemas.common import Contract
+from extensions.reference.contracts import PassiveExecutionProfile
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
@@ -79,13 +80,21 @@ class FidelityLevel(Contract):
 class FidelityPolicy(Contract):
     version: Literal['numerical_fidelity_v1'] = 'numerical_fidelity_v1'
     screening: dict[str, FidelityLevel] = Field(min_length=1)
+    refinement: dict[str,FidelityLevel] = Field(default_factory=dict)
+    numerical_sensitivity: dict[str,FidelityLevel] = Field(default_factory=dict)
     final_evaluation: FidelityLevel
     require_exact_fidelity: Literal[True] = True
     alternative_runtimes: list[str] = Field(default_factory=list)
     runtime_preflight_limit: int = Field(default=2, ge=0, le=8, strict=True)
 
 
+def fidelity_levels(policy):
+    return {**policy['screening'],**policy.get('refinement',{}),**policy.get('numerical_sensitivity',{}),
+        'final_evaluation':policy['final_evaluation']}
+
+
 class FamilyMixedSearch(Contract):
+    execution_profile: PassiveExecutionProfile | None = None
     version: Literal['family_mixed_search_v1']
     family_space_identity: str = Field(min_length=1)
     method: Literal['bounded_mixed_coordinate_v1'] = 'bounded_mixed_coordinate_v1'
@@ -119,6 +128,7 @@ class FamilyMixedSearch(Contract):
     @model_serializer(mode='wrap')
     def preserve_proxy_requests(self,handler):
         value=handler(self)
+        if self.execution_profile is None:value.pop('execution_profile',None)
         for key in ('initial_segment_count','initial_tendon_count','initial_span_strategy'):
             if getattr(self,key) is None:value.pop(key,None)
         if not self.diagnostic_load_conditions:value.pop('diagnostic_load_conditions',None)
@@ -128,6 +138,7 @@ class FamilyMixedSearch(Contract):
 
     @model_validator(mode='after')
     def selected_coordinates(self):
+        if self.execution_profile and self.evaluation_mode!='passive_task_response':raise ValueError('EXECUTION_PROFILE_REQUIRES_BASELINE_RESPONSE')
         for key,choices in (('initial_segment_count',self.segment_counts),('initial_tendon_count',self.tendon_counts),('initial_span_strategy',self.span_strategies)):
             if getattr(self,key) is not None and getattr(self,key) not in choices:raise ValueError('INITIAL_SEARCH_POINT_OUTSIDE_SELECTED_RANGE: '+key)
         native=self.evaluation_mode=='mujoco_control'
@@ -436,6 +447,8 @@ class ScientificStructureSearch(Contract):
     version: Literal['scientific_structure_search_v1'] = 'scientific_structure_search_v1'
     research_goal: Literal['structure_control_codesign','structural_capability_screening','passive_structure_research']
     design_variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','payout']] = Field(min_length=1,description='Real structure groups only. Mesh convergence is a separate generation/comparison study, not physical task improvement.')
+    screening_fidelity: str | None = Field(default=None,description='Named declared fidelity; omit only when the screening policy has one choice.')
+    execution_profile: PassiveExecutionProfile | None = None
     evaluation_model: Literal['native_mujoco','mathematical_proxy','passive_equilibrium','passive_task_response']
     control_treatment: Literal['reoptimized','not_optimized','proxy_optimized','no_active_control'] = Field(description='Passive models require no_active_control; payout determines tension. Existing active semantics are unchanged.')
     structure_search_effort: StructureSearchEffort
@@ -550,8 +563,9 @@ class MechanismQuestionV2(Contract):
 
 
 class ScientificStructureV4(MechanismQuestionV2):
+    execution_profile: PassiveExecutionProfile | None = None
     execution_checks: Literal['full','screening'] = Field(default='full',
-        description='Passive finite-time inspect only: screening checks routing on the score grid while retaining physics, dense qualification and full traces. Diagnostic screening cannot certify task acceptance. full retains every frozen check.')
+        description='Passive finite-time research: legacy screening checks routing on the score grid while retaining physics, dense qualification and full traces. Use execution_profile for scoped exploration. Diagnostic screening cannot certify task acceptance. full retains every frozen check.')
     parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict,
         description='Finite local intervals for selected actual parameter_paths, required for open domains. Preserve the full FamilySpace; include the current value and obey physical bounds. These intervals apply only to this request.')
     operation: Literal['inspect','differentiate','optimize','compare','interact']
@@ -569,6 +583,7 @@ class ScientificStructureV4(MechanismQuestionV2):
 
 
 class MechanismStudy(Contract):
+    execution_profile: PassiveExecutionProfile | None = None
     execution_checks: Literal['full','screening'] = 'full'
     parameter_bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     operation: Literal['inspect','differentiate','optimize','compare','interact']
@@ -591,7 +606,8 @@ class MechanismStudy(Contract):
 
     @model_validator(mode='after')
     def unambiguous_paths(self):
-        if self.execution_checks=='screening' and (self.effect_semantics!='finite_time_task_response' or self.operation!='inspect'):
+        if self.execution_profile and self.effect_semantics!='finite_time_task_response':raise ValueError('EXECUTION_PROFILE_REQUIRES_FINITE_TIME_RESPONSE')
+        if self.execution_checks=='screening' and self.effect_semantics!='finite_time_task_response':
             raise ValueError('SCREENING_CHECKS_REQUIRE_PASSIVE_FINITE_TIME_INSPECT')
         if self.parameter_path and self.parameter_paths:raise ValueError('USE_LEGACY_PATH_OR_SELECTED_PATHS_NOT_BOTH')
         if len(set(self.paths))!=len(self.paths):raise ValueError('DISTINCT_PARAMETER_PATHS_REQUIRED')
@@ -601,6 +617,7 @@ class MechanismStudy(Contract):
     @model_serializer(mode='wrap')
     def legacy_request(self,handler):
         value=handler(self)
+        if self.execution_profile is None:value.pop('execution_profile',None)
         if self.execution_checks=='full':value.pop('execution_checks',None)
         if not self.parameter_paths:value.pop('parameter_paths',None)
         if self.local_radius_fraction==.02:value.pop('local_radius_fraction',None)

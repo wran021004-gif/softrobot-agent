@@ -131,13 +131,19 @@ def constraint_mechanism(native,data,goal):
         constraint_direction_error=error)
 
 
-def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None,common_equilibrium=None,execution_checks='full'):
+def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_state_result=None,common_equilibrium=None,execution_checks='full',execution_profile=None):
     from tools.platform_registry import registry
     goal,bounds,problem=task_definition(inp.task,registry())
     v2=goal.version=='passive_response_v2'
     if execution_checks not in ('full','screening') or execution_checks=='screening' and not v2:
         raise ValueError('SUPPORTED_PASSIVE_EXECUTION_CHECKS_REQUIRED')
-    route_sampling='score_grid' if execution_checks=='screening' else getattr(goal,'route_check','not_required')
+    from extensions.reference.passive_program import execution_scope
+    scope=execution_scope(inp.task,execution_profile) if v2 else None
+    exploration=bool(scope and scope['purpose']=='exploration')
+    if execution_profile is not None and scope['purpose']=='final_acceptance' and execution_checks!='full':raise ValueError('FINAL_ACCEPTANCE_REQUIRES_FROZEN_CHECKS')
+    route_sampling=scope['route_sampling'] if execution_profile is not None else 'score_grid' if execution_checks=='screening' else getattr(goal,'route_check','not_required')
+    recording=scope['recording'] if scope else None
+    sample_period=scope['sample_period_s'] if scope else inp.task.timing.sample_period_s
     original=v2 and goal.execution_protocol=='phs2d_original_v1'
     hard=v2 and goal.execution_protocol in ('phs2d_original_v1','hard_equilibrium_continuous_v1')
     if (disabled_limits or initial_state is not None) and not v2:raise ValueError('PASSIVE_V2_STATE_OR_INTERVENTION_REQUIRED')
@@ -147,7 +153,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
     if v2 and (len(set(disabled_limits))!=len(disabled_limits) or any(name not in order for name in disabled_limits)):
         raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
     if disabled_limits and goal.allowed_ablation!='disable_selected_passive_limits':raise ValueError('PASSIVE_LIMIT_ABLATION_NOT_GRANTED_BY_TASK')
-    if v2 and goal.recording=='full_physics_csv' and folder is None:raise ValueError('L2_FOLDER_REQUIRED_FOR_FULL_PHYSICS_TRACE')
+    if v2 and recording=='full_physics_csv' and folder is None:raise ValueError('L2_FOLDER_REQUIRED_FOR_FULL_PHYSICS_TRACE')
     scene['control']=dict(tension_execution_mode='passive_fixed_payout_v1')
     if v2:scene['control'].update(solreflimit=goal.solreflimit,solimplimit=goal.solimplimit)
     folder=Path(folder) if folder else None
@@ -169,11 +175,15 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
         timings_s=dict(model_compile=compile_s),mujoco_version=mujoco.__version__,
         solver_options=dict(timestep_s=float(model.opt.timestep),integrator=int(model.opt.integrator),
             iterations=int(model.opt.iterations),tolerance=float(model.opt.tolerance)))
+    if execution_profile is not None:
+        raw['execution_profile']=scope
     if execution_checks=='screening':
         policy=dict(version='sparse_route_screening_v1',level='screening',route_check=route_sampling,
             route_period_s=inp.task.timing.sample_period_s,qualification='original_dense_windows',
             recording=goal.recording,task_acceptance='unmeasured')
         raw['execution_checks']={**policy,'identity':digest(policy)}
+    from extensions.reference.passive_program import execution_identity
+    raw['execution_identity']=execution_identity(plain(inp),profile=execution_profile,execution_checks=execution_checks,intervention=disabled_limits,initial_state=initial_state)
     base_limited=model.tendon_limited.copy();disabled=[];unchanged=None
     if v2:
         if len(set(disabled_limits))!=len(disabled_limits) or any(name not in raw['tendon_order'] for name in disabled_limits):raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
@@ -187,7 +197,8 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 timing='after_identical_unloaded_qualification',only_limit_array_changed=True))
         if goal.execution_protocol=='hard_equilibrium_continuous_v1':
             raw['numerical_invariant_model_signature']=model_signature(model,exclude_timestep=True)
-    dt=inp.task.timing.timestep_s;steps=round(inp.task.timing.duration_s/dt);stride=round(inp.task.timing.sample_period_s/dt)
+    dt=inp.task.timing.timestep_s;steps=round(inp.task.timing.duration_s/dt);stride=round(sample_period/dt)
+    physics_score_stride=round(inp.task.timing.sample_period_s/dt)
     failure=MujocoFailureSnapshot(model,binding['model_identity'],folder)
     tendon_ids={model.tendon(t['entity']).id:i for i,t in enumerate(p['tendons'])}
     state_saves=0;state_restores=0;static_forwards=0;constraint_checks=0
@@ -230,7 +241,9 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
         initial_qpos=np.asarray(equilibrium['equilibrium']['qpos'])+goal.initial_perturbation_rad*np.sin(np.arange(model.nv))
         raw['initial_state']=dict(qpos_rad=initial_qpos.tolist(),qvel_rad_s=[0.]*model.nv)
         checkpoint()
-    for case in goal.load_conditions:
+    cases=scope['load_conditions'] if scope else goal.load_conditions
+    for case in cases:
+        steps=round(scope['end_s'][case]/dt) if scope else steps
         if v2:model.tendon_limited[:]=base_limited
         data=mujoco.MjData(model);mujoco.mj_resetData(model,data)
         data.qpos[:]=scene['qpos_rad'];data.qvel[:]=scene['qvel_rad_s']
@@ -248,7 +261,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 maximum_force_map_error_nm=0.,minimum_constraint_multiplier_n=0.,maximum_capacity_ratio=0.,
                 maximum_enabled_length_excess_m=0.,stage_extrema={},constraint_transitions=[])
             episode['route_geometry']=dict(sampling=route_sampling,checked_poses=0,segment_body_checks=0,status='not_required',first_issue=None)
-            if goal.recording=='full_physics_csv':
+            if recording=='full_physics_csv':
                 path=folder/('episode_'+str(len(raw['episodes'])-1)+'.csv');trace=path.open('x',newline='')
                 writer=csv.writer(trace)
                 columns=['time_s','stage','engine_time_s','force_x_n','force_y_n','force_z_n']
@@ -297,7 +310,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                         current=mechanism['constraint_classification'],actual_tension_n=tension(),
                         length_residual_m=(data.ten_length-native.payout).tolist(),constraint_states=mechanism['constraint_states']))
                 episode['last_constraint_classification']=mechanism['constraint_classification']
-                if route_sampling=='every_physics_step' or route_sampling=='score_grid' and abs(time_s/inp.task.timing.sample_period_s-round(time_s/inp.task.timing.sample_period_s))<1e-8:
+                if route_sampling=='every_physics_step' or route_sampling=='score_grid' and abs(time_s/sample_period-round(time_s/sample_period))<1e-8:
                     from .route_validation import validate_routes
                     check=validate_routes(native,[data.qpos],data=data);record=episode['route_geometry']
                     record['checked_poses']+=1;record['segment_body_checks']+=check['segment_body_checks']
@@ -325,7 +338,10 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 native.apply_force(static,load.material_s,force)
                 failure.call(static,mujoco.mj_forward,'passive_static_balance');static_forwards+=1 if original else 2
                 balance=static.qfrc_passive+static.qfrc_applied-static.qfrc_bias+static.qfrc_constraint
-                value.update(**mechanism,static_balance_inf_nm=float(np.max(abs(balance))),force_map_error_nm=map_error,
+                scale=max(float(np.max(abs(v))) for v in (static.qfrc_passive,static.qfrc_applied,static.qfrc_bias,static.qfrc_constraint))
+                value.update(**mechanism,static_balance_inf_nm=float(np.max(abs(balance))),
+                    generalized_force_scale_nm=scale,normalized_static_balance=float(np.max(abs(balance)))/scale if scale>0 else None,
+                    force_map_error_nm=map_error,
                     taut=[label=='taut' for label in mechanism['constraint_classification']])
                 if original:
                     value.update(qacc_rad_s2=data.qacc.tolist(),qacc_warmstart=data.qacc_warmstart.tolist(),
@@ -352,7 +368,7 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
             else:
                 if original:failure.call(data,mujoco.mj_forward,'passive_original_initial_geometry')
                 force,phase=refresh(0.);safety();first=sample(0.,force,phase);episode['samples'].append(first)
-                if v2 and any(q.sampling=='every_physics_step' and q.window_s[0]==0 for q in goal.qualifications):episode['qualification_samples'].append(first)
+                if v2 and not exploration and any(q.sampling=='every_physics_step' and q.window_s[0]==0 for q in goal.qualifications):episode['qualification_samples'].append(first)
             checkpoint()
             for tick in range(start_tick,steps):
                 if v2 and disabled and tick==round(goal.programs[case][0].end_s/dt):
@@ -371,17 +387,18 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 episode['physics_steps']+=1
                 if hard:
                     failure.call(data,mujoco.mj_forward,'passive_original_post_step_geometry')
-                    if original and (tick+1)%stride==0:
+                    if original and (tick+1)%physics_score_stride==0:
                         native.apply_force(data,load.material_s,force)
                         failure.call(data,mujoco.mj_forward,'passive_original_snapshot_constraints')
                 else:force,phase=refresh(applied_time if v2 else (tick+1)*dt)
                 now=(tick+1)*dt
                 if v2:phase=load_at(goal,load,now)[1]
                 safety(now);episode['checked_physics_steps']+=1
-                dense=v2 and any(q.sampling=='every_physics_step' and q.window_s[0]-1e-10<=now<=q.window_s[1]+1e-10 for q in goal.qualifications)
+                dense=v2 and not exploration and any(q.sampling=='every_physics_step' and q.window_s[0]-1e-10<=now<=q.window_s[1]+1e-10 for q in goal.qualifications)
                 if (tick+1)%stride==0 or dense:
                     row=sample(now,force,phase)
-                    if (tick+1)%stride==0:episode['samples'].append(row)
+                    window=scope['observation_window_s'] if exploration else None
+                    if (tick+1)%stride==0 and (not window or window[0]-1e-10<=now<=window[1]+1e-10):episode['samples'].append(row)
                     if dense:episode['qualification_samples'].append(row)
                     if not v2:checkpoint()
                 if writer:
@@ -395,11 +412,13 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                     episode['phase_boundaries'].append(dict(stage=phase,time_s=now,integration_state=boundary_state))
                     for rule in goal.qualifications:
                         if abs(rule.window_s[1]-now)>1e-10:continue
-                        selected=episode['qualification_samples'] if rule.sampling=='every_physics_step' else episode['samples']
+                        selected=episode['qualification_samples'] if rule.sampling=='every_physics_step' and not exploration else episode['samples']
                         qualified=qualification(selected,rule,disabled_limits=disabled if disabled and episode.get('intervention_at_s') is not None else ())
+                        if exploration:
+                            qualified.update(sampling='score_grid',scope='Exploratory sampled diagnostic; frozen every-step qualification is not established')
                         episode['qualifications'][rule.stage]=qualified
                         if rule.stage==goal.unloaded_stage:
-                            if not qualified['passed']:raise ValueError('UNLOADED_DYNAMIC_QUALIFICATION_FAILED')
+                            if not qualified['passed'] and not exploration:raise ValueError('UNLOADED_DYNAMIC_QUALIFICATION_FAILED')
                             episode['qualified_state']=boundary_state
                     checkpoint()
                     if original and abs(now-goal.programs[case][0].end_s)<1e-10:
@@ -423,7 +442,10 @@ def execute(inp,folder=None,*,disabled_limits=(),initial_state=None,initial_stat
                 raw['trace_files'].append(dict(path=path.name,sha256=identity,bytes=path.stat().st_size,
                     physics_steps=episode.get('executed_physics_steps',episode['physics_steps']),load_condition=case,format='full_physics_csv_v2'))
         checkpoint()
-    if len(raw['episodes'])==len(goal.load_conditions) and all(e['complete'] for e in raw['episodes']):raw['status']='completed'
+    if len(raw['episodes'])==len(cases) and all(e['complete'] for e in raw['episodes']):raw['status']='completed'
+    if exploration:
+        raw['acceptance_status']='not_evaluated'
+        raw['observation_coverage']=[dict(load_condition=e['load_condition'],times_s=[r['time_s'] for r in e['samples']],route_geometry=e['route_geometry']) for e in raw['episodes']]
     checkpoint()
     return backend_result(inp,raw)
 
@@ -464,7 +486,7 @@ def paired_raw(first,second,folder,requested_tendons,elapsed,*,interrupted=False
         unobserved_work_possible=interrupted)
 
 
-def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None,execution_checks='full'):
+def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_result=None,execution_checks='full',execution_profile=None,baseline=None,ablation=None):
     """Two fresh native executions in one contained, fully accounted Worker.
 
     Each arm owns a complete raw record and a separate immutable execution
@@ -475,15 +497,23 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
         raise ValueError('EXACT_UNIQUE_PASSIVE_LIMIT_NAMES_REQUIRED')
     folder=Path(folder);started=time.perf_counter()
     checks=dict(execution_checks=execution_checks) if execution_checks!='full' else {}
-    first=execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result,**checks).data.data
-    if first['status']!='completed':
-        combined=paired_raw(first,None,folder,disabled_limits,time.perf_counter()-started)
-        atomic_json(folder/'passive_progress.json',combined)
-        return backend_result(inp,combined)
+    if execution_profile is not None:checks['execution_profile']=execution_profile
+    from extensions.reference.passive_program import execution_identity
+    def reused_arm(saved,intervention):
+        expected=execution_identity(plain(inp),profile=execution_profile,execution_checks=execution_checks,initial_state=initial_state,intervention=intervention)
+        if saved['raw'].get('execution_identity')!=expected or saved['raw'].get('status')!='completed' or not saved.get('source'):raise ValueError('EXACT_MATCHED_ARM_RESULT_REQUIRED')
+        if saved['raw'].get('trace_files') and not saved.get('execution_directory'):raise ValueError('REUSED_ARM_TRACE_SOURCE_REQUIRED')
+        raw=deepcopy(saved['raw'])
+        for trace in raw.get('trace_files',[]):trace['path']=str(Path(saved['execution_directory'])/trace['path'])
+        return raw
+    first=reused_arm(baseline,()) if baseline is not None else execute(inp,folder/'baseline',initial_state=initial_state,initial_state_result=initial_state_result,**checks).data.data
     combined=paired_raw(first,None,folder,disabled_limits,time.perf_counter()-started,interrupted=True)
     atomic_json(folder/'passive_progress.json',combined)
+    if ablation is not None and ([e['load_condition'] for e in first['episodes']]!=[e['load_condition'] for e in ablation['raw']['episodes']] or
+            any(a.get('integration_initial')!=b.get('integration_initial') or a.get('qualified_state')!=b.get('qualified_state')
+                for a,b in zip(first['episodes'],ablation['raw']['episodes']))):ablation=None
     try:
-        second=execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
+        second=reused_arm(ablation,disabled_limits) if ablation is not None else execute(inp,folder/'ablation',disabled_limits=disabled_limits,initial_state=initial_state,
             initial_state_result=initial_state_result,common_equilibrium=first.get('unloaded_equilibrium'),**checks).data.data
     except Exception as exc:
         from tools.state_io import read
@@ -491,6 +521,18 @@ def execute_pair(inp,folder,disabled_limits,*,initial_state=None,initial_state_r
         second=read(path) if path.exists() else dict(status='incomplete',reason=str(exc),cost={})
         second.update(status='incomplete',reason=str(exc))
     combined=paired_raw(first,second,folder,disabled_limits,time.perf_counter()-started,interrupted=second.get('physical_binding') is None)
+    for name,saved,arm in [('baseline',baseline,first),('ablation',ablation,second)]:
+        if saved is None:continue
+        combined['paired_ablation'][name+'_reuse']={k:v for k,v in saved.items() if k!='raw'}
+        receipt=combined['paired_ablation']['arm_receipts'][name]
+        receipt.update(source=saved['source'],execution_id=saved['source']['reference']['artifact_id']+saved['source']['pointer'],
+            actual_new_cost=saved['actual_new_cost'],scope='Existing exact native arm Result; no fresh execution.')
+        combined['cost']={k:v-arm['cost'].get(k,0) for k,v in combined['cost'].items()}
+        combined['model_builds']-=arm.get('model_builds',0)
+        combined['timings_s'][name]=0.
+    if baseline is not None or ablation is not None:
+        combined['trace_files']=[dict(v,path=v['path'] if saved is not None else name+'/'+v['path'])
+            for name,value,saved in [('baseline',first,baseline),('ablation',second,ablation)] for v in value.get('trace_files',[])]
     atomic_json(folder/'passive_progress.json',combined)
     return backend_result(inp,combined)
 

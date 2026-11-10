@@ -23,6 +23,10 @@ class RecordedField(Contract):
 
 
 class ResultIdentity(Contract):
+    physical_execution_identity: str | None = None
+    fidelity: dict | None = None
+    implementation_identity: str | None = None
+    solver_configuration: dict | None = None
     result: EvidenceLocation
     study: str | None = None
     task_identity: str | None = None

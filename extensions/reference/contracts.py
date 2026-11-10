@@ -89,12 +89,26 @@ class PassiveStageV2(Contract):
         return self
 
 
+class PassiveExecutionProfile(Contract):
+    purpose: Literal['exploration','final_acceptance'] = 'exploration'
+    load_conditions: list[str] = Field(default_factory=list)
+    stage_prefix: str | None = None
+    observation_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
+    sample_period_s: FiniteFloat | None = Field(default=None,gt=0)
+    route_sampling: Literal['score_grid','every_physics_step','not_required'] | None = None
+    recording: Literal['sampled','full_physics_csv'] | None = None
+    requested_observables: list[str] = Field(default_factory=list)
+    fidelity: str | None = None
+
+
 class PassiveQualificationV2(Contract):
     stage: str
     window_s: tuple[FiniteFloat,FiniteFloat]
     tip_speed_max_m_s: FiniteFloat = Field(ge=0)
     monitor_speed_max_m_s: FiniteFloat = Field(ge=0)
     qvel_max_rad_s: FiniteFloat = Field(ge=0)
+    qvel_role: Literal['qualification','diagnostic'] = 'qualification'
+    drift_role: Literal['qualification','speed_covered_diagnostic'] = 'qualification'
     tail_drift_max_m: FiniteFloat = Field(ge=0)
     static_balance_max_nm: FiniteFloat = Field(ge=0)
     length_excess_max_m: FiniteFloat = Field(ge=0)

@@ -444,7 +444,7 @@ def dispatch(host,query,key,*,guard,origin='model',plan_reference=None):
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
         raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
-    cfg=c['configuration']
+    cfg=(sensitivity_context or {}).get('execution_configuration',c['configuration'])
     design=cfg['robot']['structure']['data']
     binding=dict(candidate_id=c['candidate_id'],candidate=plain(q.candidate),configuration=c['configuration_reference'],
         effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),tendon_order=[t['id'] for t in design['tendons']],
@@ -587,6 +587,8 @@ def dispatch(host,query,key,*,guard,origin='model',plan_reference=None):
     io_path(folder).mkdir(parents=True,exist_ok=True)
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
         task_analysis=plain(requirements),analysis_applicability=applicability)
+    if q.mechanism_study and q.mechanism_study.effect_semantics=='finite_time_task_response':
+        sensitivity_context.update(result_store=str(host.store.root),result_sources=[*s.get('analysis_results',[]),*s.get('physical_replays',[])])
     if sensitivity_context:request['design_context']=sensitivity_context
     if preparation_s:request['admission_preparation_numerical_s']=preparation_s
     if method_fit:request['method_admission']=method_fit
@@ -1058,7 +1060,7 @@ def result_metadata(host, reference):
     result=host.store.artifact(reference,omit=('dynamic_execution_progress',
         base+'.episodes[*].qualification_samples',
         base+'.paired_ablation.ablation.episodes[*].qualification_samples'))
-    if any((r.get('observation') or {}).get('diagnostic_task_gap') is None
+    if any(((r.get('observation') or {}).get('diagnostic_task_gap') or {}).get('version')!='diagnostic_task_gap_v2'
             for r in result['structure_research'].get('records',[])):
         # Legacy results may need the original dense trajectories to derive
         # diagnostic observations. Never substitute a sparse calculation.

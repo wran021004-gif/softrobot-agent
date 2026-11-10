@@ -15,8 +15,8 @@ def problem(spec, query):
         if query.objective!='task_violation':raise ValueError('COMPLETE_PASSIVE_RESPONSE_REQUIRES_TASK_OBJECTIVE')
         from tools.research.structure_research import finite_time_discovery
         fit=finite_time_discovery(cfg)
-        if fit['status']=='not_applicable' or fit.get('paired_required'):
-            raise ValueError('PASSIVE_TASK_SEARCH_REQUIRES_SUPPORTED_UNPAIRED_COMPLETE_RESPONSE')
+        if fit['status']=='not_applicable':
+            raise ValueError('PASSIVE_TASK_SEARCH_REQUIRES_REGISTERED_RESPONSE')
         loads=['all_frozen_conditions']
     else:
         loads=query.diagnostic_load_conditions or [r['name'] for r in physical['loads']]
@@ -27,7 +27,7 @@ def problem(spec, query):
         if query.objective=='task_violation' and not any(o['load_condition'] in loads and
                 (o.get('minimum') is not None or o.get('maximum') is not None) for o in physical['observations']):
             raise ValueError('SELECTED_LOADS_HAVE_NO_FROZEN_BOUNDED_OBSERVATION')
-    return dict(physical_problem=physical['mode'],conditions=loads,analyses_per_structure=len(loads),
+    return dict(action='baseline_response' if query.evaluation_mode=='passive_task_response' else 'equilibrium',physical_problem=physical['mode'],conditions=loads,analyses_per_structure=len(loads),
         diagnostic_only=bool(query.diagnostic_load_conditions) or query.evaluation_mode=='passive_equilibrium',
         score_semantics=('Worst normalized frozen static observation; no dynamic task acceptance.' if query.objective=='task_violation'
             else 'Worst dimensionless physical KKT qualification residual; no task-performance objective.')
@@ -79,6 +79,7 @@ def evaluate(host, query, proposal, operation, persist, guard):
             study=dict(operation='inspect',point_semantics='frozen_task_initial_state' if dynamic else 're_equilibrated',
                 target=dict(quantity='finite_time_task_violation' if dynamic else 'constraint_active_set',goal='decrease'),
                 effect_semantics='finite_time_task_response' if dynamic else 'mechanism_effect',max_evaluations=1)
+            if dynamic and query.execution_profile:study['execution_profile']=plain(query.execution_profile)
             if not dynamic:study['load_condition']=condition
             request=dict(candidate=proposal['candidate'],operation='mechanism_structure_v1',model_source='mujoco',
                 operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],mechanism_study=study)
@@ -91,7 +92,7 @@ def evaluate(host, query, proposal, operation, persist, guard):
         else:
             research=raw.get('structure_research',{});observation=research.get('baseline',{})
             score=observation.get('value') if raw['status']=='computed' and observation.get('status')=='computed' else None
-            facts=dict(task_gap=observation.get('task_gap'),validity=observation.get('status'))
+            facts=dict(task_gap=observation.get('task_gap'),diagnostic_task_gap=observation.get('diagnostic_task_gap'),validity=observation.get('status'))
         attributed=raw.get('operation_key')==key+'-analysis'
         unscored=(query.evaluation_mode=='passive_equilibrium' and query.objective=='task_violation' and
             facts.get('bounded_observation_count')==0 and facts.get('constraint_state',{}).get('qualified'))

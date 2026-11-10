@@ -61,6 +61,9 @@ def compile_search(host, value, request_id):
     q=ScientificStructureSearch.model_validate(value['search'])
     grant=spec['family_search'];space=spec['family_space'];issues=[]
     def issue(field,reason,**extra):issues.append(dict(field='search.'+field,reason=reason,**extra))
+    if q.execution_profile and q.evaluation_model!='passive_task_response':raise ValueError('EXECUTION_PROFILE_REQUIRES_BASELINE_RESPONSE')
+    if q.evaluation_model=='passive_task_response' and spec['canonical_task']['goal']['data'].get('version')=='passive_response_v2' and q.execution_profile is None:
+        raise StructureChoiceError([dict(field='search.execution_profile',reason='Main must choose exploration scope or the full final protocol explicitly')])
     groups=q.design_variable_groups
     if q.span_strategies and not set(q.span_strategies)<=set(span_strategies(space)):
         issue('span_strategies','Outside the frozen FamilySpace rule',choices=span_strategies(space))
@@ -108,21 +111,24 @@ def compile_search(host, value, request_id):
         tension=space.get('tendon_domains',{}).get('pretension_n',{}).get('default')
         if tension is None:issue('initial_tension_n','No unique frozen common pretension; choose a legal initial tension')
     if issues:raise StructureChoiceError(issues)
-    fidelities=spec['fidelity_policy']['screening']
-    # Exact final discretization when available; otherwise require an explicit
-    # scientific choice rather than silently changing the numerical model.
-    exact=[k for k,v in fidelities.items() if v==spec['fidelity_policy']['final_evaluation']]
-    if len(exact)!=1:raise StructureChoiceError([dict(field='search.evaluation_model',reason='Unique frozen final screening fidelity required',choices=list(fidelities))])
+    from tools.research.contracts import fidelity_levels
+    fidelities=fidelity_levels(spec['fidelity_policy'])
+    selected=q.screening_fidelity or (q.execution_profile.fidelity if q.execution_profile else None)
+    if selected is None and len(spec['fidelity_policy']['screening'])==1:selected=next(iter(spec['fidelity_policy']['screening']))
+    if selected not in fidelities:
+        raise StructureChoiceError([dict(field='search.screening_fidelity',reason='Choose a declared fidelity; screening is independent of final evaluation',choices=list(fidelities))])
+    if q.execution_profile and q.execution_profile.fidelity not in (None,selected):raise ValueError('SEARCH_EXECUTION_FIDELITY_CONFLICT')
     query=dict(version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],
         variable_groups=groups,**topology,
         span_strategies=q.span_strategies or (span_strategies(space) if 'spans' in groups else ['whole_chain']),
-        section_types=q.section_types,screening_fidelity=exact[0],
+        section_types=q.section_types,screening_fidelity=selected,
         bounds=q.bounds,
         objective='task_violation' if native else q.proxy_objective,
         operating_point='standardized_initial_pretension' if native or q.proxy_objective!='target_equilibrium_residual' else 'target_equilibrium',
         **plain(q.structure_search_effort),evaluation_mode=q.evaluation_model if passive else 'mujoco_control' if native else 'mathematical_proxy',
         **starts,
         evidence_used=value.get('supporting_evidence',[]))
+    if q.execution_profile:query['execution_profile']=plain(q.execution_profile)
     if q.diagnostic_load_conditions:query['diagnostic_load_conditions']=q.diagnostic_load_conditions
     decision=deepcopy(value.get('decision') or {})
     if decision.get('selected_candidate'):query['previous_candidate_ref']=decision['selected_candidate']

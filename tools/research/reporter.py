@@ -393,6 +393,16 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
         return dict(**deliveries[main],scientific_result_index=[dict(reference=r,
             report_reference=d.get('report_reference'),interpretation_status=d['interpretation_status'])
             for r,d in zip(references,deliveries)])
+    raw=host.store.artifact(references[0])
+    research=raw.get('structure_research') or {}
+    records=research.get('records',[])
+    if research and len(records)==1 and not records[0].get('mechanics',{}).get('dynamic_execution',{}).get('paired_ablation'):
+        from tools.research.evidence_views import task_diagnosis,compact_task_diagnosis
+        from tools.research.structure_research import summary
+        return dict(delivery_version='scientific_delivery_v3',execution_status='completed',
+            scientific_result_reference=references[0],interpretation_status='not_requested',
+            deterministic_result=summary(raw,references[0]),task_diagnosis=compact_task_diagnosis(task_diagnosis(raw,references[0])),
+            interpretation_tool='research_investigate',task_acceptance='unmeasured')
     try:
         # A crash after report persistence must reuse that exact report as well.
         saved=next(((r,v) for r,v in entries(host) if not v['interpretation_for']

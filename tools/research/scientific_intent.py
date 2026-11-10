@@ -174,12 +174,13 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             **{'if':dict(properties=dict(operation=dict(enum=['differentiate','optimize'])),required=['operation'])},
             then=dict(properties=dict(target=dict(required=['goal']))))]
         schema['description']='Structure research uses inspect/differentiate/optimize/compare/interact (two registered continuous parameters, four matched local points); control research uses control feasibility and effort. Joint structure-control search uses the existing research_plan(search) interface. Main owns all scientific choices.'
+        if not passive:schema['$defs']['ScientificStructureV4']['properties'].pop('execution_profile',None)
         if not passive or spec.get('research_execution_checks')!={'version':'sparse_route_screening_v1'}:
             schema['$defs']['ScientificStructureV4']['properties'].pop('execution_checks',None)
         else:
             schema['$defs']['ScientificStructureV4']['allOf'].append({
                 'if':{'properties':{'execution_checks':{'const':'screening'}},'required':['execution_checks']},
-                'then':{'properties':{'operation':{'const':'inspect'},'effect_semantics':{'const':'finite_time_task_response'}}}})
+                'then':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}}}})
         if passive:
             problem=((candidate or {}).get('configuration',{}).get('task',{}).get('physical_problem') or spec['canonical_task']['physical_problem'])
             props=schema['$defs']['ScientificStructureV4']['properties']
@@ -272,6 +273,9 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
                 'else':{'properties':{'operating_point':{'const':'re_equilibrated'},'passive_ablation':{'type':'null'}}}})
             task=(candidate or {}).get('configuration',{}).get('task') or spec.get('canonical_task',{})
             goal=task.get('goal',{}).get('data',{})
+            if goal.get('version')=='passive_response_v2':
+                structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
+                    'then':{'required':['execution_profile'],'properties':{'execution_profile':{'type':'object'}}}})
             from tools.research_tasks import passive_registered
             props['effect_semantics']['enum']=['mechanism_effect','re_equilibrated_passive_response']+(
                 ['finite_time_task_response'] if passive_registered(task) else [])
@@ -281,9 +285,6 @@ def question_schema(spec, candidate=None, action=None, *, control_methods=None):
             elif candidate:
                 names=list(candidate['configuration']['robot']['structure']['data'].get('fixed_payout_lengths_m',{}))
                 props['passive_ablation']['anyOf'][0]['items']['enum']=names
-            if task.get('evaluator',{}).get('parameters',{}).get('data',{}).get('mechanism'):
-                structure['allOf'].append({'if':{'properties':{'effect_semantics':{'const':'finite_time_task_response'}},'required':['effect_semantics']},
-                    'then':{'required':['passive_ablation'],'properties':{'passive_ablation':{'type':'array','minItems':1}}}})
         if passive:
             structure['allOf'].append({'if':{'properties':{'operation':{'not':{'const':'compare'}}},'required':['operation']},
                 'then':{'properties':{'comparison_load_conditions':{'maxItems':0},'load_aggregation':{'type':'null'}}}})
@@ -857,7 +858,8 @@ def compile_mechanism(host, payload, *, tool_use_id,v4=False):
     capabilities=task_adapter(c['configuration']).physical_capabilities()
     if capabilities['status']=='unsupported':
         return feedback('unsupported','UNSUPPORTED_PHYSICAL_CAPABILITIES',missing=capabilities['missing'])
-    if v4 and q.execution_checks=='screening' and (q.effect_semantics!='finite_time_task_response' or q.operation!='inspect'):
+    if v4 and q.execution_profile and q.effect_semantics!='finite_time_task_response':return feedback('unsupported','EXECUTION_PROFILE_REQUIRES_FINITE_TIME_RESPONSE')
+    if v4 and q.execution_checks=='screening' and q.effect_semantics!='finite_time_task_response':
         return feedback('unsupported','SCREENING_CHECKS_REQUIRE_PASSIVE_FINITE_TIME_INSPECT')
     if v4 and q.effect_semantics=='finite_time_task_response':
         return compile_dynamic(host,q,payload,intent,tool_use_id=tool_use_id)
@@ -1055,6 +1057,8 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
     route=select_method(effect_semantics=q.effect_semantics,capabilities=capabilities,operation=q.operation,target=q.target)
     def fail(reason,status='unsupported',**extra):return dict(status=status,reason=reason,method_selection=route,scientific_execution_started=False,**extra)
     if route['validity']=='unsupported':return fail('REGISTERED_FINITE_TIME_STRUCTURE_RESPONSE_REQUIRED')
+    if c['configuration']['task']['goal']['data'].get('version')=='passive_response_v2' and q.execution_profile is None:
+        return fail('CHOOSE_EXECUTION_PROFILE','needs_choice',field='structure.execution_profile',choices=['exploration','final_acceptance'])
     if (q.target!='finite_time_task_violation' or q.operating_point!='frozen_task_initial_state' or
             q.control_treatment!='no_active_control' or q.physical_problem!=c['configuration']['task']['physical_problem']['mode']):
         return fail('EXPLICIT_COMPLETE_DYNAMIC_TASK_AND_FROZEN_INITIAL_STATE_REQUIRED','not_applicable')
@@ -1068,7 +1072,7 @@ def compile_dynamic(host,q,payload,intent,*,tool_use_id):
         from tools.research.structure_research import select_group_parameters
         paths=select_group_parameters(spec,c,q.parameter_group)
     study=MechanismStudy(operation=q.operation,target=PhysicalMechanismTarget(quantity='finite_time_task_violation',goal='decrease'),
-        execution_checks=q.execution_checks,
+        execution_checks=q.execution_checks,execution_profile=q.execution_profile,
         parameter_paths=paths,parameter_bounds=q.parameter_bounds,point_semantics='frozen_task_initial_state',effect_semantics=q.effect_semantics,
         max_evaluations=budget or 64,local_radius_fraction=q.local_radius_fraction,comparison_candidates=q.comparison_candidates,
         passive_ablation=q.passive_ablation)
