@@ -4,7 +4,17 @@
 
 The six protocol blockers are closed in the registered generic interfaces. The task remains **development_valid**. A formal autonomous research Study does not confer Benchmark certification. The original scientific thresholds and historical records are retained.
 
-The user explicitly authorized direct launch after readiness. No additional permission is required. The committed implementation is bound and the real Main loop is running in the background. See launch-receipt.json, first-main-plan.json and live-status.json. Preparation and unit fixtures do not establish a scientific success.
+**2026-11-10 16:11 +08: paused for user review.** The user explicitly requested
+pause and branch push. Both owned background processes were stopped under the
+Store writer lock after verifying a committed request-feedback SDK handoff,
+zero occupied resources, no pending scientific work and no unsettled calls.
+The ledger remains84/100 used,16 remaining;13 candidates,28 Plans and14 analyses
+are preserved. This is an operational pause, with no scientific STOP or success
+claim. Resume only after explicit user instruction, using this same Store and
+verified SDK checkpoint. See [pause receipt](user-review-pause-20261110.json),
+[process audit](process-audit-20261110.md) and live-status.json.
+
+The user originally authorized direct launch after readiness. The committed implementation is bound; launch-receipt.json and first-main-plan.json record that historical launch. Preparation and unit fixtures do not establish a scientific success.
 
 2026-11-10 15:06 update: the same Study now has the explicitly authorized
 `sparse_route_screening_v1` exploration policy, under committed implementation
