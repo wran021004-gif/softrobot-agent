@@ -31,6 +31,8 @@ class AnswerDelivery(unittest.TestCase):
         self.assertEqual(set(agent.tool_registry.registry),
             {'evidence_read','research_recall','experience_retrieve','retrieve_context'})
         self.assertTrue(all(agent.tool_registry.registry[k] is tools[k] for k in agent.tool_registry.registry))
+        answer_delivery_tools(agent,final_response=True)
+        self.assertEqual(agent.tool_registry.registry,{})
 
     def test_advertised_complete_profile_and_exploration_have_distinct_valid_scopes(self):
         schema=question_schema(self.spec)

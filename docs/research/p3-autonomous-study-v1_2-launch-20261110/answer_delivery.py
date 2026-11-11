@@ -52,7 +52,7 @@ def prepare():
 def run():
     h=host();bound=read(DOC/'answer-delivery-bound.json')
     asyncio.run(converse(h,session_handoff=True,operator_request=bound['operator_request'],
-        delivery_only=True,max_new_provider_requests=6))
+        delivery_only=True,max_new_provider_requests=1))
     s=state(h)
     print(json.dumps(dict(main_final_answer=s.get('main_final_answer'),ledger=h.store.remaining())),flush=True)
     if s.get('main_final_answer'):

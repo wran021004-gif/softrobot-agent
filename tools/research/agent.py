@@ -935,11 +935,11 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-def answer_delivery_tools(agent):
-    """Keep existing evidence navigation available for an authorized final answer."""
+def answer_delivery_tools(agent, *, final_response=False):
+    """Use the last allocated delivery request for the answer itself."""
     registry=agent.tool_registry.registry
     for name in list(registry):
-        if name not in ('evidence_read','research_recall','experience_retrieve','retrieve_context'):
+        if final_response or name not in ('evidence_read','research_recall','experience_retrieve','retrieve_context'):
             registry.pop(name)
 
 
@@ -1488,8 +1488,12 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                     tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
                 boundary.research_packet=main_packet(host,boundary.research_packet)
             if delivery_only:
-                answer_delivery_tools(agent)
+                final_response=max_model_calls is not None and host.store.remaining()['used']['model_calls']>=max_model_calls-1
+                answer_delivery_tools(agent,final_response=final_response)
                 boundary.research_packet['current_objective']='Deliver the final answer from existing evidence; necessary evidence reads only. No additional experiment, Replay or review is requested.'
+                if final_response:
+                    boundary.research_packet['current_objective']='Evidence verification is complete. This is the final allocated delivery request: give the final research answer now, using the saved evidence and verified facts already provided. No further tool use or plans for future work.'
+                    agent.system_prompt+='\nEvidence verification is complete. Give your final answer in this response; do not request more reads or describe an intention to answer later.'
             if operator_request:
                 boundary.research_packet['operator_request']=dict(reference=operator_request,
                     instruction=host.store.artifact(operator_request))
