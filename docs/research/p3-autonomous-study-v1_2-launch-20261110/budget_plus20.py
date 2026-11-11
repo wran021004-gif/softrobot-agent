@@ -1,4 +1,4 @@
-"""Apply exactly the user's 20-request addendum through the existing ledger."""
+"""Apply the user's exact finite request addendum through the existing ledger."""
 import os
 for key in ('OMP_NUM_THREADS','MKL_NUM_THREADS','OPENBLAS_NUM_THREADS'):os.environ[key]='1'
 import asyncio,json,runpy,sys,time
@@ -14,11 +14,12 @@ DOC=Path(__file__).resolve().parent
 prior=runpy.run_path(str(DOC/'official_api.py'))
 NAME=prior['NAME'];host=prior['host']
 OLD=int(sys.argv[2]) if len(sys.argv)>2 else 80
-NEW=OLD+20
-STEM='budget-plus20' if OLD==80 else 'budget-plus20-total'+str(NEW)
-USER_DATE,USER_REQUEST={80:('2026-11-10','增加20次请求预算'),
-    100:('2026-11-10','study的请求预算可以追加20'),120:('2026-11-11','增加20次请求')}[OLD]
-APPROVAL=f'User {USER_DATE}: {USER_REQUEST}. Add exactly 20 shared Main/Reporter requests to this same Study, raising its total from {OLD} to {NEW}; continue on Gateway account3. Preserve every used cost, failure, candidate, result, SDK session and scientific requirement. No future batch granted. No push.'
+EXTRA,USER_DATE,USER_REQUEST={80:(20,'2026-11-10','增加20次请求预算'),
+    100:(20,'2026-11-10','study的请求预算可以追加20'),120:(20,'2026-11-11','增加20次请求'),
+    140:(10,'2026-11-11','追加10次请求')}[OLD]
+NEW=OLD+EXTRA
+STEM='budget-plus20' if OLD==80 else f'budget-plus{EXTRA}-total{NEW}'
+APPROVAL=f'User {USER_DATE}: {USER_REQUEST}. Add exactly {EXTRA} shared Main/Reporter requests to this same Study, raising its total from {OLD} to {NEW}; continue on Gateway account3. Preserve every used cost, failure, candidate, result, SDK session and scientific requirement. No future batch granted. No push.'
 
 def invariant(h):
     s=state(h);spec=deepcopy(s['spec'])
@@ -39,7 +40,7 @@ def before():
     h=host();settled(h);guard(h);s=state(h)
     assert s['spec']['budgets']['provider_requests']==OLD
     value=dict(study_id=NAME,invariant=invariant(h),ledger=h.store.remaining(),
-        resolved_identity=s['spec']['resolved_identity'],additional_requests=20,new_total=NEW,timestamp_unix=time.time())
+        resolved_identity=s['spec']['resolved_identity'],additional_requests=EXTRA,new_total=NEW,timestamp_unix=time.time())
     atomic_json(DOC/(STEM+'-before.json'),value)
     print(json.dumps(dict(ready=True,ledger=value['ledger'],provider_requests_sent=0)))
 
@@ -48,10 +49,10 @@ def apply():
     s=state(h);events=h.store.events(NAME)
     prior_grant=next(h.store.artifact(e['outputs'][0]) for e in reversed(events)
         if e['kind']=='formal_study_authorization' and h.store.artifact(e['outputs'][0])['scope']['resolved_identity']==s['spec']['resolved_identity'])
-    scope=dict(study_id=NAME,resolved_identity=s['spec']['resolved_identity'],previous_request_limit=OLD,additional_requests=20)
+    scope=dict(study_id=NAME,resolved_identity=s['spec']['resolved_identity'],previous_request_limit=OLD,additional_requests=EXTRA)
     extension=extend_provider_requests(h,dict(version='provider_request_extension_approval_v2',approved=True,
         source=APPROVAL,scope=scope,scope_identity=digest(scope)))
-    core.bind(h,reason=f'Explicit user +20 shared Provider requests: {OLD} to {NEW}, all science, account3 transport, costs, failures and evidence retained.')
+    core.bind(h,reason=f'Explicit user +{EXTRA} shared Provider requests: {OLD} to {NEW}, all science, account3 transport, costs, failures and evidence retained.')
     assert invariant(h)==baseline['invariant']
     assert h.store.remaining()['limit']['model_calls']==NEW
     s=state(h);scope=deepcopy(prior_grant['scope'])
