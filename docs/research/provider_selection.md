@@ -61,3 +61,14 @@
 2026-11-06 用户批准后，第二、第三账号各自目录均返回 8 个型号，gpt-5.6-luna / none 短文本推理均通过。
 首轮共两次 empty_response 保留，移入已有完成事件修复后各复验一次成功；总四次尝试。
 具体工具调用能力未在这两个新账号测试。见 [真实验证报告](gateway_accounts23_validation_20261106.md)。
+
+## 官方 OpenAI API 第二份 Key
+
+2026-11-11 新增独立凭据文件 `C:\Users\gugugaga\.softrobot-agent\openai-api-account2.json`。
+在该文件的 api_key 引号内填写新 Key；base_url 保持 `https://api.openai.com/v1`。
+原 `openai-api.json` 保留，用于第一份官方 API Key。
+
+第二份连接使用 `configs/research/runtime_openai_api_account2.json`，只改变 credentials_reference；
+继续复用原 openai_api 适配、7890 代理和 none 配置，不自动轮换或回退。
+配置默认模型仍为 gpt-5.4-mini，但新 Key 的模型权限及额度尚未验证；本次只准备配置，不发送 API 请求。
+后续明确指定“官方 API 第二个”，再按该 Key 实际目录和授权选择模型；不更改既有 Study 的冻结凭据。
