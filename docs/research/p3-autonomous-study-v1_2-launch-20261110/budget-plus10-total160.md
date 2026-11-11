@@ -7,3 +7,7 @@
 复用 `budget_plus20.py before 150`、`apply 150`；本批收据独立保存为 `budget-plus10-total160-*`。
 
 用户同时询问是否已取得合格机制证据。11:30 只读核验时，最新两条成对机制诊断仍为 exploration/sampled，返回 `COMPLETE_QUALIFICATION_GRID_REQUIRED`，双向 paired_mechanism 均为 UNKNOWN。采样性能通过不能授予合格机制证据；当时没有独立 Replay 或任务验收通过。本次预算授权不改变这些历史科学结论。
+
+## 扩展核验
+
+[绑定收据](budget-plus10-total160-bound.json) 确认总上限 150 增至 160，扩展前后已用请求均为 141，剩余从 9 增至 19。全部既有工具、计算和时间费用保留，科学配置、profile、候选/结果集合、第三账号传输及原 SDK session 不变量通过。SDK restore 成功，扩展及 restore 不发送推理。绑定实现为 `a7b9d3d77`。随后通过原 launcher 继续后台研究；后续费用继续计入同一共享账本。
