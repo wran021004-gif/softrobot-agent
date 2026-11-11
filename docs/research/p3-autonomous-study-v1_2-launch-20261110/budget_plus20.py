@@ -16,7 +16,7 @@ NAME=prior['NAME'];host=prior['host']
 OLD=int(sys.argv[2]) if len(sys.argv)>2 else 80
 EXTRA,USER_DATE,USER_REQUEST={80:(20,'2026-11-10','增加20次请求预算'),
     100:(20,'2026-11-10','study的请求预算可以追加20'),120:(20,'2026-11-11','增加20次请求'),
-    140:(10,'2026-11-11','追加10次请求')}[OLD]
+    140:(10,'2026-11-11','追加10次请求'),150:(10,'2026-11-11','追加10次study')}[OLD]
 NEW=OLD+EXTRA
 STEM='budget-plus20' if OLD==80 else f'budget-plus{EXTRA}-total{NEW}'
 APPROVAL=f'User {USER_DATE}: {USER_REQUEST}. Add exactly {EXTRA} shared Main/Reporter requests to this same Study, raising its total from {OLD} to {NEW}; continue on Gateway account3. Preserve every used cost, failure, candidate, result, SDK session and scientific requirement. No future batch granted. No push.'
