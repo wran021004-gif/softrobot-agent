@@ -1,0 +1,145 @@
+\section{Experimental Design}
+\label{sec:experiments}
+
+\subsection{Task portfolio and research settings}
+
+The evaluation uses a tendon-driven robot portfolio spanning active and passive problems. The purpose is to demonstrate that the research organization can be applied to different physical questions, not to collapse heterogeneous tasks into one scalar benchmark score.
+
+\begin{table*}[t]
+\centering
+\caption{Representative task coverage. Detailed task contracts and metrics are provided in the appendix.}
+\label{tab:task-coverage}
+\small
+\begin{tabularx}{\textwidth}{@{}l l Y@{}}
+\toprule
+Task family & Research type & Scientific question represented \\
+\midrule
+M1 & Active multi-target control & Can one shared structure support multiple target conditions through condition-specific control? \\
+P3 & Passive progressive stiffness & How do unilateral tendon recruitment and structural parameters shape a progressive load--displacement response? \\
+PHS-2D & Passive multi-condition stabilization & Can tendon constraints and structural parameters stabilize selected tip motion across multiple load cases? \\
+Tracking & Time-varying control & Can the same task-conditioned mathematical interface represent trajectory error over time? \\
+M2--M6 & Loaded reach, fast reach, tracking, tool-axis pointing and scanning & How does the research framework address different task observables and operating conditions? \\
+C1 & Reduced-channel actuation & How do actuator count and routing affect the task capability of the structure? \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+P3 and M1 are the principal quantitative research cases. P3 studies passive structural behavior under bilateral multi-stage loading; M1 studies active control feasibility for multiple spatial targets. PHS-2D provides an additional passive-design case with multiple loading conditions and independent numerical checks. Existing tracking tasks provide a lightweight transfer test for the mathematical task compiler and sensitivity interface.
+
+\subsection{Contribution--Mechanism--Experiment map}
+
+Table~\ref{tab:cme} connects the scientific contributions to the mechanisms being tested and the planned comparisons.
+
+\begin{table*}[t]
+\centering
+\caption{Contribution--Mechanism--Experiment map.}
+\label{tab:cme}
+\begin{tabularx}{\textwidth}{@{}l Y Y Y@{}}
+\toprule
+Contribution & Mechanism under study & Main experiment & Primary evidence \\
+\midrule
+C1: Mechanism-Guided Autonomous Research &
+Hypothesis formulation, expected/weakening observations, adaptive research pivots, decision-relevant diagnosis &
+P3 Full vs Fixed-Plan; optionally One-shot LLM Plan if the first comparison indicates value &
+Quality of hypotheses, evidence-grounded pivots, effective research actions, task outcome and resource cost \\
+
+C2: Composable Mathematical Research &
+Intent projection, parameter/observable composition, mathematical operations, solver routing and validity &
+P3 Full vs No-Math; Full vs No-Intent-Projection; Full vs No-Pairwise-Interaction; independent numerical validation &
+Numerical correctness, method applicability, downstream use of mathematical results, structural response and cost \\
+
+C3: Evidence-Grounded Iterative Research &
+Domain knowledge, evidence retrieval, Store/Trace continuity, Reporter interpretation and context projection &
+P3 Full vs No-Knowledge; Reporter ON/OFF on six historical snapshots; evidence-trace audit &
+Decision quality, evidence citation correctness, repeated/ineffective actions, unsupported claims, context/token cost \\
+
+Cross-task transfer &
+Reuse of the research organization across passive structure design and active control &
+P3 and M1; M1 No-Automated-Physical-Probe pilot; tracking mathematical transfer test &
+Task-specific outcomes, research pivots, mathematical applicability and cost \\
+
+Model portability &
+Dependence of research behavior on the selected LLM backbone &
+DeepSeek Flash, GPT-5.6 Sol, and GPT Astra under the same M1 Full configuration &
+Research-decision quality, method selection, pivots, task outcome and resource use \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{P3: mathematical and research-strategy comparisons}
+
+P3 is the principal setting for controlled experiments because it involves a mechanism hypothesis, unilateral tendon constraints, structural parameters, pairwise interactions, and finite-time physical response.
+
+\begin{table*}[t]
+\centering
+\caption{P3 experimental conditions.}
+\label{tab:p3-ablation}
+\begin{tabularx}{\textwidth}{@{}l Y Y@{}}
+\toprule
+Condition & Intervention & Scientific question \\
+\midrule
+Full & Complete research framework. & Reference behavior of the integrated system. \\
+No-Math & Disable all optional mathematical research operations; retain autonomous research decisions, ordinary structure search, physical response, and task evaluation. & What is the overall contribution of the mathematical research capability? \\
+No-Intent-Projection & Replace adaptive intent-to-problem construction with fixed mathematical problem templates; retain the same mathematical operations and task contracts. & Does constructing a task-specific mathematical problem from research intent add value beyond selecting a pre-defined template? \\
+No-Pairwise-Interaction & Disable only the finite-scale pairwise \texttt{interact} operation; retain other mathematical operations. & Does pairwise interaction analysis provide value beyond single-parameter analysis and ordinary comparisons? \\
+No-Knowledge & Disable domain Knowledge/Skill retrieval while retaining task definitions, tool schemas, and essential model/interface information. & Does accumulated domain knowledge improve research quality or efficiency? \\
+Fixed-Plan & Predefine the research route, parameter groups, mathematical operations, order, and stopping conditions; do not replan based on intermediate evidence. & Does evidence-driven autonomous replanning outperform a fixed research route? \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+No-Math and Fixed-Plan test different dimensions. No-Math retains adaptive research decisions but removes optional mathematical research. Fixed-Plan retains the mathematical tools but removes evidence-driven changes to the research route. They are therefore not interchangeable.
+
+\begin{table*}[t]
+\centering
+\caption{Two independent dimensions of the research-strategy comparison.}
+\label{tab:two-dimensions}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & Mathematical research ON & Mathematical research OFF \\
+\midrule
+Adaptive research route & Full & No-Math \\
+Fixed research route & Fixed-Plan & Optional combined condition \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The first comparison should be Full versus Fixed-Plan. If the result indicates that adaptive replanning provides a meaningful advantage, a One-shot LLM Plan condition can be added to distinguish the value of an initial LLM-generated plan from the value of repeated evidence-driven replanning.
+
+The No-Intent-Projection condition requires a source-level audit before implementation. In particular, the current \texttt{scientific\_question\_v4} pathway must be checked to determine whether intent projection is an independently identifiable process, whether the agent genuinely selects the parameter group and research goal, and whether the fixed program constructs the mathematical problem. If the projection layer is only conceptual or cannot be isolated without changing other capabilities, the ablation must not be implemented as a superficial feature flag.
+
+No-Math and No-Pairwise-Interaction are nested rather than independent factorial conditions because No-Math also disables \texttt{interact}. Their comparison must be interpreted accordingly. The No-Pairwise condition isolates the pairwise operation only when the remaining mathematical operations are enabled.
+
+\subsection{Knowledge and Reporter experiments}
+
+The No-Knowledge condition disables domain knowledge retrieval, historical cases, and research experience, but retains task definitions, tool schemas, and essential interface information. Before running this comparison, the knowledge assets must be aligned: the historical P3 Full record references 45 knowledge records across 17 entry IDs, whereas the current Core snapshot reportedly loads four general entries. Until this mismatch is resolved, the experiment would compare different knowledge baselines and cannot be interpreted as a matched Full-versus-zero-knowledge ablation.
+
+Reporter is evaluated using six historical research decision snapshots. Each snapshot is presented in paired conditions:
+\begin{itemize}
+  \item \textbf{Reporter ON:} the same fixed numerical facts plus read-only Reporter interpretation;
+  \item \textbf{Reporter OFF:} the same fixed numerical facts without Reporter interpretation.
+\end{itemize}
+Both conditions retain the same underlying evidence access, task definition, and mathematical results. The next research decision is evaluated for decision quality, correct evidence use, physical interpretation, unsupported claims, and context/token cost. A blind paired rubric is used to avoid treating fluent explanations as automatically correct.
+
+\subsection{M1 and model-backbone comparisons}
+
+M1 is used for one targeted pilot: \textbf{No-Automated-Physical-Probe}. The experiment retains Native and Direct mathematical control methods, control initialization, replay, and evaluation, while disabling the registered automated physical-response-probe method. It tests the marginal contribution of this method when model-based control search reaches an applicability boundary. It does not prohibit every manually constructed physical probe; the comparison is specifically about the automated method.
+
+The backbone comparison uses DeepSeek Flash, GPT-5.6 Sol, and GPT Astra under the same M1 Full task, system prompt, tool schemas, knowledge, initial condition, evaluator, and budget policy. This comparison examines model portability rather than isolating C1, C2, or C3.
+
+\subsection{Tracking transfer and independent mathematical validation}
+
+A lightweight tracking transfer test examines whether the same mathematical research abstraction can compile time-varying trajectory constraints and support local sensitivity analysis. The test uses an already frozen tracking benchmark, selects two continuous structural parameters, computes a supported local sensitivity or controlled finite difference, and validates its direction and magnitude against independently re-solved perturbed cases. Before running the test, the current Core must be audited to confirm that the tracking task compiler supports the complete mathematical chain; task registration alone is not sufficient evidence of mathematical support.
+
+Mathematical correctness is evaluated independently of agent decision quality. The validation set should cover KKT residuals and active-set conditions, fixed-input sensitivity against analytic or high-accuracy references, re-optimized capability sensitivity against independently re-solved perturbed problems, and four-point interaction contrasts against directly evaluated candidates. Cases with active-set switching or non-smooth behavior test whether the router correctly downgrades or withholds an ordinary derivative claim.
+
+\subsection{Budget contract and fairness}
+
+Each independent Study has a hard ceiling of 200 Provider requests. The proposed additional ceilings are 100 mathematical evaluations and 150 physical launches per Study. The cumulative Public Operations ceiling must be set from the historical Full trace with an explicit margin before the experiment configuration is frozen. Main and Reporter share the 200-request budget. Protected requests are included in the total.
+
+There is no automatic budget extension, hidden restart, or 201st request. If the original task is fully evaluated before the ceiling, the result is classified according to the frozen task criteria. If the budget is exhausted without a qualifying candidate, the result is a within-budget failure; if a key evaluation remains incomplete, the result is incomplete. Neither outcome proves that the wider design space is infeasible.
+
+The historical P3 Full used 150 Provider requests, 67 mathematical evaluations, and 98 physical episodes. New ablations have lower resource ceilings than the historical Full. A reconstructed equal-budget prefix of the Full trace should be used where possible. If the prefix cannot be reconstructed reliably, historical Full is a high-budget reference, not a matched comparison. New ablations use the same Core commit, runtime, task contract, FamilySpace, parameter bounds, physical evaluator, and resource ceilings, with independent stores and candidate pools. The historical final candidate is not used as the starting candidate for a new ablation.
+
+A first run with one seed is a pilot. Quantitative claims should use at least three independent seeds and preferably five when resources permit. Results should report medians, ranges, and uncertainty rather than only the best run.

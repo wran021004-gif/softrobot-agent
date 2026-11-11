@@ -1,0 +1,24 @@
+\section{Related Work and Theoretical Foundations}
+\label{sec:related}
+
+\subsection{Continuum-robot modeling and design}
+
+Continuum robots have been modeled using constant-curvature approximations, Cosserat-rod formulations, and other reduced-order or geometrically exact approaches. Reviews of continuum-robot design and kinematic modeling emphasize the relationship between robot geometry, actuation, and achievable motion \cite{webster2010design}. Jacobian formulations for continuum robots provide a basis for relating configuration changes to tendon length and end-effector motion \cite{rucker2011computing}. In tendon-driven systems, the design problem is further complicated by tendon slackness, tension-only actuation, routing geometry, and the changing active set of unilateral constraints.
+
+Soft-robot co-design benchmarks provide reusable environments for evaluating morphology and control. Evolution Gym studies large-scale evolution of soft-robot bodies and controllers \cite{bhatia2022evolutiongym}; SoftZoo investigates co-design across diverse locomotion environments \cite{wang2023softzoo}; and SoMoGym provides tools for developing and evaluating controllers for soft robots \cite{graule2022somogym}. These works establish the importance of reusable design spaces and task-level evaluation. The present work focuses on the research process that uses such models and benchmarks: how an agent identifies a physical mechanism, constructs a mathematical question, and adapts its investigation according to evidence.
+
+\subsection{LLMs for robot design and scientific workflows}
+
+Recent work has begun to use foundation models for soft-robot design and co-design. RoboCrafter-QA studies foundation-model-based evaluation and generation of soft-robot designs \cite{chen2026robocrafter}, while Debate2Create uses multi-agent debate and physics-based evaluation for robot co-design \cite{qiu2026debate2create}. Such work demonstrates the potential of language-model reasoning in design generation and iterative refinement.
+
+Scientific-agent evaluation has also emphasized the need to assess workflow execution, correctness, and resource use rather than relying only on plausible language outputs. ScienceAgentBench provides a benchmark for evaluating language agents on data-driven scientific discovery tasks \cite{chen2025scienceagentbench}. Our focus is complementary: we study how a robot-design agent organizes physical hypotheses, mathematical operations, and evidence into a sequential research process.
+
+\subsection{Constrained optimization and sensitivity analysis}
+
+KKT conditions and Lagrange multipliers provide local optimality and active-constraint information for constrained optimization \cite{boyd2004convex,nocedal2006numerical}. Perturbation analysis studies how optimal solutions and optimal values change as problem parameters vary \cite{bonnans2000perturbation}. The envelope theorem can provide the sensitivity of an optimized value without explicitly differentiating the entire optimizer solution map, provided appropriate regularity and optimality conditions hold.
+
+Differentiable optimization layers have shown how optimization problems can be embedded in larger differentiable computation graphs \cite{amos2017optnet}. In robot co-design, however, not every design parameter or physical operation is differentiable. Rebuilding a simulator model, switching a tendon active set, or encountering contact may require implicit differentiation, directional analysis, controlled finite differences, or an explicit declaration that a derivative is unavailable.
+
+\subsection{Experimental design and active diagnosis}
+
+Active diagnosis and experimental design ask which observation or intervention is most useful for distinguishing competing explanations. Bayesian experimental design formalizes this through expected information and decision utility \cite{chaloner1995bayesian}. The current \softrobotagent{} framework adopts the operational part of this idea: hypotheses are accompanied by expected and weakening observations, and diagnostic actions are selected according to their ability to distinguish explanations and influence subsequent design decisions. We do not claim a calibrated Bayesian value-of-information optimizer; probabilistic information-value optimization remains a future extension requiring validated observation models and utilities.

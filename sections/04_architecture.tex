@@ -1,0 +1,82 @@
+\section{Softrobot-Agent Architecture}
+\label{sec:architecture}
+
+\subsection{Three interdependent capabilities}
+
+\softrobotagent{} organizes robot co-design around C1, C2, and C3. These are not independent software features; they form a research loop: C1 determines the scientific question, C2 makes it quantitatively investigable, and C3 uses the resulting evidence to support subsequent decisions.
+
+\paragraph{C1: Mechanism-guided autonomous research.}
+The agent interprets task requirements and physical observations, formulates a testable mechanism hypothesis, and specifies observations that would support or weaken it. It then selects a mathematical or physical investigation whose scope is appropriate to the current uncertainty. A research cycle may use a gradient, a finite-scale comparison, an equilibrium inspection, or a direct physical probe. Sensitivity analysis is available from the beginning of research but is not mandatory in every cycle.
+
+\paragraph{C2: Composable mathematical research.}
+The agent's high-level scientific intent is translated into a parameterized physical research problem. The mathematical layer exposes reusable operations with explicit input requirements, result semantics, validity conditions, and costs. It is not a fixed sequence of optimizer calls: the agent chooses the question and the relevant parameter/observable groups, while deterministic software constructs and solves the corresponding numerical problem.
+
+\paragraph{C3: Evidence-grounded iterative research.}
+The system retains the relationship between hypotheses, candidate designs, mathematical results, physical observations, and subsequent decisions. Knowledge provides domain experience; Store preserves structured results; Trace preserves the execution and decision history; and Reporter interprets numerical evidence without modifying it. This organization allows the agent to reuse earlier findings and avoid repeatedly reconstructing the full research context.
+
+\subsection{C2 as a four-layer mathematical research interface}
+
+The mathematical research contribution is organized into four layers.
+
+\begin{enumerate}
+  \item \textbf{C2-A: Research Intent Projection.} The agent expresses a high-level question, such as whether a tendon-routing parameter limits loaded tip response. The system projects this intent into a well-defined mathematical question rather than requiring the agent to construct solver-specific equations.
+  \item \textbf{C2-B: Parameter/Observable Composition.} The system selects registered design parameters, physical observables, task constraints, and an inner physical problem. The agent chooses the scientific focus; deterministic validation checks units, bounds, physical meaning, and supported model relationships. The Parameter Registry should describe which model components each parameter affects, in which analyses it is effective, which differentiation methods are supported, and which other parameters are structurally dependent on it. The system first filters the registered parameters for the current task and candidate; it does not automatically differentiate every available parameter.
+  \item \textbf{C2-C: Composable Mathematical Operations.} The research problem can be investigated through operations such as \texttt{inspect}, \texttt{differentiate}, \texttt{optimize}, \texttt{compare}, and \texttt{interact}. These operations answer different questions and can be composed when their input/output contracts are compatible.
+  \item \textbf{C2-D: Solver Routing and Validity.} A deterministic differentiation router selects analytic differentiation, automatic differentiation, implicit differentiation, directional analysis, or controlled finite differences. It checks solver convergence, active-set behavior, regularity assumptions, and numerical consistency, and may return an explicit unsupported or unresolved result.
+\end{enumerate}
+
+The boundary between C1 and C2-A is intentional: selecting a physical question is a scientific decision, while validating and constructing its mathematical representation is a deterministic responsibility. C3 manages the resulting evidence and interpretation; it does not perform the mathematical solve.
+
+\subsection{Parameterized research problem}
+
+A high-level request can be represented conceptually as
+\begin{equation}
+\mathcal P=
+(d_{\mathrm{ref}},\tau,\mathcal D_p,\mathcal O,
+\mathcal F_{\mathrm{inner}},\sigma,\mathcal B),
+\label{eq:parameterizedproblem}
+\end{equation}
+where $d_{\mathrm{ref}}$ is the reference candidate, $\tau$ is the frozen task, $\mathcal D_p$ is the selected parameter group, $\mathcal O$ is the set of registered physical observables, $\mathcal F_{\mathrm{inner}}$ is the equilibrium/dynamics/control problem, $\sigma$ specifies the sensitivity semantics, and $\mathcal B$ is the allowed analysis budget.
+
+For example, the agent may request: investigate whether the far-section tendon-routing parameters affect the best achievable holding capability after control re-optimization. The fixed program resolves the actual parameter paths, task constraints, supported observables, inner optimization problem, numerical method, missing prerequisites, and expected cost. The agent does not select finite-difference step sizes or manually assemble KKT matrices.
+
+The exact implementation boundary of the intent-projection interface is subject to a source-level audit of the current \texttt{scientific\_question\_v4} pathway. The paper formalizes the intended interface and evaluates it through a dedicated ablation only if the implementation exposes a separately identifiable projection process.
+
+
+\subsection{When mathematical research becomes available}
+
+Mathematical research is visible from the beginning of a study, but candidate-specific sensitivity requires a concrete design and operating point. Before a candidate exists, the fixed program exposes the task contract, design space, parameter registry, and available mathematical capabilities. The \MainAgent{} may propose a mechanism, select an initial parameterization, or request a low-cost mathematical pre-study; it cannot receive a meaningful local gradient for a nonexistent candidate.
+
+Once an initial candidate or validated baseline exists, the mathematical layer can inspect which registered parameters are effective for the task and which sensitivity semantics are supported. The agent then selects a small, physically motivated parameter group rather than requesting a full parameter-by-parameter matrix. After the result is returned, the fixed program extracts numerical facts, the Reporter explains their physical implications and limitations, and the Main agent decides whether to continue along the local direction, change the parameter group, alter the mechanism, or perform a physical validation.
+
+The process can move between these stages. A local gradient may become invalid after a tendon active-set transition; the agent can then return to mechanism-level reasoning rather than continuing an unsupported update.
+
+\subsection{Main, Reporter, and deterministic responsibilities}
+
+The \MainAgent{} makes scientific decisions: which mechanism to investigate, which parameters and observables matter, which mathematical semantics are relevant, and whether to continue, revise, or abandon a research direction. The \Reporter{} interprets saved evidence, explains physical implications, identifies alternative explanations, and highlights limitations. It does not alter numerical facts, task thresholds, or acceptance results.
+
+Deterministic software owns task contracts, parameter registration, problem compilation, mathematical method applicability, numerical execution, budget accounting, evidence storage, and independent task evaluation. This division allows the LLM to act as a researcher rather than as a low-level numerical solver dispatcher.
+
+\subsection{Hierarchical research context}
+
+The system uses a hierarchical context strategy:
+\begin{itemize}
+  \item \textbf{L0: decision summary.} Current research stage, active hypothesis, task gap, available mathematical opportunities, latest result, legal actions, and remaining budget.
+  \item \textbf{L1: on-demand method detail.} Parameter definitions, mathematical capability descriptions, request templates, prerequisites, and selected evidence views.
+  \item \textbf{L2: numerical evidence.} Gradients, KKT quantities, active-set records, solver diagnostics, model outputs, and physical trajectories.
+  \item \textbf{L3: full research trace.} Original plans, tool requests, source snapshots, execution receipts, raw results, and immutable evidence records.
+\end{itemize}
+
+Mathematical capability is continuously discoverable in the decision context, but detailed schemas and raw numerical results are retrieved on demand. A completed result updates the compact research packet; it does not cause the full numerical record to be injected into every subsequent request.
+
+\subsection{Adaptive research loop}
+
+The research loop can be understood as an abductive--deductive--empirical cycle:
+\begin{enumerate}
+  \item \textbf{Abduction:} infer a plausible physical mechanism from the task and current observations.
+  \item \textbf{Deduction:} derive measurable consequences and construct a parameterized mathematical or physical question.
+  \item \textbf{Investigation:} execute a supported mathematical operation or physical experiment.
+  \item \textbf{Interpretation:} extract fixed numerical facts and obtain a read-only scientific explanation.
+  \item \textbf{Revision:} update the hypothesis and choose the next research action.
+\end{enumerate}
+The process is adaptive rather than a mandatory pipeline. When a local derivative is valid, it may guide a parameter change. When an active set switches or a contact event invalidates the derivative, the agent may select a directional analysis, a matched comparison, or a different physical hypothesis.

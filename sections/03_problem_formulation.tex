@@ -1,0 +1,83 @@
+\section{Research Formulation}
+\label{sec:formulation}
+
+\subsection{Robot design and task contracts}
+
+Let a robot design be represented by
+\begin{equation}
+d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},
+d_{\mathrm{route}},d_{\mathrm{assembly}},d_{\mathrm{act}}),
+\label{eq:design}
+\end{equation}
+where the components describe topology, geometry, material properties, tendon routing, assembly and payout parameters, and actuation-related parameters. Continuous variables may include segment lengths, cross-section dimensions, Young's modulus, tendon offsets, and guide locations. Discrete variables include segment count, tendon count, and routing topology.
+
+An active task uses a finite-horizon control sequence
+\begin{equation}
+U=(u_0,u_1,\ldots,u_{N-1}),
+\end{equation}
+where each $u_k$ may represent tendon tensions or another registered input. A passive fixed-payout task has no commanded control sequence; its response is determined by the structure, unilateral tendon constraints, initial condition, and external loading.
+
+A task $\tau$ is represented by a frozen contract containing its targets, initial state, loading conditions, time horizon, observables, units, thresholds, sampling semantics, and evaluation rules. It induces normalized constraint functions
+\begin{equation}
+g_{\tau,i}(d,U)\leq 0,\qquad i=1,\ldots,m_\tau.
+\label{eq:taskconstraints}
+\end{equation}
+A non-positive value denotes satisfaction of the corresponding constraint. The LLM may interpret task intent and select which registered physical quantities are scientifically relevant, but it cannot silently modify the task's acceptance thresholds, coordinate frames, units, or sampling rules.
+
+For a reach-and-hold task, representative constraints include
+\begin{align}
+g_{\mathrm{terminal}} &=
+\frac{\|p(T;d,U)-p^\star\|}{\epsilon_p}-1,\\
+g_{\mathrm{hold,pos},k} &=
+\frac{\|p(t_k;d,U)-p^\star\|}{\epsilon_p}-1,\\
+g_{\mathrm{hold,vel},k} &=
+\frac{\|v(t_k;d,U)\|}{\epsilon_v}-1.
+\end{align}
+For tracking, a corresponding constraint may be
+\begin{equation}
+g_{\mathrm{track},k}=
+\frac{\|p(t_k;d,U)-r(t_k)\|}{\epsilon_{\mathrm{track}}}-1,
+\end{equation}
+where the tolerance and sample times come from the frozen tracking contract.
+
+\subsection{Task-conditioned design capability}
+
+For an active task, define the best achievable normalized violation for a fixed structure:
+\begin{equation}
+V_\tau(d)=
+\inf_{U\in\mathcal U(d)}
+\max_{i=1,\ldots,m_\tau}g_{\tau,i}(d,U),
+\label{eq:capability}
+\end{equation}
+where $\mathcal U(d)$ is the admissible control set. If the global optimum is attained, $V_\tau(d)\leq0$ indicates that a feasible input sequence exists in the specified model. In nonconvex numerical problems, a solver typically returns a best-found value rather than a certified global optimum; failure to find a feasible sequence is therefore not proof of infeasibility.
+
+For a family of task conditions $\mathcal T$ sharing one structure but allowing condition-specific controls,
+\begin{equation}
+V_{\mathcal T}(d)=
+\inf_{\{U_c\}_{c\in\mathcal T}}
+\max_{c\in\mathcal T,\,i}
+g_{c,i}(d,U_c).
+\label{eq:multi-capability}
+\end{equation}
+This formulation measures the worst task capability of one shared structure rather than the performance of separately tailored morphologies.
+
+\subsection{Research as a sequential decision process}
+
+At research step $k$, define the state
+\begin{equation}
+s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
+\label{eq:researchstate}
+\end{equation}
+where $\mathcal H_k$ is the set of active physical hypotheses, $\mathcal E_k$ is the accumulated evidence, and $\mathcal B_k$ is the remaining resource budget. The agent selects a research action
+\begin{equation}
+a_k\in\mathcal A_{\mathrm{adm}}(s_k),
+\end{equation}
+which may include a mathematical inspection, sensitivity analysis, interaction study, structural modification, control optimization, physical experiment, or evidence review. The resulting observation $y_k$ updates the research state:
+\begin{equation}
+(\mathcal H_{k+1},\mathcal E_{k+1},d_{k+1})
+=\Phi(s_k,a_k,y_k).
+\label{eq:researchupdate}
+\end{equation}
+An action need not improve the design immediately. It may instead reject a hypothesis, reveal that a mathematical method is inapplicable, or motivate a different parameterization.
+
+The objective is to improve task-relevant design capability while producing interpretable and reusable evidence under bounded computational resources. This motivates evaluating both physical performance and the quality of the research decisions that lead to it.

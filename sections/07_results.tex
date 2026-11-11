@@ -1,0 +1,111 @@
+\section{Representative Research Results}
+\label{sec:results}
+
+\subsection{M1: active multi-target reach-and-hold}
+
+M1 illustrates active control research on one shared two-segment, six-tendon structure across three spatially distinct target conditions. The three targets are evaluated independently under the same frozen reach-and-hold contract, with condition-specific control sequences. The final results are summarized in Table~\ref{tab:m1-results}.
+
+\begin{table*}[t]
+\centering
+\caption{M1 reach-and-hold results across three target conditions.}
+\label{tab:m1-results}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Condition & Terminal error (mm) & Hold error (mm) & Hold speed (mm/s) \\
+\midrule
+Positive high & 3.452 & 4.096 & 28.322 \\
+Negative low & 8.347 & 9.945 & 29.979 \\
+Central high & 9.732 & 9.981 & 29.850 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The three conditions satisfy their specified terminal and holding limits. The research process is relevant to C1 because the central-target investigation moved beyond repeating the initial control search: after model-based search reached an applicability boundary, the system used local physical-response diagnosis to identify a small control correction. The case illustrates how a research agent can change the kind of investigation when the original mathematical route is unproductive.
+
+\begin{figure}[t]
+\centering
+\originalfigure[width=0.92\linewidth]{figures/fig01_m1_reach_hold_d.pdf}{Use the original exported PDF from the paper-figure repository.}
+\caption{M1 independent tip paths for the three target conditions. The same physical structure supports multiple targets through condition-specific control.}
+\label{fig:m1-paths}
+\end{figure}
+
+\subsection{P3: passive progressive-stiffness design}
+
+P3 investigates a passive fixed-payout structure under bilateral, multi-stage loading. The central physical hypothesis is that a tendon can remain slack at low load and become recruited at higher load, changing the effective stiffness of the structure. The investigation considered payout, routing, cross-section, material properties, inertia, and segment architecture.
+
+The final four-segment, four-tendon design achieved the bilateral response shown in Table~\ref{tab:p3-results}.
+
+\begin{table}[t]
+\centering
+\caption{P3 bilateral progressive-stiffness response.}
+\label{tab:p3-results}
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & $+X$ & $-X$ \\
+\midrule
+Low-load displacement (mm) & 6.018 & 6.018 \\
+Middle-load displacement (mm) & 11.117 & 11.117 \\
+High-load displacement (mm) & 17.751 & 17.751 \\
+Recovery residual ($\mu$m) & 1.246 & 1.246 \\
+Progressive-stiffness ratio & 1.537 & 1.537 \\
+Maximum contacts & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The direction-swapped slack-to-taut recruitment of the passive tendons is consistent with the measured increase in interval stiffness. The result supports the proposed mechanism but does not establish tendon recruitment as the only cause of progressive stiffening. Backbone and geometric nonlinearities may also contribute. The No-Math, No-Pairwise-Interaction, and No-Intent-Projection comparisons are designed to test whether mathematical analysis changes the structural decisions beyond ordinary physical evaluation.
+
+\begin{figure}[t]
+\centering
+\originalfigure[width=0.94\linewidth]{figures/fig03_p3_stiffness_e.pdf}{Use the original exported P3 force--displacement PDF selected for the initial manuscript.}
+\caption{Representative exported force--displacement response for a passive progressive-stiffness design in the task portfolio.}
+\label{fig:p3-force}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\originalfigure[width=0.94\linewidth]{figures/fig03_p3_stiffness_f.pdf}{Use the original exported P3 stiffness summary PDF.}
+\caption{P3 interval and plateau stiffness summary.}
+\label{fig:p3-stiffness}
+\end{figure}
+
+\subsection{PHS-2D: passive multi-condition stabilization}
+
+PHS-2D provides an additional passive-design case with a nine-segment, four-tendon structure. Ten loading conditions were reported as passing, with a maximum tip displacement of 3.068 mm. The study also included independent replay, half-time-step, and initial-state perturbation checks. This case is particularly relevant to C2 because the mathematical analysis included implicit differentiation and comparison against finite differences obtained by re-solving the equilibrium.
+
+PHS-2D therefore provides complementary evidence that the mathematical research framework can be used beyond a single progressive-stiffness objective. It is presented as an additional case, while P3 and M1 remain the principal settings for controlled ablations.
+
+\begin{figure}[t]
+\centering
+\originalfigure[width=0.92\linewidth]{figures/fig04_phs2d_f.pdf}{Use the original exported PHS-2D tip-displacement PDF.}
+\caption{PHS-2D tip horizontal displacement across the evaluated loading cases.}
+\label{fig:phs-tip}
+\end{figure}
+
+\subsection{Tracking and broader task coverage}
+
+A figure-eight tracking task provides an example of time-varying task constraints. The saved nominal trajectory has 1.286 mm tracking RMSE, 2.076 mm maximum error, and 1.852 mm P95 error. It motivates a lightweight mathematical transfer test in which the same parameterized research interface is asked to represent a time-indexed trajectory-error constraint.
+
+The broader task portfolio also includes loaded reach-and-hold, fast reach-and-stop, timed polyline tracking, tool-axis pointing, loaded tool-axis scanning, and reduced-channel actuation. These tasks demonstrate different combinations of position, velocity, orientation, load, and actuation constraints. Their purpose in the paper is to establish breadth of research questions; the detailed controlled comparisons remain concentrated on P3 and M1.
+
+\begin{figure}[t]
+\centering
+\originalfigure[width=0.88\linewidth]{figures/fig02_figure_eight_d.pdf}{Use the original exported figure-eight tracking PDF.}
+\caption{Reference and actual tip trajectories for the figure-eight tracking task.}
+\label{fig:tracking}
+\end{figure}
+
+\subsection{Research-process evaluation}
+
+The principal empirical question is not only whether a final design satisfies a physical task, but whether the research process produces useful scientific progress. The controlled experiments therefore measure valid hypotheses, evidence-grounded research pivots, actual use of mathematical results in later decisions, interaction-informed parameter changes, candidate improvement, ineffective actions, and computational cost.
+
+We define the effective research action ratio as
+\begin{equation}
+R_{\mathrm{eff}}=
+\frac{N_{\mathrm{actions\ with\ usable\ evidence}}}
+     {N_{\mathrm{all\ research\ actions}}}.
+\label{eq:effective-ratio}
+\end{equation}
+An action is counted as effective only when its result makes a traceable contribution to a hypothesis assessment, parameter choice, or subsequent research direction. Tool-call success alone is insufficient. The labeling rubric must be frozen before scoring and applied by independent reviewers.

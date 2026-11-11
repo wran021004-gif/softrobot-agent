@@ -1,0 +1,78 @@
+\documentclass[journal]{IEEEtran}
+
+% ---------- Packages ----------
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+\sisetup{detect-all,per-mode=symbol}
+
+% ---------- Draft helpers ----------
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+\newcommand{\softrobotagent}{\textsc{Softrobot-Agent}}
+\newcommand{\MainAgent}{\textsc{Main}}
+\newcommand{\Reporter}{\textsc{Reporter}}
+\newcommand{\MuJoCo}{MuJoCo}
+\newcommand{\GVS}{GVS}
+\newcommand{\Vtask}{V_{\tau}}
+\newcommand{\Rset}{\mathcal{R}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% Exact exported figures only. Do not render synthetic replacements.
+% The paper compiles with a visible missing-file notice until the original export is added.
+\newcommand{\originalfigure}[3][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{%
+    \parbox[c][1.4cm][c]{0.95\linewidth}{\centering\footnotesize\textit{Original exported file not yet supplied:}\\
+      \texttt{\detokenize{#2}}}%
+  }%
+}
+
+\title{Softrobot-Agent: Mechanism-Guided and Evidence-Grounded Autonomous Research for Tendon-Driven Soft-Robot Co-Design}
+
+\author{Anonymous Authors%
+\thanks{Working draft v0.4. The author list, affiliations, target venue, and final implementation identifiers will be added after the experimental protocol is frozen.}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Designing tendon-driven soft robots is not simply a matter of searching over geometric and material parameters. It requires reasoning about physical mechanisms, translating scientific questions into mathematical problems, choosing informative analyses or experiments, and revising design hypotheses as evidence accumulates. Existing co-design workflows typically emphasize candidate generation, fixed optimization pipelines, or simulator-based evaluation; these components do not by themselves organize the open-ended reasoning process through which a designer decides what should be investigated next. This paper presents \softrobotagent{}, a research-oriented framework for autonomous soft-robot co-design. Its methodology is organized around three contributions: (i) mechanism-guided autonomous research, in which physical observations lead to testable hypotheses and adaptive research actions; (ii) composable mathematical research, in which high-level research intent is projected into parameterized physical problems and analyzed using reusable mathematical operations; and (iii) evidence-grounded iterative research, in which knowledge, numerical evidence, execution traces, and scientific interpretation are retained and made available to subsequent decisions. The mathematical framework distinguishes mechanism-level sensitivity, fixed-input physical sensitivity, re-optimized task-capability sensitivity, and closed-loop performance sensitivity. It further connects constrained optimization, KKT conditions, envelope-theorem sensitivity, implicit differentiation of equilibria, and finite-scale interaction analysis to a common research interface. We study the framework on a tendon-driven robot portfolio covering active reach-and-hold, tracking, tool-axis tasks, and passive structural responses. M1 and P3 provide complementary active-control and passive-design cases, while PHS-2D and tracking provide additional evidence of task and mathematical-method transfer. A controlled experimental program is proposed to isolate the value of mathematical research, research-intent projection, pairwise interaction analysis, knowledge, and evidence-driven replanning. The central objective is to move from LLM-assisted candidate generation toward a system that can formulate, analyze, test, and revise scientific hypotheses about robot design.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Soft robotics, continuum robots, tendon-driven robots, robot co-design, large language models, scientific agents, sensitivity analysis, evidence-grounded reasoning.
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_problem_formulation}
+\input{sections/04_architecture}
+\input{sections/05_mathematical_methods}
+\input{sections/06_experimental_setup}
+\input{sections/07_results}
+\input{sections/08_discussion}
+\input{sections/09_conclusion}
+
+\appendices
+\input{appendices/A_experiment_protocol}
+\input{appendices/B_additional_task_portfolio}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

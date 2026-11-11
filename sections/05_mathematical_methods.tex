@@ -1,0 +1,218 @@
+\section{Mathematical Foundations of Composable Research}
+\label{sec:math}
+
+\subsection{Sensitivity is defined by the research question}
+
+A design parameter does not have one universal sensitivity. The effect depends on what quantity is being differentiated and what is held fixed. We distinguish four semantics.
+
+\begin{table*}[t]
+\centering
+\caption{Four sensitivity semantics.}
+\label{tab:sensitivity}
+\small
+\begin{tabularx}{\textwidth}{@{}l l Y@{}}
+\toprule
+Level & Quantity & Scientific question \\
+\midrule
+M0: mechanism & $\partial m(d)/\partial d_j$ & How does a parameter change a registered physical relationship or mechanism proxy? \\
+M1: fixed-input physics & $\left.\partial g_\tau(d,U)/\partial d_j\right|_{U\ \mathrm{fixed}}$ & How does the structure change the response to the same input? \\
+M2: optimal capability & $\mathrm{d}V_\tau(d)/\mathrm{d}d_j$ & How does task capability change after the control is re-optimized for the modified structure? \\
+M3: closed loop & $\partial g_{\tau,H}(d,\theta)/\partial z_j$ & How does a design or controller parameter affect the executed closed-loop system? \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+These quantities are not interchangeable. A structural change may worsen a fixed-input response but improve the best achievable task capability after control re-optimization. A controller weight may improve one closed-loop execution without changing the robot's physical actuation set. The mathematical layer therefore records the sensitivity semantics, task, candidate, operating point, model, control treatment, and validity conditions together with every result.
+
+\subsection{M0: mechanism-level sensitivity}
+
+Mechanism-level analysis allows the agent to express a physical relationship that may be more informative than directly optimizing a task score. For example, let $J_\ell(d)$ denote a tendon-length Jacobian, $J_{\mathrm{tip}}(d)$ a tip-position Jacobian, and $Z(d)$ a basis for a locally admissible motion subspace associated with the active tendon constraints. A possible local decoupling proxy is
+\begin{equation}
+m_{\mathrm{decouple}}(d)
+=\|J_{\mathrm{tip}}(d)Z(d)\|_F^2.
+\label{eq:decoupling}
+\end{equation}
+Minimizing this proxy would favor admissible local shape changes that produce less tip displacement. A complementary term would be required to preserve desired internal flexibility, for example by preventing the corresponding mid-body response from collapsing.
+
+This example illustrates the role of M0: it translates a physical hypothesis into a registered, computable mechanism quantity. It is not a universal stability criterion. A small local Jacobian projection error does not by itself guarantee finite-load stability, adequate displacement, or robustness to active-set changes. A mechanism-level direction must be followed by task-level analysis and physical validation.
+
+The agent may propose a relationship among registered observables, but it cannot introduce arbitrary unverified physical quantities. The mathematical layer must check that each primitive has a defined implementation, unit, model dependency, and valid operating domain.
+
+
+M0 and M2 play complementary roles. M0 can identify a physically interpretable direction worth exploring, such as reducing the coupling between an admissible internal shape mode and tip displacement. M2 then tests whether changing the corresponding design parameters improves the best achievable task capability after control re-optimization. A mechanism gradient is therefore a hypothesis-generation signal; a task-capability gradient is a task-oriented test of that hypothesis.
+
+\subsection{M1: fixed-input physical sensitivity}
+
+For a fixed control sequence $U$, the local physical sensitivity is
+\begin{equation}
+S^{\mathrm{fixed}}_{ij}
+=
+\left.
+\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}
+\right|_{U\ \mathrm{fixed}}.
+\label{eq:fixed-sensitivity}
+\end{equation}
+This quantity describes the effect of changing the structure while preserving the same input. It is useful for interpreting physical mechanisms and for identifying which parameters influence a measured response. It does not describe the best achievable task performance of the modified structure.
+
+For a differentiable state or equilibrium map $y(d)$ and a task observable $g_\tau(d,y(d))$, the total derivative is
+\begin{equation}
+\frac{\mathrm d g_\tau}{\mathrm d d_j}
+=
+\frac{\partial g_\tau}{\partial d_j}
++
+\frac{\partial g_\tau}{\partial y}
+\frac{\mathrm d y}{\mathrm d d_j}.
+\label{eq:chain-rule}
+\end{equation}
+The second term captures the indirect effect through the robot's changed deformation, equilibrium, or trajectory. In many structural design problems this indirect term is the dominant physical effect.
+
+\subsection{M2: task-conditioned optimal capability sensitivity}
+
+M2 is particularly relevant to structure--control co-design because it accounts for control re-optimization. Consider the epigraph formulation of the minimax capability problem:
+\begin{equation}
+\begin{aligned}
+\min_{U,\rho}\quad & \rho\\
+\mathrm{s.t.}\quad
+&g_{\tau,i}(d,U)-\rho\leq0,\quad \forall i,\\
+&l_j(d)-U_j\leq0,\quad \forall j,\\
+&U_j-h_j(d)\leq0,\quad \forall j.
+\end{aligned}
+\label{eq:epigraph}
+\end{equation}
+Let $\lambda_i\geq0$ be the multipliers for task constraints, and $\alpha_j,\beta_j\geq0$ the multipliers for the input lower and upper bounds. The Lagrangian is
+\begin{align}
+\mathcal L={}&\rho+
+\sum_i\lambda_i(g_{\tau,i}(d,U)-\rho)\\
+&+\sum_j\alpha_j(l_j(d)-U_j)
++\sum_j\beta_j(U_j-h_j(d)).
+\label{eq:lagrangian}
+\end{align}
+Stationarity with respect to $\rho$ gives
+\begin{equation}
+\sum_i\lambda_i^\star=1.
+\label{eq:lambda-sum}
+\end{equation}
+Under suitable local optimality, constraint qualification, and regularity assumptions, the envelope theorem yields
+\begin{equation}
+\boxed{
+\frac{\mathrm d V_\tau}{\mathrm d d_k}
+=
+\sum_i\lambda_i^\star
+\frac{\partial g_{\tau,i}}{\partial d_k}
++
+\sum_j\alpha_j^\star\frac{\partial l_j}{\partial d_k}
+-
+\sum_j\beta_j^\star\frac{\partial h_j}{\partial d_k}
+}.
+\label{eq:envelope}
+\end{equation}
+If the input bounds are independent of the design, the last two terms vanish. The result links structural parameters to the optimized task-violation value without explicitly differentiating the full optimal control sequence.
+
+This relation is not an unconditional property of every numerical solve. It requires a suitably qualified local optimum and a regular solution map. Non-convergence, non-unique solutions, active-set changes, contact transitions, or non-smooth constraints may invalidate an ordinary gradient interpretation. A local solver result is not a global optimality certificate, and an unsuccessful search is not proof of infeasibility.
+
+\subsection{Implicit differentiation of passive equilibria}
+
+For passive fixed-payout structures, the inner physical problem may be an equilibrium with unilateral tendon constraints. Abstractly, let
+\begin{equation}
+\min_q\;\Pi(q;d,f)
+\quad\text{subject to}\quad
+c_j(q,d)\leq0,
+\label{eq:passive-equilibrium}
+\end{equation}
+where $q$ is the generalized configuration, $\Pi$ is the total potential under design $d$ and load $f$, and $c_j$ describes a unilateral tendon constraint.
+
+For a fixed active set $\mathcal A$, the KKT system can be written as
+\begin{equation}
+F(q^\star,\lambda^\star,d)=
+\begin{bmatrix}
+\nabla_q\mathcal L(q^\star,\lambda^\star;d)\\
+c_{\mathcal A}(q^\star,d)
+\end{bmatrix}
+=0.
+\end{equation}
+If the active set is locally unchanged and the KKT Jacobian is nonsingular, implicit differentiation gives
+\begin{equation}
+\frac{\partial(q^\star,\lambda^\star)}{\partial d}
+=
+-
+\left(\frac{\partial F}{\partial(q,\lambda)}\right)^{-1}
+\frac{\partial F}{\partial d}.
+\label{eq:implicit-equilibrium}
+\end{equation}
+Equivalently, for a smooth active-set model this can be implemented as a saddle-point linear system involving the Lagrangian Hessian and active constraint Jacobian.
+
+The result gives the local change in the passive equilibrium after the structure is modified and the robot is allowed to re-equilibrate. It is not the same as differentiating the tendon-length Jacobian at a fixed configuration. When a tendon changes from slack to taut, the active set may switch and the ordinary derivative may cease to exist. The mathematical layer must then return a directional or mode-specific result, use controlled re-equilibration differences, or explicitly report that the derivative is not supported.
+
+
+\subsection{Reusing physical sensitivities across tasks}
+
+Let $y(d)$ be a vector of registered physical observables. Under the same physical model, candidate, operating point, and fixed-input condition, define
+\begin{equation}
+S_{\mathrm{physics}}=\frac{\partial y}{\partial d},
+\qquad
+S_{\mathrm{task}}=\frac{\partial g_\tau}{\partial y}.
+\end{equation}
+When the task constraint depends on $d$ only through these observables, the chain rule gives
+\begin{equation}
+\frac{\mathrm d g_\tau}{\mathrm d d}
+=
+\frac{\partial g_\tau}{\partial d}
++
+S_{\mathrm{task}}S_{\mathrm{physics}}.
+\label{eq:cross-task-chain}
+\end{equation}
+This suggests a controlled reuse of physical sensitivity results across tasks that share the same model, candidate, operating point, and input treatment. The cached result must be keyed by those identities. Task-specific sensitivities remain bound to the task contract and its inner control problem. If the task requires control re-optimization, the fixed-input physical sensitivity cannot be reused as an optimal-capability gradient without accounting for the inner optimization.
+
+\subsection{Finite-scale pairwise interaction}
+
+Single-parameter sensitivity may miss interactions between design variables. For two parameters $d_1$ and $d_2$, let $f_{++}$, $f_{+-}$, $f_{-+}$, and $f_{--}$ be matched evaluations at four combinations of finite perturbations. The interaction contrast is
+\begin{equation}
+\Delta_{12}
+=f_{++}-f_{+-}-f_{-+}+f_{--}.
+\label{eq:interaction}
+\end{equation}
+This is a finite-scale interaction measure. It tests whether the joint perturbation differs from the sum of the individual effects at the selected scales. It approximates a mixed partial derivative only under additional smoothness and small-step assumptions. In particular, when strict derivative qualification is disabled, it must be reported as an interaction contrast rather than a mixed derivative.
+
+For P3, this operation can investigate whether tendon payout and routing radius, or material density and cross-section radius, have a combined effect that cannot be inferred from separate one-parameter comparisons. Its scientific value depends on whether the result changes a later design decision, not merely on whether the calculation was executed.
+
+\subsection{Typed composition and differentiation routing}
+
+A mathematical operation is treated as a typed research operator:
+\begin{equation}
+M_j:\mathcal I_j\longrightarrow
+(\mathcal R_j,\mathcal Q_j,\mathcal C_j),
+\label{eq:typed-operator}
+\end{equation}
+where $\mathcal I_j$ contains required inputs and prerequisites, $\mathcal R_j$ is the numerical result, $\mathcal Q_j$ records qualification and scope, and $\mathcal C_j$ records computational cost. Two operations can be composed only when the output of the first satisfies the input contract of the second and their candidate, task, model, and operating-point identities are compatible.
+
+The differentiation router selects among:
+\begin{itemize}
+  \item analytic derivatives or automatic differentiation for explicitly differentiable components;
+  \item implicit differentiation for qualified equilibrium or optimization solutions;
+  \item state-sensitivity or adjoint methods for supported differentiable dynamics;
+  \item controlled finite differences when structural rebuilding or non-differentiable simulation is required;
+  \item directional or mode-specific analysis when unilateral constraints or active sets change.
+\end{itemize}
+For a normalized continuous parameter $\xi_j\in[0,1]$, a central difference is
+\begin{equation}
+\frac{\partial f}{\partial\xi_j}
+\approx
+\frac{f(\xi+h e_j)-f(\xi-h e_j)}{2h}.
+\label{eq:finite-difference}
+\end{equation}
+The two perturbed evaluations must use matched task definitions, initial states, loads, models, and control treatment. If control is re-optimized, both perturbed problems must be solved and their costs and solver statuses retained. Discrete changes such as segment count or tendon topology are compared as separate designs rather than differentiated as continuous variables.
+
+\subsection{Decision-relevant active diagnosis}
+
+When a task fails, the agent may consider competing explanations, such as insufficient structural capability, an inadequate control search, or model mismatch. For each hypothesis $H_i$, the research plan records supporting evidence, an expected observation, and an observation that would weaken the hypothesis. It also records the scope and expected cost of the proposed diagnostic action.
+
+A non-probabilistic identifiability view can formalize whether an action distinguishes hypotheses. Let $\mathcal Y_i(a)$ denote the set of observations predicted by hypothesis $H_i$ under action $a$. Define
+\begin{equation}
+\delta_{ij}(a)=
+\inf_{y_i\in\mathcal Y_i(a),\,y_j\in\mathcal Y_j(a)}
+\|W(y_i-y_j)\|_2,
+\label{eq:separation}
+\end{equation}
+where $W$ scales the observables. If measurement error is bounded by $\epsilon$ in the same norm, then $\delta_{ij}(a)>2\epsilon$ is sufficient for the predicted observation sets to remain distinguishable under that error bound. This provides a theoretical criterion for selecting discriminative experiments.
+
+The current system operationalizes hypothesis-specific expected and weakening observations, evidence scope, and experiment cost. It does not yet construct calibrated probability distributions over failure hypotheses or optimize mutual information/value of information numerically. Such a probabilistic extension requires validated observation models and utilities; LLM-generated probabilities alone are not scientific calibration.
