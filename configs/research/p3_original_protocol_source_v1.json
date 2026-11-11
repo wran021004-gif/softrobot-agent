@@ -1,0 +1,188 @@
+{
+  "acceptance": {
+    "denominator_min_m": 1e-06,
+    "denominator_uncertainty_multiplier": 10.0,
+    "high_constraint_residual_max_m": 5e-05,
+    "high_displacement_max_m": 0.025,
+    "high_tension_min_n": 0.05,
+    "low_displacement_min_m": 0.006,
+    "low_slack_min_m": 1e-07,
+    "low_tension_max_n": 0.005,
+    "residual_max_m": 0.002,
+    "stiffness_ratio_min": 1.5
+  },
+  "confirmation": {
+    "half_timestep_s": 6.25e-05,
+    "max_displacement_difference_m": 0.001,
+    "perturbation_rad": 0.001
+  },
+  "design_domain": {
+    "full_assembly_length_max_m": 0.35,
+    "payout_offset_m": [
+      0,
+      0.003
+    ],
+    "segments": [
+      2,
+      6
+    ],
+    "tendons": [
+      2,
+      4
+    ]
+  },
+  "directions": {
+    "minus_x": [
+      -1,
+      0,
+      0
+    ],
+    "plus_x": [
+      1,
+      0,
+      0
+    ]
+  },
+  "force_point": {
+    "kind": "material_coordinate",
+    "s": 0.7
+  },
+  "gravity": [
+    0,
+    0,
+    -9.81
+  ],
+  "initial_state": "same qualified unloaded equilibrium for each direction; continuous stages without resets",
+  "length_excess_limit_m": 5e-05,
+  "limits": {
+    "candidates": 40,
+    "dynamic_candidates": 12,
+    "final_reserved_steps": 2000000,
+    "math_requests": 300,
+    "physics_step_attempts": 8000000
+  },
+  "mechanism": {
+    "high_displacement_increase_min": 1.25,
+    "late_stiffness_ratio_max": 0.8,
+    "require_stable_comparable": true
+  },
+  "monitor_s": [
+    0,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1
+  ],
+  "monitor_speed_limit_m_s": 0.001,
+  "mount_position": [
+    0,
+    0,
+    0.5
+  ],
+  "mount_rotation": [
+    [
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ]
+  ],
+  "qvel_inf_limit_rad_s": 0.01,
+  "ramp_s": 0.5,
+  "raw_recording": "every attempted successful mj_step; post-step forward; applied force held over preceding step",
+  "restrictions": {
+    "NMPC": 0,
+    "PPO": 0,
+    "base_only": true,
+    "fixed_payout": true,
+    "nu": 0,
+    "provider": 0,
+    "research_agent": 0
+  },
+  "route_check_semantics": "scoring poses during exploration; every recorded physical step required for final witness",
+  "scoring_interval_s": 0.01,
+  "solimplimit": [
+    0.999,
+    0.999,
+    0.001,
+    0.5,
+    2
+  ],
+  "solreflimit": [
+    0.004,
+    1
+  ],
+  "stability_source": "phs2d_protocol_inverse_v2; only physical stability/constraint thresholds reused",
+  "stages": [
+    {
+      "duration_s": 4.0,
+      "force_n": 0.0,
+      "name": "unloaded"
+    },
+    {
+      "duration_s": 4.0,
+      "force_n": 0.05,
+      "name": "low"
+    },
+    {
+      "duration_s": 4.0,
+      "force_n": 0.1,
+      "name": "middle"
+    },
+    {
+      "duration_s": 4.0,
+      "force_n": 0.2,
+      "name": "high"
+    },
+    {
+      "duration_s": 4.0,
+      "force_n": 0.0,
+      "name": "recovery"
+    }
+  ],
+  "static_balance_inf_limit_nm": 1e-05,
+  "static_solver": {
+    "active_tolerance_m": 1e-07,
+    "complementarity_tolerance_nm": 1e-08,
+    "ftol": 1e-13,
+    "hessian_step_rad": 1e-05,
+    "length_tolerance_m": 1e-08,
+    "max_iterations": 400,
+    "method": "SLSQP",
+    "minimum_reduced_eigenvalue": 1e-07,
+    "rank_relative_tolerance": 1e-08,
+    "stationarity_tolerance_nm": 1e-06
+  },
+  "status": "development_not_registered_SELECT",
+  "tail_drift_limit_m": 0.0005,
+  "tail_s": 0.25,
+  "task_id": "passive_progressive_stiffness_dev_v1",
+  "timestep_s": 0.000125,
+  "tip_speed_limit_m_s": 0.001,
+  "version": "passive_force_response_v1"
+}

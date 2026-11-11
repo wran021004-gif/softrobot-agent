@@ -470,13 +470,14 @@ def observe_pass(host, reference):
                 observed_task_pass=True, model_selection_complete=False))
 
 
-def engineering_closeout(host, reason):
+def engineering_closeout(host, reason, *, kind='engineering_count_budget_closure'):
+    """Operator closure classification; never grants scientific acceptance."""
     from tools.research.state import state, update, save
     import time
     s = state(host)
     if s['research_status'] == 'stopped':
         return
-    ref = save(host, dict(kind='engineering_count_budget_closure', reason=reason,
+    ref = save(host, dict(kind=kind, reason=reason,
         model_stop=False, selected=s.get('selected'), observed_pass=s.get('success_gate')),
-        'engineering_count_budget_closure')
+        kind)
     update(host, research_status='stopped', final_disposition=ref, closed_unix=time.time())

@@ -2,6 +2,7 @@
 
 No optimizer, state machine, source ledger or execution admission lives here.
 """
+import json
 from tools.research.budget import mathematical_remaining, mathematics_fits
 from copy import deepcopy
 
@@ -448,6 +449,17 @@ def expand_v4(spec, payload, candidate=None):
     return full,sources
 
 
+def complete_execution_profile(spec):
+    """Minimal explicit full-protocol choice; never upgrades an execution."""
+    profile=dict(purpose='final_acceptance')
+    if spec.get('fidelity_policy'):
+        from tools.research.contracts import fidelity_levels
+        levels=fidelity_levels(spec['fidelity_policy'])
+        names=[name for name,level in levels.items() if level==spec['fidelity_policy']['final_evaluation']]
+        profile['fidelity']='final_evaluation' if 'final_evaluation' in names else names[0]
+    return profile
+
+
 def project_execution_profile(schema,spec,task=None):
     """Advertise frozen execution choices without changing Worker semantics."""
     profile=schema.get('$defs',{}).get('PassiveExecutionProfile')
@@ -455,6 +467,9 @@ def project_execution_profile(schema,spec,task=None):
     goal=task.get('goal',{}).get('data',{})
     if profile is None or goal.get('version')!='passive_response_v2':return
     props=profile['properties']
+    props['purpose']['description']=('Choose explicitly: exploration records scoped sampled diagnostics; final_acceptance '
+        'collects the complete frozen qualification grid. Final spatial fidelity alone does not select full qualification. '
+        'A complete-protocol request does not grant task acceptance or require independent Replay unless the objective requires it.')
     props['load_conditions']['items']['enum']=goal['load_conditions']
     stages=list(dict.fromkeys(s['name'] for rows in goal['programs'].values() for s in rows))
     props['stage_prefix']={'anyOf':[{'type':'string','enum':stages},{'type':'null'}],
@@ -468,7 +483,8 @@ def project_execution_profile(schema,spec,task=None):
     props['requested_observables']['description']=('Optional recorded observables, not free-text research goals. Omit for default observations. '
         'Native diagnostics include tendon_transitions, stiffness_ratio, slack_to_taut and stage_qualification; '
         'task observation names and evaluator bound names/quantities are also supported.')
-    profile['description']=('Choose exploration scope explicitly. For final_acceptance, omit load_conditions, stage_prefix, observation_window_s, '
+    profile['description']=('Choose exploration or complete qualification explicitly. Minimal complete-protocol profile: '+
+        json.dumps(complete_execution_profile(spec),separators=(',',':'))+'. For final_acceptance, omit load_conditions, stage_prefix, observation_window_s, '
         'sample_period_s, route_sampling, recording and requested_observables: the Worker uses the entire frozen protocol. '
         'This does not grant acceptance or require an ablation for baseline research.')
     profile['allOf']=[{'if':{'properties':{'purpose':{'const':'final_acceptance'}},'required':['purpose']},

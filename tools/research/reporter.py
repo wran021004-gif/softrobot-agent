@@ -366,6 +366,21 @@ def investigate(host, request):
         detail_access='evidence_read(report_reference); L1 arrives before the next research decision')
 
 
+def qualification_feedback(host,result):
+    """Expose a measured coverage gap separately from successful computation."""
+    records=(result.get('structure_research') or {}).get('records',[])
+    incomplete=[r for r in records if (r.get('observation',{}).get('qualification_diagnosis') or {}).get('reason')=='COMPLETE_QUALIFICATION_GRID_REQUIRED']
+    if not incomplete:return None
+    from tools.research.scientific_intent import complete_execution_profile
+    return dict(status='incomplete_qualification_coverage',reason='COMPLETE_QUALIFICATION_GRID_REQUIRED',
+        computation_completed=result.get('status')=='computed',qualified_certificate=False,
+        observed_profiles=[r.get('mechanics',{}).get('dynamic_execution',{}).get('execution_profile') for r in incomplete],
+        complete_protocol_profile=complete_execution_profile(state(host)['spec']),
+        omit_exploration_fields=['load_conditions','stage_prefix','observation_window_s','sample_period_s','route_sampling','recording','requested_observables'],
+        explanation='Saved sampled points do not cover every physics step in the frozen qualification windows. Full qualification requires a new explicit full-protocol execution; prior sampled results retain their original meaning.',
+        choice='Use the complete profile only if the current research objective requires complete qualification. Main retains experiment choice; no automatic rerun or independent Replay is prescribed.')
+
+
 def scientific_feedback(host, value, before=None, *, receipt=None):
     """Deliver a saved deterministic report without jeopardizing completed science."""
     from tools.research.provider import record
@@ -394,12 +409,15 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
             report_reference=d.get('report_reference'),interpretation_status=d['interpretation_status'])
             for r,d in zip(references,deliveries)])
     raw=host.store.artifact(references[0])
+    guidance=qualification_feedback(host,raw)
+    execution_guidance=dict(execution_guidance=guidance) if guidance else {}
     research=raw.get('structure_research') or {}
     records=research.get('records',[])
     if research and len(records)==1 and not records[0].get('mechanics',{}).get('dynamic_execution',{}).get('paired_ablation'):
         from tools.research.evidence_views import task_diagnosis,compact_task_diagnosis
         from tools.research.structure_research import summary
         return dict(delivery_version='scientific_delivery_v3',execution_status='completed',
+            **execution_guidance,
             scientific_result_reference=references[0],interpretation_status='not_requested',
             deterministic_result=summary(raw,references[0]),task_diagnosis=compact_task_diagnosis(task_diagnosis(raw,references[0])),
             interpretation_tool='research_investigate',task_acceptance='unmeasured')
@@ -415,6 +433,7 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
         independent=references[0] in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]
         gap=task_gap(raw) if independent else None
         return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
+            **execution_guidance,
             scientific_result_status=raw.get('status'),independent_physical_evaluation=independent,
             task_acceptance=('passed' if gap['accepted'] else 'measured_failure' if gap['valid_complete'] else 'invalid_or_incomplete') if gap else 'unmeasured',
             scientific_result_reference=references[0],report_reference=ref,interpretation_status='deferred',

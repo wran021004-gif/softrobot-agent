@@ -935,7 +935,15 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None,operator_request=None):
+def answer_delivery_tools(agent):
+    """Keep existing evidence navigation available for an authorized final answer."""
+    registry=agent.tool_registry.registry
+    for name in list(registry):
+        if name not in ('evidence_read','research_recall','experience_retrieve','retrieve_context'):
+            registry.pop(name)
+
+
+async def converse(host,*,session_handoff=None,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False,recover_incomplete=False,max_new_provider_requests=None,operator_request=None,delivery_only=False):
     from tools.research.config import conversation_policy, tool_schema_policy
     recent_policy=conversation_policy(state(host)['spec'])
     on_demand=bool(tool_schema_policy(state(host)['spec']))
@@ -1138,12 +1146,14 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
     rl_mode=enabled(state(host)['spec'],'rl')
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
+    if delivery_only:
+        instructions+='\nCURRENT USER-AUTHORIZED OBJECTIVE: deliver your final research answer using the existing Study evidence. Read saved evidence only as needed. No further experiments, Replay, new Reporter review, formal SELECT or STOP certificate are prerequisites for this answer. Explain the concrete best design, measured outcomes, supported research conclusions and their actual scope. Do not claim unmeasured validation. End with the final answer itself, not a plan to continue. This delivery objective supersedes earlier instructions to keep experimenting or obtain formal certification.'
     from tools.research.evidence_policy import english_native
     if english_native(state(host)['spec']):
         instructions+='\nWrite all research decisions and tool arguments directly in English. Scientific records and reports must originate in English.'
     from tools.research.object_choices import main_context_enabled
     if main_context_enabled(state(host)['spec']):
-        instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Use exploration execution_profile to choose declared fidelity, load conditions and a continuous stage prefix; it grants no acceptance. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
+        instructions+='\nChoose research methods freely. Briefly state hypothesis, changed parameters, observables, expected observation and its next-decision consequence. Distinguish mechanism discrimination, joint design exploration and performance optimization. Multiple simultaneous changes support a joint design result; attribution to one parameter requires suitable matched evidence. Coupled Block and coordinate exploration are alternatives selected by the scientific question. Baseline response does not require ablation. Choose execution_profile purpose explicitly: exploration supplies sampled/scoped diagnostics; final_acceptance supplies the complete frozen qualification grid. Final spatial fidelity and every-step routing alone do not establish full qualification. For complete qualification omit exploration-only overrides as advertised by the Schema. A computed result can remain scientifically incomplete; inspect execution_guidance before repeating a request. These modes grant no acceptance and do not prescribe an experiment. User-authorized research-capability closeout need not seek further certification. Reuse deterministic measurements directly and request Reporter only when synthesis or competing mechanism interpretation is useful.'
         instructions+='\nFor the current interface, the advertised selected-tool Schema takes precedence over earlier parameter examples. Use stable short references from the current packet. Supply only advertised fields; the host binds omitted family identity, candidate/control lineage and repeated evidence fields. Keep scientific hypotheses, direction, effort and adoption decisions explicit. Structural inspect/differentiate/optimize/compare use research_analysis after diagnose; joint structure-control search uses research_plan(search).'
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan',PLAN_TOOL_DESCRIPTION,Plan,'plan'),
@@ -1471,15 +1481,18 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                             **(host.store.artifact(v,paths=('acceptance','candidate')) if k.startswith('evaluation_') else {}))
                             for k,v in choices.items() if v in wanted]
                         boundary.research_packet['object_choice_rule']='Use short choices for Plan references. Candidate-bearing actions bind decision.selected_candidate automatically. SELECT/CONFIRM/replay bind supporting evidence to the selected result. Independent acceptance, public evidence reads and original budgets are still required.'
-                if operator_request:
-                    boundary.research_packet['operator_request']=dict(reference=operator_request,
-                        instruction=host.store.artifact(operator_request))
             from tools.research.object_choices import main_context_enabled,main_tool_schema,reference_choices,main_packet
             if main_context_enabled(s['spec']):
                 choices=reference_choices(host,include_all=True)
                 for tool in agent.tool_registry.registry.values():
                     tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':main_tool_schema(tool.tool_spec['inputSchema']['json'],choices)}}
                 boundary.research_packet=main_packet(host,boundary.research_packet)
+            if delivery_only:
+                answer_delivery_tools(agent)
+                boundary.research_packet['current_objective']='Deliver the final answer from existing evidence; necessary evidence reads only. No additional experiment, Replay or review is requested.'
+            if operator_request:
+                boundary.research_packet['operator_request']=dict(reference=operator_request,
+                    instruction=host.store.artifact(operator_request))
             # Record the actual L0 after its final presentation projection.
             if on_demand:record(host,'model_decision_packet',boundary.research_packet)
         token_policy=s['spec'].get('research_decisions',{}).get('handoff_policy')
@@ -1594,12 +1607,16 @@ async def converse(host,*,session_handoff=None,pause_after_completed_invocations
                 continue
             record(host,'model_original_turn',dict(result=str(result),session_id=agent._session_manager.session_id,
                 sdk_message_identity=digest(agent.messages)))
+            if delivery_only:
+                answer=save(host,dict(text=str(result),session_id=agent._session_manager.session_id,
+                    sdk_message_identity=digest(agent.messages),operator_request=operator_request), 'main_final_answer')
+                update(host,main_final_answer=answer)
             if state(host)['pending'] or pending(host):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
-            if state(host)['spec'].get('research_decisions'):
+            if not delivery_only and state(host)['spec'].get('research_decisions'):
                 await complete_reports(host,boundary.inner,max_model_calls=max_model_calls)
             completed_invocations+=1
-            if (pause_after_completed_invocations is not None and completed_invocations>=pause_after_completed_invocations
+            if ((delivery_only or pause_after_completed_invocations is not None and completed_invocations>=pause_after_completed_invocations)
                     and state(host)['research_status']!='stopped' and not state(host).get('success_gate')):
                 await pause_completed_invocation(host,agent,completed_invocations)
                 break

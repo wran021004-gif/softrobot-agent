@@ -397,7 +397,11 @@ def main_feedback_projection(host, delivery):
             payload=json.loads(''.join(b.get('text','') for b in saved['content']))
             reference=payload.get('scientific_result_reference') or (payload.get('operation_outcome') or {}).get('reference')
             if reference not in state(host).get('analysis_results',[]):continue
-            if host.store.artifact(reference).get('status')!='computed':continue
+            raw=host.store.artifact(reference)
+            if raw.get('status')!='computed':continue
+            from tools.research.reporter import qualification_feedback
+            guidance=qualification_feedback(host,raw)
+            if guidance:row['execution_guidance']=guidance
             for key in ('result','facts'):row.pop(key,None)
             if state(host)['spec'].get('research_decisions',{}).get('analysis_interface')=='scientific_question_v4':row.pop('query',None)
             row.update(delivery='fixed_facts_in_l0',facts_at='mathematical_research.latest_result')
