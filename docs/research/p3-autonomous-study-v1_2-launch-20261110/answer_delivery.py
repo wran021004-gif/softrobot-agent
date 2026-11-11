@@ -66,7 +66,7 @@ def finish():
     assert answer['text'].strip()
     assert science(h)==before['science']
     engineering_closeout(h,'Main delivered its final answer using existing evidence, as requested by the user. No additional experiments, independent Replay or Reporter review required.',kind='user_requested_main_answer_delivery')
-    after=dict(main_final_answer=s['main_final_answer'],science_unchanged=science(h)==before['science'],
+    after=dict(main_final_answer=s['main_final_answer'],implementation=s['freeze'],science_unchanged=science(h)==before['science'],
         ledger_before=before['ledger'],ledger_after=h.store.remaining(),
         new_provider_requests=h.store.remaining()['used']['model_calls']-before['ledger']['used']['model_calls'],
         status=state(h)['research_status'],final_disposition=state(h)['final_disposition'],
