@@ -72,3 +72,9 @@
 继续复用原 openai_api 适配、7890 代理和 none 配置，不自动轮换或回退。
 配置默认模型仍为 gpt-5.4-mini，但新 Key 的模型权限及额度尚未验证；本次只准备配置，不发送 API 请求。
 后续明确指定“官方 API 第二个”，再按该 Key 实际目录和授权选择模型；不更改既有 Study 的冻结凭据。
+
+用户填写后于 2026-11-11 明确批准验证：经独立凭据和原 7890 代理，一次目录 GET 返回 HTTP 200、96 个型号；
+一次 gpt-5.4-mini / none / store=false 短文本请求返回 HTTP 200 和 OK，实际响应型号 gpt-5.4-mini-2026-03-17。
+usage 为 prompt=10、completion=4、total=14，reasoning=0；费用与剩余额度未知。
+无重试、切换 Key/模型或科研 Study；本次只验证文本推理，没有验证新 Key 的工具调用或其他型号权限。
+原始本地请求、响应及结果保存在 ignored 的 runs/openai-api-account2-validation-20261111，未上传 Key。
