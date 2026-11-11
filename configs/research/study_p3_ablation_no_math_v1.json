@@ -3,7 +3,7 @@
   "start_mode": "family_space",
   "family_space": "family_space_p3_passive_v2.json",
   "candidate_initialization": "all_candidate_dofs_zero_v1",
-  "base_commit": "9a8a1fd3feee5d966a5981dd965c2a2ec5c681d5",
+  "base_commit": "ac4065f27edb357876c18c290ae3983a5bae5793",
   "mode": "formal_research",
   "control": "control_passive_v1.json",
   "study_id": "p3-ablation-no-math-20261112",
@@ -24,11 +24,11 @@
     "stop"
   ],
   "budgets": {
-    "provider_requests": 48,
+    "provider_requests": 200,
     "protected_provider_requests": 4,
-    "public_operations": 160,
+    "public_operations": 800,
     "protected_public_operations": 0,
-    "physical_launches": 32,
+    "physical_launches": 150,
     "mathematical_evaluations": 0,
     "offline_nlp": 0,
     "bdf_replays": 0,
@@ -84,8 +84,8 @@
     "background": [],
     "structure_search_interface": "scientific_structure_search_v1"
   },
-  "authorization": "OFFLINE_PREPARATION_ONLY: this request authorizes permission development, configuration, offline tests and push only. No Study creation, Main, Provider, mathematical Worker or physics is authorized. A future Pilot requires a fresh exact identity-bound grant.",
-  "execution_instructions": "This is an independently authorized P3 ablation Pilot configuration, not an execution grant. Begin with an empty scientific candidate pool and agent_choice; never import historical candidates, controls or Stores. Use the frozen task, physical model, FamilySpace, runtime and available tools. Main owns hypotheses, parameter choices, interpretation and stopping. Compare the best saved candidate over both original loading directions and all five stages through 20 s, using the original low/middle/high displacement, recovery residual, stiffness ratio, contact and tendon-constraint thresholds. Report numerical metrics and all observed violations; do not claim feasibility for a threshold-violating candidate or global infeasibility from a bounded search. This study does not require a fresh independent validation certificate, half-timestep or initial-state perturbation, repeat-after-success, paired causal proof or formal SELECT certification. Necessary physical response evaluation remains available. Finite-budget ordinary FamilySearch passive_task_response uses the complete frozen physical protocol without execution_profile overrides; optional mechanism analysis remains separate and subject to its method/operation grant. Main and Reporter share the fixed request allowance; all declared count limits are hard caps with no automatic extensions. At exhaustion stop at a settled boundary and deliver the best measured numerical design with limitations. Use the frozen final_evaluation fidelity of two cells per segment for the final reported best response; optional screening fidelity does not replace it.",
+  "authorization": "OFFLINE_PREPARATION_ONLY: this revision authorizes experimental definitions, original Knowledge asset restoration, configuration, necessary offline tests, commits and push only. No Study creation, Pilot, Main, Reporter, Provider, mathematical Worker or physics is authorized. A future Pilot requires a fresh exact identity-bound grant.",
+  "execution_instructions": "This is an independently authorized P3 ablation Pilot configuration, not an execution grant. Begin with an empty scientific candidate pool and agent_choice; never import historical candidates, controls or Stores. Use the frozen task, physical model, FamilySpace, runtime and available tools. Main owns hypotheses, parameter choices, interpretation and stopping. Compare the best saved candidate over both original loading directions and all five stages through 20 s, using the original low/middle/high displacement, recovery residual, stiffness ratio, contact and tendon-constraint thresholds. Report numerical metrics and all observed violations; do not claim feasibility for a threshold-violating candidate or global infeasibility from a bounded search. This study does not require a fresh independent validation certificate, half-timestep or initial-state perturbation, repeat-after-success, paired causal proof or formal SELECT certification. Necessary physical response evaluation remains available. Finite-budget ordinary FamilySearch passive_task_response uses the complete frozen physical protocol without execution_profile overrides; optional mechanism analysis remains separate and subject to its method/operation grant. Provider requests are one shared hard total of 200 for Main and Reporter, including the final 4 protected requests (not 200+4). Request 200 may complete normally under the existing closeout guards; request 201 must never be sent. Do not extend any hard cap automatically. If the original task thresholds are met by a completed candidate within the allowance, report success with the original evidence qualification. If the request cap is reached without a threshold-satisfying candidate, report budget_exhausted; if a critical evaluation is unfinished, report incomplete_at_budget and identify the missing evidence. Save the best candidate available at exhaustion, all completed evidence and actual constraint violations; missing values remain UNKNOWN. Stop earlier when another hard cap or the original stopping rule requires it and report the actual limiting resource. Never resume spending by recreating a Study, resetting a Store, adding budget or switching identity. Budget exhaustion is not proof that the design space is infeasible. Use the frozen final_evaluation fidelity of two cells per segment for the final reported best response; optional screening fidelity does not replace it.",
   "task": "../../tasks/passive_progressive_stiffness_dev_v1_2.json",
   "supplied_evidence": [
     "configs/research/p3_original_protocol_source_v1.json"
@@ -209,6 +209,82 @@
       "phs2d-research-process"
     ],
     "include_entry_revisions": {
+      "skill-finite-search": [
+        "1",
+        "2",
+        "3"
+      ],
+      "skill-parameter-model": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-matched-comparison": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-local-to-experiment": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-continue-or-stop": [
+        "1",
+        "2",
+        "3"
+      ],
+      "skill-witness-replay": [
+        "1",
+        "2",
+        "3"
+      ],
+      "phs2d-research-process": [
+        "1",
+        "2"
+      ],
+      "passive-structure-mechanics": [
+        "1",
+        "2",
+        "3"
+      ],
+      "general-routing": [
+        "1",
+        "2",
+        "3"
+      ],
+      "general-material-inertia": [
+        "1",
+        "2",
+        "3"
+      ],
+      "diagnostic-slack": [
+        "1",
+        "2"
+      ],
+      "diagnostic-static-dynamic": [
+        "1",
+        "2"
+      ],
+      "diagnostic-convergence": [
+        "1",
+        "2"
+      ],
+      "validation-qualification": [
+        "1",
+        "2"
+      ],
+      "validation-replay": [
+        "1",
+        "2"
+      ],
+      "mechanism-research-process": [
+        "1",
+        "2"
+      ],
       "p3-case": [
         "3"
       ]
