@@ -29,7 +29,7 @@ def prepare():
     h=host();s=state(h)
     before=dict(timestamp_unix=time.time(),science=science(h),ledger=h.store.remaining(),
         implementation=s['freeze'],previous_main_answer=s.get('main_final_answer'))
-    atomic_json(DOC/'answer-delivery-before.json',before)
+    atomic_json(h.store.root/'answer-delivery-before.json',before)
     core.bind(h,reason='User requests Main final answer with necessary evidence checks, no repeated or complex validation. Repair explicit execution-purpose feedback and exact protocol source registration; science and costs unchanged.')
     protocol=read(ROOT/'configs/research/p3_original_protocol_source_v1.json')
     restored=save(h,protocol,'restored_frozen_protocol_source')
@@ -42,6 +42,7 @@ def prepare():
     assert science(h)==before['science']
     assert h.store.remaining()==before['ledger']
     guard(h)
+    atomic_json(DOC/'answer-delivery-before.json',before)
     receipt=dict(operator_request=directive,protocol_restored=restored,implementation=state(h)['freeze'],
         science_unchanged=True,ledger_unchanged=True,tests='12 targeted offline tests passed')
     atomic_json(DOC/'answer-delivery-bound.json',receipt)
