@@ -1,0 +1,373 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_p3_passive_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "16d72fe82263a44a83ca8dc6f8111b4b0e6c1858",
+  "mode": "formal_research",
+  "control": "control_passive_v1.json",
+  "study_id": "p3-ablation-no-math-20261112-account3-restart1",
+  "evidence_destination": "runs/research/p3-ablation-no-math-20261112-account3-restart1/private-evidence",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "physical_replay",
+    "search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "propose",
+    "diagnose",
+    "search",
+    "physical_replay",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 200,
+    "protected_provider_requests": 4,
+    "public_operations": 800,
+    "protected_public_operations": 0,
+    "physical_launches": 150,
+    "mathematical_evaluations": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "evaluation_episodes": 0,
+    "actions_per_trial": null,
+    "training_actions": null
+  },
+  "reserve_rl_evaluation": false,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    },
+    "analysis_interface": "scientific_question_v4",
+    "architecture": "english_decision_v1",
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "medium"
+      },
+      "reporter": {
+        "reasoning": "medium"
+      }
+    },
+    "language_policy": {
+      "version": "english_sources_v1",
+      "authored_language": "en"
+    },
+    "evidence_read_policy": {
+      "version": "bounded_scientific_evidence_v1"
+    },
+    "background": [],
+    "structure_search_interface": "scientific_structure_search_v1"
+  },
+  "authorization": "EXPLICIT_USER_AUTHORIZATION: after diagnosing the wrong default-Gateway attempt, user instructed directly fix and restart this No-Math ablation. Authorizes this single new independent Study on Gateway account3 at 127.0.0.1:8789, Main/Reporter Provider and ordinary passive physics/FamilySearch. Shared Provider cap 200 including 4 protected, mathematics 0, physical launches 150, public operations 800, per-search 24/16. Old failed Study remains sealed with its 1 request separately reported. No historical candidates/controls/Stores imported; no other Study, automatic restart or budget extension authorized.",
+  "execution_instructions": "This is an independently authorized P3 ablation Pilot configuration, not an execution grant. Begin with an empty scientific candidate pool and agent_choice; never import historical candidates, controls or Stores. Use the frozen task, physical model, FamilySpace, runtime and available tools. Main owns hypotheses, parameter choices, interpretation and stopping. Compare the best saved candidate over both original loading directions and all five stages through 20 s, using the original low/middle/high displacement, recovery residual, stiffness ratio, contact and tendon-constraint thresholds. Report numerical metrics and all observed violations; do not claim feasibility for a threshold-violating candidate or global infeasibility from a bounded search. This study does not require a fresh independent validation certificate, half-timestep or initial-state perturbation, repeat-after-success, paired causal proof or formal SELECT certification. Necessary physical response evaluation remains available. Finite-budget ordinary FamilySearch passive_task_response uses the complete frozen physical protocol without execution_profile overrides; optional mechanism analysis remains separate and subject to its method/operation grant. Provider requests are one shared hard total of 200 for Main and Reporter, including the final 4 protected requests (not 200+4). Request 200 may complete normally under the existing closeout guards; request 201 must never be sent. Do not extend any hard cap automatically. If the original task thresholds are met by a completed candidate within the allowance, report success with the original evidence qualification. If the request cap is reached without a threshold-satisfying candidate, report budget_exhausted; if a critical evaluation is unfinished, report incomplete_at_budget and identify the missing evidence. Save the best candidate available at exhaustion, all completed evidence and actual constraint violations; missing values remain UNKNOWN. Stop earlier when another hard cap or the original stopping rule requires it and report the actual limiting resource. Never resume spending by recreating a Study, resetting a Store, adding budget or switching identity. Budget exhaustion is not proof that the design space is infeasible. Use the frozen final_evaluation fidelity of two cells per segment for the final reported best response; optional screening fidelity does not replace it.",
+  "task": "../../tasks/passive_progressive_stiffness_dev_v1_2.json",
+  "supplied_evidence": [
+    "configs/research/p3_original_protocol_source_v1.json"
+  ],
+  "require_task_guidance": false,
+  "runtime": "runtime_p3_gateway_account3_20261112.json",
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_passive_mujoco",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.25,
+      4.0,
+      8.0,
+      20.0
+    ],
+    "samples_s": [
+      0.0,
+      4.0,
+      8.0,
+      12.0,
+      16.0,
+      20.0
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1,
+      10,
+      100
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "scoring_window_s": 0.25,
+  "mathematical_methods": {
+    "mechanism_structure_v1": null
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "*"
+    ]
+  },
+  "physical_replay_limit": null,
+  "physical_worker_watchdog_s": 14400,
+  "initial_structure_strategy": "agent_choice",
+  "mathematical_worker_watchdog_s": 7200,
+  "knowledge": {
+    "version": "curated_knowledge_policy_v1",
+    "mode": "enabled",
+    "allowed_kinds": [
+      "procedure",
+      "case"
+    ],
+    "allow_benchmark_answers": false,
+    "delivery": "compact_skill_v1",
+    "organization": "typed_knowledge_v1",
+    "include_entry_ids": [
+      "p3-case",
+      "passive-structure-mechanics",
+      "general-routing",
+      "general-material-inertia",
+      "diagnostic-slack",
+      "diagnostic-static-dynamic",
+      "diagnostic-convergence",
+      "validation-qualification",
+      "validation-replay",
+      "skill-parameter-model",
+      "skill-matched-comparison",
+      "skill-local-to-experiment",
+      "skill-finite-search",
+      "skill-continue-or-stop",
+      "skill-witness-replay",
+      "mechanism-research-process",
+      "phs2d-research-process"
+    ],
+    "include_entry_revisions": {
+      "skill-finite-search": [
+        "1",
+        "2",
+        "3"
+      ],
+      "skill-parameter-model": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-matched-comparison": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-local-to-experiment": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "skill-continue-or-stop": [
+        "1",
+        "2",
+        "3"
+      ],
+      "skill-witness-replay": [
+        "1",
+        "2",
+        "3"
+      ],
+      "phs2d-research-process": [
+        "1",
+        "2"
+      ],
+      "passive-structure-mechanics": [
+        "1",
+        "2",
+        "3"
+      ],
+      "general-routing": [
+        "1",
+        "2",
+        "3"
+      ],
+      "general-material-inertia": [
+        "1",
+        "2",
+        "3"
+      ],
+      "diagnostic-slack": [
+        "1",
+        "2"
+      ],
+      "diagnostic-static-dynamic": [
+        "1",
+        "2"
+      ],
+      "diagnostic-convergence": [
+        "1",
+        "2"
+      ],
+      "validation-qualification": [
+        "1",
+        "2"
+      ],
+      "validation-replay": [
+        "1",
+        "2"
+      ],
+      "mechanism-research-process": [
+        "1",
+        "2"
+      ],
+      "p3-case": [
+        "3"
+      ]
+    }
+  },
+  "analysis_cap_s": null,
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing",
+      "payout"
+    ],
+    "segment_counts": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "tendon_counts": [
+      2,
+      3,
+      4
+    ],
+    "max_proposals": 24,
+    "max_evaluations": 16,
+    "evaluation_modes": [
+      "passive_equilibrium",
+      "passive_task_response"
+    ],
+    "require_explicit_start": false,
+    "coupled_block_enabled": true
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "screening": {
+        "cells_per_segment": 2,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      },
+      "screening1": {
+        "cells_per_segment": 1,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 2,
+      "backend": "backend.family_passive_mujoco@1.0.0"
+    },
+    "refinement": {
+      "refinement2": {
+        "cells_per_segment": 2,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      }
+    },
+    "numerical_sensitivity": {
+      "diagnostic4": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      },
+      "diagnostic8": {
+        "cells_per_segment": 8,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      },
+      "diagnostic12": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      },
+      "diagnostic16": {
+        "cells_per_segment": 16,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      },
+      "diagnostic32": {
+        "cells_per_segment": 32,
+        "backend": "backend.family_passive_mujoco@1.0.0"
+      }
+    }
+  },
+  "request_budget_only": false
+}
