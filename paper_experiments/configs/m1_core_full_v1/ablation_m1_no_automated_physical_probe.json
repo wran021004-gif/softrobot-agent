@@ -1,0 +1,150 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_stage0_base_only_v1.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "m1-no-automated-physical-probe-20261111",
+  "base_commit": "78e1c8535597f67c365f6a94b4a522a58d5a1e52",
+  "authorization": "OFFLINE_CONFIGURATION_ONLY: Phase 1A authorizes configuration and permission development, not Study creation, Main, Provider, mathematical Worker or physical execution. Any future Pilot requires its own exact identity-bound execution authorization.",
+  "evidence_destination": "evidence/m1-no-automated-physical-probe-20261111",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      6
+    ]
+  },
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "native_control_limits": {
+    "evaluation_requests": 800,
+    "iterations": 100,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    },
+    "background": [],
+    "architecture": "english_decision_v1",
+    "analysis_interface": "scientific_question_v4",
+    "role_policy": {
+      "version": "research_roles_v3",
+      "main": {
+        "reasoning": "medium"
+      },
+      "reporter": {
+        "reasoning": "medium"
+      }
+    },
+    "conversation_policy": {
+      "version": "recent_round_trace_v1",
+      "trace_limit": 8
+    },
+    "tool_schema_policy": {
+      "version": "research_information_flow_v1"
+    },
+    "evidence_read_policy": {
+      "version": "bounded_scientific_evidence_v1"
+    }
+  },
+  "task_conditions": [
+    {
+      "condition_id": "positive_high",
+      "task": "tasks/bf7_shared_reach_v1_positive_high.json"
+    },
+    {
+      "condition_id": "negative_low",
+      "task": "tasks/bf7_shared_reach_v1_negative_low.json"
+    },
+    {
+      "condition_id": "central_high",
+      "task": "tasks/bf7_shared_reach_v1_central_high.json"
+    }
+  ],
+  "mode": "formal_research",
+  "scoring_window_s": 0.6,
+  "analysis_protocol": {
+    "windows_s": [
+      0.05,
+      0.1,
+      0.6
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.58
+    ]
+  },
+  "budgets": {
+    "provider_requests": 48,
+    "protected_provider_requests": 8,
+    "public_operations": 160,
+    "protected_public_operations": 12,
+    "physical_launches": 18,
+    "mathematical_evaluations": 16,
+    "provider_reserve_policy": "last_requests_v2"
+  },
+  "initial_structure_strategy": "agent_choice",
+  "knowledge": {
+    "version": "curated_knowledge_policy_v1",
+    "mode": "enabled",
+    "allowed_kinds": [
+      "procedure"
+    ],
+    "allow_benchmark_answers": false,
+    "delivery": "compact_skill_v1",
+    "organization": "typed_knowledge_v1",
+    "include_entry_ids": [
+      "general-material-inertia",
+      "skill-parameter-model",
+      "skill-matched-comparison",
+      "skill-finite-search"
+    ]
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "mechanism_structure_v1": "Proposed registered mathematics scope: optional Main-chosen instantaneous physical mechanisms and registered short fixed-input responses; no full active-task structure gradient or acceptance. Formal identity-bound approval is still required.",
+    "mujoco-nonlinear-task-capability-v1": "Proposed registered mathematics scope: original bounded Reach/Hold Native T1 per frozen condition. Callbacks, iterations and knots share the frozen finite limits; independent Replay and joint SELECT remain required. Formal identity-bound approval is still required.",
+    "mujoco-reoptimized-structure-response-v1": "Proposed registered mathematics scope: compare compatible saved current-Study T1 evidence only; no new optimizer or imported historical T1. Formal identity-bound approval is still required.",
+    "mujoco_direct_control_v1": "Explicit Direct control research grant on the unchanged M1 task; bounded Native search never substitutes for independent Replay."
+  },
+  "runtime": "runtime_m1_core_full_v1.json",
+  "execution_instructions": "This M1 ablation uses the same frozen original BF7 v1 task. Execution requires a separate identity-bound Pilot authorization. Begin with an empty scientific candidate pool. Main independently decides hypotheses, optional mathematics, legal structure choices and control research; no method or structure change is mandatory. Preserve the exact two-segment/six-tendon executable domain and all other frozen FamilySpace bounds. Preserve the three conditions, initial-state rule, sampling, time horizon, physics, 0.01 m position and 0.03 m/s holding-speed constraints. One physical structure and discretization must satisfy all three; each has its own legal control. Explain material decisions using observed facts, a testable physical hypothesis, expected and weakening observations, the chosen tool, returned evidence and next decision. Full Main/Reporter and registered mechanism/T1/current-Study T2 tools remain available. Mathematical predictions never establish independent acceptance. A changed structure invalidates inherited control and Replay acceptance for all conditions. Optimize/adapt each condition, obtain its necessary independent physical Replay, publicly read every complete original acceptance certificate, then jointly SELECT one structure and immediately STOP. No extra success confirmation, identical-candidate duplicate Replay, half-timestep or perturbed-start study. Do not access historical winning structures, controls, M1/P3 case bodies or private scientific Stores; only the frozen generic procedure whitelist is available. A finite unsuccessful search is not an infeasibility proof. Request smaller legal effort when useful but never expand any frozen ceiling; account failures and unknown outcomes and never automatically relaunch unknown work. This configuration alone is not an execution grant: the existing exact identity-bound user authorization event is required before sending requests. Automated physical_response initialization is unauthorized. Native T1, Direct, ordinary legal initialization, independent physical Replay and joint SELECT remain available. This ablation removes the automated helper, not all possible manually organized physical experiments.",
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "segments.*.length_m",
+      "segments.*.young_pa",
+      "segments.*.sections.*.parameters.*",
+      "spans.*.radius_m",
+      "spans.*.phase_rad"
+    ]
+  },
+  "control_initialization_methods": [
+    "baseline",
+    "mathematical_response",
+    "capability_sequence"
+  ]
+}
