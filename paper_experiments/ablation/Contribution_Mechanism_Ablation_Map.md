@@ -1,16 +1,36 @@
 # Contribution–Mechanism–Ablation Map
 
-本表冻结论文贡献、可观察机制和实验问题，避免将理论名称、Schema 准入或工具授权直接写成实际科研收益。历史结果只复用，不重跑；新消融尚无科学结果。
+本表冻结论文贡献、可观察机制和实验问题，避免将理论名称、Schema 准入或工具授权直接写成实际科研收益。历史 Full 与 No-Math Pilot 结果只复用，不重跑。本轮准备 Full-Selective 与 Direct-Math-Tools 两组，均未启动。
 
 ## 三个论文贡献
 
 | 贡献 | 论文主张与系统机制 | 理论依据 | 可检验的证据 |
 |---|---|---|---|
 | C1: Mechanism-Guided Autonomous Research（机制驱动的自主科研决策） | Main 根据物理现象提出可检验假设，自主选择数学分析或物理实验，依据新证据调整研究方向 | Abductive Reasoning；Hypothesis Testing；Active Diagnosis；Sequential Research Decision Making | 假设—预期/削弱观测—行动—结果—下一决策链；由 Fixed-Plan 对照动态规划价值 |
-| C2: Composable Mathematical Research（可组合的数学研究能力） | Main 将研究意图转化为具体数学问题，选择参数、物理观测和数学操作，获得有依据且带有效性边界的设计建议 | KKT 与活动集分析；参数敏感性；参数化优化；双参数有限尺度交互分析；数值有效性与物理约束检查 | No-Math 检验整体数学研究体系，No-Pairwise-Interaction 检验已实际使用的四点交互；投影的独立对照须先满足可消融条件 |
+| C2: Composable Mathematical Research（可组合的数学研究能力） | 将底层数学能力组织成能够理解显式科研意图、构造数学问题、选择并组合数学操作的结构化研究层；必要的模型绑定和合法性验证始终保留 | 参数化数学问题；KKT/活动集、局部敏感性、有限尺度交互及数值有效性 | 核心对照为 Full-Selective vs Direct-Math-Tools；前者保留现有结构化组织，后者由 Main 直接组合相同底层 API。No-Optional-Math、No-Pairwise-Interaction 为补充问题；不独立消融意图投影 |
 | C3: Evidence-Grounded Iterative Research（证据驱动的迭代与记忆） | Knowledge、Store、Trace、Reporter 支撑跨轮次研究、证据追溯、上下文压缩和结果解释 | 科学证据可追溯性；外部记忆；信息组织与上下文管理；证据驱动的迭代决策 | No-Knowledge 测领域知识输入；Reporter ON/OFF 采用相同历史证据快照的小实验；Store/Trace 本轮始终保留 |
 
 上述数学理论与科研推理思想已有成熟基础。系统创新是科研决策、问题组合、确定性验证和证据迭代的组织与连接；不宣称提出新的 KKT、敏感性或双因素交互理论，也不把所有 C3 组件的价值都归于一个 No-Knowledge 对照。
+
+## 当前 C2 核心对照（2026-11-12）
+
+| 能力 | Full-Selective | Direct-Math-Tools |
+|---|---|---|
+| Main 自主假设、行动、证据调整和停止 | ON | ON |
+| 结构化科研意图/数学问题编译与语义操作组织 | ON：现有 scientific_question_v4 与五种 operation | OFF：不暴露高层 mechanism_structure_v1；Main 明确组织底层函数及输入 |
+| 数值能力 | 现有平衡/约束/观测、有限差分、Powell、算术对照、有限四点交互 | 相同共享函数，经 research_math_api 薄适配器调用；无任意代码或表达式执行 |
+| 普通物理搜索 | v1 mixed + passive_task_response + finite physical budget 的直接 Replay 路径 | 完全相同 |
+| 研究动作选择指导 | 同版 research-action-selection-and-stopping@1，完整内容自动进入 Main system prompt | 完全相同 |
+| Knowledge / Reporter / 初始候选 | 历史45条加共同Skill；Reporter相同；空池、agent_choice | 完全相同 |
+| 硬预算 | Provider 200（含保护4）、math 100、physical 150、public 800；search每次24/16 | 完全相同 |
+
+这是结构化数学研究组织方式的对照，不是移除数学算法。Direct 可以直接求值、差分、调用求解器、对保存数值做算术并自行组合四点研究；Full 不额外获得数学算法、领域指导或更高预算。共同的动作选择 Skill 优化 Main 的信息价值、重复识别、成本与停止策略，不能归为 C2 结构化层独有收益。
+
+历史 No-Math 更准确称 No-Optional-Math：主动五类机制数学操作为0，但物理评价器仍计算机制指标，Main 曾收到并引用张力/松弛/招募信息；因此它不是 Task-Only Feedback。历史 Full 普通搜索借道数学适配器，和该 Pilot 不匹配，不能用150对42归因 C2。本轮两组明确统一直接物理路径与数值停止合同，不给 Full 单独追加成对因果或独立 Replay 要求。
+
+单次匹配运行仅是探索性对照，稳定量化结论需独立重复。No-Pairwise-Interaction、Fixed-Plan、No-Knowledge、Reporter 快照配对与跨任务案例继续作为其他明确问题，均不在本轮启动；本轮不增加第三组。
+
+细节及未启动声明见 [本轮实验计划](P3_structured_vs_direct_math_plan.md)。旧配置和历史结果保留，下面原有机制盘点不代表本轮新增实验组。
 
 ## C1 与 C2 的区别
 
@@ -38,7 +58,7 @@ C2 不能缩减为五种 operation 列表。问题构造、参数/观测/约束�
 | 实验 | 关闭能力 | 保留能力 | 对应问题与本轮状态 |
 |---|---|---|---|
 | No-Math | 全部可选机制数学研究，五种 operation 均关闭 | Main 自主研究、普通 FamilySearch、完整被动物理响应与原任务评价、结构生成和参数修改 | 数学研究体系整体是否有价值；配置已修订 |
-| No-Intent-Projection | 条件满足时关闭自适应科研意图投影 | 数学工具、固定问题模板、物理评价 | 自主构造数学问题是否有价值；本轮未满足独立消融条件，不创建配置 |
+| No-Intent-Projection | 不作为独立实验组 | 必要的模型/任务绑定与验证保留 | 沿用不可独立关闭的审计结论；本轮改为比较完整结构化研究层与直接底层 API，不再单独开发此开关 |
 | No-Pairwise-Interaction | MechanismStudy.operation=interact 的双参数四点交互 | inspect、differentiate、optimize、compare、普通坐标搜索、联合参数修改、FamilySearch 的其他合法功能 | 双参数有限尺度交互是否有独立价值；沿用文件名 no_interact |
 | No-Knowledge | Main/Reporter 领域知识检索、同源缓存、预载和正文输入 | System Prompt、TaskDefinition、工具 Schema、必要物理模型说明、原数学与物理工具、Store/Trace | 领域知识是否改善效率与决策；配置已修订 |
 
