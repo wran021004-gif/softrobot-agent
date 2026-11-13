@@ -1,0 +1,3 @@
+# 数据统计图草稿
+
+这里保留此前生成的草稿，当前停止新增与精修；后续写论文时依据原始结果重新设计。可复用数据见根目录CSV、SOURCE_DATA和FIGURE_DATA。结构与任务动画分别见FIGURES_MUJOCO、ANIMATIONS_MUJOCO。

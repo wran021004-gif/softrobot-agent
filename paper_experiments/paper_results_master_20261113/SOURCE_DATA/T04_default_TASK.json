@@ -1,0 +1,422 @@
+{
+  "acceptance": {
+    "evaluator": "figure_eight",
+    "grid": "physics_including_initial",
+    "historical_status": null,
+    "parameters": {
+      "cycle_drift_m": 0.002,
+      "cycle_windows_s": [
+        [
+          0,
+          11
+        ],
+        [
+          11,
+          22.001
+        ]
+      ],
+      "independent_channels": 4,
+      "initial_state_mode": "qualified_candidate_equilibrium",
+      "initial_static_balance_max_nm": 1e-07,
+      "lobe_y_max_m": 0.018,
+      "lobe_y_min_m": -0.018,
+      "lobe_z_max_m": 0.177,
+      "lobe_z_min_m": 0.163,
+      "rigid_tool": {
+        "body": "payload",
+        "com_local_m": [
+          0.007,
+          0,
+          0
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            1e-08,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4e-08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            4e-08
+          ]
+        ],
+        "mass_kg": 0.002
+      },
+      "speed_m_s": 0.03,
+      "stroke_m": 0.03,
+      "tension_n": [
+        0.2,
+        8
+      ],
+      "tracking_max_m": 0.006,
+      "tracking_rmse_m": 0.003
+    },
+    "required_signals": [
+      "time_s",
+      "tip_m",
+      "qpos",
+      "qvel",
+      "tension_n",
+      "contacts",
+      "warnings",
+      "tendon_length_m"
+    ],
+    "source_files": [
+      {
+        "path": "figure_eight_tracking/task.json",
+        "sha256": "0c5d34455b58ec200580c0602079bb1377bee768d0a8f7e0f5c4a4e296268f9f"
+      },
+      {
+        "path": "scripts/solve_figure_eight.py",
+        "sha256": "66e417e4d2944504b3c387bc0393c3e696f62850da944284320cd1a33e2fdf26"
+      }
+    ],
+    "task_id": "T04",
+    "version": "task_acceptance_v1"
+  },
+  "actuator_channels": [
+    "actuator_commands"
+  ],
+  "contract_version": "1.0.0",
+  "environment": {
+    "contract": "experiment.assembly",
+    "data": {
+      "environment": {
+        "coordinate_frame": "world_base_x_forward_yz_cross_section",
+        "environment_id": "reach_free",
+        "gravity_m_s2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+        "lights": [
+          {
+            "direction": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "position_m": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "conaffinity": 1,
+            "contype": 0,
+            "half_size_m": [
+              2.0,
+              2.0,
+              0.1
+            ],
+            "kind": "plane",
+            "name": "floor",
+            "position_m": [
+              0.0,
+              0.0,
+              -0.02
+            ]
+          }
+        ],
+        "schema_version": "1",
+        "truth_status": "HUMAN_OWNED",
+        "units": "SI"
+      },
+      "external_forces": [],
+      "floor_id": "floor",
+      "mount": {
+        "position_m": [
+          0.0,
+          0.0,
+          0.17
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "physical_environment": {
+        "actuator_min_tension_n": 0.2,
+        "bodies": [],
+        "collision_policy": "native_default",
+        "contact_pairs": [],
+        "geometries": [
+          {
+            "body": "payload",
+            "conaffinity": 2,
+            "contype": 1,
+            "kind": "capsule",
+            "name": "pointer_shaft",
+            "position_m": [
+              0.007,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              0.7071067811865476,
+              0.0,
+              0.7071067811865476,
+              0.0
+            ],
+            "size_m": [
+              0.002,
+              0.007
+            ]
+          },
+          {
+            "body": "payload",
+            "conaffinity": 2,
+            "contype": 1,
+            "kind": "sphere",
+            "name": "pointer_head",
+            "position_m": [
+              0.014,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.003
+            ]
+          }
+        ],
+        "input_freeze_after_s": null,
+        "replace_robot_geometries": [
+          "payload_shape"
+        ],
+        "robot_hinge_range_rad": [
+          -0.3,
+          0.3
+        ],
+        "sites": [],
+        "solver_iterations": null,
+        "solver_tolerance": null,
+        "version": "physical_environment_v1",
+        "wrenches": []
+      }
+    },
+    "version": "1.0.0"
+  },
+  "evaluator": {
+    "extension_id": "evaluate.tracking",
+    "parameters": {
+      "contract": "reference.tracking_evaluation",
+      "data": {
+        "geometry_step_m": 0.001,
+        "max_error_m": 0.006
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "failure_policy": "retain_invalid_and_constraint_failures",
+  "family": "task.tracking",
+  "goal": {
+    "contract": "reference.parametric_tracking_goal",
+    "data": {
+      "reference": {
+        "amplitude_y_m": 0.02,
+        "amplitude_z_m": 0.008,
+        "center_m": [
+          0.282,
+          0.0,
+          0.17
+        ],
+        "cycles": 2,
+        "duration_s": 22,
+        "frequency_hz": 0.1,
+        "kind": "figure_eight",
+        "start_ramp_s": 2,
+        "stop_ramp_s": 2
+      },
+      "time_requirement": "timed"
+    },
+    "version": "1.0.0"
+  },
+  "initializer": {
+    "extension_id": "initialize.family",
+    "parameters": {
+      "contract": "family.initial",
+      "data": {
+        "qpos_rad": {
+          "segment_0_cell_0_y": 0.0373147311282136,
+          "segment_0_cell_0_z": -3.3607122937486307e-10,
+          "segment_0_cell_10_y": -0.018921310284689175,
+          "segment_0_cell_10_z": -4.566925446808288e-10,
+          "segment_0_cell_11_y": -0.021073456101018608,
+          "segment_0_cell_11_z": -4.0887985936703735e-10,
+          "segment_0_cell_1_y": 0.03649447938027095,
+          "segment_0_cell_1_z": -4.1030161556376875e-10,
+          "segment_0_cell_2_y": 0.03324706394720526,
+          "segment_0_cell_2_z": -4.5481031141108264e-10,
+          "segment_0_cell_3_y": 0.027814596783606784,
+          "segment_0_cell_3_z": -4.667747846344437e-10,
+          "segment_0_cell_4_y": 0.02060053534777464,
+          "segment_0_cell_4_z": -4.456820558601272e-10,
+          "segment_0_cell_5_y": 0.012137816498316089,
+          "segment_0_cell_5_z": -3.9331039372124e-10,
+          "segment_0_cell_6_y": 0.0030487007110424303,
+          "segment_0_cell_6_z": -3.1357791985637483e-10,
+          "segment_0_cell_7_y": -0.003730259285506323,
+          "segment_0_cell_7_z": -3.9656415771217073e-10,
+          "segment_0_cell_8_y": -0.00991586427423078,
+          "segment_0_cell_8_z": -4.5015655547436733e-10,
+          "segment_0_cell_9_y": -0.015107589305559761,
+          "segment_0_cell_9_z": -4.707525251651683e-10,
+          "segment_1_cell_0_y": -0.028029596229006255,
+          "segment_1_cell_0_z": -3.6271507130317774e-10,
+          "segment_1_cell_10_y": -0.041555688985042326,
+          "segment_1_cell_10_z": -3.64448248147599e-10,
+          "segment_1_cell_11_y": -0.03865591735112044,
+          "segment_1_cell_11_z": -3.354488796026165e-10,
+          "segment_1_cell_1_y": -0.03345897646061945,
+          "segment_1_cell_1_z": -4.039040207072781e-10,
+          "segment_1_cell_2_y": -0.03697525436023184,
+          "segment_1_cell_2_z": -4.236880262737362e-10,
+          "segment_1_cell_3_y": -0.03838850188167943,
+          "segment_1_cell_3_z": -4.2100086366137017e-10,
+          "segment_1_cell_4_y": -0.03762214276393696,
+          "segment_1_cell_4_z": -3.9600525454759933e-10,
+          "segment_1_cell_5_y": -0.03471811222891949,
+          "segment_1_cell_5_z": -3.500682173053635e-10,
+          "segment_1_cell_6_y": -0.029833979356546064,
+          "segment_1_cell_6_z": -2.8565938814042777e-10,
+          "segment_1_cell_7_y": -0.03618778609877117,
+          "segment_1_cell_7_z": -3.3467693196469814e-10,
+          "segment_1_cell_8_y": -0.04029006053407659,
+          "segment_1_cell_8_z": -3.6413937868017897e-10,
+          "segment_1_cell_9_y": -0.04211160125170044,
+          "segment_1_cell_9_z": -3.742182247772823e-10
+        },
+        "qualification": {
+          "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+          "media_type": "application/json"
+        },
+        "qvel_rad_s": {
+          "segment_0_cell_0_y": 0.0,
+          "segment_0_cell_0_z": 0.0,
+          "segment_0_cell_10_y": 0.0,
+          "segment_0_cell_10_z": 0.0,
+          "segment_0_cell_11_y": 0.0,
+          "segment_0_cell_11_z": 0.0,
+          "segment_0_cell_1_y": 0.0,
+          "segment_0_cell_1_z": 0.0,
+          "segment_0_cell_2_y": 0.0,
+          "segment_0_cell_2_z": 0.0,
+          "segment_0_cell_3_y": 0.0,
+          "segment_0_cell_3_z": 0.0,
+          "segment_0_cell_4_y": 0.0,
+          "segment_0_cell_4_z": 0.0,
+          "segment_0_cell_5_y": 0.0,
+          "segment_0_cell_5_z": 0.0,
+          "segment_0_cell_6_y": 0.0,
+          "segment_0_cell_6_z": 0.0,
+          "segment_0_cell_7_y": 0.0,
+          "segment_0_cell_7_z": 0.0,
+          "segment_0_cell_8_y": 0.0,
+          "segment_0_cell_8_z": 0.0,
+          "segment_0_cell_9_y": 0.0,
+          "segment_0_cell_9_z": 0.0,
+          "segment_1_cell_0_y": 0.0,
+          "segment_1_cell_0_z": 0.0,
+          "segment_1_cell_10_y": 0.0,
+          "segment_1_cell_10_z": 0.0,
+          "segment_1_cell_11_y": 0.0,
+          "segment_1_cell_11_z": 0.0,
+          "segment_1_cell_1_y": 0.0,
+          "segment_1_cell_1_z": 0.0,
+          "segment_1_cell_2_y": 0.0,
+          "segment_1_cell_2_z": 0.0,
+          "segment_1_cell_3_y": 0.0,
+          "segment_1_cell_3_z": 0.0,
+          "segment_1_cell_4_y": 0.0,
+          "segment_1_cell_4_z": 0.0,
+          "segment_1_cell_5_y": 0.0,
+          "segment_1_cell_5_z": 0.0,
+          "segment_1_cell_6_y": 0.0,
+          "segment_1_cell_6_z": 0.0,
+          "segment_1_cell_7_y": 0.0,
+          "segment_1_cell_7_z": 0.0,
+          "segment_1_cell_8_y": 0.0,
+          "segment_1_cell_8_z": 0.0,
+          "segment_1_cell_9_y": 0.0,
+          "segment_1_cell_9_z": 0.0
+        },
+        "tensions_n": {
+          "tendon_0": 1.73181746737138,
+          "tendon_1": 3.350965277515667,
+          "tendon_2": 1.7318174943346532,
+          "tendon_3": 0.21000000000000002
+        },
+        "unspecified": "zero"
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "name": "Frozen figure-eight tracking",
+  "objectives": [
+    {
+      "direction": "minimize",
+      "metric": "rms_position_error",
+      "units": "m",
+      "weight": 1.0
+    }
+  ],
+  "observations": [
+    {
+      "dimension": 3,
+      "entity": "tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_position",
+      "phase": "post_step",
+      "units": "m"
+    }
+  ],
+  "robot_families": [
+    "tendon_robot_family"
+  ],
+  "sampling": {
+    "aggregation": "per_instance",
+    "seeds": [
+      17
+    ],
+    "split": "development",
+    "window_s": [
+      0.01,
+      22.0
+    ]
+  },
+  "source": "Showcase 2e5d1088746df0916e2a7ec60f4780998c6ba004 figure_eight_tracking/task.json and scripts/solve_figure_eight.py; prepared candidate equilibrium required",
+  "status": "development_valid",
+  "task_id": "figure-eight-tracking-v1",
+  "task_version": "1.0.0",
+  "timing": {
+    "control_period_s": 0.01,
+    "duration_s": 22.0,
+    "sample_period_s": 0.01,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.001
+  }
+}

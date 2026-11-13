@@ -1,0 +1,189 @@
+{
+  "source": {
+    "artifact_id": "59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+    "media_type": "application/json"
+  },
+  "keys": [
+    "active_actuators",
+    "attempted_steps",
+    "base_model_signature",
+    "boundary",
+    "coordinate_order",
+    "cost",
+    "cost_initialization",
+    "cost_observation_scope",
+    "episodes",
+    "execution_identity",
+    "implementation",
+    "initial_state",
+    "initial_state_result",
+    "initial_state_source",
+    "intervention",
+    "joint_count",
+    "kind",
+    "material_point_bindings",
+    "model_builds",
+    "mujoco_version",
+    "native_forward_calls",
+    "numerical_confirmation",
+    "numerical_invariant_model_signature",
+    "paired_ablation",
+    "payout_lengths_m",
+    "physical_binding",
+    "physics_steps",
+    "solver_options",
+    "status",
+    "tendon_order",
+    "timings_s",
+    "tip_binding",
+    "trace_files",
+    "unloaded_equilibrium",
+    "unobserved_work_possible"
+  ],
+  "preview": {
+    "coordinate_order": [
+      "segment_0_cell_0_y",
+      "segment_0_cell_0_z",
+      "segment_0_cell_1_y",
+      "segment_0_cell_1_z",
+      "segment_1_cell_0_y",
+      "segment_1_cell_0_z",
+      "segment_1_cell_1_y",
+      "segment_1_cell_1_z"
+    ],
+    "cost": {
+      "KKT_solves": 0,
+      "QP_calls": 0,
+      "attempted_steps": 1600000,
+      "constraint_calls": 4,
+      "constraint_jacobian_calls": 18,
+      "constraint_observations": 1600008,
+      "episodes_completed": 8,
+      "episodes_started": 8,
+      "equilibrium_solves": 1,
+      "gradient_calls": 18,
+      "hessian_columns": 8,
+      "integration_state_restores": 0,
+      "integration_state_saves": 48,
+      "material_point_jacobian_calls": 8375242,
+      "model_builds": 8,
+      "multiplier_fits": 0,
+      "native_forward_calls": 3430050,
+      "native_position_attempts": 1,
+      "native_position_calls": 1,
+      "objective_calls": 2,
+      "optimizer_iterations": 1,
+      "physics_steps": 1600000,
+      "route_checked_poses": 3200008,
+      "route_segment_body_checks": 179200448,
+      "static_balance_forwards": 230016,
+      "tendon_jacobian_extractions": 1600026
+    },
+    "initial_state": {
+      "qpos_rad": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "qvel_rad_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "joint_count": 8,
+    "kind": "passive_dynamic_execution_v2",
+    "solver_options": {
+      "integrator": 3,
+      "iterations": 100,
+      "timestep_s": 0.000125,
+      "tolerance": 1e-10
+    },
+    "status": "completed",
+    "tendon_order": [
+      "tendon_0",
+      "tendon_1"
+    ],
+    "timings_s": {
+      "ablation": 280.76520829999936,
+      "baseline": 284.8635607000033,
+      "total": 2535.815360700006
+    },
+    "trace_files": [
+      {
+        "bytes": 159747257,
+        "format": "full_physics_csv_v3",
+        "load_condition": "plus_x",
+        "path": "independent/baseline/episode_0.csv",
+        "physics_steps": 160000,
+        "sha256": "6982008ac5910187597c8032e43b8a2dfb45c417b9eb56ac3b208c65782b8546"
+      },
+      {
+        "bytes": 159513006,
+        "format": "full_physics_csv_v3",
+        "load_condition": "minus_x",
+        "path": "independent/baseline/episode_1.csv",
+        "physics_steps": 160000,
+        "sha256": "ef4d69e4497fccda5963d1b2871f0073a9e71b663fd06a6df0ee8f6d26fe3e26"
+      },
+      {
+        "bytes": 156159657,
+        "format": "full_physics_csv_v3",
+        "load_condition": "plus_x",
+        "path": "independent/ablation/episode_0.csv",
+        "physics_steps": 160000,
+        "sha256": "199a3b3046fbe48333afa9cd3d27e6fae5b11c090f46c74b4dd1fd48690a94a5"
+      },
+      {
+        "bytes": 156242731,
+        "format": "full_physics_csv_v3",
+        "load_condition": "minus_x",
+        "path": "independent/ablation/episode_1.csv",
+        "physics_steps": 160000,
+        "sha256": "4bed46bc11b433b8886862989b8638eeeb82cc44a5cbfd295349bb01c4d7e20e"
+      },
+      {
+        "bytes": 319811134,
+        "format": "full_physics_csv_v3",
+        "load_condition": "plus_x",
+        "path": "half_timestep/episode_0.csv",
+        "physics_steps": 320000,
+        "sha256": "198d3456d0626f77d3dfc36740e7d5d8ed2314e9272819018096af4c1091c01e"
+      },
+      {
+        "bytes": 319415952,
+        "format": "full_physics_csv_v3",
+        "load_condition": "minus_x",
+        "path": "half_timestep/episode_1.csv",
+        "physics_steps": 320000,
+        "sha256": "5d5b0a7a058cce910aa3d793826d4095aba52236f4c3a5af035ff8cf1f3d0647"
+      },
+      {
+        "bytes": 160725846,
+        "format": "full_physics_csv_v3",
+        "load_condition": "plus_x",
+        "path": "initial_perturbation/episode_0.csv",
+        "physics_steps": 160000,
+        "sha256": "6c541fe0150e28cdfca57ec5dda0e27898fbab2056c414166cf3422cf515bac6"
+      },
+      {
+        "bytes": 160800880,
+        "format": "full_physics_csv_v3",
+        "load_condition": "minus_x",
+        "path": "initial_perturbation/episode_1.csv",
+        "physics_steps": 160000,
+        "sha256": "5720d6745592584e3c5bb1c581cf1f06742ca8828e804fa1c9e16797806195bb"
+      }
+    ]
+  }
+}

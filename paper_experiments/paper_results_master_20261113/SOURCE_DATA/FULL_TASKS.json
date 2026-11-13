@@ -1,0 +1,909 @@
+[
+  {
+    "task_id": "T01",
+    "task_name": "多目标到达与保持",
+    "task_category": "active_reach_hold",
+    "task_description": "M1_reach_hold",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.1625,
+        0.1125
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生非线性控制响应优化后张力节点执行",
+    "required_conditions": [
+      "central_high",
+      "negative_low",
+      "positive_high"
+    ],
+    "passed_conditions": 3,
+    "total_conditions": 3,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "central_high": {
+        "geometric_stroke_max": 0.006242437087095598,
+        "geometric_stroke_min": -0.00854727312436876,
+        "geometric_tendon_speed": 0.02475,
+        "holding_position": 0.009146735638176468,
+        "holding_speed": 0.029699999854067648,
+        "solver_errors": 0.0,
+        "tension_max": 4.742583100414827,
+        "tension_min": -0.0,
+        "terminal_position": 0.009146735638176468,
+        "geometric_stroke_max_m": 0.006242437087095598,
+        "geometric_stroke_min_m": -0.00854727312436876,
+        "geometric_tendon_speed_max_m_s": 0.02475,
+        "holding_max_error_m": 0.009146735638176468,
+        "holding_max_speed_m_s": 0.029699999854067648,
+        "terminal_error_m": 0.009146735638176468
+      },
+      "negative_low": {
+        "geometric_stroke_max": 0.008884071935855276,
+        "geometric_stroke_min": -0.008142095679415817,
+        "geometric_tendon_speed": 0.024772647745639094,
+        "holding_position": 0.009905895250612671,
+        "holding_speed": 0.0297196178042583,
+        "solver_errors": 0.0,
+        "tension_max": 2.637260277939597,
+        "tension_min": -0.0,
+        "terminal_position": 0.009833273979196665,
+        "geometric_stroke_max_m": 0.008884071935855276,
+        "geometric_stroke_min_m": -0.008142095679415817,
+        "geometric_tendon_speed_max_m_s": 0.024772647745639094,
+        "holding_max_error_m": 0.009905895250612671,
+        "holding_max_speed_m_s": 0.0297196178042583,
+        "terminal_error_m": 0.009833273979196665
+      },
+      "positive_high": {
+        "geometric_stroke_max": 0.004063966875702596,
+        "geometric_stroke_min": -0.008651931381412348,
+        "geometric_tendon_speed": 0.02474999999999999,
+        "holding_position": 0.009899999999999973,
+        "holding_speed": 0.029699999928910016,
+        "solver_errors": 0.0,
+        "tension_max": 4.401956289169533,
+        "tension_min": -0.0,
+        "terminal_position": 0.009813057962543706,
+        "geometric_stroke_max_m": 0.004063966875702596,
+        "geometric_stroke_min_m": -0.008651931381412348,
+        "geometric_tendon_speed_max_m_s": 0.02474999999999999,
+        "holding_max_error_m": 0.009899999999999973,
+        "holding_max_speed_m_s": 0.029699999928910016,
+        "terminal_error_m": 0.009813057962543706
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STORE_CORRECTED_PROTOCOL#artifacts/8894dee5540172c14282312c3f555730e79e34808b1aba47c43bbe72e459989f",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STORE_CORRECTED_PROTOCOL#artifacts/0d052241a5ff64cf334fda5a83f72ea8e7182d96cceb659e4ea31dc2feb57975",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STORE_CORRECTED_PROTOCOL#artifacts/dbd9be49ae1d85c08911176fa5c93c5d3516717777327af34a2f73f856d8f77e"
+    ],
+    "run_id": "codex-expert-T01-20261113-s1",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T02",
+    "task_name": "带载受扰保持（M2）",
+    "task_category": "loaded_hold",
+    "task_description": "M2_loaded_hold",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生非线性控制响应优化后张力节点执行",
+    "required_conditions": [
+      "negative",
+      "positive",
+      "zero"
+    ],
+    "passed_conditions": 3,
+    "total_conditions": 3,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "negative": {
+        "geometric_stroke_max": 0.005316207417810803,
+        "geometric_stroke_min": -0.0034143066130029043,
+        "geometric_tendon_speed": 0.024736707763668535,
+        "holding_position": 0.009897088402492153,
+        "holding_speed": 0.019757280334218204,
+        "solver_errors": 0.0,
+        "tension_max": 4.718492376283703,
+        "tension_min": -0.0,
+        "terminal_position": 0.00943946043182984,
+        "geometric_stroke_max_m": 0.005316207417810803,
+        "geometric_stroke_min_m": -0.0034143066130029043,
+        "geometric_tendon_speed_max_m_s": 0.024736707763668535,
+        "holding_max_error_m": 0.009897088402492153,
+        "holding_max_speed_m_s": 0.019757280334218204,
+        "terminal_error_m": 0.00943946043182984
+      },
+      "positive": {
+        "geometric_stroke_max": 0.005093465479993953,
+        "geometric_stroke_min": -0.0027839089451672794,
+        "geometric_tendon_speed": 0.024744238841624546,
+        "holding_position": 0.009880943306424453,
+        "holding_speed": 0.019725865714044232,
+        "solver_errors": 0.0,
+        "tension_max": 4.7314513049519435,
+        "tension_min": -0.0,
+        "terminal_position": 0.00953349902465537,
+        "geometric_stroke_max_m": 0.005093465479993953,
+        "geometric_stroke_min_m": -0.0027839089451672794,
+        "geometric_tendon_speed_max_m_s": 0.024744238841624546,
+        "holding_max_error_m": 0.009880943306424453,
+        "holding_max_speed_m_s": 0.019725865714044232,
+        "terminal_error_m": 0.00953349902465537
+      },
+      "zero": {
+        "geometric_stroke_max": 0.0054192244835994385,
+        "geometric_stroke_min": -0.0029546945485629528,
+        "geometric_tendon_speed": 0.02473691807375513,
+        "holding_position": 0.005357274331766039,
+        "holding_speed": 0.019790830274628676,
+        "solver_errors": 0.0,
+        "tension_max": 4.726844883959983,
+        "tension_min": -0.0,
+        "terminal_position": 0.0050628666986212625,
+        "geometric_stroke_max_m": 0.0054192244835994385,
+        "geometric_stroke_min_m": -0.0029546945485629528,
+        "geometric_tendon_speed_max_m_s": 0.02473691807375513,
+        "holding_max_error_m": 0.005357274331766039,
+        "holding_max_speed_m_s": 0.019790830274628676,
+        "terminal_error_m": 0.0050628666986212625
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/ee6526754ee50859f37b38c277ca353dd081d7f788f49a7dc6bc5ebeaa9a2141",
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/bc6b846d34fef0c5e8b3ba47f3e3b7252ce057b0044f654882fe0295abb2ba4b"
+    ],
+    "run_id": "codex-surrogate-T02-20261112",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T03",
+    "task_name": "快速到达（M3）",
+    "task_category": "fast_reach",
+    "task_description": "M3_fast_reach",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生非线性控制响应优化后张力节点执行",
+    "required_conditions": [
+      "default"
+    ],
+    "passed_conditions": 1,
+    "total_conditions": 1,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "default": {
+        "geometric_stroke_max": 0.006274302285623923,
+        "geometric_stroke_min": -0.0036801474059404704,
+        "geometric_tendon_speed": 0.024749984920440206,
+        "holding_position": 0.002662671632155634,
+        "holding_speed": 0.019783051372062464,
+        "solver_errors": 0.0,
+        "tension_max": 5.07005002602848,
+        "tension_min": -0.0,
+        "terminal_position": 0.002109920802953995,
+        "geometric_stroke_max_m": 0.006274302285623923,
+        "geometric_stroke_min_m": -0.0036801474059404704,
+        "geometric_tendon_speed_max_m_s": 0.024749984920440206,
+        "holding_max_error_m": 0.002662671632155634,
+        "holding_max_speed_m_s": 0.019783051372062464,
+        "terminal_error_m": 0.002109920802953995
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T03_M3_fast_reach\\STORE\\platform.sqlite#artifacts/7e4d609d65f6d50abb627a59cbf5ee9831717ab6da01c29595aec18d3615df8c"
+    ],
+    "run_id": "codex-surrogate-T03-20261112",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T03_M3_fast_reach\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T04",
+    "task_name": "双叶八字轨迹跟踪",
+    "task_category": "trajectory_tracking",
+    "task_description": "Figure-eight Tracking",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.14,
+        0.118
+      ],
+      "tendons": 4,
+      "actuators": 4,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生平衡点组连续构造 + 周期张力前馈",
+    "required_conditions": [
+      "default"
+    ],
+    "passed_conditions": 1,
+    "total_conditions": 1,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "default": {
+        "actual_two_lobes_each_cycle": 1.0,
+        "contacts": 0.0,
+        "cycle_1_lobe_clearance": 0.0008965565703454303,
+        "cycle_2_lobe_clearance": 0.0008964712539745179,
+        "cycle_count_error": 0.0,
+        "cycle_drift": 0.0010088782522628332,
+        "no_saturation": 0.00990000000000002,
+        "speed": 0.0012876943118840245,
+        "stroke": 0.003729687336853027,
+        "tracking_max": 0.0010206639031726755,
+        "tracking_rmse": 0.0006878528448055238,
+        "warnings": 0.0,
+        "cycle_phase_matched_max_difference_m": 0.0010088782522628332,
+        "max_error_m": 0.0010206639031726755,
+        "terminal_speed_m_s": 8.880355752485461e-05,
+        "tracking_rmse_m": 0.0006878528448055238
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH#artifacts/f9d19d368c9f183fab8f69ea8d984c97c0665dc67117cbcc46c7f245a4de5f8c"
+    ],
+    "run_id": "codex-expert-T04-20261113-core029-interior",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T05",
+    "task_name": "工具位置与轴向姿态（M5）",
+    "task_category": "position_orientation",
+    "task_description": "M5_tool_axis",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生直接控制搜索后张力执行",
+    "required_conditions": [
+      "default"
+    ],
+    "passed_conditions": 1,
+    "total_conditions": 1,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "default": {
+        "geometric_stroke_max": 0.0030902659168050017,
+        "geometric_stroke_min": -0.003370090902027778,
+        "geometric_tendon_speed": 0.024746331837824785,
+        "solver_errors": 0.0,
+        "tension_max": 1.4877256938863477,
+        "tension_min": -0.0,
+        "tool_axis_direction": 0.05182348756322416,
+        "tool_position": 0.007458477556880469,
+        "geometric_stroke_max_m": 0.0030902659168050017,
+        "geometric_stroke_min_m": -0.003370090902027778,
+        "geometric_tendon_speed_max_m_s": 0.024746331837824785,
+        "max_position_error": 0.007458477556880469,
+        "max_tool_axis_angle_error": 0.05182348756322416
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite#artifacts/cd1e6aa8326938f069ad096e8f196aa688ac66c82df5e7ba4fbf36f3e165e5b2"
+    ],
+    "run_id": "codex-surrogate-T05-20261112",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T06",
+    "task_name": "带载位置—姿态扫描（M6）",
+    "task_category": "loaded_timed_scan",
+    "task_description": "M6_loaded_scan",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生直接控制搜索后定时张力执行",
+    "required_conditions": [
+      "default"
+    ],
+    "passed_conditions": 1,
+    "total_conditions": 1,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "default": {
+        "geometric_stroke_max": 0.002214475847617109,
+        "geometric_stroke_min": -0.0028449788311974977,
+        "geometric_tendon_speed": 0.024749270174872277,
+        "no_environment_contact": 0.0,
+        "solver_errors": 0.0,
+        "tension_max": 3.111687614158914,
+        "tension_min": -0.0,
+        "tool_axis_direction": 0.11044811880898212,
+        "tracking_max_error": 0.011819789230672182,
+        "geometric_stroke_max_m": 0.002214475847617109,
+        "geometric_stroke_min_m": -0.0028449788311974977,
+        "geometric_tendon_speed_max_m_s": 0.024749270174872277,
+        "max_position_error": 0.011819789230672182,
+        "max_tool_axis_angle_error": 0.11044811880898212
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T06_M6_loaded_scan\\STORE\\platform.sqlite#artifacts/a7992f28ff2449a79db12d1b1f142e94dfd8e407cfdc7a6af6ea8b324e2126c6"
+    ],
+    "run_id": "codex-surrogate-T06-20261112",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T06_M6_loaded_scan\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T07",
+    "task_name": "四独立腱共同结构多任务（C1）",
+    "task_category": "shared_structure_multitask",
+    "task_description": "C1 Four-tendon Multi-task",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.1585,
+        0.109
+      ],
+      "tendons": 4,
+      "actuators": 4,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "共同结构 + 各工况原生控制响应优化",
+    "required_conditions": [
+      "M1_A",
+      "M1_B",
+      "M1_C",
+      "M5"
+    ],
+    "passed_conditions": 4,
+    "total_conditions": 4,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "M1_A": {
+        "geometric_stroke_max": 0.0030102107005688383,
+        "geometric_stroke_min": -0.0058591313904798326,
+        "geometric_tendon_speed": 0.02475,
+        "holding_position": 0.00989999999999998,
+        "holding_speed": 0.029699999999999598,
+        "solver_errors": 0.0,
+        "tension_max": 4.935690982090013,
+        "tension_min": -0.0,
+        "terminal_position": 0.00989999999999998,
+        "geometric_stroke_max_m": 0.0030102107005688383,
+        "geometric_stroke_min_m": -0.0058591313904798326,
+        "geometric_tendon_speed_max_m_s": 0.02475,
+        "holding_max_error_m": 0.00989999999999998,
+        "holding_max_speed_m_s": 0.029699999999999598,
+        "terminal_error_m": 0.00989999999999998
+      },
+      "M1_B": {
+        "geometric_stroke_max": 0.003592679646657826,
+        "geometric_stroke_min": -0.008598089677690546,
+        "geometric_tendon_speed": 0.024749999856049483,
+        "holding_position": 0.009895482501791793,
+        "holding_speed": 0.029699411730774245,
+        "solver_errors": 0.0,
+        "tension_max": 2.110900659001921,
+        "tension_min": -0.0,
+        "terminal_position": 0.009895482501791793,
+        "geometric_stroke_max_m": 0.003592679646657826,
+        "geometric_stroke_min_m": -0.008598089677690546,
+        "geometric_tendon_speed_max_m_s": 0.024749999856049483,
+        "holding_max_error_m": 0.009895482501791793,
+        "holding_max_speed_m_s": 0.029699411730774245,
+        "terminal_error_m": 0.009895482501791793
+      },
+      "M1_C": {
+        "geometric_stroke_max": 0.002595621599376652,
+        "geometric_stroke_min": -0.006286595443685317,
+        "geometric_tendon_speed": 0.024749857112116806,
+        "holding_position": 0.009897784609851577,
+        "holding_speed": 0.029660147042107426,
+        "solver_errors": 0.0,
+        "tension_max": 4.647357499152035,
+        "tension_min": -0.0,
+        "terminal_position": 0.009840813438434995,
+        "geometric_stroke_max_m": 0.002595621599376652,
+        "geometric_stroke_min_m": -0.006286595443685317,
+        "geometric_tendon_speed_max_m_s": 0.024749857112116806,
+        "holding_max_error_m": 0.009897784609851577,
+        "holding_max_speed_m_s": 0.029660147042107426,
+        "terminal_error_m": 0.009840813438434995
+      },
+      "M5": {
+        "geometric_stroke_max": 0.0055045475474597705,
+        "geometric_stroke_min": -0.005463982490606589,
+        "geometric_tendon_speed": 0.02474999999999998,
+        "solver_errors": 0.0,
+        "tension_max": 1.2757961069226782,
+        "tension_min": -0.0,
+        "tool_axis_direction": 0.05183616091804452,
+        "tool_position": 0.007919999999999996,
+        "geometric_stroke_max_m": 0.0055045475474597705,
+        "geometric_stroke_min_m": -0.005463982490606589,
+        "geometric_tendon_speed_max_m_s": 0.02474999999999998,
+        "max_position_error": 0.007919999999999996,
+        "max_tool_axis_angle_error": 0.05183616091804452
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH#artifacts/404a4d3c65e03452b1b9bdff3cdf9c28b2dd66153cc1d8a98eb340ae0deed874",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH#artifacts/edd0709167f7b6328ba2dbb0f1a5b16d89e3551584c8f14665f19356f3e5d11b",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH#artifacts/78cd7ef4b0f6757cce8b0b839157554e8e749c571d8857e1b9936ff2833279a3",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH#artifacts/452305b42f5276af12c5ba34ba829cd836d9a4706e4a8b537ff705cf1893f1fe"
+    ],
+    "run_id": "codex-expert-T07-20261113",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T08",
+    "task_name": "被动渐进刚度（P3）",
+    "task_category": "task.passive_response / development_valid",
+    "task_description": "P3 Progressive Stiffness",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.1,
+        0.1
+      ],
+      "tendons": 2,
+      "actuators": 0,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "无主动控制；固定放绳单向被动腱",
+    "required_conditions": [
+      "plus_x",
+      "minus_x"
+    ],
+    "passed_conditions": 2,
+    "total_conditions": 2,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "plus_x": {
+        "no_contact": 0.0,
+        "high_maximum": 0.022508490353744023,
+        "low_minimum": 0.007928066911447334,
+        "paired_mechanism": 1.0,
+        "residual_maximum": 6.858960174692536e-07,
+        "slack_to_taut": 1.0,
+        "stiffness_ratio": 1.6314547492588845
+      },
+      "minus_x": {
+        "high_maximum": 0.02250849035374532,
+        "low_minimum": 0.007928066911447379,
+        "paired_mechanism": 1.0,
+        "residual_maximum": 6.858960174326618e-07,
+        "slack_to_taut": 1.0,
+        "stiffness_ratio": 1.631454749259155,
+        "no_contact": 0.0
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+      "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0"
+    ],
+    "run_id": "codex-surrogate-T08-20261112",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\TASK_PROTOCOL.json",
+    "source_classification": "development_not_registered_SELECT",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T09",
+    "task_name": "复杂导向件弹簧按钮接触",
+    "task_category": "contact_manipulation",
+    "task_description": "Spring Button Press v1.2",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.149,
+        0.1205
+      ],
+      "tendons": 4,
+      "actuators": 4,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide",
+        "guide"
+      ]
+    },
+    "control_method": "已归档张力节点 + 原生接触仿真",
+    "required_conditions": [
+      "default"
+    ],
+    "passed_conditions": 1,
+    "total_conditions": 1,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "default": {
+        "button_travel_max": 0.002052752700179422,
+        "button_travel_min": -9.458299618748604e-08,
+        "contact_near_approach_end": 1.0,
+        "depth_and_force_hold_0p4s": 0.4999999999999559,
+        "finite_no_warning": 0.0,
+        "no_external_force": 0.0,
+        "no_unexpected_collision": 0.0,
+        "real_contact_established": 0.002052752700179422,
+        "release_1p8_depth": 9.163145029673288e-11,
+        "release_1p8_force": 0.0,
+        "release_1p8_speed": 0.0014543316152657777,
+        "release_2p0_depth": 5.309534589328372e-17,
+        "release_2p0_force": 0.0,
+        "release_2p0_speed": 0.0004168938873019986,
+        "speed_limit": 0.018224426063267712,
+        "stroke_max": 0.00117591245911558,
+        "stroke_min": -0.0032966105752161856,
+        "tension_max": 4.402568121786447,
+        "tension_min": 0.2,
+        "hold_valid_continuous_s": 0.4999999999999559,
+        "max_hold_contact_force_error_n": 0.002465057424524908,
+        "max_hold_depth_error_m": 5.2752700179421914e-05,
+        "max_rope_speed_m_s": 0.018224426063267712,
+        "max_stroke_m": 0.0032966105752161856,
+        "max_tension_n": 4.402568121786447
+      }
+    },
+    "secondary_metrics": {},
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH#artifacts/ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb"
+    ],
+    "run_id": "codex-expert-T09-20261113-core027",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "T10",
+    "task_name": "外部冲击主动恢复（M7）",
+    "task_category": "dynamic_disturbance_rejection",
+    "task_description": "M7 External Impact Recovery",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 2,
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "tendons": 6,
+      "actuators": 6,
+      "components": [
+        "guide",
+        "rigid_connector",
+        "payload"
+      ]
+    },
+    "control_method": "原生状态反馈：静力/完整切线/离散 LQR/有界张力分配",
+    "required_conditions": [
+      "positive_y",
+      "negative_y",
+      "no_impulse"
+    ],
+    "passed_conditions": 3,
+    "total_conditions": 3,
+    "control_conditions": [
+      {
+        "name": "positive_y_frozen",
+        "passed": false
+      },
+      {
+        "name": "negative_y_frozen",
+        "passed": false
+      }
+    ],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "positive_y": {
+        "actual_speed_limit": 0.021785913906941182,
+        "final_hold_all_timesteps": 1.0,
+        "final_hold_position": 0.00403181200271061,
+        "final_hold_speed": 0.005430562171212072,
+        "finite_no_warning": 0.0,
+        "force_off_after_pulse": 1.3114412061970439e-14,
+        "no_unexpected_collision": 0.0,
+        "pre_impact_hold_all_timesteps": 1.0,
+        "pre_impact_hold_position": 0.00901865151081948,
+        "pre_impact_hold_speed": 0.012277512014984506,
+        "recovery_within_0p35s_with_100ms_hold": 1.0,
+        "stroke_limit": 0.005670336166028106,
+        "tension_max": 7.575620326838632,
+        "tension_min": -0.0,
+        "continuous_post_pulse_valid_s": 0.44999999999995044,
+        "final_hold_max_error_m": 0.00403181200271061,
+        "final_hold_max_speed_m_s": 0.005430562171212072,
+        "max_tendon_speed_m_s": 0.021785913906941182,
+        "max_tendon_stroke_m": 0.005670336166028106,
+        "pre_hold_max_error_m": 0.00901865151081948,
+        "pre_hold_max_speed_m_s": 0.012277512014984506,
+        "recovery_time_after_pulse_s": 0
+      },
+      "negative_y": {
+        "actual_speed_limit": 0.021785913906941182,
+        "final_hold_all_timesteps": 1.0,
+        "final_hold_position": 0.004131381938040607,
+        "final_hold_speed": 0.005565169055264074,
+        "finite_no_warning": 0.0,
+        "force_off_after_pulse": 1.3114412061970439e-14,
+        "no_unexpected_collision": 0.0,
+        "pre_impact_hold_all_timesteps": 1.0,
+        "pre_impact_hold_position": 0.00901865151081948,
+        "pre_impact_hold_speed": 0.012277512014984506,
+        "recovery_within_0p35s_with_100ms_hold": 1.0,
+        "stroke_limit": 0.005711337675604361,
+        "tension_max": 7.498426080267424,
+        "tension_min": -0.0,
+        "continuous_post_pulse_valid_s": 0.4484999999999506,
+        "final_hold_max_error_m": 0.004131381938040607,
+        "final_hold_max_speed_m_s": 0.005565169055264074,
+        "max_tendon_speed_m_s": 0.021785913906941182,
+        "max_tendon_stroke_m": 0.005711337675604361,
+        "pre_hold_max_error_m": 0.00901865151081948,
+        "pre_hold_max_speed_m_s": 0.012277512014984506,
+        "recovery_time_after_pulse_s": 0.0014999999999946168
+      },
+      "no_impulse": {
+        "actual_speed_limit": 0.021785913906941182,
+        "final_hold_all_timesteps": 1.0,
+        "final_hold_position": 0.004028091382257626,
+        "final_hold_speed": 0.005416475657616396,
+        "finite_no_warning": 0.0,
+        "force_off_after_pulse": 0.0,
+        "no_unexpected_collision": 0.0,
+        "pre_impact_hold_all_timesteps": 1.0,
+        "pre_impact_hold_position": 0.00901865151081948,
+        "pre_impact_hold_speed": 0.012277512014984506,
+        "recovery_within_0p35s_with_100ms_hold": 1.0,
+        "stroke_limit": 0.00568868721038665,
+        "tension_max": 7.496724502524078,
+        "tension_min": -0.0,
+        "continuous_post_pulse_valid_s": 0.44999999999995044,
+        "final_hold_max_error_m": 0.004028091382257626,
+        "final_hold_max_speed_m_s": 0.005416475657616396,
+        "max_tendon_speed_m_s": 0.021785913906941182,
+        "max_tendon_stroke_m": 0.00568868721038665,
+        "pre_hold_max_error_m": 0.00901865151081948,
+        "pre_hold_max_speed_m_s": 0.012277512014984506,
+        "recovery_time_after_pulse_s": 0
+      }
+    },
+    "secondary_metrics": {
+      "positive_y_frozen": {
+        "actual_speed_limit": 0.021785913906941182,
+        "final_hold_all_timesteps": 0.0,
+        "final_hold_position": 0.007127696966858097,
+        "final_hold_speed": 0.02158253799868025,
+        "finite_no_warning": 0.0,
+        "force_off_after_pulse": 1.3114412061970439e-14,
+        "no_unexpected_collision": 0.0,
+        "pre_impact_hold_all_timesteps": 1.0,
+        "pre_impact_hold_position": 0.00901865151081948,
+        "pre_impact_hold_speed": 0.012277512014984506,
+        "recovery_within_0p35s_with_100ms_hold": 1.0,
+        "stroke_limit": 0.005530428073144772,
+        "tension_max": 7.447520177293419,
+        "tension_min": -0.0,
+        "continuous_post_pulse_valid_s": 0.126999999999986,
+        "final_hold_max_error_m": 0.007127696966858097,
+        "final_hold_max_speed_m_s": 0.02158253799868025,
+        "max_tendon_speed_m_s": 0.021785913906941182,
+        "max_tendon_stroke_m": 0.005530428073144772,
+        "pre_hold_max_error_m": 0.00901865151081948,
+        "pre_hold_max_speed_m_s": 0.012277512014984506,
+        "recovery_time_after_pulse_s": 0.29449999999996235
+      },
+      "negative_y_frozen": {
+        "actual_speed_limit": 0.021785913906941182,
+        "final_hold_all_timesteps": 0.0,
+        "final_hold_position": 0.0076200030322926045,
+        "final_hold_speed": 0.025357390029626073,
+        "finite_no_warning": 0.0,
+        "force_off_after_pulse": 1.3114412061970439e-14,
+        "no_unexpected_collision": 0.0,
+        "pre_impact_hold_all_timesteps": 1.0,
+        "pre_impact_hold_position": 0.00901865151081948,
+        "pre_impact_hold_speed": 0.012277512014984506,
+        "recovery_within_0p35s_with_100ms_hold": 0.0,
+        "stroke_limit": 0.005708775395879079,
+        "tension_max": 7.447520177293419,
+        "tension_min": -0.0,
+        "continuous_post_pulse_valid_s": 0.06999999999999229,
+        "final_hold_max_error_m": 0.0076200030322926045,
+        "final_hold_max_speed_m_s": 0.025357390029626073,
+        "max_tendon_speed_m_s": 0.021785913906941182,
+        "max_tendon_stroke_m": 0.005708775395879079,
+        "pre_hold_max_error_m": 0.00901865151081948,
+        "pre_hold_max_speed_m_s": 0.012277512014984506,
+        "recovery_time_after_pulse_s": null
+      }
+    },
+    "physical_validation": "MuJoCo original-task independent acceptance",
+    "source_reference": [
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\STORE_RESEARCH#artifacts/a36af181dea4772af742696b57dd3637367757520982e86d7c257f619601cab6",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\STORE_RESEARCH#artifacts/15ff70c8a4d64e8a88c9cde47b3b6f2660152044aac18702cb4264110a5c7f93",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\STORE_RESEARCH#artifacts/8f6927468e7560f4703ed17fbf7ac780ce7cd3cd9da49927607c788438e1b21f",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\STORE_RESEARCH#artifacts/513bb684b985303d5f738a4762f314457694916ec23e3426db2ee38aee7f1a5e",
+      "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\STORE_RESEARCH#artifacts/98c63235f2310676704f742adef4841d79f697432c7282a83128f904603ac458"
+    ],
+    "run_id": "codex-expert-T10-20261113-verified-common",
+    "protocol_source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T10_M7_impact_recovery\\T10_RUN_06\\TASK_PROTOCOL.json",
+    "source_classification": "historical_development",
+    "task_version": "1.0.0"
+  },
+  {
+    "task_id": "PHS-2D",
+    "task_name": "被动腱结构的受力点柔顺与末端抑制",
+    "task_category": "passive_shape_design",
+    "task_description": "7 段/4 腱被动结构，5 个材料位置 × 两种载荷符号",
+    "system": "Full",
+    "structure_type": {
+      "flexible_segments": 7,
+      "lengths_m": [
+        0.04,
+        0.04,
+        0.04,
+        0.04,
+        0.04,
+        0.04,
+        0.04
+      ],
+      "tendons": 4,
+      "actuators": 0
+    },
+    "control_method": "无主动控制；固定放绳单向被动腱",
+    "required_conditions": [
+      "s3_positive",
+      "s3_negative",
+      "s4_positive",
+      "s4_negative",
+      "s5_positive",
+      "s5_negative",
+      "s6_positive",
+      "s6_negative",
+      "s7_positive",
+      "s7_negative"
+    ],
+    "passed_conditions": 10,
+    "total_conditions": 10,
+    "control_conditions": [],
+    "success_status": "PASS",
+    "primary_metrics": {
+      "min_point_m": 0.014798131700207415,
+      "max_tip_m": 0.004346996547103517,
+      "max_ratio": 0.15375060000631982
+    },
+    "secondary_metrics": {
+      "half_timestep_accepted": true,
+      "half_timestep_result_ref": {
+        "artifact_id": "9d640b79e4ab5eaed008730f0afdf0bad445fca67bed54634fa398218f66a2b8",
+        "media_type": "application/json"
+      }
+    },
+    "physical_validation": "原十工况 + 半步长十工况",
+    "source_reference": "D:\\softrobot-agent\\runs\\phs2d-paper-data-20261112\\FINAL_METRICS.json",
+    "run_id": "psd2d-core-fresh-20261112",
+    "protocol_source": "D:\\softrobot-agent\\runs\\phs2d-paper-data-20261112\\SOURCE_EXTRACTS\\FROZEN_TASK.json",
+    "source_classification": "development_valid",
+    "task_version": "1.2.0"
+  }
+]
