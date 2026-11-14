@@ -1,0 +1,55 @@
+\section{System Implementation}
+\label{sec:implementation}
+
+\subsection{Execution harness}
+
+The research method is implemented in an executable harness that connects the LLM agent to robot design generation, registered mathematical capabilities, physical simulation, independent task evaluation, and persistent research evidence. The harness provides a common execution interface while allowing different tasks to use different inner physical solvers. Active tasks may use equilibrium, reduced-order dynamics, trajectory optimization, or controller execution; passive tasks use fixed-payout equilibrium and unilateral tendon constraints.
+
+The implementation is organized by responsibilities rather than by a one-to-one mapping from software directories to scientific contributions.
+
+\subsection{Task and parameter registries}
+
+The task registry stores frozen task contracts, including the required observables, units, thresholds, initial conditions, time windows, loading cases, and independent acceptance rules. The parameter registry exposes the legal design variables, ranges, units, dependencies, affected model components, and supported analysis routes. It distinguishes continuous parameters from discrete morphology choices and prevents a controller parameter from being treated as a physical structure parameter when the requested mathematical problem does not support that interpretation.
+
+The task compiler maps a registered task to its mathematical constraints and observables. It does not silently replace an unsupported requirement with an easier proxy. If a task condition is not represented by the current mathematical backend, the condition remains part of the independent physical evaluation and is marked as outside the current analysis scope.
+
+\subsection{Mathematical execution layer}
+
+The mathematical execution layer receives a high-level PPRP request and performs parameter resolution, task-constraint compilation, applicability checks, method routing, numerical computation, and validity assessment. It returns a structured evidence object containing the requested metric, derivative or candidate result, model scope, solver status, parameter units, perturbation details, and computational cost.
+
+The differentiation router is internal to this layer. The \MainAgent{} does not need to choose a finite-difference step, construct a KKT matrix, or call a simulator-specific derivative routine. It selects the scientific question and parameter/observable groups; the fixed program determines which numerical route is valid for that request.
+
+\subsection{Main agent and read-only reporter}
+
+The \MainAgent{} is responsible for task interpretation, physical-hypothesis formation, selection of research goals and parameter groups, and decisions about subsequent design or control changes. It does not rewrite numerical evidence or determine whether a solver has converged.
+
+The \Reporter{} is a read-only sub-agent that interprets completed evidence. Its role is to explain the physical meaning of a result, compare it with the active hypothesis, identify observations that support or weaken the explanation, and propose questions for the next investigation. Numerical values, units, solver states, and validity flags remain owned by deterministic software. If the reporter is unavailable, the fixed numerical facts remain available to the \MainAgent{}.
+
+\subsection{Hierarchical research context}
+
+Research context is organized so that the agent receives decision-relevant information without repeatedly loading all historical numerical detail.
+
+\begin{table}[t]
+\centering
+\caption{Research-context hierarchy.}
+\label{tab:context-hierarchy}
+\small
+\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+\toprule
+Layer & Content and access policy \\
+\midrule
+System instruction & Stable role, scientific rules, evidence boundaries, and decision ownership; included in every request. \\
+L0 decision packet & Current task gap, active hypothesis, available mathematical opportunities, latest conclusions, available actions, and budget; automatically projected. \\
+L1 method details & Parameter groups, mathematical semantics, request schemas, and applicability conditions; retrieved on demand. \\
+L2/L3 evidence & Raw derivative arrays, KKT and solver records, model details, and original traces; read for verification or deeper diagnosis. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The context hierarchy is not simply prompt truncation. It separates the information needed for the next decision from the detailed evidence needed for diagnosis and reproducibility. The L0 packet reports what can be investigated and the latest validated result; L1--L3 provide progressively more detailed information when requested.
+
+\subsection{Evidence storage and independent physical evaluation}
+
+Every research action is linked to its input request, candidate identity, tool result, and subsequent decision. The store and trace preserve intermediate candidates and failed investigations as well as final accepted designs. The physical backend executes the robot model, while an independent evaluator applies the frozen task contract to the resulting trajectory or equilibrium response. A mathematical proxy or local sensitivity prediction cannot replace this final evaluation.
+
+This implementation supports a separation between scientific decision-making and numerical fact generation: the agent determines what to investigate and how to act on the result; fixed software determines what was computed, under which assumptions, and whether the numerical result passed its declared validity checks.

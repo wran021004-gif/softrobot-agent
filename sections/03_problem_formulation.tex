@@ -1,0 +1,97 @@
+\section{Problem Formulation}
+\label{sec:formulation}
+
+\subsection{Robot design space}
+
+A robot design is represented by
+\begin{equation}
+d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},
+d_{\mathrm{route}},d_{\mathrm{assembly}},d_{\mathrm{act}}),
+\label{eq:design}
+\end{equation}
+where the components describe topology, geometry, material properties, tendon routing, assembly and payout parameters, and actuation-related parameters. Continuous variables may include segment lengths, cross-section dimensions, Young's modulus, tendon offsets, guide locations, and payout lengths. Discrete variables include segment count, tendon count, routing topology, and cross-section type. Controller parameters are denoted by $\theta$ and are kept distinct from physical design variables when the distinction matters.
+
+An active task uses a finite-horizon control sequence
+\begin{equation}
+U=(u_0,u_1,\ldots,u_{N-1}),
+\end{equation}
+where each $u_k$ may represent tendon tensions or another registered actuation input. A passive fixed-payout task has no commanded control sequence: its response is determined by the structure, unilateral tendon constraints, initial condition, and external loading.
+
+\subsection{Frozen task contracts}
+
+A task $\tau$ is represented by a frozen contract containing its targets, initial state, loading conditions, time horizon, observables, units, thresholds, coordinate frames, sampling semantics, and independent evaluation rules. The contract induces normalized constraint functions
+\begin{equation}
+g_{\tau,i}(d,U)\leq 0,\qquad i=1,\ldots,m_\tau.
+\label{eq:taskconstraints}
+\end{equation}
+A non-positive value denotes satisfaction of the corresponding constraint. The LLM may interpret task intent and select which registered physical quantities are scientifically relevant, but it cannot silently modify acceptance thresholds, units, coordinate frames, or sampling rules.
+
+For a reach-and-hold task, representative constraints include
+\begin{align}
+g_{\mathrm{terminal}} &=
+\frac{\|p(T;d,U)-p^\star\|}{\epsilon_p}-1,\\
+g_{\mathrm{hold,pos},k} &=
+\frac{\|p(t_k;d,U)-p^\star\|}{\epsilon_p}-1,\\
+g_{\mathrm{hold,vel},k} &=
+\frac{\|v(t_k;d,U)\|}{\epsilon_v}-1.
+\end{align}
+For a time-indexed tracking task, a representative constraint is
+\begin{equation}
+g_{\mathrm{track},k}=
+\frac{\|p(t_k;d,U)-r(t_k)\|}{\epsilon_{\mathrm{track}}}-1,
+\end{equation}
+where the tolerance and sample times are obtained from the frozen tracking contract. Orientation, contact, load, and passive-response tasks use their own registered observables and acceptance rules; the framework does not force all tasks into a common physical metric.
+
+\subsection{Active task capability and shared structures}
+
+For an active task, define the best achievable normalized task violation for a fixed structure:
+\begin{equation}
+V_\tau(d)=
+\inf_{U\in\mathcal U(d)}
+\max_{i=1,\ldots,m_\tau}g_{\tau,i}(d,U),
+\label{eq:capability}
+\end{equation}
+where $\mathcal U(d)$ is the admissible control set. If the global infimum is attained, $V_\tau(d)\leq0$ indicates that a feasible input sequence exists in the specified model. In a nonconvex numerical problem, a solver generally returns a best-found value rather than a certified global optimum; failure to find a feasible sequence is therefore not proof of infeasibility.
+
+For a family of conditions $\mathcal T$ sharing one structure but allowing condition-specific controls,
+\begin{equation}
+V_{\mathcal T}(d)=
+\inf_{\{U_c\}_{c\in\mathcal T}}
+\max_{c\in\mathcal T,\,i}
+g_{c,i}(d,U_c).
+\label{eq:multi-capability}
+\end{equation}
+This formulation measures the worst task capability of one shared structure rather than the performance of separately tailored morphologies.
+
+\subsection{Passive equilibrium problems}
+
+For a passive fixed-payout design under load $f$, the inner physical problem is an equilibrium problem rather than an active control optimization. A generic formulation is
+\begin{equation}
+q^\star(d,f)\in
+\arg\min_q \Pi(q;d,f)
+\quad\text{subject to}\quad
+c_j(q,d)\leq0,
+\label{eq:passive-problem}
+\end{equation}
+where $q$ is the generalized configuration, $\Pi$ is the potential energy including elastic, gravitational, and external-load contributions, and $c_j$ represents unilateral tendon constraints. The response is evaluated at the re-equilibrated configuration $q^\star$ for each load condition. A passive multi-condition design therefore requires one structure to satisfy the specified set of equilibrium-response conditions, but it does not introduce a fictitious active control sequence.
+
+\subsection{Research as a sequential decision process}
+
+At research step $k$, define the state
+\begin{equation}
+s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
+\label{eq:researchstate}
+\end{equation}
+where $\mathcal H_k$ is the set of active physical hypotheses, $\mathcal E_k$ is accumulated mathematical and physical evidence, and $\mathcal B_k$ is the remaining resource budget. The agent selects a research action
+\begin{equation}
+a_k\in\mathcal A_{\mathrm{adm}}(s_k),
+\end{equation}
+which may include parameter inspection, mechanism analysis, sensitivity calculation, finite-scale comparison, structural modification, control optimization, physical execution, or evidence review. An observation $y_k$ updates the research state:
+\begin{equation}
+(\mathcal H_{k+1},\mathcal E_{k+1},d_{k+1})
+=\Phi(s_k,a_k,y_k).
+\label{eq:researchupdate}
+\end{equation}
+An action need not improve the design immediately. It may reject a hypothesis, reveal that a mathematical method is inapplicable, or motivate a different parameterization or control formulation.
+
+The objective is to improve task-relevant design capability while producing interpretable and reusable evidence under bounded computational resources. This motivates evaluating both physical outcomes and the research decisions that lead to them.

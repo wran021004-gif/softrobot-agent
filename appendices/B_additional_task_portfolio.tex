@@ -1,0 +1,30 @@
+\section{Task Portfolio and Reporting Conventions}
+\label{app:task-portfolio}
+
+The eleven task cases are T01--T10 and PHS-2D. Their required-condition counts sum to 30. T10 includes two additional frozen controls, which are reported separately and are not included in the required-condition count. The archived portfolio therefore contains 32 required/control records.
+
+\begin{table*}[t]
+\centering
+\caption{Task families and the physical quantities retained for reporting.}
+\label{tab:task-metrics-appendix}
+\small
+\begin{tabularx}{\textwidth}{@{}l Y Y@{}}
+\toprule
+Task & Primary task-specific quantities & Reporting convention \\
+\midrule
+T01 & Terminal position, holding position and speed, tendon stroke and speed, tension. & Report all three target conditions and the worst required value. \\
+T02 & Loaded terminal/holding position, holding speed, tendon stroke and tension. & Report positive, negative, and zero-load conditions separately. \\
+T03 & Terminal error, post-arrival position and speed, tendon limits. & Report the fast-reach condition and its terminal/hold metrics. \\
+T04 & Tracking RMSE, maximum tracking error, cycle count/drift, saturation, and contacts. & Report the full 22-s two-cycle trajectory. \\
+T05 & Tool position and directed tool-axis error. & Keep position and axis-angle errors as separate metrics. \\
+T06 & Time-indexed position error, directed tool-axis error, payload, and contact. & Report the complete loaded scan. \\
+T07 & Per-condition task violation, tendon limits, and shared morphology. & Report all four conditions under one structure. \\
+T08 & Low/high-load response, stiffness ratio, bilateral response, and equilibrium residual. & Report both loading directions for the same passive structure. \\
+T09 & Button travel, force, depth/force hold duration, contact state, and solver warnings. & Report the contact event and hold interval. \\
+T10 & Pre-impact hold, post-impact recovery time, final hold position/speed, tendon limits. & Report three required impact conditions and two frozen controls separately. \\
+PHS-2D & Loaded-point displacement, projected tip displacement, ratio, plane deviation, equilibrium residual, and stability checks. & Report the ten loading conditions for the nine-segment, four-tendon passive-design case. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+The task-specific metrics are not collapsed into a single cross-task raw-error average. A normalized violation may be used within a task when its normalization is defined by the frozen task contract. Condition-level values and the worst required condition remain available in the source data.

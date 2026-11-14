@@ -1,0 +1,98 @@
+\section{Experimental Setup}
+\label{sec:experimental-setup}
+
+\subsection{Completed task portfolio}
+
+The completed evaluation portfolio contains T01--T10 and PHS-2D. The tasks span active and passive designs, single- and multi-condition requirements, and different physical regimes. The archived master summary contains 32 required/control condition records: all 30 required conditions passed, while two additional frozen control conditions in T10 did not satisfy the complete recovery criteria. The 30/30 count is a summary of these completed cases, not a multi-seed success-rate estimate.
+
+\begin{table*}[t]
+\centering
+\caption{Completed soft-robot research task portfolio. Required-condition counts are reported separately from T10 frozen controls.}
+\label{tab:task-portfolio}
+\small
+\begin{tabularx}{\textwidth}{@{}l l Y c@{}}
+\toprule
+Task & Research family & Main physical/design question & Required conditions \\
+\midrule
+T01 & Active reach and hold & Can one structure reach and hold three spatial targets under tendon and terminal constraints? & 3 \\
+T02 & Loaded hold & How does the structure--control solution respond to positive, negative, and zero external loading? & 3 \\
+T03 & Fast reach & Can the robot reach a target rapidly while satisfying terminal and hold constraints? & 1 \\
+T04 & Trajectory tracking & Can the robot track a two-cycle figure-eight reference over the complete 22-s horizon? & 1 \\
+T05 & Position and tool axis & Can the end effector satisfy both a position target and a directed tool-axis constraint? & 1 \\
+T06 & Loaded timed scan & Can the robot execute a time-indexed position--orientation scan under a 20-g payload? & 1 \\
+T07 & Shared-structure multi-task design & Can one four-tendon morphology support four distinct task conditions with condition-specific controls? & 4 \\
+T08 & Passive progressive stiffness & Does one passive two-tendon structure exhibit the required bilateral progressive response? & 2 \\
+T09 & Contact manipulation & Can a tendon-driven structure press and hold a spring button under joint depth/force requirements? & 1 \\
+T10 & Impact recovery & Can one state-feedback control recipe recover from the three required impact conditions? Two frozen controls are evaluated separately. & 3 (+2 controls) \\
+PHS-2D & Passive tendon-constrained design & Can one nine-segment, four-tendon passive structure satisfy the prescribed loading conditions while limiting tip motion? & 10 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+For PHS-2D, the manuscript uses the nine-segment, four-tendon Round-3 evidence package as the principal mechanism-design case. Older seven-segment snapshots are not combined with the nine-segment geometry or performance values.
+
+\subsection{Task protocols and independent evaluation}
+
+Each task retains its own frozen protocol, including initial state, target, loading conditions, time horizon, observables, thresholds, and required/control classification. Final results are evaluated by the corresponding independent physical evaluator. The mathematical analysis layer may operate on a reduced or equilibrium model, but its output is not substituted for the original task evaluation.
+
+For active tasks, each condition may use its own control sequence while sharing the required robot structure. For passive tasks, the same morphology is evaluated under the prescribed loads and fixed-payout conditions. A condition-specific structure is not substituted for a shared-structure requirement.
+
+\subsection{Methods for the matched comparison}
+
+The first matched comparison contains three methods.
+
+\begin{table}[t]
+\centering
+\caption{Method definitions for the first A/B/C comparison.}
+\label{tab:methods-abc}
+\small
+\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+\toprule
+Method & Available capabilities \\
+\midrule
+A: LLM-only & The LLM proposes and revises structures and controls using task descriptions and physical-evaluation feedback. It can generate candidates, set control inputs, execute the robot, and read the evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed. \\
+B: Direct mathematical tools & The LLM has the A capabilities and can directly call bottom-level mathematical tools (e.g., Jacobian, KKT/equilibrium, finite-difference, and supported optimization routines). It must formulate the mathematical question and construct the requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed. \\
+C: \softrobotagent{} (historical FULL) & The completed FULL study, including research-intent organization, parameterized mathematical research, M0--M3 semantics, differentiation routing, validity checks, evidence feedback, and the existing knowledge/context mechanisms. C is not re-run. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The first batch comprises eight new A/B runs across four representative tasks. C is taken from the corresponding historical FULL record.
+
+\begin{table}[t]
+\centering
+\caption{First batch of matched A/B runs and historical C references.}
+\label{tab:first-batch}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Task & A & B & C \\
+\midrule
+PHS-2D & 1 new run & 1 new run & Historical FULL \\
+T01 & 1 new run & 1 new run & Historical FULL \\
+T04 & 1 new run & 1 new run & Historical FULL \\
+T07 & 1 new run & 1 new run & Historical FULL \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A and B start from the task's original initial state and receive the same legal design space, structure generator, physics backend, independent evaluator, and task-specific resource ceilings. Neither method is restricted to the topology or parameter values of the historical FULL design. The two methods receive the same base model and equivalent task information and knowledge access. Within each task, A and B share the same limits for LLM tokens, candidate generation, physical evaluations, integration steps, and wall-clock time; mathematical calls are additionally recorded for B.
+
+C is a historical reference rather than a newly randomized run. Its actual model, knowledge snapshot, task protocol, and resource configuration are retained as recorded. Any mismatch with the new A/B configuration is reported at the task level; historical results are not described as a fully controlled intervention when the original configuration cannot be matched.
+
+\subsection{Evaluation metrics}
+
+The comparison records:
+\begin{itemize}[leftmargin=*]
+  \item required-condition pass count and the original task-specific normalized violation measures;
+  \item best task violation versus cumulative physical-evaluation budget;
+  \item cost to first feasible candidate, when a feasible candidate is found;
+  \item number of generated candidates and physical evaluations;
+  \item mathematical calls, LLM tokens, integration steps, and wall-clock time;
+  \item whether a mathematical result was explicitly used in a subsequent structural or control decision, with the corresponding evidence trace.
+\end{itemize}
+Raw errors from different task families are not averaged directly. Each task is reported using its own frozen metrics and normalization. The first batch uses one new run per A/B condition; it is therefore interpreted as a set of matched case studies and budget traces, not as a multi-seed statistical comparison.
+
+\subsection{Evidence and reporting policy}
+
+The completed FULL portfolio is used to describe demonstrated task capability and research processes. The PHS-2D gradient audit is used to assess local mathematical consistency within its declared fixed-topology parameter direction. The A/B runs are used to evaluate the incremental role of direct mathematical tools and the complete research architecture. These evidence types are kept distinct: tool use alone is not treated as proof of design improvement, and a local sensitivity match is not treated as a global convergence or high-fidelity performance guarantee.

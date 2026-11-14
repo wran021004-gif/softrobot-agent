@@ -1,0 +1,96 @@
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Multi-task FULL results}
+
+Table~\ref{tab:full-results} summarizes the completed task portfolio. All 30 required conditions in the archived summary passed their corresponding task evaluators. T10 also contains two frozen control conditions; both are reported separately and did not pass the full recovery criteria.
+
+\begin{table*}[t]
+\centering
+\caption{Completed FULL results. Values are taken from the task-specific evaluators and are not pooled across different physical metrics.}
+\label{tab:full-results}
+\small
+\begin{tabularx}{\textwidth}{@{}l c Y Y@{}}
+\toprule
+Task & Required & Final result & Research/design characteristic \\
+\midrule
+T01 & 3/3 & Maximum holding-position error: 9.9059 mm. & One shared two-segment, six-tendon structure reaches and holds three targets; the research trace records routing-radius and total-length changes and condition-specific control refinement. \\
+T02 & 3/3 & Maximum holding-position error: 9.8971 mm. & Three external-load conditions are evaluated on one structure. The research route moves from static/GVS reasoning to a native finite-horizon dynamic treatment for the loaded task. \\
+T03 & 1/1 & Terminal error: 2.1099 mm; maximum hold-position error: 2.6627 mm. & Fast-reach task with explicit terminal and post-arrival requirements. \\
+T04 & 1/1 & 22-s, two-cycle figure-eight tracking; RMSE: 0.68785 mm; maximum error: 1.02066 mm. & Final route uses a continuously constructed native equilibrium-point sequence and periodic tension feedforward. \\
+T05 & 1/1 & Tool-position error: 7.4585 mm; directed-axis error: 0.05182 rad. & Joint position and directed tool-axis requirements. \\
+T06 & 1/1 & 20-g timed scan; maximum position error: 11.8198 mm; directed-axis error: 0.11045 rad. & Time-indexed loaded position--orientation task. \\
+T07 & 4/4 & One four-tendon structure satisfies M1\_A, M1\_B, M1\_C, and M5. & Multi-task structural refinement includes rejecting a longer design, revising tendon routing, and transferring a control initialization between conditions. \\
+T08 & 2/2 & Progressive-stiffness ratio: 1.63145; low-load response: 7.9281 mm; high-load response: 22.5085 mm. & Passive two-segment, two-tendon structure with bilateral response conditions. \\
+T09 & 1/1 & Depth/force hold: 0.5 s; reported depth error: 0.05275 mm; force error: 0.002465 N. & Contact manipulation with a complex guide structure and native contact evaluation. \\
+T10 & 3/3 (+ 0/2 frozen controls) & Maximum final-hold position error over required cases: 4.1314 mm. & Final controller is native state feedback using a static reference, full tangent model, discrete LQR, and bounded tension allocation; it is not reported as successful online NMPC. \\
+PHS-2D & 10/10 & Nine-segment, four-tendon passive design: minimum loaded-point displacement 11.155 mm; maximum projected tip displacement 3.068 mm; maximum displacement ratio 0.1093. & Passive tendon-constrained structural design with physical guide plates, fixed payout, and multi-load validation. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+The portfolio demonstrates a range of physical research problems rather than repeated instances of one reach task. It includes active and passive structures, multi-condition shared morphologies, trajectory tracking, orientation, external loading, contact, and impact recovery. The reported counts describe the archived completed cases; they do not estimate performance over random seeds.
+
+\subsection{PHS-2D: mechanism-guided passive structure design}
+
+The principal passive-design case is a nine-segment, four-tendon structure using physical guide plates and fixed payout. The final design was evaluated over ten prescribed loading conditions. The archived study records independent-process reproduction, a half-time-step re-evaluation, and an initial-state perturbation check. The reported minimum loaded-point displacement is 11.155 mm, the maximum projected tip displacement is 3.068 mm, and the maximum displacement ratio is 0.1093. The study archive records 3,456,000 integration steps, 303 mathematical requests, and 47 candidate-generation attempts.
+
+The research process is informative because the structural question changed as the evidence accumulated. Local tendon-constraint and response analysis motivated a decoupling hypothesis. Subsequent finite-load evaluation exposed behaviors that were not captured by the initial local indicator alone, including slackness and routing-geometry issues. The investigation then moved toward guide-path and structural changes, followed by multi-condition physical validation. This case illustrates how mechanism analysis can guide the next structural question while the original task evaluator remains the final acceptance authority.
+
+\subsubsection{Local implicit-gradient consistency}
+
+A complementary fixed-topology sensitivity audit on a nine-segment, four-tendon passive model compares KKT-based implicit derivatives with finite differences obtained by perturbing the common Young's-modulus direction and re-solving the loaded and unloaded equilibria. Six loading branches were evaluated for three task metrics: loaded-point displacement, horizontal tip displacement, and their ratio. This gives 18 task-metric derivative pairs.
+
+The maximum relative discrepancy among these 18 task-metric pairs is 0.1191223\%. The result supports local numerical consistency of the reported task-metric sensitivities for the tested branches and perturbation. It is not a claim of 18 independent design-parameter gradients: the perturbation changes the common Young's-modulus parameter across the nine segments. It is also not a global derivative bound or a guarantee of task improvement outside the tested local setting. The audit uses KKT implicit differentiation with numerically estimated partial derivatives and compares against actual re-equilibration finite differences.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
+\todo{Insert the nine-segment, four-tendon PHS-2D structure and representative ten-condition response panels. Use the Round-3 physical evidence package; do not reuse the older seven-segment figure assets.}}}
+\caption{Nine-segment PHS-2D passive-design case. The final artwork will combine the physical guide layout and representative load responses from the same nine-segment evidence package.}
+\label{fig:phs2d-design}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox[c][2.3cm][c]{0.94\linewidth}{\centering
+\todo{Insert the 18-pair implicit-gradient versus re-equilibration finite-difference plot. Label the six loading branches, three task metrics, and the common-modulus perturbation scope.}}}
+\caption{Local task-metric sensitivity consistency for the nine-segment passive model.}
+\label{fig:gradient-validation}
+\end{figure}
+
+\subsection{Active structure--control refinement}
+
+T01, T02, and T07 provide complementary active-robot examples. T01 records a sequence of routing and length changes in response to tendon-speed and reach/hold constraints. A longer total flexible length was introduced after the initial routing adjustment did not provide sufficient margin at a boundary target; the final shared structure passed all three target conditions.
+
+T02 evaluates loaded holding under three force conditions. Its research trace records a change in the mathematical/control treatment when static or quasi-static reasoning was not sufficient to represent the full loaded task. The final native finite-horizon dynamic treatment was evaluated under all three required loads.
+
+T07 is the clearest shared-structure example. One four-tendon morphology was retained across four different task conditions. A longer structural candidate increased the violation in one condition and was rejected; the study returned to a better-performing length and revised tendon routing. A control sequence from an already solved condition was used as an initialization for a different condition and then re-optimized and independently evaluated. The final common structure passed all four required conditions.
+
+These cases illustrate why fixed-input response and re-optimized task capability must be distinguished. A structure change can alter the response under an existing control sequence, while the final task result depends on the control sequence that is available after the change.
+
+\subsection{Adaptive research and control-method selection}
+
+T04 and T10 provide clear examples of research-route changes. In T04, the final 22-s figure-eight tracking result uses a continuously constructed equilibrium-point sequence and periodic tension feedforward. The final result is not described as a successful execution of the earlier GVS route. In T10, the final impact-recovery controller uses a static reference, a full tangent model, discrete LQR, and bounded tension allocation. The common recipe passed the three required impact conditions; two frozen controls are retained as separate non-passing controls.
+
+T02, T05, and T06 further show that different task contracts require different mathematical outputs and control treatments. A loaded task, a directed tool-axis task, and a time-indexed loaded scan cannot be represented faithfully by a single endpoint-position metric. The system therefore retains task-specific constraints and physical evaluation while reusing the same research-problem interface.
+
+\subsection{Matched A/B/C comparisons: first batch pending}
+
+The first matched comparison is defined for PHS-2D, T01, T04, and T07. It comprises eight new runs: one LLM-only run and one direct-mathematical-tool run for each task. The corresponding C results are the historical FULL records. The A/B runs use the original task initial state and the complete legal design space; they are not initialized from the final FULL structures or intermediate FULL decisions.
+
+The comparison is designed to separate three questions: whether bottom-level mathematical tools help beyond LLM-only physical feedback (A versus B); whether the complete research-intent and mathematical-research organization adds value beyond direct tool access (B versus C); and how the complete method compares with direct LLM design (A versus C). The comparison results will be inserted after the eight runs and task-wise configuration audit are complete. No A/B/C performance ranking or statistical claim is made in this draft.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox[c][2.3cm][c]{0.94\linewidth}{\centering
+\todo{Insert the four-task A/B/C result panel after the first eight runs. Include task-wise violation-versus-budget curves and a compact outcome/cost table; do not interpolate missing results.}}}
+\caption{Planned matched comparison of LLM-only, direct mathematical-tool use, and the complete research architecture.}
+\label{fig:abc-comparison}
+\end{figure}
+
+\subsection{Cross-task research continuity}
+
+The completed traces contain examples of reusing intermediate results and prior research knowledge while adapting them to a new condition. In T07, a control sequence from one condition is used as an initialization for another condition, then re-optimized under the new condition. T04 adapts prior quasi-static tracking experience to the current robot and task before selecting a different final tracking route. T10 uses prior feedback-control experience as a starting point for the impact-recovery investigation.
+
+These examples are reported as evidence of research continuity and adaptation. They do not imply that a stored solution can be transferred unchanged across tasks; each transferred method or initialization is checked against the current task contract and physical evaluator.

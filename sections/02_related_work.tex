@@ -1,0 +1,28 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Tendon-driven continuum robots and morphology--control co-design}
+
+Continuum robots have been studied using constant-curvature models, Cosserat-rod formulations, and other reduced-order or geometrically exact representations. Reviews of continuum-robot design and kinematic modeling emphasize the relationship between geometry, actuation, and achievable motion \cite{webster2010design}. General tendon-routing formulations provide a basis for analyzing statics and dynamics under external loading \cite{rucker2011computing}. In tendon-driven systems, the design problem is further complicated by tension-only actuation, tendon slackness, routing geometry, and changes in the active set of unilateral constraints.
+
+Soft-robot co-design benchmarks provide reusable environments for evaluating morphology and control. Evolution Gym studies large-scale evolution of soft-robot bodies and controllers \cite{bhatia2022evolutiongym}; SoftZoo investigates co-design across diverse locomotion environments \cite{wang2023softzoo}; and SoMoGym provides tools for developing and evaluating soft-robot controllers \cite{graule2022somogym}. These works establish the importance of reusable design spaces and task-level evaluation. Our focus is complementary: we study how a research agent identifies the physical question that should be investigated and organizes mathematical evidence to guide structure and control refinement.
+
+\subsection{Foundation models for robot design and scientific workflows}
+
+Recent work has explored foundation models for soft-robot design and co-design. RoboCrafter-QA studies foundation-model-based evaluation and generation of soft-robot designs \cite{chen2026robocrafter}, while Debate2Create uses multi-agent debate and physics-based evaluation for robot co-design \cite{qiu2026debate2create}. These studies demonstrate the potential of language-model reasoning for design generation and iterative candidate refinement.
+
+Scientific-agent evaluation has also emphasized the need to assess workflow execution and evidence quality rather than relying only on plausible language outputs. ScienceAgentBench provides a benchmark for evaluating language agents on data-driven scientific discovery tasks \cite{chen2025scienceagentbench}. Our work focuses on the physical and mathematical research loop in tendon-driven robots: how an agent forms a physical hypothesis, constructs a parameterized mathematical question, and changes its subsequent research action in response to evidence.
+
+\subsection{Sensitivity analysis and differentiable optimization}
+
+KKT conditions and Lagrange multipliers provide local optimality and active-constraint information for constrained optimization \cite{boyd2004convex,nocedal2006numerical}. Perturbation analysis studies how optimal solutions and optimal values change as problem parameters vary \cite{bonnans2000perturbation}. Under appropriate regularity and optimality conditions, the envelope theorem relates the sensitivity of an optimized value to partial derivatives of the Lagrangian. Differentiable optimization layers have demonstrated how selected optimization problems can be embedded in differentiable computation graphs \cite{amos2017optnet}.
+
+These mathematical tools are not universally applicable to robot-design parameters. Rebuilding a simulator model, switching a tendon active set, changing a discrete topology, or encountering contact may require implicit differentiation, controlled finite differences, directional analysis, or an explicit declaration that an ordinary derivative is unavailable. We use these established methods as composable research operations and make their assumptions and scope explicit.
+
+\subsection{Scientific reasoning, evidence, and active diagnosis}
+
+Scientific reasoning involves proposing explanations, deriving consequences, and evaluating them against observations. The abductive role of hypothesis formation is classically distinguished from deduction and induction \cite{peirce1878}. Experimental-design theory studies how to select observations or interventions under uncertainty and cost \cite{chaloner1995bayesian}. In our setting, the agent proposes physical explanations and discriminating observations, while deterministic tools execute the requested analysis and preserve the resulting evidence. The current system does not claim calibrated Bayesian information gain or numerical value-of-information optimization; it uses explicit expected and weakening observations, evidence scope, and computational cost to support research decisions.
+
+\subsection{Positioning}
+
+The proposed framework does not claim that morphology--control co-design, sensitivity analysis, implicit differentiation, or LLM-based design generation is new in isolation. Its focus is the organization of these capabilities into a task-conditioned research process: the agent chooses the scientific question and relevant parameter/observable groups; deterministic software constructs and validates the mathematical problem; numerical analysis produces scoped evidence; and the agent uses that evidence to refine the structure, control, or research route.

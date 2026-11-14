@@ -1,0 +1,208 @@
+\section{Method: Physics-Guided Agentic Research}
+\label{sec:method}
+
+\subsection{Overview}
+
+\softrobotagent{} organizes robot co-design as an adaptive research loop rather than a fixed sequence of optimizer calls. The agent first interprets the task and available physical observations, proposes a mechanism hypothesis, and chooses a research question. A deterministic mathematical layer turns that question into a typed parameterized physical problem, selects an applicable numerical method, and returns validated evidence. The agent then decides whether to refine the current design, change the parameter group, investigate a different mechanism, revise the control formulation, or perform an independent physical evaluation.
+
+Fig.~\ref{fig:research-framework} summarizes the division of responsibility. The agent owns the scientific choice; fixed software owns task semantics, parameter resolution, numerical execution, and evidence integrity. The \Reporter{} provides a read-only physical interpretation of completed evidence, while the \MainAgent{} retains the final research decision.
+
+\begin{figure*}[t]
+\centering
+\input{figures/fig01_research_framework}
+\caption{Physics-guided agentic research loop. The \MainAgent{} selects the physical hypothesis, parameter/observable groups, and research action. Fixed software compiles and validates the parameterized physical research problem, executes the appropriate mathematical operation, and preserves numerical evidence. The \Reporter{} summarizes physical implications and limitations; the agent then chooses the next design or research action.}
+\label{fig:research-framework}
+\end{figure*}
+
+The sensitivity capability is available from the beginning of a study, but it is not a mandatory stage in every iteration. Before an initial candidate exists, the agent may formulate a structural mechanism hypothesis and select a candidate design. Once a candidate and working point are available, the mathematical layer can calculate local sensitivities. If the current topology is discrete, the response is non-smooth, or a mechanism hypothesis is already sufficiently specific, the agent may instead choose a direct structural or physical test.
+
+\subsection{Research intent and parameterized physical research problems}
+
+A high-level research request is represented by a parameterized physical research problem (PPRP):
+\begin{equation}
+\mathcal P_k =
+(\tau,d_k,\mathcal D_k,\mathcal O_k,\mathcal F_k,
+\sigma_k,\mathcal B_k),
+\label{eq:pprp}
+\end{equation}
+where $\tau$ is the frozen task contract, $d_k$ is the current candidate, $\mathcal D_k$ is the selected parameter group, $\mathcal O_k$ is the selected set of physical observables, $\mathcal F_k$ specifies the inner physical problem, $\sigma_k$ is the requested analysis semantics, and $\mathcal B_k$ is the allocated mathematical budget.
+
+The agent supplies the scientific content of the request: the working hypothesis, the parameter group worth investigating, the physical quantities that could reveal the proposed mechanism, and whether the comparison should hold the input fixed, re-optimize control, or evaluate a closed-loop controller. The fixed program resolves these choices against registered capabilities. It binds parameter paths and units, compiles task constraints from the frozen contract, checks whether the requested observables exist, selects the inner solver, and constructs the numerical request. The agent does not manually assemble Jacobian matrices, choose finite-difference step sizes, or manipulate solver-specific KKT arrays.
+
+This separation makes the mathematical interface composable without allowing the language model to invent unregistered physical quantities or silently change task acceptance criteria. A proposed mechanism indicator must be built from registered observables and pass dimensional and applicability checks before it can be used as an optimization objective.
+
+\subsection{Two dimensions of sensitivity organization}
+
+The mathematical research layer organizes sensitivity along two independent dimensions.
+
+\paragraph{Parameter dimension.}
+The parameter registry describes what each design variable changes and which analysis routes can use it. Representative groups include:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Geometry:} segment length, cross-section, wall thickness, and guide location;
+  \item \textbf{Material:} Young's modulus, density, damping, and other constitutive parameters;
+  \item \textbf{Tendon routing:} offset, radius, angle, anchor position, and path geometry;
+  \item \textbf{Assembly and actuation:} fixed payout, pretension, tension bounds, and actuator limits;
+  \item \textbf{Controller:} NMPC weights, feedback gains, and other controller parameters;
+  \item \textbf{Discrete morphology:} segment count, tendon count, routing topology, and cross-section type.
+\end{itemize}
+Continuous parameters may support derivatives or controlled perturbations. Discrete morphology changes are handled by candidate comparison rather than by assigning an ordinary continuous derivative.
+
+\paragraph{Sensitivity semantics.}
+For a selected parameter $d_j$, the agent must specify what output is being differentiated. We define four complementary levels.
+
+\begin{table*}[t]
+\centering
+\caption{Task-conditioned multi-level sensitivity semantics. These are different mathematical objects, not four sequential optimizers.}
+\label{tab:sensitivity-levels}
+\small
+\begin{tabularx}{\textwidth}{@{}l l Y Y@{}}
+\toprule
+Level & Mathematical object & Research question & Primary use \\
+\midrule
+M0: Mechanism & $\partial m(d)/\partial d_j$ &
+How does a design parameter change a selected physical mechanism or geometric relation? &
+Propose physically interpretable structural directions. \\
+M1: Fixed-input physical response & $\left.\partial g_\tau(d,U)/\partial d_j\right|_U$ &
+What changes when the structure is perturbed while the same input is replayed? &
+Explain the physical effect of a structural modification under a controlled input. \\
+M2: Re-optimized task capability & $\mathrm d V_\tau(d)/\mathrm d d_j$ &
+How does task capability change when the structure is modified and the admissible control is re-optimized? &
+Evaluate structure--control trade-offs and identify promising morphology changes. \\
+M3: Closed-loop performance & $\partial g_{\tau,H}(d,\theta)/\partial z_j$ &
+How does a structure or controller parameter affect the complete closed-loop execution? &
+Assess controller-dependent behavior and high-fidelity task performance. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+The levels answer different questions and need not be executed in the order M0--M3. M0 can identify a mechanism worth shaping; M2 can test whether the mechanism direction improves the best task capability after control re-optimization. M1 explains the effect of a structural change under a fixed input. M3 evaluates the controller and high-fidelity execution path. A parameter can have different, or even opposing, effects under these different treatments.
+
+For example, a tendon-routing change may improve a geometric decoupling metric at M0, worsen the response under a previously fixed tension sequence at M1, yet improve the best achievable task violation after the tension sequence is re-optimized at M2. The interpretation must retain the sensitivity semantics and control treatment.
+
+\subsection{Mechanism-level analysis (M0)}
+
+M0 starts from a physical hypothesis expressed in terms of registered observables. For a tendon-constrained mechanism, let $J_\ell(d)$ denote the Jacobian of tendon lengths with respect to generalized coordinates, and let $Z(d)$ span the local null space of the active tendon constraints. If the desired mechanism is to constrain tip motion while retaining motion in a selected middle region, one possible mechanism indicator is
+\begin{equation}
+m(d)=\|J_{\mathrm{tip}}(d)Z(d)\|_F^2,
+\label{eq:m0-indicator}
+\end{equation}
+possibly combined with a term that prevents the middle-region response from collapsing. The agent may propose this relationship; the fixed program computes the registered Jacobians, constructs the indicator, checks its dimensions, and evaluates its sensitivity with respect to the selected continuous parameters.
+
+The indicator is a mechanism proxy. A reduction in \eqref{eq:m0-indicator} does not by itself prove that finite-load passive stability or the original task has improved. It therefore motivates a subsequent equilibrium or task-capability evaluation rather than replacing it.
+
+\subsection{Fixed-input and task-capability sensitivities (M1--M2)}
+
+For M1, a previously defined input $U$ is held fixed:
+\begin{equation}
+S^{\mathrm{M1}}_{\tau,ij}
+=
+\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_U.
+\label{eq:m1}
+\end{equation}
+This isolates the effect of changing the structure under the same actuation. It is useful for diagnosing the physical response, but it is not the final structure--control co-design objective.
+
+For M2, the structure is perturbed and control is re-optimized through \eqref{eq:capability}. Introducing an epigraph variable $\rho$ gives
+\begin{equation}
+\begin{aligned}
+\min_{U,\rho}\quad & \rho\\
+\mathrm{s.t.}\quad&
+g_{\tau,i}(d,U)-\rho\leq0,\quad \forall i,\\
+&\ell_j(d)-U_j\leq0,\quad
+U_j-h_j(d)\leq0,\quad \forall j.
+\end{aligned}
+\label{eq:epigraph}
+\end{equation}
+Let $\lambda_i\geq0$, $\alpha_j\geq0$, and $\beta_j\geq0$ denote multipliers for the task, lower-input, and upper-input constraints. Under local optimality, differentiability, an appropriate constraint qualification, and regularity of the optimizer, the envelope relation gives
+\begin{equation}
+\frac{\partial V_\tau}{\partial d_j}
+=
+\sum_i\lambda_i^\star
+\frac{\partial g_{\tau,i}}{\partial d_j}
++
+\sum_{\ell}\alpha_\ell^\star\frac{\partial \ell_\ell}{\partial d_j}
+-
+\sum_{\ell}\beta_\ell^\star\frac{\partial h_\ell}{\partial d_j}.
+\label{eq:envelope-general}
+\end{equation}
+When the admissible input bounds do not depend on the structure, the final two terms vanish. This relation is an application of established parametric-optimization sensitivity theory, not a new theorem introduced here \cite{boyd2004convex,bonnans2000perturbation}. Its use is conditional: an unconverged inner solve, non-unique local solutions, active-set changes, or non-smooth constraints may invalidate an ordinary derivative interpretation.
+
+\subsection{Passive-equilibrium sensitivity}
+
+For passive structures, the relevant inner problem is the re-equilibrated response in \eqref{eq:passive-problem}. Let $z=(q,\lambda_{\mathcal A})$ collect the generalized configuration and multipliers associated with the active tendon set $\mathcal A$. The equilibrium KKT system can be written abstractly as
+\begin{equation}
+F(z,d;f)=0.
+\end{equation}
+If the active set remains unchanged and the Jacobian $F_z$ is nonsingular at the operating point, the implicit-function theorem gives
+\begin{equation}
+\frac{\partial z^\star}{\partial d}
+=
+-F_z^{-1}F_d.
+\label{eq:implicit-equilibrium}
+\end{equation}
+The derivative of a task metric $g(d,z^\star(d))$ then follows by the chain rule:
+\begin{equation}
+\frac{\dd g}{\dd d_j}
+=
+\frac{\partial g}{\partial d_j}
++
+\frac{\partial g}{\partial z}
+\frac{\partial z^\star}{\partial d_j}.
+\label{eq:equilibrium-chain}
+\end{equation}
+For a displacement measured relative to an unloaded reference, both loaded and unloaded equilibria depend on $d$ and must be differentiated. Slack-to-taut transitions can change the active set and invalidate a classical derivative across the transition; the router must then return a mode-specific or directional result, or declare the ordinary derivative unavailable.
+
+\subsection{Closed-loop sensitivity (M3)}
+
+M3 concerns the complete controller--robot execution:
+\begin{equation}
+J_{\tau,H}(d,\theta)
+=
+\mathcal J\bigl(y_{0:H}(d,\theta)\bigr),
+\end{equation}
+where $H$ denotes the high-fidelity execution model, $\theta$ denotes controller parameters, and $y_{0:H}$ is the resulting trajectory. Differentiation may require propagating sensitivities through the controller optimization and the closed-loop dynamics. When the controller contains truncated iterative solves, saturation, contact, or mode switching, the full mapping may not be differentiable. In those cases, controlled perturbation and paired physical evaluation are preferred to an unsupported ordinary-gradient claim.
+
+\subsection{Differentiation routing and composable operations}
+
+The mathematical core exposes a small set of high-level operations:
+\begin{itemize}[leftmargin=*]
+  \item \texttt{inspect}: enumerate registered parameters, observables, supported inner problems, and applicability conditions;
+  \item \texttt{differentiate}: evaluate a requested sensitivity using an applicable derivative route;
+  \item \texttt{optimize}: search a selected continuous parameter group within declared bounds and budget;
+  \item \texttt{compare}: evaluate matched candidates under the same task and physical conditions;
+  \item \texttt{interact}: evaluate finite-scale joint changes of selected parameter pairs.
+\end{itemize}
+The internal differentiation router selects among analytic derivatives, automatic differentiation, KKT-based implicit differentiation, controlled finite differences, and directional or mode-specific comparisons. The choice depends on the parameter type, the physical model, the inner solver, and the regularity of the requested quantity. For example, changing segment count or tendon count is a discrete design comparison, not a continuous derivative.
+
+For two continuous parameters $d_i$ and $d_j$, a finite-scale interaction contrast can be computed as
+\begin{equation}
+\begin{aligned}
+I_{ij}={}&f(d+h_i e_i+h_j e_j)
+-f(d+h_i e_i)\\
+&-f(d+h_j e_j)+f(d).
+\end{aligned}
+\label{eq:interaction}
+\end{equation}
+This contrast detects non-additive effects at the selected finite perturbation scale. It is a numerical analysis operation, not a new mathematical theorem.
+
+Every sensitivity result is associated with its task, candidate, model, operating point, input treatment, parameter units, perturbation size, solver status, and validity checks. If a derivative is not supported, the system returns the reason rather than substituting an unrelated proxy.
+
+\subsection{Evidence-guided design refinement}
+
+The overall design update is represented as
+\begin{equation}
+d_{k+1}=
+\mathcal R(d_k,\mathcal H_k,\mathcal E_k,\tau),
+\label{eq:refinement}
+\end{equation}
+where $\mathcal R$ is an agent-directed research refinement policy, not a fixed gradient-descent rule. Depending on the evidence, a refinement may be a local continuous update, a coordinated parameter change, a discrete topology change, a control-method replacement, or a new diagnostic investigation.
+
+The method combines two complementary roles:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Mechanism evidence proposes a direction.} M0 and M1 help explain which physical relationships and responses are affected by a candidate modification.
+  \item \textbf{Task evidence evaluates its relevance.} M2 checks the task capability after control re-optimization; M3 checks the closed-loop result in the high-fidelity execution model.
+\end{itemize}
+A mechanism proxy is therefore not treated as a substitute for the original task. A predicted local improvement is followed by re-solving the relevant inner problem and, where required, independent physical validation.
+
+After each mathematical or physical action, fixed software extracts the numerical facts and stores the original evidence. The \Reporter{} produces a read-only summary of the physical interpretation, supporting and weakening observations, and unresolved questions. The \MainAgent{} then decides whether to accept the hypothesis, change the parameter group, select another mathematical semantics, or abandon the current research route. This loop supports adaptive research without requiring M0--M3 to be executed in a fixed order.
+
+The current framework uses explicit hypotheses, expected observations, weakening observations, evidence scope, and computational cost. It does not assign uncalibrated probabilities to failure mechanisms or claim that it already computes Bayesian mutual information or numerical value of information.

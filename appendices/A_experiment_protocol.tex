@@ -1,0 +1,26 @@
+\section{First-Batch A/B/C Comparison Protocol}
+\label{app:abc-protocol}
+
+\subsection{Method permissions}
+
+\paragraph{A: LLM-only.}
+The LLM may read the frozen task description and complete legal design space; generate or modify robot structures; propose control strategies; set control inputs through the unified execution interface; run the physical simulator; and read the independent task-evaluation results. It is not provided optional mathematical diagnosis tools, Jacobian/KKT/finite-difference interfaces, or automated mathematical optimization tools. The restriction concerns external mathematical capabilities, not the LLM's own language-based reasoning.
+
+\paragraph{B: Direct mathematical tools.}
+B has the A capabilities and may call supported bottom-level mathematical tools, including Jacobian evaluation, equilibrium/KKT routines, finite differences, and supported optimization routines. The LLM must decide what mathematical question to ask and construct the requests. It is not given the high-level research-intent projection, parameterized-research-problem compiler, differentiation router, or the complete mathematical research orchestration used by C.
+
+\paragraph{C: Historical FULL.}
+C uses the already completed FULL result and its original Store/Trace. It is not re-run or rewritten. The actual model, knowledge snapshot, task protocol, and resource configuration are reported as recorded.
+
+\subsection{Initial conditions and design-space access}
+
+A and B begin from the original task initial condition, not from an intermediate FULL candidate or decision node. Both receive the same complete legal design space and structure-generation interface. Topology, segment count, tendon count, routing, geometry, and material variables are not fixed in advance beyond the legal bounds of the task's generator. The task contract, physical model, evaluator, and within-task resource ceilings are identical for A and B.
+
+The first batch contains PHS-2D, T01, T04, and T07, with one A run and one B run per task (eight new runs total). C is the historical FULL reference for each task. The first batch does not include a fixed-plan condition.
+
+\subsection{Budget and reporting}
+
+Within each task, A and B share limits for LLM tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately because A has no optional mathematical-tool access. Budget ceilings are frozen before each A/B pair using the corresponding task's historical resource record as the reference. No single raw-error average is computed across heterogeneous tasks.
+
+The primary outputs are required-condition pass count, task-specific normalized violation, best violation versus cumulative physical-evaluation budget, cost to first feasible candidate, candidate count, physical evaluations, mathematical calls, LLM tokens, integration steps, wall-clock time, and an evidence trace linking mathematical findings to subsequent design/control actions. One run per condition supports a case comparison and budget trace, not a statistical-significance claim.
+

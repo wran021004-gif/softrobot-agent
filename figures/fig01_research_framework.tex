@@ -1,0 +1,31 @@
+\begin{tikzpicture}[
+  scale=0.88, transform shape,
+  node distance=1.0cm and 1.05cm,
+  base/.style={draw=black!65, rounded corners=2pt, align=center,
+               minimum height=1.45cm, text width=3.15cm,
+               font=\small, inner sep=6pt},
+  task/.style={base, fill=blue!7},
+  agent/.style={base, fill=orange!10, text width=3.35cm},
+  problem/.style={base, fill=cyan!8, text width=3.45cm},
+  math/.style={base, fill=green!8, text width=3.45cm},
+  evidence/.style={base, fill=yellow!12, text width=3.45cm},
+  physical/.style={base, fill=gray!10, text width=3.25cm},
+  arrow/.style={-{Latex[length=2.2mm]}, thick, draw=black!70},
+  feedback/.style={-{Latex[length=2.2mm]}, thick, dashed, draw=blue!65}
+]
+\node[task] (task) at (0,0) {\textbf{Frozen task contract}\\Targets, loads, time windows, observables, thresholds, and independent acceptance};
+\node[agent] (agent) at (4.35,0) {\textbf{Main Agent}\\Physical hypothesis, research intent, parameter/observable groups, and next action};
+\node[problem] (problem) at (8.85,0) {\textbf{Parameterized physical research problem}\\Candidate, task, selected parameters, inner problem, sensitivity semantics, and budget};
+\node[math] (math) at (8.85,-2.65) {\textbf{Deterministic mathematical core}\\Inspect, differentiate, optimize, compare, interact; method routing and validity checks};
+\node[evidence] (evidence) at (4.35,-2.65) {\textbf{Evidence and interpretation}\\Fixed numerical facts, immutable trace, and read-only Reporter summary};
+\node[physical] (physical) at (0,-2.65) {\textbf{Independent physical validation}\\MuJoCo or passive-equilibrium evaluation under the frozen task contract};
+
+\draw[arrow] (task) -- (agent);
+\draw[arrow] (agent) -- (problem);
+\draw[arrow] (problem) -- (math);
+\draw[arrow] (math) -- (evidence);
+\draw[arrow] (agent.south) -- ++(0,-0.75) -| (physical.north);
+\draw[arrow] (physical) -- (evidence);
+\draw[feedback] (evidence.north) -- ++(0,0.7) -| (agent.south);
+\node[font=\scriptsize, text=blue!70!black, align=center] at (6.1,-3.72) {Evidence updates the hypothesis and determines whether to refine, diagnose, or change the research route};
+\end{tikzpicture}
