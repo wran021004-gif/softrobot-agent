@@ -1,41 +1,47 @@
-\section{Motivation and Contributions}
+\section{Introduction}
 \label{sec:introduction}
 
-\subsection{Robot co-design as a scientific reasoning problem}
+\subsection{Robot co-design as a scientific research problem}
 
-Tendon-driven continuum robots exhibit strong coupling between morphology, material properties, tendon routing, unilateral constraints, and actuation. Segment lengths and cross-sections influence elastic response; tendon offsets and guide locations determine force-transmission geometry; payout and assembly conditions determine when tendons become slack or taut; and the resulting structure constrains the control actions that can be realized. A design change can therefore affect several physical mechanisms at once.
+Tendon-driven soft robots exhibit strong coupling among morphology, material properties, tendon routing, unilateral constraints, and actuation. Segment lengths and cross-sections affect elastic response; tendon offsets and guide locations determine force-transmission geometry; payout and assembly conditions determine when tendons become slack or taut; and the resulting structure constrains the control actions that can be realized. Consequently, a design change can alter several physical mechanisms at once.
 
-This coupling makes soft-robot design fundamentally different from unconstrained parameter tuning. When a task fails, the cause may be insufficient structural capability, an unsuitable control sequence, an active-set transition, an inaccurate physical model, or an interaction among several of these factors. The next useful action is not always another optimization step. It may instead be a new physical hypothesis, an equilibrium analysis, a sensitivity calculation, a paired parameter experiment, or a change in the mathematical problem being studied.
+When a robot fails a task, the next useful action is not necessarily another parameter update. The limiting factor may be insufficient structural capability, an unsuitable control sequence, an active-set transition, an inaccurate reduced model, or an interaction among several effects. A researcher may need to inspect an equilibrium, compare fixed-input responses, estimate a sensitivity, test a competing physical explanation, or replace the mathematical formulation being used. The challenge is therefore not only to optimize a given design problem, but also to determine which problem should be investigated next.
 
-Conventional numerical optimization assumes that the objective and decision variables have already been selected. It can efficiently solve a specified problem, but it does not generally decide whether that problem captures the physical mechanism that currently limits the robot. Similarly, an LLM that proposes geometries or invokes a simulator may generate candidates without establishing why a particular change should work, what observation would falsify the explanation, or how the result should alter the next research decision.
+Numerical optimization is effective when the objective, decision variables, constraints, and model have already been specified. It does not generally determine whether those choices capture the physical mechanism currently limiting the robot. Conversely, an LLM can propose geometries, interpret simulation outcomes, and suggest design changes, but an unstructured language-model loop does not by itself guarantee that a physical hypothesis has been translated into a well-defined mathematical problem or that a proposed modification is supported by quantitative evidence.
 
-We argue that autonomous robot co-design should be treated as an iterative scientific process. A research system should be able to infer plausible mechanisms from observations, derive measurable consequences, select an appropriate mathematical or physical investigation, and revise its hypothesis when the evidence does not support the expected behavior. This view is closely related to the abductive--deductive--empirical cycle of scientific reasoning: abduction proposes a plausible explanation, deduction derives testable consequences, and empirical or computational investigation evaluates those consequences \cite{peirce1878}.
+We therefore treat autonomous soft-robot co-design as an iterative scientific process. The agent should be able to interpret task and physical observations, formulate a testable mechanism hypothesis, choose an appropriate mathematical or physical investigation, and revise its research direction when the evidence does not support the expected behavior. This process is related to the abductive--deductive--empirical cycle of scientific reasoning: abduction proposes a plausible explanation, deduction derives testable consequences, and investigation evaluates those consequences \cite{peirce1878}.
 
-\subsection{The central research question}
+\subsection{Research question}
 
-This work asks:
+The central question of this work is:
 
 \begin{quote}
-Can an agent organize mathematical and physical tools into an adaptive research process that discovers task-relevant mechanisms and improves robot design more effectively than fixed optimization or unstructured trial-and-error search?
+How can an LLM agent use mathematical and physical evidence to autonomously investigate and improve soft-robot structure and control, rather than relying only on direct design generation or unguided candidate search?
 \end{quote}
 
-The question has three connected parts. First, how should an agent decide what physical mechanism is worth investigating? Second, how can a high-level scientific question be converted into a well-defined mathematical problem whose variables, observables, constraints, and solution method are physically meaningful? Third, how can the resulting evidence be retained and interpreted so that it changes later research decisions rather than disappearing into an execution log?
+This question has two connected parts. First, how can an agent determine which physical mechanism, design parameter, or control variable is worth investigating? Second, how can the resulting mathematical and physical evidence change the subsequent research action, including the possibility of changing the parameterization, mathematical method, structure, or control strategy?
 
-\subsection{Three contributions}
+\subsection{Methodological overview}
 
-We organize the methodology around three contributions.
+We introduce \softrobotagent{}, a research-oriented framework for tendon-driven soft-robot design and control. The framework is organized around three coupled capabilities.
 
-\paragraph{C1: Mechanism-Guided Autonomous Research.}
-The agent treats physical observations as evidence for or against explicit mechanism hypotheses. It identifies expected and weakening observations, chooses diagnostic actions, and changes its research direction when intermediate results invalidate the current explanation. The distinguishing capability is not merely selecting a parameter to optimize, but deciding which physical relationship should be investigated and when the current mathematical formulation should be abandoned.
+\paragraph{C1: Mechanism-guided adaptive research.}
+The agent interprets physical observations as evidence for or against explicit hypotheses. It identifies expected and weakening observations, selects diagnostic or design actions, and can revise its research route when intermediate results invalidate the current explanation. The contribution is not simply choosing a parameter to optimize; it is deciding which physical relationship should be investigated and when the current research question should change.
 
-\paragraph{C2: Composable Mathematical Research.}
-The agent's high-level research intent is translated into a parameterized physical research problem. The problem combines registered design parameters, physical observables, task constraints, an inner equilibrium/dynamics/control problem, and a requested sensitivity or optimization semantics. The mathematical layer then selects among reusable operations such as inspection, differentiation, optimization, comparison, and finite-scale interaction analysis. Numerical method selection, solver execution, and validity checks remain deterministic.
+\paragraph{C2: Task-conditioned composable mathematical research.}
+A high-level research intent is represented as a parameterized physical research problem. The problem combines a frozen task contract, registered design parameters, physical observables, an inner equilibrium/dynamics/control problem, and a requested sensitivity or optimization semantics. Reusable mathematical operations are then selected and executed with explicit input requirements, numerical validity checks, and evidence outputs.
 
-\paragraph{C3: Evidence-Grounded Iterative Research.}
-Knowledge, structured evidence, execution traces, and scientific interpretation are organized to support continuity across research decisions. The system preserves the relationship between a hypothesis, the action selected to test it, the numerical or physical result, and the subsequent decision. A read-only scientific reporter interprets evidence without changing numerical facts, while hierarchical context projection makes the most decision-relevant information available without repeatedly injecting every raw record.
+\paragraph{C3: Cross-task evidence-grounded research continuity.}
+Knowledge, mathematical results, candidate designs, physical observations, and execution traces are organized so that later decisions can reuse earlier findings without treating them as universally valid. A deterministic evidence layer preserves numerical facts, while a read-only reporter explains their physical implications and limitations. A hierarchical context representation exposes decision-relevant summaries and keeps detailed numerical records available on demand.
 
-The three contributions are complementary. C1 determines what should be investigated; C2 determines how the question can be analyzed; C3 ensures that the result can inform the next decision. The paper does not claim new KKT, sensitivity, or information-theoretic theorems. Its methodological contribution is to organize established mathematical and scientific-reasoning principles into an agent-directed research process with explicit problem semantics and evidence boundaries.
+These capabilities are supported by an executable research harness and a multi-task evaluation suite. The paper does not claim new KKT, envelope-theorem, implicit-differentiation, or finite-difference theorems. Its methodological contribution is to organize established mathematical tools and scientific-reasoning principles into an agent-directed process with explicit problem semantics and evidence boundaries.
 
-\subsection{Summary of the evaluation strategy}
+\subsection{Evaluation overview}
 
-We evaluate the system across active and passive tendon-driven robot problems. P3 is the principal passive structural-design case, and M1 is the complementary active-control case. PHS-2D provides an additional multi-condition passive-design case, while tracking tasks are used to examine whether the same mathematical problem abstraction transfers to time-varying trajectory constraints. The main controlled comparisons are designed around the scientific claims: No-Math and No-Pairwise-Interaction examine mathematical capability; No-Intent-Projection examines the construction of task-specific mathematical problems; Fixed-Plan examines evidence-driven replanning; and No-Knowledge and Reporter ON/OFF examine evidence organization and interpretation.
+The completed study portfolio contains eleven task cases, T01--T10 and PHS-2D, covering active reach-and-hold, loaded response, fast motion, trajectory tracking, tool-axis orientation, timed scanning, shared-structure multi-task design, passive progressive stiffness, contact interaction, impact recovery, and passive tendon-constrained response. Across the archived task summary, 30 required conditions passed; two additional frozen control conditions in T10 are reported separately and did not pass the full recovery criteria. These are completed-case results, not multi-seed success-rate estimates.
+
+A nine-segment, four-tendon PHS-2D study is used as the principal passive mechanism-design case. Its mathematical evidence is complemented by a local sensitivity audit that compares KKT-based implicit task-metric derivatives with finite differences obtained by rebuilding the perturbed design and re-solving equilibrium. A matched comparison among LLM-only design, direct bottom-level mathematical-tool use, and the complete \softrobotagent{} method is being conducted on four representative tasks. No comparative outcome is claimed before those runs are complete.
+
+\subsection{Paper organization}
+
+Section~\ref{sec:formulation} defines the design, task, and research-state formulations. Section~\ref{sec:method} presents the research method and its multi-level sensitivity semantics. Section~\ref{sec:implementation} describes the executable system. Sections~\ref{sec:experimental-setup}--\ref{sec:results} report the completed task portfolio and the current mathematical evidence. Section~\ref{sec:hardware} reserves a separate place for physical-robot demonstrations. The final sections discuss interpretation, scope, and future work.

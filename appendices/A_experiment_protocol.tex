@@ -1,56 +1,26 @@
-\section{Experiment Protocol and Ablation Definitions}
-\label{app:protocol}
+\section{First-Batch A/B/C Comparison Protocol}
+\label{app:abc-protocol}
 
-\subsection{P3 budget contract}
+\subsection{Method permissions}
 
-The per-Study resource ceilings are:
-\begin{itemize}
-  \item Provider requests: 200 total, shared by Main and Reporter;
-  \item mathematical evaluations: 100;
-  \item physical launches: 150;
-  \item Public Operations: a separate hard limit derived from the historical Full trace and frozen before new runs.
-\end{itemize}
-No automatic extension or restart is allowed. The 201st Provider request is prohibited. Budget exhaustion without a qualifying candidate is a within-budget failure; exhaustion with an incomplete required evaluation is classified as incomplete. Neither outcome proves global infeasibility.
+\paragraph{A: LLM-only.}
+The LLM may read the frozen task description and complete legal design space; generate or modify robot structures; propose control strategies; set control inputs through the unified execution interface; run the physical simulator; and read the independent task-evaluation results. It is not provided optional mathematical diagnosis tools, Jacobian/KKT/finite-difference interfaces, or automated mathematical optimization tools. The restriction concerns external mathematical capabilities, not the LLM's own language-based reasoning.
 
-\subsection{Fair comparison conditions}
+\paragraph{B: Direct mathematical tools.}
+B has the A capabilities and may call supported bottom-level mathematical tools, including Jacobian evaluation, equilibrium/KKT routines, finite differences, and supported optimization routines. The LLM must decide what mathematical question to ask and construct the requests. It is not given the high-level research-intent projection, parameterized-research-problem compiler, differentiation router, or the complete mathematical research orchestration used by C.
 
-New P3 conditions use the same Core commit, runtime, task contract, initial conditions, FamilySpace, parameter bounds, physical evaluator, and resource ceilings. Each condition uses an independent Store and an empty candidate pool. The historical final candidate is not used to initialize a new ablation.
+\paragraph{C: Historical FULL.}
+C uses the already completed FULL result and its original Store/Trace. It is not re-run or rewritten. The actual model, knowledge snapshot, task protocol, and resource configuration are reported as recorded.
 
-Where possible, a matched-budget Full prefix is reconstructed from the original trace. If this cannot be reconstructed reliably, historical Full is treated as a high-budget reference rather than a matched comparison. The historical Full result used 150 Provider requests, 67 mathematical evaluations, and 98 physical episodes.
+\subsection{Initial conditions and design-space access}
 
-\subsection{Nested ablation interpretation}
+A and B begin from the original task initial condition, not from an intermediate FULL candidate or decision node. Both receive the same complete legal design space and structure-generation interface. Topology, segment count, tendon count, routing, geometry, and material variables are not fixed in advance beyond the legal bounds of the task's generator. The task contract, physical model, evaluator, and within-task resource ceilings are identical for A and B.
 
-No-Math disables all optional mathematical research operations, including pairwise interaction. No-Pairwise-Interaction disables only the pairwise four-point \texttt{interact} operation while retaining the other mathematical operations. These conditions are nested, not independent factorial levels. The No-Pairwise-Interaction result therefore measures the marginal value of pairwise interaction conditional on the remaining mathematical research capability.
+The first batch contains PHS-2D, T01, T04, and T07, with one A run and one B run per task (eight new runs total). C is the historical FULL reference for each task. The first batch does not include a fixed-plan condition.
 
-\subsection{No-Knowledge alignment}
+\subsection{Budget and reporting}
 
-The historical P3 Full knowledge record references 45 records across 17 entry IDs, while the current Core snapshot reportedly loads four general entries. The knowledge assets must be restored or aligned before a strict Full-versus-No-Knowledge comparison. Otherwise, the experiment measures the current four-entry configuration against zero, and the conclusion must be scoped accordingly.
+Within each task, A and B share limits for LLM tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately because A has no optional mathematical-tool access. Budget ceilings are frozen before each A/B pair using the corresponding task's historical resource record as the reference. No single raw-error average is computed across heterogeneous tasks.
 
-\subsection{Reporter paired snapshots}
+The primary outputs are required-condition pass count, task-specific normalized violation, best violation versus cumulative physical-evaluation budget, cost to first feasible candidate, candidate count, physical evaluations, mathematical calls, LLM tokens, integration steps, wall-clock time, and an evidence trace linking mathematical findings to subsequent design/control actions. One run per condition supports a case comparison and budget trace, not a statistical-significance claim.
 
-Six historical decision snapshots are evaluated in paired Reporter ON/OFF conditions. Both conditions receive the same fixed numerical facts, task contract, and evidence access. Only the Reporter interpretation is changed. The Main decision is scored blind for evidence use, physical reasoning, decision quality, unsupported claims, and context/token cost.
-
-
-\subsection{Historical study resource references}
-
-The historical studies provide resource references for planning the new hard ceilings:
-
-\begin{table*}[t]
-\centering
-\caption{Historical resource references.}
-\label{tab:historical-cost}
-\small
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Study & Provider requests & Math evaluations/requests & Physical episodes/steps \\
-\midrule
-M1 & 48 & 7 & 5 episodes \\
-P3 & 150 & 67 & 98 episodes \\
-PHS-2D & -- & 303 requests & 3,456,000 physics steps \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-The PHS-2D study also recorded 47 structural-generation attempts. These counts use the original study-specific definitions and should not be combined across studies as if they were one common benchmark cost. In particular, mathematical Worker integration steps and registered physical launches are distinct accounting quantities.
-
-The historical P3 record includes two finite-scale pairwise interaction studies: \texttt{payout\_offsets\_m.tendon\_1} with \texttt{spans.0.radius\_m}, and remote-segment density with cross-section radius. Both used finite perturbations with strict derivative qualification disabled. The historical bounded directional \texttt{optimize} operation did not produce a defined derivative or a comparable improvement and must not be described as successful gradient descent.

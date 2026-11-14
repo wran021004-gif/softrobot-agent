@@ -1,53 +1,57 @@
-# Contribution--Mechanism--Experiment Map (v0.3)
+# Paper claim map — research-oriented manuscript v1.0
 
-## C1 — Mechanism-Guided Autonomous Research
-**Claim:** the system can formulate testable physical hypotheses, select discriminating investigations, and revise its research direction in response to evidence.
+The manuscript is organized around one scientific question: how can an LLM agent use mathematical and physical evidence to autonomously investigate and improve soft-robot structure and control?
 
-- Theoretical support: abductive reasoning; hypothesis testing; sequential research decisions; active diagnosis and identifiability.
-- Primary comparison: P3 Full vs Fixed-Plan.
-- Optional extension: One-shot LLM Plan, added only if Full vs Fixed-Plan indicates a meaningful difference.
-- Supporting comparison: M1 Full vs No-Automated-Physical-Probe.
-- Measures: valid hypotheses, expected/weakening observations, evidence-grounded pivots, effective research action ratio, task outcome, and cost.
-- Do not claim calibrated mutual-information or numerical VOI optimization.
+## C1 — Mechanism-guided adaptive research
 
-## C2 — Composable Mathematical Research
-**Claim:** high-level research intent can be projected into parameterized physical problems and investigated through reusable mathematical operations with explicit semantics and validity.
+**Claim.** The agent can formulate testable physical hypotheses, choose a discriminating mathematical or physical investigation, and revise the research route when the evidence changes the interpretation of the current design problem.
 
-Four layers:
-1. Research Intent Projection.
-2. Parameter / Observable Composition.
-3. Composable Mathematical Operations: inspect, differentiate, optimize, compare, interact.
-4. Solver Routing and Numerical Validity.
+- Main process evidence: PHS-2D, T04, T07, T10.
+- Supporting evidence: T02, T05, and T06.
+- Theoretical framing: abductive hypothesis formation, deduction of expected/weakening observations, empirical investigation, and sequential research-state updates.
+- Main comparison: complete research architecture (C) against LLM-only (A) and direct bottom-level mathematical-tool use (B).
+- Do not claim that the agent is a globally optimal experiment selector or that it computes calibrated mutual information/value of information.
 
-- Theoretical support: KKT and active-set analysis; parameterized optimization; implicit differentiation; envelope-theorem sensitivity; finite-scale interaction analysis.
-- Primary comparisons: P3 Full vs No-Math; Full vs No-Intent-Projection; Full vs No-Pairwise-Interaction.
-- Independent validation: equilibrium/KKT residuals, derivative checks against reference solutions, active-set qualification, finite-difference scale checks, and four-point interaction verification.
-- Do not present KKT, sensitivity, or four-point interaction as newly invented mathematics.
-- Do not claim global gradients or descent guarantees without regularity and error bounds.
-- No-Intent-Projection must wait for an audit of `scientific_question_v4`; do not create a nominal feature flag if no independent projection process exists.
-- No-Math and No-Pairwise-Interaction are nested, not independent factorial ablations.
+## C2 — Task-conditioned composable mathematical research
 
-## C3 — Evidence-Grounded Iterative Research
-**Claim:** domain knowledge, structured evidence, traceability, and scientific interpretation improve research continuity and decision quality.
+**Claim.** High-level research intent can be mapped to a parameterized physical research problem, which is analyzed using task-conditioned mathematical semantics and applicable differentiation/optimization methods.
 
-- Theoretical support: external memory, evidence provenance, context organization, evidence-based iteration.
-- Primary comparisons: P3 Full vs No-Knowledge; Reporter ON/OFF on six paired historical snapshots; evidence-trace audit.
-- Measures: evidence citation correctness, unsupported claims, repeated/ineffective actions, decision quality, context/token cost.
-- No-Knowledge must retain task definitions, tool schemas, and essential interface information.
-- Align historical Full knowledge assets (45 records / 17 entry IDs) with current Core knowledge (reported four general entries) before claiming a matched ablation.
+- Core interface: frozen task contract + candidate + registered parameter group + physical observables + inner physical problem + sensitivity semantics + budget.
+- Mathematical semantics: M0 mechanism sensitivity; M1 fixed-input physical sensitivity; M2 re-optimized task-capability sensitivity; M3 closed-loop sensitivity.
+- Reusable operations: inspect, differentiate, optimize, compare, and interact.
+- Mathematical basis: KKT and active-set analysis, implicit differentiation, parametric optimization/envelope sensitivity, finite differences, and finite-scale interaction analysis.
+- Main evidence: PHS-2D gradient audit; T01/T02/T07 active structure--control cases; T04/T10 control-method changes.
+- Main comparison: B (direct bottom-level math tools) against C (complete research-intent and mathematical-research organization).
+- KKT, implicit differentiation, envelope sensitivity, and finite differences are established mathematics; the contribution is their task-conditioned composition, validity-aware execution, and integration into agent-directed research.
 
-## Cross-task and portability
-- P3: passive structural design and progressive stiffness.
-- M1: active multi-target control.
-- PHS-2D: additional passive multi-condition stabilization case.
-- Tracking: lightweight mathematical transfer, conditional on auditing the task compiler.
-- Backbone comparison: DeepSeek Flash, GPT-5.6 Sol, GPT Astra under the same M1 Full configuration.
-- One seed is a pilot; use at least three, preferably five, independent seeds for quantitative claims.
+## C3 — Cross-task evidence-grounded research continuity
 
-## Budget fairness
-- Hard cap: 200 Provider requests per Study, shared by Main and Reporter.
-- Additional ceilings: 100 mathematical evaluations and 150 physical launches.
-- Public Operations ceiling must be derived from historical Full usage and frozen before execution.
-- No automatic extension or 201st request.
-- Budget exhaustion without a qualifying candidate is a within-budget failure, not proof of infeasibility.
-- Reconstruct an equal-budget Full prefix if possible; otherwise treat historical Full as a high-budget reference.
+**Claim.** Historical methods, intermediate solutions, and numerical evidence can be retained and adapted to later tasks or conditions while preserving task-specific physical validity.
+
+- Main evidence: T04 reuse and adaptation of prior tracking experience; T07 transfer of a control initialization between conditions; T10 use of prior feedback-control experience; shared task and evidence interfaces across T01--T10 and PHS-2D.
+- Supporting architecture: Knowledge/Skill, immutable Store/Trace, fixed evidence extraction, Reporter summaries, and L0--L3 hierarchical context.
+- Knowledge/Skill and context ablations are extensions, not part of the first A/B/C batch.
+
+## Supporting system contribution
+
+**Executable soft-robot research harness and multi-task evaluation suite.** The harness connects task contracts, design/parameter registries, mathematical analysis, physical backends, independent evaluators, and evidence storage. The eleven completed cases span active and passive tendon-driven design, multi-condition tasks, tracking, orientation, loading, contact, and impact recovery.
+
+## First controlled-comparison batch
+
+| Task | A: LLM-only | B: Direct mathematical tools | C: Historical FULL |
+|---|---:|---:|---|
+| PHS-2D | 1 new run | 1 new run | Existing FULL |
+| T01 | 1 new run | 1 new run | Existing FULL |
+| T04 | 1 new run | 1 new run | Existing FULL |
+| T07 | 1 new run | 1 new run | Existing FULL |
+
+Eight new runs in total. No Fixed-Plan condition is included in this batch. A and B start from the original task initial state and the complete legal design space. C is not re-run; its historical configuration and comparability are reported as recorded.
+
+## Claim boundaries
+
+- M0--M3 are different sensitivity semantics, not four mandatory sequential stages or four independent optimizers.
+- A local sensitivity is scoped to its model, candidate, operating point, parameterization, and input treatment.
+- The PHS-2D 18-pair audit concerns three task metrics along one common Young's-modulus direction; it is not 18 independent parameter gradients or a global error bound.
+- The 30/30 required-condition count is a completed-case snapshot, not a multi-seed success rate. T10's two frozen controls are separate.
+- A/B/C outcome claims are added only after the eight new runs are complete.
+- Physical-robot validation is a separate evidence layer and must use the already archived hardware records.

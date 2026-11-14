@@ -1,0 +1,28 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{From design search to research-driven refinement}
+
+The completed studies suggest that soft-robot design is not always well represented as optimization over a fixed objective and a fixed set of variables. T01 and T07 include structural changes and reversals; T02, T04, and T10 include changes in the mathematical or control treatment; and PHS-2D includes a shift from local mechanism analysis to finite-load and routing investigations. These processes motivate a research formulation in which the agent can revise the hypothesis and the mathematical question, not merely update a vector of parameters.
+
+The proposed method assigns different responsibilities to the agent and deterministic software. The agent interprets the physical situation, selects a scientific question, and decides what the evidence should change. The mathematical layer resolves the request into a supported physical problem and performs the numerical work. The reporter interprets, but does not alter, the numerical evidence. This separation is central to making the research loop both adaptive and auditable.
+
+\subsection{Why M0--M3 are distinct}
+
+M0--M3 describe different functions and experimental treatments. They should not be interpreted as four optimizers or as a mandatory sequence. M0 can reveal a mechanism-level design direction; M1 isolates a structural effect under fixed input; M2 evaluates task capability after control re-optimization; and M3 evaluates the complete closed-loop execution. A result at one level does not automatically imply a result at another. In particular, improvement of a mechanism proxy does not prove task feasibility, and a local M2 derivative does not guarantee high-fidelity closed-loop improvement.
+
+The active and passive cases share the parameterized research interface but use different inner physical problems. Active designs may involve a constrained control sequence, while passive designs require re-equilibrating the structure under unilateral tendon constraints. The common abstraction is the research request and evidence contract, not a universal solver.
+
+\subsection{Interpretation of the current evidence}
+
+The eleven completed task cases demonstrate the range of tasks that the harness has executed and independently evaluated. The PHS-2D study provides a detailed passive structural-design example and a local numerical consistency check for task-metric sensitivities. The T01/T02/T07 cases connect structural changes to active task performance; T04/T10 show that the research route and control formulation can change in response to evidence.
+
+The matched A/B/C comparison is needed to quantify the incremental value of direct mathematical tools and the complete research architecture. Until those runs are complete, the FULL traces support process-level case analysis but do not by themselves isolate the causal contribution of each architectural component. Likewise, the first A/B batch uses one new run per method and task; it should be interpreted as a matched case comparison unless further repetitions are added.
+
+\subsection{Scope and limitations}
+
+The sensitivity results are local to their declared model, candidate, operating point, parameterization, and input treatment. The 18-pair PHS-2D audit concerns three task metrics along one common Young's-modulus direction on a fixed nine-segment topology; it is not a full design-space gradient, a global error bound, or a universal descent guarantee. KKT and envelope-based sensitivities require their corresponding regularity and numerical-optimality conditions. Active-set changes, contact, discrete topology changes, and non-converged inner solves require separate treatment.
+
+The completed FULL portfolio is an archived set of task cases rather than a randomized multi-seed benchmark study. The two T10 frozen controls are retained separately from the required conditions. Historical C results are not re-run, so any configuration differences relative to new A/B runs must remain visible in the comparison.
+
+Finally, the current research-decision interface uses explicit hypotheses, predicted observations, evidence, and cost. It does not claim calibrated probabilities for competing failure mechanisms or a numerically optimized mutual-information/value-of-information policy. These are potential future extensions once sufficient calibrated diagnostic data are available.

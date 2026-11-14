@@ -1,24 +1,39 @@
-# Experimental matrix and interpretation rules (v0.3)
+# Experimental matrix — manuscript v1.0
 
-| Study / test | Main comparison | Contribution |
-|---|---|---|
-| P3 Full | Historical integrated system | C1 + C2 + C3 |
-| P3 No-Math | Full vs no optional math operations | C2 overall |
-| P3 No-Intent-Projection | Adaptive intent-to-problem projection vs fixed templates | C2-A |
-| P3 No-Pairwise-Interaction | Full vs no finite-scale `interact` | C2-C |
-| P3 No-Knowledge | Full vs no domain Knowledge/Skill retrieval | C3 |
-| P3 Fixed-Plan | Full vs fixed research route | C1 |
-| P3 One-shot Plan | Optional follow-up if Full vs Fixed-Plan warrants it | C1 |
-| Reporter | Six paired historical snapshots, ON/OFF | C3 |
-| M1 | Full vs No-Automated-Physical-Probe pilot | C1 / active-control transfer |
-| Backbone | DeepSeek Flash, GPT-5.6 Sol, GPT Astra on M1 Full | Model portability |
-| Tracking | Light mathematical transfer validation | C2 task transfer |
-| Math correctness | Independent numerical references | C2 numerical validity |
+## Completed FULL portfolio
 
-## Important distinctions
-- No-Math removes mathematical research but retains adaptive research decisions.
-- Fixed-Plan retains mathematical research but removes evidence-driven replanning.
-- No-Intent-Projection retains mathematical operations and task contracts; it replaces adaptive custom problem construction with fixed templates.
-- No-Pairwise-Interaction disables only the finite-scale four-point interaction operation.
-- No-Math and No-Pairwise-Interaction are nested because No-Math also removes `interact`.
-- No-Automated-Physical-Probe disables the registered automated probe method, not every possible manually constructed physical test.
+Eleven completed task cases: T01--T10 and PHS-2D. The archived summary contains 30 passed required conditions among 30 required records, plus two T10 frozen control records that did not pass the complete recovery criteria. This is a completed-case summary, not a multi-seed success-rate estimate.
+
+## First matched comparison: eight new runs
+
+| Task | A: LLM-only | B: Direct mathematical tools | C: Historical FULL |
+|---|---:|---:|---|
+| PHS-2D | 1 | 1 | Existing result |
+| T01 | 1 | 1 | Existing result |
+| T04 | 1 | 1 | Existing result |
+| T07 | 1 | 1 | Existing result |
+
+### Method permissions
+
+- **A — LLM-only:** LLM proposes and modifies structures and controls; it can use the candidate generator, physical simulator, direct control-input interface, and independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are unavailable.
+- **B — Direct mathematical tools:** A plus direct access to supported bottom-level mathematical tools (e.g., Jacobian, KKT/equilibrium, finite difference, and supported optimization). The LLM constructs the mathematical question and requests itself. The high-level research-intent projection and mathematical research orchestration are unavailable.
+- **C — Ours:** the existing FULL result and trace; no re-run.
+
+### Fairness conditions
+
+- A and B use the same base model, task contract, initial state, legal design space, structure generator, physical backend, evaluator, and within-task budget.
+- A and B start from the original task state, not from a FULL intermediate candidate or decision trace.
+- Topology and parameter groups are open within the task's complete legal design space.
+- Knowledge/Skill access is aligned between A and B and documented against the historical C configuration.
+- C remains a historical reference. Any mismatch in model, knowledge snapshot, task protocol, or resource configuration is reported rather than hidden.
+- The same task-specific budget ceilings apply to A and B. Mathematical calls are separately recorded.
+
+### Primary measurements
+
+Required pass count; task-specific normalized violation; best violation versus cumulative physical-evaluation budget; cost to first feasible candidate; candidate count; physical evaluations; mathematical calls; LLM tokens; integration steps; wall-clock time; and evidence linking a mathematical finding to a subsequent design/control action.
+
+One run per A/B condition is a matched case comparison and budget trace, not a statistical-significance study. No raw-error average is computed across heterogeneous tasks.
+
+## Extensions not included in the first batch
+
+Knowledge/Skill ON/OFF, Flat Context versus L0--L3, and additional task coverage may be considered after the first batch. They are not prerequisites for the initial manuscript framework. No Fixed-Plan experiment is included in the current plan.
