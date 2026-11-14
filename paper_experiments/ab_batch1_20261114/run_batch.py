@@ -66,6 +66,8 @@ def compact_evaluation(row):
         isinstance(v.get('normalized_violation'),(int,float)) and v['normalized_violation']>0 or isinstance(v.get('margin'),(int,float)) and v['margin']<0)}
     out={k:row.get(k) for k in ('candidate','condition','accepted','validity','max_violation','reference','raw','cumulative')}
     out['failed_checks']=dict(list(failed.items())[:12]);out['metrics']=(row.get('metrics') or [])[:6]
+    if detail.get('reason'):out['evaluation_reason']=detail['reason']
+    if row.get('physical_failure'):out['physical_failure']=row['physical_failure']
     samples=row.get('physical_observations',[])
     if samples:out['final_state']={k:samples[-1][k] for k in ('time_s','tip_m','tip_velocity_m_s','qpos_rad','qvel_rad_s') if k in samples[-1]}
     if row.get('required_case_results'):
@@ -75,6 +77,12 @@ def compact_evaluation(row):
 def compact_feedback(value):
     if isinstance(value,list):return [compact_feedback(v) for v in value]
     if isinstance(value,dict) and 'condition' in value and 'validity' in value:return compact_evaluation(value)
+    if isinstance(value,dict) and isinstance(value.get('result'),dict):
+        result=value['result'];trials=result.get('trials')
+        if isinstance(trials,list) and len(trials)==1 and trials[0]==result.get('equilibrium'):
+            result={k:v for k,v in result.items() if k!='trials'}
+            result['trials_reference']='The single trial is identical to equilibrium; full original trials remain in the referenced artifact.'
+            return {**value,'result':result}
     return value
 
 def token_reservation(request):
@@ -177,7 +185,7 @@ class Run:
         self.limits={**LIMITS}
         if method=='A':self.limits['mathematical_calls']=0
         if task=='PHS-2D':self.limits.update(integration_steps=850000,physics_evaluations=30,wall_s=3600)
-        if task=='T08':self.limits.update(integration_steps=2100000,physics_evaluations=30,wall_s=3600)
+        if task=='T08':self.limits.update(integration_steps=2240000,physics_evaluations=30,wall_s=3600)
         self.base['run_id']=self.id
         self.base['policy']['allowed_tools']=[];self.base['policy']['tool_bindings']={}
         self.base['policy']['budget']=dict(model_calls=self.limits['requests'],tool_calls=100,backend_solves=self.limits['physics_evaluations'],worker_calls=0,wall_s=self.limits['wall_s'])
@@ -192,7 +200,7 @@ class Run:
             self.s=self.store.session(self.id)['state']
             meta=read(self.folder/'config.json')
             if meta['limits']!=self.limits:
-                self.trace('paired_budget_addendum',dict(previous=meta['limits'],current=self.limits,reason='User clarified at most 60 requests per independent run, not entire batch. Same task A/B ceilings remain equal; continue existing Store.'))
+                self.trace('paired_budget_addendum',dict(previous=meta['limits'],current=self.limits,reason='Explicit paired budget correction; the original configuration and correction remain in Trace. Same task A/B ceilings remain equal; continue existing Store.'))
                 meta['limits']=self.limits;write(self.folder/'config.json',meta)
         meta=read(self.folder/'config.json')
         if 'original_task' not in meta:
@@ -231,9 +239,10 @@ class Run:
         # A never runs NMPC or an automatic mathematical controller.
         # This controller descriptor only compiles the original physical scene;
         # playback_tensions applies the LLM-authored inputs directly.
-        r=self.put(dict(configuration=cfg,generation=plain(build.request),topology=dict(segments=request.segment_count,tendons=request.tendon_count),initial_state=cfg['task']['initializer']),'candidate_generated')
+        order=dict(native_coordinate_order=p['dofs'],tendon_order=[t['entity'] for t in p['tendons']])
+        r=self.put(dict(configuration=cfg,generation=plain(build.request),topology=dict(segments=request.segment_count,tendons=request.tendon_count),initial_state=cfg['task']['initializer'],**order),'candidate_generated')
         alias=recovering or 'c'+str(self.s['candidate_count']);self.s['candidates'][alias]=r;self.save_state()
-        return dict(candidate=alias,topology=dict(segments=request.segment_count,tendons=request.tendon_count),initial_tip_geometry='Along base +x; world mount from frozen task.',generation=plain(build.request))
+        return dict(candidate=alias,topology=dict(segments=request.segment_count,tendons=request.tendon_count),initial_tip_geometry='Along base +x; world mount from frozen task.',generation=plain(build.request),**order)
 
     def candidate(self,name):return self.store.artifact(self.s['candidates'][name])
     def config_case(self,candidate,condition):
@@ -302,10 +311,11 @@ class Run:
                 backend.controller=FixedStateFeedback(p,control,u);backend.controller.period_s=cfg['task']['timing']['control_period_s']
                 rows,observations,complete,reason,count=backend.solve(max(1.,self.limits['wall_s']-(time.time()-self.s['started'])))
                 evidence=backend.task_evidence;arrays=evidence['arrays']
-                initial=dict(time_s=arrays['time_s'][0],tip_m=arrays['tip_m'][0],tip_velocity_m_s=arrays['tip_velocity_m_s'][0])
+                initial=dict(time_s=arrays['time_s'][0],tip_m=arrays['tip_m'][0],tip_velocity_m_s=arrays['tip_velocity_m_s'][0],speed_m_s=arrays['tip_speed_m_s'][0])
+                rows=[{**row,'actual_tension_n':row['tension_n'],'speed_m_s':float(np.linalg.norm(row['tip_velocity_m_s']))} for row in rows]
                 raw=dict(status='completed' if complete else 'incomplete',failure=reason,samples=[initial]+rows,
                     physics_steps=count,task_evidence=evidence,controller_observations=observations,
-                    supplied_control=control,controller_construction='none; only LLM-supplied fixed coefficients')
+                    supplied_control=control,tendon_order=[t['entity'] for t in p['tendons']],controller_construction='none; only LLM-supplied fixed coefficients')
                 write(folder/'samples.json',raw['samples']);write(folder/'fixed_feedback_execution.json',raw)
             else:raw=playback_tensions(inp,p,scene,u.tolist(),folder)
         except Exception as e:
@@ -347,6 +357,7 @@ class Run:
                 first=goal['programs'][loads[0]]
                 unloaded_end=next(v['end_s'] for v in first if v['name']==goal['unloaded_stage'])
                 steps=round((timing['duration_s']+(len(loads)-1)*(timing['duration_s']-unloaded_end))/timing['timestep_s'])
+                if self.task=='T08':steps=round(len(loads)*timing['duration_s']/timing['timestep_s'])
                 self.guard('integration_steps',steps)
                 self.guard('physics_evaluations');self.s['physics_evaluations']+=1;self.save_state()
                 raw=execute(SessionInput.model_validate(cfg),folder).data.data
@@ -390,6 +401,9 @@ class Run:
                     limit=c.get('limit',0);violations.append(max(0.,-c['margin'])/(abs(limit) if isinstance(limit,(int,float)) and limit else 1.))
             samples=raw.get('samples',[])
             row=dict(candidate=alias,condition=cond,accepted=ev.task_success,validity=ev.validity,diagnostics=detail,metrics=clean(plain(ev).get('metrics')),max_violation=max(violations) if violations else None,reference=er,raw=rr,physical_observations=[samples[i] for i in sorted(set([0,len(samples)//4,len(samples)//2,len(samples)-1]))] if samples else [],cumulative={k:self.s[k] for k in ['physics_evaluations','integration_steps','mathematical_calls','llm_tokens']})
+            if raw.get('failure'):
+                failure=raw['failure'] if isinstance(raw['failure'],dict) else dict(reason=raw['failure']);native=failure.get('native_diagnostic') or {}
+                row['physical_failure']=dict(reason=str(failure.get('reason',''))[:500],**{k:native[k] for k in ('error_location','attempted_steps','confirmed_completed_steps') if k in native})
             if cfg['task'].get('physical_problem'):row['required_case_results']=passive_cases(cfg['task'],raw,plain(ev),er)
             self.s['evaluations'].append(row);self.save_state();self.trace('evaluation',row);out.append(row)
         return out
@@ -485,12 +499,12 @@ class Run:
         return dict(task_id=self.task,method=MODES[self.method],legal_design_space=space,assembly_prototypes=assembly,generation_schema=schema,
             tasks=[dict(condition_id=c['condition_id'],role=c.get('role','required'),task={k:v for k,v in c['task'].items() if k in ('family','goal','timing','physical_problem','environment')},initial_condition='Original all-zero named joint position and velocity; T04 requires physically prepared qualified equilibrium.',acceptance=c.get('acceptance'),independent_channels=c.get('independent_channels')) for c in cases],
             limits=self.limits,physics='Existing native MuJoCo serial bending model, original frozen evaluator. Full legal structure generation; all candidates start from task initial conditions.',
-            control_interface=dict(description='PHS-2D is passive: no active control or control_weights/recipe edits. LLM chooses structure, routing and fixed payout lengths. evaluate needs candidate only and executes the original ten-load-case native protocol, including its required fresh unloaded physical equilibrium solver.' if self.task=='PHS-2D' else 'Explicit absolute nonnegative tension in N. Each condition uses knots=[{time_s,tensions_n:[all channels]}], linearly interpolated on original grid. Or bias_n plus optional period_s and harmonics=[{order,sin_n,cos_n}]. No optimizer or NMPC runs. T04: initial_tensions_n constructs the required initial equilibrium by constant-input physical settling over the frozen 22 s reference horizon; shorter settle_s cannot shorten that required preparation horizon. The independent task then runs its own full 22 s from the qualified prepared state.'),
+            control_interface=dict(description='This task is passive: no active control or control_weights/recipe edits. LLM chooses structure, routing and fixed payout lengths. evaluate accepts {candidate,controls:{},conditions:[condition_id]}; do not supply zero-tension knots or a condition entry under controls. It executes the original native protocol, including its required fresh unloaded physical equilibrium solver.' if self.base['task'].get('physical_problem') else 'Explicit absolute nonnegative tension in N. Each condition uses knots=[{time_s,tensions_n:[all channels]}], linearly interpolated on original grid. Or bias_n plus optional period_s and harmonics=[{order,sin_n,cos_n}]. No optimizer or NMPC runs. T04: initial_tensions_n constructs the required initial equilibrium by constant-input physical settling over the frozen 22 s reference horizon; shorter settle_s cannot shorten that required preparation horizon. The independent task then runs its own full 22 s from the qualified prepared state.'),
             task_specific_interface=(dict(passive=True,conditions='One both_directions execution retains plus_x/minus_x separately. No active control. Frozen development_not_registered_SELECT classification; original qualification, mechanism and numerical confirmation are required.') if self.task=='T08' else
-                dict(feedback='T10 accepts control.feedback={gain:[[nu,2*n]],qref_rad:[n],vref_rad_s:[n]}; explicitly author every coefficient. n=segment_count*24 native named hinges. Control is feedforward(time) - gain @ [measured_q-qref,measured_v-vref], clipped by existing ideal tension bounds. No gain construction or optimization is called. Same candidate/control law for required and separate frozen-input control cases.') if self.task=='T10' else
+                dict(feedback='T10 accepts control.feedback={gain:[[nu,2*n]],qref_rad:[n],vref_rad_s:[n]}; explicitly author every coefficient. n is the generated candidate native hinge coordinate count (two coordinates per flexible cell). Control is feedforward(time) - gain @ [measured_q-qref,measured_v-vref], clipped by existing ideal tension bounds. No gain construction or optimization is called. Same candidate/control law for required and separate frozen-input control cases.') if self.task=='T10' else
                 dict(equilibrium_handoff='B may supply initial_equilibrium_reference from its own converged equilibrium tool, plus identical initial_tensions_n. Existing GVS-to-native mapping then original static qualification; residual threshold remains 1e-7 N.m, trajectory remains 22 s.') if self.task=='T04' else None),
             generation_notes=dict(section_station_counts={c['id']:len(c.get('sections',[])) for c in assembly['components'] if c['kind']=='flexible_segment'},rules='sections replaces each existing section station, so supply the exact prototype count; omitting sections preserves original sections. All spans first_segment=0 under base-only rule. guide_s lists interior normalized guide stations. Candidate aliases are returned only on success.'),
-            mathematical_interface=None if self.method=='A' else dict(operations=['equilibrium','kkt','jacobian','finite_difference'] if self.task=='PHS-2D' else ['jacobian','mechanics','finite_difference','equilibrium'],description='Direct existing native kernels only. Explicit candidate, condition, qpos_rad,qvel_rad_s,tensions_n. Active finite_difference options={horizon_s:0.01,difference_step_n:0.02}; horizon <=0.05. Active equilibrium uses existing GVS damped Newton: tensions_n, optional basis={strategy:structural_linear},initial_q,max_iterations,tolerance. Passive equilibrium/kkt/jacobian args material_s,force_world_n,qpos_rad; passive finite_difference additionally requires explicit locations,increment_n,direction_world,force_n. No intent projection, automatic problem constructor, differentiation router or high-level research optimization.'),
+            mathematical_interface=None if self.method=='A' else dict(operations=['equilibrium','kkt','jacobian','finite_difference'] if self.base['task'].get('physical_problem') else ['jacobian','mechanics','finite_difference','equilibrium'],description='Direct existing native kernels only. Explicit candidate, condition, qpos_rad,qvel_rad_s,tensions_n. Active finite_difference options={horizon_s:0.01,difference_step_n:0.02}; horizon <=0.05. Active equilibrium uses existing GVS damped Newton: tensions_n, optional basis={strategy:structural_linear},initial_q,max_iterations,tolerance. Passive equilibrium/kkt/jacobian args material_s,force_world_n,qpos_rad; passive finite_difference additionally requires explicit locations,increment_n,direction_world,force_n. No intent projection, automatic problem constructor, differentiation router or high-level research optimization.'),
             knowledge='Generic SI mechanics, family domains and task definitions only. Historical FULL final designs and decision traces are inaccessible.')
 
     def step(self,command):
@@ -524,19 +538,29 @@ class Run:
             try:self.guard('requests')
             except ValueError as exc:
                 self.s['status']='budget_complete';self.s['stop_reason']=str(exc);break
-            wire=self.s['messages'] if len(self.s['messages'])<=4 else self.s['messages'][:2]+self.s['messages'][-2:]
+            wire=deepcopy(self.s['messages'] if len(self.s['messages'])<=4 else self.s['messages'][:2]+self.s['messages'][-2:])
+            for message in wire:
+                if message['role']=='user' and message['content'].startswith('{"feedback":'):
+                    feedback_message=json.loads(message['content'])
+                    for item in feedback_message['feedback']:item['result']=compact_feedback(item['result'])
+                    message['content']=json.dumps(feedback_message,ensure_ascii=False)
             # Exact owned working set survives bounded conversational context.
             latest={(r['candidate'],r['condition']):r for r in self.s['evaluations']}
             snapshot=dict(available_candidates={k:self.candidate(k)['topology'] for k in self.s['candidates']},latest_evaluations=[{k:r.get(k) for k in ('candidate','condition','accepted','validity','max_violation','reference')} for r in latest.values()],current_limits=self.limits,resource_use={k:self.s[k] for k in ('requests','llm_tokens','candidate_count','physics_evaluations','integration_steps','mathematical_calls')})
+            if self.task=='T10':snapshot['native_io']={k:{name:self.candidate(k).get(name) for name in ('native_coordinate_order','tendon_order')} for k in self.s['candidates']}
             wire=wire+[dict(role='user',content='Current authoritative own-run working set: '+json.dumps(snapshot))]
             idx=self.s['requests']+1;request=dict(model=PROVIDER['model'],messages=wire,stream=False)
             # Reserve the serialized input conservatively plus the existing
             # runtime's 32768-token response allowance before sending.
             reservation=token_reservation(request)
             unknown_reserved=sum(self.s.get('token_reservations',{}).get(str(n),{}).get('total',0) for n in self.s.get('unreported_token_requests',[]))
+            available=self.limits['llm_tokens']-self.s['llm_tokens']-unknown_reserved
+            if available-reservation['total']<32768 and reservation['total']<=available:
+                wire[-1]['content']+=' Budget notice: this is the last request that currently fits the conservative token reservation budget. No additional model response allowance remains afterward; include your intended final research actions in this response.'
+                reservation=token_reservation(request)
             if self.s['llm_tokens']+unknown_reserved+reservation['total']>self.limits['llm_tokens']:
                 self.trace('token_budget_stop',dict(reported_tokens=self.s['llm_tokens'],unreported_reserved=unknown_reserved,remaining=self.limits['llm_tokens']-self.s['llm_tokens']-unknown_reserved,reservation=reservation))
-                self.s['status']='budget_complete';break
+                self.s['status']='budget_complete';self.s['stop_reason']='BUDGET_EXHAUSTED: llm_tokens including unreported reservations';break
             self.s.setdefault('token_reservations',{})[str(idx)]=reservation
             self.trace('provider_request',dict(request_number=idx,request=request,token_reservation=reservation))
             self.s['requests']+=1;self.save_state();start=time.time()
@@ -570,7 +594,9 @@ class Run:
                         self.save_state()
                         if self.s['status']=='budget_complete':break
                     # Native full artifacts stay in Store; bounded exact numerical feedback.
-                    self.s['messages'].append(dict(role='user',content=json.dumps(clean(dict(feedback=feedback,remaining={k:self.limits[k]-self.s[k] for k in ['requests','llm_tokens','candidate_count','mathematical_calls']},resource_use={k:self.s[k] for k in ['candidate_count','physics_evaluations','integration_steps']},instruction='Continue independent research or finish. All required conditions must be evaluated on one final design.')),ensure_ascii=False)))
+                    remaining={k:self.limits[k]-self.s[k] for k in ['requests','llm_tokens','candidate_count','mathematical_calls']}
+                    remaining['llm_tokens']-=sum(self.s.get('token_reservations',{}).get(str(n),{}).get('total',0) for n in self.s.get('unreported_token_requests',[]))
+                    self.s['messages'].append(dict(role='user',content=json.dumps(clean(dict(feedback=feedback,remaining=remaining,token_budget_basis='Reported usage plus conservative reservations for unreported requests; token totals remain unknown.',resource_use={k:self.s[k] for k in ['candidate_count','physics_evaluations','integration_steps']},instruction='Continue independent research or finish. All required conditions must be evaluated on one final design.')),ensure_ascii=False)))
             except CommandError as exc:
                 self.trace('command_contract_error',dict(request_number=idx,error=str(exc),physics_started=False))
                 self.s['messages'].append(dict(role='user',content=json.dumps(dict(command_error=str(exc),schema=command_schema(self.method),instruction='No commands from this malformed step executed. Correct the command contract.'))))
@@ -581,7 +607,7 @@ class Run:
                 self.s['status']='environment_blocked';self.s['block_reason']=str(exc)
             self.save_state()
             print(json.dumps(dict(task=self.task,method=self.method,request=idx,status=self.s['status'],candidates=self.s['candidate_count'],evaluations=self.s['physics_evaluations'],tokens=self.s['llm_tokens'])),flush=True)
-        if self.s['status']=='running':self.s['status']='budget_complete'
+        if self.s['status']=='running':self.s['status']='budget_complete';self.s['stop_reason']='BUDGET_EXHAUSTED: requests'
         self.s['wall_time']=time.time()-self.s['started'];self.save_state();self.finalize()
 
     def recover_last(self):
@@ -704,7 +730,7 @@ class Run:
         latest={r['condition']:r for r in final['evaluations']}
         if final.get('required_case_results'):latest=final['required_case_results'];required=list(latest)
         stages=final.get('required_stage_outcomes',{})
-        final['scientific_result']=('INITIAL_CONDITION_FAILED' if stages else 'QUALIFICATION_FAILED' if any(r.get('validity')=='qualification_failed' for r in latest.values()) else
+        final['scientific_result']=('INITIAL_CONDITION_FAILED' if stages else 'QUALIFICATION_FAILED' if any(latest.get(c,{}).get('validity')=='qualification_failed' for c in required) else
             'PASS' if all(c in latest and latest[c].get('accepted') is True for c in required) else
             'VALID_FAILURE' if all(c in latest and latest[c].get('validity')=='valid' and latest[c].get('accepted') is not None for c in required) else
             'INTERFACE_ERROR' if self.s['status']=='environment_blocked' else 'INCOMPLETE')
@@ -712,6 +738,9 @@ class Run:
         final['source_classification']=(self.protocol or {}).get('source_status')
         final['resources']['llm_tokens_reported']=self.s['llm_tokens']
         if self.s.get('unreported_token_requests'):final['resources']['llm_tokens']=None
+        if self.s.get('physics_interruption'):
+            final['interrupted_physics_evidence']=self.s['physics_interruption']
+            final['resources'].update(integration_steps_reported_lower_bound=self.s['integration_steps'],integration_steps=None,unreported_physics_steps=True)
         final['stop_reason']=self.s.get('stop_reason')
         final['resources']['structure_generation_attempts']=self.s['candidate_count']
         final['resources']['candidate_count']=len(self.s['candidates'])
@@ -747,11 +776,15 @@ def supplement_t04():
             if command.get('operation')=='math' and args.get('candidate')=='c7' and args.get('operation')=='equilibrium' and args.get('tensions_n')==initial and result.get('reference'):
                 matches.append((args,result['reference']))
     r=Run('T04','B',output_root=destination,label='batch1-supplement')
-    for key in ('requests','llm_tokens','candidate_count','physics_evaluations','integration_steps','mathematical_calls','unreported_token_requests'):
-        r.s[key]=deepcopy(state.get(key,[] if key=='unreported_token_requests' else 0))
-    r.s['started']=time.time()-state['wall_time'];r.s['selected']='c7'
-    r.s['candidates']={'c7':r.put(source.artifact(state['candidates']['c7']),'inherited_B_candidate_c7')}
-    r.trace('supplement_provenance',dict(source_store=str(old/'STORE/platform.sqlite'),source_run_id=meta['run_id'],source_candidate=state['candidates']['c7'],provider_requests_allowed=0,original_resources=read(old/'result.json')['resources'],limits=r.limits))
+    trace_path=r.folder/'TRACE.jsonl'
+    inherited=trace_path.exists() and any(json.loads(l)['kind']=='supplement_provenance' for l in trace_path.read_text(encoding='utf8').splitlines())
+    if not inherited:
+        for key in ('requests','llm_tokens','candidate_count','physics_evaluations','integration_steps','mathematical_calls','unreported_token_requests'):
+            r.s[key]=deepcopy(state.get(key,[] if key=='unreported_token_requests' else 0))
+        r.s['started']=time.time()-state['wall_time'];r.s['selected']='c7'
+        r.s['candidates']={'c7':r.put(source.artifact(state['candidates']['c7']),'inherited_B_candidate_c7')}
+        r.trace('supplement_provenance',dict(source_store=str(old/'STORE/platform.sqlite'),source_run_id=meta['run_id'],source_candidate=state['candidates']['c7'],provider_requests_allowed=0,original_resources=read(old/'result.json')['resources'],limits=r.limits))
+    else:r.trace('supplement_resume',dict(reason='Continue existing supplement after an execution-environment error; retain all cumulative counters.'))
     if matches:
         args,reference=matches[-1];value=source.artifact(reference)
         value['source_binding']=dict(candidate='c7',tensions_n=initial,basis=args.get('basis',{'strategy':'structural_linear'}),historical_B_reference=reference)
