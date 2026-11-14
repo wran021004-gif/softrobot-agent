@@ -75,15 +75,18 @@ V_\tau(d)=
 where $\mathcal U(d)$ is the admissible control set. This definition asks what the robot can achieve after its control sequence has been optimized for the task, rather than evaluating only one prescribed input. If the global infimum is attained, $V_\tau(d)\leq 0$ indicates that a feasible input sequence exists in the specified model. In a nonconvex numerical problem, however, an optimizer generally returns a best-found value rather than a certified global optimum. A feasible sequence is evidence of model-based feasibility, whereas failure to find one is not, by itself, proof of infeasibility.
 
 \paragraph{Passive tasks.}
-A passive fixed-payout robot has no commanded control sequence during the evaluated response. Its configuration is determined by the design, tendon constraints, initial condition, and applied loading. For a conservative quasi-static model, an energy-based equilibrium problem can be written as
+A passive fixed-payout robot has no commanded control sequence during the evaluated response. Its configuration is determined by the design, tendon constraints, initial condition, and applied loading. For a conservative quasi-static model, an energy-based formulation defines the relevant equilibrium through the first-order constrained equilibrium conditions
 \begin{equation}
-q^\star_\tau(d,f)\in
-\arg\min_q \ \Pi(q;d,f)
-\quad\text{subject to}\quad
-c_j(q,d)\leq 0,
+\begin{aligned}
+\nabla_q\Pi(q^\star_\tau;d,f)
++\sum_j \lambda^\star_j\nabla_q c_j(q^\star_\tau,d)&=0,\\
+c_j(q^\star_\tau,d)\leq 0,\quad
+\lambda^\star_j&\geq 0,\quad
+\lambda^\star_j c_j(q^\star_\tau,d)=0,
+\end{aligned}
 \label{eq:passive-problem}
 \end{equation}
-where $q$ is the generalized configuration, $f$ denotes the applied load, $\Pi$ includes elastic, gravitational, and external-load potential energy, and $c_j$ represents unilateral tendon constraints. The relevant equilibrium response is then evaluated using passive-task constraints
+where $q$ is the generalized configuration, $f$ denotes the applied load, $\Pi$ includes elastic, gravitational, and external-load potential energy, $c_j$ represents unilateral tendon constraints, and $\lambda^\star_j$ is the corresponding constraint multiplier. The equilibrium solver must additionally apply the local-stability checks required by the physical model. These first-order conditions characterize a constrained equilibrium; they do not, by themselves, certify a global energy minimum. The relevant equilibrium response is then evaluated using passive-task constraints
 \begin{equation}
 g^{\mathrm{pass}}_{\tau,i}
 \bigl(d,q^\star_\tau(d,f)\bigr)\leq 0.
