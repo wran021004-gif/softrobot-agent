@@ -1,0 +1,2331 @@
+{
+  "task_id": "T07",
+  "method": "A",
+  "mode": "llm_only",
+  "run_id": "batch1-t07-llm_only-20261114",
+  "limits": {
+    "requests": 60,
+    "llm_tokens": 350000,
+    "candidate_count": 12,
+    "physics_evaluations": 24,
+    "integration_steps": 180000,
+    "mathematical_calls": 0,
+    "wall_s": 2400
+  },
+  "provider": {
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "medium",
+    "base_url": "http://127.0.0.1:8789/v1",
+    "credential": "~/.softrobot-agent/chatgpt-api-account3.json"
+  },
+  "core": "D:\\softrobot-agent\\.worktrees\\core-five-task-native-feedback-20261113",
+  "core_commit": "56cc418",
+  "design_space": {
+    "version": "serial_family_space_v2",
+    "family_id": "serial_external_tendons_base_only_v1",
+    "assumptions": [
+      "SI; serial bending only; external frictionless straight tendon spans",
+      "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+      "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+      "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+    ],
+    "segment_count_bounds": [
+      1,
+      9
+    ],
+    "tendon_count_bounds": [
+      1,
+      12
+    ],
+    "executable_segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "executable_tendon_count_bounds": [
+      1,
+      7
+    ],
+    "segment_domain": {
+      "length_m": {
+        "minimum": 0.06,
+        "maximum": 0.24,
+        "default": 0.14
+      },
+      "young_pa": {
+        "minimum": 2000000.0,
+        "maximum": 15000000.0,
+        "default": 7000000.0
+      },
+      "section_dimensions_m": {
+        "circle": {
+          "radius_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.008
+          }
+        },
+        "tube": {
+          "outer_radius_m": {
+            "minimum": 0.005,
+            "maximum": 0.012,
+            "default": 0.009
+          },
+          "inner_radius_m": {
+            "minimum": 0.001,
+            "maximum": 0.004,
+            "default": 0.003
+          }
+        },
+        "ellipse": {
+          "semi_y_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0095
+          },
+          "semi_z_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0076
+          }
+        },
+        "rectangle": {
+          "width_y_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0133
+          },
+          "height_z_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0095
+          }
+        }
+      }
+    },
+    "segment_domains": {
+      "0": {
+        "length_m": {
+          "minimum": 0.08,
+          "maximum": 0.24,
+          "default": 0.16
+        },
+        "young_pa": {
+          "minimum": 2000000.0,
+          "maximum": 15000000.0,
+          "default": 7200000.0
+        },
+        "section_dimensions_m": {
+          "circle": {
+            "radius_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.008
+            }
+          },
+          "tube": {
+            "outer_radius_m": {
+              "minimum": 0.005,
+              "maximum": 0.012,
+              "default": 0.009
+            },
+            "inner_radius_m": {
+              "minimum": 0.001,
+              "maximum": 0.004,
+              "default": 0.003
+            }
+          },
+          "ellipse": {
+            "semi_y_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.0095
+            },
+            "semi_z_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.0076
+            }
+          },
+          "rectangle": {
+            "width_y_m": {
+              "minimum": 0.006,
+              "maximum": 0.018,
+              "default": 0.0133
+            },
+            "height_z_m": {
+              "minimum": 0.006,
+              "maximum": 0.018,
+              "default": 0.0095
+            }
+          }
+        }
+      },
+      "1": {
+        "length_m": {
+          "minimum": 0.06,
+          "maximum": 0.2,
+          "default": 0.11
+        },
+        "young_pa": {
+          "minimum": 2000000.0,
+          "maximum": 15000000.0,
+          "default": 5400000.0
+        },
+        "section_dimensions_m": {
+          "circle": {
+            "radius_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.008
+            }
+          },
+          "tube": {
+            "outer_radius_m": {
+              "minimum": 0.005,
+              "maximum": 0.012,
+              "default": 0.009
+            },
+            "inner_radius_m": {
+              "minimum": 0.001,
+              "maximum": 0.004,
+              "default": 0.003
+            }
+          },
+          "ellipse": {
+            "semi_y_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.0095
+            },
+            "semi_z_m": {
+              "minimum": 0.003,
+              "maximum": 0.012,
+              "default": 0.0076
+            }
+          },
+          "rectangle": {
+            "width_y_m": {
+              "minimum": 0.006,
+              "maximum": 0.018,
+              "default": 0.0133
+            },
+            "height_z_m": {
+              "minimum": 0.006,
+              "maximum": 0.018,
+              "default": 0.0095
+            }
+          }
+        }
+      }
+    },
+    "tendon_domains": {
+      "diameter_m": {
+        "minimum": 0.0005,
+        "maximum": 0.0012,
+        "default": 0.001
+      },
+      "force_limit_n": {
+        "minimum": 1.0,
+        "maximum": 8.0,
+        "default": 8.0
+      },
+      "pretension_n": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.2
+      },
+      "length_servo_gain_n_m": {
+        "minimum": 300.0,
+        "maximum": 1500.0,
+        "default": 900.0
+      }
+    },
+    "routing_domains": {
+      "radius_m": {
+        "minimum": 0.014,
+        "maximum": 0.023,
+        "default": 0.018
+      },
+      "guide_s": {
+        "minimum": 0.15,
+        "maximum": 0.75,
+        "default": 0.5
+      },
+      "anchor_s": {
+        "minimum": 0.8,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "phase_rad": {
+        "minimum": -6.283185307179586,
+        "maximum": 6.283185307179586,
+        "default": 0.0
+      },
+      "angular_offset_rad": {
+        "minimum": -3.141592653589793,
+        "maximum": 3.141592653589793,
+        "default": 0.0
+      }
+    },
+    "control_domains": {
+      "holding_tip_speed_weight": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.1
+      },
+      "terminal_tip_speed_weight": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.1
+      }
+    },
+    "assembly": {
+      "components": [
+        {
+          "id": "segment_0",
+          "kind": "flexible_segment",
+          "connection": {
+            "part": "fixed_base",
+            "s": 0.0,
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "length_m": 0.16,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "kind": "ellipse",
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": 0.35
+              }
+            }
+          ],
+          "interpolation": "step",
+          "physics": {
+            "mode": "material",
+            "density_kg_m3": 1100.0,
+            "young_pa": 7200000.0,
+            "line_density_kg_m": null,
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ]
+          },
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "id": "mid_guide",
+          "kind": "guide",
+          "connection": {
+            "part": "segment_0",
+            "s": 1.0,
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "mass_kg": 0.002,
+          "com_local_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inertia_com_local_kg_m2": [
+            [
+              4e-07,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              2e-07,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              2e-07
+            ]
+          ],
+          "envelope_halfsize_m": [
+            0.002,
+            0.025,
+            0.025
+          ],
+          "guide_holes": {},
+          "hole_radius_m": 0.0015
+        },
+        {
+          "id": "connector",
+          "kind": "rigid_connector",
+          "connection": {
+            "part": "mid_guide",
+            "s": 0.0,
+            "position_m": [
+              0.002,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "mass_kg": 0.003,
+          "com_local_m": [
+            0.006,
+            0.0,
+            0.0
+          ],
+          "inertia_com_local_kg_m2": [
+            [
+              5e-08,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              7e-08,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              7e-08
+            ]
+          ],
+          "envelope_halfsize_m": [
+            0.006,
+            0.006,
+            0.006
+          ],
+          "guide_holes": {},
+          "hole_radius_m": 0.0
+        },
+        {
+          "id": "segment_1",
+          "kind": "flexible_segment",
+          "connection": {
+            "part": "connector",
+            "s": 0.0,
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "kind": "rectangle",
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": -0.25
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "kind": "rectangle",
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": 0.15000000000000002
+              }
+            }
+          ],
+          "interpolation": "linear",
+          "physics": {
+            "mode": "material",
+            "density_kg_m3": 1050.0,
+            "young_pa": 5400000.0,
+            "line_density_kg_m": null,
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ]
+          },
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "id": "payload",
+          "kind": "payload",
+          "connection": {
+            "part": "segment_1",
+            "s": 1.0,
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "mass_kg": 0.01,
+          "com_local_m": [
+            0.007,
+            0.001,
+            -0.002
+          ],
+          "inertia_com_local_kg_m2": [
+            [
+              6e-07,
+              1e-07,
+              0.0
+            ],
+            [
+              1e-07,
+              8e-07,
+              1e-07
+            ],
+            [
+              0.0,
+              1e-07,
+              9e-07
+            ]
+          ],
+          "envelope_halfsize_m": [
+            0.009,
+            0.009,
+            0.008
+          ],
+          "guide_holes": {},
+          "hole_radius_m": 0.0
+        }
+      ],
+      "tip": {
+        "part": "payload",
+        "s": 0.0,
+        "position_m": [
+          0.014,
+          0.0,
+          0.0
+        ],
+        "quaternion_wxyz": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "mesh": {
+        "version": "serial_bending_discretization_v1",
+        "model": "serial_bending_cells_v1",
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell"
+      },
+      "provenance": {
+        "source": "Stage 0 Base-only space; unchanged public SI serial-family prototypes",
+        "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+        "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics"
+      }
+    },
+    "actuator_defaults": {
+      "rule": "independent_displacement_ideal_tension_v1",
+      "limits_m": [
+        -0.015,
+        0.015
+      ],
+      "velocity_limit_m_s": 0.025
+    },
+    "conditional_rules": "base_only_consecutive_spans_v1",
+    "unsupported": [
+      "8-12 tendons: declared, not execution validated",
+      "polygon section domain not granted in this example",
+      "axial extension",
+      "shear",
+      "twist",
+      "friction",
+      "swept self-collision",
+      "High segment-count dynamics and controller compatibility require candidate-specific validation"
+    ],
+    "serial_assembly": {
+      "version": "repeat_serial_prototypes_v1",
+      "root_segment": "segment_0",
+      "repeated_segment": "segment_1",
+      "guide": "mid_guide",
+      "connector": "connector",
+      "payload": "payload",
+      "cell_count_bounds": [
+        1,
+        32
+      ],
+      "default_cells": 12
+    }
+  },
+  "protocol": {
+    "version": "core_task_protocol_v1",
+    "task_id": "T07",
+    "name": "C1 Four-tendon Multi-task",
+    "source_repository": "wran021004-gif/softrobot-demo-showcase",
+    "source_commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+    "source_status": "historical_development",
+    "cases": [
+      {
+        "condition_id": "M1_A",
+        "role": "required",
+        "task": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.295,
+                0.0,
+                0.215
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "BF7 v1 shared-structure sensor positioning: central_high",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.6
+            ]
+          },
+          "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+          "status": "development_valid",
+          "task_id": "bf7-shared-reach-v1-central_high",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          }
+        },
+        "acceptance": {
+          "version": "task_acceptance_v1",
+          "evaluator": "reach_hold",
+          "parameters": {
+            "tension_bounds_n": [
+              0,
+              8
+            ],
+            "initial_tension_n": 0.0,
+            "prohibit_contact": false,
+            "geometric_actuator_limits": {
+              "stroke_from_initial_bounds_m": [
+                -0.015,
+                0.015
+              ],
+              "max_tendon_speed_m_s": 0.025,
+              "observation": "Native geometric tendon length relative to the complete initial pose and actual tendon velocity at every physics state; ideal-tension actuator metadata, not a motor constitutive model."
+            },
+            "rigid_tool": {
+              "body": "payload",
+              "mass_kg": 0.01,
+              "com_local_m": [
+                0.007,
+                0.001,
+                -0.002
+              ],
+              "inertia_com_local_kg_m2": [
+                [
+                  6e-07,
+                  1e-07,
+                  0.0
+                ],
+                [
+                  1e-07,
+                  8e-07,
+                  1e-07
+                ],
+                [
+                  0.0,
+                  1e-07,
+                  9e-07
+                ]
+              ]
+            },
+            "holding_window_s": [
+              0.54,
+              0.6
+            ],
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "independent_channels": 4
+          },
+          "source_files": [
+            {
+              "path": "C1_four_tendons/task.txt",
+              "sha256": "776074148711e30d7ebad2a23850b79f750e257ecb66118c87430dd2b220f0c7"
+            },
+            {
+              "path": "C1_four_tendons/M1_A/configuration.json",
+              "sha256": "96e4c3f46d69ceed97417f167eb77d512c8b3c191101ee3d53f033a9e4ec2ebf"
+            }
+          ],
+          "required_signals": [
+            "time_s",
+            "tip_m",
+            "qpos",
+            "qvel",
+            "tension_n",
+            "contacts",
+            "solver_errors",
+            "tendon_length_m",
+            "tendon_speed_m_s",
+            "tip_velocity_m_s"
+          ],
+          "grid": "physics_including_initial",
+          "historical_status": null,
+          "task_id": "T07"
+        },
+        "environment_extension": null,
+        "independent_channels": 4,
+        "initial_state_source": "C1_four_tendons/M1_A/configuration.json#/task/initializer",
+        "structure_sources": [
+          {
+            "path": "C1_four_tendons/design.json",
+            "sha256": "be41cf1d6c2e2703b67d11b56c7af9fc950f65ca13f9057c89224dac1f330f3c"
+          }
+        ]
+      },
+      {
+        "condition_id": "M1_B",
+        "role": "required",
+        "task": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.275,
+                -0.04,
+                0.135
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "BF7 v1 shared-structure sensor positioning: negative_low",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.6
+            ]
+          },
+          "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+          "status": "development_valid",
+          "task_id": "bf7-shared-reach-v1-negative_low",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          }
+        },
+        "acceptance": {
+          "version": "task_acceptance_v1",
+          "evaluator": "reach_hold",
+          "parameters": {
+            "tension_bounds_n": [
+              0,
+              8
+            ],
+            "initial_tension_n": 0.0,
+            "prohibit_contact": false,
+            "geometric_actuator_limits": {
+              "stroke_from_initial_bounds_m": [
+                -0.015,
+                0.015
+              ],
+              "max_tendon_speed_m_s": 0.025,
+              "observation": "Native geometric tendon length relative to the complete initial pose and actual tendon velocity at every physics state; ideal-tension actuator metadata, not a motor constitutive model."
+            },
+            "rigid_tool": {
+              "body": "payload",
+              "mass_kg": 0.01,
+              "com_local_m": [
+                0.007,
+                0.001,
+                -0.002
+              ],
+              "inertia_com_local_kg_m2": [
+                [
+                  6e-07,
+                  1e-07,
+                  0.0
+                ],
+                [
+                  1e-07,
+                  8e-07,
+                  1e-07
+                ],
+                [
+                  0.0,
+                  1e-07,
+                  9e-07
+                ]
+              ]
+            },
+            "holding_window_s": [
+              0.54,
+              0.6
+            ],
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "independent_channels": 4
+          },
+          "source_files": [
+            {
+              "path": "C1_four_tendons/task.txt",
+              "sha256": "776074148711e30d7ebad2a23850b79f750e257ecb66118c87430dd2b220f0c7"
+            },
+            {
+              "path": "C1_four_tendons/M1_B/configuration.json",
+              "sha256": "8089e768877e0e39c085e9c4e9ac7de27dce863f57a3088c10e77ce453f6a098"
+            }
+          ],
+          "required_signals": [
+            "time_s",
+            "tip_m",
+            "qpos",
+            "qvel",
+            "tension_n",
+            "contacts",
+            "solver_errors",
+            "tendon_length_m",
+            "tendon_speed_m_s",
+            "tip_velocity_m_s"
+          ],
+          "grid": "physics_including_initial",
+          "historical_status": null,
+          "task_id": "T07"
+        },
+        "environment_extension": null,
+        "independent_channels": 4,
+        "initial_state_source": "C1_four_tendons/M1_B/configuration.json#/task/initializer",
+        "structure_sources": [
+          {
+            "path": "C1_four_tendons/design.json",
+            "sha256": "be41cf1d6c2e2703b67d11b56c7af9fc950f65ca13f9057c89224dac1f330f3c"
+          }
+        ]
+      },
+      {
+        "condition_id": "M1_C",
+        "role": "required",
+        "task": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.285,
+                0.035,
+                0.185
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "BF7 v1 shared-structure sensor positioning: positive_high",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.6
+            ]
+          },
+          "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+          "status": "development_valid",
+          "task_id": "bf7-shared-reach-v1-positive_high",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          }
+        },
+        "acceptance": {
+          "version": "task_acceptance_v1",
+          "evaluator": "reach_hold",
+          "parameters": {
+            "tension_bounds_n": [
+              0,
+              8
+            ],
+            "initial_tension_n": 0.0,
+            "prohibit_contact": false,
+            "geometric_actuator_limits": {
+              "stroke_from_initial_bounds_m": [
+                -0.015,
+                0.015
+              ],
+              "max_tendon_speed_m_s": 0.025,
+              "observation": "Native geometric tendon length relative to the complete initial pose and actual tendon velocity at every physics state; ideal-tension actuator metadata, not a motor constitutive model."
+            },
+            "rigid_tool": {
+              "body": "payload",
+              "mass_kg": 0.01,
+              "com_local_m": [
+                0.007,
+                0.001,
+                -0.002
+              ],
+              "inertia_com_local_kg_m2": [
+                [
+                  6e-07,
+                  1e-07,
+                  0.0
+                ],
+                [
+                  1e-07,
+                  8e-07,
+                  1e-07
+                ],
+                [
+                  0.0,
+                  1e-07,
+                  9e-07
+                ]
+              ]
+            },
+            "holding_window_s": [
+              0.54,
+              0.6
+            ],
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.03,
+            "independent_channels": 4
+          },
+          "source_files": [
+            {
+              "path": "C1_four_tendons/task.txt",
+              "sha256": "776074148711e30d7ebad2a23850b79f750e257ecb66118c87430dd2b220f0c7"
+            },
+            {
+              "path": "C1_four_tendons/M1_C/configuration.json",
+              "sha256": "c725c6ebd5748fce6cc0ffb7118de118d0a9b8977f50eb9d499906ea7b3a681f"
+            }
+          ],
+          "required_signals": [
+            "time_s",
+            "tip_m",
+            "qpos",
+            "qvel",
+            "tension_n",
+            "contacts",
+            "solver_errors",
+            "tendon_length_m",
+            "tendon_speed_m_s",
+            "tip_velocity_m_s"
+          ],
+          "grid": "physics_including_initial",
+          "historical_status": null,
+          "task_id": "T07"
+        },
+        "environment_extension": null,
+        "independent_channels": 4,
+        "initial_state_source": "C1_four_tendons/M1_C/configuration.json#/task/initializer",
+        "structure_sources": [
+          {
+            "path": "C1_four_tendons/design.json",
+            "sha256": "be41cf1d6c2e2703b67d11b56c7af9fc950f65ca13f9057c89224dac1f330f3c"
+          }
+        ]
+      },
+      {
+        "condition_id": "M5",
+        "role": "required",
+        "task": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.position_tool_axis",
+            "parameters": {
+              "contract": "reference.tool_axis_evaluation",
+              "data": {
+                "angle_tolerance_rad": 0.05235987755982988,
+                "position_tolerance_m": 0.008
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.position_tool_axis",
+          "goal": {
+            "contract": "reference.tool_axis_goal",
+            "data": {
+              "axis_frame": "tip_site_local",
+              "axis_local": [
+                1.0,
+                0.0,
+                0.0
+              ],
+              "frame": "world",
+              "target_axis_world": [
+                0.9656541190600237,
+                -0.17381774143080425,
+                -0.19313082381200475
+              ],
+              "target_m": [
+                0.29,
+                -0.025,
+                0.12
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "BF5 inspection probe positioning and directed tool-axis aiming",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "max_position_error",
+              "units": "m",
+              "weight": 1.0
+            },
+            {
+              "direction": "minimize",
+              "metric": "max_tool_axis_angle_error",
+              "units": "rad",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            },
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_tool_axis",
+              "phase": "post_step",
+              "units": "1"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.58,
+              0.6
+            ]
+          },
+          "source": "Task B minimal preparation, fixed after three-state MuJoCo kinematic domain audit and before any tool-axis control search. No full orientation, roll, hardware or robustness claim.",
+          "status": "development_valid",
+          "task_id": "bf5-position-tool-axis",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.02,
+            "duration_s": 0.6,
+            "sample_period_s": 0.02,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          }
+        },
+        "acceptance": {
+          "version": "task_acceptance_v1",
+          "evaluator": "tool_axis",
+          "parameters": {
+            "tension_bounds_n": [
+              0,
+              8
+            ],
+            "initial_tension_n": 0.0,
+            "prohibit_contact": false,
+            "geometric_actuator_limits": {
+              "stroke_from_initial_bounds_m": [
+                -0.015,
+                0.015
+              ],
+              "max_tendon_speed_m_s": 0.025,
+              "observation": "Native geometric tendon length relative to the complete initial pose and actual tendon velocity at every physics state; ideal-tension actuator metadata, not a motor constitutive model."
+            },
+            "rigid_tool": {
+              "body": "payload",
+              "mass_kg": 0.01,
+              "com_local_m": [
+                0.007,
+                0.001,
+                -0.002
+              ],
+              "inertia_com_local_kg_m2": [
+                [
+                  6e-07,
+                  1e-07,
+                  0.0
+                ],
+                [
+                  1e-07,
+                  8e-07,
+                  1e-07
+                ],
+                [
+                  0.0,
+                  1e-07,
+                  9e-07
+                ]
+              ]
+            },
+            "independent_channels": 4
+          },
+          "source_files": [
+            {
+              "path": "C1_four_tendons/task.txt",
+              "sha256": "776074148711e30d7ebad2a23850b79f750e257ecb66118c87430dd2b220f0c7"
+            },
+            {
+              "path": "C1_four_tendons/M5/configuration.json",
+              "sha256": "3b674e5cd9b3be8bf863784cd3e403d6126b2736fb125bc9fceef37fd2b0f480"
+            }
+          ],
+          "required_signals": [
+            "time_s",
+            "tip_m",
+            "qpos",
+            "qvel",
+            "tension_n",
+            "contacts",
+            "solver_errors",
+            "tendon_length_m",
+            "tendon_speed_m_s",
+            "tool_axis_world"
+          ],
+          "grid": "physics_including_initial",
+          "historical_status": null,
+          "task_id": "T07"
+        },
+        "environment_extension": null,
+        "independent_channels": 4,
+        "initial_state_source": "C1_four_tendons/M5/configuration.json#/task/initializer",
+        "structure_sources": [
+          {
+            "path": "C1_four_tendons/design.json",
+            "sha256": "be41cf1d6c2e2703b67d11b56c7af9fc950f65ca13f9057c89224dac1f330f3c"
+          }
+        ]
+      }
+    ],
+    "reference": null,
+    "algorithm_bindings": [
+      "candidate.family@6.0.0",
+      "model.serial_bending_cells@1.0.0",
+      "controller.gvs_nmpc@12.0.0",
+      "backend.family_mujoco@1.5.0"
+    ],
+    "restrictions": [
+      "No Provider, optimization, candidate search, research Study or physics integration during interface validation.",
+      "Historical evidence is regression data, never a default candidate or a new Study result.",
+      "Preserve all source windows, units and physical meanings."
+    ]
+  },
+  "original_task": {
+    "acceptance": {
+      "evaluator": "reach_hold",
+      "grid": "physics_including_initial",
+      "historical_status": null,
+      "parameters": {
+        "geometric_actuator_limits": {
+          "max_tendon_speed_m_s": 0.025,
+          "observation": "Native geometric tendon length relative to the complete initial pose and actual tendon velocity at every physics state; ideal-tension actuator metadata, not a motor constitutive model.",
+          "stroke_from_initial_bounds_m": [
+            -0.015,
+            0.015
+          ]
+        },
+        "holding_window_s": [
+          0.54,
+          0.6
+        ],
+        "independent_channels": 4,
+        "initial_tension_n": 0.0,
+        "position_limit_m": 0.01,
+        "prohibit_contact": false,
+        "rigid_tool": {
+          "body": "payload",
+          "com_local_m": [
+            0.007,
+            0.001,
+            -0.002
+          ],
+          "inertia_com_local_kg_m2": [
+            [
+              6e-07,
+              1e-07,
+              0.0
+            ],
+            [
+              1e-07,
+              8e-07,
+              1e-07
+            ],
+            [
+              0.0,
+              1e-07,
+              9e-07
+            ]
+          ],
+          "mass_kg": 0.01
+        },
+        "speed_limit_m_s": 0.03,
+        "tension_bounds_n": [
+          0,
+          8
+        ]
+      },
+      "required_signals": [
+        "time_s",
+        "tip_m",
+        "qpos",
+        "qvel",
+        "tension_n",
+        "contacts",
+        "solver_errors",
+        "tendon_length_m",
+        "tendon_speed_m_s",
+        "tip_velocity_m_s"
+      ],
+      "source_files": [
+        {
+          "path": "C1_four_tendons/task.txt",
+          "sha256": "776074148711e30d7ebad2a23850b79f750e257ecb66118c87430dd2b220f0c7"
+        },
+        {
+          "path": "C1_four_tendons/M1_A/configuration.json",
+          "sha256": "96e4c3f46d69ceed97417f167eb77d512c8b3c191101ee3d53f033a9e4ec2ebf"
+        }
+      ],
+      "task_id": "T07",
+      "version": "task_acceptance_v1"
+    },
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.295,
+          0.0,
+          0.215
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "BF7 v1 shared-structure sensor positioning: central_high",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.6
+      ]
+    },
+    "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+    "status": "development_valid",
+    "task_id": "bf7-shared-reach-v1-central_high",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.02,
+      "duration_s": 0.6,
+      "sample_period_s": 0.02,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.001
+    }
+  },
+  "initialization": "Fresh family-space choice; zero named joints for active cases, physically qualified equilibrium for task-required prepared/passive initial conditions."
+}

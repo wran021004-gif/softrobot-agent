@@ -1,0 +1,173 @@
+{
+  "task_order": [
+    "T01",
+    "T04",
+    "T07",
+    "PHS-2D"
+  ],
+  "request_limit_scope": "At most 60 per independent A/B run, as clarified by user; no batch-wide 60 limit.",
+  "run_artifacts": {
+    "T01": {
+      "A": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\A\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\A\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\A\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\A\\config.json"
+      },
+      "B": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\B\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\B\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\B\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T01\\B\\config.json"
+      }
+    },
+    "T04": {
+      "A": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\A\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\A\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\A\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\A\\config.json"
+      },
+      "B": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\B\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\B\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\B\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04\\B\\config.json"
+      }
+    },
+    "T07": {
+      "A": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\A\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\A\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\A\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\A\\config.json"
+      },
+      "B": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\B\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\B\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\B\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T07\\B\\config.json"
+      }
+    },
+    "PHS-2D": {
+      "A": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\A\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\A\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\A\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\A\\config.json"
+      },
+      "B": {
+        "store": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\B\\STORE\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\B\\TRACE.jsonl",
+        "result": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\B\\result.json",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\PHS-2D\\B\\config.json"
+      }
+    }
+  },
+  "modes": {
+    "llm_only": {
+      "operations": [
+        "generate",
+        "evaluate",
+        "finish"
+      ],
+      "optional_mathematical_calls": 0,
+      "control": "LLM-authored absolute tendon inputs; native physics and original task evaluation available"
+    },
+    "direct_math_tools": {
+      "operations": [
+        "generate",
+        "evaluate",
+        "math",
+        "finish"
+      ],
+      "math": "Explicit lower-level native/GVS equilibrium, Jacobian, mechanics, finite differences; passive KKT. No intent projection, ParameterizedResearchProblem, differentiation router, M0-M3 orchestration or automatic design optimization."
+    }
+  },
+  "core_source": "D:\\softrobot-agent\\.worktrees\\core-five-task-native-feedback-20261113",
+  "core_commit": "56cc418",
+  "model": "gpt-5.6-sol through existing account3 text Gateway",
+  "context_policy": "Fresh independent context per run; full task/domain plus own most recent conversation and own working set. FULL final designs and decision traces not supplied.",
+  "historical_full": {
+    "results": "D:\\softrobot-agent\\paper_experiments\\paper_results_master_20261113\\ALL_TASK_RESULTS.csv",
+    "costs": "D:\\softrobot-agent\\paper_experiments\\paper_results_master_20261113\\RESOURCE_COSTS.csv",
+    "raw_index": "D:\\softrobot-agent\\paper_experiments\\paper_results_master_20261113\\RAW_RESULT_INDEX.csv",
+    "native_sources": {
+      "T01": {
+        "final_stores": [
+          "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STORE_CORRECTED_PROTOCOL\\platform.sqlite"
+        ],
+        "research_store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STORE_RESEARCH\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\STUDY_TRACE.jsonl",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\RESOLVED_STUDY_CONFIG.json",
+        "version": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T01_M1_reach_hold\\CORE_LOCK.json"
+      },
+      "T04": {
+        "final_stores": [
+          "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite"
+        ],
+        "research_store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\RESOLVED_STUDY_CONFIG.json",
+        "version": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\CORE_LOCK.json"
+      },
+      "T07": {
+        "final_stores": [
+          "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH\\platform.sqlite"
+        ],
+        "research_store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STORE_RESEARCH\\platform.sqlite",
+        "trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\STUDY_TRACE.jsonl",
+        "configuration": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\RESOLVED_STUDY_CONFIG.json",
+        "version": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T07_C1_four_tendon\\CORE_LOCK.json"
+      },
+      "PHS-2D": {
+        "final_stores": [
+          "D:\\softrobot-agent\\runs\\psd2d-core-only-20261112\\fresh-store\\platform.sqlite"
+        ],
+        "trace": "D:\\softrobot-agent\\runs\\psd2d-core-only-20261112\\TOOL_TRACE.jsonl",
+        "configuration": "D:\\softrobot-agent\\runs\\psd2d-core-only-20261112\\fresh-store\\resolved_configuration.json",
+        "physical_trace_manifest": "D:\\softrobot-agent\\runs\\phs2d-paper-data-20261112\\SOURCE_EXTRACTS\\EXECUTION_MANIFEST.json"
+      }
+    },
+    "policy": "Read-only existing results, versions and native source links retained; no C execution."
+  },
+  "verification": {
+    "formal_runs": 8,
+    "request_cap_60_per_run": true,
+    "A_optional_math_zero": true,
+    "paired_task_domain_and_nonmath_budget_equal": true
+  },
+  "data_quality": [
+    "T04 interrupted responses have unknown token totals; reported lower bounds are retained.",
+    "T07-B reported token usage exceeded its 350000-token ceiling by 7564 before the pre-send reservation was fixed. This batch is not fully matched in observed token-budget compliance."
+  ],
+  "interface_repairs": [
+    "Text-only Gateway command transport; original rejected request retained.",
+    "Canonical FamilySpace identity uses existing typed parser; redundant duplicate guide stations normalized.",
+    "Explicit generation command spelling and source section-station metadata.",
+    "Task-specific inactive tracking controller descriptor and original timed horizon retained during physical initial preparation.",
+    "Native coordinate dimensions reported explicitly; no automatic coordinate projection.",
+    "Trace reference name collision fixed; original physical artifacts retained.",
+    "Only omitted closing JSON delimiters repaired, preserving all research fields.",
+    "Growing samples are checkpointed every 100 controls; complete native evidence and all integration/observation steps retained."
+  ],
+  "accounting": {
+    "ledger": "Cumulative counts are in native Store session state; raw provider/kernel evidence is in immutable artifacts and TRACE. The thin direct-kernel adapter does not use Core Host.calls for its execution accounting.",
+    "candidate_count": "Successful generated candidates; attempts recorded separately.",
+    "physics_evaluations": "Launch attempts including preparation and interface failures; original native counters retained.",
+    "integration_steps": "Confirmed steps in task physics and direct mathematical rollouts; no inferred failed internal progress.",
+    "llm_tokens": "Provider-reported total, blank when an interrupted response is unreported; known lower bound in llm_tokens_reported.",
+    "wall_time": "Measured elapsed formal run including interface repair and orchestration pauses; no CPU estimates.",
+    "max_violation": "Maximum positive normalized constraint violation when available on complete required results; blank for unexecuted/incomplete task. C PASS yields zero."
+  },
+  "physical_robot_validation": {
+    "section": "Real-world Demonstrations / Physical Robot Validation",
+    "status": "Reserved in index; existing hardware results unchanged; no real robot execution."
+  },
+  "output": "batch1_results.csv plus each native Store/TRACE and config/result metadata.",
+  "distribution": {
+    "manifest": "raw_archives.json",
+    "restore_command": "python paper_experiments/ab_batch1_20261114/package_raw.py restore",
+    "policy": "Native Stores and large physical records are losslessly gzip archived for Git transport. Original files remain unchanged locally; machine-local runtime authority anchor is excluded."
+  }
+}
