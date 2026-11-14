@@ -1,28 +1,47 @@
-# Softrobot-Agent 论文 v0.4 — GitHub 版（含真实导出图）
+# Softrobot-Agent 论文 v1.0 — GitHub 工作分支
 
-本分支 `paper/overleaf-v0.4` 基于用户实际使用的 Overleaf v0.1 工程，保留 IEEEtran 模板、main.tex 和原有九章节文件名，正文已按 C1/C2/C3 科学叙事重新组织。
+当前重组稿位于：
 
-## 原始图片已包含
+- Branch: \`paper/research-restructure-v1.0\`
+- Base: \`paper/overleaf-v0.4\`
+- Main document: \`main.tex\`
+- Compiler: \`pdfLaTeX\`
 
-`figures/` 下包含从 `wran021004-gif/softrobot-demo-showcase` 的 `codex/paper-figures-spring-button-20261111` 分支直接复制的 8 张**原始导出 PDF**，每张通过 Git blob SHA-1 与原始仓库逐一校验，未重新绘制、生成或修改。
+本分支将论文叙事重组为：Problem Formulation → Physics-Guided Agentic Research Method → System Implementation → Multi-task Results → Real-World Robot Validation。M0--M3 被定义为不同的敏感性研究语义，而不是四个独立优化器。
 
-正文引用的五张图（M1、Figure-eight、P3 两张、PHS-2D）已经在 `figures/` 内，不需要另行运行图片下载脚本。完整来源见 `figures/original_assets_manifest.json`。PowerShell 脚本仅用于日后重新下载和验证原图。
+## 当前稿件结构
 
-## 在中科大 Overleaf 中使用
+1. Introduction
+2. Related Work
+3. Problem Formulation
+4. Method: Physics-Guided Agentic Research
+5. System Implementation
+6. Experimental Setup
+7. Results and Analysis
+8. Real-World Robot Validation
+9. Discussion
+10. Conclusion
 
-**推荐（无需本地 Git）：** 打开 GitHub 仓库切换至 `paper/overleaf-v0.4` 分支，点击 **Code → Download ZIP**，然后在 `https://latex.ustc.edu.cn` 选择 **New Project → Upload Project** 上传从 GitHub 下载的 ZIP，并将 `main.tex` 设置为主文件，编译器选 `pdfLaTeX`。
+附录包括第一批 A/B/C 对照协议、11 项任务组合，以及 PHS-2D 数学证据的来源与适用范围。
 
-如果 USTC Overleaf 提供 **Import from GitHub**，可以尝试，但请确认它导入的是正确的分支；这一自建实例是否提供官方云端 GitHub 同步功能尚未验证，不能假定能够直接选择非默认分支。
+## 图表与数据状态
 
-已有的 Overleaf 项目不会因为 GitHub 分支更新而自动同步。原项目建议先保存备份后再替换源码。
+- Figure 1 的研究架构图使用 TikZ 源码。
+- PHS-2D 结构图、18 组梯度配对图、A/B/C 对照图和真机演示图保留了明确的插图位置。
+- A/B 第一批为 PHS-2D、T01、T04、T07，共 8 次新运行；当前稿件不包含尚未产生的 A/B 结果。
+- PHS-2D 主案例采用九段四腱 Round-3 证据包。旧七段图像资产不用于当前正文，避免结构和性能数据混用。
+- 真机结果单独放在 Section 8，待从已归档的硬件实验记录导入。
 
-## 主要内容
+## 同步到 USTC Overleaf
 
-- C1 Mechanism-Guided Autonomous Research。
-- C2 Composable Mathematical Research（科研意图投影、参数/观测组合、数学操作、有效性检查）。
-- C3 Evidence-Grounded Iterative Research。
-- P3 No-Math、No-Intent-Projection、No-Pairwise-Interaction、No-Knowledge、Fixed-Plan。
-- M1 物理探针消融、Reporter 快照、Tracking 数学迁移与三模型对照。
-- 200 Provider 请求、100 数学评价、150 物理启动的实验硬预算协议。
+本地 Git 仓库已经配置了 GitHub \`origin\` 和 USTC Overleaf \`overleaf\` 两个 remote。确认本地没有未提交修改后，可执行：
 
-详情见 `OVERLEAF_GITHUB_IMPORT_CN.md`、`EXPERIMENT_MATRIX.md` 和附录。
+\`\`\`powershell
+git fetch origin
+git switch -c paper/research-restructure-v1.0 --track origin/paper/research-restructure-v1.0
+git push overleaf HEAD:main
+\`\`\`
+
+如果本地分支已经存在，使用 \`git switch paper/research-restructure-v1.0\`。推送前若 Overleaf 网页端有新修改，应先 fetch 并检查差异；不要使用 force push。
+
+原始 v0.4 分支和 Overleaf 原有项目未被本次修改覆盖。

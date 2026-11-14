@@ -1,22 +1,37 @@
-# 从 GitHub 导入论文到中科大 Overleaf
+# 将论文重组稿同步到中科大 Overleaf
 
-## 最稳妥的方法：GitHub ZIP → Overleaf 上传
+## 当前 GitHub 版本
 
-1. 打开 [GitHub 论文分支](https://github.com/wran021004-gif/softrobot-agent/tree/paper/overleaf-v0.4)。
-2. 确认左上角分支选择为 `paper/overleaf-v0.4`，而不是 `main`。
-3. 点击 **Code → Download ZIP**。下载直接来自 GitHub，不依赖 ChatGPT 附件。
-4. 登录 [中科大 Overleaf](https://latex.ustc.edu.cn/)。
-5. 选择 **New Project → Upload Project**，上传从 GitHub 下载的 ZIP。
-6. 打开 `main.tex`，设置 Main document = `main.tex`，Compiler = `pdfLaTeX`，然后 Recompile。
+- Repository: \`wran021004-gif/softrobot-agent\`
+- Manuscript branch: \`paper/research-restructure-v1.0\`
+- Main file: \`main.tex\`
+- Compiler: \`pdfLaTeX\`
 
-本分支已经含有 8 张 SHA-1 校验过的原始导出 PDF，位于 `figures/`，不需要手动生成或替换图片。
+本分支从 \`paper/overleaf-v0.4\` 创建，原始 v0.4 分支保持不变。本次只推送到 GitHub 的新分支，没有直接修改 Overleaf 的 \`main\`。
 
-## 如果菜单包含 Import from GitHub
+## 使用已配置的 Overleaf Git remote
 
-可以尝试连接 GitHub 并导入项目，但中科大 Overleaf 是独立部署的实例，是否提供官方云端 GitHub Sync 尚不确定。官方 GitHub Synchronization 主要面向 Overleaf Cloud；不要假定这里能直接选取已有仓库的非默认分支。
+本地仓库此前已配置 \`overleaf\` remote，且 Overleaf 的 \`main\` 与 v0.4 基线一致。若本地没有未提交修改，可在论文仓库目录执行：
 
-若导入后看到的不是论文 `main.tex`，请改用上面的 GitHub ZIP 上传方法。
+\`\`\`powershell
+git fetch origin
+git switch -c paper/research-restructure-v1.0 --track origin/paper/research-restructure-v1.0
+git push overleaf HEAD:main
+\`\`\`
 
-## 已有 Overleaf 项目
+若本地分支已经存在，改用：
 
-GitHub 导入通常创建新项目，不能自动覆盖或接管已有的 Overleaf 项目。建议先备份当前项目，再从本分支上传文件或创建一个新的论文项目。后续 GitHub 分支更新也不会自动改变你当前的 Overleaf 项目。
+\`\`\`powershell
+git switch paper/research-restructure-v1.0
+git push overleaf HEAD:main
+\`\`\`
+
+这是普通 fast-forward 推送，不需要 force push。若 Overleaf 端已经产生新的提交，推送会被拒绝；此时先 fetch 并检查差异，不要强制覆盖。
+
+## 使用 ZIP 上传
+
+如果不使用 Git remote，也可以打开 GitHub 的 \`paper/research-restructure-v1.0\` 分支，选择 **Code → Download ZIP**，再在 USTC Overleaf 中上传项目。设置 \`main.tex\` 为主文件，Compiler 选择 \`pdfLaTeX\`。
+
+## 当前稿件中的图表状态
+
+Figure 1 架构图为 TikZ 源码。PHS-2D 结构图、梯度一致性图、A/B/C 对比图和真机演示图目前是有明确说明的占位框，待导入对应原始数据和图像。旧 v0.4 PDF 图像仍保留在仓库，但没有在新稿中引用，避免使用与当前九段 PHS-2D 主案例不一致的旧图。

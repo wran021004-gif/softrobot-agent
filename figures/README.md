@@ -1,11 +1,7 @@
-# Verified original exported PDF figures
+# Figure assets and provenance
 
-All eight files `*.pdf` in this directory were copied **byte-for-byte** from:
+The eight PDF files already present in this directory are original exported assets from the earlier v0.4 manuscript workflow. They are retained unchanged for provenance and possible later reuse.
 
-- Repository: https://github.com/wran021004-gif/softrobot-demo-showcase
-- Branch: `codex/paper-figures-spring-button-20261111`
-- Subdirectory: `paper_figures/main/`
+**They are not referenced by the v1.0 manuscript at present.** The earlier exports include figures tied to older task/design snapshots; do not insert them into the new manuscript until the task identity, robot structure, and reported metrics have been checked against the current evidence package.
 
-The exact source paths and Git blob SHA-1 values are recorded in `original_assets_manifest.json`. Each destination Git blob SHA-1 matched its expected source blob SHA-1 upon upload.
-
-This branch does **not** include any synthetic, recreated, or redrawn experimental figures. To refresh and verify the images on Windows, you may optionally run `download_original_figures.ps1`.
+The current manuscript uses \`fig01_research_framework.tex\` for the conceptual architecture figure. New result figures will be generated from the current task-level data and the nine-segment PHS-2D evidence. No synthetic experimental values or recreated plots are substituted for source data.
