@@ -100,13 +100,13 @@ T01, T02, and T07 provide complementary active-robot examples. T01 records a seq
 
 T02 evaluates loaded holding under three force conditions. Its research trace records a change in the mathematical/control treatment when static or quasi-static reasoning was not sufficient to represent the full loaded task. The final native finite-horizon dynamic treatment was evaluated under all three required loads.
 
-T07 is the clearest shared-structure example. One four-tendon morphology was retained across four different task conditions. The final morphology integrates structural-length selection with tendon-routing refinement. A control sequence from an already solved condition was used as an initialization for a different condition and then re-optimized and independently evaluated. The final common structure passed all four required conditions.
+T07 is the clearest shared-structure example. One four-tendon morphology was retained across four different task conditions. The final morphology integrates structural-length selection with tendon-routing refinement. A control sequence from an already solved condition was used as an initialization for a different condition and then re-optimized and independently evaluated. The final common structure supports all four task conditions.
 
 These cases illustrate why fixed-input response and re-optimized task capability must be distinguished. A structure change can alter the response under an existing control sequence, while the final task result depends on the control sequence that is available after the change.
 
 \subsection{Adaptive research and control-method selection}
 
-T04 and T10 provide clear examples of research-route changes. In T04, the final 22-s figure-eight tracking result uses a continuously constructed equilibrium-point sequence and periodic tension feedforward. The final route uses a continuously constructed equilibrium-point sequence and periodic tension feedforward. In T10, the final impact-recovery controller uses a static reference, a full tangent model, discrete LQR, and bounded tension allocation. The resulting controller provides a common state-feedback recipe across the three required impact conditions.
+T04 and T10 provide clear examples of research-route adaptation. T04 achieves 22-s figure-eight tracking using a continuously constructed equilibrium-point sequence and periodic tension feedforward. In T10, the final impact-recovery controller uses a static reference, a full tangent model, discrete LQR, and bounded tension allocation. The resulting controller provides a common state-feedback recipe across the three required impact conditions.
 
 T02, T05, and T06 further show that different task contracts require different mathematical outputs and control treatments. A loaded task, a directed tool-axis task, and a time-indexed loaded scan cannot be represented faithfully by a single endpoint-position metric. The system therefore retains task-specific constraints and physical evaluation while reusing the same research-problem interface.
 
